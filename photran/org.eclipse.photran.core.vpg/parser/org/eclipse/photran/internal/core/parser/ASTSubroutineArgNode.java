@@ -28,10 +28,10 @@ public class ASTSubroutineArgNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTSubroutineArgNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTSubroutineArgNode
+    org.eclipse.photran.internal.core.lexer.Token hollerith; // in ASTSubroutineArgNode
     IExpr expr; // in ASTSubroutineArgNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTSubroutineArgNode
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTSubroutineArgNode
-    org.eclipse.photran.internal.core.lexer.Token hollerith; // in ASTSubroutineArgNode
 
     public org.eclipse.photran.internal.core.lexer.Token getName()
     {
@@ -41,6 +41,17 @@ public class ASTSubroutineArgNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getHollerith()
+    {
+        return this.hollerith;
+    }
+
+    public void setHollerith(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hollerith = newValue;
     }
 
 
@@ -66,17 +77,6 @@ public class ASTSubroutineArgNode extends ASTNode
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getHollerith()
-    {
-        return this.hollerith;
-    }
-
-    public void setHollerith(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hollerith = newValue;
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubroutineArgNode(this);
@@ -94,10 +94,10 @@ public class ASTSubroutineArgNode extends ASTNode
         {
         case 0:  return this.name;
         case 1:  return this.hiddenTEquals;
-        case 2:  return this.expr;
-        case 3:  return this.hiddenTAsterisk;
-        case 4:  return this.label;
-        case 5:  return this.hollerith;
+        case 2:  return this.hollerith;
+        case 3:  return this.expr;
+        case 4:  return this.hiddenTAsterisk;
+        case 5:  return this.label;
         default: return null;
         }
     }
@@ -108,10 +108,10 @@ public class ASTSubroutineArgNode extends ASTNode
         {
         case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.expr = (IExpr)value; return;
-        case 3:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.expr = (IExpr)value; return;
+        case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

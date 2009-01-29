@@ -2,16 +2,22 @@
   + Section 2
   + Section 4
   + Section 5
-  - Section 6
-  - Section 8
-  - Section 9
-  - Section 11
-  - Section 12
+  + Section 6
+  + Section 8
+  + Section 9
+  + Section 11
+  + Section 12 (Completed 1/28/09)
+  - Missing productions?
+  - Semantics
+  - Outline view
 + Fortran Decl View not populating when it should (12/9/08)
 + Refactorings should not work if VPG is turned off -- give appropriate error
   instead of "please select an ..." error when VPG is disabled (12/9/08)
 + Renaming outu in "write (outu, ..." doesn't work in bstfit.f90 (12/9/08)
 + Link interfaces to function definitions (12/31/08) and vice versa (1/4-5/08)
+  - Include module subprograms, not just external subprograms
+  - Module Procedure statements
+  - Named interfaces
 - Refactorings should not be available for fixed form files
 - Rename bug: local variable may not shadow program name
 - Preproc substring bug
@@ -49,11 +55,11 @@ NEW IN THIS BETA:
 
 
 GRANT/SUPPORT REQUIREMENTS
-- 2003 syntax (10/08 or 11/08)
++ 2003 syntax (10/08 or 11/08)
 + Fix AST for expressions (for Stoyan 9/8/08)
 - Include intent, etc. in definition
-- Make a Type object for arrays which includes dimensions (for Stoyan)
 - Parse kinds and character lengths and include in Type
+X Make a Type object for arrays which includes dimensions (for Stoyan)
 
 
 
@@ -61,7 +67,7 @@ ECLIPSE FOUNDATION REQUIREMENTS
 - Photran CQ 2737
   + Nicolas Chen
   + Cheah Chin Fei
-  - Dirk Rosson
+  + Dirk Rosson
   + Kdeeker
   + Slicter
   + John Goode
@@ -70,11 +76,3 @@ ECLIPSE FOUNDATION REQUIREMENTS
   + Walt Brained (WB)
   + Stoyan Gaydarov
 - Eli Grammar CQ 2880
-
-
-
-Stas is going to...
-1. Move save vars to common block
-2. Common to composite type
-3. Move composite type from common to local pointer
-4. Pass that pointer around

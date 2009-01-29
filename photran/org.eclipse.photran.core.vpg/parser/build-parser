@@ -8,6 +8,7 @@ echo Deleting old files...
 rm -f *.java
 
 echo Generating parser and AST classes...
+#	-prec "<LblDef>, <Label>, T_ICON > <SelectTypeBody>" \
 java -Xmx256M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-workspace/bz.over.templates/lib/js.jar \
 	Main_LALR1_Java_AST_Prototype \
 	-shift T_COMMA "<IoControlSpecList>" \
@@ -15,8 +16,9 @@ java -Xmx256M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-wo
 	-package "org.eclipse.photran.internal.core.parser" \
 	-prec "<DeferredShapeSpecList> > <AssumedShapeSpec>" \
 	-prec "<BodyPlusInternals> < <Label>, T_ICON" \
-	-prec " <TypeBoundProcedurePart> < T_ICON" \
+	-prec "<TypeBoundProcedurePart> < T_ICON" \
 	-shift T_IDENT "<CommonBlock>" \
+	-reduce "<SectionSubscript>" "<SubroutineArg>" \
 	-imports "import org.eclipse.photran.internal.core.lexer.*; \
                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;" \
 	-onError "throw new Exception(\"Syntax error: Unexpected \" + lookahead.getTerminal().toString() + \" (\" + (lookahead.getFile()==null ? \"\" : lookahead.getFile().getName() + \", \") + \"line \" + lookahead.getLine() + \", column \" + lookahead.getCol() + \")\");" \

@@ -117,7 +117,7 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTStructureConstructorNode(ASTStructureConstructorNode node)
     {
         super.traverseChildren(node);
-        bind(node.getTypeName().getTypeName());
+        bind(node.getTypeName());
     }
 
     // # R434
@@ -286,6 +286,8 @@ class ReferenceCollector extends BindingCollector
             // <Variable> is the only context where a <DataRef> does not refer to a member of a derived type 
         	if (!node.hasDerivedTypeComponentName() && node.getParent().getParent() instanceof ASTVariableNode)
         		bind(node.getName());
+        	else if (!node.hasDerivedTypeComponentName() && node.getParent().getParent() instanceof ASTCallStmtNode)
+                bind(node.getName());
         	else
         		dontbind(node.getName());
         }
@@ -716,7 +718,9 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        bind(node.getSubroutineName());
+        // F03 This is handled in visitASTDataRefNode
+        //if (node.getSubroutineName() != null)
+        //    bind(node.getSubroutineName());
 
         IASTListNode<ASTSubroutineArgNode> list = node.getSubroutineArgList();
         if (list != null)

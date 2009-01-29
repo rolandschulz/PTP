@@ -30,11 +30,13 @@ public class ASTProcComponentDefStmtNode extends ASTNode implements IComponentDe
     org.eclipse.photran.internal.core.lexer.Token hiddenTProcedure; // in ASTProcComponentDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTProcComponentDefStmtNode
     ASTProcInterfaceNode procInterface; // in ASTProcComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTProcComponentDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTProcComponentDefStmtNode
     IASTListNode<ASTProcComponentAttrSpecNode> procComponentAttrSpecList; // in ASTProcComponentDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTProcComponentDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTProcComponentDefStmtNode
     IASTListNode<ASTProcDeclNode> procDeclList; // in ASTProcComponentDefStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTProcComponentDefStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
@@ -89,7 +91,7 @@ public class ASTProcComponentDefStmtNode extends ASTNode implements IComponentDe
 
     @Override protected int getNumASTFields()
     {
-        return 9;
+        return 11;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -100,11 +102,13 @@ public class ASTProcComponentDefStmtNode extends ASTNode implements IComponentDe
         case 1:  return this.hiddenTProcedure;
         case 2:  return this.hiddenTLparen;
         case 3:  return this.procInterface;
-        case 4:  return this.hiddenTComma;
-        case 5:  return this.procComponentAttrSpecList;
-        case 6:  return this.hiddenTColon;
-        case 7:  return this.hiddenTColon2;
-        case 8:  return this.procDeclList;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.hiddenTComma;
+        case 6:  return this.procComponentAttrSpecList;
+        case 7:  return this.hiddenTColon;
+        case 8:  return this.hiddenTColon2;
+        case 9:  return this.procDeclList;
+        case 10: return this.hiddenTEos;
         default: return null;
         }
     }
@@ -117,11 +121,13 @@ public class ASTProcComponentDefStmtNode extends ASTNode implements IComponentDe
         case 1:  this.hiddenTProcedure = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.procInterface = (ASTProcInterfaceNode)value; return;
-        case 4:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.procComponentAttrSpecList = (IASTListNode<ASTProcComponentAttrSpecNode>)value; return;
-        case 6:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.procDeclList = (IASTListNode<ASTProcDeclNode>)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.procComponentAttrSpecList = (IASTListNode<ASTProcComponentAttrSpecNode>)value; return;
+        case 7:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.procDeclList = (IASTListNode<ASTProcDeclNode>)value; return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

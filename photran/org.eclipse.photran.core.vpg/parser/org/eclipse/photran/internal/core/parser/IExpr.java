@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public interface IExpr extends IASTNode
+public interface IExpr extends IASTNode, ISelector
 {
 }
 

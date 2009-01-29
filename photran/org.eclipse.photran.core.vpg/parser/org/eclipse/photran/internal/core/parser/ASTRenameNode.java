@@ -26,9 +26,26 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTRenameNode extends ASTNode
 {
+    org.eclipse.photran.internal.core.lexer.Token isOperator; // in ASTRenameNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTRenameNode
     org.eclipse.photran.internal.core.lexer.Token newName; // in ASTRenameNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTRenameNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEqgreaterthan; // in ASTRenameNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTOperator; // in ASTRenameNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen2; // in ASTRenameNode
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTRenameNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen2; // in ASTRenameNode
+
+    public boolean isOperator()
+    {
+        return this.isOperator != null;
+    }
+
+    public void setIsOperator(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isOperator = newValue;
+    }
+
 
     public org.eclipse.photran.internal.core.lexer.Token getNewName()
     {
@@ -60,16 +77,22 @@ public class ASTRenameNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 3;
+        return 9;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.newName;
-        case 1:  return this.hiddenTEqgreaterthan;
-        case 2:  return this.name;
+        case 0:  return this.isOperator;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.newName;
+        case 3:  return this.hiddenTRparen;
+        case 4:  return this.hiddenTEqgreaterthan;
+        case 5:  return this.hiddenTOperator;
+        case 6:  return this.hiddenTLparen2;
+        case 7:  return this.name;
+        case 8:  return this.hiddenTRparen2;
         default: return null;
         }
     }
@@ -78,9 +101,15 @@ public class ASTRenameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

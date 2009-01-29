@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTRealConstNode extends ASTNode implements IExpr, IUnsignedArithmeticConst
+public class ASTRealConstNode extends ASTNode implements IExpr, ISelector, IUnsignedArithmeticConst
 {
     org.eclipse.photran.internal.core.lexer.Token realConst; // in ASTRealConstNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTRealConstNode
@@ -68,6 +68,7 @@ public class ASTRealConstNode extends ASTNode implements IExpr, IUnsignedArithme
     {
         visitor.visitASTRealConstNode(this);
         visitor.visitIExpr(this);
+        visitor.visitISelector(this);
         visitor.visitIUnsignedArithmeticConst(this);
         visitor.visitASTNode(this);
     }

@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTStringConstNode extends ASTNode implements IExpr
+public class ASTStringConstNode extends ASTNode implements IExpr, ISelector
 {
     org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTStringConstNode
     ASTSubstringRangeNode substringRange; // in ASTStringConstNode
@@ -55,6 +55,7 @@ public class ASTStringConstNode extends ASTNode implements IExpr
     {
         visitor.visitASTStringConstNode(this);
         visitor.visitIExpr(this);
+        visitor.visitISelector(this);
         visitor.visitASTNode(this);
     }
 

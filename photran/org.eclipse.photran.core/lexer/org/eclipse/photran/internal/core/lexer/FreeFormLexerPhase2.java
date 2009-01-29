@@ -134,6 +134,7 @@ public class FreeFormLexerPhase2 implements ILexer
             lastToken.setStreamOffset(lastTokenStreamOffset);
             lastToken.setLength(lastTokenLength);
             
+            //System.out.println(lastToken);
             return lastToken;
         }
         else return null;
@@ -177,11 +178,12 @@ public class FreeFormLexerPhase2 implements ILexer
 
 //        for (int i = 0; i < tokenStream.size(); i++)
 //        {
-//          Token t = (Token)tokenStream.elementAt(i);
-//          System.out.print(Token.getTokenName(t.id));
-//          System.out.print("(" + t.text + ")");
+//          IToken t = (IToken)tokenStream.elementAt(i);
+//          System.out.print(t.getTerminal());
+//          System.out.print("/");
 //          //System.out.print(", " + parenDepth[i]);
-//          System.out.print("," + retainAsKeyword[i]);
+//          System.out.print(t.getText());
+//          System.out.print(retainAsKeyword[i] ? "(keyword)" : "(ident)");
 //          System.out.print("   ");
 //        }
 //        System.out.println();
@@ -337,10 +339,10 @@ public class FreeFormLexerPhase2 implements ILexer
         addRule(Terminal.T_NULL,
                 new MustBeFollowedBy(Terminal.T_LPAREN, Terminal.T_RPAREN));
         
-        // R430, also R542/R502 (Types in IMPLICIT statement)
-        addRules(Terminal.T_TYPE,
-                new StmtMustStartWithOneOf(Terminal.T_END, Terminal.T_IMPLICIT),
-                new MustBePrecededByOneOf(Terminal.T_END, Terminal.T_IMPLICIT, Terminal.T_COMMA));
+        // R430, also R542/R502 (Types in IMPLICIT statement) -- MODIFIED FOR FORTRAN 2003 (see below)
+//        addRules(Terminal.T_TYPE,
+//                new StmtMustStartWithOneOf(Terminal.T_END, Terminal.T_IMPLICIT),
+//                new MustBePrecededByOneOf(Terminal.T_END, Terminal.T_IMPLICIT, Terminal.T_COMMA));
         
         // R502
         addRule(Terminal.T_PRECISION,
@@ -357,7 +359,6 @@ public class FreeFormLexerPhase2 implements ILexer
         applySameRulesTo(Terminal.T_DIMENSION);
         applySameRulesTo(Terminal.T_EXTERNAL);
         applySameRulesTo(Terminal.T_INTENT);
-        applySameRulesTo(Terminal.T_INTRINSIC);
         applySameRulesTo(Terminal.T_OPTIONAL);
         applySameRulesTo(Terminal.T_SAVE);
         applySameRulesTo(Terminal.T_TARGET);
@@ -367,6 +368,26 @@ public class FreeFormLexerPhase2 implements ILexer
         applySameRulesTo(Terminal.T_VALUE);
         applySameRulesTo(Terminal.T_VOLATILE);
         applySameRulesTo(Terminal.T_BIND);
+
+        addRules(Terminal.T_INTRINSIC,
+            new MustBePartOfTypeDeclOrStmtMustStartWith(Terminal.T_USE),
+            new MustBePrecededBy(Terminal.T_COMMA));
+
+        addRule(Terminal.T_IS,
+            new MustBePrecededByOneOf(Terminal.T_TYPE, Terminal.T_CLASS));
+        addRule(Terminal.T_ASSOCIATE,
+            new MustBePrecededBy(Terminal.T_END));
+        
+        addRules(Terminal.T_TYPE,
+            new StmtMustStartWithOneOf(Terminal.T_END, Terminal.T_IMPLICIT, Terminal.T_SELECT),
+            new MustBePrecededByOneOf(Terminal.T_END, Terminal.T_IMPLICIT, Terminal.T_COMMA, Terminal.T_SELECT));
+
+        addRule(Terminal.T_ABSTRACT,
+            new MustBeFollowedBy(Terminal.T_INTERFACE));
+        
+        addRules(Terminal.T_INTERFACE,
+            new StmtMustStartWithOneOf(Terminal.T_END, Terminal.T_ABSTRACT),
+            new MustBePrecededByOneOf(Terminal.T_END, Terminal.T_ABSTRACT));
         // END FORTRAN 2003
         
         // R506, R507
@@ -435,8 +456,8 @@ public class FreeFormLexerPhase2 implements ILexer
                 new MustBePrecededBy(Terminal.T_END));
         
         // R813
-        addRule(Terminal.T_DEFAULT,
-                new MustBePrecededBy(Terminal.T_CASE));
+        addRule(Terminal.T_DEFAULT,                        // FORTRAN 2003
+                new MustBePrecededByOneOf(Terminal.T_CASE, Terminal.T_CLASS));
         
         // R821
         addRule(Terminal.T_WHILE,
@@ -479,6 +500,19 @@ public class FreeFormLexerPhase2 implements ILexer
                 new MustBePrecededByOneOf(Terminal.T_LPAREN, Terminal.T_COMMA));
         applySameRulesTo(Terminal.T_ERREQ);
         applySameRulesTo(Terminal.T_IOSTATEQ);
+
+        // BEGIN FORTRAN 2003
+        applySameRulesTo(Terminal.T_STREAMEQ);
+        applySameRulesTo(Terminal.T_PENDINGEQ);
+        applySameRulesTo(Terminal.T_POSEQ);
+        applySameRulesTo(Terminal.T_IDEQ);
+        applySameRulesTo(Terminal.T_SIGNEQ);
+        applySameRulesTo(Terminal.T_ROUNDEQ);
+        applySameRulesTo(Terminal.T_IOMSGEQ);
+        applySameRulesTo(Terminal.T_ENCODINGEQ);
+        applySameRulesTo(Terminal.T_DECIMALEQ);
+        applySameRulesTo(Terminal.T_ASYNCHRONOUSEQ);
+        // END FORTRAN 2003
         
         // R912
         addRules(Terminal.T_FMTEQ,
@@ -519,7 +553,7 @@ public class FreeFormLexerPhase2 implements ILexer
         applySameRulesTo(Terminal.T_MODULE);
         applySameRulesTo(Terminal.T_BLOCK);
         applySameRulesTo(Terminal.T_BLOCKDATA);
-        applySameRulesTo(Terminal.T_INTERFACE);
+        //applySameRulesTo(Terminal.T_INTERFACE);
         applySameRulesTo(Terminal.T_FUNCTION);
         applySameRulesTo(Terminal.T_SUBROUTINE);
         
@@ -610,7 +644,13 @@ public class FreeFormLexerPhase2 implements ILexer
     
     private void markFortran2003Changes()
     {
-        if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_TYPE)
+        if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_END
+            && tokenStream.size() > 1
+            && ((IToken)tokenStream.elementAt(firstTokenPos+1)).getTerminal() == Terminal.T_SELECT)
+        {
+            ((IToken)tokenStream.elementAt(firstTokenPos)).setTerminal(Terminal.T_ENDBEFORESELECT);
+        }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_TYPE)
         {
             for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
             {
@@ -619,7 +659,8 @@ public class FreeFormLexerPhase2 implements ILexer
                     || t == Terminal.T_ABSTRACT
                     || t == Terminal.T_BIND
                     || t == Terminal.T_KIND
-                    || t == Terminal.T_LEN)
+                    || t == Terminal.T_LEN
+                    || t == Terminal.T_IS)
                 {
                     retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
                 }
@@ -682,6 +723,10 @@ public class FreeFormLexerPhase2 implements ILexer
                     retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
                 }
             }
+        }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_IMPORT)
+        {
+            retainAsKeyword[firstTokenPos] = true;
         }
     }
     
@@ -1017,7 +1062,8 @@ public class FreeFormLexerPhase2 implements ILexer
     {
         Terminal possibility1 = ALWAYS_RETURN_TRUE,
             possibility2 = ALWAYS_RETURN_TRUE,
-            possibility3 = ALWAYS_RETURN_TRUE;
+            possibility3 = ALWAYS_RETURN_TRUE,
+            possibility4 = ALWAYS_RETURN_TRUE;
         
         public MustBePrecededByOneOf(Terminal tokenTerminal1, Terminal tokenTerminal2)
         {
@@ -1032,11 +1078,20 @@ public class FreeFormLexerPhase2 implements ILexer
             possibility3 = tokenTerminal3;
         }
         
+        public MustBePrecededByOneOf(Terminal tokenTerminal1, Terminal tokenTerminal2, Terminal tokenTerminal3, Terminal tokenTerminal4)
+        {
+            possibility1 = tokenTerminal1;
+            possibility2 = tokenTerminal2;
+            possibility3 = tokenTerminal3;
+            possibility4 = tokenTerminal4;
+        }
+        
         public boolean appliesToTokenAt(int tokenPos)
         {
             return matchToken(tokenPos-1, possibility1) 
                 || matchToken(tokenPos-1, possibility2)
-                || matchToken(tokenPos-1, possibility3);
+                || matchToken(tokenPos-1, possibility3)
+                || matchToken(tokenPos-1, possibility4);
         }
     }
     

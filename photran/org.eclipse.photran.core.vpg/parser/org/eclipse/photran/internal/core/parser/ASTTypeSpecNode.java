@@ -26,20 +26,67 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTTypeSpecNode extends ASTNode
 {
+    org.eclipse.photran.internal.core.lexer.Token isDerivedType; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isReal; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isCharacter; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isDouble; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token isInteger; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTPrecision; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token isComplex; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token isLogical; // in ASTTypeSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isReal; // in ASTTypeSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isDouble; // in ASTTypeSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTPrecision; // in ASTTypeSpecNode
     ASTKindSelectorNode kindSelector; // in ASTTypeSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isCharacter; // in ASTTypeSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isDerivedType; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token typeName; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenLParen2; // in ASTTypeSpecNode
+    IASTListNode<ASTTypeParamSpecNode> typeParamSpecList; // in ASTTypeSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenRParen2; // in ASTTypeSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeSpecNode
     ASTCharSelectorNode charSelector; // in ASTTypeSpecNode
+
+    public boolean isDerivedType()
+    {
+        return this.isDerivedType != null;
+    }
+
+    public void setIsDerivedType(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDerivedType = newValue;
+    }
+
+
+    public boolean isReal()
+    {
+        return this.isReal != null;
+    }
+
+    public void setIsReal(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isReal = newValue;
+    }
+
+
+    public boolean isCharacter()
+    {
+        return this.isCharacter != null;
+    }
+
+    public void setIsCharacter(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isCharacter = newValue;
+    }
+
+
+    public boolean isDouble()
+    {
+        return this.isDouble != null;
+    }
+
+    public void setIsDouble(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDouble = newValue;
+    }
+
 
     public boolean isInteger()
     {
@@ -74,28 +121,6 @@ public class ASTTypeSpecNode extends ASTNode
     }
 
 
-    public boolean isReal()
-    {
-        return this.isReal != null;
-    }
-
-    public void setIsReal(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isReal = newValue;
-    }
-
-
-    public boolean isDouble()
-    {
-        return this.isDouble != null;
-    }
-
-    public void setIsDouble(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isDouble = newValue;
-    }
-
-
     public ASTKindSelectorNode getKindSelector()
     {
         return this.kindSelector;
@@ -104,28 +129,6 @@ public class ASTTypeSpecNode extends ASTNode
     public void setKindSelector(ASTKindSelectorNode newValue)
     {
         this.kindSelector = newValue;
-    }
-
-
-    public boolean isCharacter()
-    {
-        return this.isCharacter != null;
-    }
-
-    public void setIsCharacter(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isCharacter = newValue;
-    }
-
-
-    public boolean isDerivedType()
-    {
-        return this.isDerivedType != null;
-    }
-
-    public void setIsDerivedType(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isDerivedType = newValue;
     }
 
 
@@ -151,6 +154,17 @@ public class ASTTypeSpecNode extends ASTNode
     }
 
 
+    public IASTListNode<ASTTypeParamSpecNode> getTypeParamSpecList()
+    {
+        return this.typeParamSpecList;
+    }
+
+    public void setTypeParamSpecList(IASTListNode<ASTTypeParamSpecNode> newValue)
+    {
+        this.typeParamSpecList = newValue;
+    }
+
+
     public ASTCharSelectorNode getCharSelector()
     {
         return this.charSelector;
@@ -170,27 +184,30 @@ public class ASTTypeSpecNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 14;
+        return 17;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.isInteger;
-        case 1:  return this.isComplex;
-        case 2:  return this.isLogical;
-        case 3:  return this.isReal;
-        case 4:  return this.isDouble;
+        case 0:  return this.isDerivedType;
+        case 1:  return this.isReal;
+        case 2:  return this.isCharacter;
+        case 3:  return this.isDouble;
+        case 4:  return this.isInteger;
         case 5:  return this.hiddenTPrecision;
-        case 6:  return this.kindSelector;
-        case 7:  return this.isCharacter;
-        case 8:  return this.isDerivedType;
+        case 6:  return this.isComplex;
+        case 7:  return this.isLogical;
+        case 8:  return this.kindSelector;
         case 9:  return this.hiddenTLparen;
         case 10: return this.isAsterisk;
         case 11: return this.typeName;
-        case 12: return this.hiddenTRparen;
-        case 13: return this.charSelector;
+        case 12: return this.hiddenHiddenLParen2;
+        case 13: return this.typeParamSpecList;
+        case 14: return this.hiddenHiddenRParen2;
+        case 15: return this.hiddenTRparen;
+        case 16: return this.charSelector;
         default: return null;
         }
     }
@@ -199,20 +216,23 @@ public class ASTTypeSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isInteger = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isComplex = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.isLogical = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.isReal = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.isDouble = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isDerivedType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isReal = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.isCharacter = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.isDouble = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.isInteger = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTPrecision = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.kindSelector = (ASTKindSelectorNode)value; return;
-        case 7:  this.isCharacter = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.isDerivedType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.isComplex = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.isLogical = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.kindSelector = (ASTKindSelectorNode)value; return;
         case 9:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 10: this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 11: this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 12: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 13: this.charSelector = (ASTCharSelectorNode)value; return;
+        case 12: this.hiddenHiddenLParen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 13: this.typeParamSpecList = (IASTListNode<ASTTypeParamSpecNode>)value; return;
+        case 14: this.hiddenHiddenRParen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 15: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 16: this.charSelector = (ASTCharSelectorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

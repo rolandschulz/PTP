@@ -26,23 +26,12 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTUFTermNode extends ASTNode
 {
-    ASTUFFactorNode UFFactor; // in ASTUFTermNode
     ASTUFTermNode lhsExpr; // in ASTUFTermNode
     ASTOperatorNode multOp; // in ASTUFTermNode
-    ASTUFFactorNode rhsExpr; // in ASTUFTermNode
     ASTOperatorNode concatOp; // in ASTUFTermNode
     ASTUFPrimaryNode rhsPrimary; // in ASTUFTermNode
-
-    public ASTUFFactorNode getUFFactor()
-    {
-        return this.UFFactor;
-    }
-
-    public void setUFFactor(ASTUFFactorNode newValue)
-    {
-        this.UFFactor = newValue;
-    }
-
+    ASTUFFactorNode rhsExpr; // in ASTUFTermNode
+    ASTUFFactorNode UFFactor; // in ASTUFTermNode
 
     public ASTUFTermNode getLhsExpr()
     {
@@ -63,17 +52,6 @@ public class ASTUFTermNode extends ASTNode
     public void setMultOp(ASTOperatorNode newValue)
     {
         this.multOp = newValue;
-    }
-
-
-    public ASTUFFactorNode getRhsExpr()
-    {
-        return this.rhsExpr;
-    }
-
-    public void setRhsExpr(ASTUFFactorNode newValue)
-    {
-        this.rhsExpr = newValue;
     }
 
 
@@ -99,6 +77,28 @@ public class ASTUFTermNode extends ASTNode
     }
 
 
+    public ASTUFFactorNode getRhsExpr()
+    {
+        return this.rhsExpr;
+    }
+
+    public void setRhsExpr(ASTUFFactorNode newValue)
+    {
+        this.rhsExpr = newValue;
+    }
+
+
+    public ASTUFFactorNode getUFFactor()
+    {
+        return this.UFFactor;
+    }
+
+    public void setUFFactor(ASTUFFactorNode newValue)
+    {
+        this.UFFactor = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTUFTermNode(this);
@@ -114,12 +114,12 @@ public class ASTUFTermNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.UFFactor;
-        case 1:  return this.lhsExpr;
-        case 2:  return this.multOp;
-        case 3:  return this.rhsExpr;
-        case 4:  return this.concatOp;
-        case 5:  return this.rhsPrimary;
+        case 0:  return this.lhsExpr;
+        case 1:  return this.multOp;
+        case 2:  return this.concatOp;
+        case 3:  return this.rhsPrimary;
+        case 4:  return this.rhsExpr;
+        case 5:  return this.UFFactor;
         default: return null;
         }
     }
@@ -128,12 +128,12 @@ public class ASTUFTermNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.UFFactor = (ASTUFFactorNode)value; return;
-        case 1:  this.lhsExpr = (ASTUFTermNode)value; return;
-        case 2:  this.multOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (ASTUFFactorNode)value; return;
-        case 4:  this.concatOp = (ASTOperatorNode)value; return;
-        case 5:  this.rhsPrimary = (ASTUFPrimaryNode)value; return;
+        case 0:  this.lhsExpr = (ASTUFTermNode)value; return;
+        case 1:  this.multOp = (ASTOperatorNode)value; return;
+        case 2:  this.concatOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhsPrimary = (ASTUFPrimaryNode)value; return;
+        case 4:  this.rhsExpr = (ASTUFFactorNode)value; return;
+        case 5:  this.UFFactor = (ASTUFFactorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -378,6 +378,11 @@
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RenameRefactoringCommand">
       </command>
+      <command
+            name="Move Saved Variables to Global Common Block"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand">
+      </command>
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
    <extension
@@ -405,6 +410,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.RenameRefactoringCommand"
+     />
+     <key
+            sequence="M3+M2+S"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
      />
    </extension>
    <!-- 3. Add the refactoring to the Refactoring dropdown menu (in the menu bar) -->
@@ -452,6 +463,12 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+         <action
+               label="&amp;Move Saved Variables to Global Common Block  (Fortran)..."
+               definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlock"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
+               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>         
       </actionSet>
    </extension>
    <!--extension
@@ -503,6 +520,11 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+         <action 
+               label="&amp;Move Saved Variables to Global Common Block..." 
+               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
       </viewerContribution>
    </extension>
    

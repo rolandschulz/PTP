@@ -28,6 +28,10 @@ public class ASTUseStmtNode extends ASTNode implements ISpecificationPartConstru
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTUseStmtNode
     org.eclipse.photran.internal.core.lexer.Token useToken; // in ASTUseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTComma1; // in ASTUseStmtNode
+    ASTModuleNatureNode moduleNature; // in ASTUseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTColon1; // in ASTUseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTColon2; // in ASTUseStmtNode
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTUseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTUseStmtNode
     IASTListNode<ASTRenameNode> renameList; // in ASTUseStmtNode
@@ -55,6 +59,17 @@ public class ASTUseStmtNode extends ASTNode implements ISpecificationPartConstru
     public void setUseToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.useToken = newValue;
+    }
+
+
+    public ASTModuleNatureNode getModuleNature()
+    {
+        return this.moduleNature;
+    }
+
+    public void setModuleNature(ASTModuleNatureNode newValue)
+    {
+        this.moduleNature = newValue;
     }
 
 
@@ -100,7 +115,7 @@ public class ASTUseStmtNode extends ASTNode implements ISpecificationPartConstru
 
     @Override protected int getNumASTFields()
     {
-        return 9;
+        return 13;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -109,13 +124,17 @@ public class ASTUseStmtNode extends ASTNode implements ISpecificationPartConstru
         {
         case 0:  return this.label;
         case 1:  return this.useToken;
-        case 2:  return this.name;
-        case 3:  return this.hiddenTComma;
-        case 4:  return this.renameList;
-        case 5:  return this.hiddenTOnly;
-        case 6:  return this.hiddenTColon;
-        case 7:  return this.onlyList;
-        case 8:  return this.hiddenTEos;
+        case 2:  return this.hiddenHiddenTComma1;
+        case 3:  return this.moduleNature;
+        case 4:  return this.hiddenHiddenTColon1;
+        case 5:  return this.hiddenHiddenTColon2;
+        case 6:  return this.name;
+        case 7:  return this.hiddenTComma;
+        case 8:  return this.renameList;
+        case 9:  return this.hiddenTOnly;
+        case 10: return this.hiddenTColon;
+        case 11: return this.onlyList;
+        case 12: return this.hiddenTEos;
         default: return null;
         }
     }
@@ -126,13 +145,17 @@ public class ASTUseStmtNode extends ASTNode implements ISpecificationPartConstru
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.useToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.renameList = (IASTListNode<ASTRenameNode>)value; return;
-        case 5:  this.hiddenTOnly = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.onlyList = (IASTListNode<ASTOnlyNode>)value; return;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenHiddenTComma1 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.moduleNature = (ASTModuleNatureNode)value; return;
+        case 4:  this.hiddenHiddenTColon1 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenHiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.renameList = (IASTListNode<ASTRenameNode>)value; return;
+        case 9:  this.hiddenTOnly = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.onlyList = (IASTListNode<ASTOnlyNode>)value; return;
+        case 12: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

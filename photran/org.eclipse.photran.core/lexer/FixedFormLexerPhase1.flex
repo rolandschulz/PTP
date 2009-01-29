@@ -271,6 +271,23 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 <YYSTANDARD,YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
 // New for Fortran 2003 //////////////////////////////////
+"IMPORT"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IMPORT); }
+"NON_INTRINSIC"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NON_INTRINSIC); }
+"WAIT"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_WAIT); }
+"["						{ wantEos = true;                     return token(Terminal.T_LBRACKET); }
+"]"						{ wantEos = true;                     return token(Terminal.T_RBRACKET); }
+"STREAM"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_STREAMEQ); }
+"PENDING"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_PENDINGEQ); }
+"POS"[ \t]*"="					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_POSEQ); }
+"ID"[ \t]*"="					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IDEQ); }
+"SIGN"[ \t]*"="					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SIGNEQ); }
+"ROUND"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ROUNDEQ); }
+"IOMSG"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IOMSGEQ); }
+"ENCODING"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ENCODINGEQ); }
+"DECIMAL"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_DECIMALEQ); }
+"ASYNCHRONOUS"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ASYNCHRONOUSEQ); }
+"IS"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IS); }
+"ASSOCIATE"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ASSOCIATE); }
 "EXTENDS"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_EXTENDS); }
 "ABSTRACT"					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ABSTRACT); }
 "BIND"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_BIND); }

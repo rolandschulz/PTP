@@ -28,8 +28,8 @@ public class ASTTargetNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTTargetNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTargetNode
-    IExpr expr; // in ASTTargetNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTargetNode
+    IExpr expr; // in ASTTargetNode
 
     public boolean isNull()
     {
@@ -70,8 +70,8 @@ public class ASTTargetNode extends ASTNode
         {
         case 0:  return this.isNull;
         case 1:  return this.hiddenTLparen;
-        case 2:  return this.expr;
-        case 3:  return this.hiddenTRparen;
+        case 2:  return this.hiddenTRparen;
+        case 3:  return this.expr;
         default: return null;
         }
     }
@@ -82,8 +82,8 @@ public class ASTTargetNode extends ASTNode
         {
         case 0:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.expr = (IExpr)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.expr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

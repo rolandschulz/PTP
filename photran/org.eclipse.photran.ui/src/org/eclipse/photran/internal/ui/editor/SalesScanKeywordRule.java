@@ -464,9 +464,6 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 //            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
 //            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
 //            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
-//            
-//            if (line.substring(column).startsWith("type"))
-//                System.err.println("!!!"); // Put breakpoint here
             
             return internalRetainAsKeyword(column, keyword);
         }
@@ -489,7 +486,11 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos));
             // BEGIN FORTRAN 2003
             else if (keyword.equalsIgnoreCase("bind"))
-                return openContextComma && match("enum", firstTokenPos);
+                return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos));
+            else if (keyword.equalsIgnoreCase("procedure"))
+                return match("procedure", firstTokenPos);
+            else if (keyword.equalsIgnoreCase("pointer"))
+                return openContextComma;
             // END FORTRAN 2003
             else
             {
@@ -518,13 +519,18 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("implicit");
             else if (keyword.equalsIgnoreCase("precision"))
                 return precedingKeyword.equalsIgnoreCase("double");
-            else if (keyword.equalsIgnoreCase("type"))
-                return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit") || precedingKeyword.equalsIgnoreCase("end");
             else if (keyword.equalsIgnoreCase("while"))
                 return precedingKeyword.equalsIgnoreCase("do");
             // BEGIN FORTRAN 2003
+            else if (keyword.equalsIgnoreCase("type"))
+                return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit") || precedingKeyword.equalsIgnoreCase("end")
+                    || precedingKeyword.equalsIgnoreCase("select");
             else if (keyword.equalsIgnoreCase("interface"))
                 return precedingKeyword.equalsIgnoreCase("abstract") || precedingKeyword.equalsIgnoreCase("end");
+            else if (keyword.equalsIgnoreCase("is"))
+                return precedingKeyword.equalsIgnoreCase("type") || precedingKeyword.equalsIgnoreCase("class");
+            else if (keyword.equalsIgnoreCase("default"))
+                return precedingKeyword.equalsIgnoreCase("case") || precedingKeyword.equalsIgnoreCase("class");
             // END FORTRAN 2003
             else
                 return precedingKeyword.equalsIgnoreCase("end");

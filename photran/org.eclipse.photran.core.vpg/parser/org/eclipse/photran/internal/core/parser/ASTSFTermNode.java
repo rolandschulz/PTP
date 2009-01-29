@@ -27,8 +27,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTSFTermNode extends ASTNode
 {
     ASTSFTermNode lhsExpr; // in ASTSFTermNode
-    ASTOperatorNode multOp; // in ASTSFTermNode
     ASTSFFactorNode SFFactor; // in ASTSFTermNode
+    ASTOperatorNode multOp; // in ASTSFTermNode
     IExpr rhsExpr; // in ASTSFTermNode
 
     public ASTSFTermNode getLhsExpr()
@@ -42,17 +42,6 @@ public class ASTSFTermNode extends ASTNode
     }
 
 
-    public ASTOperatorNode getMultOp()
-    {
-        return this.multOp;
-    }
-
-    public void setMultOp(ASTOperatorNode newValue)
-    {
-        this.multOp = newValue;
-    }
-
-
     public ASTSFFactorNode getSFFactor()
     {
         return this.SFFactor;
@@ -61,6 +50,17 @@ public class ASTSFTermNode extends ASTNode
     public void setSFFactor(ASTSFFactorNode newValue)
     {
         this.SFFactor = newValue;
+    }
+
+
+    public ASTOperatorNode getMultOp()
+    {
+        return this.multOp;
+    }
+
+    public void setMultOp(ASTOperatorNode newValue)
+    {
+        this.multOp = newValue;
     }
 
 
@@ -91,8 +91,8 @@ public class ASTSFTermNode extends ASTNode
         switch (index)
         {
         case 0:  return this.lhsExpr;
-        case 1:  return this.multOp;
-        case 2:  return this.SFFactor;
+        case 1:  return this.SFFactor;
+        case 2:  return this.multOp;
         case 3:  return this.rhsExpr;
         default: return null;
         }
@@ -103,8 +103,8 @@ public class ASTSFTermNode extends ASTNode
         switch (index)
         {
         case 0:  this.lhsExpr = (ASTSFTermNode)value; return;
-        case 1:  this.multOp = (ASTOperatorNode)value; return;
-        case 2:  this.SFFactor = (ASTSFFactorNode)value; return;
+        case 1:  this.SFFactor = (ASTSFFactorNode)value; return;
+        case 2:  this.multOp = (ASTOperatorNode)value; return;
         case 3:  this.rhsExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

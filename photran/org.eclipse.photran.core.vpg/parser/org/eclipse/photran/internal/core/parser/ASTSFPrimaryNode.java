@@ -27,13 +27,13 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTSFPrimaryNode extends ASTNode
 {
     IASTListNode<ASTSFDataRefNode> SFDataRef; // in ASTSFPrimaryNode
-    org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTSFPrimaryNode
-    ASTArrayConstructorNode arrayConstructor; // in ASTSFPrimaryNode
     ASTFunctionReferenceNode functionReference; // in ASTSFPrimaryNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSFPrimaryNode
     IExpr expr; // in ASTSFPrimaryNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSFPrimaryNode
+    org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTSFPrimaryNode
     ASTSFVarNameNode SFVarName; // in ASTSFPrimaryNode
+    ASTArrayConstructorNode arrayConstructor; // in ASTSFPrimaryNode
 
     public IASTListNode<ASTSFDataRefNode> getSFDataRef()
     {
@@ -43,28 +43,6 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setSFDataRef(IASTListNode<ASTSFDataRefNode> newValue)
     {
         this.SFDataRef = newValue;
-    }
-
-
-    public org.eclipse.photran.internal.core.lexer.Token getIntConst()
-    {
-        return this.intConst;
-    }
-
-    public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.intConst = newValue;
-    }
-
-
-    public ASTArrayConstructorNode getArrayConstructor()
-    {
-        return this.arrayConstructor;
-    }
-
-    public void setArrayConstructor(ASTArrayConstructorNode newValue)
-    {
-        this.arrayConstructor = newValue;
     }
 
 
@@ -90,6 +68,17 @@ public class ASTSFPrimaryNode extends ASTNode
     }
 
 
+    public org.eclipse.photran.internal.core.lexer.Token getIntConst()
+    {
+        return this.intConst;
+    }
+
+    public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.intConst = newValue;
+    }
+
+
     public ASTSFVarNameNode getSFVarName()
     {
         return this.SFVarName;
@@ -98,6 +87,17 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setSFVarName(ASTSFVarNameNode newValue)
     {
         this.SFVarName = newValue;
+    }
+
+
+    public ASTArrayConstructorNode getArrayConstructor()
+    {
+        return this.arrayConstructor;
+    }
+
+    public void setArrayConstructor(ASTArrayConstructorNode newValue)
+    {
+        this.arrayConstructor = newValue;
     }
 
 
@@ -117,13 +117,13 @@ public class ASTSFPrimaryNode extends ASTNode
         switch (index)
         {
         case 0:  return this.SFDataRef;
-        case 1:  return this.intConst;
-        case 2:  return this.arrayConstructor;
-        case 3:  return this.functionReference;
-        case 4:  return this.hiddenTLparen;
-        case 5:  return this.expr;
-        case 6:  return this.hiddenTRparen;
-        case 7:  return this.SFVarName;
+        case 1:  return this.functionReference;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.expr;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.intConst;
+        case 6:  return this.SFVarName;
+        case 7:  return this.arrayConstructor;
         default: return null;
         }
     }
@@ -133,13 +133,13 @@ public class ASTSFPrimaryNode extends ASTNode
         switch (index)
         {
         case 0:  this.SFDataRef = (IASTListNode<ASTSFDataRefNode>)value; return;
-        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.arrayConstructor = (ASTArrayConstructorNode)value; return;
-        case 3:  this.functionReference = (ASTFunctionReferenceNode)value; return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.expr = (IExpr)value; return;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.SFVarName = (ASTSFVarNameNode)value; return;
+        case 1:  this.functionReference = (ASTFunctionReferenceNode)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.expr = (IExpr)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.SFVarName = (ASTSFVarNameNode)value; return;
+        case 7:  this.arrayConstructor = (ASTArrayConstructorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

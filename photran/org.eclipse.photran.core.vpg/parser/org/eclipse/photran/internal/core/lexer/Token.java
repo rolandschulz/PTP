@@ -309,6 +309,16 @@ public class Token implements IToken, IASTNode
         ASTNodeUtil.replaceWith(this, newNode);
     }
     
+    public void replaceWith(String string)
+    {
+        ASTNodeUtil.replaceWith(this, string);
+    }
+    
+    public Object clone()
+    {
+        return new Token(this);
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     // Debugging Output
     ///////////////////////////////////////////////////////////////////////////
@@ -344,6 +354,11 @@ public class Token implements IToken, IASTNode
         }
         
         return currentPreprocessorDirective;
+    }
+    
+    @Override public String toString()
+    {
+        return terminal + ": " + text.replace("\n", "\\n").replace("\r", "\\r");
     }
     
     ///////////////////////////////////////////////////////////////////////////

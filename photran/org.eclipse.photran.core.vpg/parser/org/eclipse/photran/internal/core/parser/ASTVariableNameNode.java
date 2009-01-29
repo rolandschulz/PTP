@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTVariableNameNode extends ASTNode
+public class ASTVariableNameNode extends ASTNode implements IBindEntity
 {
     org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTVariableNameNode
 
@@ -42,6 +42,7 @@ public class ASTVariableNameNode extends ASTNode
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTVariableNameNode(this);
+        visitor.visitIBindEntity(this);
         visitor.visitASTNode(this);
     }
 

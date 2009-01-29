@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,9 +43,12 @@ import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
+import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
@@ -517,6 +521,52 @@ public abstract class FortranRefactoring extends Refactoring
         
         return result;
     }
+    
+    protected int findIndexToInsertTypeDeclaration(IASTListNode<? extends IASTNode> body)
+    {
+        IASTNode node = null;
+        Iterator<? extends IASTNode> iterator = body.iterator();
+        while(iterator.hasNext())
+        {
+            node = iterator.next();
+            if (!(node instanceof ASTUseStmtNode) && !(node instanceof ASTImplicitStmtNode))
+            {
+                break;
+            }
+        }
+        //If there are no other nodes besides use statements and implicit none, then increment the index
+        if (node instanceof ASTUseStmtNode || node instanceof ASTImplicitStmtNode)
+        {
+            return body.indexOf(node) + 1; 
+        }else
+        {
+            return body.indexOf(node);            
+        }
+    }
+
+    protected int findIndexToInsertStatement(IASTListNode<? extends IASTNode> body)
+    {
+        IASTNode node = null;
+        Iterator<? extends IASTNode> iterator = body.iterator();
+        while(iterator.hasNext())
+        {
+            node = iterator.next();
+            if (!(node instanceof ISpecificationPartConstruct))
+            {
+                break;
+            }
+        }
+        //If there are no other nodes besides those that implement ISpecificationPartConstruct, 
+        //then increment the index
+        if (node instanceof ISpecificationPartConstruct)
+        {
+            return body.indexOf(node) + 1; 
+        }else
+        {
+            return body.indexOf(node);            
+        }
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////

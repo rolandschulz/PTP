@@ -18,6 +18,7 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -30,12 +31,14 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * 
  * @see org.eclipse.photran.internal.core.properties.SearchPathProperties
  * @author Jeff Overbey
+ * Modified by Jungyoon Lee, Kun Koh, Nam Kim, David Weiner
  */
 public class SearchPathsPropertyPage extends PropertyPage
 {
-    private BooleanFieldEditor enableVPG, enableDeclView, enableContentAssist;
+    private BooleanFieldEditor enableVPG, enableDeclView, enableContentAssist, enableHoverTip;
     private WorkspacePathEditor modulePathEditor, includePathEditor;
     private boolean showMessage = false;
+
     
     /**
      * @see PreferencePage#createContents(Composite)
@@ -61,6 +64,8 @@ public class SearchPathsPropertyPage extends PropertyPage
             {
                 enableDeclView.setEnabled(newValue, composite);
                 enableContentAssist.setEnabled(newValue, composite);
+                enableHoverTip.setEnabled(newValue, composite);                
+                
                 showMessage = (oldValue != newValue);
             }
         };
@@ -89,9 +94,27 @@ public class SearchPathsPropertyPage extends PropertyPage
         enableContentAssist.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
                                                                                      SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME));
         enableContentAssist.load();
+        
+        enableHoverTip = new BooleanFieldEditor("IgnoreThis", "Enable Fortran Hover tips", composite)
+        {
+            @Override protected void valueChanged(boolean oldValue, boolean newValue)
+            {
+                showMessage = (oldValue != newValue);
+            }
+        };
+        
+        
+        enableHoverTip.setPreferenceStore(SearchPathProperties.getPropertyStore((IProject)getElement(),
+            SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME));
+        enableHoverTip.load();
+        
+        
 
         enableDeclView.setEnabled(enableVPG.getBooleanValue(), composite);
         enableContentAssist.setEnabled(enableVPG.getBooleanValue(), composite);
+        enableHoverTip.setEnabled(enableVPG.getBooleanValue(), composite);
+        
+        
         
         l = new Label(composite, SWT.WRAP);
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
@@ -125,11 +148,12 @@ public class SearchPathsPropertyPage extends PropertyPage
         return composite;
     }
 
-    protected void performDefaults()
+    public void performDefaults()
     {
         enableVPG.loadDefault();
         enableDeclView.loadDefault();
         enableContentAssist.loadDefault();
+        enableHoverTip.loadDefault();
         modulePathEditor.loadDefault();
         includePathEditor.loadDefault();
     }
@@ -139,6 +163,7 @@ public class SearchPathsPropertyPage extends PropertyPage
         enableVPG.store();
         enableDeclView.store();
         enableContentAssist.store();
+        enableHoverTip.store();
         modulePathEditor.store();
         includePathEditor.store();
         

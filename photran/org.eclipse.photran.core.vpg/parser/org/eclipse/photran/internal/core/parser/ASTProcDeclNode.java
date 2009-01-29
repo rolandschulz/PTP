@@ -28,7 +28,7 @@ public class ASTProcDeclNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token procedureEntityName; // in ASTProcDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEqgreaterthan; // in ASTProcDeclNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTNull; // in ASTProcDeclNode
+    org.eclipse.photran.internal.core.lexer.Token assignsNull; // in ASTProcDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTProcDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTProcDeclNode
 
@@ -40,6 +40,17 @@ public class ASTProcDeclNode extends ASTNode
     public void setProcedureEntityName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.procedureEntityName = newValue;
+    }
+
+
+    public boolean assignsNull()
+    {
+        return this.assignsNull != null;
+    }
+
+    public void setAssignsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.assignsNull = newValue;
     }
 
 
@@ -60,7 +71,7 @@ public class ASTProcDeclNode extends ASTNode
         {
         case 0:  return this.procedureEntityName;
         case 1:  return this.hiddenTEqgreaterthan;
-        case 2:  return this.hiddenTNull;
+        case 2:  return this.assignsNull;
         case 3:  return this.hiddenTLparen;
         case 4:  return this.hiddenTRparen;
         default: return null;
@@ -73,7 +84,7 @@ public class ASTProcDeclNode extends ASTNode
         {
         case 0:  this.procedureEntityName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.assignsNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

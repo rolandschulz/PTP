@@ -26,21 +26,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTUFFactorNode extends ASTNode
 {
-    ASTUFPrimaryNode UFPrimary; // in ASTUFFactorNode
     ASTUFPrimaryNode lhsPrimary; // in ASTUFFactorNode
     ASTOperatorNode powerOp; // in ASTUFFactorNode
     ASTUFFactorNode rhsExpr; // in ASTUFFactorNode
-
-    public ASTUFPrimaryNode getUFPrimary()
-    {
-        return this.UFPrimary;
-    }
-
-    public void setUFPrimary(ASTUFPrimaryNode newValue)
-    {
-        this.UFPrimary = newValue;
-    }
-
+    ASTUFPrimaryNode UFPrimary; // in ASTUFFactorNode
 
     public ASTUFPrimaryNode getLhsPrimary()
     {
@@ -75,6 +64,17 @@ public class ASTUFFactorNode extends ASTNode
     }
 
 
+    public ASTUFPrimaryNode getUFPrimary()
+    {
+        return this.UFPrimary;
+    }
+
+    public void setUFPrimary(ASTUFPrimaryNode newValue)
+    {
+        this.UFPrimary = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTUFFactorNode(this);
@@ -90,10 +90,10 @@ public class ASTUFFactorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.UFPrimary;
-        case 1:  return this.lhsPrimary;
-        case 2:  return this.powerOp;
-        case 3:  return this.rhsExpr;
+        case 0:  return this.lhsPrimary;
+        case 1:  return this.powerOp;
+        case 2:  return this.rhsExpr;
+        case 3:  return this.UFPrimary;
         default: return null;
         }
     }
@@ -102,10 +102,10 @@ public class ASTUFFactorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.UFPrimary = (ASTUFPrimaryNode)value; return;
-        case 1:  this.lhsPrimary = (ASTUFPrimaryNode)value; return;
-        case 2:  this.powerOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (ASTUFFactorNode)value; return;
+        case 0:  this.lhsPrimary = (ASTUFPrimaryNode)value; return;
+        case 1:  this.powerOp = (ASTOperatorNode)value; return;
+        case 2:  this.rhsExpr = (ASTUFFactorNode)value; return;
+        case 3:  this.UFPrimary = (ASTUFPrimaryNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

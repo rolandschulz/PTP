@@ -301,10 +301,13 @@ public class ModuleLoader extends BindingCollector
 		
 		for (int i = 0; i < renameList.size(); i++)
         {
-            Token newName = renameList.get(i).getNewName();
-            Token oldName = renameList.get(i).getName();
-            
-            bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
+		    if (!renameList.get(i).isOperator()) // TODO: User-defined operators
+		    {
+                Token newName = renameList.get(i).getNewName();
+                Token oldName = renameList.get(i).getName();
+                
+                bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
+		    }
         }
 	}
 
@@ -314,10 +317,13 @@ public class ModuleLoader extends BindingCollector
 		
 		for (int i = 0; i < onlyList.size(); i++)
         {
-            Token newName = onlyList.get(i).getNewName();
-            Token oldName = onlyList.get(i).getName();
-            
-            if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
+		    if (!onlyList.get(i).isOperator()) // TODO: User-defined operators
+		    {
+                Token newName = onlyList.get(i).getNewName();
+                Token oldName = onlyList.get(i).getName();
+                
+                if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
+		    }
         }
 	}
 

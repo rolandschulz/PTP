@@ -28,9 +28,9 @@ public class ASTWhereConstructNode extends ASTNode implements IBodyConstruct, IC
 {
     ASTWhereConstructStmtNode whereConstructStmt; // in ASTWhereConstructNode
     IASTListNode<IWhereBodyConstruct> whereBodyConstructBlock; // in ASTWhereConstructNode
+    ASTElseWhereConstructNode elseWhereConstruct; // in ASTWhereConstructNode
     ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTWhereConstructNode
     ASTEndWhereStmtNode endWhereStmt; // in ASTWhereConstructNode
-    ASTElseWhereConstructNode elseWhereConstruct; // in ASTWhereConstructNode
 
     public ASTWhereConstructStmtNode getWhereConstructStmt()
     {
@@ -54,6 +54,17 @@ public class ASTWhereConstructNode extends ASTNode implements IBodyConstruct, IC
     }
 
 
+    public ASTElseWhereConstructNode getElseWhereConstruct()
+    {
+        return this.elseWhereConstruct;
+    }
+
+    public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
+    {
+        this.elseWhereConstruct = newValue;
+    }
+
+
     public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
     {
         return this.maskedElseWhereConstruct;
@@ -73,17 +84,6 @@ public class ASTWhereConstructNode extends ASTNode implements IBodyConstruct, IC
     public void setEndWhereStmt(ASTEndWhereStmtNode newValue)
     {
         this.endWhereStmt = newValue;
-    }
-
-
-    public ASTElseWhereConstructNode getElseWhereConstruct()
-    {
-        return this.elseWhereConstruct;
-    }
-
-    public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
-    {
-        this.elseWhereConstruct = newValue;
     }
 
 
@@ -110,9 +110,9 @@ public class ASTWhereConstructNode extends ASTNode implements IBodyConstruct, IC
         {
         case 0:  return this.whereConstructStmt;
         case 1:  return this.whereBodyConstructBlock;
-        case 2:  return this.maskedElseWhereConstruct;
-        case 3:  return this.endWhereStmt;
-        case 4:  return this.elseWhereConstruct;
+        case 2:  return this.elseWhereConstruct;
+        case 3:  return this.maskedElseWhereConstruct;
+        case 4:  return this.endWhereStmt;
         default: return null;
         }
     }
@@ -123,9 +123,9 @@ public class ASTWhereConstructNode extends ASTNode implements IBodyConstruct, IC
         {
         case 0:  this.whereConstructStmt = (ASTWhereConstructStmtNode)value; return;
         case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
-        case 2:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
-        case 3:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
-        case 4:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
+        case 2:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
+        case 3:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
+        case 4:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

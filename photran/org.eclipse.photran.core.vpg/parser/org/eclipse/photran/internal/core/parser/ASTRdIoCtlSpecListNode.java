@@ -28,8 +28,8 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
 {
     ASTUnitIdentifierNode unitIdentifier; // in ASTRdIoCtlSpecListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTRdIoCtlSpecListNode
-    ASTIoControlSpecNode ioControlSpec; // in ASTRdIoCtlSpecListNode
     ASTFormatIdentifierNode formatIdentifier; // in ASTRdIoCtlSpecListNode
+    ASTIoControlSpecNode ioControlSpec; // in ASTRdIoCtlSpecListNode
 
     public ASTUnitIdentifierNode getUnitIdentifier()
     {
@@ -42,17 +42,6 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
     }
 
 
-    public ASTIoControlSpecNode getIoControlSpec()
-    {
-        return this.ioControlSpec;
-    }
-
-    public void setIoControlSpec(ASTIoControlSpecNode newValue)
-    {
-        this.ioControlSpec = newValue;
-    }
-
-
     public ASTFormatIdentifierNode getFormatIdentifier()
     {
         return this.formatIdentifier;
@@ -61,6 +50,17 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
     public void setFormatIdentifier(ASTFormatIdentifierNode newValue)
     {
         this.formatIdentifier = newValue;
+    }
+
+
+    public ASTIoControlSpecNode getIoControlSpec()
+    {
+        return this.ioControlSpec;
+    }
+
+    public void setIoControlSpec(ASTIoControlSpecNode newValue)
+    {
+        this.ioControlSpec = newValue;
     }
 
 
@@ -81,8 +81,8 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
         {
         case 0:  return this.unitIdentifier;
         case 1:  return this.hiddenTComma;
-        case 2:  return this.ioControlSpec;
-        case 3:  return this.formatIdentifier;
+        case 2:  return this.formatIdentifier;
+        case 3:  return this.ioControlSpec;
         default: return null;
         }
     }
@@ -93,8 +93,8 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
         {
         case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
         case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.ioControlSpec = (ASTIoControlSpecNode)value; return;
-        case 3:  this.formatIdentifier = (ASTFormatIdentifierNode)value; return;
+        case 2:  this.formatIdentifier = (ASTFormatIdentifierNode)value; return;
+        case 3:  this.ioControlSpec = (ASTIoControlSpecNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

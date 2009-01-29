@@ -24,22 +24,11 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTUnaryExprNode extends ASTNode implements IExpr
+public class ASTUnaryExprNode extends ASTNode implements IExpr, ISelector
 {
-    ASTSignNode sign; // in ASTUnaryExprNode
     ASTOperatorNode operator; // in ASTUnaryExprNode
+    ASTSignNode sign; // in ASTUnaryExprNode
     IExpr operand; // in ASTUnaryExprNode
-
-    public ASTSignNode getSign()
-    {
-        return this.sign;
-    }
-
-    public void setSign(ASTSignNode newValue)
-    {
-        this.sign = newValue;
-    }
-
 
     public ASTOperatorNode getOperator()
     {
@@ -49,6 +38,17 @@ public class ASTUnaryExprNode extends ASTNode implements IExpr
     public void setOperator(ASTOperatorNode newValue)
     {
         this.operator = newValue;
+    }
+
+
+    public ASTSignNode getSign()
+    {
+        return this.sign;
+    }
+
+    public void setSign(ASTSignNode newValue)
+    {
+        this.sign = newValue;
     }
 
 
@@ -67,6 +67,7 @@ public class ASTUnaryExprNode extends ASTNode implements IExpr
     {
         visitor.visitASTUnaryExprNode(this);
         visitor.visitIExpr(this);
+        visitor.visitISelector(this);
         visitor.visitASTNode(this);
     }
 
@@ -79,8 +80,8 @@ public class ASTUnaryExprNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  return this.sign;
-        case 1:  return this.operator;
+        case 0:  return this.operator;
+        case 1:  return this.sign;
         case 2:  return this.operand;
         default: return null;
         }
@@ -90,8 +91,8 @@ public class ASTUnaryExprNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  this.sign = (ASTSignNode)value; return;
-        case 1:  this.operator = (ASTOperatorNode)value; return;
+        case 0:  this.operator = (ASTOperatorNode)value; return;
+        case 1:  this.sign = (ASTSignNode)value; return;
         case 2:  this.operand = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

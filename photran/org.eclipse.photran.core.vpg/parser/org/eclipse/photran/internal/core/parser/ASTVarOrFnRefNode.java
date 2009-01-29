@@ -24,12 +24,12 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTVarOrFnRefNode extends ASTNode implements IExpr
+public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
 {
     ASTNameNode name; // in ASTVarOrFnRefNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTVarOrFnRefNode
-    IASTListNode<ASTFunctionArgListNode> functionArgList; // in ASTVarOrFnRefNode
     IASTListNode<ASTSectionSubscriptNode> primarySectionSubscriptList; // in ASTVarOrFnRefNode
+    IASTListNode<ASTFunctionArgListNode> functionArgList; // in ASTVarOrFnRefNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTVarOrFnRefNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTPercent; // in ASTVarOrFnRefNode
     IASTListNode<ASTDataRefNode> derivedTypeComponentRef; // in ASTVarOrFnRefNode
@@ -49,17 +49,6 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr
     }
 
 
-    public IASTListNode<ASTFunctionArgListNode> getFunctionArgList()
-    {
-        return this.functionArgList;
-    }
-
-    public void setFunctionArgList(IASTListNode<ASTFunctionArgListNode> newValue)
-    {
-        this.functionArgList = newValue;
-    }
-
-
     public IASTListNode<ASTSectionSubscriptNode> getPrimarySectionSubscriptList()
     {
         return this.primarySectionSubscriptList;
@@ -68,6 +57,17 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr
     public void setPrimarySectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.primarySectionSubscriptList = newValue;
+    }
+
+
+    public IASTListNode<ASTFunctionArgListNode> getFunctionArgList()
+    {
+        return this.functionArgList;
+    }
+
+    public void setFunctionArgList(IASTListNode<ASTFunctionArgListNode> newValue)
+    {
+        this.functionArgList = newValue;
     }
 
 
@@ -108,6 +108,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr
     {
         visitor.visitASTVarOrFnRefNode(this);
         visitor.visitIExpr(this);
+        visitor.visitISelector(this);
         visitor.visitASTNode(this);
     }
 
@@ -122,8 +123,8 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr
         {
         case 0:  return this.name;
         case 1:  return this.hiddenTLparen;
-        case 2:  return this.functionArgList;
-        case 3:  return this.primarySectionSubscriptList;
+        case 2:  return this.primarySectionSubscriptList;
+        case 3:  return this.functionArgList;
         case 4:  return this.hiddenTRparen;
         case 5:  return this.hiddenTPercent;
         case 6:  return this.derivedTypeComponentRef;
@@ -141,8 +142,8 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr
         {
         case 0:  this.name = (ASTNameNode)value; return;
         case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.functionArgList = (IASTListNode<ASTFunctionArgListNode>)value; return;
-        case 3:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 2:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 3:  this.functionArgList = (IASTListNode<ASTFunctionArgListNode>)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; return;

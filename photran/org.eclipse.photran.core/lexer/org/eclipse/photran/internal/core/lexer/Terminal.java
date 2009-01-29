@@ -17,6 +17,25 @@ package org.eclipse.photran.internal.core.lexer;
  */
 public final class Terminal
 {
+    public static final Terminal SKIP = new Terminal("(skip)");
+    public static final Terminal T_IMPORT = new Terminal("import");
+    public static final Terminal T_NON_INTRINSIC = new Terminal("non_intrinsic");
+    public static final Terminal T_WAIT = new Terminal("wait");
+    public static final Terminal T_LBRACKET = new Terminal("[");
+    public static final Terminal T_RBRACKET = new Terminal("]");
+    public static final Terminal T_ENDBEFORESELECT = new Terminal("end");
+    public static final Terminal T_STREAMEQ = new Terminal("stream=");
+    public static final Terminal T_PENDINGEQ = new Terminal("pending=");
+    public static final Terminal T_POSEQ = new Terminal("pos=");
+    public static final Terminal T_IDEQ = new Terminal("id=");
+    public static final Terminal T_SIGNEQ = new Terminal("sign=");
+    public static final Terminal T_ROUNDEQ = new Terminal("round=");
+    public static final Terminal T_IOMSGEQ = new Terminal("iomsg=");
+    public static final Terminal T_ENCODINGEQ = new Terminal("encoding=");
+    public static final Terminal T_DECIMALEQ = new Terminal("decimal=");
+    public static final Terminal T_ASYNCHRONOUSEQ = new Terminal("asynchronous=");
+    public static final Terminal T_IS = new Terminal("is");
+    public static final Terminal T_ASSOCIATE = new Terminal("associate");
     public static final Terminal T_WRITEEQ = new Terminal("write=");
     public static final Terminal T_RESULT = new Terminal("result");
     public static final Terminal T_ENDSUBROUTINE = new Terminal("endsubroutine");

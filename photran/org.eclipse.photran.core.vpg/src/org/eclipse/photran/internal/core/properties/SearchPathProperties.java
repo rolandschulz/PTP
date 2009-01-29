@@ -33,14 +33,17 @@ import org.eclipse.jface.util.IPropertyChangeListener;
  * 
  * @see org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage
  * @author Jeff Overbey
+ * Modified by Jungyoon Lee, Kun Koh, Nam Kim, David Weiner
  */
 public class SearchPathProperties
 {
     public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG";
     public static final String ENABLE_DECL_VIEW_PROPERTY_NAME = "EnableDeclView";
     public static final String ENABLE_CONTENT_ASSIST_PROPERTY_NAME = "EnableContentAssist";
+    public static final String ENABLE_HOVER_TIP_PROPERTY_NAME = "EnableHoverTip";
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
+    
     
     /** @return the value of the given property for the given project */
     public static String getProperty(IProject project, String propertyName)

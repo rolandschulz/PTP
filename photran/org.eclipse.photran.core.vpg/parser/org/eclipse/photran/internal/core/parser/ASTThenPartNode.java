@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTThenPartNode extends ASTNode
 {
     IASTListNode<IExecutionPartConstruct> conditionalBody; // in ASTThenPartNode
-    ASTEndIfStmtNode endIfStmt; // in ASTThenPartNode
-    ASTElseIfConstructNode elseIfConstruct; // in ASTThenPartNode
     ASTElseConstructNode elseConstruct; // in ASTThenPartNode
+    ASTElseIfConstructNode elseIfConstruct; // in ASTThenPartNode
+    ASTEndIfStmtNode endIfStmt; // in ASTThenPartNode
 
     public IASTListNode<IExecutionPartConstruct> getConditionalBody()
     {
@@ -42,14 +42,14 @@ public class ASTThenPartNode extends ASTNode
     }
 
 
-    public ASTEndIfStmtNode getEndIfStmt()
+    public ASTElseConstructNode getElseConstruct()
     {
-        return this.endIfStmt;
+        return this.elseConstruct;
     }
 
-    public void setEndIfStmt(ASTEndIfStmtNode newValue)
+    public void setElseConstruct(ASTElseConstructNode newValue)
     {
-        this.endIfStmt = newValue;
+        this.elseConstruct = newValue;
     }
 
 
@@ -64,14 +64,14 @@ public class ASTThenPartNode extends ASTNode
     }
 
 
-    public ASTElseConstructNode getElseConstruct()
+    public ASTEndIfStmtNode getEndIfStmt()
     {
-        return this.elseConstruct;
+        return this.endIfStmt;
     }
 
-    public void setElseConstruct(ASTElseConstructNode newValue)
+    public void setEndIfStmt(ASTEndIfStmtNode newValue)
     {
-        this.elseConstruct = newValue;
+        this.endIfStmt = newValue;
     }
 
 
@@ -91,9 +91,9 @@ public class ASTThenPartNode extends ASTNode
         switch (index)
         {
         case 0:  return this.conditionalBody;
-        case 1:  return this.endIfStmt;
+        case 1:  return this.elseConstruct;
         case 2:  return this.elseIfConstruct;
-        case 3:  return this.elseConstruct;
+        case 3:  return this.endIfStmt;
         default: return null;
         }
     }
@@ -103,9 +103,9 @@ public class ASTThenPartNode extends ASTNode
         switch (index)
         {
         case 0:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value; return;
-        case 1:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
+        case 1:  this.elseConstruct = (ASTElseConstructNode)value; return;
         case 2:  this.elseIfConstruct = (ASTElseIfConstructNode)value; return;
-        case 3:  this.elseConstruct = (ASTElseConstructNode)value; return;
+        case 3:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

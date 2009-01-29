@@ -29,9 +29,9 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTSelectCaseStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTSelectcase; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSelect; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTCase; // in ASTSelectCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSelectcase; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSelectCaseStmtNode
     IExpr selectionExpression; // in ASTSelectCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSelectCaseStmtNode
@@ -88,9 +88,9 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 0:  return this.label;
         case 1:  return this.name;
         case 2:  return this.hiddenTColon;
-        case 3:  return this.hiddenTSelectcase;
-        case 4:  return this.hiddenTSelect;
-        case 5:  return this.hiddenTCase;
+        case 3:  return this.hiddenTSelect;
+        case 4:  return this.hiddenTCase;
+        case 5:  return this.hiddenTSelectcase;
         case 6:  return this.hiddenTLparen;
         case 7:  return this.selectionExpression;
         case 8:  return this.hiddenTRparen;
@@ -106,9 +106,9 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTSelectcase = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTSelectcase = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.selectionExpression = (IExpr)value; return;
         case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
