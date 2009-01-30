@@ -286,7 +286,7 @@ public class IndexQueries {
 	public static ICElement[] findRepresentative(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject, ICProjectFactory projectFactory) throws CoreException {
 		ICElement[] defs = findAllDefinitions(index, binding, converter, preferProject, projectFactory);
 		if (defs.length == 0) {
-			ICElement elem = findAnyDeclaration(index, null, binding, converter, projectFactory);
+			ICElement elem = findAnyDeclaration(index, preferProject, binding, converter, projectFactory);
 			if (elem != null) {
 				defs = new ICElement[] { elem };
 			}
