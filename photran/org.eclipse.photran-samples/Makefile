@@ -16,7 +16,7 @@ OUTSWITCH=-o
 EXEFILE=a.exe
 
 # In each of these directories, all of the sources will be compiled into a single executable
-SRCDIRS=$(wildcard src-*)
+SRCDIRS=$(filter-out src-fortran2003, $(wildcard src-*))
 
 # Here we do not use $(wildcard) to delay expansion until the shell is invoked
 SRCFILES=*.f*
