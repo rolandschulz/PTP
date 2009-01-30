@@ -36,7 +36,7 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
     public IContentAssistant setup(AbstractFortranEditor editor)
     {
         String contentAssistEnabledProperty = SearchPathProperties.getProperty(
-            editor.getIFile().getProject(),
+            editor.getIFile(),
             SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
         if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true"))
         {

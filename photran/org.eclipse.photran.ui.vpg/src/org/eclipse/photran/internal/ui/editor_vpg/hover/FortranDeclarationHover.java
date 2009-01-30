@@ -69,7 +69,7 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
         Assert.isNotNull(sourceViewer);
         fEditor = editor;
 
-        hoverTipEnabled = SearchPathProperties.getProperty(editor.getIFile().getProject(), 
+        hoverTipEnabled = SearchPathProperties.getProperty(editor.getIFile(), 
             SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME).equals("true");
 
         
@@ -88,7 +88,8 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
             TextSelection ts = new TextSelection(textViewer.getDocument(),
                 hoverRegion.getOffset(),
                 hoverRegion.getLength());
-            str = activeDefinitionMap.lookup(ts, activeTokenList).describe();
+            Definition def = activeDefinitionMap.lookup(ts, activeTokenList);
+            if (def != null) str = def.describe();
         }
 
         return str;

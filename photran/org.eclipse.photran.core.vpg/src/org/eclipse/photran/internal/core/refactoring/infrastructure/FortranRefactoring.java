@@ -581,7 +581,7 @@ public abstract class FortranRefactoring extends Refactoring
         if (PhotranVPG.inTestingMode()) return;
         
         String vpgEnabledProperty = SearchPathProperties.getProperty(
-            fileInEditor.getProject(),
+            fileInEditor,
             SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
         if (vpgEnabledProperty == null || !vpgEnabledProperty.equals("true"))
             fail("Please enable analysis and refactoring in the project properties.");

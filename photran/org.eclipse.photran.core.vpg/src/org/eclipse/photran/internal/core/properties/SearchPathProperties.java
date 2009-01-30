@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
@@ -44,7 +45,15 @@ public class SearchPathProperties
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
     
-    
+    /** @return the value of the given property for the project containing the given file */
+    public static String getProperty(IFile file, String propertyName)
+    {
+        if (file == null || file.getProject() == null)
+            return "";
+        else
+            return getProperty(file.getProject(), propertyName);
+    }
+
     /** @return the value of the given property for the given project */
     public static String getProperty(IProject project, String propertyName)
     {

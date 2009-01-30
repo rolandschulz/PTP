@@ -354,6 +354,11 @@
             id="org.eclipse.photran.ui.RefactoringCategory">
       </category>
       <command
+            name="Move Saved Variables to Global Common Block"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand">
+      </command>
+      <command
             name="Extract Common Block to Module"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand">
@@ -377,11 +382,6 @@
             name="Rename"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RenameRefactoringCommand">
-      </command>
-      <command
-            name="Move Saved Variables to Global Common Block"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand">
       </command>
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
@@ -437,8 +437,14 @@
                label="Extract Common Block to &amp;Module"
                definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand" 
                class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup" 
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup" 
                id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/>
+         <action
+               label="&amp;Move Saved Variables to Common Block (Fortran)..."
+               definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
+               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>         
          <!--action
                label="E&amp;xtract Procedure..."
                definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
@@ -463,12 +469,6 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-         <action
-               label="&amp;Move Saved Variables to Global Common Block  (Fortran)..."
-               definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlock"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>         
       </actionSet>
    </extension>
    <!--extension

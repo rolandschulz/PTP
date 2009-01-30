@@ -187,7 +187,7 @@ public class ModuleLoader extends BindingCollector
 
 	private List<IFile> applyModulePaths(List<IFile> files)
     {
-        String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(fileContainingUseStmt.getProject(),
+        String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(fileContainingUseStmt,
                                                                                            SearchPathProperties.MODULE_PATHS_PROPERTY_NAME));
         if (paths.length == 0) return files; // Do not apply if property not set
         

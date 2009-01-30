@@ -109,7 +109,7 @@ public class FortranEditorTasks
         {
             if (editor == null) return;
             
-            String vpgEnabledProperty = SearchPathProperties.getProperty(editor.getIFile().getProject(),
+            String vpgEnabledProperty = SearchPathProperties.getProperty(editor.getIFile(),
                                                  SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
             if (vpgEnabledProperty != null && vpgEnabledProperty.equals("true"))
             {
@@ -134,9 +134,13 @@ public class FortranEditorTasks
                         {
                             String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
                             
+                            SourceForm sourceForm =
+                                editor.getIFile() == null || editor.getIFile().getProject() == null
+                                ? SourceForm.UNPREPROCESSED_FREE_FORM
+                                : SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject()));
                             IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
                                                                                 null,
-                                                                                SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject())),
+                                                                                sourceForm,
                                                                                 false);
                             astRootNode = parser.parse(lexer);
                             if (astRootNode == null) return Status.OK_STATUS;

@@ -174,7 +174,7 @@ public class DeclarationView extends ViewPart
         if (editor != null)
         {
             String declViewEnabledProperty = SearchPathProperties.getProperty(
-                editor.getIFile().getProject(),
+                editor.getIFile(),
                 SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME);
             if (declViewEnabledProperty != null && declViewEnabledProperty.equals("true"))
             {

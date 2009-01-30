@@ -241,6 +241,8 @@ public class PhotranVPGBuilder extends PhotranVPG
         SourceForm sourceForm;
         if (contentType != null && contentType.equals(FIXED_FORM_CONTENT_TYPE))
             sourceForm = SourceForm.FIXED_FORM;
+        else if (file == null)
+            sourceForm = SourceForm.UNPREPROCESSED_FREE_FORM;
         else
         {
             sourceForm = SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject())
