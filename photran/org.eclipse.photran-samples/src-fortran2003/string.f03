@@ -7,6 +7,8 @@ module string_module
     implicit none
     private
 
+    public :: new_string
+
     type, public :: string
         private
         character, dimension(:), allocatable :: data
@@ -32,6 +34,11 @@ module string_module
     end type string
 
 contains
+
+    type(string) function new_string(string) result(return)
+    	character(len=*), intent(in) :: string
+    	call return%initialize(string)
+    end function
 
     subroutine initialize(self, data)
         class(string), intent(inout) :: self
@@ -195,6 +202,11 @@ program string_test
 
 	print *, "Expected: Hello"
     print *, "Actual:   ", s1%value()
+
+    s1 = new_string("HeLlOoO!")
+	print *, "Expected: HeLlOoO!"
+    print *, "Actual:   ", s1%value()
+    s1 = new_string("Hello")
 
 	s1 = s1%concat(', world')
 	print *, "Expected: Hello, world"
