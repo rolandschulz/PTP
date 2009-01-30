@@ -35,7 +35,7 @@ public class RemoteLocationConverter implements IIndexLocationConverter {
 	 */
 	public IIndexFileLocation fromInternalFormat(String raw) {
 		try {
-			return new IndexFileLocation(new URI("file:/" + raw), raw); //$NON-NLS-1$
+			return new IndexFileLocation(new URI("file", null, raw, null, null), raw); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
