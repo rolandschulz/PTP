@@ -66,11 +66,11 @@ public class SearchPathProperties
                     || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
                 return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true") ? "true" : "";
             else
-                return result;
+                return result == null ? "" : result;
         }
         catch (CoreException e)
         {
-            return null;
+            return "";
         }
     }
     

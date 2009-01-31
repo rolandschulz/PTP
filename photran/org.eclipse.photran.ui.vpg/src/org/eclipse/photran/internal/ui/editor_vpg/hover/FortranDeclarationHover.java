@@ -68,6 +68,8 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
     {
         Assert.isNotNull(sourceViewer);
         fEditor = editor;
+        
+        if (editor == null) return;
 
         hoverTipEnabled = SearchPathProperties.getProperty(editor.getIFile(), 
             SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME).equals("true");
