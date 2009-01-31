@@ -55,6 +55,8 @@ NEW IN THIS BETA:
 + Find All References
 + Fortran 2003
 + New gfortran error parser
++ Hover Tips
++ Move Saved Variables to Common Block
 
 
 
