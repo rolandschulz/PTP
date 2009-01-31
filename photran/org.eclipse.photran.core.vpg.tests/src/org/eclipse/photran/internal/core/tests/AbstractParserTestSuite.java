@@ -108,7 +108,9 @@ public abstract class AbstractParserTestSuite extends TestSuite
         public boolean accept(File dir, String name)
         {
             return (name.endsWith(".f90")
+                || name.endsWith(".f03")
                 || name.endsWith(".F90")
+                || name.endsWith(".F03")
                 || name.endsWith(".FRE")) && !name.startsWith("XXX");
         }
     };
