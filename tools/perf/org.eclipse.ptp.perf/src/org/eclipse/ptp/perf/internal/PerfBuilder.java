@@ -347,7 +347,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		
 		//TODO: Make sure this never has side-effects.
 		String allargs="";
-		if(!tool.getGlobalCompiler().equals(tool.getCcCompiler()))
+		if(tool.getGlobalCompiler()!=null && !tool.getGlobalCompiler().equals(tool.getCcCompiler()))
 		{
 			allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation);
 		}

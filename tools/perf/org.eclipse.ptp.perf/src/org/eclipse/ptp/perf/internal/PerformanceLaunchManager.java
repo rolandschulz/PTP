@@ -84,7 +84,6 @@ public class PerformanceLaunchManager {
 		
 		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
 		
-		
 		boolean useParam=configuration.getAttribute(org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants.PARA_USE_PARAMETRIC, false)||(pproc.para!=null&&pproc.para.runParametric);
 		if(useParam)
 		{
@@ -105,15 +104,23 @@ public class PerformanceLaunchManager {
 		boolean buildOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY, false);
 		boolean analyzeOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.ANALYZEONLY, false);
 		
+		BuildTool bt = pproc.getFirstBuilder(configuration);
+		PostProcTool ppt = pproc.getFirstAnalyzer(configuration);
+		ExecTool et = pproc.getFirstRunner(configuration);
+		
+		
+		
 		if(buildOnly){
-			builder = new PerfBuilder(configuration, pproc.getFirstBuilder(configuration));
+			builder = new PerfBuilder(configuration, bt);
 			runStep(builder);
 			return;
 		}
 		
+		analyzeOnly=analyzeOnly||(bt==null&&ppt!=null&&et==null);
+		
 		if(analyzeOnly){
 			//String lookdir="somedir";
-			PerfPostlaunch analyzer=new PerfPostlaunch(configuration,pproc.getFirstAnalyzer(configuration),null);
+			PerfPostlaunch analyzer=new PerfPostlaunch(configuration,ppt,null);
 			runStep(analyzer);
 			return;
 		}

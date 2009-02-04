@@ -13,6 +13,7 @@ import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.toolopts.PostProcTool;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfigurationConstants{
@@ -119,9 +120,11 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 			Display.getDefault().syncExec(new Runnable() {
 		
 				public void run() {
-					DirectoryDialog dl = new DirectoryDialog(PlatformUI.getWorkbench()
-							.getDisplay()
-							.getActiveShell());
+					Shell s = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+					if(s==null){
+						s=PlatformUI.getWorkbench().getDisplay().getShells()[0];
+					}
+					DirectoryDialog dl = new DirectoryDialog(s);
 					dl.setText("Select the directory containing performance data");
 					outputLocation=dl.open();
 				}

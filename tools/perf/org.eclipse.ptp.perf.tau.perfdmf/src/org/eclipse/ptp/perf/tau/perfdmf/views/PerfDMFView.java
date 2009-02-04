@@ -286,7 +286,9 @@ public class PerfDMFView extends ViewPart {
         	 databaseName=null;
          	return null;
          }
-         
+         if(name==null){
+        	 name="Default";
+         }
          Iterator<Database> dit = dbs.iterator();
          
          while(dit.hasNext())
