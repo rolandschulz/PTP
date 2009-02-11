@@ -103,8 +103,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     
     protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
     
-    protected static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
-    
     protected static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
     
     protected static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
@@ -151,8 +149,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         // JO: This gives you a "Toggle Breakpoint" action (and others)
         // when you right-click the Fortran editor's ruler
         setRulerContextMenuId("#CEditorRulerContext"); //$NON-NLS-1$
-        
-        setEditorContextMenuId(CONTEXT_MENU_ID);
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////

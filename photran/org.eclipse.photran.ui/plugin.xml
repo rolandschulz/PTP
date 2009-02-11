@@ -61,8 +61,18 @@
 
    <extension point="org.eclipse.ui.popupMenus">
 	  <viewerContribution 
-	        targetID="#FortranEditorContextMenu" 
-	        id="org.eclipse.photran.ui.BlockCommentEditorContribution">
+	        targetID="#FixedFormFortranEditorContextMenu" 
+	        id="org.eclipse.photran.ui.FixedBlockCommentEditorContribution">
+	     <action 
+	           label="Comment/Uncomment" 
+               definitionId="org.eclipse.photran.ui.CommentCommand"
+	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
+	           menubarPath="group.edit" 
+	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
+	  </viewerContribution>
+	  <viewerContribution 
+	        targetID="#FreeFormFortranEditorContextMenu" 
+	        id="org.eclipse.photran.ui.FreeBlockCommentEditorContribution">
 	     <action 
 	           label="Comment/Uncomment" 
                definitionId="org.eclipse.photran.ui.CommentCommand"

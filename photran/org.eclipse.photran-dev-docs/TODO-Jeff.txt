@@ -18,14 +18,14 @@
   - Include module subprograms, not just external subprograms
   - Module Procedure statements
   - Named interfaces
++ mailinglists.php -- See "Re: MySQL Error" e-mail (1/27/09)
 + CS427 - Hover tips - https://bugs.eclipse.org/bugs/show_bug.cgi?id=259163 (1/29/09)
 + Stas - Move Saved to Common Block Refactoring (1/29/09)
 + NPE org.eclipse.photran.internal.ui.editor_vpg.hover.FortranDeclarationHover.getHoverInfo(FortranDeclarationHover.java:91) (1/29/09)
 + New Fortran File wizard and menu item (1/29/09) -- If I click on new source file, I can choose between a C and a C++ template or <no template>. However, there's no FORTRAN-template. This is a usability feature, I hope this is not too hard to add.
++ Refactorings should not be available for fixed form files (2/11/09) -- Separate context menus for fixed and free form
 
 CRITICAL:
-- mailinglists.php -- See "Re: MySQL Error" e-mail
-- Refactorings should not be available for fixed form files
 - Preproc substring bug
 - I'm having trouble getting content assist and declaration view working.  I've enabled them per the directions, but still no luck.  My vpg error log has many exceptions, one of which pointed to a line of my code: include 'constants.h'   My code compiles, but there are additional files that vpg is picking up that aren't part of my makefile, which may be causing problems.  Hence, I would like to specify directories to be excluded from analysis.
 - Bug in indexing: not linking identifiers -- See Stas's description

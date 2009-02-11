@@ -85,8 +85,18 @@
    </extension>
    <extension point="org.eclipse.ui.popupMenus">
      <viewerContribution 
-        targetID="#FortranEditorContextMenu" 
-        id="org.eclipse.photran.ui.NavigationContribution">
+        targetID="#FixedFormFortranEditorContextMenu" 
+        id="org.eclipse.photran.ui.FixedNavigationContribution">
+       <action
+            class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
+            definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
+            id="org.eclipse.photran.ui.OpenDeclarationMenuAction"
+            label="&amp;Open Declaration"
+            menubarPath="group.open"/>
+     </viewerContribution>
+     <viewerContribution 
+        targetID="#FreeFormFortranEditorContextMenu" 
+        id="org.eclipse.photran.ui.FreeNavigationContribution">
        <action
             class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
             definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
@@ -192,8 +202,44 @@
    </extension>
    <extension point="org.eclipse.ui.popupMenus">
      <viewerContribution
-         id="org.eclipse.photran.ui.vpg.FortranFindReferencesContribution"
-         targetID="#FortranEditorContextMenu">
+         id="org.eclipse.photran.ui.vpg.FixedFortranFindReferencesContribution"
+         targetID="#FixedFormFortranEditorContextMenu">
+      <menu
+            id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
+            label="Re&amp;ferences"
+            path="group.search"><!-- See IContextMenuConstants -->
+         <separator
+               name="FindAllReferencesGroup">
+         </separator>
+      </menu>
+      <action
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesFileActionDelegate"
+            definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
+            icon="icons/full/obj16/search_ref_obj.gif"
+            id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
+            label="File"
+            menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
+      </action>
+      <action
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesProjectActionDelegate"
+            definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
+            icon="icons/full/obj16/search_ref_obj.gif"
+            id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
+            label="Project"
+            menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
+      </action>
+      <action
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesWorkspaceActionDelegate"
+            definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
+            icon="icons/full/obj16/search_ref_obj.gif"
+            id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
+            label="Workspace"
+            menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
+      </action>
+     </viewerContribution>
+     <viewerContribution
+         id="org.eclipse.photran.ui.vpg.FreeFortranFindReferencesContribution"
+         targetID="#FreeFormFortranEditorContextMenu">
       <menu
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
             label="Re&amp;ferences"
@@ -487,7 +533,7 @@
    <!-- 4. Add the refactoring to the editor's popup menu -->
    <extension point="org.eclipse.ui.popupMenus">
       <viewerContribution 
-            targetID="#FortranEditorContextMenu" 
+            targetID="#FreeFormFortranEditorContextMenu" 
             id="org.eclipse.photran.refactoring.refactoringEditorContribution">
          <menu
                id="org.eclipse.photran.ui.RefactoringMenu"
