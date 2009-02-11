@@ -48,7 +48,8 @@
 - Bugs reported in MP5
 - VPG omits dependencies on unnamed common blocks (?)
 - NPEs in indexer -- see Bugzilla
-
+- Bug renaming function in Arjan's libgrid.f90 (line 72/82): implicit function result variable not renamed
+- Look at and possibly commit search patch
 
 
 NEW IN THIS BETA:
@@ -70,7 +71,7 @@ X Make a Type object for arrays which includes dimensions (for Stoyan)
 
 
 ECLIPSE FOUNDATION REQUIREMENTS
-- Photran CQ 2737
++ Photran CQ 2737
   + Nicolas Chen
   + Cheah Chin Fei
   + Dirk Rosson
@@ -81,4 +82,4 @@ ECLIPSE FOUNDATION REQUIREMENTS
   X Sean Kim
   + Walt Brained (WB)
   + Stoyan Gaydarov
-- Eli Grammar CQ 2880
++ Eli Grammar CQ 2880
