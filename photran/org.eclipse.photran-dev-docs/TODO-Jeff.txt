@@ -50,6 +50,11 @@
 - NPEs in indexer -- see Bugzilla
 - Bug renaming function in Arjan's libgrid.f90 (line 72/82): implicit function result variable not renamed
 - Look at and possibly commit search patch
+- Rename across interfaces, external subprograms (promised Bruno in e-mail)
+- Should be able to select after last character of an identifier and still activate refactoring
+- Outdated (and duplicate?) VPG error messages when not tied to an IFile
+- Need view (and optional markers?) with VPG errors/warnings
+
 
 
 NEW IN THIS BETA:
