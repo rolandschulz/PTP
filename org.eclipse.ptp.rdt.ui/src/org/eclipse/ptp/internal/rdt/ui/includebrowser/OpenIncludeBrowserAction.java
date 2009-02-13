@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.LocalIncludeBrowserService;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -35,7 +36,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class OpenIncludeBrowserAction extends SelectionDispatchAction {
 
 	private ITextEditor fEditor;
-	private IIncludeBrowserService fService = new LocalIncludeBrowserService();
 
 	public OpenIncludeBrowserAction(IWorkbenchSite site) {
 		super(site);
@@ -50,7 +50,7 @@ public class OpenIncludeBrowserAction extends SelectionDispatchAction {
 	}
 
 	public void run(ITextSelection sel) {
-		IncludeBrowserUI.open(fService, fEditor, sel);
+		IncludeBrowserUI.open(fEditor, sel);
 	}
 	
 	public void run(IStructuredSelection selection) {
@@ -58,7 +58,7 @@ public class OpenIncludeBrowserAction extends SelectionDispatchAction {
 			Object selectedObject= selection.getFirstElement();
 			ICElement elem= (ICElement) getAdapter(selectedObject, ICElement.class);
 			if (elem != null) {
-				IncludeBrowserUI.open(fService, getSite().getWorkbenchWindow(), elem);
+				IncludeBrowserUI.open(getSite().getWorkbenchWindow(), elem);
 			}
 		}
 	}

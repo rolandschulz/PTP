@@ -41,8 +41,8 @@ import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 
 public class LocalIncludeBrowserService extends AbstractIncludeBrowserService {
 
-	private static final IIndexInclude[] EMPTY = new IIndexInclude[0];
-
+	private static final IIndexIncludeValue[] EMPTY = new IIndexIncludeValue[0];
+	
 	private IIndexInclude[] findIncludedBy(IIndex index, IIndexFileLocation ifl, IProgressMonitor pm) {
 		try {
 			if (ifl != null) {
@@ -101,54 +101,73 @@ public class LocalIncludeBrowserService extends AbstractIncludeBrowserService {
 		return new IIndexInclude[0];
 	}
 
-	public IIndexInclude[] findIncludedBy(IIndexFileLocation ifl, IProgressMonitor progress) {
-		IIndex index;
+	public IIndexIncludeValue[] findIncludedBy(IIndexFileLocation ifl, ICProject project, IProgressMonitor progress) {
+		IIndex index = null;
 		try {
 			ICProject[] scope= CoreModel.getDefault().getCModel().getCProjects();
 			index= CCorePlugin.getIndexManager().getIndex(scope);
 			index.acquireReadLock();
+
+			IIndexInclude[] includes = findIncludedBy(index, ifl, progress);
+			
+			IIndexIncludeValue[] includeValues = new IIndexIncludeValue[includes.length];
+			for (int i = 0; i < includes.length; i ++)
+			{
+				includeValues[i] = new IndexIncludeValue(includes[i]);
+			}
+			
+			return includeValues;
+
 		} catch (CoreException e) {
 			CCorePlugin.log(e);
 			return EMPTY;
 		} catch (InterruptedException e) {
 			return EMPTY;
-		}
-		
-		try {
-			return findIncludedBy(index, ifl, progress);
 		} finally {
-			index.releaseReadLock();
+			if (index != null)
+				index.releaseReadLock();
 		}
 	}
 
-	public IIndexInclude[] findIncludesTo(IIndexFileLocation ifl, IProgressMonitor progress) {
-		IIndex index;
+	public IIndexIncludeValue[] findIncludesTo(IIndexFileLocation ifl, ICProject project, IProgressMonitor progress) {
+		IIndex index = null;
 		try {
 			ICProject[] scope= CoreModel.getDefault().getCModel().getCProjects();
 			index= CCorePlugin.getIndexManager().getIndex(scope);
 			index.acquireReadLock();
+
+			IIndexInclude[] includes = findIncludesTo(index, ifl, progress);
+
+			IIndexIncludeValue[] includeValues = new IIndexIncludeValue[includes.length];
+			for (int i = 0; i < includes.length; i ++)
+			{
+				includeValues[i] = new IndexIncludeValue(includes[i]);
+			}
+			
+			return includeValues;
+			
 		} catch (CoreException e) {
 			CCorePlugin.log(e);
 			return EMPTY;
 		} catch (InterruptedException e) {
 			return EMPTY;
-		}
-		
-		try {
-			return findIncludesTo(index, ifl, progress);
 		} finally {
-			index.releaseReadLock();
+			if (index != null)
+				index.releaseReadLock();
 		}
 	}
 
-	public IIndexInclude findInclude(IInclude input) throws CoreException {
+	public IIndexIncludeValue findInclude(IInclude input, IProgressMonitor monitor) throws CoreException {
 		ICProject project= input.getCProject();
 		if (project != null) {
 			IIndex index= CCorePlugin.getIndexManager().getIndex(project);
 			try {
 				index.acquireReadLock();
 				try {
-					return IndexQueries.elementToInclude(index, input);
+					IIndexInclude include = IndexQueries.elementToInclude(index, input);
+					
+					return new IndexIncludeValue(include);
+					
 				} finally {
 					index.releaseReadLock();
 				}
@@ -158,4 +177,31 @@ public class LocalIncludeBrowserService extends AbstractIncludeBrowserService {
 		}
 		return null;
 	}
+
+	public boolean isIndexed(IIndexFileLocation location, ICProject project, IProgressMonitor monitor)
+	{
+		try 
+		{
+			final ICProject[] projects= CoreModel.getDefault().getCModel().getCProjects();
+			IIndex index= CCorePlugin.getIndexManager().getIndex(projects);
+			index.acquireReadLock();
+			try 
+			{
+				IIndexFile[] files= index.getFiles(location);
+				
+				return files.length > 0;
+			}
+			finally 
+			{
+				index.releaseReadLock();
+			}
+		}
+		catch (CoreException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+		}
+		
+		return false;
+	}
+
 }

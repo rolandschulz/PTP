@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -30,12 +31,15 @@ import org.eclipse.cdt.core.dom.ast.IFunction;
 import org.eclipse.cdt.core.dom.ast.IVariable;
 import org.eclipse.cdt.core.dom.ast.c.ICExternalBinding;
 import org.eclipse.cdt.core.index.IIndex;
+import org.eclipse.cdt.core.index.IIndexFile;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
+import org.eclipse.cdt.core.index.IIndexInclude;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ILanguage;
+import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
@@ -57,6 +61,8 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.CompletionProposalComputer;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
@@ -119,6 +125,16 @@ public class CDTMiner extends Miner {
 	// navigation
 	public static final String C_NAVIGATION_OPEN_DECLARATION = "C_NAVIGATION_OPEN_DECLARATION"; //$NON-NLS-1$
 	public static final String T_NAVIGATION_RESULT = "Type.Navigation.Result"; //$NON-NLS-1$
+	
+	// includes
+	public static final String C_INCLUDES_FIND_INCLUDES_TO = "C_INCLUDES_FIND_INCLUDES_TO"; //$NON-NLS-1$
+	public static final String C_INCLUDES_FIND_INCLUDES_TO_RESULT = "C_INCLUDES_FIND_INCLUDES_TO_RESULT"; //$NON-NLS-1$
+	public static final String C_INCLUDES_FIND_INCLUDED_BY = "C_INCLUDES_FIND_INCLUDED_BY"; //$NON-NLS-1$
+	public static final String C_INCLUDES_FIND_INCLUDED_BY_RESULT = "C_INCLUDES_FIND_INCLUDED_BY_RESULT"; //$NON-NLS-1$
+	public static final String C_INCLUDES_IS_INDEXED = "C_INCLUDES_IS_INDEXED"; //$NON-NLS-1$
+	public static final String C_INCLUDES_IS_INDEXED_RESULT = "C_INCLUDES_IS_INDEXED_RESULT"; //$NON-NLS-1$
+	public static final String C_INCLUDES_FIND_INCLUDE = "C_INCLUDES_FIND_INCLUDE"; //$NON-NLS-1$
+	public static final String C_INCLUDES_FIND_INCLUDE_RESULT = "C_INCLUDES_FIND_INCLUDE_RESULT"; //$NON-NLS-1$
 	
 	public static String LINE_SEPARATOR;
 	
@@ -471,8 +487,418 @@ public class CDTMiner extends Miner {
 			}
 			
 		}
+		else if (name.equals(C_INCLUDES_FIND_INCLUDES_TO)) 
+		{
+			try 
+			{
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Finding includes for location " + location + "..."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+				
+				handleFindIncludesTo(scopeName, hostName, location, status);
+				
+				System.out.println("Finished finding includes"); //$NON-NLS-1$
+				System.out.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		else if (name.equals(C_INCLUDES_FIND_INCLUDED_BY)) 
+		{
+			try 
+			{
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Finding included by for location " + location + "..."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+				
+				handleFindIncludedBy(scopeName, hostName, location, status);
+				
+				System.out.println("Finished finding included by"); //$NON-NLS-1$
+				System.out.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		else if (name.equals(C_INCLUDES_FIND_INCLUDE)) 
+		{
+			try 
+			{
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				String includeName = getString(theCommand, 4);
+				int offset = getInteger(theCommand, 5);
+				
+				System.out.println("Finding include for location " + location + "..."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+				
+				handleFindInclude(scopeName, hostName, location, includeName, offset, status);
+				
+				System.out.println("Finished finding include"); //$NON-NLS-1$
+				System.out.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		else if (name.equals(C_INCLUDES_IS_INDEXED)) 
+		{
+			try 
+			{
+				String scopeName = getString(theCommand, 1);
+				String hostName = getString(theCommand, 2);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				
+				System.out.println("Finding if location is indexed: " + location + "..."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+				
+				handleIsIndexed(scopeName, hostName, location, status);
+
+				System.out.println("Finished finding if location is indexed"); //$NON-NLS-1$
+				System.out.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
+		}
 		
 		return status;
+	}
+	
+	
+	
+	protected void handleFindIncludesTo(String scopeName, String hostName, IIndexFileLocation location, DataElement status) 
+	{
+		try 
+		{
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+
+			try
+			{
+				IIndexIncludeValue[] includesToReturn;
+				IIndexFile[] files= index.getFiles(location);
+				
+				if (files.length == 0)
+				{
+					System.out.println("No index files found"); //$NON-NLS-1$
+					System.out.flush();
+
+					includesToReturn = new IIndexIncludeValue[0];
+				}
+				else if (files.length == 1) 
+				{
+//					System.out.println("Found 1 index file"); //$NON-NLS-1$ 
+//					System.out.flush();
+
+					IIndexInclude[] includes = index.findIncludes(files[0]);
+					
+					if (includes == null)
+						includesToReturn = new IIndexIncludeValue[0];
+					else
+					{
+						includesToReturn = new IIndexIncludeValue[includes.length];
+						for (int i = 0; i < includes.length; i ++)
+						{
+							includesToReturn[i] = new IndexIncludeValue(includes[i], getLocationConverter(hostName));
+							
+							System.out.println("IndexIncludeValue to return: " + includesToReturn[i]); //$NON-NLS-1$
+						}
+						
+						System.out.flush();
+					}
+				}
+				else 
+				{
+//					System.out.println("Found " + files.length + " index files"); //$NON-NLS-1$ //$NON-NLS-2$
+//					System.out.flush();
+
+					ArrayList<IIndexIncludeValue> list= new ArrayList<IIndexIncludeValue>();
+					HashSet<IIndexFileLocation> handled= new HashSet<IIndexFileLocation>();
+					
+					for (int i = 0; i < files.length; i++) 
+					{
+						final IIndexInclude[] includes = index.findIncludes(files[i]);
+
+//						System.out.println("Found " + includes.length + " includes"); //$NON-NLS-1$ //$NON-NLS-2$
+//						System.out.flush();
+
+						for (int j = 0; j < includes.length; j++) 
+						{
+							IIndexInclude indexInclude = includes[j];
+							if (handled.add(indexInclude.getIncludesLocation())) 
+							{
+								IIndexIncludeValue value = new IndexIncludeValue(indexInclude, getLocationConverter(hostName));
+								list.add(value);
+
+								System.out.println("IndexIncludeValue to return: " + value); //$NON-NLS-1$
+							}
+							
+							System.out.flush();
+						}
+					}
+					
+					includesToReturn = list.toArray(new IIndexIncludeValue[list.size()]);
+				}
+	
+				// create the result object
+				String resultString = Serializer.serialize(includesToReturn);
+				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDES_TO_RESULT, resultString);
+			}			         
+			finally 
+			{
+				if (index != null)
+					index.releaseReadLock();
+				
+				statusDone(status);
+
+				System.out.println("Released read lock"); //$NON-NLS-1$
+				System.out.flush();
+				
+			}
+		} 
+		catch (Throwable e) 
+		{
+			e.printStackTrace();
+		} 
+		
+	}
+	
+	protected void handleFindInclude(String scopeName, String hostName, IIndexFileLocation location, String name, int offset, DataElement status) 
+	{
+		try 
+		{
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+
+			try
+			{
+				IIndexIncludeValue includeToReturn = null;
+				IIndexFile[] files= index.getFiles(location);
+				
+				if (files.length == 0)
+				{
+					System.out.println("No index files found"); //$NON-NLS-1$
+					System.out.flush();
+				}
+				else 
+				{
+					IIndexInclude best= null;
+
+					for (int j = 0; j < files.length; j ++) 
+					{
+						IIndexFile file = files[j];
+
+						IIndexInclude[] includes= index.findIncludes(file);
+						int bestDiff= Integer.MAX_VALUE;
+
+						for (int i = 0; i < includes.length; i++) 
+						{
+							IIndexInclude candidate = includes[i];
+							int diff = Math.abs(candidate.getNameOffset()- offset);
+							if (diff > bestDiff) 
+							{
+								break;
+							}
+							if (candidate.getName().endsWith(name)) 
+							{
+								bestDiff= diff;
+								best= candidate;
+							}
+						}
+						
+						if (best != null)
+						{
+							includeToReturn = new IndexIncludeValue(best);
+							break;
+						}
+					}
+					
+				}
+	
+				// create the result object
+				String resultString = Serializer.serialize(includeToReturn);
+				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDE_RESULT, resultString);
+			}			         
+			finally 
+			{
+				if (index != null)
+					index.releaseReadLock();
+				
+				statusDone(status);
+
+				System.out.println("Released read lock"); //$NON-NLS-1$
+				System.out.flush();
+				
+			}
+		} 
+		catch (Throwable e) 
+		{
+			e.printStackTrace();
+		} 
+		
+	}
+
+	protected void handleFindIncludedBy(String scopeName, String hostName, IIndexFileLocation location, DataElement status) 
+	{
+		try 
+		{
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+
+			try
+			{
+				IIndexIncludeValue[] includesToReturn;
+				IIndexFile[] files= index.getFiles(location);
+				
+				if (files.length == 0)
+				{
+					System.out.println("No index files found"); //$NON-NLS-1$
+					System.out.flush();
+
+					includesToReturn = new IIndexIncludeValue[0];
+				}
+				else if (files.length == 1) 
+				{
+//					System.out.println("Found 1 index file"); //$NON-NLS-1$ 
+//					System.out.flush();
+
+					IIndexInclude[] includes = index.findIncludedBy(files[0]);
+					
+					if (includes == null)
+						includesToReturn = new IIndexIncludeValue[0];
+					else
+					{
+						includesToReturn = new IIndexIncludeValue[includes.length];
+						for (int i = 0; i < includes.length; i ++)
+						{
+							includesToReturn[i] = new IndexIncludeValue(includes[i], getLocationConverter(hostName));
+							
+							System.out.println("IndexIncludeValue to return: " + includesToReturn[i]); //$NON-NLS-1$
+						}
+						
+						System.out.flush();
+					}
+				}
+				else 
+				{
+//					System.out.println("Found " + files.length + " index files"); //$NON-NLS-1$ //$NON-NLS-2$
+//					System.out.flush();
+
+					ArrayList<IIndexIncludeValue> list= new ArrayList<IIndexIncludeValue>();
+					HashSet<IIndexFileLocation> handled= new HashSet<IIndexFileLocation>();
+					
+					for (int i = 0; i < files.length; i++) 
+					{
+						final IIndexInclude[] includes = index.findIncludedBy(files[i]);
+
+//						System.out.println("Found " + includes.length + " includes"); //$NON-NLS-1$ //$NON-NLS-2$
+//						System.out.flush();
+
+						for (int j = 0; j < includes.length; j++) 
+						{
+							IIndexInclude indexInclude = includes[j];
+							if (handled.add(indexInclude.getIncludedByLocation())) 
+							{
+								IIndexIncludeValue value = new IndexIncludeValue(indexInclude, getLocationConverter(hostName));
+								list.add(value);
+
+								System.out.println("IndexIncludeValue to return: " + value); //$NON-NLS-1$
+							}
+							
+							System.out.flush();
+						}
+					}
+					
+					includesToReturn = list.toArray(new IIndexIncludeValue[list.size()]);
+				}
+	
+				// create the result object
+				String resultString = Serializer.serialize(includesToReturn);
+				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDED_BY_RESULT, resultString);
+			}			         
+			finally 
+			{
+				if (index != null)
+					index.releaseReadLock();
+				
+				statusDone(status);
+
+				System.out.println("Released read lock"); //$NON-NLS-1$
+				System.out.flush();
+				
+			}
+		} 
+		catch (Throwable e) 
+		{
+			e.printStackTrace();
+		} 
+		
+	}
+	
+	protected void handleIsIndexed(String scopeName, String hostName, IIndexFileLocation location, DataElement status) 
+	{
+		try 
+		{
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			System.out.println("Acquiring read lock"); //$NON-NLS-1$
+			System.out.flush();
+			index.acquireReadLock();
+
+			try
+			{
+				IIndexFile[] files= index.getFiles(location);
+				
+				System.out.println("Found " + files.length + " index files"); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+
+				// create the result object
+				String resultString = Serializer.serialize(new Boolean(files.length > 0));
+				status.getDataStore().createObject(status, C_INCLUDES_IS_INDEXED_RESULT, resultString);
+			}			         
+			finally 
+			{
+				if (index != null)
+					index.releaseReadLock();
+				
+				statusDone(status);
+
+				System.out.println("Released read lock"); //$NON-NLS-1$
+				System.out.flush();
+				
+			}
+		} 
+		catch (Throwable e) 
+		{
+			e.printStackTrace();
+		} 
+		
 	}
 
 	protected void handleFindTypeHierarchyInput(String scopeName, String hostName, ITranslationUnit unit, String projectName, int selectionStart, int selectionLength, DataElement status) {
@@ -784,6 +1210,12 @@ public class CDTMiner extends Miner {
 		// navigation
 		createCommandDescriptor(schemaRoot, "Open declaration", C_NAVIGATION_OPEN_DECLARATION, false); //$NON-NLS-1$
 		
+		//includes
+		createCommandDescriptor(schemaRoot, "Find includes to", C_INCLUDES_FIND_INCLUDES_TO, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Find included by", C_INCLUDES_FIND_INCLUDED_BY, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Is indexed", C_INCLUDES_IS_INDEXED, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Find include", C_INCLUDES_FIND_INCLUDE, false); //$NON-NLS-1$
+		
 		_dataStore.refresh(schemaRoot);
 	}
 	
@@ -806,7 +1238,7 @@ public class CDTMiner extends Miner {
 				ICElement[] definitions = null;
 				if (subject instanceof ISourceReference) {
 					ISourceReference input = (ISourceReference) subject;
-					ITranslationUnit tu = ((ISourceReference) subject).getTranslationUnit();
+					ITranslationUnit tu = input.getTranslationUnit();
 					
 					if (needToFindDefinition(subject)) {
 						IBinding binding= IndexQueries.elementToBinding(index, subject);
@@ -1108,7 +1540,7 @@ public class CDTMiner extends Miner {
 		
 		Set<String> files = new LinkedHashSet<String>();
 		
-		System.out.println("Added scope " + scope + "Files:\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println("Added scope " + scope + ". Files:\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		System.out.flush();
 		
 		while(iterator.hasNext())
