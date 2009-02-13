@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.rdt.ui.includebrowser;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexInclude;
+import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
@@ -30,8 +31,10 @@ import org.eclipse.cdt.internal.ui.includebrowser.IBMessages;
 import org.eclipse.cdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -39,9 +42,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 public class IncludeBrowserUI {
 
-	public static void open(final IIncludeBrowserService service, final IWorkbenchWindow window, final ICElement input) {
+	public static void open(final IWorkbenchWindow window, final ICElement input) {
         try {
-        	ITranslationUnit tu= convertToTranslationUnit(service, input);
+        	ITranslationUnit tu= convertToTranslationUnit(input);
         	if (tu != null) {
         		IWorkbenchPage page= window.getActivePage();
         		IBViewPart result= (IBViewPart)page.showView(UIPlugin.INCLUDE_BROWSER_VIEW_ID);
@@ -54,17 +57,17 @@ public class IncludeBrowserUI {
 		}
     }
 
-	public static void open(final IIncludeBrowserService service, final ITextEditor editor, final ITextSelection sel) {
+	public static void open(final ITextEditor editor, final ITextSelection sel) {
 		if (editor != null) {
 			ICElement inputCElement = CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editor.getEditorInput());
-			open (service, editor.getSite().getWorkbenchWindow(), inputCElement);
+			open (editor.getSite().getWorkbenchWindow(), inputCElement);
 		}
     }
 
-    private static ITranslationUnit convertToTranslationUnit(IIncludeBrowserService service, ICElement input) throws CoreException, InterruptedException {
+    private static ITranslationUnit convertToTranslationUnit(ICElement input) throws CoreException, InterruptedException {
     	ITranslationUnit result= null;
     	if (input instanceof IInclude) {
-    		result= findTargetTranslationUnit(service, (IInclude) input);
+    		result= findTargetTranslationUnit((IInclude) input);
     	}
     	if (result == null && input instanceof ISourceReference) {
     		result= ((ISourceReference) input).getTranslationUnit();
@@ -72,10 +75,13 @@ public class IncludeBrowserUI {
 		return result;
 	}
 
-	private static ITranslationUnit findTargetTranslationUnit(IIncludeBrowserService service, IInclude input) throws CoreException, InterruptedException {
+	private static ITranslationUnit findTargetTranslationUnit(IInclude input) throws CoreException, InterruptedException {
 		ICProject project= input.getCProject();
 		if (project != null) {
-			IIndexInclude include= service.findInclude(input);
+			
+			IIncludeBrowserService service = new IncludeBrowserServiceFactory().getIncludeBrowserService(project);
+			
+			IIndexInclude include= service.findInclude(input, null);
 			if (include != null) {
 				IIndexFileLocation loc= include.getIncludesLocation();
 				if (loc != null) {
@@ -85,4 +91,28 @@ public class IncludeBrowserUI {
 		}
 		return null;
 	}
+	
+	public static boolean isIndexed(ICElement element, IProgressMonitor monitor) throws CoreException 
+	{
+		if (element instanceof ISourceReference) 
+		{
+			ISourceReference sf = ((ISourceReference)element);
+			ITranslationUnit tu= sf.getTranslationUnit();
+			if (tu != null) 
+			{
+				IIndexFileLocation location= IndexLocationFactory.getIFL(tu);
+				if (location != null) 
+				{
+					ICProject project = element.getCProject();
+					
+					IIncludeBrowserService service = new IncludeBrowserServiceFactory().getIncludeBrowserService(project);
+
+					return service.isIndexed(location, project, monitor);
+				}
+			}
+		}
+		return false;
+	}
+	
+	
 }

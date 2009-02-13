@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
-import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
@@ -39,6 +37,7 @@ import org.eclipse.cdt.internal.ui.includebrowser.IBMessages;
 import org.eclipse.cdt.internal.ui.includebrowser.IBNode;
 import org.eclipse.cdt.internal.ui.includebrowser.IBWorkingSetFilter;
 import org.eclipse.cdt.internal.ui.navigator.OpenCElementAction;
+import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.viewsupport.EditorOpener;
 import org.eclipse.cdt.internal.ui.viewsupport.ExtendedTreeViewer;
@@ -47,7 +46,9 @@ import org.eclipse.cdt.internal.ui.viewsupport.TreeNavigator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -74,6 +75,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
@@ -185,7 +188,7 @@ public class IBViewPart extends ViewPart
     		fTreeViewer.setInput(null);
     		return;
     	}
-    	
+
     	if (CCorePlugin.getIndexManager().isIndexerIdle()) {
     		setInputIndexerIdle(input);
     	}
@@ -221,31 +224,26 @@ public class IBViewPart extends ViewPart
         Job job= new Job(IBMessages.IBViewPart_jobCheckInput) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					IIndex index= CCorePlugin.getIndexManager().getIndex(input.getCProject());
-					index.acquireReadLock();
-					try {
-						if (!IndexUI.isIndexed(index, input)) {
-							final String msg = IndexUI
-									.getFileNotIndexedMessage(input);
-							display.asyncExec(new Runnable() {
-								public void run() {
-									if (fTreeViewer.getInput() == input) {
-										setMessage(msg);
-										fTreeViewer.setInput(null);
-									}
+				try 
+				{
+					if (!IncludeBrowserUI.isIndexed(input, monitor)) 
+					{
+						final String msg = IndexUI
+								.getFileNotIndexedMessage(input);
+						display.asyncExec(new Runnable() {
+							public void run() {
+								if (fTreeViewer.getInput() == input) {
+									setMessage(msg);
+									fTreeViewer.setInput(null);
 								}
-							});
-						}
-						return Status.OK_STATUS;
-					} finally {
-						index.releaseReadLock();
+							}
+						});
 					}
-				} catch (CoreException e) {
 					return Status.OK_STATUS;
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					return Status.CANCEL_STATUS;
+				} 
+				catch (CoreException e) 
+				{
+					return Status.OK_STATUS;
 				} 
 			}
         };
@@ -776,10 +774,40 @@ public class IBViewPart extends ViewPart
                 }
                 else {
                     IIndexFileLocation ifl = ibf.getLocation();
-                    if (ifl != null) {
-                    	IPath location= IndexLocationFactory.getAbsolutePath(ifl);
-                    	if (location != null) {
+                    if (ifl != null) 
+                    {
+                    	//find resource that is in the workspace (like user include)
+                    	IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(ifl.getURI());
+                    	IPath location = null;
+                    	
+                    	if(files.length > 0) 
+                    	{
+                    		IProject project = files[0].getProject();
+                    		IPath projectPath = new Path(project.getName()).makeAbsolute();
+                    		location = projectPath.append(files[0].getProjectRelativePath());
+                    	}
+                    	
+                    	if (location != null) 
+                    	{
+                    		//open workspace resource
                     		EditorOpener.openExternalFile(page, location, region, timestamp);
+                    	}
+                    	else 
+                    	{
+                    		//open external resource that is not a part of the workspace (like system include)
+                    		ITranslationUnit context = getInput();
+                			EditorOpener.openExternalFile(page, ifl.getURI(), region, timestamp, context);
+                			
+                			/*
+                    		try
+							{
+
+								EditorUtility.openInEditor(ifl.getURI(), context);
+							}
+							catch (PartInitException e)
+							{
+								e.printStackTrace();
+							} */
                     	}
                     }
                 }
