@@ -77,4 +77,14 @@
          <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
       </scannerInfoProvider>
    </extension>
+   <extension
+         id="remoteNature"
+         name="%RemoteNature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.ptp.rdt.core.resources.RemoteNature">
+         </run>
+      </runtime>
+   </extension>
 </plugin>
