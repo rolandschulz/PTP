@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ErrorParserManager;
+import org.eclipse.cdt.core.envvar.IEnvironmentVariable;
 import org.eclipse.cdt.core.model.ICModelMarker;
 import org.eclipse.cdt.core.resources.IConsole;
 import org.eclipse.cdt.internal.core.ConsoleOutputSniffer;
@@ -161,7 +162,12 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				HashMap<String, String> envMap = new HashMap<String, String>();
 				
 				// Add variables from build info
-				envMap.putAll(info.getExpandedEnvironment());
+				IEnvironmentVariable[] envVars = ManagedBuildManager.getEnvironmentVariableProvider().getVariables(mbsInfo.getDefaultConfiguration(), true);
+				
+				for (IEnvironmentVariable environmentVariable : envVars) {
+					envMap.put(environmentVariable.getName(), environmentVariable.getValue());
+				}
+				
 				Iterator<?> iter = envMap.entrySet().iterator();
 				List<String> strings= new ArrayList<String>(envMap.size());
 				while (iter.hasNext()) {
