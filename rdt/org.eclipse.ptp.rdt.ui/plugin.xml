@@ -11,7 +11,7 @@
             category="org.eclipse.cdt.ui.views"
             class="org.eclipse.ptp.internal.rdt.ui.includebrowser.IBViewPart"
             icon="icons/view16/includeBrowser.gif"
-            id="org.eclipse.cdt.ui.includeBrowser"
+            id="org.eclipse.ptp.rdt.ui.includeBrowser"
             name="%includeBrowser.name"/>
       <view
             category="org.eclipse.ptp.rdt.ui.views"

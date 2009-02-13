@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.rdt.ui.includebrowser;
 import java.util.ArrayList;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
-import org.eclipse.cdt.core.index.IIndexInclude;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.ui.includebrowser.IBFile;
@@ -30,9 +29,9 @@ import org.eclipse.cdt.internal.ui.viewsupport.AsyncTreeContentProvider;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.LocalIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
 import org.eclipse.swt.widgets.Display;
 
 /** 
@@ -40,9 +39,8 @@ import org.eclipse.swt.widgets.Display;
  */
 public class IBContentProvider extends AsyncTreeContentProvider {
 
-	private static final IProgressMonitor NPM = new NullProgressMonitor();
 	private boolean fComputeIncludedBy = true;
-	private IIncludeBrowserService fService = new LocalIncludeBrowserService();
+	private IncludeBrowserServiceFactory fServiceFactory;  
 
 	/**
 	 * Constructs the content provider.
@@ -78,7 +76,8 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 
 	@Override
 	protected Object[] asyncronouslyComputeChildren(Object parentElement, IProgressMonitor monitor) {
-		if (parentElement instanceof IBNode) {
+		if (parentElement instanceof IBNode) 
+		{
 			IBNode node = (IBNode) parentElement;
 			IIndexFileLocation ifl= node.getRepresentedIFL();
 			ICProject project= node.getCProject();
@@ -88,18 +87,27 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 			
 			IBFile directiveFile= null;
 			IBFile targetFile= null;
-			IIndexInclude[] includes;
+			IIndexIncludeValue[] includes;
+			
+			if (fServiceFactory == null)
+				fServiceFactory  = new IncludeBrowserServiceFactory();
+			
+			IIncludeBrowserService service = fServiceFactory.getIncludeBrowserService(project);
+			
+			if (service == null)
+				return NO_CHILDREN;
+			
 			if (fComputeIncludedBy) {
-				includes= fService.findIncludedBy(ifl, NPM);
+				includes = service.findIncludedBy(ifl, project, monitor);
 			}
 			else {
-				includes= fService.findIncludesTo(ifl, NPM);
+				includes= service.findIncludesTo(ifl, project, monitor);
 				directiveFile= node.getRepresentedFile();
 			}
 			if (includes.length > 0) {
 				ArrayList<IBNode> result= new ArrayList<IBNode>(includes.length);
 				for (int i = 0; i < includes.length; i++) {
-					IIndexInclude include = includes[i];
+					IIndexIncludeValue include = includes[i];
 					try {
 						if (fComputeIncludedBy) {
 							directiveFile= targetFile= new IBFile(project, include.getIncludedByLocation());
@@ -116,7 +124,7 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 						IBNode newnode= new IBNode(node, targetFile, directiveFile, 
 								include.getNameOffset(), 
 								include.getNameLength(), 
-								include.getIncludedBy().getTimestamp());
+								include.getIncludedByTimestamp());
 						newnode.setIsActiveCode(include.isActive());
 						newnode.setIsSystemInclude(include.isSystemInclude());
 						result.add(newnode);
@@ -140,5 +148,10 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 
 	public boolean getComputeIncludedBy() {
 		return fComputeIncludedBy;
+	}
+	
+	public IncludeBrowserServiceFactory getServiceFactory()
+	{
+		return this.fServiceFactory;
 	}
 }

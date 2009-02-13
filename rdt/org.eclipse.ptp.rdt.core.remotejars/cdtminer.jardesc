@@ -32,6 +32,8 @@
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.search"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{OpenDeclarationResult.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.contentassist"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.includebrowser{IIndexIncludeValue.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.includebrowser{IndexIncludeValue.java"/>
     </selectedElements>
     <fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
 </jardesc>
