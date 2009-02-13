@@ -12,13 +12,18 @@
 package org.eclipse.ptp.internal.rdt.core.includebrowser;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
-import org.eclipse.cdt.core.index.IIndexInclude;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IIncludeBrowserService {
-	IIndexInclude[] findIncludedBy(IIndexFileLocation ifl, IProgressMonitor progress);
-	IIndexInclude[] findIncludesTo(IIndexFileLocation ifl, IProgressMonitor progress);
-	IIndexInclude findInclude(IInclude input) throws CoreException;
+
+	IIndexIncludeValue[] findIncludedBy(IIndexFileLocation location, ICProject project, IProgressMonitor monitor);
+	
+	IIndexIncludeValue[] findIncludesTo(IIndexFileLocation location, ICProject project, IProgressMonitor monitor);
+	
+	IIndexIncludeValue findInclude(IInclude input, IProgressMonitor monitor) throws CoreException;
+	
+	boolean isIndexed(IIndexFileLocation location, ICProject project, IProgressMonitor monitor);
 }

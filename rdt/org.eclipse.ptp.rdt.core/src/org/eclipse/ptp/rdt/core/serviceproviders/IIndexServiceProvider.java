@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.core.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
@@ -35,4 +36,6 @@ public interface IIndexServiceProvider extends IServiceProvider {
 	public ICallHierarchyService getCallHierarchyService();
 	
 	public ITypeHierarchyService getTypeHierarchyService();
+	
+	public IIncludeBrowserService getIncludeBrowserService();
 }
