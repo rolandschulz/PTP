@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
+import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICContainer;
@@ -52,6 +53,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerProgress;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
@@ -947,4 +949,52 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 			fInitializedProjects.add(project);
 		}
 	}
+
+
+
+	public IIndexIncludeValue[] findIncludesTo(Scope scope, IIndexFileLocation location, IProgressMonitor monitor)
+	{
+		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDES_TO, new Object[] { scope, getHostName(), location }, monitor);
+		if (result == null) 
+		{
+			return new IIndexIncludeValue[0];
+		}
+	
+		return (IIndexIncludeValue[]) result;
+	}
+
+	public IIndexIncludeValue[] findIncludedBy(Scope scope, IIndexFileLocation location, IProgressMonitor monitor)
+	{
+		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDED_BY, new Object[] { scope, getHostName(), location }, monitor);
+		if (result == null) 
+		{
+			return new IIndexIncludeValue[0];
+		}
+	
+		return (IIndexIncludeValue[]) result;
+	}
+
+
+	public boolean isIndexed(Scope scope, IIndexFileLocation location, IProgressMonitor monitor)
+	{
+		Object result = sendRequest(CDTMiner.C_INCLUDES_IS_INDEXED, new Object[] { scope, getHostName(), location }, monitor);
+		if (result != null) 
+		{
+			return Boolean.parseBoolean(result.toString());
+		}
+		
+		return false;
+	}
+	
+	public IIndexIncludeValue findInclude(Scope scope, IIndexFileLocation location, String name, int offset, IProgressMonitor monitor)
+	{
+		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDE, new Object[] { scope, getHostName(), location, name, offset}, monitor);
+		if (result == null) 
+		{
+			return null;
+		}
+	
+		return (IIndexIncludeValue) result;
+	}
+	
 }

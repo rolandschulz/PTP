@@ -12,6 +12,8 @@ package org.eclipse.ptp.internal.rdt.core.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.RemoteCallHierarchyService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.RemoteIncludeBrowserService;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
@@ -41,6 +43,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 	protected INavigationService fNavigationService;
 	protected ICallHierarchyService fCallHierarchyService;
 	protected ITypeHierarchyService fTypeHierarchyService;
+	protected IIncludeBrowserService fIncludeBrowserService;
 	
 	public static final String ID = "org.eclipse.ptp.rdt.core.RemoteCIndexServiceProvider"; //$NON-NLS-1$
 	public static final String NAME = Messages.RemoteCIndexServiceProvider_0;
@@ -103,6 +106,16 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			fTypeHierarchyService = new RemoteTypeHierarchyService(fHost, fConnectorService);
 		
 		return fTypeHierarchyService;
+	}
+
+	public synchronized IIncludeBrowserService getIncludeBrowserService() {
+		if(!isConfigured())
+			return null;
+		
+		if(fIncludeBrowserService== null)
+			fIncludeBrowserService = new RemoteIncludeBrowserService(fHost, fConnectorService);
+		
+		return fIncludeBrowserService;
 	}
 
 	/**
