@@ -1,5 +1,6 @@
 !>
-!! Example program causes an internal compiler error in XLF
+!! Example program causes an internal compiler error in
+!! IBM XL Fortran for AIX, V12.1 (5724-U82)
 !!
 !! Jeff Overbey (1/29/09)
 !<

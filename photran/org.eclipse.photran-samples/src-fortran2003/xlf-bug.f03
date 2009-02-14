@@ -1,5 +1,7 @@
 !>
-!! Illustrates a bug in the XLF compiler.  The function "identity" is an internal function which
+!! Illustrates a bug in IBM XL Fortran for AIX, V12.1 (5724-U82)
+!!
+!! The function "identity" is an internal function which
 !! is passed as a parameter to the "map" routine.  However, when it is invoked as a callback,
 !! the string it receives as its first parameter is not the string that was actually passed
 !! as the first parameter by the invoking function.
