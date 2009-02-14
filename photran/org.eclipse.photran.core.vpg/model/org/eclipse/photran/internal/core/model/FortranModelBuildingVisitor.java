@@ -12,11 +12,14 @@ import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTGenericBindingNode;
+import org.eclipse.photran.internal.core.parser.ASTGenericSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTSpecificBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
@@ -152,6 +155,32 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
     public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
     {
         Token token = node.getSubroutineStmt().getSubroutineName().getSubroutineName();
+        addToModel(node, setPos(new FortranElement.Subroutine(getCurrentParent(), token), node));
+    }
+
+    public void visitASTSpecificBindingNode(ASTSpecificBindingNode node)
+    {
+        Token token = node.getBindingName();
+        addToModel(node, setPos(new FortranElement.Subroutine(getCurrentParent(), token), node));
+    }
+
+    public void visitASTGenericBindingNode(ASTGenericBindingNode node)
+    {
+        Token token;
+        if (node.getGenericName() != null)
+        {
+            token =  node.getGenericName().getGenericName();
+        }
+        else
+        {
+            ASTGenericSpecNode spec = node.getGenericSpec();
+            if (spec.isAssignmentOperator())
+                token = spec.getEqualsToken();
+            else if (spec.isDefinedOperator())
+                token = spec.getDefinedOperator().findFirstToken();
+            else
+                token = spec.findFirstToken();
+        }
         addToModel(node, setPos(new FortranElement.Subroutine(getCurrentParent(), token), node));
     }
 
