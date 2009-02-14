@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTFormatsepNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFormatsepNode
     org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFormatsepNode
-
-    public boolean slashFormatSep()
-    {
-        return this.slashFormatSep != null;
-    }
-
-    public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.slashFormatSep = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFormatsepNode
 
     public boolean colonFormatSep()
     {
@@ -48,6 +37,17 @@ public class ASTFormatsepNode extends ASTNode
     public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.colonFormatSep = newValue;
+    }
+
+
+    public boolean slashFormatSep()
+    {
+        return this.slashFormatSep != null;
+    }
+
+    public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.slashFormatSep = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.slashFormatSep;
-        case 1:  return this.colonFormatSep;
+        case 0:  return this.colonFormatSep;
+        case 1:  return this.slashFormatSep;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -465,6 +465,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "("								{ wantEos = true; unsetSOL();          return token(Terminal.T_LPAREN); }
 ".LT."							{ wantEos = true; unsetSOL();          return token(Terminal.T_LT); }
 "-"								{ wantEos = true; unsetSOL();          return token(Terminal.T_MINUS); }
+"<>"							{ wantEos = true;                     return token(Terminal.T_NE); }
 ".NE."							{ wantEos = true; unsetSOL();          return token(Terminal.T_NE); }
 ".NEQV."						{ wantEos = true; unsetSOL();          return token(Terminal.T_NEQV); }
 ".NOT."							{ wantEos = true; unsetSOL();          return token(Terminal.T_NOT); }

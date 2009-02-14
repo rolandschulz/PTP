@@ -398,6 +398,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 "NAMED"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NAMEDEQ); }
 "NAME"[ \t]*"="					{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NAMEEQ); }
 "NAMELIST"						{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NAMELIST); }
+"<>"							{ wantEos = true;                     return token(Terminal.T_NE); }
 ".NE."							{ wantEos = true;                     return token(Terminal.T_NE); }
 ".NEQV."						{ wantEos = true;                     return token(Terminal.T_NEQV); }
 "NEXTREC"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NEXTRECEQ); }

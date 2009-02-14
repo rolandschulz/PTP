@@ -27,8 +27,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTTypeParamValueNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTTypeParamValueNode
-    org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTTypeParamValueNode
     IExpr expr; // in ASTTypeParamValueNode
+    org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTTypeParamValueNode
 
     public boolean isColon()
     {
@@ -41,17 +41,6 @@ public class ASTTypeParamValueNode extends ASTNode
     }
 
 
-    public boolean isAsterisk()
-    {
-        return this.isAsterisk != null;
-    }
-
-    public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAsterisk = newValue;
-    }
-
-
     public IExpr getExpr()
     {
         return this.expr;
@@ -60,6 +49,17 @@ public class ASTTypeParamValueNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+    }
+
+
+    public boolean isAsterisk()
+    {
+        return this.isAsterisk != null;
+    }
+
+    public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAsterisk = newValue;
     }
 
 
@@ -79,8 +79,8 @@ public class ASTTypeParamValueNode extends ASTNode
         switch (index)
         {
         case 0:  return this.isColon;
-        case 1:  return this.isAsterisk;
-        case 2:  return this.expr;
+        case 1:  return this.expr;
+        case 2:  return this.isAsterisk;
         default: return null;
         }
     }
@@ -90,8 +90,8 @@ public class ASTTypeParamValueNode extends ASTNode
         switch (index)
         {
         case 0:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.expr = (IExpr)value; return;
+        case 1:  this.expr = (IExpr)value; return;
+        case 2:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

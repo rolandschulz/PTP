@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTSubroutineParNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSubroutineParNode
     org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTSubroutineParNode
-
-    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
-    {
-        return this.variableName;
-    }
-
-    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.variableName = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSubroutineParNode
 
     public boolean isAsterisk()
     {
@@ -48,6 +37,17 @@ public class ASTSubroutineParNode extends ASTNode
     public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAsterisk = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
+    {
+        return this.variableName;
+    }
+
+    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.variableName = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.variableName;
-        case 1:  return this.isAsterisk;
+        case 0:  return this.isAsterisk;
+        case 1:  return this.variableName;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -728,6 +728,21 @@ public class FreeFormLexerPhase2 implements ILexer
         {
             retainAsKeyword[firstTokenPos] = true;
         }
+        else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_GENERIC
+            && tokenStream.size() > 1
+            && ((IToken)tokenStream.elementAt(firstTokenPos+1)).getTerminal() == Terminal.T_COLON)
+        {
+            retainAsKeyword[firstTokenPos] = true;
+            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            {
+                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                if (t == Terminal.T_READ || t == Terminal.T_WRITE)
+                {
+                    if (i+1 < tokenStream.size() && ((IToken)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_LPAREN)
+                        retainAsKeyword[i] = true;
+                }
+            }
+        }
     }
     
     /**

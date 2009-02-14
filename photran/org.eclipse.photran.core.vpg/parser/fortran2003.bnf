@@ -479,9 +479,14 @@ ASTLogicalConstNode:<LogicalConstant> ::=
 #  <DerivedTypeStmt> <DerivedTypeBody> <EndTypeStmt>
 # R422 -- F03 R429 # TODO: Note ... in spec -- need to fix!
 (customsuperclass=ScopingNode):<DerivedTypeDef> ::=
+#                   (1)--------------- (2)-------------- (3)---------------------
+| <DerivedTypeStmt>                                                               <EndTypeStmt>
+| <DerivedTypeStmt>                                      <TypeBoundProcedurePart> <EndTypeStmt>
 | <DerivedTypeStmt>                    <DerivedTypeBody>                          <EndTypeStmt>
-| <DerivedTypeStmt> <TypeParamDefStmt> <DerivedTypeBody>                          <EndTypeStmt>
 | <DerivedTypeStmt>                    <DerivedTypeBody> <TypeBoundProcedurePart> <EndTypeStmt>
+| <DerivedTypeStmt> <TypeParamDefStmt>                                            <EndTypeStmt>
+| <DerivedTypeStmt> <TypeParamDefStmt>                   <TypeBoundProcedurePart> <EndTypeStmt>
+| <DerivedTypeStmt> <TypeParamDefStmt> <DerivedTypeBody>                          <EndTypeStmt>
 | <DerivedTypeStmt> <TypeParamDefStmt> <DerivedTypeBody> <TypeBoundProcedurePart> <EndTypeStmt>
 
 (list):<DerivedTypeBody> ::=
@@ -671,6 +676,8 @@ ASTLogicalConstNode:<LogicalConstant> ::=
 <GenericBinding> ::=
   | (inline):<LblDef> -:T_GENERIC -:T_COMMA <AccessSpec> -:T_COLON -:T_COLON <GenericSpec> -:T_EQGREATERTHAN <BindingNameList> -:T_EOS
   | (inline):<LblDef> -:T_GENERIC                        -:T_COLON -:T_COLON <GenericSpec> -:T_EQGREATERTHAN <BindingNameList> -:T_EOS
+  | (inline):<LblDef> -:T_GENERIC -:T_COMMA <AccessSpec> -:T_COLON -:T_COLON <GenericName> -:T_EQGREATERTHAN <BindingNameList> -:T_EOS
+  | (inline):<LblDef> -:T_GENERIC                        -:T_COLON -:T_COLON <GenericName> -:T_EQGREATERTHAN <BindingNameList> -:T_EOS
 
 (list):<BindingNameList> ::= <BindingNameList> -:T_COMMA T_IDENT | T_IDENT
 
@@ -1896,10 +1903,10 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 # R803
 # JO -- Added error production
 <IfThenStmt> ::=
-  | (inline):<LblDef>                               -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
+  | (inline):<LblDef>                                      -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
   | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
-  | (inline):<LblDef>                               -:T_IF (error) T_THEN
-  | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF (error) T_THEN
+  | (inline):<LblDef>                                      -:T_IF (error) T_EOS
+  | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF (error) T_EOS
 
 # R804
 # JO -- Added error production
@@ -1914,15 +1921,15 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 # R805
 # JO -- Added error production
 <ElseStmt> ::=
-  | (inline):<LblDef> -:T_ELSE             -:T_EOS
+  | (inline):<LblDef> -:T_ELSE                    -:T_EOS
   | (inline):<LblDef> -:T_ELSE (inline):<EndName> -:T_EOS
-  | (inline):<LblDef> -:T_ELSE    (error)    T_EOS
+  | (inline):<LblDef> -:T_ELSE       (error)        T_EOS
 
 # R806
 <EndIfStmt> ::=
-  | (inline):<LblDef> -:T_ENDIF                  -:T_EOS
+  | (inline):<LblDef> -:T_ENDIF                         -:T_EOS
   | (inline):<LblDef> -:T_ENDIF      (inline):<EndName> -:T_EOS
-  | (inline):<LblDef> -:T_END -:T_IF             -:T_EOS
+  | (inline):<LblDef> -:T_END -:T_IF                    -:T_EOS
   | (inline):<LblDef> -:T_END -:T_IF (inline):<EndName> -:T_EOS
 
 # R807
@@ -2297,6 +2304,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | -:T_ASYNCHRONOUSEQ asyncExpr:<CExpr>          # F03
   | -:T_DECIMALEQ    decimalExpr:<CExpr>          # F03
   | -:T_IDEQ               idVar:<ScalarVariable> # F03
+  | -:T_IOMSGEQ        iomsgExpr:<ScalarVariable> # F03
   | -:T_POSEQ            posExpr:<CExpr>          # F03
   | -:T_ROUNDEQ        roundExpr:<CExpr>          # F03
   | -:T_SIGNEQ          signExpr:<CExpr>          # F03
@@ -2635,10 +2643,13 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 <ProcedureName> ::= procedureName:T_IDENT
 
-# R1207
+# R1207 -- N.B. Note in F03 grammar that <GenericName> can be used everywhere <GenericSpec> can
 <GenericSpec> ::=
   |    isDefinedOperator(bool):T_OPERATOR   -:T_LPAREN   <DefinedOperator>  -:T_RPAREN
   | isAssignmentOperator(bool):T_ASSIGNMENT -:T_LPAREN equalsToken:T_EQUALS -:T_RPAREN
+  # F03 R1208 inlined
+  |      isDerivedTypeIO(bool):T_READ       -:T_LPAREN formattingSpec:T_IDENT -:T_RPAREN
+  |      isDerivedTypeIO(bool):T_WRITE      -:T_LPAREN formattingSpec:T_IDENT -:T_RPAREN
 
 # F03 R1209
 <ImportStmt> ::=

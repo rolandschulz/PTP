@@ -32,6 +32,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     ASTAccessSpecNode accessSpec; // in ASTGenericBindingNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTGenericBindingNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTGenericBindingNode
+    ASTGenericNameNode genericName; // in ASTGenericBindingNode
     ASTGenericSpecNode genericSpec; // in ASTGenericBindingNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEqgreaterthan; // in ASTGenericBindingNode
     IASTListNode<org.eclipse.photran.internal.core.lexer.Token> bindingNameList; // in ASTGenericBindingNode
@@ -56,6 +57,17 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     public void setAccessSpec(ASTAccessSpecNode newValue)
     {
         this.accessSpec = newValue;
+    }
+
+
+    public ASTGenericNameNode getGenericName()
+    {
+        return this.genericName;
+    }
+
+    public void setGenericName(ASTGenericNameNode newValue)
+    {
+        this.genericName = newValue;
     }
 
 
@@ -90,7 +102,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
 
     @Override protected int getNumASTFields()
     {
-        return 10;
+        return 11;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -103,10 +115,11 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
         case 3:  return this.accessSpec;
         case 4:  return this.hiddenTColon;
         case 5:  return this.hiddenTColon2;
-        case 6:  return this.genericSpec;
-        case 7:  return this.hiddenTEqgreaterthan;
-        case 8:  return this.bindingNameList;
-        case 9:  return this.hiddenTEos;
+        case 6:  return this.genericName;
+        case 7:  return this.genericSpec;
+        case 8:  return this.hiddenTEqgreaterthan;
+        case 9:  return this.bindingNameList;
+        case 10: return this.hiddenTEos;
         default: return null;
         }
     }
@@ -121,10 +134,11 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
         case 3:  this.accessSpec = (ASTAccessSpecNode)value; return;
         case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.genericSpec = (ASTGenericSpecNode)value; return;
-        case 7:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.bindingNameList = (IASTListNode<org.eclipse.photran.internal.core.lexer.Token>)value; return;
-        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.genericName = (ASTGenericNameNode)value; return;
+        case 7:  this.genericSpec = (ASTGenericSpecNode)value; return;
+        case 8:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.bindingNameList = (IASTListNode<org.eclipse.photran.internal.core.lexer.Token>)value; return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
