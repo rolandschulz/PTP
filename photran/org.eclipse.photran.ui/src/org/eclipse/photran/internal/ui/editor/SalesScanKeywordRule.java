@@ -491,6 +491,11 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return match("procedure", firstTokenPos);
             else if (keyword.equalsIgnoreCase("pointer"))
                 return openContextComma;
+            else if (keyword.equalsIgnoreCase("operator")
+                || keyword.equalsIgnoreCase("assignment")
+                || keyword.equalsIgnoreCase("read")
+                || keyword.equalsIgnoreCase("write"))
+                return lineContainsColonColon;
             // END FORTRAN 2003
             else
             {
@@ -507,12 +512,14 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             // N.B. These rules depend on the token preceding this one
             if (isType(keyword))
                 return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit");
+            else if (isPrefixSpec(keyword))
+                return isType(precedingKeyword);
             else if (keyword.equalsIgnoreCase("case"))
                 return precedingKeyword.equalsIgnoreCase("select");
             else if (keyword.equalsIgnoreCase("data"))
                 return precedingKeyword.equalsIgnoreCase("block");
             else if (keyword.equalsIgnoreCase("function"))
-                return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword);
+                return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword) || match("type", firstTokenPos);
             else if (keyword.equalsIgnoreCase("if"))
                 return precedingKeyword.equalsIgnoreCase("else") || precedingKeyword.equalsIgnoreCase("end");
             else if (keyword.equalsIgnoreCase("none"))
@@ -577,7 +584,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 || kw.equalsIgnoreCase("doubleprecision")
                 || kw.equalsIgnoreCase("integer")
                 || kw.equalsIgnoreCase("logical")
-                || kw.equalsIgnoreCase("real");
+                || kw.equalsIgnoreCase("real")
+                || kw.equalsIgnoreCase("type");
         }
 
         private boolean isPrefixSpec(String kw)
