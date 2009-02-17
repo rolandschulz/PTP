@@ -23,7 +23,7 @@
 + Stas - Move Saved to Common Block Refactoring (1/29/09)
 + NPE org.eclipse.photran.internal.ui.editor_vpg.hover.FortranDeclarationHover.getHoverInfo(FortranDeclarationHover.java:91) (1/29/09)
 + New Fortran File wizard and menu item (1/29/09) -- If I click on new source file, I can choose between a C and a C++ template or <no template>. However, there's no FORTRAN-template. This is a usability feature, I hope this is not too hard to add.
-+ Refactorings should not be available for fixed form files (2/11/09) -- Separate context menus for fixed and free form
++ Refactorings should not be available for fixed form files (2/11/09) -- Created separate context menus for fixed and free form
 
 CRITICAL:
 - Preproc substring bug
@@ -58,14 +58,31 @@ EVENTUAL:
 - Outdated (and duplicate?) VPG error messages when not tied to an IFile
 - Need view (and optional markers?) with VPG errors/warnings
 
+427 PROJECTS:
+- Hover Tips
+  + Bug submitted
+  + Patch applied
+- FRUIT Integration (Maracuja)
+  + Bug submitted
+  + CQ created (2/17/09)
+  - CQ approved
+  - Patch applied
+- Fortran Search (Quillback)
+  + Bug submitted
+  + CQ created (2/17/09)
+  - CQ approved
+  - Patch applied
+- (Ariadne)
+- (Nibbler)
+- (Snatch)
 
 
-NEW IN THIS BETA:
-+ Find All References
+NEW IN BETA 5:
 + Fortran 2003
 + New gfortran error parser
-+ Hover Tips
-+ Move Saved Variables to Common Block
++ Find All References (427)
++ Hover Tips (427)
++ Move Saved Variables to Common Block (Stas)
 
 
 
