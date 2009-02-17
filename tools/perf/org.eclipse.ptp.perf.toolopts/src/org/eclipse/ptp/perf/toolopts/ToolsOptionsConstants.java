@@ -27,4 +27,6 @@ public class ToolsOptionsConstants {
 	 */
 	public static final String PROJECT_LOCATION="%%REPLACE_WITH_LOCAL_DIR%%";
 	
+	public static final String CONF_VALUE="%%REPLACE_WITH_CONFIGURATION_VALUE%%";
+	
 }

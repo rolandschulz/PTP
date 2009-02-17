@@ -172,6 +172,9 @@ public class ToolParser extends DefaultHandler{
 	 */
 	private ToolApp currentApp;
 	
+	
+	private ArrayList<IAppInput> appInput;
+	
 	private ArrayList<ToolOption> toolOptions;
 	private ToolOption actOpt;
 	private Stack<StringBuffer> content = new Stack<StringBuffer>();
@@ -250,6 +253,8 @@ public class ToolParser extends DefaultHandler{
 			ppTool=new PostProcTool();
 			toolApps=new ArrayList<ToolApp>();
 			ppTool.requireTrue=getAttribute("if",atts);
+			ppTool.useDefaultLocation=getBooleanAttribute("defaultloc",false,atts);
+			ppTool.forAllLike=getAttribute("foralllike",atts);
 		}
 		else if(name.equals(PARAMETRIC)&&inTool&&!inParametric&&currentTool!=null){
 			inParametric=true;
@@ -306,6 +311,8 @@ public class ToolParser extends DefaultHandler{
 			else{
 			if(currentArgs==null)
 				currentArgs=new ArrayList<ToolArgument>();
+			if(appInput==null)
+				appInput=new ArrayList<IAppInput>();
 			
 			boolean local=getBooleanAttribute("localdir",false,atts);
 			
@@ -313,10 +320,24 @@ public class ToolParser extends DefaultHandler{
 			String val=getAttribute("value",atts);
 			String sep=getAttribute("separator",atts);
 			
+			String cval=getAttribute("confvalue",atts);
+			
+//			if(cval!=null)
+//				val=cval;
+			
+			ToolArgument tArg=new ToolArgument(flag,val,sep,local);
+			if(cval!=null)
+			{
+				tArg.setUseConfValue(true);
+				tArg.setConfValue(cval);
+			}
+			
+			
 //			if(local){
 //				arg=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+arg;//Must be the same as IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION
 //			}
-			currentArgs.add(new ToolArgument(flag,val,sep,local));
+			currentArgs.add(tArg);
+			appInput.add(tArg);
 			}
 		}
 		else if(name.equals(OPTIONPANE))
@@ -387,7 +408,10 @@ public class ToolParser extends DefaultHandler{
 					else if(type.equals("dir"))
 						actOpt.type=ToolOption.DIR;
 					else if(type.equals("file"))
+					{
 						actOpt.type=ToolOption.FILE;
+						actOpt.fileLike=getAttribute("filelike",atts);
+					}
 					else if(type.equals("number"))
 						actOpt.type=ToolOption.NUMBER;
 					else if(type.equals("combo"))
@@ -401,6 +425,10 @@ public class ToolParser extends DefaultHandler{
 	
 	private ToolApp finishApp()
 	{
+		if(appInput!=null&&appInput.size()>0){
+			currentApp.allInput=new IAppInput[appInput.size()];
+			appInput.toArray(currentApp.allInput);
+		}
 		if(currentArgs!=null&&currentArgs.size()>0)
 		{
 			currentApp.arguments=new ToolArgument[currentArgs.size()];
@@ -416,6 +444,7 @@ public class ToolParser extends DefaultHandler{
 		}
 		currentArgs=null;
 		toolPanes=null;
+		appInput=null;
 		return currentApp;
 	}
 	
@@ -503,8 +532,11 @@ public class ToolParser extends DefaultHandler{
 			{
 				if(toolPanes==null)
 					toolPanes=new ArrayList<ToolPane>();
+				if(appInput==null)
+					appInput=new ArrayList<IAppInput>();
 				currentPane.setOptions(toolOptions);
 				toolPanes.add(currentPane);
+				appInput.add(currentPane);
 			}
 		}
 		else if(name.equals(TOGOPT))

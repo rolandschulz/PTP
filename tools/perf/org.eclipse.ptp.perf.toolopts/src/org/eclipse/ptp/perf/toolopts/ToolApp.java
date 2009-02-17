@@ -41,6 +41,8 @@ public class ToolApp {
 	 */
 	public ToolArgument[] arguments=null;
 	
+	
+	
 //	public String queryText=null;
 //	public String queryMessage=null;
 	
@@ -62,6 +64,12 @@ public class ToolApp {
 	 * The array of toolPanes associated with this tool
 	 */
 	public ToolPane[] toolPanes=null;
+	
+	
+	/**
+	 * The array of all ToolPanes and ToolArguments, in the order they were defined in the tool xml document
+	 */
+	public IAppInput[] allInput=null;
 	
 	/**
 	 * The file to which the standard out of this tool must be written
@@ -87,9 +95,21 @@ public class ToolApp {
 //		return command;
 //	}
 	
+	/**
+	 * Builds and concatenates all arguments from the defined sources (toolArgument and toolPane objects)
+	 */
 	public String getArguments(ILaunchConfiguration configuration) throws CoreException
 	{
-		return getArgs()+" "+getPaneArgs(configuration);
+		String input = "";
+		
+		if(allInput!=null)
+		for(int i=0;i<allInput.length;i++){
+			if(allInput[i]!=null){
+				input+=allInput[i].getArgument(configuration);
+				input+=" ";
+			}
+		}
+		return input;//getArgs(configuration)+" "+getPaneArgs(configuration);
 	}
 	
 //	public String[] getCommandArray(ILaunchConfiguration configuration) throws CoreException
@@ -132,42 +152,60 @@ public class ToolApp {
 //		return command;
 //	}
 	
-	/**
-	 * Returns the space-separated string of arguments stored by this tool 
-	 * @return
-	 */
-	private String getArgs()
-	{
-		String args="";
-		
-		if(arguments!=null)
-			for(int i =0;i<arguments.length;i++)
-			{
-				if(arguments[i]!=null)
-					args+=" "+arguments[i].getArg();
-			}
-		
-		return args;
-	}
+//	/**
+//	 * Returns the space-separated string of arguments stored by this tool 
+//	 * @return
+//	 */
+//	private String getArgs(ILaunchConfiguration configuration)
+//	{
+//		String args="";
+//		
+//		if(arguments!=null)
+//			for(int i =0;i<arguments.length;i++)
+//			{
+//				if(arguments[i]!=null)
+//				{
+//					if(arguments[i].isUseConfValue())
+//					{
+//						String carg=arguments[i].getArg();
+//						String cval="";
+//						try {
+//							cval=configuration.getAttribute(arguments[i].getConfValue(), "");
+//						} catch (CoreException e) {
+//							e.printStackTrace();
+//						}
+//						carg=carg.replace(ToolsOptionsConstants.CONF_VALUE, cval);
+//						args+=" "+carg;
+//					}
+//					else
+//					{
+//						args+=" "+arguments[i].getArg();
+//					}
+//				}
+//			}
+//		
+//		return args;
+//	}
 	
-	/**
-	 * Retrieves the space-separated string of arguments stored as configuration variables by this tool's associated tool panes
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	private String getPaneArgs(ILaunchConfiguration configuration) throws CoreException
-	{
-		String envArgs="";
-		if(toolPanes!=null)
-		{
-			for(int i=0;i<toolPanes.length;i++)
-			{
-				envArgs+=" "+configuration.getAttribute(toolPanes[i].configID,"");
-			}
-		}
-		return envArgs;
-	}
+//	/**
+//	 * Retrieves the space-separated string of arguments stored as configuration variables by this tool's associated tool panes
+//	 * @param configuration
+//	 * @return
+//	 * @throws CoreException
+//	 */
+//	private String getPaneArgs(ILaunchConfiguration configuration) throws CoreException
+//	{
+//		String envArgs="";
+//		if(toolPanes!=null)
+//		{
+//			for(int i=0;i<toolPanes.length;i++)
+//			{
+//				//TODO: Core and virtual panes get duplicated when defined in the same area!
+//				envArgs+=" "+configuration.getAttribute(toolPanes[i].configID,"");
+//			}
+//		}
+//		return envArgs;
+//	}
 	
 //	public String getIO()
 //	{

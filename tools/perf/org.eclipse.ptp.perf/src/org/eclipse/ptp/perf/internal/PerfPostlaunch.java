@@ -1,6 +1,11 @@
 package org.eclipse.ptp.perf.internal;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,6 +24,11 @@ import org.eclipse.ui.PlatformUI;
 public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfigurationConstants{
 	
 	String outputLocation;
+	
+	String currentFile;
+	
+	FileFilter dFil=new DirFilter();
+	
 	private PostProcTool tool=null;
 	boolean externalTarget=false;
 	String projName=null;
@@ -61,6 +71,15 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 					{
 						runTool=getToolCommand(tool.analysisCommands[i],configuration,outputLocation);//tool.analysisCommands[i].toolCommand;
 						//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
+						if(tool.forAllLike!=null){
+							runTool=runTool.replace("%%FILE%%", currentFile);
+							File getname = new File(currentFile);
+							String name = getname.getName();
+							if(name.contains(".")){
+								name = name.substring(0,name.lastIndexOf("."));
+							}
+							runTool=runTool.replace("%%FILENAME%%", name);
+						}
 						if(runTool!=null)
 						{
 							BuildLaunchUtils.runTool(runTool, null, projectLoc,tool.analysisCommands[i].outToFile);
@@ -117,6 +136,12 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 		
 		if(outputLocation==null)
 		{
+			if(tool.useDefaultLocation)
+			{
+				outputLocation=System.getProperty("user.home");
+			}
+			else
+			{
 			Display.getDefault().syncExec(new Runnable() {
 		
 				public void run() {
@@ -134,13 +159,69 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 			}
 			externalTarget=true;
 		}
+		}
 		
 		try{
-			postlaunch(monitor);
+			
+			if(tool.forAllLike!=null)
+			{
+				File workDir= new File(outputLocation);
+				
+				FilenameFilter ffn = new FilenameFilter(){
+
+					public boolean accept(File dir, String name) {
+						if(name.toLowerCase().endsWith(tool.forAllLike.toLowerCase()))
+							return true;
+						else
+							return false;
+					}};
+				
+					LinkedHashSet<File> fileSet=new LinkedHashSet<File>();
+					findFiles(fileSet,workDir,-1,ffn);
+				//String[] files=workDir.list(ffn);
+				if(fileSet.size()<=0){
+					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"No Valid Files Found",null);
+				}
+				for(File f : fileSet){
+					currentFile=f.getCanonicalPath();
+					postlaunch(monitor);
+				}
+			}
+			else
+			{
+				postlaunch(monitor);
+			}
+			
 		}catch(Exception e){
 			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Data Collection Error",e);
 		}
 		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Data Collected",null);
 	}	
+	
+	class DirFilter implements FileFilter {
+        public boolean accept(File file) {
+            return file.isDirectory();
+        }
+    }
+
+	//TODO: The use of set here might gain us nothing
+	private void findFiles(Set<File> fileSet, File root, int depth, FilenameFilter filter){
+		
+		//ArrayList<File[]> fList=new ArrayList<File[]>();
+		
+		File[] files= root.listFiles(filter);
+		
+		for(File f : files){
+			fileSet.add(f);
+		}
+		
+		if(depth>0||depth<0)
+		{
+			File[] roots=root.listFiles(dFil);
+			for(int i=0;i<roots.length;i++){
+				findFiles(fileSet,roots[i],depth-1,filter);
+			}
+		}
+	}
 
 }

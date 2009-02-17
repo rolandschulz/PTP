@@ -93,6 +93,11 @@ public interface ITAULaunchConfigurationConstants {
 	public static final String PERFDMF_DB="perfdmf_database_configuration";
 	
 	/**
+	 * Simple name of the perfdmf database
+	 */
+	public static final String PERFDMF_DB_NAME="perfdmf_database_simple_name";
+	
+	/**
 	 * String constant message used if no database names are found
 	 */
 	public static final String NODB="No databases available";

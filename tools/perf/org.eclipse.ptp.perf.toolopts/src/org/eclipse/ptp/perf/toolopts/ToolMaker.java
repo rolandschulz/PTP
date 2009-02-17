@@ -251,9 +251,19 @@ public class ToolMaker {
 	 * @param opt The option whose value is being browsed for
 	 */
 	protected static void optBrowse(ToolOption opt){
+		
+		String dialogText=opt.toolTip;
+		if(dialogText==null)
+		{
+			dialogText=opt.optLabel;
+			if(dialogText==null){
+				dialogText="";
+			}
+		}
+		
 		if(opt.type==ToolOption.DIR){
 			DirectoryDialog dialog = new DirectoryDialog(getShell());
-			dialog.setText(opt.toolTip);
+			dialog.setText(dialogText);
 
 			String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
 			if (correctPath != null) {
@@ -273,7 +283,11 @@ public class ToolMaker {
 		if(opt.type==ToolOption.FILE)
 		{
 			FileDialog dialog = new FileDialog(getShell());
-			dialog.setText(opt.toolTip);
+			if(opt.fileLike!=null){
+				String[] filter={opt.fileLike};
+				dialog.setFilterExtensions(filter);
+			}
+			dialog.setText(dialogText);
 
 			String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
 			if (correctPath != null) {
@@ -298,7 +312,14 @@ public class ToolMaker {
 	 */
 	protected static Shell getShell(){
 		Display thisDisplay = PlatformUI.getWorkbench().getDisplay();//.getCurrent();//.getDefault();
-		return new Shell(thisDisplay.getActiveShell());
+		
+		Shell s= thisDisplay.getActiveShell();
+		if(s==null){
+			Shell[] shells=thisDisplay.getShells();
+			s=shells[0];
+		}
+		
+		return new Shell(s);
 	}
 	
 	/**

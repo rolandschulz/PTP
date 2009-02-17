@@ -1151,6 +1151,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex()));
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, dbCombo.getItem(dbCombo.getSelectionIndex()));
+		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB_NAME, PerfDMFView.extractDatabaseName(dbCombo.getItem(dbCombo.getSelectionIndex())));
 
 		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.TOOLCONFNAME+"TAU", "_"+tauMakeName.substring(tauMakeName.lastIndexOf(".")+1));
 		//.setDefault("TAUCheckForAutoOptions",true);

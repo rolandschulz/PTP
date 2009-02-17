@@ -133,7 +133,6 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	
 	/**
 	 * Gets the project associated with the launch configuration held by this manager
-	 * @param projnameattrib 
 	 * @param configuration
 	 * @return The project associated with this manager's launch configuration, or null if no project is found
 	 * @throws CoreException
@@ -266,6 +265,11 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 		return opath;
 	}
 	
+	/**
+	 * Given a ToolApp app finds the full path to the associated executable if possible and returns it.  If not it just returns the executable name
+	 * @param app
+	 * @return
+	 */
 	protected static String getToolExecutable(ToolApp app)
 	{
 		String command=app.toolCommand;
@@ -284,6 +288,10 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 //		return getToolCommand(app,configuration,"");
 //	}
 	
+	/**
+	 * Returns the full tool command; the full path to the executable used by  app followed by any arguments, replacing the 
+	 * output location with the string provided by outputloc if necessary
+	 */
 	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration,String outputloc) throws CoreException
 	{
 		String command=getToolExecutable(app);

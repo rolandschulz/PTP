@@ -1,7 +1,9 @@
 package org.eclipse.ptp.perf.toolopts;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 
-public class ToolIO{
+
+public class ToolIO implements IAppInput{
 	/**
 	 * This value indicates an output object that specifies a directory for output data
 	 */
@@ -13,13 +15,29 @@ public class ToolIO{
 	
 	public String ID=null;
 	
-	
+	public ToolIO(){
+		
+	}
 	
 //	public String outputPath=null;
 //	public boolean overridePath=false;
+	/**
+	 * The flag or command preceding the path to the I/O file or directory
+	 */
 	public String pathFlag=null;
 //	public int outputType=0;
 //	public String fileName=null;
+
+
+
+	public String getArgument(ILaunchConfiguration configuration) {
+		String arg = "";
+		if(pathFlag!=null){
+			arg+=pathFlag+" ";
+		}
+		arg+=ID;
+		return null;
+	}
 
 	
 	

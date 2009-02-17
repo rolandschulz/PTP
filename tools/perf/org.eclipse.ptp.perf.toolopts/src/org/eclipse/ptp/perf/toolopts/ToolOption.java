@@ -138,6 +138,7 @@ public class ToolOption {
 	 * default argument of this option, if any
 	 */
 	protected String confDefString;
+	public String fileLike=null;
 
 	/**
 	 * Determines if this option includes a text box

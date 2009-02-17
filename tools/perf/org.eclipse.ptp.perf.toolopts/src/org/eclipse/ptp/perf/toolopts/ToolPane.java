@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
  * @author wspear
  *
  */
-public class ToolPane {
+public class ToolPane  implements IAppInput{
 
 	public static final int ALL_COMPILERS=0;
 	public static final int CC_COMPILER=1;
@@ -43,6 +43,17 @@ public class ToolPane {
 	public static final int EXEC_UTIL=4;
 	public static final int ANALYSIS=5;
 	public static final int ENV_VAR=6;
+	
+	
+	public String getArgument(ILaunchConfiguration configuration){
+		try {
+			return configuration.getAttribute(configID,"");
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}
 	
 	/**
 	 * A listener class to launch file or directory browsers from browse buttons for a ToolPane's tools
