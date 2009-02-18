@@ -1075,10 +1075,10 @@ public class FreeFormLexerPhase2 implements ILexer
      */
     private final class MustBePrecededByOneOf extends Rule
     {
-        Terminal possibility1 = ALWAYS_RETURN_TRUE,
-            possibility2 = ALWAYS_RETURN_TRUE,
-            possibility3 = ALWAYS_RETURN_TRUE,
-            possibility4 = ALWAYS_RETURN_TRUE;
+        Terminal possibility1 = ALWAYS_RETURN_FALSE,
+            possibility2 = ALWAYS_RETURN_FALSE,
+            possibility3 = ALWAYS_RETURN_FALSE,
+            possibility4 = ALWAYS_RETURN_FALSE;
         
         public MustBePrecededByOneOf(Terminal tokenTerminal1, Terminal tokenTerminal2)
         {
@@ -1128,6 +1128,11 @@ public class FreeFormLexerPhase2 implements ILexer
      * This is used when we need a reasonable default in some places...
      */
     private final Terminal ALWAYS_RETURN_TRUE = new Terminal("always return true");
+    
+    /**
+     * This is used when we need a reasonable default in some places...
+     */
+    private final Terminal ALWAYS_RETURN_FALSE = new Terminal("always return false");
 
     private final class MustBeFollowedBy extends Rule
     {
@@ -1365,6 +1370,8 @@ public class FreeFormLexerPhase2 implements ILexer
     private boolean matchToken(int tokenPos, Terminal targetTerminal)
     {
         if (targetTerminal == ALWAYS_RETURN_TRUE) return true;
+        
+        if (targetTerminal == ALWAYS_RETURN_FALSE) return false;
         
         if (tokenPos < 0 || tokenPos >= tokenStream.size()) return false;
         

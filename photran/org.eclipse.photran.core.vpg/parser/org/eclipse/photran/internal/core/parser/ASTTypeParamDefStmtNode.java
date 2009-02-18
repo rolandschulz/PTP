@@ -32,7 +32,7 @@ public class ASTTypeParamDefStmtNode extends ASTNode
     ASTTypeParamAttrSpecNode typeParamAttrSpec; // in ASTTypeParamDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTTypeParamDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTTypeParamDefStmtNode
-    ASTTypeParamDeclListNode typeParamDeclList; // in ASTTypeParamDefStmtNode
+    IASTListNode<ASTTypeParamDeclNode> typeParamDeclList; // in ASTTypeParamDefStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTTypeParamDefStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -68,12 +68,12 @@ public class ASTTypeParamDefStmtNode extends ASTNode
     }
 
 
-    public ASTTypeParamDeclListNode getTypeParamDeclList()
+    public IASTListNode<ASTTypeParamDeclNode> getTypeParamDeclList()
     {
         return this.typeParamDeclList;
     }
 
-    public void setTypeParamDeclList(ASTTypeParamDeclListNode newValue)
+    public void setTypeParamDeclList(IASTListNode<ASTTypeParamDeclNode> newValue)
     {
         this.typeParamDeclList = newValue;
     }
@@ -116,7 +116,7 @@ public class ASTTypeParamDefStmtNode extends ASTNode
         case 3:  this.typeParamAttrSpec = (ASTTypeParamAttrSpecNode)value; return;
         case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.typeParamDeclList = (ASTTypeParamDeclListNode)value; return;
+        case 6:  this.typeParamDeclList = (IASTListNode<ASTTypeParamDeclNode>)value; return;
         case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
