@@ -42,7 +42,7 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection()
+	 * @see org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
 	 */
 	public IRemoteConnection newConnection(Shell shell) {
 		if (remoteHost != null) {
@@ -56,7 +56,7 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 			if (dialog.open() == WizardDialog.OK) {
 				/*
 				 * Locate the new connection and return it. Assumes connections can
-				 * only be created, NOT removed.
+				 * only be created by the wizard, NOT removed.
 				 */
 				IRemoteConnection[] newConns = connMgr.getConnections();
 				
