@@ -82,7 +82,9 @@ public class Definition implements Serializable, Comparable<Definition>
         SUBROUTINE,
         SELECT,
         VARIABLE_DECLARATION { @Override public String toString() { return "Local variable"; } },
-        WHERE;
+        WHERE,
+        ENUMERATOR, // F03
+        ;
         
         @Override public String toString()
         {
@@ -114,6 +116,8 @@ public class Definition implements Serializable, Comparable<Definition>
     
     private boolean subprogramArgument = false;
     private boolean parameter = false;
+    private boolean typeBoundProcedure = false;
+    private boolean renamedTypeBoundProcedure = false;
 
     protected Definition() {}
     
@@ -380,6 +384,22 @@ public class Definition implements Serializable, Comparable<Definition>
         // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
         return this.visibility.equals(Visibility.PUBLIC);
             //|| this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
+    }
+
+    void markAsTypeBoundProcedure(boolean renamed)
+    {
+        this.typeBoundProcedure = true;
+        this.renamedTypeBoundProcedure = renamed;
+    }
+    
+    public boolean isTypeBoundProcedure()
+    {
+        return this.typeBoundProcedure;
+    }
+    
+    public boolean isRenamedTypeBoundProcedure()
+    {
+        return this.renamedTypeBoundProcedure;
     }
 
     public IMarker createMarker()

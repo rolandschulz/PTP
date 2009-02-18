@@ -13,6 +13,9 @@ package org.eclipse.photran.internal.core.analysis.binding;
 import java.util.List;
 
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.lexer.Terminal;
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAcImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTAllocateObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayElementNode;
@@ -28,6 +31,7 @@ import org.eclipse.photran.internal.core.parser.ASTCycleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDataImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTDataRefNode;
 import org.eclipse.photran.internal.core.parser.ASTDataStmtValueNode;
+import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEditElementNode;
 import org.eclipse.photran.internal.core.parser.ASTElseIfStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTElseStmtNode;
@@ -46,9 +50,11 @@ import org.eclipse.photran.internal.core.parser.ASTEndTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndWhereStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFieldSelectorNode;
+import org.eclipse.photran.internal.core.parser.ASTFinalBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionArgListNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionParNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTGenericBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTInputImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTIoControlSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTLoopControlNode;
@@ -63,16 +69,20 @@ import org.eclipse.photran.internal.core.parser.ASTPointerObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
+import org.eclipse.photran.internal.core.parser.ASTSpecificBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStructureComponentNode;
 import org.eclipse.photran.internal.core.parser.ASTStructureConstructorNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineArgNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineParNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTUFPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.ASTVariableNode;
+import org.eclipse.photran.internal.core.parser.ASTWaitSpecNode;
+import org.eclipse.photran.internal.core.parser.ASTWaitStmtNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
@@ -876,5 +886,75 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         bind(node.getVariableName());
+    }
+
+    // F03
+    @Override public void visitASTDerivedTypeStmtNode(ASTDerivedTypeStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        if (node.getTypeAttrSpecList() != null)
+            for (ASTTypeAttrSpecNode spec : node.getTypeAttrSpecList())
+                if (spec.isExtends())
+                    bind(spec.getParentTypeName());
+    }
+    
+    // F03
+    @Override public void visitASTSpecificBindingNode(ASTSpecificBindingNode node)
+    {
+        super.visitASTSpecificBindingNode(node);
+        
+        if (node.getInterfaceName() != null)
+            bind(node.getInterfaceName());
+        
+        if (node.getProcedureName() != null)
+            setTypeBoundProcedureAttribInDefinition(bind(node.getProcedureName()), true);
+        else
+            setTypeBoundProcedureAttribInDefinition(bind(node.getBindingName()), false);
+    }
+    
+    private void setTypeBoundProcedureAttribInDefinition(List<PhotranTokenRef> definitionTokenRefs, boolean renamed)
+    {
+        for (PhotranTokenRef tokenRef : definitionTokenRefs)
+        {
+            Definition def = PhotranVPG.getInstance().getDefinitionFor(tokenRef);
+            def.markAsTypeBoundProcedure(renamed);
+            vpg.setDefinitionFor(tokenRef, def);
+        }
+    }
+
+    // F03
+    @Override public void visitASTGenericBindingNode(ASTGenericBindingNode node)
+    {
+        super.visitASTGenericBindingNode(node);
+        
+        for (Token name : node.getBindingNameList())
+            bind(name);
+    }
+    
+    // F03
+    @Override public void visitASTFinalBindingNode(ASTFinalBindingNode node)
+    {
+        super.visitASTFinalBindingNode(node);
+        
+        for (Token name : node.getFinalSubroutineNameList())
+            bind(name);
+    }
+    
+    // F03
+    @Override public void visitASTWaitStmtNode(ASTWaitStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        for (ASTWaitSpecNode waitSpec : node.getWaitSpecList())
+        {
+            String keyword = waitSpec.getKeyword().getText().toLowerCase();
+            if (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat"))
+            {
+                Token variable = waitSpec.getExpr().findFirstToken();
+                if (variable != null && variable.getTerminal() == Terminal.T_IDENT)
+                    bind(variable);
+            }
+        }
     }
 }

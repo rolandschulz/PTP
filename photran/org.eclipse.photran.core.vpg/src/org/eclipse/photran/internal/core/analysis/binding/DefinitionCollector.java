@@ -18,6 +18,7 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
+import org.eclipse.photran.internal.core.parser.ASTAssociationNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
@@ -26,6 +27,8 @@ import org.eclipse.photran.internal.core.parser.ASTDataComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTEntryStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEnumeratorDefStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEnumeratorNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
@@ -45,11 +48,14 @@ import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSelectTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeParamDeclNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeParamDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
@@ -95,6 +101,13 @@ class DefinitionCollector extends BindingCollector
             for (ASTTypeAttrSpecNode attrSpec : node.getTypeAttrSpecList())
                 if (attrSpec.getAccessSpec() != null)
                     d.setVisibility(attrSpec.getAccessSpec());
+        
+        // F03 -- Don't bind derived type parameters since we don't bind derived type components yet
+        // (so there is no scope for the derived type).  When we do, should also bind
+        // ASTTypeParamDefStmtNode 
+//        if (node.getTypeParamNameList() != null)
+//            for (ASTTypeParamNameNode typeParam : node.getTypeParamNameList())
+//                addDefinition(typeParam.getTypeParamName(), Definition.Classification.DERIVED_TYPE_PARAMETER);
     }
 
     // # R424
@@ -591,6 +604,42 @@ class DefinitionCollector extends BindingCollector
     {
         super.visitASTExecutableProgramNode(node);
         markExternalSubprogramExports(node);
+    }
+    
+    // F03
+    @Override public void visitASTTypeParamDefStmtNode(ASTTypeParamDefStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTTypeParamDeclNode> list = node.getTypeParamDeclList();
+        for (int i = 0; i < list.size(); i++)
+            bind(list.get(i).getTypeParamName());
+    }
+
+    // F03
+    @Override public void visitASTEnumeratorDefStmtNode(ASTEnumeratorDefStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        for (ASTEnumeratorNode enumNode : node.getEnumeratorList())
+            addDefinition(enumNode.getNamedConstant().getNamedConstant(), Definition.Classification.ENUMERATOR, Type.INTEGER);
+    }
+
+    // F03  TODO: associate-construct-name
+    @Override public void visitASTAssociationNode(ASTAssociationNode node)
+    {
+        super.traverseChildren(node);
+        
+        addDefinition(node.getAssociateName(), Definition.Classification.VARIABLE_DECLARATION, Type.UNKNOWN); // TODO: Type
+    }
+    
+    // F03  TODO: select-construct-name
+    @Override public void visitASTSelectTypeStmtNode(ASTSelectTypeStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        if (node.getAssociateName() != null)
+            addDefinition(node.getAssociateName(), Definition.Classification.VARIABLE_DECLARATION, Type.UNKNOWN); // TODO: Type
     }
 
     private void markExternalSubprogramExports(ASTExecutableProgramNode node)

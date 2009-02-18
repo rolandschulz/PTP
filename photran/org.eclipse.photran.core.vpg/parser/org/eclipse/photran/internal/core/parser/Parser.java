@@ -1523,8 +1523,8 @@ public class Parser
         public static final Production PRIVATE_SEQUENCE_STMT_225 = new Production(Nonterminal.PRIVATE_SEQUENCE_STMT, 3, "ASTPrivateSequenceStmtNode:<PrivateSequenceStmt> ::= [ASTPrivateSequenceStmtNode] (inline):<LblDef> privateToken:T_PRIVATE isPrivate(bool):T_EOS");
         public static final Production PRIVATE_SEQUENCE_STMT_226 = new Production(Nonterminal.PRIVATE_SEQUENCE_STMT, 3, "ASTPrivateSequenceStmtNode:<PrivateSequenceStmt> ::= [ASTPrivateSequenceStmtNode] (inline):<LblDef> sequenceToken:T_SEQUENCE isSequence(bool):T_EOS");
         public static final Production TYPE_PARAM_DEF_STMT_227 = new Production(Nonterminal.TYPE_PARAM_DEF_STMT, 8, "ASTTypeParamDefStmtNode:<TypeParamDefStmt> ::= [ASTTypeParamDefStmtNode] (inline):<LblDef> <TypeSpec> (omit):T_COMMA <TypeParamAttrSpec> (omit):T_COLON (omit):T_COLON <TypeParamDeclList> (omit):T_EOS");
-        public static final Production TYPE_PARAM_DECL_LIST_228 = new Production(Nonterminal.TYPE_PARAM_DECL_LIST, 3, "ASTTypeParamDeclListNode:<TypeParamDeclList> ::= [ASTTypeParamDeclListNode] <TypeParamDeclList> (omit):T_COMMA <TypeParamDecl>");
-        public static final Production TYPE_PARAM_DECL_LIST_229 = new Production(Nonterminal.TYPE_PARAM_DECL_LIST, 1, "ASTTypeParamDeclListNode:<TypeParamDeclList> ::= [ASTTypeParamDeclListNode] <TypeParamDecl>");
+        public static final Production TYPE_PARAM_DECL_LIST_228 = new Production(Nonterminal.TYPE_PARAM_DECL_LIST, 3, "ASTTypeParamDeclListNode(list):<TypeParamDeclList> ::= [ASTTypeParamDeclListNode] <TypeParamDeclList> (omit):T_COMMA <TypeParamDecl>");
+        public static final Production TYPE_PARAM_DECL_LIST_229 = new Production(Nonterminal.TYPE_PARAM_DECL_LIST, 1, "ASTTypeParamDeclListNode(list):<TypeParamDeclList> ::= [ASTTypeParamDeclListNode] <TypeParamDecl>");
         public static final Production TYPE_PARAM_DECL_230 = new Production(Nonterminal.TYPE_PARAM_DECL, 1, "ASTTypeParamDeclNode:<TypeParamDecl> ::= [ASTTypeParamDeclNode] type-param-name:T_IDENT");
         public static final Production TYPE_PARAM_DECL_231 = new Production(Nonterminal.TYPE_PARAM_DECL, 3, "ASTTypeParamDeclNode:<TypeParamDecl> ::= [ASTTypeParamDeclNode] type-param-name:T_IDENT (omit):T_EQUALS <Expr>");
         public static final Production TYPE_PARAM_ATTR_SPEC_232 = new Production(Nonterminal.TYPE_PARAM_ATTR_SPEC, 1, "ASTTypeParamAttrSpecNode:<TypeParamAttrSpec> ::= [ASTTypeParamAttrSpecNode] isKind(bool):T_KIND");
@@ -10046,7 +10046,6 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
         void visitASTTypeGuardStmtNode(ASTTypeGuardStmtNode node);
         void visitASTTypeNameNode(ASTTypeNameNode node);
         void visitASTTypeParamAttrSpecNode(ASTTypeParamAttrSpecNode node);
-        void visitASTTypeParamDeclListNode(ASTTypeParamDeclListNode node);
         void visitASTTypeParamDeclNode(ASTTypeParamDeclNode node);
         void visitASTTypeParamDefStmtNode(ASTTypeParamDefStmtNode node);
         void visitASTTypeParamNameNode(ASTTypeParamNameNode node);
@@ -10435,7 +10434,6 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
         public void visitASTTypeGuardStmtNode(ASTTypeGuardStmtNode node) { traverseChildren(node); }
         public void visitASTTypeNameNode(ASTTypeNameNode node) { traverseChildren(node); }
         public void visitASTTypeParamAttrSpecNode(ASTTypeParamAttrSpecNode node) { traverseChildren(node); }
-        public void visitASTTypeParamDeclListNode(ASTTypeParamDeclListNode node) { traverseChildren(node); }
         public void visitASTTypeParamDeclNode(ASTTypeParamDeclNode node) { traverseChildren(node); }
         public void visitASTTypeParamDefStmtNode(ASTTypeParamDefStmtNode node) { traverseChildren(node); }
         public void visitASTTypeParamNameNode(ASTTypeParamNameNode node) { traverseChildren(node); }
@@ -10824,7 +10822,6 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
         public void visitASTTypeGuardStmtNode(ASTTypeGuardStmtNode node) {}
         public void visitASTTypeNameNode(ASTTypeNameNode node) {}
         public void visitASTTypeParamAttrSpecNode(ASTTypeParamAttrSpecNode node) {}
-        public void visitASTTypeParamDeclListNode(ASTTypeParamDeclListNode node) {}
         public void visitASTTypeParamDeclNode(ASTTypeParamDeclNode node) {}
         public void visitASTTypeParamDefStmtNode(ASTTypeParamDefStmtNode node) {}
         public void visitASTTypeParamNameNode(ASTTypeParamNameNode node) {}
@@ -18220,7 +18217,7 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
                     if (node.hiddenTColon != null) node.hiddenTColon.setParent(node);
                     node.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 5);
                     if (node.hiddenTColon2 != null) node.hiddenTColon2.setParent(node);
-                    node.typeParamDeclList = (ASTTypeParamDeclListNode)valueStack.get(valueStackOffset + 6);
+                    node.typeParamDeclList = (IASTListNode<ASTTypeParamDeclNode>)valueStack.get(valueStackOffset + 6);
                     if (node.typeParamDeclList != null) node.typeParamDeclList.setParent(node);
                     node.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 7);
                     if (node.hiddenTEos != null) node.hiddenTEos.setParent(node);
@@ -18228,21 +18225,21 @@ public static final class ASTSeparatedListNode<T extends IASTNode> extends Abstr
         }
         public Object handleTypeParamDeclList228(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
-                    ASTTypeParamDeclListNode node = new ASTTypeParamDeclListNode();
-                    node.typeParamDeclList = (ASTTypeParamDeclListNode)valueStack.get(valueStackOffset + 0);
-                    if (node.typeParamDeclList != null) node.typeParamDeclList.setParent(node);
-                    node.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
-                    if (node.hiddenTComma != null) node.hiddenTComma.setParent(node);
-                    node.typeParamDecl = (ASTTypeParamDeclNode)valueStack.get(valueStackOffset + 2);
-                    if (node.typeParamDecl != null) node.typeParamDecl.setParent(node);
-                    return node;
+                    ASTSeparatedListNode<ASTTypeParamDeclNode> list = (ASTSeparatedListNode<ASTTypeParamDeclNode>)valueStack.get(valueStackOffset);
+                    org.eclipse.photran.internal.core.lexer.Token token = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
+                    ASTTypeParamDeclNode elt = (ASTTypeParamDeclNode)valueStack.get(valueStackOffset + 2);
+                    list.add(token, elt);
+                    token.setParent(list);
+                    if (elt != null) elt.setParent(list);
+                    return list;
         }
         public Object handleTypeParamDeclList229(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
-                    ASTTypeParamDeclListNode node = new ASTTypeParamDeclListNode();
-                    node.typeParamDecl = (ASTTypeParamDeclNode)valueStack.get(valueStackOffset + 0);
-                    if (node.typeParamDecl != null) node.typeParamDecl.setParent(node);
-                    return node;
+                    ASTSeparatedListNode<ASTTypeParamDeclNode> list = new ASTSeparatedListNode<ASTTypeParamDeclNode>();
+                    ASTTypeParamDeclNode elt = (ASTTypeParamDeclNode)valueStack.get(valueStackOffset + 0);
+                    list.add(null, elt);
+                    if (elt != null) elt.setParent(list);
+                    return list;
         }
         public Object handleTypeParamDecl230(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {

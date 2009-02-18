@@ -13,10 +13,14 @@ package org.eclipse.photran.internal.core.analysis.binding;
 import java.util.List;
 
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAllocatableStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayAllocationNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorNode;
+import org.eclipse.photran.internal.core.parser.ASTAsynchronousStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTBindStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTCommonBlockBinding;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentParListNode;
@@ -27,11 +31,16 @@ import org.eclipse.photran.internal.core.parser.ASTOptionalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTParameterStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerStmtObjectNode;
+import org.eclipse.photran.internal.core.parser.ASTProtectedStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSaveStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSavedEntityNode;
 import org.eclipse.photran.internal.core.parser.ASTTargetObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTTargetStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTValueStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTVariableNameNode;
+import org.eclipse.photran.internal.core.parser.ASTVolatileStmtNode;
 import org.eclipse.photran.internal.core.parser.IAccessId;
+import org.eclipse.photran.internal.core.parser.IBindEntity;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
@@ -295,5 +304,61 @@ class SpecificationCollector extends BindingCollector
                 throw new Error(e);
             }
         }
+    }
+    
+    // F03
+    @Override public void visitASTAsynchronousStmtNode(ASTAsynchronousStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<Token> list = node.getObjectList();
+        for (int i = 0; i < list.size(); i++)
+            bind(list.get(i));
+    }
+    
+    // F03
+    @Override public void visitASTBindStmtNode(ASTBindStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<IBindEntity> list = node.getBindEntityList();
+        for (int i = 0; i < list.size(); i++)
+        {
+            IBindEntity entity = list.get(i);
+            if (entity instanceof ASTCommonBlockBinding)
+                bind(((ASTCommonBlockBinding)entity).getCommonBlockName());
+            else
+                bind(((ASTVariableNameNode)entity).getVariableName());
+        }
+    }
+    
+    // F03
+    @Override public void visitASTProtectedStmtNode(ASTProtectedStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<Token> list = node.getEntityNameList();
+        for (int i = 0; i < list.size(); i++)
+            bind(list.get(i));
+    }
+    
+    // F03
+    @Override public void visitASTValueStmtNode(ASTValueStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<Token> list = node.getEntityNameList();
+        for (int i = 0; i < list.size(); i++)
+            bind(list.get(i));
+    }
+    
+    // F03
+    @Override public void visitASTVolatileStmtNode(ASTVolatileStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<Token> list = node.getEntityNameList();
+        for (int i = 0; i < list.size(); i++)
+            bind(list.get(i));
     }
 }

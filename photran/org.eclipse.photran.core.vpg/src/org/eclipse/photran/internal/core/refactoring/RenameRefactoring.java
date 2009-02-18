@@ -111,6 +111,10 @@ public class RenameRefactoring extends FortranRefactoring
 	{
 		if (definitionToRename.isSubprogramArgument())
         	fail("Subprogram arguments cannot be renamed.");
+		
+		// F03
+		if (definitionToRename.isTypeBoundProcedure() && !definitionToRename.isRenamedTypeBoundProcedure())
+		    fail("Type-bound procedures cannot be renamed.");
         
         if (!definitionToRename.isLocalVariable()
                && !definitionToRename.isSubprogram()

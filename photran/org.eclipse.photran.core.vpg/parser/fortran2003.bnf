@@ -537,7 +537,7 @@ ASTLogicalConstNode:<LogicalConstant> ::=
   | (inline):<LblDef> <TypeSpec> -:T_COMMA <TypeParamAttrSpec> -:T_COLON -:T_COLON <TypeParamDeclList> -:T_EOS
 
 # F03 R436
-<TypeParamDeclList> ::= <TypeParamDeclList> -:T_COMMA <TypeParamDecl> | <TypeParamDecl>
+(list):<TypeParamDeclList> ::= <TypeParamDeclList> -:T_COMMA <TypeParamDecl> | <TypeParamDecl>
 
 <TypeParamDecl> ::=
   | type-param-name:T_IDENT
