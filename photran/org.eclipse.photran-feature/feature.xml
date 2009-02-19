@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran_feature"
       label="Photran (Eclipse Fortran Development Tools) (Eclipse Technology Incubation)"
-      version="4.0.4"
+      version="4.0.5"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory">
 
    <description url="http://www.eclipse.org/photran">
@@ -10,7 +10,7 @@
    </description>
 
    <copyright url="http://www.eclipse.org/photran">
-      Copyright (c) 2006-2008 University of Illinois at Urbana-Champaign,
+      Copyright (c) 2006-2009 University of Illinois at Urbana-Champaign,
 Los Alamos National Laboratory, and others.  All rights reserved.
 This program and the accompanying materials are made available
 under the terms of the Eclipse Public License v1.0 which
@@ -122,59 +122,59 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
    </url>
 
    <requires>
-      <import feature="org.eclipse.cdt" version="5.0.0" match="compatible"/>
+      <import feature="org.eclipse.cdt" version="5.0.1" match="compatible"/>
    </requires>
 
    <plugin
          id="org.eclipse.photran.core"
          download-size="0"
          install-size="0"
-         version="4.0.4"/>
+         version="4.0.5"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.core"
          download-size="0"
          install-size="0"
-         version="4.0.4"
+         version="4.0.5"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.ui"
          download-size="0"
          install-size="0"
-         version="4.0.4"/>
+         version="4.0.5"/>
 
    <plugin
          id="org.eclipse.photran.cdtinterface"
          download-size="0"
          install-size="0"
-         version="4.0.4"/>
+         version="4.0.5"/>
 
    <plugin
          id="org.eclipse.photran.ui"
          download-size="0"
          install-size="0"
-         version="4.0.4"/>
+         version="4.0.5"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.gnu.ui"
          download-size="0"
          install-size="0"
-         version="4.0.4"
+         version="4.0.5"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.core.vpg"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.0.5"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.ui.vpg"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.0.5"
          unpack="false"/>
 
 </feature>

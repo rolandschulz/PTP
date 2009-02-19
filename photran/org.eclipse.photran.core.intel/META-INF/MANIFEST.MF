@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.core.intel; singleton:=true
-Bundle-Version: 4.0.4
+Bundle-Version: 4.0.5
 Bundle-ClassPath: photranIntel.jar
 Bundle-Activator: org.eclipse.photran.core.intel.IntelPlugin
 Bundle-Vendor: %providerName

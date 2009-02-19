@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran.xlf_feature"
       label="IBM XLF Compiler Support (Eclipse Technology Incubation)"
-      version="4.0.4"
+      version="4.0.5"
       provider-name="Los Alamos National Laboratory">
 
    <description>
@@ -150,21 +150,21 @@ Inc. in the United States, other countries, or both.
    </url>
 
    <requires>
-      <import feature="org.eclipse.photran_feature" version="4.0.4" match="perfect"/>
+      <import feature="org.eclipse.photran_feature" version="4.0.5" match="perfect"/>
    </requires>
 
    <plugin
          id="org.eclipse.photran.errorparsers.xlf"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.0.5"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.xlf.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.0.5"
          unpack="false"/>
 
 </feature>
