@@ -479,12 +479,12 @@
             <separator name="typeGroup"/>
             <separator name="codingGroup"/>
          </menu>
-         <action 
+         <!--action 
                label="Extract Common Block to &amp;Module"
                definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand" 
                class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup" 
-               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/>
+               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
          <action
                label="&amp;Move Saved Variables to Common Block (Fortran)..."
                definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
@@ -541,11 +541,11 @@
                path="group.reorganize"><!-- See IContextMenuConstants -->
             <separator name="refactorings"/>
          </menu>
-         <action 
+         <!--action 
                label="Extract Common Block to &amp;Module" 
                class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
-               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/>
+               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
          <!--action 
                label="E&amp;xtract Procedure..." 
                class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
@@ -557,6 +557,11 @@
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
                id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
          <action 
+               label="&amp;Move Saved Variables to Global Common Block..." 
+               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
+         <action 
                label="&amp;Introduce Implicit None" 
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
@@ -566,11 +571,6 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-         <action 
-               label="&amp;Move Saved Variables to Global Common Block..." 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
       </viewerContribution>
    </extension>
    
