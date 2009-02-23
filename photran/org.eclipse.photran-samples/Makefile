@@ -6,7 +6,7 @@
 # Note - pattern substitution: $(patsubst %.f90,%.exe,$(wildcard *.f90))
 
 # Command to run your Fortran compiler
-FORTRAN=`which gfortran ifort g95 2>/dev/null | head -1`
+FORTRAN=`which gfortran ifort 2>/dev/null | head -1`
 DEBUGSWITCH=-g
 INCLUDESWITCH=-I
 LIBSWITCH=-L
@@ -16,13 +16,14 @@ OUTSWITCH=-o
 EXEFILE=a.exe
 
 # In each of these directories, all of the sources will be compiled into a single executable
-SRCDIRS=$(filter-out src-fortran2003, $(wildcard src-*))
+#SRCDIRS=$(filter-out src-fortran2003, $(wildcard src-*))
+SRCDIRS=$(wildcard src-*)
 
 # Here we do not use $(wildcard) to delay expansion until the shell is invoked
 SRCFILES=*.f*
 OBJFILES=*.o *.obj
 OTHERFILES=*.mod *.fwd *.map *.ydg
-EXEFILES=$(EXEFILE)
+EXEFILES=$(EXEFILE) *.exe
 
 all:	clean build
 
@@ -60,4 +61,3 @@ build:
 	  rm -f $(OTHERFILES) >/dev/null 2>&1; \
 	  cd ..; \
 	done
-	
