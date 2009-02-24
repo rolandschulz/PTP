@@ -1,9 +1,10 @@
 !>
 !! Illustrates a bug in IBM XL Fortran for AIX, V12.1 (5724-U82)
 !!
-!! XLF reports errors when a subclass overrides a procedure with a pointer to
-!! class(*) as either an argument or a return type.  If both modules are
-!! combined into a single module, the code compiles successfully.
+!! XLF reports errors when a subclass, whose parent class is in a different
+!! module, overrides a procedure with a pointer to class(*) as either an
+!! argument or a return type.  If both modules are combined into a single
+!! module, the code compiles successfully.
 !!
 !! Jeff Overbey (2/24/09)
 !<
