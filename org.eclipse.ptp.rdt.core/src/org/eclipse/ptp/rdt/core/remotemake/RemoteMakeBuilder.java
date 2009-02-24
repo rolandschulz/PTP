@@ -200,7 +200,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					last = new Integer(100);
 				}
 				StreamMonitor streamMon = new StreamMonitor(new SubProgressMonitor(monitor, 100), cos, last.intValue());
-				ErrorParserManager epm = new ErrorParserManager(getProject(), workingDirectory, this, info.getErrorParsers());
+				ErrorParserManager epm = new ErrorParserManager(getProject(), workingDirectory, this, mbsInfo.getDefaultConfiguration().getErrorParserList());
 				epm.setOutputStream(streamMon);
 				final OutputStream stdout = epm.getOutputStream();
 				final OutputStream stderr = epm.getOutputStream();
