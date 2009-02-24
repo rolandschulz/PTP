@@ -1,44 +1,52 @@
-! xlf-bug2.f03 - Implementation of the xlf-bug2 class and xlf-bug2_module module
-module mod_super
+!>
+!! Illustrates a bug in IBM XL Fortran for AIX, V12.1 (5724-U82)
+!!
+!! XLF reports errors when a subclass overrides a procedure with a pointer to
+!! class(*) as either an argument or a return type.  If both modules are
+!! combined into a single module, the code compiles successfully.
+!!
+!! Jeff Overbey (2/24/09)
+!<
+module mod_base
     implicit none
     private
-    ! Abstract class "super" contains two routines
+    ! Abstract class "base" contains two routines
     ! * accept_any accepts a pointer to class(*)
     ! * return_any returns a pointer to class(*)
-    type, public, abstract :: super
+    type, public, abstract :: base
     contains
         procedure(accept_any), deferred :: accept_any
         procedure(return_any), deferred :: return_any
     end type
     abstract interface
         subroutine accept_any(self, arg)
-            import super
-            class(super), intent(in) :: self
+            import base
+            class(base), intent(in) :: self
             class(*), pointer, intent(in) :: arg
         end subroutine
         function return_any(self) result(return)
-            import super
-            class(super), intent(in) :: self
+            import base
+            class(base), intent(in) :: self
             class(*), pointer :: return
         end function
     end interface
 end module
-module mod_base
-    use mod_super
+module mod_extended
+    use mod_base
     implicit none
     private
-    type, public, extends(super) :: base
+    type, public, extends(base) :: extended
     contains
-        procedure :: accept_any => base_accept_any
-        procedure :: return_any => base_return_any
+        procedure :: accept_any => extended_accept_any  ! XLF reports Dummy argument arg of overridden binding accept_any and the corresponding dummy argument of overriding binding accept_any must have the same type and type parameters.
+        procedure :: return_any => extended_return_any  ! XLF reports The function results of the overridden binding return_any and overridding binding return_any must have the same type and type parameters.
     end type
 contains
-    subroutine base_accept_any(self, arg)
-        class(base), intent(in) :: self
+    subroutine extended_accept_any(self, arg)
+        class(extended), intent(in) :: self
         class(*), pointer, intent(in) :: arg
     end subroutine
-    function base_return_any(self) result(return)
-        class(base), intent(in) :: self
+    function extended_return_any(self) result(return)
+        class(extended), intent(in) :: self
         class(*), pointer :: return
         return => null()
     end function
