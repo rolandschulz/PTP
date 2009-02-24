@@ -1,11 +1,11 @@
 ! xlf-bug2.f03 - Implementation of the xlf-bug2 class and xlf-bug2_module module
-module module
+module mod_super
     implicit none
-
+    private
     ! Abstract class "super" contains two routines
     ! * accept_any accepts a pointer to class(*)
     ! * return_any returns a pointer to class(*)
-    type, abstract :: super
+    type, public, abstract :: super
     contains
         procedure(accept_any), deferred :: accept_any
         procedure(return_any), deferred :: return_any
@@ -22,8 +22,12 @@ module module
             class(*), pointer :: return
         end function
     end interface
-
-    type, extends(super) :: base
+end module
+module mod_base
+    use mod_super
+    implicit none
+    private
+    type, public, extends(super) :: base
     contains
         procedure :: accept_any => base_accept_any
         procedure :: return_any => base_return_any
