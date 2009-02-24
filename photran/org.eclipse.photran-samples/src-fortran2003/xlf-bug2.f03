@@ -7,8 +7,8 @@ module module
     ! * return_any returns a pointer to class(*)
     type, abstract :: super
     contains
-        procedure :: accept_any
-        procedure :: return_any
+        procedure(accept_any), deferred :: accept_any
+        procedure(return_any), deferred :: return_any
     end type
     abstract interface
         subroutine accept_any(self, arg)
@@ -39,3 +39,4 @@ contains
         return => null()
     end function
 end module
+program p; end program
