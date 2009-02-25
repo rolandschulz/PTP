@@ -1,0 +1,68 @@
+% Release and Deployment Procedure
+
+\textit{Most contributors/committers do not need to read this.  This explains
+our entire release and deployment procedure: setting the Photran version
+number, building the feature, uploading it to the download site, etc.}
+
+\begin{enumerate}
+
+\item Note that, as a policy, Photran's update site URL changes when the
+version of the Platform or CDT that it requires changes.
+
+\item If the VPG database structure (or any of the serialized classes) have
+changed, update the VPG database filename in the PhotranVPGDB class
+constructor.  For example, in Photran 4.0 beta 5, the filename was
+``photran40b5vpg''
+
+\item There are three features: org.eclipse.photran-feature,
+org.eclipse.photran.intel-feature, and org.eclipse.photran.xlf-feature.
+(Ignore the vpg-feature; it is included in the photran-feature.)  For each of
+these three features:
+  \begin{enumerate}
+  \item The feature.xml should open in the Feature Manifest Editor.  In the
+        Overview tab, first update the version number.
+  \item Then click Synchronize, and ``force feature version into plug-in and
+        fragment manifests.''
+  \item Change the update site URL.
+  \item In the Information tab, change the copyright year.
+  \item For the intel-feature and xlf-feature, in the Dependencies tab, change
+        the ``version to match'' to the new photran-feature version number
+  \end{enumerate}
+
+\item In an update site project (create one if necessary), open the site.xml
+file (it should open in the Site Manifest Editor).  Add the three features, and
+Build each of them.  Note that, as long as the
+required versions of the Platform and CDT are the same, \textit{there can be multiple
+version of Photran features in the update site.}  For example, this allowed
+users running 4.0 beta 4 to automatically upgrade to 4.0 beta 5 simply by
+clicking the ``Update'' button in Help > Software Updates > Installed Software.
+
+\item \textit{Delete} the artifacts.xml and content.xml files.  In Eclipse
+3.4, these only seem to confuse/break the update manager.
+
+\item Switch to the ``site.xml'' tab in the Site Manifest Editor, and update
+  \begin{enumerate}
+  \item the ``site mirrorsURL'' to reflect the new update site URL, and
+  \item the ``description url'' to reflect the new update site URL, and
+  \end{enumerate}
+
+\item Assuming your committer username is joverbey and the update site project
+is called eclipse9.9cdt9.9,
+\begin{verbatim}
+cd /wherever/the/update/site/project/is
+rsync -av -e ssh joverbey@dev.eclipse.org:/home/data/users/joverbey/downloads/technology/photran/updates/
+\end{verbatim}
+\textit{Don't forget the trailing slash!}
+
+\item Update the timeline in the next appendix
+(org.eclipse.photran-dev-docs/dev-guide/app-history.ltx-inc)
+
+\item Tag the org.eclipse.photran module in CVS with something like
+v20090225\_4\_0\_5\_Beta5 where the date and version have been substituted
+appropriately
+
+\item Wait 24 hours for the update site to replicate to the mirrors
+
+\item E-mail photran, photran-announce, and photran-dev
+
+\end{enumerate}

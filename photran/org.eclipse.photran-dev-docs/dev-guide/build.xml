@@ -33,7 +33,8 @@
 	</target>
 
 	<target name="clean" description="Remove generated PDFs">
-		<delete><fileset includes="*.pdf" /></delete>
+		<delete><fileset dir="." includes="*.pdf" /></delete>
+	  	<delete><fileset dir="." includes="*.aux *.log *.toc *.dvi *.ps *.out" /></delete>
 	</target>
 
 </project>
