@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+	<category-def name="Photran 4.0" label="Photran Features"/>
+	
+	<feature id="org.eclipse.photran_feature" url="features/org.eclipse.photran-feature_@buildVersion@.jar" version="@buildVersion@">
+		<category name="Photran 4.0"/>
+	</feature>
+	<feature id="org.eclipse.photran.intel_feature" url="features/org.eclipse.photran.intel-feature_@buildVersion@.jar" version="@buildVersion@">
+		<category name="Photran 4.0"/>
+	</feature>
+	<feature id="org.eclipse.photran.xlf_feature" url="features/org.eclipse.photran.xlf-feature_@buildVersion@.jar" version="@buildVersion@">
+		<category name="Photran 4.0"/>
+	</feature>
+</site>

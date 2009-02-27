@@ -1,0 +1,137 @@
+<project name="Photran" default="build">
+	<target name="hi">
+		<echo message="${eclipse.home}"/>
+	</target>
+	
+	<target name="build" depends="zips,test"/>
+	<target name="nightly" depends="tag,zips,sign,test,copy"/>
+	<target name="testbuild" depends="zips,test,copy"/>
+	<target name="buildcopy" depends="zips,copy"/>
+	
+	<target name="init">
+		<touch file="${user.home}/.cvspass" />
+		<tstamp/>
+		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/R-3.4-200806172000/eclipse-SDK-3.4-linux-gtk-ppc.tar.gz"/>
+		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/5.0.2/I.I200902130801/cdt-master-5.0.2-I200902130801.zip"/>
+		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/ganymede/mylyn-3.0.1.v20080721-2100-e3.4.zip"/>
+		<property name="branchVersion" value="1.0"/>
+		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
+		<property name="forceContextQualifier" value="${timestamp}"/>
+		<property name="buildingOSGi" value="true"/>
+		<property name="buildDirectory" value="${basedir}/results"/>
+		<property name="testDirectory" value="${buildDirectory}/test"/>
+		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
+		<property name="pde.build.scripts" value="${eclipse.pdebuild.scripts}"/>
+		<property name="collectingFolder" value="eclipse"/>
+		<property name="archivePrefix" value="eclipse"/>
+		<property name="buildType" value="I" />
+		<property name="buildId" value="${buildType}${timestamp}"/>
+		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
+		<property name="masterFile" value="photran-master-${branchVersion}-${buildId}.zip"/>
+		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
+		<property name="mailto" value="overbey2@uiuc.edu"/>
+		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
+		<property name="baseos" value="${osgi.os}"/>
+		<property name="basews" value="${osgi.ws}"/>
+		<property name="basearch" value="${osgi.arch}"/>
+		<property name="tagbranch" value="-r HEAD"/>
+		<property name="tagname" value="v${timestamp}"/>
+		<property name="testReports" value="${zipsdir}/testReports"/>
+		<property name="junit-report-output" value="${testReports}"/>
+		<condition property="onWindows">
+			<os family="windows"/>
+		</condition>
+		<mkdir dir="${buildDirectory}"/>
+		<mkdir dir="${testReports}"/>
+	</target>
+	
+	<target name="fetch" depends="init">
+		<ant antfile="build.xml" dir="${pde.build.scripts}" target="preBuild">
+			<property name="builder" value="${basedir}/master"/>
+		</ant>
+		<ant antfile="build.xml" dir="${pde.build.scripts}" target="fetch">
+			<property name="builder" value="${basedir}/master"/>
+		</ant>
+	</target>
+	
+	<target name="unzip" depends="init" unless="dontUnzip">
+		<untar src="${eclipseDist}" dest="${buildDirectory}" compression="gzip"/>
+		<unzip src="${cdtDist}" dest="${buildDirectory}/eclipse"/>
+		<unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/>
+	</target>
+	
+	<target name="zips" depends="init,unzip">
+		<ant antfile="build.xml" dir="${pde.build.scripts}">
+			<property name="builder" value="${basedir}/master" />
+		</ant>
+		<concat destfile="${zipsdir}/compilelog.txt">
+			<fileset dir="${buildDirectory}/plugins" includes="**/*.bin.log"/>
+		</concat>
+		<loadfile property="compileLog" srcFile="${zipsdir}/compilelog.txt"/>
+		<condition property="hasErrors">
+			<contains string="${compileLog}" substring=" ERROR"/>
+		</condition>
+		<move file="${zipsdir}/${masterFile}" todir="${buildDirectory}"/>
+		<unzip src="${buildDirectory}/${masterFile}" dest="${buildDirectory}/site"/>
+		<move file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
+		<move file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
+		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
+		<replace file="${buildDirectory}/site/eclipse/site.xml">
+			<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		</replace>
+		<copy file="pack.properties" todir="${buildDirectory}/site/eclipse"/>
+
+		<zip destfile="${zipsdir}/${masterFile}"
+			basedir="${buildDirectory}/site/eclipse"/>
+	</target>
+
+	<target name="sign" depends="init" unless="hasErrors"/>
+	<target name="test" depends="init" unless="hasErrors"/>
+	<target name="copy" depends="init" unless="hasErrors"/>
+
+	<target name="tagone">
+		<cvs cvsroot="/cvsroot/tools" command="rtag ${tagbranch} ${tagname} ${tagmodule}"/>
+	</target>
+	
+	<target name="tag" depends="init">
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.cdtinterface"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.core"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.core.intel"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.core.vpg"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.errorparsers.xlf"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.core"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.gnu.ui"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.intel.ui"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.ui"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.xlf.ui"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.ui"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.ui.vpg"/>
+		</antcall>	
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran-feature"/>
+		</antcall>	
+	</target>
+</project>
