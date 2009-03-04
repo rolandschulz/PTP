@@ -20,6 +20,7 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.messages.Messages;
 
 /**
  * This is a complete description needed to run or debug a parallel job
@@ -132,17 +133,17 @@ public class JobRunConfiguration {
 	
 	public void setDebuggerArgs(String args)
 	{
-		debuggerArgs = args.split(" ");
+		debuggerArgs = args.split(" "); //$NON-NLS-1$
 	}
 	
 	public String toString()
 	{
-		return "name:\t\t"+execName+"\n"+
-				"path:\t\t"+pathToExec+"\n"+
-				"cwd:\t\t"+workingDir+"\n"+
-				"resourceManagerName:\t"+resourceManagerName+"\n"+
-				"queueName:\t"+queueName+"\n"+
-				"isDebug?\t\t"+isDebugJob;
+		return "name:\t\t"+execName+"\n"+ //$NON-NLS-1$ //$NON-NLS-2$
+				"path:\t\t"+pathToExec+"\n"+ //$NON-NLS-1$ //$NON-NLS-2$
+				"cwd:\t\t"+workingDir+"\n"+ //$NON-NLS-1$ //$NON-NLS-2$
+				"resourceManagerName:\t"+resourceManagerName+"\n"+ //$NON-NLS-1$ //$NON-NLS-2$
+				"queueName:\t"+queueName+"\n"+ //$NON-NLS-1$ //$NON-NLS-2$
+				"isDebug?\t\t"+isDebugJob; //$NON-NLS-1$
 	}
 
 	public IAttribute<?,?,?>[] getLaunchAttributes() {

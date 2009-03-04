@@ -29,13 +29,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 public class PTPCorePlugin extends Plugin {
-	public static final String PLUGIN_ID = "org.eclipse.ptp.core";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.core"; //$NON-NLS-1$
 
 	// The shared instance.
 	private static PTPCorePlugin plugin;
@@ -102,7 +103,7 @@ public class PTPCorePlugin extends Plugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.PTPCorePlugin_0, e));
 	}
 
 	/*
@@ -122,7 +123,7 @@ public class PTPCorePlugin extends Plugin {
 		plugin = this;
 		try {
 			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID
-					+ ".ParallelPluginResources");
+					+ ".ParallelPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -176,11 +177,11 @@ public class PTPCorePlugin extends Plugin {
 		if (frags != null) {
 			String os = Platform.getOS();
 			String arch = Platform.getOSArch();
-			String frag_os_arch = fragment+"."+os+"."+arch;
+			String frag_os_arch = fragment+"."+os+"."+arch; //$NON-NLS-1$ //$NON-NLS-2$
 			
 			for (int i=0; i<frags.length; i++) {
 				Bundle frag = frags[i];
-				URL path = frag.getEntry("/");
+				URL path = frag.getEntry("/"); //$NON-NLS-1$
 				try {
 					URL local_path = FileLocator.toFileURL(path);
 					String str_path = local_path.getPath();
@@ -192,7 +193,7 @@ public class PTPCorePlugin extends Plugin {
 					int idx = str_path.indexOf(frag_os_arch);
 					if (idx > 0) {
 						/* found it!  This is the right fragment for our OS & arch */
-						String file_path = str_path + "bin/"+file;
+						String file_path = str_path + "bin/"+file; //$NON-NLS-1$
 						File f = new File(file_path);
 						if (f.exists()) {
 							return file_path;

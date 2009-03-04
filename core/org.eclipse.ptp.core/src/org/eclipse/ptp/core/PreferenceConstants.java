@@ -18,11 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public interface PreferenceConstants {
-	public static final String SET_ROOT_ID = "Root";
+	public static final String SET_ROOT_ID = "Root"; //$NON-NLS-1$
 	
-	public static final String OUTPUT_DIR = "OUTPUT_DIR";
-	public static final String STORE_LINE = "STORE_LINE";
+	public static final String OUTPUT_DIR = "OUTPUT_DIR"; //$NON-NLS-1$
+	public static final String STORE_LINE = "STORE_LINE"; //$NON-NLS-1$
 	public int DEF_STORE_LINE = 100;
-	public String DEF_OUTPUT_DIR_NAME = "output";
+	public String DEF_OUTPUT_DIR_NAME = "output"; //$NON-NLS-1$
 }

@@ -110,7 +110,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
 	 */
 	public void setValueAsString(String string) throws IllegalValueException {
-		String[] values = string.split("");
+		String[] values = string.split(""); //$NON-NLS-1$
 		try {
 			setValue((T[]) values);
 		} catch (ClassCastException e) {

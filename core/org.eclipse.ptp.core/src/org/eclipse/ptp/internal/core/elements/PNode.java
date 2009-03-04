@@ -152,7 +152,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 		if (num != null) {
 			return num.getValueAsString();
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)

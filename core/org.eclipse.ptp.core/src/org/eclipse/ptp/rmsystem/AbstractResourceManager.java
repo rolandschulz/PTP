@@ -92,6 +92,7 @@ import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PElement;
 import org.eclipse.ptp.internal.core.elements.PJob;
 import org.eclipse.ptp.internal.core.elements.PMachine;
@@ -548,7 +549,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			if (monitor == null) {
 				monitor = new NullProgressMonitor();
 			}
-			monitor.beginTask("Stopping Resource Manager " + getName(), 10);
+			monitor.beginTask(Messages.AbstractResourceManager_0 + getName(), 10);
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
 				doShutdown(subMonitor);
@@ -571,7 +572,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			if (monitor == null) {
 				monitor = new NullProgressMonitor();
 			}
-			monitor.beginTask("Resource manager starting: " + getName(), 10);
+			monitor.beginTask(Messages.AbstractResourceManager_1 + getName(), 10);
 			try {
 				initialize();
 				boolean started = doStartup(new SubProgressMonitor(monitor, 10));

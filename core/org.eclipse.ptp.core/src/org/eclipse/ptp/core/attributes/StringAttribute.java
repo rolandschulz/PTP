@@ -53,7 +53,7 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
      */
     public synchronized void setValueAsString(String string) {
     	if (string == null) {
-    		string = "";
+    		string = ""; //$NON-NLS-1$
     	}
 		this.value.replace(0, this.value.length(), string);
 	}

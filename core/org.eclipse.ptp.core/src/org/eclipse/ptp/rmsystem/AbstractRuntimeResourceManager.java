@@ -49,6 +49,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
@@ -101,7 +102,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		private final Condition 		subCondition = subLock.newCondition();
 		
 		public JobSubmission(int count) {
-			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count);
+			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count); //$NON-NLS-1$
 		}
 
 		public JobSubmission(String id) {
@@ -369,7 +370,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				addJobs(queue, newJobs);
 			}
 		} else {
-			PTPCorePlugin.log("IRuntimeEventListener#handleEvent: unknown queue ID " + e.getParentId());
+			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_0 + e.getParentId());
 		}
 	}
 	
@@ -421,7 +422,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				addNodes(machine, newNodes);
 			}
 		} else {
-			PTPCorePlugin.log("IRuntimeEventListener#handleEvent: unknown machine ID " + e.getParentId());
+			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_1 + e.getParentId());
 		}
 	}
 
@@ -450,7 +451,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				addProcesses(job, newProcesses);
 			}
 		} else {
-			PTPCorePlugin.log("IRuntimeEventListener#handleEvent: unknown job ID " + e.getParentId());
+			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_2 + e.getParentId());
 		}
 	}
 
@@ -565,7 +566,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (queue != null) {
 					queues.add(queue);
 				} else {
-					PTPCorePlugin.log("QueueChange: unknown queue " + elementId);
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_3 + elementId);
 				}
 			}
 			
@@ -786,7 +787,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		if (job != null) {
 			name = job.getName();
 		}
-		fireError("Error while terminating job \"" + name + "\": " + e.getErrorMessage());
+		fireError(Messages.AbstractRuntimeResourceManager_4 + name + Messages.AbstractRuntimeResourceManager_5 + e.getErrorMessage());
 	}
 
 	/**

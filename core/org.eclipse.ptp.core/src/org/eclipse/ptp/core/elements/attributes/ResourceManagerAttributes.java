@@ -13,6 +13,7 @@ package org.eclipse.ptp.core.elements.attributes;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
@@ -28,23 +29,23 @@ public class ResourceManagerAttributes {
 		ERROR
 	}
 	
-	private final static String STATE_ATTR_ID = "rmState";
-	private final static String DESC_ATTR_ID = "rmDescription";
-	private final static String RMID_ATTR_ID = "rmID";
-	private final static String TYPE_ATTR_ID = "rmType";
+	private final static String STATE_ATTR_ID = "rmState"; //$NON-NLS-1$
+	private final static String DESC_ATTR_ID = "rmDescription"; //$NON-NLS-1$
+	private final static String RMID_ATTR_ID = "rmID"; //$NON-NLS-1$
+	private final static String TYPE_ATTR_ID = "rmType"; //$NON-NLS-1$
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", 
-				"RM State", true, State.STOPPED);
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state",  //$NON-NLS-1$
+				Messages.ResourceManagerAttributes_0, true, State.STOPPED);
 	private final static StringAttributeDefinition descAttrDef = 
-		new StringAttributeDefinition(DESC_ATTR_ID, "description", 
-				"RM description", true, "");
+		new StringAttributeDefinition(DESC_ATTR_ID, "description",  //$NON-NLS-1$
+				Messages.ResourceManagerAttributes_1, true, ""); //$NON-NLS-1$
 	private final static StringAttributeDefinition rmIDAttrDef = 
-		new StringAttributeDefinition(RMID_ATTR_ID, "RM ID", 
-				"RM unique identifier", false, "");
+		new StringAttributeDefinition(RMID_ATTR_ID, "RM ID",  //$NON-NLS-1$
+				Messages.ResourceManagerAttributes_2, false, ""); //$NON-NLS-1$
 	private final static StringAttributeDefinition typeAttrDef = 
-		new StringAttributeDefinition(TYPE_ATTR_ID, "type", 
-				"RM type", false, "unspecified");
+		new StringAttributeDefinition(TYPE_ATTR_ID, "type",  //$NON-NLS-1$
+				Messages.ResourceManagerAttributes_3, false, Messages.ResourceManagerAttributes_4);
 	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;

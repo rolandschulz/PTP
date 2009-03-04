@@ -20,6 +20,8 @@ package org.eclipse.ptp.core.attributes;
 
 import java.math.BigInteger;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public final class BigIntegerAttribute
 extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefinition> {
 
@@ -65,7 +67,7 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 
 	public synchronized void setValue(BigInteger value) throws IllegalValueException {
 		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
-			throw new IllegalValueException("The set valid range does not include the new value");
+			throw new IllegalValueException(Messages.BigIntegerAttribute_0);
 		}
 		this.value = value;
 	}
@@ -73,7 +75,7 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 	public synchronized void setValue(Integer ivalue) throws IllegalValueException {
 		BigInteger value = BigInteger.valueOf(ivalue);
 		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
-			throw new IllegalValueException("The set valid range does not include the new value");
+			throw new IllegalValueException(Messages.BigIntegerAttribute_1);
 		}
 		this.value = value;
 	}
@@ -82,7 +84,7 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		try {
 			BigInteger value = new BigInteger(string);
 			if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
-				throw new IllegalValueException("The set valid range does not include the new value");
+				throw new IllegalValueException(Messages.BigIntegerAttribute_2);
 			}
 			this.value = value;
 		}

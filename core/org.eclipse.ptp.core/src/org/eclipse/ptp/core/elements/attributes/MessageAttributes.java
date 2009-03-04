@@ -14,6 +14,7 @@ import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
@@ -29,21 +30,21 @@ public class MessageAttributes {
 		UNDEFINED
 	};
 	
-	private static final String LEVEL_ATTR_ID = "messageLevel";
-	private static final String CODE_ATTR_ID = "messageCode";
-	private static final String TEXT_ATTR_ID = "messageText";
+	private static final String LEVEL_ATTR_ID = "messageLevel"; //$NON-NLS-1$
+	private static final String CODE_ATTR_ID = "messageCode"; //$NON-NLS-1$
+	private static final String TEXT_ATTR_ID = "messageText"; //$NON-NLS-1$
 
 	private final static EnumeratedAttributeDefinition<Level> levelAttrDef = 
-		new EnumeratedAttributeDefinition<Level>(LEVEL_ATTR_ID, "Message Level", 
-				"Level of the message", true, Level.UNDEFINED);
+		new EnumeratedAttributeDefinition<Level>(LEVEL_ATTR_ID, "Message Level",  //$NON-NLS-1$
+				Messages.MessageAttributes_0, true, Level.UNDEFINED);
 
 	private final static IntegerAttributeDefinition codeAttrDef = 
-		new IntegerAttributeDefinition(CODE_ATTR_ID, "Message Code", 
-				"Code assigned to this message", true, 0);
+		new IntegerAttributeDefinition(CODE_ATTR_ID, "Message Code",  //$NON-NLS-1$
+				Messages.MessageAttributes_1, true, 0);
 
 	private final static StringAttributeDefinition textAttrDef = 
-		new StringAttributeDefinition(TEXT_ATTR_ID, "Message Text",
-				"Text of message", true, "");
+		new StringAttributeDefinition(TEXT_ATTR_ID, "Message Text", //$NON-NLS-1$
+				Messages.MessageAttributes_2, true, ""); //$NON-NLS-1$
 
 	public static EnumeratedAttributeDefinition<Level> getLevelAttributeDefinition() {
 		return levelAttrDef;

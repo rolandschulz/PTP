@@ -20,6 +20,8 @@ package org.eclipse.ptp.core.attributes;
 
 import java.math.BigInteger;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 
 public final class BigIntegerAttributeDefinition
 extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefinition> {
@@ -41,10 +43,10 @@ extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAtt
 			final BigInteger minValue, final BigInteger maxValue) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (minValue.compareTo(maxValue) > 0) {
-			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
+			throw new IllegalArgumentException(Messages.BigIntegerAttributeDefinition_0);
 		}
 		if (defaultValue.compareTo(minValue) < 0 || defaultValue.compareTo(maxValue) > 0) {
-			throw new IllegalValueException("The set valid range does not include the default value");
+			throw new IllegalValueException(Messages.BigIntegerAttributeDefinition_1);
 		}
 		this.defaultValue = defaultValue;
 		this.minValue = minValue;

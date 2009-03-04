@@ -14,10 +14,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class DebugUtil {
-	private static final String PROTOCOL_TRACING_OPTION = "org.eclipse.ptp.core/debug/proxy/protocol/tracing";
-	private static final String PROXY_CLIENT_TRACING_OPTION = "org.eclipse.ptp.core/debug/proxy/client/tracing";
-	private static final String PROXY_SERVER_DEBUG_LEVEL_OPTION = "org.eclipse.ptp.core/debug/proxy/server/debug_level";
-	private static final String RM_TRACING_OPTION = "org.eclipse.ptp.core/debug/rm/tracing";
+	private static final String PROTOCOL_TRACING_OPTION = "org.eclipse.ptp.core/debug/proxy/protocol/tracing"; //$NON-NLS-1$
+	private static final String PROXY_CLIENT_TRACING_OPTION = "org.eclipse.ptp.core/debug/proxy/client/tracing"; //$NON-NLS-1$
+	private static final String PROXY_SERVER_DEBUG_LEVEL_OPTION = "org.eclipse.ptp.core/debug/proxy/server/debug_level"; //$NON-NLS-1$
+	private static final String RM_TRACING_OPTION = "org.eclipse.ptp.core/debug/rm/tracing"; //$NON-NLS-1$
 
 	public static boolean PROTOCOL_TRACING = false;
 	public static boolean PROXY_CLIENT_TRACING = false;

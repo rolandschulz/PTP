@@ -42,6 +42,7 @@ import org.eclipse.ptp.core.elements.events.INewNodeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.events.ChangedNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
@@ -50,7 +51,7 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
 public class PMachine extends Parent implements IPMachineControl {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private String arch = "undefined";
+	private String arch = Messages.PMachine_0;
     
     public PMachine(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_MACHINE, attrs);

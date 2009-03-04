@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 
 public final class DoubleAttributeDefinition
 extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefinition> {
@@ -39,10 +41,10 @@ extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefini
 			final Double defaultValue, final double minValue, final double maxValue) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (minValue > maxValue) {
-			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
+			throw new IllegalArgumentException(Messages.DoubleAttributeDefinition_0);
 		}
 		if (defaultValue < minValue || defaultValue > maxValue) {
-			throw new IllegalValueException("The set valid range does not include the default value");
+			throw new IllegalValueException(Messages.DoubleAttributeDefinition_1);
 		}
 		this.defaultValue = defaultValue;
 		this.minValue = minValue;

@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public final class DoubleAttribute
 extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 
@@ -53,7 +55,7 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 
 	public synchronized void setValue(Double value) throws IllegalValueException {
 		if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
-			throw new IllegalValueException("The set valid range does not include the new value");
+			throw new IllegalValueException(Messages.DoubleAttribute_0);
 		}
 		this.value = value;
 	}
@@ -62,7 +64,7 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 		try {
 			Double value = Double.valueOf(string);
 			if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
-				throw new IllegalValueException("The set valid range does not include the new value");
+				throw new IllegalValueException(Messages.DoubleAttribute_1);
 			}
 			this.value = value;
 		}

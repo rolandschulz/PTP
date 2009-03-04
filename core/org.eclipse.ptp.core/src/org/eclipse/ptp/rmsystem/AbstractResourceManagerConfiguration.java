@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 
@@ -29,7 +30,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		private final String uniqueName;
 
 		public CommonConfig() {
-			this("", "", generateUniqueName());
+			this("", "", generateUniqueName()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		public CommonConfig(String name, String desc, String uniqueName) {
@@ -65,9 +66,9 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 			IMemento memento) {
 		String factoryId = memento.getString(TAG_FACTORY_ID);
 		if (!factoryId.equals(factory.getId())) {
-			throw new IllegalStateException("Incompatable factory with factoryId"
-					+ " stored id" + factoryId 
-					+ ", factory id:" + factory.getId());
+			throw new IllegalStateException(Messages.AbstractResourceManagerConfiguration_0
+					+ Messages.AbstractResourceManagerConfiguration_1 + factoryId 
+					+ Messages.AbstractResourceManagerConfiguration_2 + factory.getId());
 		}
 		String name = memento.getString(TAG_NAME);
 		String desc = memento.getString(TAG_DESCRIPTION);
@@ -77,7 +78,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	
 	protected static String generateUniqueName() {
 		long time = System.currentTimeMillis();
-		return "RMID:" + Long.toString(time);
+		return "RMID:" + Long.toString(time); //$NON-NLS-1$
 	}
 
 	private String description;

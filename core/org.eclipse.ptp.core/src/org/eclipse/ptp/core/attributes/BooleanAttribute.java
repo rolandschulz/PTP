@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public class BooleanAttribute 
 extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 
@@ -42,7 +44,7 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 	}
 
 	public boolean isValid(String string) {
-		if ("true".equalsIgnoreCase(string) || "false".equalsIgnoreCase(string)) {
+		if ("true".equalsIgnoreCase(string) || "false".equalsIgnoreCase(string)) { //$NON-NLS-1$ //$NON-NLS-2$
 			return true;
 		}
 		return false;
@@ -54,7 +56,7 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 
 	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		if (!isValid(string)) {
-			throw new IllegalValueException(string + " is not a legal Boolean");
+			throw new IllegalValueException(string + Messages.BooleanAttribute_0);
 		}
 		value = Boolean.valueOf(string);
 	}

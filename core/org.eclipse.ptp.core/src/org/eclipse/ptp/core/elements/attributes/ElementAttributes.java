@@ -12,6 +12,7 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
@@ -22,14 +23,14 @@ public class ElementAttributes {
 	 * Predefine attributes. These are attributes that
 	 * the UI knows about.
 	 */
-	private final static String ATTR_ID = "id";
-	private final static String ATTR_NAME = "name";
+	private final static String ATTR_ID = "id"; //$NON-NLS-1$
+	private final static String ATTR_NAME = "name"; //$NON-NLS-1$
 	
 	private final static StringAttributeDefinition idAttributeDefinition = 
-		new StringAttributeDefinition(ATTR_ID, "ID", "Unique ID of element", false, "");
+		new StringAttributeDefinition(ATTR_ID, "ID", Messages.ElementAttributes_0, false, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	private final static StringAttributeDefinition nameAttributeDefinition = 
-		new StringAttributeDefinition(ATTR_NAME, "Name", "Name of element", true, "");
+		new StringAttributeDefinition(ATTR_NAME, "Name", Messages.ElementAttributes_1, true, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	public static StringAttributeDefinition getIdAttributeDefinition() {
 		return idAttributeDefinition;

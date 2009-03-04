@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 
 public final class IntegerAttributeDefinition
 extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDefinition> {
@@ -39,10 +41,10 @@ extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDef
 			final Integer defaultValue, final Integer minValue, final Integer maxValue) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (minValue > maxValue) {
-			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
+			throw new IllegalArgumentException(Messages.IntegerAttributeDefinition_0);
 		}
 		if (defaultValue < minValue || defaultValue > maxValue) {
-			throw new IllegalValueException("The set valid range does not include the default value");
+			throw new IllegalValueException(Messages.IntegerAttributeDefinition_1);
 		}
 		this.defaultValue = defaultValue;
 		this.minValue = minValue;

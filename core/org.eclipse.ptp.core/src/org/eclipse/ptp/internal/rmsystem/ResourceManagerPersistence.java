@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
@@ -41,22 +42,22 @@ import org.eclipse.ui.XMLMemento;
 
 public class ResourceManagerPersistence {
 
-	private static final String TAG_RESOURCEMANAGER_INDEX = "ResourceManagerIndex";
+	private static final String TAG_RESOURCEMANAGER_INDEX = "ResourceManagerIndex"; //$NON-NLS-1$
 
-	private static final String TAG_RESOURCEMANAGERS = "ResourceManagers";
+	private static final String TAG_RESOURCEMANAGERS = "ResourceManagers"; //$NON-NLS-1$
 
-	private static final String TAG_RESOURCEMANGER = "ResourceManager";
+	private static final String TAG_RESOURCEMANGER = "ResourceManager"; //$NON-NLS-1$
 
-	private static final String TAG_RESOURCEMANGER_CONFIGURATION = "Configuration";
+	private static final String TAG_RESOURCEMANGER_CONFIGURATION = "Configuration"; //$NON-NLS-1$
 
-	private static final String TAG_RESOURCEMANGER_ID = "ResourceManagerId";
+	private static final String TAG_RESOURCEMANGER_ID = "ResourceManagerId"; //$NON-NLS-1$
 
-	private static final String TAG_RESOURCEMANGER_RUNNING = "IsRunning";
+	private static final String TAG_RESOURCEMANGER_RUNNING = "IsRunning"; //$NON-NLS-1$
 
 	public static void saveResourceManagers(File file,
 			IResourceManagerControl[] resourceManagers) {
 		if (DebugUtil.RM_TRACING) {
-			System.out.println("In saveResourceManagers to file, " + file.getAbsolutePath());
+			System.out.println(Messages.ResourceManagerPersistence_0 + file.getAbsolutePath());
 		}
 		XMLMemento memento = XMLMemento.createWriteRoot(TAG_RESOURCEMANAGERS);
 		saveResourceManagers(memento, resourceManagers);
@@ -76,7 +77,7 @@ public class ResourceManagerPersistence {
 			}
 		}
 		if (DebugUtil.RM_TRACING) {
-			System.out.println("Leaving saveResourceManagers");
+			System.out.println(Messages.ResourceManagerPersistence_1);
 		}
 	}
 
@@ -89,7 +90,7 @@ public class ResourceManagerPersistence {
 					resourceManagers[i].getConfiguration().getResourceManagerId());
 			child.putInteger(TAG_RESOURCEMANAGER_INDEX, i);
 			boolean isRunning = resourceManagers[i].getState().equals(ResourceManagerAttributes.State.STARTED);
-			child.putString(TAG_RESOURCEMANGER_RUNNING, isRunning ? "true" : "false");
+			child.putString(TAG_RESOURCEMANGER_RUNNING, isRunning ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
 			IMemento grandchild = child.createChild(TAG_RESOURCEMANGER_CONFIGURATION);
 			resourceManagers[i].getConfiguration().save(grandchild);
 		}
@@ -172,7 +173,7 @@ public class ResourceManagerPersistence {
 			String resourceManagerId = children[i].getString(TAG_RESOURCEMANGER_ID);
 			final int index = children[i].getInteger(TAG_RESOURCEMANAGER_INDEX).intValue();
 			String isRunningRep = children[i].getString(TAG_RESOURCEMANGER_RUNNING);
-			boolean isRunning = "true".equalsIgnoreCase(isRunningRep);
+			boolean isRunning = "true".equalsIgnoreCase(isRunningRep); //$NON-NLS-1$
 			IResourceManagerFactory factory = getResourceManagerFactory(
 					factories, resourceManagerId);
 			if (factory != null) {
@@ -195,7 +196,7 @@ public class ResourceManagerPersistence {
 		if (statuses.size() > 0) {
 			throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
 					MultiStatus.ERROR, statuses.toArray(new IStatus[0]),
-					"loading resource managers", null));
+					Messages.ResourceManagerPersistence_2, null));
 		}
 	}
 
