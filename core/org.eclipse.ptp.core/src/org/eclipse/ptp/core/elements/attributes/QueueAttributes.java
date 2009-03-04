@@ -12,6 +12,7 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
@@ -25,10 +26,10 @@ public class QueueAttributes {
 		STOPPED
 	};
 
-	private static final String STATE_ATTR_ID = "queueState";
+	private static final String STATE_ATTR_ID = "queueState"; //$NON-NLS-1$
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Queue State",
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", Messages.QueueAttributes_0, //$NON-NLS-1$
 				true, State.NORMAL);
 	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {

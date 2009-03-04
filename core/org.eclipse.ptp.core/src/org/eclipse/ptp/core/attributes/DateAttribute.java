@@ -25,6 +25,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public class DateAttribute
 extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
@@ -32,7 +34,7 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	public static void main(String[] args) throws IllegalValueException {
 		Calendar cal = Calendar.getInstance();
-		DateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance());
+		DateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		DateAttribute mda = (DateAttribute)def.create();
 		mda.setValue(cal);
 		System.out.println(mda.toString());
@@ -62,7 +64,6 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 				}
 			}
 		}
-		System.out.println("There are " + dfs.size() + " date formats");
 		dateFormats = (DateFormat[]) dfs.toArray(new DateFormat[dfs.size()]);
 		return dateFormats;
 	}
@@ -117,24 +118,24 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	public void setValue(Date date) throws IllegalValueException {
 		value.setTime(date);
 		if (date.compareTo(getMinDate()) < 0) {
-			throw new IllegalValueException("date specified is before min date");
+			throw new IllegalValueException(Messages.DateAttribute_0);
 		}
 		if (date.compareTo(getMaxDate()) > 0) {
-			throw new IllegalValueException("date specified is after max date");
+			throw new IllegalValueException(Messages.DateAttribute_1);
 		}
 	}
 
 	public void setValueAsString(String string) throws IllegalValueException {
 		final Date date = parseString(string);
 		if (date == null) {
-			throw new IllegalValueException("Unable to parse \"" + string
-					+ "\" into a date");
+			throw new IllegalValueException(Messages.DateAttribute_2 + string
+					+ Messages.DateAttribute_3);
 		}
 		if (date.compareTo(getMinDate()) < 0) {
-			throw new IllegalValueException("Date, " + string + ", is before " + toString(getMinDate()));
+			throw new IllegalValueException(Messages.DateAttribute_4 + string + Messages.DateAttribute_5 + toString(getMinDate()));
 		}
 		if (date.compareTo(getMaxDate()) > 0) {
-			throw new IllegalValueException("Date, " + string + ", is after " + toString(getMaxDate()));
+			throw new IllegalValueException(Messages.DateAttribute_6 + string + Messages.DateAttribute_7 + toString(getMaxDate()));
 		}
 		value.setTime(date);
 	}

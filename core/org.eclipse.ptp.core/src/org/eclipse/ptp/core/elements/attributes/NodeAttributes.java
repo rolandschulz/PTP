@@ -13,6 +13,7 @@ package org.eclipse.ptp.core.elements.attributes;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
@@ -36,21 +37,21 @@ public class NodeAttributes {
 		NONE,
 	};
 
-	private static final String STATE_ATTR_ID = "nodeState";
-	private static final String EXTRA_STATE_ATTR_ID = "nodeExtraState";
-	private static final String NUMBER_ATTR_ID = "nodeNumber";
+	private static final String STATE_ATTR_ID = "nodeState"; //$NON-NLS-1$
+	private static final String EXTRA_STATE_ATTR_ID = "nodeExtraState"; //$NON-NLS-1$
+	private static final String NUMBER_ATTR_ID = "nodeNumber"; //$NON-NLS-1$
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Node State", "State of the node",
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Node State", Messages.NodeAttributes_0, //$NON-NLS-1$
 				true, State.UNKNOWN);
 	
 	private final static EnumeratedAttributeDefinition<ExtraState> extraStateAttrDef = 
-		new EnumeratedAttributeDefinition<ExtraState>(EXTRA_STATE_ATTR_ID, "Extra Node State",
-				"Extra state information for the node (e.g. job scheduler state)", true, ExtraState.NONE);
+		new EnumeratedAttributeDefinition<ExtraState>(EXTRA_STATE_ATTR_ID, "Extra Node State", //$NON-NLS-1$
+				Messages.NodeAttributes_1, true, ExtraState.NONE);
 	
 	private final static IntegerAttributeDefinition numAttrDef = 
-		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number", 
-				"Zero-based index of node", true, 0);
+		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number",  //$NON-NLS-1$
+				Messages.NodeAttributes_2, true, 0);
 	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;

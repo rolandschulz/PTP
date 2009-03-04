@@ -13,22 +13,23 @@ package org.eclipse.ptp.core.elements.attributes;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
  * Error attributes
  */
 public class ErrorAttributes {
-	private static final String CODE_ATTR_ID = "errorCode";
-	private static final String MESSAGE_ATTR_ID = "errorMsg";
+	private static final String CODE_ATTR_ID = "errorCode"; //$NON-NLS-1$
+	private static final String MESSAGE_ATTR_ID = "errorMsg"; //$NON-NLS-1$
 
 	private final static IntegerAttributeDefinition codeAttrDef = 
-		new IntegerAttributeDefinition(CODE_ATTR_ID, "Error Code", 
-				"Code assigned to this error", true, 0);
+		new IntegerAttributeDefinition(CODE_ATTR_ID, "Error Code",  //$NON-NLS-1$
+				Messages.ErrorAttributes_0, true, 0);
 
 	private final static StringAttributeDefinition msgAttrDef = 
-		new StringAttributeDefinition(MESSAGE_ATTR_ID, "Error Message",
-				"Text of error message", true, "");
+		new StringAttributeDefinition(MESSAGE_ATTR_ID, "Error Message", //$NON-NLS-1$
+				Messages.ErrorAttributes_1, true, ""); //$NON-NLS-1$
 
 	public static IntegerAttributeDefinition getCodeAttributeDefinition() {
 		return codeAttrDef;

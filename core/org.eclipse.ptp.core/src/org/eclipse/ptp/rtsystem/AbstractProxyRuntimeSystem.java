@@ -46,6 +46,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeConnectedStateEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeErrorStateEvent;
@@ -221,17 +222,17 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						}
 						pos += numArgs + 1;
 					} else {
-						fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: bad arg count"));
+						fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_0));
 						return;
 					}
 				}
 				
 				fireRuntimeAttributeDefinitionEvent(new RuntimeAttributeDefinitionEvent(attrDefs.toArray(new IAttributeDefinition[attrDefs.size()])));
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert arg to integer"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_1));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_2));
 		}
 	}
 
@@ -252,7 +253,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(mgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 
@@ -263,7 +264,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -271,7 +272,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeJobChangeEvent(new RuntimeJobChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 
@@ -282,7 +283,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -290,7 +291,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeMachineChangeEvent(new RuntimeMachineChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 	
@@ -301,7 +302,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 2) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -325,7 +326,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			
 			fireRuntimeNewJobEvent(new RuntimeNewJobEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 	
@@ -336,7 +337,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 2) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -344,7 +345,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 	
@@ -355,7 +356,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 2) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -363,7 +364,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 	
@@ -374,7 +375,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 2) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -382,7 +383,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 
@@ -393,7 +394,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 2) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -401,7 +402,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 	
@@ -412,7 +413,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -420,7 +421,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeNodeChangeEvent(new RuntimeNodeChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 
@@ -431,7 +432,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -439,7 +440,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeProcessChangeEvent(new RuntimeProcessChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 	
@@ -450,7 +451,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -458,7 +459,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		if (eMgr != null) {			
 			fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
 		}
 	}
 
@@ -483,7 +484,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -497,7 +498,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -511,7 +512,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String[] attrs = e.getAttributes();
 		
 		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
 		
@@ -525,7 +526,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			String[] attrs = e.getAttributes();
 			
 			if (attrs.length < 1) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 				return;
 			}
 			
@@ -539,7 +540,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			String[] attrs = e.getAttributes();
 			
 			if (attrs.length < 1) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 				return;
 			}
 			
@@ -572,12 +573,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			IntegerAttribute codeAttr = mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
 			StringAttribute msgAttr = mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
 			if (codeAttr == null || msgAttr == null) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "StartupErrorEvent: missing attibutes"));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_5));				
 			} else {
 				fireRuntimeStartupErrorEvent(new RuntimeStartupErrorEvent(codeAttr.getValue(), msgAttr.getValue()));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "StartupErrorEvent: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_6));				
 		}
 	}
 
@@ -594,12 +595,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
 			StringAttribute jobSubIdAttr = (StringAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 			if (codeAttr == null || msgAttr == null || jobSubIdAttr == null) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "SubmitJobErrorEvent: missing attibutes"));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_7));				
 			} else {
 				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobSubIdAttr.getValue()));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "SubmitJobErrorEvent: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_8));				
 		}
 	}
 
@@ -616,12 +617,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
 			StringAttribute jobIdAttr = (StringAttribute) mgr.getAttribute(JobAttributes.getJobIdAttributeDefinition());
 			if (codeAttr == null || msgAttr == null || jobIdAttr == null) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "TerminateJobErrorEvent: missing attibutes"));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_9));				
 			} else {
 				fireRuntimeTerminateJobErrorEvent(new RuntimeTerminateJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobIdAttr.getValue()));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "TerminateJobErrorEvent: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_10));				
 		}
 	}
 
@@ -646,7 +647,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			proxy.submitJob(attrMgr.toStringArray());
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
+				Messages.AbstractProxyRuntimeSystem_11, null));
 		}
 	}
 
@@ -655,7 +656,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 */
 	public void terminateJob(IPJob job) throws CoreException {
 		if(job == null) {
-			PTPCorePlugin.log("Tried to terminate a null job.");
+			PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_12);
 			return;
 		}
 		
@@ -663,7 +664,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			proxy.terminateJob(job.getID());
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
+				Messages.AbstractProxyRuntimeSystem_11, null));
 		}
 	}
 
@@ -713,17 +714,17 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				try {
 					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(kv.substring(0, sep));
 					if(attrDef != null) {
-						String value = "";
+						String value = ""; //$NON-NLS-1$
 						if (sep < kv.length() - 1) {
 							value = kv.substring(sep+1);
 						}
 						IAttribute<?,?,?> attr = attrDef.create(value);
 						mgr.addAttribute(attr);
 					} else {
-						PTPCorePlugin.log("AbstractProxyRuntimSystem: unknown attribute definition");
+						PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_13);
 					}
 				} catch (IllegalValueException e1) {
-					PTPCorePlugin.log("AbstractProxyRuntimSystem: invalid attribute for definition");
+					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14);
 				}
 			}
 		}
@@ -788,21 +789,21 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			attrDisplay = Boolean.parseBoolean(attrs[pos++]);
 		} catch (NumberFormatException ex) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-					"Bad proxy event: could not convert attr to boolean"));
+					Messages.AbstractProxyRuntimeSystem_15));
 			return null;
 		}
 		
 		String attrDefault = attrs[pos++];
 		
-		if (attrType.equals("BOOLEAN")) {
+		if (attrType.equals("BOOLEAN")) { //$NON-NLS-1$
 			try {
 				Boolean defVal = Boolean.parseBoolean(attrDefault);
 				attrDef = attrDefManager.createBooleanAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not convert attrs to boolean"));
+						Messages.AbstractProxyRuntimeSystem_16));
 			}
-		} else if (attrType.equals("DATE")) {
+		} else if (attrType.equals("DATE")) { //$NON-NLS-1$
 			if (end - pos > 2) {
 				try {
 					int dateStyle = toDateStyle(attrs[pos++]);
@@ -821,17 +822,17 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					}
 				} catch (ParseException ex) {
 					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-							"Bad proxy event: could not parse date"));
+							Messages.AbstractProxyRuntimeSystem_17));
 				} catch (IllegalValueException ex) {
 					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-							"Bad proxy event: could not create attribute definition, "
+							Messages.AbstractProxyRuntimeSystem_18
 							+ ex.getMessage()));					
 				}
 			} else {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: missing date format"));				
+						Messages.AbstractProxyRuntimeSystem_19));				
 			}
-		} else if (attrType.equals("DOUBLE")) {
+		} else if (attrType.equals("DOUBLE")) { //$NON-NLS-1$
 			try {
 				Double defVal = Double.parseDouble(attrDefault);
 				if (end - pos > 0) {
@@ -843,13 +844,13 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				}
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not convert args to double"));
+						Messages.AbstractProxyRuntimeSystem_20));
 			} catch (IllegalValueException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not create attribute definition, " 
+						Messages.AbstractProxyRuntimeSystem_18 
 						+ ex.getMessage()));					
 			}
-		} else if (attrType.equals("ENUMERATED")) {
+		} else if (attrType.equals("ENUMERATED")) { //$NON-NLS-1$
 			ArrayList<String> values = new ArrayList<String>();
 			while (pos <= end) {
 				values.add(attrs[pos++]);
@@ -859,10 +860,10 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						attrDesc, attrDisplay, attrDefault, values.toArray(new String[values.size()]));
 			} catch (IllegalValueException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not create attribute definition, " 
+						Messages.AbstractProxyRuntimeSystem_18 
 						+ ex.getMessage()));					
 			}
-		} else if (attrType.equals("INTEGER")) {
+		} else if (attrType.equals("INTEGER")) { //$NON-NLS-1$
 			try {
 				Integer defVal = Integer.parseInt(attrDefault);
 				if (end - pos > 0) {
@@ -874,13 +875,13 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				}
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, 
-						"Bad proxy event: could not convert args to integer"));
+						Messages.AbstractProxyRuntimeSystem_21));
 			} catch (IllegalValueException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not create attribute definition, " 
+						Messages.AbstractProxyRuntimeSystem_18 
 						+ ex.getMessage()));					
 			}
-		} else if (attrType.equals("BIGINTEGER")) {
+		} else if (attrType.equals("BIGINTEGER")) { //$NON-NLS-1$
 			try {
 				BigInteger defVal = new BigInteger(attrDefault);
 				if (end - pos > 0) {
@@ -894,17 +895,17 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				}
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not convert args to BigInteger"));
+						Messages.AbstractProxyRuntimeSystem_22));
 			} catch (IllegalValueException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						"Bad proxy event: could not create attribute definition, "
+						Messages.AbstractProxyRuntimeSystem_18
 						+ ex.getMessage()));					
 			}
-		} else if (attrType.equals("STRING")) {
+		} else if (attrType.equals("STRING")) { //$NON-NLS-1$
 			attrDef = attrDefManager.createStringAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, attrDefault);
 		} else {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-					"Bad proxy event: unknown attribute type"));
+					Messages.AbstractProxyRuntimeSystem_23));
 		}
 		
 		return attrDef;
@@ -915,13 +916,13 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @return
 	 */
 	private int toDateStyle(String val) {
-		if (val.equals("SHORT")) {
+		if (val.equals("SHORT")) { //$NON-NLS-1$
 			return DateFormat.SHORT;
-		} else if (val.equals("MEDIUM")) {
+		} else if (val.equals("MEDIUM")) { //$NON-NLS-1$
 			return DateFormat.MEDIUM;
-		} else if (val.equals("LONG")) {
+		} else if (val.equals("LONG")) { //$NON-NLS-1$
 			return DateFormat.LONG;
-		} else if (val.equals("FULL")) {
+		} else if (val.equals("FULL")) { //$NON-NLS-1$
 			return DateFormat.FULL;
 		} else {
 			return DateFormat.DEFAULT;
@@ -933,23 +934,23 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @return
 	 */
 	private Locale toLocale(String val) {
-		if (val.equals("CANADA")) {
+		if (val.equals("CANADA")) { //$NON-NLS-1$
 			return Locale.CANADA;
-		} else if (val.equals("CHINA")) {
+		} else if (val.equals("CHINA")) { //$NON-NLS-1$
 			return Locale.CHINA;
-		} else if (val.equals("FRANCE")) {
+		} else if (val.equals("FRANCE")) { //$NON-NLS-1$
 			return Locale.FRANCE;
-		} else if (val.equals("GERMANY")) {
+		} else if (val.equals("GERMANY")) { //$NON-NLS-1$
 			return Locale.GERMANY;
-		} else if (val.equals("ITALY")) {
+		} else if (val.equals("ITALY")) { //$NON-NLS-1$
 			return Locale.ITALY;
-		} else if (val.equals("JAPAN")) {
+		} else if (val.equals("JAPAN")) { //$NON-NLS-1$
 			return Locale.JAPAN;
-		} else if (val.equals("TAIWAN")) {
+		} else if (val.equals("TAIWAN")) { //$NON-NLS-1$
 			return Locale.TAIWAN;
-		} else if (val.equals("UK")) {
+		} else if (val.equals("UK")) { //$NON-NLS-1$
 			return Locale.UK;
-		} else if (val.equals("US")) {
+		} else if (val.equals("US")) { //$NON-NLS-1$
 			return Locale.US;
 		} else {
 			return Locale.US;

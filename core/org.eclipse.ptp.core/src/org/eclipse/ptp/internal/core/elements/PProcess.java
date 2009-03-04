@@ -65,9 +65,9 @@ public class PProcess extends Parent implements IPProcessControl {
 		 * Derive a unique name for the output file
 		 */
 		String name = job.getQueue().getResourceManager().getName()
-						+ "_" + job.getQueue().getName()
-						+ "_" + job.getName()
-						+ "_" + getName();
+						+ "_" + job.getQueue().getName() //$NON-NLS-1$
+						+ "_" + job.getName() //$NON-NLS-1$
+						+ "_" + getName(); //$NON-NLS-1$
 	
 		outputFile = new OutputTextFile(name, 
 							ProcessAttributes.getStdoutAttributeDefinition().getId(), 
@@ -187,7 +187,7 @@ public class PProcess extends Parent implements IPProcessControl {
 		if (attrDef.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
 			return outputFile.getContents();
 		} else {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 	}
 
@@ -254,7 +254,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @param output
 	 */
 	private void addOutput(String output) {
-		outputFile.write(output + "\n");
+		outputFile.write(output + "\n"); //$NON-NLS-1$
 	}
 
 	/**

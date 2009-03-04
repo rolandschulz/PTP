@@ -20,6 +20,8 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.List;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public final class StringSetAttribute
 extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition> {
 
@@ -83,8 +85,8 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	 */
 	public synchronized void setValueAsString(String valueIn) throws IllegalValueException {
 		if (!isValid(valueIn)) {
-			throw new IllegalValueException("value: " + valueIn +
-					" is not in StringSetAttribute: " +	getDefinition().getName());
+			throw new IllegalValueException(Messages.StringSetAttribute_0 + valueIn +
+					Messages.StringSetAttribute_1 +	getDefinition().getName());
 		}
 		this.value = valueIn;
 	}

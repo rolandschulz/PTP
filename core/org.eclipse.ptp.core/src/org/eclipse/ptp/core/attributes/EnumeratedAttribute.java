@@ -23,6 +23,8 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.List;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 /**
  * @author rsqrd
  *
@@ -124,7 +126,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	public synchronized void setValue(int valueIndex) throws IllegalValueException {
 		final List<? extends E> enumerations = getEnumerations();
 		if (valueIndex < 0 || valueIndex >= enumerations.size()) {
-			throw new IllegalValueException("valueIndex is out of range");
+			throw new IllegalValueException(Messages.EnumeratedAttribute_0);
 		}
 		this.value = enumerations.get(valueIndex);
 	}

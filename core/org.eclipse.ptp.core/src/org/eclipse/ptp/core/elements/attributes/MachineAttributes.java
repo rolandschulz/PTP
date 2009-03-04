@@ -13,6 +13,7 @@ package org.eclipse.ptp.core.elements.attributes;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
@@ -27,15 +28,15 @@ public class MachineAttributes {
 		UNKNOWN,
 	};
 
-    private static final String STATE_ATTR_ID = "machineState";
-    private static final String NUMNODES_ATTR_ID = "numNodes";
+    private static final String STATE_ATTR_ID = "machineState"; //$NON-NLS-1$
+    private static final String NUMNODES_ATTR_ID = "numNodes"; //$NON-NLS-1$
 
     private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-        new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Machine State",
+        new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", Messages.MachineAttributes_0, //$NON-NLS-1$
                 true, State.UNKNOWN);
     
     private final static IntegerAttributeDefinition numNodesAttrDef = 
-        new IntegerAttributeDefinition(NUMNODES_ATTR_ID, "nodes", "Number of Nodes",
+        new IntegerAttributeDefinition(NUMNODES_ATTR_ID, "nodes", Messages.MachineAttributes_1, //$NON-NLS-1$
                 true, 0);
     
     public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {

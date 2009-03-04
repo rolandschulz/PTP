@@ -22,6 +22,8 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public final class DateAttributeDefinition
 extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefinition> {
 
@@ -44,10 +46,10 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 			final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (defaultValue.compareTo(getMinDate()) < 0) {
-			throw new IllegalValueException("default date specified is before min date");
+			throw new IllegalValueException(Messages.DateAttributeDefinition_0);
 		}
 		if (defaultValue.compareTo(getMaxDate()) > 0) {
-			throw new IllegalValueException("default date specified is after max date");
+			throw new IllegalValueException(Messages.DateAttributeDefinition_1);
 		}
 		this.defaultValue = defaultValue;
 		this.outputDateFormat = outputDateFormat;
@@ -90,7 +92,7 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 			this.maxDate = maxDate;
 		}
 		if (this.minDate.compareTo(this.maxDate) > 0) {
-				throw new IllegalArgumentException("minDate must be less than or equal to maxDate");
+				throw new IllegalArgumentException(Messages.DateAttributeDefinition_2);
 		}
 	}
 }

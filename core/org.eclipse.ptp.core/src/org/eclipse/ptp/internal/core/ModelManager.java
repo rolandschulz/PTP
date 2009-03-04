@@ -46,6 +46,7 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
@@ -60,7 +61,7 @@ public class ModelManager implements IModelManager {
 		private IResourceManagerControl resourceManager;
 		
 		public RMStartupJob(IResourceManagerControl rm) {
-			super("Starting Resource Manager: " + rm.getName());
+			super(Messages.ModelManager_0 + rm.getName());
 			resourceManager = rm;
 		}
 
@@ -68,7 +69,7 @@ public class ModelManager implements IModelManager {
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
 	            try {
-	            	monitor.beginTask("Starting resource manager", 100);
+	            	monitor.beginTask(Messages.ModelManager_1, 100);
 	            	resourceManager.startUp(new SubProgressMonitor(monitor, 100));
 	            } catch (CoreException e) {
 	                return e.getStatus();
@@ -145,8 +146,8 @@ public class ModelManager implements IModelManager {
 			{
 				IConfigurationElement ce = elements[i];
 				try {
-					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class");
-					factory.setId(ce.getAttribute("id"));
+					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
+					factory.setId(ce.getAttribute("id")); //$NON-NLS-1$
 					factoryList.add(factory);
 				} catch (CoreException e) {
 					PTPCorePlugin.log(e);
@@ -171,7 +172,7 @@ public class ModelManager implements IModelManager {
 			if (factories[i].getId().equals(id)) return factories[i];
 		}
 		
-		throw new RuntimeException("Unable to find resource manager factory");
+		throw new RuntimeException(Messages.ModelManager_2);
 	}
 
 	/* (non-Javadoc)

@@ -274,11 +274,11 @@ public class BitList {
 	}
 	
 	public String toString() {
-		String res = "";
+		String res = ""; //$NON-NLS-1$
 		boolean nonzero = false;
 		
 		if (this.nBits == 0) {
-			res = "0";
+			res = "0"; //$NON-NLS-1$
 		} else {
 			for (int i = this.nBytes-1 ; i >= 0; i--) {
 				nonzero |= this.bits[i] != 0;
@@ -288,7 +288,7 @@ public class BitList {
 				}
 			}
 			if (!nonzero)
-				res = "0";
+				res = "0"; //$NON-NLS-1$
 		}
 		
 		return res;
@@ -353,13 +353,13 @@ public class BitList {
 
 	public static String showBitList(BitList tasks) {
 		if (tasks == null) {
-			return "{null}";
+			return "{null}"; //$NON-NLS-1$
 		}
 		int[] array = tasks.toArray();
 		if (array.length == 0)
-			return "{}";
+			return "{}"; //$NON-NLS-1$
 		
-		String msg = "{";
+		String msg = "{"; //$NON-NLS-1$
 		int preTask = array[0];
 		msg += preTask;
 		boolean isContinue = false;
@@ -368,17 +368,17 @@ public class BitList {
 				preTask = array[i];
 				isContinue = true;
 				if (i == (array.length - 1)) {
-					msg += "-" + array[i];
+					msg += "-" + array[i]; //$NON-NLS-1$
 					break;
 				}
 				continue;
 			}
 			if (isContinue)
-				msg += "-" + preTask;
-			msg += "," + array[i];
+				msg += "-" + preTask; //$NON-NLS-1$
+			msg += "," + array[i]; //$NON-NLS-1$
 			isContinue = false;
 			preTask = array[i];
 		}
-		return msg + "}";
+		return msg + "}"; //$NON-NLS-1$
 	}
 }

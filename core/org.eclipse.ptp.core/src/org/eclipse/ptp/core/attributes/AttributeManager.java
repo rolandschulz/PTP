@@ -151,10 +151,10 @@ public class AttributeManager {
 				if (attr instanceof ArrayAttribute) {
 					List<?> arrObj = ((ArrayAttribute<?>)attr).getValue();
 					for (Object obj : arrObj) {
-						res.add(entry.getKey().getId() + "=" + obj.toString());					
+						res.add(entry.getKey().getId() + "=" + obj.toString());					 //$NON-NLS-1$
 					}
 				} else {
-					res.add(entry.getKey().getId() + "=" + attr.getValueAsString());
+					res.add(entry.getKey().getId() + "=" + attr.getValueAsString()); //$NON-NLS-1$
 				}
 			}
 		}

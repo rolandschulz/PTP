@@ -39,11 +39,11 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	private int nextResourceManagerId = 1;
 	private final List<IResourceManagerControl> resourceManagers =
 		Collections.synchronizedList(new LinkedList<IResourceManagerControl>());
-	protected String NAME_TAG = "universe ";
+	protected String NAME_TAG = "universe "; //$NON-NLS-1$
 	
 	public PUniverse() {
 		/* '1' because this is the only universe */
-		super("1", null, P_UNIVERSE, getDefaultAttributes("TheUniverse"));
+		super("1", null, P_UNIVERSE, getDefaultAttributes("TheUniverse")); //$NON-NLS-1$ //$NON-NLS-2$
 		// setOutputStore();
 	}
 

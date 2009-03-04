@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import org.eclipse.ptp.core.messages.Messages;
+
 public final class IntegerAttribute
 extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 
@@ -56,7 +58,7 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 
 	public synchronized void setValue(Integer value) throws IllegalValueException {
 		if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
-			throw new IllegalValueException("The set valid range does not include the new value");
+			throw new IllegalValueException(Messages.IntegerAttribute_0);
 		}
 		this.value = value;
 	}
@@ -65,7 +67,7 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 		try {
 			Integer value = Integer.valueOf(string);
 			if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
-				throw new IllegalValueException("The set valid range does not include the new value");
+				throw new IllegalValueException(Messages.IntegerAttribute_1);
 			}
 			this.value = value;
 		}

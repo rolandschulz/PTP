@@ -32,12 +32,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.messages.Messages;
 
 /**
  *
  */
 public class OutputTextFile implements PreferenceConstants {
-	private String filename = "";
+	private String filename = ""; //$NON-NLS-1$
 
 	private File file = null;
 
@@ -48,7 +49,7 @@ public class OutputTextFile implements PreferenceConstants {
 	private int lineCounter = 0;
 
 	public OutputTextFile(String name, String type, String outputPath, int storeLine) {
-		this.filename = name + "." + type;
+		this.filename = name + "." + type; //$NON-NLS-1$
 		this.outputPath = outputPath;
 		this.storeLine = storeLine;
 		init();
@@ -64,7 +65,7 @@ public class OutputTextFile implements PreferenceConstants {
 		try {
 			tmpFile.createNewFile();
 		} catch (IOException e) {
-			System.out.println("OutputTextFile - getFilePath err: "
+			System.out.println("OutputTextFile - getFilePath err: " //$NON-NLS-1$
 					+ e.getMessage());
 		}
 		return tmpFile;
@@ -85,17 +86,17 @@ public class OutputTextFile implements PreferenceConstants {
 			fos.write(text.getBytes());
 			lineCounter++;
 		} catch (FileNotFoundException e) {
-			System.out.println("OutputTextFile - append file err: "
+			System.out.println("OutputTextFile - append file err: " //$NON-NLS-1$
 					+ e.getMessage());
 		} catch (IOException ioe) {
-			System.out.println("OutputTextFile - append io err: "
+			System.out.println("OutputTextFile - append io err: " //$NON-NLS-1$
 					+ ioe.getMessage());
 		} finally {
 			if (fos != null) {
 				try {
 					fos.close();
 				} catch (IOException ioe) {
-					System.out.println("OutputTextFile - append close err: "
+					System.out.println("OutputTextFile - append close err: " //$NON-NLS-1$
 							+ ioe.getMessage());
 				}
 			}
@@ -119,7 +120,7 @@ public class OutputTextFile implements PreferenceConstants {
 			is = new BufferedInputStream(new FileInputStream(file));
 			return readString(is, ResourcesPlugin.getEncoding());
 		} catch (FileNotFoundException e) {
-			System.out.println("OutputTextFile - read file err: "
+			System.out.println("OutputTextFile - read file err: " //$NON-NLS-1$
 					+ e.getMessage());
 		} finally {
 			is = null;
