@@ -8,7 +8,7 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT(org.eclipse.ptp.ibmll, 2.1.0)
+AC_INIT(org.eclipse.ptp.ibmll, 2.1.1)
 AC_CONFIG_SRCDIR(src/ptp_ibmll_proxy.c)
 AC_CONFIG_HEADERS(config.h)
 
