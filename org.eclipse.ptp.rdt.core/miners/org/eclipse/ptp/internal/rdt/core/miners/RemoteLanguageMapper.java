@@ -27,13 +27,13 @@ public class RemoteLanguageMapper implements ILanguageMapper {
 	public ILanguage getLanguage(String file) {
 		String extension = getFileExtension(file);
 		
-		if(extension.equals(".cpp")) //$NON-NLS-1$
+		if(extension.equals(".cpp") || extension.equals(".C") || extension.equals(".cxx") || extension.equals(".cc")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			return new GPPLanguage();
 		
 		else if(extension.equals(".c")) //$NON-NLS-1$
 			return new GCCLanguage();
 		
-		else if(extension.equals(".h")) //$NON-NLS-1$
+		else if(extension.equals(".h") || extension.equals(".hpp") || extension.equals(".hxx") || extension.equals(".hbh")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			return new GPPLanguage();
 		
 		else
