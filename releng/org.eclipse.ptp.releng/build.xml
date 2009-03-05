@@ -15,7 +15,7 @@
 		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/5.0.2/I.I200902130801/cdt-master-5.0.2-I200902130801.zip"/>
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/ganymede/mylyn-3.0.1.v20080721-2100-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.0-200806202130/RSE-SDK-3.0.zip"/>
-		<property name="photranDist" value="/home/data/httpd/download.eclipse.org/technology/photran/updates/photran40b5-master.zip"/>
+		<property name="photranDist" value="/home/data/httpd/download.eclipse.org/tools/ptp/photran/builds/4.0.5/I.I200903051141/photran-master-4.0.5-I200903051141.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
 		<property name="branchVersion" value="2.1.1"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
