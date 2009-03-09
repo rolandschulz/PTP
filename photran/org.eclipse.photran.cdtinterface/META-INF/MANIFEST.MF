@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photran CDT Interface Plug-in
 Bundle-SymbolicName: org.eclipse.photran.cdtinterface; singleton:=true
-Bundle-Version: 4.0.5
+Bundle-Version: 4.0.5.qualifier
 Bundle-ClassPath: cdtinterface.jar
 Bundle-Activator: org.eclipse.photran.cdtinterface.CDTInterfacePlugin
 Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory

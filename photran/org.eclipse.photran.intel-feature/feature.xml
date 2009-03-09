@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran.intel"
       label="%featureName"
-      version="4.0.5"
+      version="4.0.5.qualifier"
       provider-name="%providerName"
       os="linux">
 
@@ -31,13 +31,13 @@
          os="linux"
          download-size="0"
          install-size="0"
-         version="4.0.5"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.photran.core.intel"
          os="linux"
          download-size="0"
          install-size="0"
-         version="4.0.5"/>
+         version="0.0.0"/>
 
 </feature>

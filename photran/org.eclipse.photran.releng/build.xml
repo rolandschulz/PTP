@@ -1,4 +1,4 @@
-<project name="Photran" default="build">
+<project name="Photran" default="nightly">
 	<target name="hi">
 		<echo message="${eclipse.home}"/>
 	</target>
@@ -14,7 +14,7 @@
 		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/R-3.4-200806172000/eclipse-SDK-3.4-linux-gtk-ppc.tar.gz"/>
 		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/5.0.2/I.I200902130801/cdt-master-5.0.2-I200902130801.zip"/>
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/ganymede/mylyn-3.0.1.v20080721-2100-e3.4.zip"/>
-		<property name="branchVersion" value="1.0"/>
+		<property name="branchVersion" value="4.0.5"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
@@ -87,8 +87,14 @@
 
 	<target name="sign" depends="init" unless="hasErrors"/>
 	<target name="test" depends="init" unless="hasErrors"/>
-	<target name="copy" depends="init" unless="hasErrors"/>
-
+	<target name="copy" depends="init" unless="hasErrors">
+		<property name="copyToDir" value="/home/www/tools/ptp/photran/builds/${branchVersion}"/>
+		<mkdir dir="${copyToDir}/${buildType}.${buildId}"/>
+		<copy todir="${copyToDir}/${buildType}.${buildId}">
+			<fileset dir="${buildDirectory}/${buildType}.${buildId}"/>
+		</copy>
+	</target>
+	
 	<target name="tagone">
 		<cvs cvsroot="/cvsroot/tools" command="rtag ${tagbranch} ${tagname} ${tagmodule}"/>
 	</target>

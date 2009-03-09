@@ -7,7 +7,7 @@
 <target name="allElements">
 	<ant antfile="${genericTargets}" target="${target}">
 		<property name="type" value="feature"/>
-		<property name="id" value="org.eclipse.photran_feature"/>
+		<property name="id" value="org.eclipse.photran.master"/>
 	</ant>
 </target>
 
@@ -18,7 +18,7 @@
 <!-- Add one target for each root element and each configuration -->
 <!-- ===================================================================== -->
 
-<target name="assemble.org.eclipse.photran_feature.group.group.group">
+<target name="assemble.org.eclipse.photran.master.group.group.group">
 	<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 		<property name="archiveName" value="photran-master-${branchVersion}-${buildId}.zip"/>
 	</ant>
