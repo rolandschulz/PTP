@@ -1,3 +1,27 @@
+Stas: Link
+- module subprograms
+- named interfaces
+- module procedure statements
+Stas:
+- refactor w/o open editor
+- update command line suite
+
+
+- Update plan version #
+- Update description incl. 2003
+- Update CVS instructions?
+- complex*16
+
+- Rename hits fixed-form files?
+- Unsaved changes in editor
+- Stale messages in error log
+
+
+- Design patterns code (e-mail)
+- Replace Obsolete Operators refactoring (Bugzilla)
+
+
+
 - Fortran 2003
   + Section 2
   + Section 4
@@ -108,3 +132,6 @@ ECLIPSE FOUNDATION REQUIREMENTS
   + Walt Brained (WB)
   + Stoyan Gaydarov
 + Eli Grammar CQ 2880
+X FRUIT CQ
+- Fortran Search CQ
+- Photran Move - Bugzilla
