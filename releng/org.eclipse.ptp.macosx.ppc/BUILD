@@ -11,7 +11,7 @@ if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
 	VERSION=
 fi
 
-RMS="mpich2 ibm.pe ibm.ll"
+RMS="ibm.pe ibm.ll"
 
 KNOWN_PLUGINS="\
 	org.eclipse.ptp.utils$VERSION\
