@@ -90,6 +90,9 @@ public class OpenMPIProcessMap {
 			if (iterator == null || !iterator.hasNext()) {
 				iterator = resolvedNames.listIterator();
 			}
+			if (!iterator.hasNext()) {
+				return name;
+			}
 			return iterator.next();
 		}
 		
