@@ -2140,7 +2140,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":validateAllFields entered.");
 		try {
-			if (llSubmitMode.getValue().equals("Advanced")) {
+			if (llSubmitMode != null && llSubmitMode.getValue().equals("Advanced")) {
 				validateInputPath(llJobCommandFile, "Invalid.llJobCommandFile");
 			} else {
 				validateInputPath(llJobCommandFileTemplate,
