@@ -16,7 +16,7 @@
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/ganymede/mylyn-3.0.1.v20080721-2100-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.0.3-200902181300/RSE-SDK-3.0.3.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
-		<property name="branchVersion" value="2.1.1"/>
+		<property name="branchVersion" value="2.2.0"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
@@ -90,9 +90,9 @@
 
 	<target name="sign" depends="init" unless="hasErrors">
 		<exec executable="sign">
-			<arg value="/home/data/httpd/download-staging.priv/tools/ptp/releng/results/${buildType}.${buildId}/${masterFile}"/>
+			<arg value="${buildDirectory}/${buildType}.${buildId}/${masterFile}"/>
 			<arg value="nomail"/>
-			<arg value="/home/data/httpd/download-staging.priv/tools/ptp/releng/results/signed"/>
+			<arg value="${buildDirectory}/signed"/>
 		</exec>
 		<waitfor maxwait="30" maxwaitunit="minute">
 			<available file="${buildDirectory}/signed/${masterFile}"/>
