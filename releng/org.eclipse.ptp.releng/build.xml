@@ -21,6 +21,7 @@
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
 		<property name="buildDirectory" value="${basedir}/results"/>
+		<property name="copyToDir" value="/home/www/tools/ptp/builds/${branchVersion}"/>
 		<property name="testDirectory" value="${buildDirectory}/test"/>
 		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
 		<property name="pde.build.scripts" value="${eclipse.pdebuild.scripts}"/>
@@ -101,7 +102,6 @@
 	</target>
 	<target name="test" depends="init" unless="hasErrors"/>
 	<target name="copy" depends="init" unless="hasErrors">
-		<property name="copyToDir" value="/home/www/tools/ptp/builds/${branchVersion}"/>
 		<mkdir dir="${copyToDir}/${buildType}.${buildId}"/>
 		<copy todir="${copyToDir}/${buildType}.${buildId}">
 			<fileset dir="${buildDirectory}/${buildType}.${buildId}"/>
