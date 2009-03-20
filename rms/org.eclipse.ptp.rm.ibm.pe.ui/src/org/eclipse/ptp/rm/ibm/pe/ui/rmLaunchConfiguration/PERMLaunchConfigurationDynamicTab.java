@@ -2448,7 +2448,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	// Validation of valid dependencies between fields should be performed as a second step after all fields have
 	// been individually validated for correct values.
 	try {
-	    if (peAdvancedMode.getSelection()) {
+	    if (peAdvancedMode != null && peAdvancedMode.getSelection()) {
 		validateInputPath(peEnvScript, "Invalid.peEnvScript");
 		validateRedirectBox();
 	    } else {
@@ -2968,7 +2968,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      */
     private void validateBufferMem() throws ValidationException
     {
-	if ((peBufferMem != null) || peBufferMem.isEnabled() && peBufferMem.isValidationRequired()) {
+	if (peBufferMem != null && peBufferMem.isEnabled() && peBufferMem.isValidationRequired()) {
 	    String widgetValue[];
 
 	    widgetValue = peBufferMem.getValue();
