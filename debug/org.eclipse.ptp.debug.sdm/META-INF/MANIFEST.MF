@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Scalable Debug Manager (SDM)
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.debug.sdm
-Bundle-Version: 2.1.1.qualifier
-Bundle-Vendor: Eclipse.org
+Bundle-Version: 2.1.2.qualifier
+Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ptp.proxy,
  org.eclipse.ptp.utils

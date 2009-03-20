@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PTP Proxy Protocol Library
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.proxy
-Bundle-Version: 2.1.1.qualifier
-Bundle-Vendor: Eclipse.org
+Bundle-Version: 2.1.2.qualifier
+Bundle-Vendor: %pluginProvider
