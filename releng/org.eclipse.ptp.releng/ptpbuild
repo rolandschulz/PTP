@@ -2,57 +2,68 @@
 #
 # ptpbuild wrapper script
 #
-# Usage: ptpbuild version [build_args]
+# Usage: ptpbuild [-t tag] [-d build_dir] [build_args]
 #
-# where version is the current PTP version being built and
-# build_args are any other arguments you want to pass to the
-# build script.
+# where
+#
+# tag is the CVS tag used to check out the releng project (default HEAD)
+# build_dir is the location that the build will take place
+# build_args are any arguments you want to pass to the build script
 #
 # set up anything environment specific that needs to be done before
 # launching the build script in the releng project
 
-if [ $# -lt 1 ]; then
-	echo "usage: ptpbuild version [build_args]"
+TAG=HEAD
+# main staging directory
+BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
+
+args=`getopt t: $*`
+
+if [ $? != 0 ]; then
+	echo "usage: ptpbuild [-t tag] [-d build_dir] [build_args]"
 	exit 1
 fi
 
-# Version of PTP we're building
-PTP_VERSION=$1; shift
-
-# main staging directory
-STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
-
-# download location for builds
-BUILDS_DIR=/home/www/tools/ptp/builds/$PTP_VERSION
-
-if [ ! -d $BUILDS_DIR ]; then
-        echo "$BUILDS_DIR doesn't exist, please create first"
-        exit 1
-fi
+set -- $args
+for i
+do
+	case "$i"
+	in
+	-t) TAG="$2"; shift; shift;;
+	-d) BUILD_DIR="$2"; shift; shift;;
+	--) shift; break;;
+	esac
+done
 
 # create the releng staging directory and go there
-mkdir -p $STAGING_DIR
-cd $STAGING_DIR
-
-# make a link to the results
-if [ ! -L results ]; then
-	ln -s org.eclipse.ptp/releng/org.eclipse.ptp.releng/results results
-fi
+mkdir -p $BUILD_DIR && cd $BUILD_DIR
 
 # remove the old build
 rm -fr org.eclipse.ptp
 
 # Check out the releng project
 export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
-cvs co org.eclipse.ptp/releng/org.eclipse.ptp.releng
+cvs co -r $TAG -d org.eclipse.ptp org.eclipse.ptp/releng/org.eclipse.ptp.releng
 
 # run the main script
-cd org.eclipse.ptp/releng/org.eclipse.ptp.releng
-sh build.sh $* 2>&1 | tee $STAGING_DIR/build.log
+cd org.eclipse.ptp
+sh build.sh $*
 
-# Copy the build.log to where the latest build is. Only copy
-# if a build.log doesn't exist, otherwise the build failed and
-# we would copy over an old log file.
-if [ ! -f $BUILDS_DIR/latest/build.log ]; then
-	cp $STAGING_DIR/build.log $BUILDS_DIR/latest
-fi
+# Build RDT server packages
+cd results/plugins
+
+# Check out rdt.core.remotejars, rdt.core.stubs and cdt.core for source
+export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
+cvs co -r $TAG -d org.eclipse.ptp.rdt.core.remotejars org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.remotejars
+cvs co -r $TAG -d org.eclipse.ptp.rdt.core.stubs org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs
+cvs co -r cdt_5_0 -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
+
+cd org.eclipse.ptp.rdt.core.remotejars
+
+# run the script in remotejars
+export PATH=/opt/public/common/ibm-java2-ppc-50/bin:$PATH
+echo `java -version`
+java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar \
+	-ws gtk -arch ppc -os linux -application org.eclipse.ant.core.antRunner
+
+exit 0
