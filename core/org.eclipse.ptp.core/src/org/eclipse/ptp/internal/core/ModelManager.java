@@ -181,7 +181,7 @@ public class ModelManager implements IModelManager {
 	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
 		IPUniverse universe = getUniverse();
 		if (universe != null) {
-			IResourceManager[] rms = getStartedResourceManagers(universe);
+			IResourceManager[] rms = universe.getResourceManagers();
 			
 			for (IResourceManager rm : rms) {
 				if (rm.getUniqueName().equals(rmUniqueName)) {
