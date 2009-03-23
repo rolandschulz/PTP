@@ -32,6 +32,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -121,7 +122,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
-		IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
+		IResourceManager[] rms = universe.getResourceManagers();
 		new Label(comp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 			
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
@@ -212,10 +213,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return false;
 		}
-
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 		if (rmDynamicTab == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] {resourceManager.getName()}));
+			return false;
+		}
+		if (resourceManager.getState() != State.STARTED) {
+			setErrorMessage(Messages.ResourcesTab_Resource_Manager_Not_Started);
 			return false;
 		}
 		RMLaunchValidation validation = rmDynamicTab.isValid(configuration, resourceManager, null);
@@ -333,7 +337,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe != null) {
-			IResourceManager[] rms = modelManager.getStartedResourceManagers(universe);
+			IResourceManager[] rms = universe.getResourceManagers();
 			if (rms.length != 1) {
 				return null;
 			}
@@ -407,10 +411,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
     
     /**
-	 * This routine is called when either the resource manager or the
-	 * queue has been changed via the combo boxes.  It's job is to
-	 * regenerate the dynamic ui components, dependent on the resource
-	 * manager and queue choice.
+	 * This routine is called when the resource manager has been changed via the combo boxes.  
+	 * It's job is to regenerate the dynamic ui components, dependent on the resource
+	 * manager choice.
 	 * 
 	 * @param rm
 	 * @param queue

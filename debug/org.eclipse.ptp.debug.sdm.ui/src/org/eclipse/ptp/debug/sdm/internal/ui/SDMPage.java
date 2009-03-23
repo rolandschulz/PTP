@@ -215,15 +215,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		IRemoteConnection rmConn = getRemoteConnection();
 		if (rmConn != null) {
 			IRemoteFileManager fileManager = getRemoteServices().getFileManager(rmConn);
-			try {
-				IFileStore res = fileManager.getResource(new Path(path), new NullProgressMonitor());
-				if (res.fetchInfo().exists()) {
-					return true;
+			if (fileManager != null) {
+				try {
+					IFileStore res = fileManager.getResource(new Path(path), new NullProgressMonitor());
+					if (res.fetchInfo().exists()) {
+						return true;
+					}
+				}
+				catch (IOException e) {
 				}
 			}
-			catch (IOException e) {
-				return false;
-			}
+			return false;
 		}
 		if (new Path(path).toFile().exists()) {
 			return true;
