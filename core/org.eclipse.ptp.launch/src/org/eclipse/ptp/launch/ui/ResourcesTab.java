@@ -190,6 +190,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 
 		setResourceManagerComboSelection(resourceManager);
+		if (resourceManager == null) {
+			setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
+			return;
+		}
 
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 		final Composite launchComp = getLaunchAttrsScrollComposite();
