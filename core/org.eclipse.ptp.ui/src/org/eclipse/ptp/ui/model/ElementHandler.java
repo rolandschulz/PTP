@@ -50,7 +50,7 @@ public class ElementHandler extends ElementSet implements IElementHandler {
 	}
 	public void addToRegister(IElement[] elements) {
 		for (IElement element : elements) {
-			if (!containsRegister(element)) {
+			if (element != null && !containsRegister(element)) {
 				element.setRegistered(true);
 				registerList.add(element);
 			}
@@ -58,7 +58,7 @@ public class ElementHandler extends ElementSet implements IElementHandler {
 	}
 	public void removeFromRegister(IElement[] elements) {
 		for (IElement element : elements) {
-			if (registerList.remove(element))
+			if (element != null && registerList.remove(element))
 				element.setRegistered(false);
 		}
 	}
