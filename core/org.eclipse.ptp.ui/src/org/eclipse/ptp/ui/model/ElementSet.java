@@ -41,19 +41,21 @@ public class ElementSet extends Element implements IElementSet {
 	}
 	public void addElements(IElement[] elements) {
 		for (IElement element : elements) {
-			if (contains(element.getID()))
-				continue;
-
-			if (!isRootSet()) {
-				IElementSet[] sets = ((IElementHandler)getParent()).getSetsWithElement(element.getID());
-				for (IElementSet set : sets) {
-					set.addMatchSet(getID());
-					addMatchSet(set.getID());
+			if (element != null) {
+				if (contains(element.getID()))
+					continue;
+	
+				if (!isRootSet()) {
+					IElementSet[] sets = ((IElementHandler)getParent()).getSetsWithElement(element.getID());
+					for (IElementSet set : sets) {
+						set.addMatchSet(getID());
+						addMatchSet(set.getID());
+					}
 				}
+				elementMap.put(element.getID(), element);
+				elementList.add(element);
+				number_of_elements++;
 			}
-			elementMap.put(element.getID(), element);
-			elementList.add(element);
-			number_of_elements++;
 		}
 		sorting();
 	}
@@ -108,7 +110,9 @@ public class ElementSet extends Element implements IElementSet {
 	}
 	public void removeElements(IElement[] elements) {
 		for (IElement element : elements) {
-			removeElement(element.getID());
+			if (element != null) {
+				removeElement(element.getID());
+			}
 		}
 	}
 	public void removeElement(String id) {
