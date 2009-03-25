@@ -80,7 +80,6 @@ import org.eclipse.cdt.core.model.IProblemRequestor;
 import org.eclipse.cdt.core.model.IStructure;
 import org.eclipse.cdt.core.parser.Keywords;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
-import org.eclipse.cdt.internal.core.dom.parser.IASTAmbiguousDeclaration;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor;
 import org.eclipse.cdt.internal.core.model.ASTStringUtil;
 import org.eclipse.cdt.internal.core.model.DebugLogConstants;
@@ -288,8 +287,6 @@ public class CModelBuilder2 {
 			// TODO [cmodel] asm declaration?
 		} else if (declaration instanceof IASTProblemDeclaration) {
 			// TODO [cmodel] problem declaration?
-		} else if (declaration instanceof IASTAmbiguousDeclaration) {
-			// TODO [cmodel] ambiguous declaration?
 		} else {
 			assert false : "TODO: " + declaration.getClass().getName(); //$NON-NLS-1$
 		}

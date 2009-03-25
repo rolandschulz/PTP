@@ -35,7 +35,7 @@ public class RemoteLocationConverter implements IIndexLocationConverter {
 	 */
 	public IIndexFileLocation fromInternalFormat(String raw) {
 		try {
-			return new IndexFileLocation(new URI("file", null, raw, null, null), raw); //$NON-NLS-1$
+			return new IndexFileLocation(new URI("file", null, raw, null, null), null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,7 +49,7 @@ public class RemoteLocationConverter implements IIndexLocationConverter {
 	 * @see org.eclipse.cdt.core.index.IIndexLocationConverter#toInternalFormat(org.eclipse.cdt.core.index.IIndexFileLocation)
 	 */
 	public String toInternalFormat(IIndexFileLocation location) {
-		return location.getFullPath();
+		return location.getURI().getPath();
 	}
 
 }

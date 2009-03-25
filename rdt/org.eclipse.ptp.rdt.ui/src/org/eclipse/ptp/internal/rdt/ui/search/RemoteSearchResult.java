@@ -85,7 +85,13 @@ public class RemoteSearchResult extends AbstractTextSearchResult implements IEdi
 				return fileInput.getFile().getLocationURI().toString();
 		} else if (input instanceof ExternalEditorInput) {
 			ExternalEditorInput extInput = (ExternalEditorInput)input;
-			return extInput.getStorage().getFullPath().toOSString();
+			if(extInput.getPath() != null) 	{
+				return extInput.getPath().toOSString();
+			}
+			else {
+				return extInput.getURI().toString();
+			}
+				
 		} else if (input instanceof IStorageEditorInput) {
 				try {
 					IStorage storage = ((IStorageEditorInput)input).getStorage();

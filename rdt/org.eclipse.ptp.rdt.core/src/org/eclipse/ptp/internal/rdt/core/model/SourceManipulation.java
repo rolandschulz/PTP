@@ -23,7 +23,10 @@ public abstract class SourceManipulation extends Parent implements ISourceManipu
 	private static final long serialVersionUID = 1L;
 
 	protected SourceRange fRange;
+	private boolean fIsActive= true;
+	private short fIndex= 0;
 
+	
 	protected SourceManipulation(ICElement parent, int type, String name) {
 		super(parent, type, name);
 		fRange = new SourceRange();
@@ -86,5 +89,27 @@ public abstract class SourceManipulation extends Parent implements ISourceManipu
 	
 	public ITranslationUnit getTranslationUnit() {
 		return (ITranslationUnit) getAncestor(ICElement.C_UNIT);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.core.model.ISourceReference#getIndex()
+	 */
+	public int getIndex() {
+		return fIndex;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.core.model.ISourceReference#isActive()
+	 */
+	public boolean isActive() {
+		return fIsActive;
+	}
+	
+	public void setActive(boolean active) {
+		fIsActive= active;
+	}
+
+	public void setIndex(int i) {
+		fIndex= (short) i;
 	}
 }

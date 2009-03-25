@@ -154,4 +154,9 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 		return buffer.toString();
 	}
 
+	public boolean isResolvedByHeuristics() throws CoreException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
