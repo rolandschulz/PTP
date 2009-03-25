@@ -155,4 +155,8 @@ public class DummyName implements IIndexName, Serializable {
 	public String toString() {
 		return fName;
 	}
+
+	public char[] getSimpleID() {
+		return fName.toCharArray();
+	}
 }
