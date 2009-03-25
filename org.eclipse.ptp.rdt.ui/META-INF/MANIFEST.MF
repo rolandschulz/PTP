@@ -33,7 +33,8 @@ Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.2",
  org.eclipse.rse.subsystems.files.core;bundle-version="3.0.0",
  org.eclipse.ptp.remote.core;bundle-version="2.0.1",
  org.eclipse.ptp.remote.ui;bundle-version="2.0.0",
- org.eclipse.ui.console;bundle-version="3.3.0"
+ org.eclipse.ui.console;bundle-version="3.3.0",
+ org.eclipse.dstore.extra;bundle-version="2.1.100"
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.internal.rdt.ui.actions,
  org.eclipse.ptp.internal.rdt.ui.callhierarchy,

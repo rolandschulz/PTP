@@ -92,4 +92,8 @@ public class SimpleName implements IName, Serializable {
 	public String toString() {
 		return new String(name);
 	}
+
+	public char[] getSimpleID() {
+		return name;
+	}
 }

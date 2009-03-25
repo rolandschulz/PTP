@@ -199,7 +199,7 @@ public class IndexQueries {
 				IIndexFileLocation location = null;
 				
 				if(uri != null)
-					location = new IndexFileLocation(uri, uri.getPath());
+					location = new IndexFileLocation(uri, null);
 
 				if (location != null) {
 					IIndexFile[] files= index.getFiles(location);

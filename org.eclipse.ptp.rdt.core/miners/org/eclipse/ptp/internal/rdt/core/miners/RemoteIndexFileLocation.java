@@ -23,7 +23,7 @@ public class RemoteIndexFileLocation implements IIndexFileLocation, Serializable
 
 	public RemoteIndexFileLocation(String path, URI uri) {
 		fURI = uri;
-		fPath = path;
+		fPath = null;
 	}
 	
 	public RemoteIndexFileLocation(IIndexFileLocation location) {
