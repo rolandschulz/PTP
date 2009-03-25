@@ -216,4 +216,9 @@ public class Path implements IPath, Serializable {
 		checkDelegate();
 		return fDelegate.toString();
 	}
+
+	public IPath makeRelativeTo(IPath base) {
+		checkDelegate();
+		return fDelegate.makeRelativeTo(base);
+	}
 }
