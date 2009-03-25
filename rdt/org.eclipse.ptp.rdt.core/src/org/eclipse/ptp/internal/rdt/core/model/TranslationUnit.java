@@ -412,4 +412,31 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		}
 		return 0;
 	}
+
+	public IWorkingCopy findSharedWorkingCopy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public IWorkingCopy getSharedWorkingCopy(IProgressMonitor monitor,
+			IProblemRequestor requestor) throws CModelException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public IWorkingCopy getWorkingCopy(IProgressMonitor monitor)
+			throws CModelException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public boolean isActive() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
