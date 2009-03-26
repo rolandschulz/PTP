@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,6 +49,8 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	transient protected ILanguage fLanguage;
 
 	private IScannerInfo fScannerInfo;
+	private boolean isHeaderUnit = false;
+	
 	
 	public TranslationUnit(ICElement parent, String name, String projectName, URI locationURI) {
 		super(parent, ICElement.C_UNIT, name);
@@ -79,6 +81,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			throw new IllegalArgumentException(e);
 		}
 		setLocationURI(element.getLocationURI());
+		isHeaderUnit = element.isHeaderUnit();
 	}
 
 	public IInclude createInclude(String name, boolean isStd,
@@ -127,11 +130,23 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			IParserLogService log = new DefaultLogService();
 			ICodeReaderFactory fileCreator = StandaloneSavedCodeReaderFactory.getInstance();
 			String filePath = fLocation.getPath();
-			int options = style | getParserOptions(filePath);
+			
+			int options = getParserOptions(filePath);
+			
 			CodeReader reader = getCodeReader();
 			return fLanguage.getASTTranslationUnit(reader, fScannerInfo, fileCreator, index, options, log);
 		}
 		return null;
+	}
+	
+	/**
+	 * TODO this is just wrong!
+	 */
+	public int getParserOptions(String filePath) {
+		if (filePath.endsWith(".cpp") || filePath.endsWith(".C") || filePath.endsWith(".c")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return ILanguage.OPTION_IS_SOURCE_UNIT;
+		}
+		return 0;
 	}
 
 	public CodeReader getCodeReader() {
@@ -272,13 +287,11 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	}
 
 	public boolean isHeaderUnit() {
-		// TODO Auto-generated method stub
-		return false;
+		return isHeaderUnit;
 	}
 
 	public boolean isSourceUnit() {
-		// TODO Auto-generated method stub
-		return false;
+		return !isHeaderUnit;
 	}
 
 	public boolean isWorkingCopy() {
@@ -404,13 +417,6 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 				throw new IllegalArgumentException(e);
 			}
 		}
-	}
-	
-	public int getParserOptions(String filePath) {
-		if (filePath.endsWith(".cpp") || filePath.endsWith(".C") || filePath.endsWith(".c")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			return ILanguage.OPTION_IS_SOURCE_UNIT;
-		}
-		return 0;
 	}
 
 	public IWorkingCopy findSharedWorkingCopy() {

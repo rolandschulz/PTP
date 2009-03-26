@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,10 @@ import java.util.List;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
@@ -70,7 +70,7 @@ public interface ICIndexSubsystem {
 	 * @param monitor
 	 * @return IStatus indicating success or failure
 	 */
-	public IStatus startIndexOfScope(Scope scope, IStandaloneScannerInfoProvider provider, IProgressMonitor monitor);
+	public IStatus startIndexOfScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor);
 
 	/**
 	 * Re-indexes the given scope.
@@ -79,7 +79,7 @@ public interface ICIndexSubsystem {
 	 * @param monitor
 	 * @return IStatus indicating success or failure
 	 */
-	public IStatus reindexScope(Scope scope, IStandaloneScannerInfoProvider provider, IProgressMonitor monitor);
+	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor);
 	
 	/**
 	 * Incrementally indexes based on a delta of added, changed, and removed elements.  Valid elements can be
@@ -93,7 +93,7 @@ public interface ICIndexSubsystem {
 	 * @param task that this operation originates from
 	 * @return IStatus indicating success or failure
 	 */
-	public IStatus indexDelta(Scope scope, IStandaloneScannerInfoProvider provider,	List<ICElement> newElements, List<ICElement> changedElements, 
+	public IStatus indexDelta(Scope scope, IRemoteIndexerInfoProvider provider,	List<ICElement> newElements, List<ICElement> changedElements, 
 			List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	
