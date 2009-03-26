@@ -61,8 +61,19 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 		return incl_.isResolved();
 	}
 
+	/**
+	 * CDT 6.0 implement isPartOfTranslationUnitFile()
+	 * @return
+	 */
 	public boolean isPartOfTranslationUnitFile() {
 		return incl_.isPartOfTranslationUnitFile();
+	}
+	/**
+	 * CDT 6.0 implement  IASTPreprocessorIncludeStatement.isResolvedByHeuristics()
+	 */
+	public boolean isResolvedByHeuristics(){
+		return false;
+		
 	}
 	
 }
