@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.cdt.core.parser.DefaultLogService;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.internal.core.index.CIndex;
 import org.eclipse.cdt.internal.core.index.IIndexFragment;
-import org.eclipse.cdt.internal.core.indexer.ILanguageMapper;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.cdt.internal.core.indexer.StandaloneIndexer;
 import org.eclipse.cdt.internal.core.pdom.dom.IPDOMLinkageFactory;
@@ -48,7 +47,6 @@ public class RemoteIndexManager {
 	private static final IIndexLocationConverter locationConverter = new RemoteLocationConverter();;
 	
 	private static final Map<String, IPDOMLinkageFactory> linkageFactoryMap = new HashMap<String, IPDOMLinkageFactory>();
-	private static final ILanguageMapper MAPPER = new RemoteLanguageMapper();
 	
 	static {
 		linkageFactoryMap.put(ILinkage.C_LINKAGE_NAME, cLinkageFactory);
@@ -109,7 +107,7 @@ public class RemoteIndexManager {
 		System.out.flush();
 
 		try {
-			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, MAPPER, LOG);
+			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, LOG);
 
 			scopeToIndexerMap.put(scope, indexer);
 		} catch (CoreException e) {

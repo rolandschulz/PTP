@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    IBM Corporation - initial API and implementation
+ *    Mike Kucera (IBM)
  *******************************************************************************/ 
 
 package org.eclipse.ptp.internal.rdt.core;
@@ -20,15 +21,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
-import org.eclipse.cdt.core.parser.ScannerInfo;
-import org.eclipse.cdt.internal.core.pdom.indexer.PDOMIndexerTask;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -38,36 +37,33 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rdt.core.RDTLog;
 
 /**
- * Used to get instances of RemoteScannerInfoProvider.
+ * Used to get instances of RemoteIndexerInfoProvider.
  * 
  * The factory is not part of the remote JAR because it depends on
  * eclipse and CDT APIs.
- * 
- * @author Mike Kucera
- *
  */
-public class RemoteScannerInfoProviderFactory {
+public class RemoteIndexerInfoProviderFactory {
 	
 	
 	/**
-	 * Returns a RemoteScannerInfoProvider that contains all the IScannerInfos
+	 * Returns a RemoteIndexerInfoProvider that contains all the IScannerInfos and language mapping info
 	 * for all the translation units in the given scope (project name).
 	 * @param scopeName the name of a project
 	 */
-	public static RemoteScannerInfoProvider getProvider(String scopeName) {
+	public static RemoteIndexerInfoProvider getProvider(String scopeName) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(scopeName);
 		return getProvider(project);
 	}
 	
 	
 	/**
-	 * Returns a RemoteScannerInfoProvider that contains all the IScannerInfos
+	 * Returns a RemoteIndexerInfoProvider that contains all the IScannerInfos and language mapping info
 	 * for all the translation units in the given project.
 	 * Returns an empty provider if the project is null.
 	 */
-	public static RemoteScannerInfoProvider getProvider(IProject project) {
+	public static RemoteIndexerInfoProvider getProvider(IProject project) {
 		if(project == null)
-			return new RemoteScannerInfoProvider();
+			return new RemoteIndexerInfoProvider();
 		
 		final List<ICElement> elements = new ArrayList<ICElement>();
 		IResourceVisitor resourceVisitor = new IResourceVisitor() {
@@ -143,20 +139,22 @@ public class RemoteScannerInfoProviderFactory {
 	
 
 	/**
-	 * Returns a RemoteScannerInfoProvider that contains IScannerInfos for every
-	 * translation unit in the given list of ICElements. The returned RemoteScannerInfoProvider
+	 * Returns a RemoteIndexerInfoProvider that contains IScannerInfos for every
+	 * translation unit in the given list of ICElements. The returned RemoteIndexerInfoProvider
 	 * is optimized to not contain any duplicate scanner infos.
 	 * 
 	 * It is assumed that all the elements are from the same project.
 	 * 
 	 * @throws NullPointerException if the given list is null or contains a null element
 	 */
-	public static RemoteScannerInfoProvider getProvider(List<ICElement> elements) {
+	public static RemoteIndexerInfoProvider getProvider(List<ICElement> elements) {
 		if(elements.isEmpty())
-			return new RemoteScannerInfoProvider();
+			return new RemoteIndexerInfoProvider();
 		
 		Map<String,RemoteScannerInfo> scannerInfoMap = new HashMap<String,RemoteScannerInfo>();
-		Map<Integer,RemoteScannerInfo> linkageMap = new HashMap<Integer, RemoteScannerInfo>();
+		Map<Integer,RemoteScannerInfo> linkageMap = new HashMap<Integer,RemoteScannerInfo>();
+		Map<String,String> languageMap = new HashMap<String,String>();
+		Map<String,Boolean> isHeaderMap = new HashMap<String,Boolean>();
 		
 		// we assume all the elements are from the same project
 		IProject project = elements.get(0).getCProject().getProject(); 
@@ -167,10 +165,24 @@ public class RemoteScannerInfoProviderFactory {
 		
 		for(ICElement element : elements) {
 			if(element instanceof ITranslationUnit) {
-				IScannerInfo localScannerInfo = provider.getScannerInformation(element.getResource());
+				ITranslationUnit tu = (ITranslationUnit) element;
+				
+				// compute the scanner info, share identical scanner infos
+				IScannerInfo localScannerInfo = provider.getScannerInformation(tu.getResource());
 				RemoteScannerInfo remoteScannerInfo = cache.get(localScannerInfo);
 				String path = element.getLocationURI().getPath();
 				scannerInfoMap.put(path, remoteScannerInfo);
+		
+				// compute the language
+				try {
+					ILanguage language = tu.getLanguage();
+					languageMap.put(path, language.getId());
+				} catch (CoreException e) {
+					RDTLog.logError(e);
+				}
+				
+				// is it a header file?
+				isHeaderMap.put(path, tu.isHeaderUnit());
 				
 				try {
 					linkageIDs.add(((ITranslationUnit)element).getLanguage().getLinkageID());
@@ -184,7 +196,7 @@ public class RemoteScannerInfoProviderFactory {
 			linkageMap.put(id, remoteScannerInfo);
 		}
 		
-		return new RemoteScannerInfoProvider(scannerInfoMap, linkageMap);
+		return new RemoteIndexerInfoProvider(scannerInfoMap, linkageMap, languageMap, isHeaderMap);
 	}
 	
 	
