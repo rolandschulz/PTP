@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,14 +39,11 @@ import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ILanguage;
-import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.NullLogService;
-import org.eclipse.cdt.core.parser.ParserLanguage;
 import org.eclipse.cdt.internal.core.indexer.ILanguageMapper;
-import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,6 +52,7 @@ import org.eclipse.dstore.core.miners.Miner;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStoreResources;
+import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
@@ -66,9 +64,7 @@ import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
-import org.eclipse.ptp.internal.rdt.core.model.Path;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
-import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -195,7 +191,7 @@ public class CDTMiner extends Miner {
 		else if (name.equals(C_INDEX_START)) {
 			try {
 				String scopeName = getString(theCommand, 1);
-				IStandaloneScannerInfoProvider provider = (IStandaloneScannerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
+				IRemoteIndexerInfoProvider provider = (IRemoteIndexerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
 	
 				System.out.println("Indexing scope " + scopeName); //$NON-NLS-1$
 	
@@ -213,9 +209,9 @@ public class CDTMiner extends Miner {
 		
 		else if(name.equals(C_INDEX_DELTA)) {
 			String scopeName = getString(theCommand, 1);
-			IStandaloneScannerInfoProvider provider;
+			IRemoteIndexerInfoProvider provider;
 			try {
-				provider = (IStandaloneScannerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
+				provider = (IRemoteIndexerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
 			} catch (IOException e) {
 				e.printStackTrace();
 				return status;
@@ -273,7 +269,7 @@ public class CDTMiner extends Miner {
 		{
 			try {
 				String scopeName = getString(theCommand, 1);
-				IStandaloneScannerInfoProvider provider = (IStandaloneScannerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
+				IRemoteIndexerInfoProvider provider = (IRemoteIndexerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
 	
 				System.out.println("Re-indexing scope " + scopeName); //$NON-NLS-1$
 	
@@ -1123,13 +1119,16 @@ public class CDTMiner extends Miner {
 	}
 	
 	protected void handleIndexDelta(String scopeName, List<String> addedFiles,
-			List<String> changedFiles, List<String> removedFiles, IStandaloneScannerInfoProvider provider, DataElement status) {
+			List<String> changedFiles, List<String> removedFiles, IRemoteIndexerInfoProvider provider, DataElement status) {
 		try {
 
 //			statusWorking(status);
 			
+			
+			
 			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
 			indexer.setScannerInfoProvider(provider);
+			indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
 			
 			ScopeManager scopeManager = ScopeManager.getInstance();
 			
@@ -1487,10 +1486,11 @@ public class CDTMiner extends Miner {
 		}
 	}
 
-	protected void handleIndexStart(String scopeName, IStandaloneScannerInfoProvider provider, DataElement status) {
+	protected void handleIndexStart(String scopeName, IRemoteIndexerInfoProvider provider, DataElement status) {
 		try {
 			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
 			indexer.setScannerInfoProvider(provider);
+			indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
 			
 			Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
 			
@@ -1511,9 +1511,10 @@ public class CDTMiner extends Miner {
 		}
 	}
 	
-	protected void handleReindex(String scopeName, IStandaloneScannerInfoProvider provider, DataElement status) {
+	protected void handleReindex(String scopeName, IRemoteIndexerInfoProvider provider, DataElement status) {
 		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
 		indexer.setScannerInfoProvider(provider);
+		indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
 		
 		Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
 		
@@ -1590,47 +1591,29 @@ public class CDTMiner extends Miner {
 		return status;
 	}
 
-
-	 public static ParserLanguage getLanguage(String path) {
-
-		if (path.endsWith(".cpp") || path.endsWith(".hpp") || path.endsWith(".C") || path.endsWith(".H")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			return ParserLanguage.CPP;
-		} else if (path.endsWith(".c") || path.endsWith(".h")) { //$NON-NLS-1$ //$NON-NLS-2$
-			return ParserLanguage.C;
-		} else {
-			return ParserLanguage.CPP;
-		}
-
-	}
 	 
-	public IASTTranslationUnit getASTTranslationUnit(String filePath, IStandaloneScannerInfoProvider scannerInfoProvider, IIndex index) {
-		ILanguageMapper languageMapper = new RemoteLanguageMapper();
+	public IASTTranslationUnit getASTTranslationUnit(String filePath, IRemoteIndexerInfoProvider indexerInfoProvider, IIndex index) {
+		ILanguageMapper languageMapper = new RemoteLanguageMapper(indexerInfoProvider);
 		
 		ILanguage language = languageMapper.getLanguage(filePath);
+		if(language == null)
+			return null;
 		
 		IASTTranslationUnit tu = null;
 		try {
-			tu = language.getASTTranslationUnit(new CodeReader(filePath), scannerInfoProvider.getScannerInformation(filePath),
-					StandaloneSavedCodeReaderFactory.getInstance(), index, getParserOptions(filePath), new NullLogService());
+			int options = 0;
+			if(indexerInfoProvider.isHeaderUnit(filePath))
+				options = ILanguage.OPTION_IS_SOURCE_UNIT;
+			
+			tu = language.getASTTranslationUnit(new CodeReader(filePath), indexerInfoProvider.getScannerInformation(filePath),
+					StandaloneSavedCodeReaderFactory.getInstance(), index, options, new NullLogService());
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return tu;
 	}
 	
-	public int getParserOptions(String filePath) {
-		if (filePath.endsWith(".cpp") || filePath.endsWith(".C") || filePath.endsWith(".c")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			return ILanguage.OPTION_IS_SOURCE_UNIT;
-		}
-//			else if (filePath.endsWith(".hpp")  || filePath.endsWith(".h") || filePath.endsWith(".H")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//			return 0;
-//		} 
-			
-		return 0;
-	}
 }
