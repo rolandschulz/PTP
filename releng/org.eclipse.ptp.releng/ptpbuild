@@ -16,6 +16,9 @@
 TAG=HEAD
 # main staging directory
 BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
+BUILD_LOG=$BUILD_DIR/ptpbuild_`date +%Y%m%d%H%M`.log
+
+{
 
 args=`getopt t: $*`
 
@@ -65,5 +68,7 @@ export PATH=/opt/public/common/ibm-java2-ppc-50/bin:$PATH
 echo `java -version`
 java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar \
 	-ws gtk -arch ppc -os linux -application org.eclipse.ant.core.antRunner
+
+} 2>&1 | tee $BUILD_LOG
 
 exit 0
