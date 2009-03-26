@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfo;
-import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfoProviderFactory;
+import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
@@ -60,7 +60,7 @@ public class AbstractRemoteService {
 		}
 		
 		if (unit instanceof TranslationUnit) {
-			IScannerInfo scannerInfo = RemoteScannerInfoProviderFactory.getScannerInfo(unit.getResource());
+			IScannerInfo scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(unit.getResource());
 			((TranslationUnit) unit).setASTContext(scannerInfo);
 		}
 		return unit;

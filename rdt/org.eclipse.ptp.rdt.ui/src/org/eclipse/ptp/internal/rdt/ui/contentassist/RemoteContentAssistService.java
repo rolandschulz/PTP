@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package org.eclipse.ptp.internal.rdt.ui.contentassist;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.IScannerInfo;
@@ -23,7 +22,7 @@ import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfoProviderFactory;
+import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
@@ -76,7 +75,7 @@ public class RemoteContentAssistService extends AbstractRemoteService implements
 		subsystem.checkProject(project, monitor );
 		
 		if(targetUnit instanceof TranslationUnit) {
-			IScannerInfo scannerInfo = RemoteScannerInfoProviderFactory.getScannerInfo(unit.getResource());
+			IScannerInfo scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(unit.getResource());
 			((TranslationUnit)targetUnit).setASTContext(scannerInfo);
 		}
 		

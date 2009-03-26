@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -48,6 +47,7 @@ import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.dstore.core.model.DataStoreSchema;
+import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
@@ -130,7 +130,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#startIndexOfScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus startIndexOfScope(Scope scope, IStandaloneScannerInfoProvider provider, IProgressMonitor monitor)
+	public IStatus startIndexOfScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor)
 	{
 		DataStore dataStore = getDataStore();
 		   
@@ -190,7 +190,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#reindexScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus reindexScope(Scope scope, IStandaloneScannerInfoProvider provider, IProgressMonitor monitor)
+	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor)
 	{
 		DataStore dataStore = getDataStore();
 		   
@@ -315,7 +315,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#indexDelta(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, java.util.List, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IStatus indexDelta(Scope scope,
-			IStandaloneScannerInfoProvider provider,
+			IRemoteIndexerInfoProvider provider,
 			List<ICElement> newElements, List<ICElement> changedElements,
 			List<ICElement> deletedElements, IProgressMonitor monitor,
 			RemoteIndexerTask task) {
