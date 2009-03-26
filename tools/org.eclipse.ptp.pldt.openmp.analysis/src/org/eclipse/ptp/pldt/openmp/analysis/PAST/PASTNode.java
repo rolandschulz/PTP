@@ -12,10 +12,12 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.ASTNodeProperty;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
+import org.eclipse.cdt.core.dom.ast.ExpansionOverlapsBoundaryException;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.parser.IToken;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
@@ -174,6 +176,52 @@ public abstract class PASTNode implements IASTNode
 	public void setPropertyInParent(ASTNodeProperty property) {
 		astNode_.setPropertyInParent(property);
 	}
+	/**
+	 *  CDT6.0 implement IASTNode.copy()
+	 */
+	public IASTNode copy(){
+		return astNode_.copy();
+	}
+	/**
+	 *  CDT6.0 implement IASTNode.getChildren()
+	 */
+	public IASTNode[] getChildren(){
+		return astNode_.getChildren();
+	}
+	/**
+	 *  CDT6.0 implement IASTNode.getSyntax()
+	 */
+	public IToken getSyntax() throws ExpansionOverlapsBoundaryException{
+		return astNode_.getSyntax();
+		
+	}
+	/**
+	 *  CDT6.0 implement IASTNode.getLeadingSyntax()
+	 */
+	public IToken getLeadingSyntax() throws ExpansionOverlapsBoundaryException{
+		return astNode_.getLeadingSyntax();
+	}
+	/**
+	 *  CDT6.0 implement IASTNode.getTrailingSyntax()
+	 */
+	public IToken getTrailingSyntax() throws ExpansionOverlapsBoundaryException{
+		return astNode_.getTrailingSyntax();		
+	}
+	/**
+	 *  CDT6.0 implement IASTNode.isActive()
+	 */
+	public boolean isActive(){
+		return astNode_.isActive();
+		
+	}
+	/**
+	 *  CDT6.0 implement IASTNode.isFrozen()
+	 */
+	public boolean isFrozen(){
+		return astNode_.isFrozen();
+		
+	}
+	
 	
     
 }
