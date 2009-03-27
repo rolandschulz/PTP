@@ -30,24 +30,26 @@ public class LocalConnection implements IRemoteConnection {
 		this.name = "Local";
 		this.address = "localhost";
 		this.username = System.getProperty("user.name");
-		this.connected = false;
+		this.connected = true;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
 	public void close(IProgressMonitor monitor) {
-		connected = false;
-		
-		conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-			public IRemoteConnection getConnection() {
-				return connection;
-			}
-
-			public int getType() {
-				return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
-			}
+		if (connected) {
+			connected = false;
 			
-		});
+			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				public IRemoteConnection getConnection() {
+					return connection;
+				}
+	
+				public int getType() {
+					return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
+				}
+				
+			});
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -114,18 +116,20 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
 	 */
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
-		connected = true;
-		
-		conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-			public IRemoteConnection getConnection() {
-				return connection;
-			}
-
-			public int getType() {
-				return IRemoteConnectionChangeEvent.CONNECTION_OPENED;
-			}
+		if (!connected) {
+			connected = true;
 			
-		});	
+			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				public IRemoteConnection getConnection() {
+					return connection;
+				}
+	
+				public int getType() {
+					return IRemoteConnectionChangeEvent.CONNECTION_OPENED;
+				}
+				
+			});	
+		}
 	}
 
 	/* (non-Javadoc)
