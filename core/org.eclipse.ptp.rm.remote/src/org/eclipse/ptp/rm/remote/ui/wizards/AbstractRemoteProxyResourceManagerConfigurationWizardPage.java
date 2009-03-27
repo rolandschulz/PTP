@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.remote.ui.wizards;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -29,10 +30,15 @@ import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -43,6 +49,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -72,9 +79,29 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.progress.UIJob;
 
 public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage extends
 		RMConfigurationWizardPage {
+	
+	/**
+	 * Job to validate proxyPath. We use a job here so that the input is
+	 * only validated after the user finishes (or pauses typing). This is
+	 * to prevent a remote lookup on every key stroke.
+	 *
+	 */
+	protected class ValidateJob extends UIJob {
+		public ValidateJob() {
+			super("ValidateJob"); //$NON-NLS-1$
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			validateProxyPath();
+			updatePage();
+			return Status.OK_STATUS;
+		}
+	}
 	
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
 	{
@@ -83,9 +110,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 */
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && (source == serverText)) {
-				updatePage();
-			}
+			if(!loading && (source == proxyPathText)) {
+				/*
+				 * Reschedule the validate job to run in VALIDATE_TIMER ms every
+				 * time the user hits a key.
+				 */
+				validateJob.cancel();
+				validateJob.schedule(VALIDATE_TIMER);			}
 		}
 	
 		/* (non-Javadoc)
@@ -112,9 +143,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			}
 		}
 	}
+	
 	public static final String EMPTY_STRING = "";
+	public static final int VALIDATE_TIMER = 250;
 	private AbstractRemoteResourceManagerConfiguration config;
-	private String proxyFile = EMPTY_STRING;
+	private String proxyPath = EMPTY_STRING;
 	private String proxyArgs = EMPTY_STRING;
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
@@ -125,19 +158,21 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	private boolean isValid;
 	private boolean muxPortFwd = false;
 	private boolean portFwdSupported = true;
-
+	private boolean proxyPathIsValid = true;
 	private boolean manualLaunch = false;
-	private Text serverText = null;
+
+	private Job validateJob = new ValidateJob();
+	private WidgetListener listener = new WidgetListener();
+
+	private Text proxyPathText = null;
 	private Button optionsButton = null;
 	private Button browseButton = null;
 	private Button noneButton = null;
 	private Button portForwardingButton = null;
 	private Button manualButton = null;
-	private WidgetListener listener = new WidgetListener();
 	private Button newConnectionButton;
 	private Combo  remoteCombo;
 	private Combo  connectionCombo;
-
 	private Combo  localAddrCombo;
 
 	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard,
@@ -207,7 +242,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		}
 		localAddrCombo.select(selection);
 	}
-
+	
 	/**
 	 * Save the current state in the RM configuration. This is called whenever
 	 * anything is changed.
@@ -231,12 +266,12 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			config.setConnectionName(connection.getName());
 		}
 		config.setLocalAddress(localAddr);
-		config.setProxyServerPath(proxyFile);
+		config.setProxyServerPath(proxyPath);
 		config.setInvocationOptions(proxyArgs);
 		config.setOptions(options);
 		return true;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
 	 */
@@ -246,6 +281,40 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			initContents();
 		}
 		super.setVisible(visible);
+	}
+	
+	/**
+	 * Attempt to open a connection.
+	 */
+	private void checkConnection() {
+		if (!connection.isOpen()) {
+			IRunnableWithProgress op = new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor)
+						throws InvocationTargetException,
+						InterruptedException {
+					try {
+						connection.open(monitor);
+						if (monitor.isCanceled()) {
+							throw new InterruptedException(Messages.getString("RemoteProxyConfigurationWizard.cancelMessage")); //$NON-NLS-1$
+						}
+					} catch (RemoteConnectionException e) {
+						throw new InvocationTargetException(e);
+					}
+				}
+				
+			};
+			try {
+				new ProgressMonitorDialog(getShell()).run(true, true, op);
+			} catch (InvocationTargetException e) {
+				ErrorDialog.openError(getShell(), Messages.getString("RemoteProxyConfigurationWizard.connectionError"), //$NON-NLS-1$
+						Messages.getString("RemoteProxyConfigurationWizard.connectionErrorMessage"),  //$NON-NLS-1$
+						new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getCause().getMessage()));
+			} catch (InterruptedException e) {
+				ErrorDialog.openError(getShell(), Messages.getString("RemoteProxyConfigurationWizard.connectionError"), //$NON-NLS-1$
+						Messages.getString("RemoteProxyConfigurationWizard.connectionErrorMessage"),  //$NON-NLS-1$
+						new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+			}
+		}
 	}
 	
 	/**
@@ -306,13 +375,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
 
-		serverText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
+		proxyPathText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		gd.grabExcessHorizontalSpace = true;
 		gd.widthHint = 100;
-		serverText.setLayoutData(gd);
-		serverText.addModifyListener(listener);
+		proxyPathText.setLayoutData(gd);
+		proxyPathText.addModifyListener(listener);
 		
 		browseButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteProxyConfigurationWizard.browseButton"), null); //$NON-NLS-1$
 		browseButton.addSelectionListener(listener);
@@ -407,7 +476,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	private void loadSaved()
 	{
-		proxyFile = config.getProxyServerPath();
+		proxyPath = config.getProxyServerPath();
 		proxyArgs = config.getInvocationOptionsStr();
 		localAddr = config.getLocalAddress();
 		
@@ -425,7 +494,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 	}
-
+	
 	private void registerListeners() {
 		remoteCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -477,8 +546,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	private void store() 
 	{
-		if (serverText != null) {
-			proxyFile = serverText.getText();
+		if (proxyPathText != null) {
+			proxyPath = proxyPathText.getText();
 		}
 	}
 	
@@ -537,21 +606,50 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	}
 	
 	/**
-	 * Creates the dialog when the proxy "Options..." button
-	 * is selected. Override if you want to provide your own dialog.
+	 * Check if the proxy path supplied in proxyPathText is a valid file on the remote system.
 	 * 
-	 * @param parent the parent composite to contain the dialog area
-	 * @return the proxy options string
+	 * @return true if valid
 	 */
-	protected String createOptionsDialog(Shell shell, String initialOptions) {
-		InputDialog dialog = new InputDialog(shell, 
-				Messages.getResourceString("RemoteProxyConfigurationWizard.optionsTitle"), 
-				Messages.getString("RemoteProxyConfigurationWizard.options"),
-				initialOptions, null);
-		if (dialog.open() == Dialog.OK) {
-			return dialog.getValue();
+	private boolean validateProxyPath() {
+		proxyPathIsValid = false;
+		final String path = proxyPathText.getText();
+		if (path != null) {
+			if (connection != null) {
+				checkConnection();
+				if (connection.isOpen()) {
+					if (remoteServices != null) {
+						final IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
+						if (fileMgr != null) {
+							IRunnableWithProgress op = new IRunnableWithProgress() {
+								public void run(IProgressMonitor monitor)
+										throws InvocationTargetException,
+										InterruptedException {
+									try {
+										IFileStore file = fileMgr.getResource(new Path(path), monitor);
+										if (!monitor.isCanceled()) {
+											proxyPathIsValid = file.fetchInfo(EFS.NONE, monitor).exists();
+										}
+									} catch (IOException e) {
+										throw new InvocationTargetException(e);
+									} catch (CoreException e) {
+										throw new InvocationTargetException(e);
+									}
+								}
+								
+							};
+							try {
+								ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
+								dialog.setOpenOnRun(false);
+								dialog.run(true, true, op);
+							} catch (InvocationTargetException e) {
+							} catch (InterruptedException e) {
+							}
+						}
+					}
+				}
+			}
 		}
-		return initialOptions;
+		return proxyPathIsValid;
 	}
 
 	/**
@@ -600,6 +698,24 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	}
 
 	/**
+	 * Creates the dialog when the proxy "Options..." button
+	 * is selected. Override if you want to provide your own dialog.
+	 * 
+	 * @param parent the parent composite to contain the dialog area
+	 * @return the proxy options string
+	 */
+	protected String createOptionsDialog(Shell shell, String initialOptions) {
+		InputDialog dialog = new InputDialog(shell, 
+				Messages.getResourceString("RemoteProxyConfigurationWizard.optionsTitle"), 
+				Messages.getString("RemoteProxyConfigurationWizard.options"),
+				initialOptions, null);
+		if (dialog.open() == Dialog.OK) {
+			return dialog.getValue();
+		}
+		return initialOptions;
+	}
+
+	/**
 	 * Creates an new radio button instance and sets the default
 	 * layout data.
 	 *
@@ -620,13 +736,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		}
 		return button;
 	}
-
+	
 	/**
 	 * Transfer current settings to text fields
 	 */
 	protected void defaultSetting() 
 	{
-		serverText.setText(proxyFile);
+		proxyPathText.setText(proxyPath);
 	}
 	
 	/**
@@ -681,51 +797,24 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
 		}
 	}
-	
+
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
 	protected void handlePathBrowseButtonSelected() 
 	{
 		if (connection != null) {
-			if (!connection.isOpen()) {
-				IRunnableWithProgress op = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor)
-							throws InvocationTargetException,
-							InterruptedException {
-						try {
-							connection.open(monitor);
-							if (monitor.isCanceled()) {
-								throw new InterruptedException(Messages.getString("RemoteProxyConfigurationWizard.cancelMessage")); //$NON-NLS-1$
-							}
-						} catch (RemoteConnectionException e) {
-							throw new InvocationTargetException(e);
-						}
-					}
-					
-				};
-				try {
-					new ProgressMonitorDialog(getShell()).run(true, true, op);
-				} catch (InvocationTargetException e) {
-					ErrorDialog.openError(getShell(), Messages.getString("RemoteProxyConfigurationWizard.connectionError"), //$NON-NLS-1$
-							Messages.getString("RemoteProxyConfigurationWizard.connectionErrorMessage"),  //$NON-NLS-1$
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getCause().getMessage()));
-				} catch (InterruptedException e) {
-					ErrorDialog.openError(getShell(), Messages.getString("RemoteProxyConfigurationWizard.connectionError"), //$NON-NLS-1$
-							Messages.getString("RemoteProxyConfigurationWizard.connectionErrorMessage"),  //$NON-NLS-1$
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
-				}
-			}
+			checkConnection();
 			if (connection.isOpen()) {
 				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 				if (remoteUIServices != null) {
 					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 					if (fileMgr != null) {
 						fileMgr.setConnection(connection);
-						String correctPath = serverText.getText();
+						String correctPath = proxyPathText.getText();
 						IPath selectedPath = fileMgr.browseFile(getShell(), Messages.getString("RemoteProxyConfigurationWizard.select"), correctPath); //$NON-NLS-1$
 						if (selectedPath != null) {
-							serverText.setText(selectedPath.toString());
+							proxyPathText.setText(selectedPath.toString());
 						}
 					}
 				}
@@ -823,9 +912,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected boolean isValidSetting() 
 	{
-		if (serverText != null) {
-			String name = getFieldContent(serverText.getText());
-			if (name == null) {
+		if (proxyPathText != null) {
+			String name = getFieldContent(proxyPathText.getText());
+			if (name == null || !proxyPathIsValid) {
 				setErrorMessage(Messages.getString("RemoteProxyConfigurationWizard.invalid")); //$NON-NLS-1$
 				return false;
 			}
