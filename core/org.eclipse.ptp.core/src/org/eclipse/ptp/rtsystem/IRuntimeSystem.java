@@ -44,7 +44,7 @@ public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {
 	 * Called when the control system is being shutdown.
 	 * @throws CoreException 
 	 */
-	public void shutdown(IProgressMonitor monitor) throws CoreException;
+	public void shutdown() throws CoreException;
 
 	/**
 	 * Called to start the runtime system.
