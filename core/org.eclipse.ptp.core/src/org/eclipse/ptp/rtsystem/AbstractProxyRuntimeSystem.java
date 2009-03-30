@@ -627,9 +627,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
 	 */
-	public abstract void shutdown(IProgressMonitor monitor) throws CoreException;
+	public abstract void shutdown() throws CoreException;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
