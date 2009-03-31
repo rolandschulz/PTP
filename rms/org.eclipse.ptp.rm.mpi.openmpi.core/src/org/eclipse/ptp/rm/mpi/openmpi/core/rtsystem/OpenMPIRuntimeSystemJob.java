@@ -61,7 +61,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser
  *
  */
 public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
-	Object lock1 = new Object();
+	public Object lock1 = new Object();
 
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
@@ -81,7 +81,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	public OpenMPIRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
-
+	
 	@Override
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
 		/*
@@ -107,7 +107,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		Thread stdoutThread = new Thread() {
 			@Override
 			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", getJobID()); //$NON-NLS-1$
 				BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
 				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
@@ -115,7 +115,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					while (line != null) {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
+							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
 						line = stdoutBufferedReader.readLine();
 					}
@@ -124,21 +124,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					OpenMPIPlugin.log(e);
 				} finally {
 					stdoutPipedStreamListener.disable();
-					//					if (stdoutObserver != null) {
-					//						stdoutObserver.removeListener(stdoutPipedStreamListener);
-					//					}
-					//					try {
-					//						stdoutOutputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
-					//					try {
-					//						stdoutInputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", getJobID()); //$NON-NLS-1$
 			}
 		};
 
@@ -156,7 +143,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		Thread stderrThread = new Thread() {
 			@Override
 			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", getJobID()); //$NON-NLS-1$
 				final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
 				IPProcess ipProc = ipJob.getProcessById(zeroIndexProcessID);
 				try {
@@ -165,7 +152,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 						synchronized (lock1) {
 							ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 							ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
+							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
 						line = stderrBufferedReader.readLine();
 					}
@@ -174,21 +161,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					OpenMPIPlugin.log(e);
 				} finally {
 					stderrPipedStreamListener.disable();
-					//					if (stderrObserver != null) {
-					//						stderrObserver.removeListener(stderrPipedStreamListener);
-					//					}
-					//					try {
-					//						stderrOutputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
-					//					try {
-					//						stderrInputStream.close();
-					//					} catch (IOException e) {
-					//						PTPCorePlugin.log(e);
-					//					}
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", getJobID()); //$NON-NLS-1$
 			}
 		};
 
@@ -206,7 +180,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		Thread parserThread = new Thread() {
 			@Override
 			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", getJobID()); //$NON-NLS-1$
 				OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 				try {
 					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
@@ -219,13 +193,13 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							}
 							public void endDocument() {
 								/*
-								 * Turn of listener that generates input for parser when parsing finishes.
+								 * Turn off listener that generates input for parser when parsing finishes.
 								 * If not done, the parser will close the piped inputstream, making the listener
 								 * get IOExceptions for closed stream.
 								 */
-								if (stderrObserver != null) {
-									parserPipedStreamListener.disable();
-									stderrObserver.removeListener(parserPipedStreamListener);
+								parserPipedStreamListener.disable();
+								if (getStdoutObserver() != null) {
+									getStdoutObserver().removeListener(parserPipedStreamListener);
 								}
 							}
 						});
@@ -240,16 +214,18 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 //					process.destroy();
 					DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {0}", e); //$NON-NLS-1$
 				} finally {
-					parserPipedStreamListener.disable();
-					if (stderrObserver != null) {
-						stderrObserver.removeListener(parserPipedStreamListener);
+					if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+						parserPipedStreamListener.disable();
+						if (getStderrObserver() != null) {
+							getStderrObserver().removeListener(parserPipedStreamListener);
+						}
 					}
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: finished", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: finished", getJobID()); //$NON-NLS-1$
 			}
 		};
 
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", getJobID()); //$NON-NLS-1$
 		/*
 		 * Create and start listeners.
 		 */
@@ -257,27 +233,26 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		stderrThread.start();
 		parserThread.start();
 
-		stderrObserver = new InputStreamObserver(process.getErrorStream());
-		stdoutObserver = new InputStreamObserver(process.getInputStream());
-
-		stdoutObserver.addListener(stdoutPipedStreamListener);
-		stderrObserver.addListener(stderrPipedStreamListener);
+		setStderrObserver(new InputStreamObserver(process.getErrorStream()));
+		getStderrObserver().addListener(stderrPipedStreamListener);
+		setStdoutObserver(new InputStreamObserver(process.getInputStream()));
+		getStdoutObserver().addListener(stdoutPipedStreamListener);
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 		OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 		if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
-			stderrObserver.addListener(parserPipedStreamListener);
+			getStderrObserver().addListener(parserPipedStreamListener);
 		} else if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
-			stdoutObserver.addListener(parserPipedStreamListener);
+			getStdoutObserver().addListener(parserPipedStreamListener);
 		} else {
 			assert false;
 		}
 
-		stderrObserver.start();
-		stdoutObserver.start();
+		getStderrObserver().start();
+		getStdoutObserver().start();
 
 		try {
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting for display-map parser thread to finish", jobID); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting for display-map parser thread to finish", getJobID()); //$NON-NLS-1$
 			parserThread.join();
 		} catch (InterruptedException e) {
 			// Do nothing.
@@ -288,51 +263,37 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			 * If process completed with error, then it display map parsing failed because of the error message.
 			 * If process did not complete, the destroy it.
 			 */
-//			synchronized (this) {
-//				try {
-//					wait(1000);
-//				} catch (InterruptedException e) {
-//					// Ignore
-//				}
-//			}
 			boolean parseError = true;
-//			if (!process.isCompleted()) {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: destroy process due error while parsing display map", jobID); //$NON-NLS-1$
-//				process.destroy();
-//			} else {
-//				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: process terminated with no valid display map", jobID); //$NON-NLS-1$
-//				if (process.exitValue() != 0) {
-//					parseError = false;
-//				}
-//			}
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: destroy process due error while parsing display map", getJobID()); //$NON-NLS-1$
+
 			/*
 			 * Wait until both stdout and stderr stop because stream are closed.
 			 * Error messages may be still queued in the stream.
 			 */
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 			try {
-				stderrObserver.join();
+				getStderrObserver().join();
 			} catch (InterruptedException e1) {
 				// Ignore
 			}
 
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", getJobID()); //$NON-NLS-1$
 			try {
-				stdoutObserver.join();
+				getStdoutObserver().join();
 			} catch (InterruptedException e1) {
 				// Ignore
 			}
 			if (parseError) {
 				throw OpenMPIPlugin.coreErrorException("Failed to parse output of Open MPI command. Check output for errors.", parserException); //$NON-NLS-1$
-			} else {
-				throw OpenMPIPlugin.coreErrorException("Open MPI failed to launch parallel application. Check output for errors."); //$NON-NLS-1$
 			}
+			
+			throw OpenMPIPlugin.coreErrorException("Open MPI failed to launch parallel application. Check output for errors."); //$NON-NLS-1$
 		}
 
 		/*
 		 * Copy job attributes from map.
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", getJobID()); //$NON-NLS-1$
 		rtSystem.changeJob(getJobID(), map.getAttributeManager());
 
 		/*
@@ -364,7 +325,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
 			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 			try {
-				attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(newProcess.getIndex()));
+				attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(new Integer(newProcess.getIndex())));
 			} catch (IllegalValueException e) {
 				// Is always valid.
 				assert false;
@@ -382,7 +343,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			IPNodeControl nodeControl = (IPNodeControl) node;
 			nodeControl.addProcesses(Arrays.asList(new IPProcessControl[] {processControl} ));
 		}
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: finished updating model", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: finished updating model", getJobID()); //$NON-NLS-1$
 	}
 
 	@Override
@@ -391,16 +352,16 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * Wait until both stdout and stderr stop because stream are closed.
 		 * This means that the process has finished.
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 		try {
-			stderrObserver.join();
+			getStderrObserver().join();
 		} catch (InterruptedException e1) {
 			// Ignore
 		}
 
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", getJobID()); //$NON-NLS-1$
 		try {
-			stdoutObserver.join();
+			getStdoutObserver().join();
 		} catch (InterruptedException e1) {
 			// Ignore
 		}
@@ -408,14 +369,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", getJobID()); //$NON-NLS-1$
 		try {
 			process.waitFor();
 		} catch (InterruptedException e) {
 			// Ignore
 		}
 
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", getJobID()); //$NON-NLS-1$
 	}
 
 	@Override
@@ -424,18 +385,30 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
-		if (process.exitValue() != 0) {
-			changeJobState(JobAttributes.State.ERROR);
-			if (! terminateJobFlag) {
-				throw OpenMPIPlugin.coreErrorException(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue, process.exitValue()));
-			} else {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", jobID, process.exitValue()); //$NON-NLS-1$
-			}
-		}
+	protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException {
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+		if (process.exitValue() != 0) {
+			if (!terminateJobFlag) {
+				if ((process.exitValue() & 0177) == 0) {
+					int exit_code = (process.exitValue()>>8) & 0xff;
+					changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(exit_code)));
+				} else {
+					int signal = process.exitValue() & 0177;
+					changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithSignal, new Integer(signal)));
+				}
+				return JobAttributes.State.ERROR;
+			}
+			
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
+		}
+		return JobAttributes.State.TERMINATED;
 	}
 
+	/**
+	 * Change the state of all processes in a job.
+	 * 
+	 * @param newState
+	 */
 	private void changeAllProcessesStatus(State newState) {
 		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
 		final IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID());
@@ -480,13 +453,13 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			process.destroy();
 			process = null;
 		}
-		if (stderrObserver != null) {
-			stderrObserver.kill();
-			stderrObserver = null;
+		if (getStderrObserver() != null) {
+			getStderrObserver().kill();
+			setStderrObserver(null);
 		}
-		if (stdoutObserver != null) {
-			stdoutObserver.kill();
-			stdoutObserver = null;
+		if (getStdoutObserver() != null) {
+			getStdoutObserver().kill();
+			setStdoutObserver(null);
 		}
 		// TODO: more cleanup?
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
@@ -539,6 +512,34 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	@Override
 	protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing to do
+	}
+
+	/**
+	 * @return the stderrObserver
+	 */
+	protected InputStreamObserver getStderrObserver() {
+		return stderrObserver;
+	}
+
+	/**
+	 * @param stderrObserver the stderrObserver to set
+	 */
+	protected void setStderrObserver(InputStreamObserver stderrObserver) {
+		this.stderrObserver = stderrObserver;
+	}
+
+	/**
+	 * @return the stdoutObserver
+	 */
+	protected InputStreamObserver getStdoutObserver() {
+		return stdoutObserver;
+	}
+
+	/**
+	 * @param stdoutObserver the stdoutObserver to set
+	 */
+	protected void setStdoutObserver(InputStreamObserver stdoutObserver) {
+		this.stdoutObserver = stdoutObserver;
 	}
 
 }
