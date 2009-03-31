@@ -177,7 +177,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 
 		if (monitor.isCanceled()) {
-			connection.close(monitor);
+			connection.close();
 			connection = null;
 			return;
 		}
@@ -185,24 +185,25 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			doStartup(monitor);
 		} catch (CoreException e) {
-			connection.close(monitor);
+			connection.close();
 			connection = null;
 			throw e;
 		}
 
-		Job discoverJob = createDiscoverJob();
-		if (discoverJob != null) {
-			discoverJob.schedule();
-		}
-
 		if (!monitor.isCanceled()) {
-			fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
+			Job discoverJob = createDiscoverJob();
+			if (discoverJob != null) {
+				discoverJob.schedule();
+			}
+
 			if (jobQueueThread == null) {
 				jobQueueThread = new Thread(new JobRunner(), Messages.AbstractToolRuntimeSystem_JobQueueManagerThreadTitle);
 				jobQueueThread.start();
 			}
+			
+			fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
 		} else {
-			connection.close(monitor);
+			connection.close();
 			connection = null;
 		}
 	}
@@ -216,11 +217,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
 	 */
-	public void shutdown(IProgressMonitor monitor) throws CoreException {
+	public void shutdown() throws CoreException {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: shutdown", rmConfiguration.getName()); //$NON-NLS-1$
-		doShutdown(monitor);
+		doShutdown();
 
 		stopEvents();
 
@@ -247,7 +248,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		 * Close the the connection.
 		 */
 		if (connection != null) {
-			connection.close(monitor);
+			connection.close();
 		}
 
 		connection = null;
@@ -260,7 +261,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @param monitor The progress monitor.
 	 * @throws CoreException
 	 */
-	protected abstract void doShutdown(IProgressMonitor monitor) throws CoreException;
+	protected abstract void doShutdown() throws CoreException;
 
 	/*
 	 * (non-Javadoc)
