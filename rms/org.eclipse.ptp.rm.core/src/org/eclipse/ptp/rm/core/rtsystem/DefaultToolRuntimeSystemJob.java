@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.core.utils.ITextInputStreamListener;
 import org.eclipse.ptp.rm.core.utils.TextInputStreamObserver;
 
@@ -44,8 +45,8 @@ public class DefaultToolRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
-		// Nothing
+	protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException {
+		return JobAttributes.State.TERMINATED;
 	}
 
 	@Override
