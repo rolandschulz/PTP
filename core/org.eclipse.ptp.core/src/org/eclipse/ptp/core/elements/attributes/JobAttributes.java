@@ -53,6 +53,7 @@ public class JobAttributes {
 	private static final String PROG_ARGS_ATTR_ID = "progArgs"; //$NON-NLS-1$
 	private static final String QUEUEID_ATTR_ID = "queueId"; //$NON-NLS-1$
 	private static final String STATE_ATTR_ID = "jobState"; //$NON-NLS-1$
+	private static final String STATUS_MESSAGE_ATTR_ID = "jobStatusMessage"; //$NON-NLS-1$
 	private static final String SUBID_ATTR_ID = "jobSubId"; //$NON-NLS-1$
 	private static final String USERID_ATTR_ID = "userId"; //$NON-NLS-1$
 	private static final String WORKING_DIR_ATTR_ID = "workingDir"; //$NON-NLS-1$
@@ -117,6 +118,10 @@ public class JobAttributes {
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State", Messages.JobAttributes_14,  //$NON-NLS-1$
 				true, State.STARTED);
 
+	private final static StringAttributeDefinition statusMessageAttrDef = 
+		new StringAttributeDefinition(STATUS_MESSAGE_ATTR_ID, "Status Message", //$NON-NLS-1$
+				Messages.JobAttributes_18, false, ""); //$NON-NLS-1$
+
 	private final static StringAttributeDefinition subIdAttrDef = 
 		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID", //$NON-NLS-1$
 				Messages.JobAttributes_15, false, ""); //$NON-NLS-1$
@@ -167,6 +172,7 @@ public class JobAttributes {
 				progArgsAttrDef,
 				queueIdAttrDef,
 				stateAttrDef, 
+				statusMessageAttrDef,
 				subIdAttrDef, 
 				userIdAttrDef,
 				workingDirAttrDef,
@@ -213,6 +219,10 @@ public class JobAttributes {
 		return stateAttrDef;
 	}
 
+	public static StringAttributeDefinition getStatusMessageAttributeDefinition() {
+		return statusMessageAttrDef;
+	}
+	
 	public static StringAttributeDefinition getSubIdAttributeDefinition() {
 		return subIdAttrDef;
 	}
