@@ -99,6 +99,7 @@ public class Messages extends NLS {
 	public static String JobAttributes_15;
 	public static String JobAttributes_16;
 	public static String JobAttributes_17;
+	public static String JobAttributes_18;
 	public static String JobAttributes_2;
 	public static String JobAttributes_3;
 	public static String JobAttributes_4;
