@@ -78,10 +78,10 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
 	 */
 	@Override
-	protected void doShutdown(IProgressMonitor monitor) throws CoreException {
+	protected void doShutdown() throws CoreException {
 		// Nothing to do
 	}
 
