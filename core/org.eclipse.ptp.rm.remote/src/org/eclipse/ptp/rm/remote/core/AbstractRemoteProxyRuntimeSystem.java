@@ -30,11 +30,11 @@ public class AbstractRemoteProxyRuntimeSystem extends AbstractProxyRuntimeSystem
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#shutdown(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#shutdown()
 	 */
-	public void shutdown(IProgressMonitor monitor) throws CoreException {
+	public void shutdown() throws CoreException {
 		try {
-			proxy.shutdown(monitor);
+			proxy.shutdown();
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), 
 					IStatus.WARNING, e.getMessage(), null));
