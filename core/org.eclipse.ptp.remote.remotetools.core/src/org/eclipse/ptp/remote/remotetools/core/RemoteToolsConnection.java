@@ -44,10 +44,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
-	public synchronized void close(IProgressMonitor monitor) {
-			if (monitor == null) {
-				monitor = new NullProgressMonitor();
-			}
+	public synchronized void close() {
+			IProgressMonitor monitor = new NullProgressMonitor();
 			
 			monitor.beginTask(Messages.RemoteToolsConnection_close, 1);
 			

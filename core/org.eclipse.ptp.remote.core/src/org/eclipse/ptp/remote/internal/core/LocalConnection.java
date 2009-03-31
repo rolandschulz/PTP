@@ -35,7 +35,7 @@ public class LocalConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
-	public void close(IProgressMonitor monitor) {
+	public void close() {
 		if (connected) {
 			connected = false;
 			
