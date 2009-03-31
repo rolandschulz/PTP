@@ -120,7 +120,7 @@ public class JobAttributes {
 
 	private final static StringAttributeDefinition statusMessageAttrDef = 
 		new StringAttributeDefinition(STATUS_MESSAGE_ATTR_ID, "Status Message", //$NON-NLS-1$
-				Messages.JobAttributes_18, false, ""); //$NON-NLS-1$
+				Messages.JobAttributes_18, true, ""); //$NON-NLS-1$
 
 	private final static StringAttributeDefinition subIdAttrDef = 
 		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID", //$NON-NLS-1$
