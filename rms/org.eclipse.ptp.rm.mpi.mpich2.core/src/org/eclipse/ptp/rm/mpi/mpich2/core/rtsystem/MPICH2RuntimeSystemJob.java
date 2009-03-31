@@ -25,6 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -48,6 +49,7 @@ import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2JobAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
+import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 
 /**
  * 
@@ -57,7 +59,7 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
  */
 public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	
-	private Object lock1 = new Object();
+	public Object lock1 = new Object();
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
@@ -169,8 +171,23 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
+	protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException {
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+		if (process.exitValue() != 0) {
+			if (!terminateJobFlag) {
+				if ((process.exitValue() & 0177) == 0) {
+					int exit_code = (process.exitValue()>>8) & 0xff;
+					changeJobStatusMessage(NLS.bind(Messages.MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(exit_code)));
+				} else {
+					int signal = process.exitValue() & 0177;
+					changeJobStatusMessage(NLS.bind(Messages.MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithSignal, new Integer(signal)));
+				}
+				return JobAttributes.State.ERROR;
+			}
+			
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
+		}
+		return JobAttributes.State.TERMINATED;
 	}
 
 	@Override
@@ -213,7 +230,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							if (ipProc != null) {
 								ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
 							}
-							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", jobID, line); //$NON-NLS-1$
+							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
 						line = stdoutBufferedReader.readLine();
 					}
@@ -223,7 +240,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				} finally {
 					stdoutPipedStreamListener.disable();
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", jobID); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", getJobID()); //$NON-NLS-1$
 			}
 		};
 
