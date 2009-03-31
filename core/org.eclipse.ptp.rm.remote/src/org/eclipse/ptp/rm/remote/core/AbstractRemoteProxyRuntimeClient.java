@@ -68,15 +68,15 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	 * @param monitor
 	 * @throws IOException
 	 */
-	public void shutdown(IProgressMonitor monitor) throws IOException {
-		shutdown();
+	public void shutdown() throws IOException {
+		super.shutdown();
 		try {
 			sessionFinish();
 		} catch (IOException e) {
 			PTPCorePlugin.log(e);
 		}
 		if (connection != null && connection.isOpen()) {
-			connection.close(monitor);
+			connection.close();
 		}
 	}
 
@@ -227,7 +227,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		} catch (RemoteConnectionException e) {
 			throw new IOException("Failed to start proxy: " + e.getMessage()); //$NON-NLS-1$
 		}
-		startup();
+		super.startup();
 	}
 
 	/**
