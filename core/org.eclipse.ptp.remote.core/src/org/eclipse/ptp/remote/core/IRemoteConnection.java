@@ -17,7 +17,7 @@ public interface IRemoteConnection {
 	/**
 	 * Close the connection. Must be called to terminate the connection.
 	 */
-	public void close(IProgressMonitor monitor);
+	public void close();
 	
 	/**
 	 * Forward local port localPort to remote port fwdPort on remote machine fwdAddress. If this
