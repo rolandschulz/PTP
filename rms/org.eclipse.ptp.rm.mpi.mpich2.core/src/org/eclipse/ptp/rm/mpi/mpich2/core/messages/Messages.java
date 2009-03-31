@@ -103,6 +103,8 @@ public class Messages extends NLS {
 	public static String MPICH2RuntimeSystemJob_Exception_FailedParse;
 	public static String MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch;
 	public static String MPICH2RuntimeSystemJob_ProcessName;
+	public static String MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
+	public static String MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithSignal;
 	
 	static {
 		// initialize resource bundle
