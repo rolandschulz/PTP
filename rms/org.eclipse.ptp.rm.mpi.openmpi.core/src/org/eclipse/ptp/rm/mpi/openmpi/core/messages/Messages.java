@@ -103,6 +103,7 @@ public class Messages extends NLS {
 	public static String OpenMPIRuntimeSystemJob_Exception_FailedExecute0;
 	public static String OpenMPIRuntimeSystemJob_ProcessName;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
+	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithSignal;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
