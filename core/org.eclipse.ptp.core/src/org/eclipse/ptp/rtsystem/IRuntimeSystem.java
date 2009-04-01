@@ -48,6 +48,10 @@ public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {
 
 	/**
 	 * Called to start the runtime system.
+	 * 
+	 * @param monitor the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+     *                to call done() on the given monitor. Accepts null, indicating that no progress should be
+     *                reported and that the operation cannot be cancelled.
 	 * @throws CoreException
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException;
