@@ -48,17 +48,17 @@ public class ProtocolUtil {
 		}
 
 		// Handle minus sign, if present
-		if (address.startsWith("-")) {
+		if (address.startsWith("-")) { //$NON-NLS-1$
 			negative = true;
 			index++;
 		}
-		if (address.startsWith("0x", index) || address.startsWith("0X", index)) {
+		if (address.startsWith("0x", index) || address.startsWith("0X", index)) { //$NON-NLS-1$ //$NON-NLS-2$
 			index += 2;
 			radix = 16;
-		} else if (address.startsWith("#", index)) {
+		} else if (address.startsWith("#", index)) { //$NON-NLS-1$
 			index ++;
 			radix = 16;
-		} else if (address.startsWith("0", index) && address.length() > 1 + index) {
+		} else if (address.startsWith("0", index) && address.length() > 1 + index) { //$NON-NLS-1$
 			index ++;
 			radix = 8;
 		}
@@ -67,7 +67,7 @@ public class ProtocolUtil {
 			address = address.substring(index);
 		}
 		if (negative) {
-			address = "-" + address;
+			address = "-" + address; //$NON-NLS-1$
 		}
 		try {
 			return new BigInteger(address, radix);
@@ -144,12 +144,12 @@ public class ProtocolUtil {
 		
 		if (str == null) {
 			len = 0;
-			str = "";
+			str = ""; //$NON-NLS-1$
 		} else {
 			len = str.length();
 		}
 		
-		return encodeIntVal(len, ProxyPacket.PACKET_ARG_LEN_SIZE) + ":" + str;		
+		return encodeIntVal(len, ProxyPacket.PACKET_ARG_LEN_SIZE) + ":" + str; //$NON-NLS-1$	
 	}	
 
 }

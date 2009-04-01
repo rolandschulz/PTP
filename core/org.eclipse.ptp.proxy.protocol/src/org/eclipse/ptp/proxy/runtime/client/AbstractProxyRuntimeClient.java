@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.proxy.client.AbstractProxyClient;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.event.IProxyConnectedEvent;
@@ -38,6 +39,7 @@ import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
+import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand;
@@ -77,18 +79,18 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		implements IProxyRuntimeClient, IProxyEventListener {
 
 	private class StateMachineThread implements Runnable {
-		private static final String name = "State Machine Thread";
+		private static final String name = "State Machine Thread"; //$NON-NLS-1$
 
 		public void run() {
 			try {
 				runStateMachine();
 			} catch (IllegalStateException e) {
-				System.out.println("Illegal state detected: " + e.getMessage());
+				System.out.println("Illegal state detected: " + e.getMessage()); //$NON-NLS-1$
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (logEvents) {
-				System.out.println("state machine thread exited");
+				System.out.println("state machine thread exited"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -107,7 +109,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * Actual name of the proxy - used for debugging messages
 	 */
-	private String proxyName = "";
+	private String proxyName = ""; //$NON-NLS-1$
 	/*
 	 * Main state machine variable
 	 */
@@ -302,7 +304,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	public void shutdown() throws IOException {
 		if (state != ProxyState.SHUTDOWN) {
 			if (logEvents) {
-				System.out.println(toString() + ": shutting down server...");
+				System.out.println(toString() + ": shutting down server..."); //$NON-NLS-1$
 			}
 			state = ProxyState.SHUTDOWN;
 		}
@@ -315,7 +317,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	public void startEvents() throws IOException {
 		if (state != ProxyState.RUNNING) {
-			throw new IOException("Not accepting commands");
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
 		}
 		IProxyCommand command = cmdFactory.newProxyRuntimeStartEventsCommand();
 		addCommand(command);
@@ -344,7 +346,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	public void stopEvents() throws IOException {
 		if (state != ProxyState.RUNNING) {
-			throw new IOException("Not accepting commands");
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
 		}
 		IProxyCommand command = cmdFactory.newProxyRuntimeStopEventsCommand();
 		addCommand(command);
@@ -358,7 +360,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	public void submitJob(String[] args) throws IOException {
 		if (state != ProxyState.RUNNING) {
-			throw new IOException("Not accepting commands");
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
 		}
 		IProxyCommand command = cmdFactory
 				.newProxyRuntimeSubmitJobCommand(args);
@@ -373,7 +375,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	public void terminateJob(String jobId) throws IOException {
 		if (state != ProxyState.RUNNING) {
-			throw new IOException("Not accepting commands");
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
 		}
 		IProxyCommand command = cmdFactory
 				.newProxyRuntimeTerminateJobCommand(jobId);
@@ -387,7 +389,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return proxyName + "ProxyRuntimeClient";
+		return proxyName + "ProxyRuntimeClient"; //$NON-NLS-1$
 	}
 
 	/**
@@ -417,7 +419,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	private void processRunningEvent(IProxyCommand command, IProxyEvent event) {
 		if (logEvents) {
-			System.out.println(toString() + " received event " + event);
+			System.out.println(toString() + " received event " + event); //$NON-NLS-1$
 		}
 		if (event instanceof IProxyMessageEvent) {
 			fireProxyRuntimeMessageEvent(eventFactory
@@ -844,17 +846,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				} else if (event instanceof IProxyTimeoutEvent) {
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
-							.newProxyRuntimeStartupErrorEvent("Proxy connection timeout out"));
+							.newProxyRuntimeStartupErrorEvent(Messages.AbstractProxyRuntimeClient_1));
 				} else if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
-							.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+							.newProxyRuntimeStartupErrorEvent(Messages.AbstractProxyRuntimeClient_2));
 				} else {
 					state = ProxyState.ERROR;
 					fireProxyRuntimeErrorStateEvent(eventFactory
 							.newProxyRuntimeErrorStateEvent());
-					throw new IllegalStateException("Received "
-							+ event.toString() + " in STARTUP");
+					throw new IllegalStateException(
+							NLS.bind(Messages.AbstractProxyRuntimeClient_3, event.toString()));
 				}
 				break;
 
@@ -869,7 +871,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
-							.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+							.newProxyRuntimeStartupErrorEvent(Messages.AbstractProxyRuntimeClient_2));
 				} else if (event instanceof IProxyMessageEvent) {
 					fireProxyRuntimeMessageEvent(eventFactory
 							.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
@@ -893,15 +895,14 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException(
-									"Could not find command for event [" 
-										+ event.toString() + "] in INIT");
+									NLS.bind(Messages.AbstractProxyRuntimeClient_4, event.toString()));
 						}
 					} else {
 						state = ProxyState.ERROR;
 						fireProxyRuntimeErrorStateEvent(eventFactory
 								.newProxyRuntimeErrorStateEvent());
-						throw new IllegalStateException("Received "
-								+ event.toString() + " in INIT");
+						throw new IllegalStateException(
+								NLS.bind(Messages.AbstractProxyRuntimeClient_5, event.toString()));
 					}
 				}
 				break;
@@ -919,7 +920,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(eventFactory
-							.newProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+							.newProxyRuntimeStartupErrorEvent(Messages.AbstractProxyRuntimeClient_2));
 				} else if (event instanceof IProxyMessageEvent) {
 					fireProxyRuntimeMessageEvent(eventFactory
 							.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
@@ -945,15 +946,14 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
 							throw new IllegalStateException(
-									"Could not find command for event [" 
-										+ event.toString() + "] in MODEL_DEF");
+									NLS.bind(Messages.AbstractProxyRuntimeClient_6, event.toString())); 
 						}
 					} else {
 						state = ProxyState.ERROR;
 						fireProxyRuntimeErrorStateEvent(eventFactory
 								.newProxyRuntimeErrorStateEvent());
-						throw new IllegalStateException("Received "
-								+ event.toString() + " in MODEL_DEF");
+						throw new IllegalStateException(
+								NLS.bind(Messages.AbstractProxyRuntimeClient_7, event.toString()));
 					}
 				}
 				break;
@@ -971,7 +971,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeMessageEvent(eventFactory
 							.newProxyRuntimeMessageEvent(Level.FATAL,
-									"Proxy disconnected"));
+									Messages.AbstractProxyRuntimeClient_2));
 				} else {
 					command = getCommandForEvent(event);
 					if (command != null) {
@@ -979,8 +979,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					} else {
 						state = ProxyState.ERROR;
 						throw new IllegalStateException(
-								"Could not find command for event [" 
-									+ event.toString() + "] in RUNNING");
+								NLS.bind(Messages.AbstractProxyRuntimeClient_8, event.toString())); 
 					}
 				}
 				break;
@@ -1008,8 +1007,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				break;
 
 			default:
-				throw new IllegalStateException("Unknown state: "
-						+ state.toString());
+				throw new IllegalStateException(
+						NLS.bind(Messages.AbstractProxyRuntimeClient_9, state.toString()));
 			}
 		}
 	}

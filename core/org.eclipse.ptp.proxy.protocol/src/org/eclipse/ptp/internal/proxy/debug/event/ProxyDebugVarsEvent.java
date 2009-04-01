@@ -35,15 +35,15 @@ public class ProxyDebugVarsEvent extends AbstractProxyDebugEvent implements IPro
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_VARS transid=" + getTransactionID() + " " + this.getBitSet().toString() + " {";
+		String res = "EVENT_DBG_VARS transid=" + getTransactionID() + " " + this.getBitSet().toString() + " {"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		for (int i = 0; i < vars.length; i++) {
 			if (i > 0)
-				res += ", ";
+				res += ", "; //$NON-NLS-1$
 			res += vars[i];
 		}
 		
-		res += "}";
+		res += "}"; //$NON-NLS-1$
 		return res;
 	}
 }

@@ -39,6 +39,6 @@ public class ProxyDebugMemoryInfoEvent extends AbstractProxyDebugEvent implement
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_DATA_READ_MEMORY transid=" + getTransactionID() + " " + this.getBitSet().toString();
+		return "EVENT_DBG_DATA_READ_MEMORY transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

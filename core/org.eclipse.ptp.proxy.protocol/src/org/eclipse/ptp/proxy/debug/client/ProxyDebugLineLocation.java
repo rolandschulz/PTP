@@ -37,6 +37,6 @@ public class ProxyDebugLineLocation {
 	}
 
 	public String toString() {
-		return file + ":" + ":" + line;	 
+		return file + ":" + ":" + line;	 //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

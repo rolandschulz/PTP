@@ -52,6 +52,7 @@ import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.proxy.event.IProxyShutdownEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
+import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.util.DebugOptions;
 
@@ -134,7 +135,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	public void sendCommand(IProxyCommand cmd) throws IOException {
 		if (!isReady()) {
-			throw new IOException("channel is not ready to send");
+			throw new IOException(Messages.AbstractProxyClient_0);
 		}
 		ProxyPacket packet = new ProxyPacket(cmd);
 		packet.send(sessOutput);
@@ -166,12 +167,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	public void sessionCreate(int port, int timeout) throws IOException {
 		if (DebugOptions.CLIENT_TRACING) {
-			System.out.println("sessionCreate("+port+","+timeout+")");
+			System.out.println("sessionCreate("+port+","+timeout+")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		sessSvrSock = ServerSocketChannel.open();
 		InetSocketAddress isa = new InetSocketAddress(port);
 		if (DebugOptions.CLIENT_TRACING) {
-			System.out.println("bind("+isa.toString()+")");
+			System.out.println("bind("+isa.toString()+")"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		sessSvrSock.socket().bind(isa);
 		if (timeout > 0)
@@ -183,15 +184,15 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		
 		if (DebugOptions.CLIENT_TRACING) {
-			System.out.println("port=" + sessPort);
+			System.out.println("port=" + sessPort); //$NON-NLS-1$
 		}
 		
-		acceptThread = new Thread("Proxy Client Accept Thread") {
+		acceptThread = new Thread("Proxy Client Accept Thread") { //$NON-NLS-1$
 			public void run() {
 				boolean error = false;
 				try {
 					if (DebugOptions.CLIENT_TRACING) {
-						System.out.println("accept thread starting...");
+						System.out.println("accept thread starting..."); //$NON-NLS-1$
 					}
 					sessSock = sessSvrSock.accept();
 					sessInput = sessSock;
@@ -201,22 +202,22 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {
 					error = true;
-					fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, "Accept cancelled by user"));
+					fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, Messages.AbstractProxyClient_1));
 				} catch (IOException e) {
 					error = true;
-					fireProxyMessageEvent(new ProxyMessageEvent(Level.FATAL, "IOException in accept"));
+					fireProxyMessageEvent(new ProxyMessageEvent(Level.FATAL, Messages.AbstractProxyClient_2));
 				} finally {		
 					try {
 						sessSvrSock.close();
 					} catch (IOException e) {
 						if (DebugOptions.CLIENT_TRACING) {
-							System.out.println("IO Exception trying to close server socket (non fatal)");
+							System.out.println("IO Exception trying to close server socket (non fatal)"); //$NON-NLS-1$
 						}
 					}
 					synchronized (state) {
 						if (isInterrupted()) {
 							error = true;
-							fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, "Connection cancelled by user"));
+							fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, Messages.AbstractProxyClient_3));
 						}
 						if (!error && state == SessionState.WAITING) {
 							state = SessionState.CONNECTED;
@@ -226,7 +227,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						}
 					}
 					if (DebugOptions.CLIENT_TRACING) {
-						System.out.println("accept thread exiting...");
+						System.out.println("accept thread exiting..."); //$NON-NLS-1$
 					}
 				}
 			}
@@ -244,7 +245,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	public void sessionCreate(OutputStream output, InputStream input) {
 		if (DebugOptions.CLIENT_TRACING) {
-			System.out.println("sessionCreate(stdin, stdout)");
+			System.out.println("sessionCreate(stdin, stdout)"); //$NON-NLS-1$
 		}
 		sessInput = Channels.newChannel(input);
 		sessOutput = Channels.newChannel(output);
@@ -305,13 +306,13 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @throws IOException	if the session is not connected or the event thread fails to start
 	 */
 	public void sessionHandleEvents() throws IOException {
-		eventThread = new Thread("Proxy Client Event Thread") {
+		eventThread = new Thread("Proxy Client Event Thread") { //$NON-NLS-1$
 			public void run() {
 				boolean error = false;
 				int errorCount = 0;			
 				
 				if (DebugOptions.CLIENT_TRACING) {
-					System.out.println("event thread starting...");
+					System.out.println("event thread starting..."); //$NON-NLS-1$
 				}
 				try {
 					while (errorCount < MAX_ERRORS && !isInterrupted()) {
@@ -329,7 +330,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						if (!isInterrupted() && state != SessionState.SHUTTING_DOWN) {
 							error = true;
 							if (DebugOptions.CLIENT_TRACING) {
-								System.out.println("event thread IOException . . . " + e.getMessage());
+								System.out.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
 							}
 						}
 					}
@@ -351,14 +352,14 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				fireProxyDisconnectedEvent(new ProxyDisconnectedEvent(error));
 				
 				if (DebugOptions.CLIENT_TRACING) {
-					System.out.println("event thread exited");
+					System.out.println("event thread exited"); //$NON-NLS-1$
 				}
 			}
 		};
 
 		synchronized (state) {
 			if (state != SessionState.CONNECTED) {
-				throw new IOException("Not ready to receive events");
+				throw new IOException(Messages.AbstractProxyClient_4);
 			}
 			state = SessionState.RUNNING;
 		}

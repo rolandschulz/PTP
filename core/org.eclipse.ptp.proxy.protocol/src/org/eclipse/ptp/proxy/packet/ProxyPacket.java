@@ -22,6 +22,7 @@ import java.nio.charset.CharsetEncoder;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
 public class ProxyPacket {
@@ -38,7 +39,7 @@ public class ProxyPacket {
 	private int packetTransID;
 	private String[] packetArgs;
 
-	private Charset			charset = Charset.forName("US-ASCII");
+	private Charset			charset = Charset.forName("US-ASCII"); //$NON-NLS-1$
 	private CharsetEncoder	encoder = charset.newEncoder();
 	private CharsetDecoder	decoder = charset.newDecoder();
 
@@ -151,7 +152,7 @@ public class ProxyPacket {
 		CharBuffer len_str = decoder.decode(lengthBytes);
 		
 		if (debug) {
-			System.out.print("RECEIVE:[" + len_str);
+			System.out.print("RECEIVE:[" + len_str); //$NON-NLS-1$
 		}
 	
 		int len;
@@ -159,11 +160,11 @@ public class ProxyPacket {
 			len = Integer.parseInt(len_str.subSequence(0, PACKET_LENGTH_SIZE).toString(), 16);
 		} catch (NumberFormatException e) {
 			if (debug) {
-				System.out.println("] BAD PACKET LENGTH");
+				System.out.println("] BAD PACKET LENGTH"); //$NON-NLS-1$
 			} else {
-				System.out.println("BAD PACKET LENGTH: \"" + len_str + "\"");
+				System.out.println("BAD PACKET LENGTH: \"" + len_str + "\""); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			throw new IOException("Bad packet length format");
+			throw new IOException(Messages.ProxyPacket_0);
 		}
 		
 		/*
@@ -174,7 +175,7 @@ public class ProxyPacket {
 		CharBuffer packetBuf = decoder.decode(packetBytes);
 		
 		if (debug) {
-			System.out.println(packetBuf + "]");
+			System.out.println(packetBuf + "]"); //$NON-NLS-1$
 		}
 
 		/*
@@ -206,8 +207,8 @@ public class ProxyPacket {
 				argPos += packetArgs[i].length() + PACKET_ARG_LEN_SIZE + 2;
 			}
 		} catch (NumberFormatException e) {
-			System.out.println("BAD PACKET FORMAT: \"" + packetBuf + "\"");
-			throw new IOException("Bad packet format");
+			System.out.println("BAD PACKET FORMAT: \"" + packetBuf + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IOException(Messages.ProxyPacket_1);
 		} catch (IndexOutOfBoundsException e1) {
 			return false;
 		}
@@ -217,21 +218,21 @@ public class ProxyPacket {
 	
 	public void send(WritableByteChannel channel) throws IOException {
 		String body = ProtocolUtil.encodeIntVal(packetID, PACKET_ID_SIZE) 
-			+ ":" + ProtocolUtil.encodeIntVal(packetTransID, PACKET_TRANS_ID_SIZE)
-			+ ":" + ProtocolUtil.encodeIntVal(packetArgs.length, PACKET_ARG_LEN_SIZE);
+			+ ":" + ProtocolUtil.encodeIntVal(packetTransID, PACKET_TRANS_ID_SIZE) //$NON-NLS-1$
+			+ ":" + ProtocolUtil.encodeIntVal(packetArgs.length, PACKET_ARG_LEN_SIZE); //$NON-NLS-1$
 
 		for (String arg : packetArgs) {
-			body += " " + ProtocolUtil.encodeString(arg);
+			body += " " + ProtocolUtil.encodeString(arg); //$NON-NLS-1$
 		}
 
 		/*
 		 * Note: command length includes the first space!
 		 */
 		String packet = ProtocolUtil.encodeIntVal(body.length() + 1, 
-				PACKET_LENGTH_SIZE) + " " + body;
+				PACKET_LENGTH_SIZE) + " " + body; //$NON-NLS-1$
 		
 		if (debug) {
-			System.out.println("SEND:[" + packet + "]");
+			System.out.println("SEND:[" + packet + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		fullWrite(channel, encoder.encode(CharBuffer.wrap(packet)));
@@ -260,7 +261,7 @@ public class ProxyPacket {
 		while (buf.hasRemaining()) {
 			int n = channel.read(buf);
 			if (n < 0) {
-				throw new IOException("EOF from proxy");
+				throw new IOException(Messages.ProxyPacket_2);
 			}
 		}
 		buf.flip();
@@ -279,7 +280,7 @@ public class ProxyPacket {
 		while (buf.hasRemaining()) {
 			int n = channel.write(buf);
 			if (n < 0) {
-				throw new IOException("EOF from proxy");
+				throw new IOException(Messages.ProxyPacket_3);
 			}
 		}
 	}

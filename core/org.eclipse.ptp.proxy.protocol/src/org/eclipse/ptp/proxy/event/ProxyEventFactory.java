@@ -52,8 +52,8 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 	
 	public static IProxyErrorEvent newErrorEvent(int transID, int code, String message) {
 		String[] args = new String[] {
-				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code, 
-				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message
+				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code,  //$NON-NLS-1$
+				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message //$NON-NLS-1$
 		};
 		
 		return new ProxyErrorEvent(transID, args);

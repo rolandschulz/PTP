@@ -43,6 +43,6 @@ public class ProxyDebugErrorEvent extends AbstractProxyDebugEvent implements IPr
 	}
 
 	public String toString() {
-		return "EVENT_DBG_ERROR transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.errorCode + " " + this.errorMsg;
+		return "EVENT_DBG_ERROR transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.errorCode + " " + this.errorMsg; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

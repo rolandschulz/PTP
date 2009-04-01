@@ -35,6 +35,6 @@ public class ProxyDebugStackInfoDepthEvent extends AbstractProxyDebugEvent imple
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_STACK_INFO_DEPTH transid=" + getTransactionID() + " " + this.getBitSet().toString();
+		return "EVENT_DBG_STACK_INFO_DEPTH transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

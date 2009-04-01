@@ -71,12 +71,12 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	 * calling sessionProgress(). 
 	 */
 	public void start() {
-		commandThread = new Thread("Proxy Server Command Thread") {
+		commandThread = new Thread("Proxy Server Command Thread") { //$NON-NLS-1$
 			public void run() {
 				boolean error = false;
 				int errorCount = 0;			
 				
-				System.out.println("server command thread starting...");
+				System.out.println("server command thread starting..."); //$NON-NLS-1$
 				try {
 					while (errorCount < MAX_ERRORS && !isInterrupted()) {
 						synchronized(state) {
@@ -92,7 +92,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 					synchronized(state) {
 						if (!isInterrupted() && state != ServerState.SHUTTING_DOWN) {
 							error = true;
-							System.out.println("event thread IOException . . . " + e.getMessage());
+							System.out.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
 						}
 					}
 				} 
@@ -110,11 +110,11 @@ public abstract class AbstractProxyServer implements IProxyServer {
 					state = ServerState.SHUTDOWN;
 				}
 
-				System.out.println("server thread exited");
+				System.out.println("server thread exited"); //$NON-NLS-1$
 				if (error) {
-					System.out.println(" due to errors");
+					System.out.println(" due to errors"); //$NON-NLS-1$
 				} else {
-					System.out.println(" normally");
+					System.out.println(" normally"); //$NON-NLS-1$
 				}
 			}
 		};

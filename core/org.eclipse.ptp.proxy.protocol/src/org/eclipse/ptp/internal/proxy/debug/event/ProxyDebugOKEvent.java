@@ -28,6 +28,6 @@ public class ProxyDebugOKEvent extends AbstractProxyDebugEvent implements IProxy
 	}
 
 	public String toString() {
-		return "EVENT_DBG_OK transid=" + getTransactionID() + " " + this.getBitSet().toString();
+		return "EVENT_DBG_OK transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

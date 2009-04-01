@@ -35,6 +35,6 @@ public class ProxyDebugExitEvent extends AbstractProxyDebugEvent implements IPro
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_EXIT transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.exitStatus;
+		return "EVENT_DBG_EXIT transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.exitStatus; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

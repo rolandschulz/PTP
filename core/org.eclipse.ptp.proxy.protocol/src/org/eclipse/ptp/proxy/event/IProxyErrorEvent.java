@@ -20,6 +20,6 @@
 package org.eclipse.ptp.proxy.event;
 
 public interface IProxyErrorEvent extends IProxyEvent {
-	public static final String ERROR_CODE_ATTR = "errorCode";
-	public static final String ERROR_MESSAGE_ATTR = "errorMsg";
+	public static final String ERROR_CODE_ATTR = "errorCode"; //$NON-NLS-1$
+	public static final String ERROR_MESSAGE_ATTR = "errorMsg"; //$NON-NLS-1$
 }

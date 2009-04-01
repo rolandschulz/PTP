@@ -21,8 +21,8 @@ public class ProxyRuntimeStartupErrorEvent
 
 	public ProxyRuntimeStartupErrorEvent(String message) {
 		super(STARTUP_ERROR, 0, new String[] {
-				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + 0,
-				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message
+				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + 0, //$NON-NLS-1$
+				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message //$NON-NLS-1$
 		});
 	}
 

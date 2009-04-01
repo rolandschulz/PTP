@@ -36,9 +36,9 @@ public class ProxyDebugStackframeEvent extends AbstractProxyDebugEvent implement
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_FRAMES transid=" + getTransactionID() + " " + this.getBitSet().toString();
+		String res = "EVENT_DBG_FRAMES transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		for (int i = 0; i < frames.length; i++) {
-			res += "\n " + frames[i].toString();	
+			res += "\n " + frames[i].toString(); //$NON-NLS-1$
 		}
 		return res;
 	}

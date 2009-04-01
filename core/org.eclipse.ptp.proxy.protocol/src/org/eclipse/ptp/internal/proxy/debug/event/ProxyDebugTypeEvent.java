@@ -35,6 +35,6 @@ public class ProxyDebugTypeEvent extends AbstractProxyDebugEvent implements IPro
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_TYPE transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.type;
+		return "EVENT_DBG_TYPE transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.type; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

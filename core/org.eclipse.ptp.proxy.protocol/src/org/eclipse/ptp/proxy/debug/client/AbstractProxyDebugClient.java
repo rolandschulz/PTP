@@ -116,7 +116,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		try {
 			if (state == DebugProxyState.CONNECTING || state == DebugProxyState.CONNECTED) {
 				state = DebugProxyState.DISCONNECTING;
-				System.out.println("calling session finish");
 				sessionFinish();
 				while (state == DebugProxyState.DISCONNECTING) {
 					waiting = true;
@@ -150,7 +149,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
 	 */
 	public void handleEvent(IProxyConnectedEvent e) {
-		System.out.println("debug: received connected event");
 		waitLock.lock();
 		try {
 			state = DebugProxyState.CONNECTED;
@@ -167,7 +165,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
 	 */
 	public void handleEvent(IProxyDisconnectedEvent e) {
-		System.out.println("debug: received disconnected event");
 		waitLock.lock();
 		try {
 			if (state == DebugProxyState.DISCONNECTING) {
@@ -186,14 +183,13 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyErrorEvent)
 	 */
 	public void handleEvent(IProxyErrorEvent e) {
-		System.out.println("debug: received error event");
+		// Do nothing
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyMessageEvent)
 	 */
 	public void handleEvent(IProxyMessageEvent e) {
-		System.out.println("debug: received message event");
 		waitLock.lock();
 		try {
 			if (state == DebugProxyState.DISCONNECTING) {
@@ -212,14 +208,13 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyOKEvent)
 	 */
 	public void handleEvent(IProxyOKEvent e) {
-		System.out.println("debug: received ok event");
+		// Do nothing
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
 	 */
 	public void handleEvent(IProxyTimeoutEvent e) {
-		System.out.println("debug: received timeout event");
 		waitLock.lock();
 		try {
 			timeout = true;
