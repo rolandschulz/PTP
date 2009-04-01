@@ -152,7 +152,9 @@ public interface IResourceManager extends IPElement,
 	 * Start up the resource manager. This could potentially take a long time (or forever),
 	 * particularly if the RM is located on a remote system.
 	 * 
-	 * @param monitor progress monitor to indicate startup progress
+	 * @param monitor the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+     *                to call done() on the given monitor. Accepts null, indicating that no progress should be
+     *                reported and that the operation cannot be cancelled.
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException;
 
