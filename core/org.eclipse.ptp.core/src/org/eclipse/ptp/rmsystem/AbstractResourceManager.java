@@ -34,7 +34,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
@@ -445,7 +445,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
-	public ResourceManagerAttributes.State getState() {
+	public synchronized ResourceManagerAttributes.State getState() {
 		EnumeratedAttribute<State> stateAttr = getStateAttribute();
 		return stateAttr.getValue();
 	}
@@ -535,27 +535,20 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#stop()
+	 * @see org.eclipse.ptp.rm.IResourceManager#shutdown()
 	 */
 	public void shutdown() throws CoreException {
-		IProgressMonitor monitor = null;
 		switch (getState()) {
 		case ERROR:
 			setState(ResourceManagerAttributes.State.STOPPED);
 			cleanUp();
 			break;
+		case STARTING:
 		case STARTED:
 			setState(ResourceManagerAttributes.State.STOPPING);
-			if (monitor == null) {
-				monitor = new NullProgressMonitor();
-			}
-			monitor.beginTask(Messages.AbstractResourceManager_0 + getName(), 10);
-			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
-				doShutdown(subMonitor);
+				doShutdown();
 			} finally {
-				monitor.done();
-				setState(ResourceManagerAttributes.State.STOPPED);
 				cleanUp();
 			}
 		}
@@ -564,7 +557,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#start()
+	 * @see org.eclipse.ptp.rm.IResourceManager#startUp(IProgressMonitor monitor)
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException {
 		if (getState() == ResourceManagerAttributes.State.STOPPED) {
@@ -575,17 +568,14 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			monitor.beginTask(Messages.AbstractResourceManager_1 + getName(), 10);
 			try {
 				initialize();
-				boolean started = doStartup(new SubProgressMonitor(monitor, 10));
-				if (started) {
-					setState(ResourceManagerAttributes.State.STARTED);
-				} else {
-					setState(ResourceManagerAttributes.State.STOPPED);
-				}
+				SubMonitor subMon = SubMonitor.convert(monitor);
+				doStartup(subMon.newChild(100));
 			} catch (CoreException e) {
 				setState(ResourceManagerAttributes.State.ERROR);
 				throw e;
-			} finally {
-				monitor.done();
+			}
+			if (monitor.isCanceled()) {
+				setState(ResourceManagerAttributes.State.STOPPED);
 			}
 		}
 	}
@@ -851,17 +841,15 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * 
 	 * @throws CoreException
 	 */
-	protected abstract void doShutdown(IProgressMonitor monitor) throws CoreException;
+	protected abstract void doShutdown() throws CoreException;
 
 	/**
-	 * Start the resource manager subsystem. Returns true if the system was
-	 * started successfully or false if startup was canceled by the user.
+	 * Start the resource manager subsystem. 
 	 * 
 	 * @param monitor
-	 * @return true if successful
 	 * @throws CoreException
 	 */
-	protected abstract boolean doStartup(IProgressMonitor monitor) throws CoreException;
+	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Submit a job with the supplied submission ID.Returns a job that represents the submitted job, or null if
@@ -1177,7 +1165,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/**
 	 * @param state
 	 */
-	protected void setState(ResourceManagerAttributes.State state) {
+	protected synchronized void setState(ResourceManagerAttributes.State state) {
 		EnumeratedAttribute<State> stateAttr = getStateAttribute();
 		if (stateAttr.getValue() != state) {
 			stateAttr.setValue(state);
