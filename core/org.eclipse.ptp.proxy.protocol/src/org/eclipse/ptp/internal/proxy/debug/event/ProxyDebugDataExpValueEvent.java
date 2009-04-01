@@ -37,6 +37,6 @@ public class ProxyDebugDataExpValueEvent extends AbstractProxyDebugEvent impleme
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_DATA_EVA_EX transid=" + getTransactionID() + " " + this.getBitSet().toString() + " - value: " + this.value;
+		return "EVENT_DBG_DATA_EVA_EX transid=" + getTransactionID() + " " + this.getBitSet().toString() + " - value: " + this.value; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

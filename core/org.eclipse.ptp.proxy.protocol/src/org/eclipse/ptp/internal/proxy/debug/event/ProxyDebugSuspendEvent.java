@@ -28,6 +28,6 @@ public class ProxyDebugSuspendEvent extends AbstractProxyDebugSuspendEvent imple
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_SUSPEND transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getFrame().toString();
+		return "EVENT_DBG_SUSPEND transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getFrame().toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

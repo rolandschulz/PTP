@@ -36,9 +36,9 @@ public class ProxyRuntimeMessageEvent extends AbstractProxyEvent
 
 	public ProxyRuntimeMessageEvent(Level level, int code, String message) {
 		super(MESSAGE, 0, new String[] {
-			IProxyMessageEvent.LEVEL_ATTR + "=" + level.name(),
-			IProxyMessageEvent.CODE_ATTR + "=" + code,
-			IProxyMessageEvent.TEXT_ATTR + "=" + message
+			IProxyMessageEvent.LEVEL_ATTR + "=" + level.name(), //$NON-NLS-1$
+			IProxyMessageEvent.CODE_ATTR + "=" + code, //$NON-NLS-1$
+			IProxyMessageEvent.TEXT_ATTR + "=" + message //$NON-NLS-1$
 		});
 	}
 	

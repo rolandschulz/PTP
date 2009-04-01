@@ -38,6 +38,6 @@ public class ProxyDebugStackFrame {
 	}
 	
 	public String toString() {
-		return getLevel() + " " + loc.toString();	 
+		return getLevel() + " " + loc.toString(); //$NON-NLS-1$
 	}
 }

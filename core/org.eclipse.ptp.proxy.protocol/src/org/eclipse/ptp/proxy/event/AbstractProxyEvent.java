@@ -47,15 +47,15 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 	}
 
 	public String toString() {
-		String str = eventID + " transid=" + getTransactionID();
+		String str = eventID + " transid=" + getTransactionID(); //$NON-NLS-1$
 		if (attributes != null) {
-			str += " (";
+			str += " ("; //$NON-NLS-1$
 			for (int i = 0 ; i < attributes.length; i++) {
 				if (i > 0)
-					str += ",";
+					str += ","; //$NON-NLS-1$
 				str += attributes[i];
 			}
-			str += ")";
+			str += ")"; //$NON-NLS-1$
 		}
 		return str;
 	}

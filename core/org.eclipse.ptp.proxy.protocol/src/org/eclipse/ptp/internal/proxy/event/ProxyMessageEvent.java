@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.proxy.event;
 
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
-import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 
 
 public class ProxyMessageEvent extends AbstractProxyEvent implements IProxyMessageEvent {
@@ -33,8 +32,8 @@ public class ProxyMessageEvent extends AbstractProxyEvent implements IProxyMessa
 
 	public ProxyMessageEvent(Level level, String message) {
 		super(MESSAGE, 0, new String[] {
-			LEVEL_ATTR + "=" + level.name(),
-			TEXT_ATTR + "=" + message
+			LEVEL_ATTR + "=" + level.name(), //$NON-NLS-1$
+			TEXT_ATTR + "=" + message //$NON-NLS-1$
 		});
 	}
 }

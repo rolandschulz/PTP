@@ -26,7 +26,7 @@ import org.eclipse.ptp.proxy.event.IProxyEventListener;
 
 public interface IProxyClient {
 	/* wire protocol version */
-	public static final String WIRE_PROTOCOL_VERSION = "2.0";
+	public static final String WIRE_PROTOCOL_VERSION = "2.0"; //$NON-NLS-1$
 	public static final int MAX_ERRORS = 5;
 	
 	/**

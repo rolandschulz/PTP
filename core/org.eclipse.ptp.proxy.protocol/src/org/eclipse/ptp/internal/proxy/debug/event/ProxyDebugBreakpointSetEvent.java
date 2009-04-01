@@ -42,6 +42,6 @@ public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implem
 	}
 
 	public String toString() {
-		return "EVENT_DBG_BPSET transid=" + getTransactionID() + " " + this.getBitSet().toString();
+		return "EVENT_DBG_BPSET transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

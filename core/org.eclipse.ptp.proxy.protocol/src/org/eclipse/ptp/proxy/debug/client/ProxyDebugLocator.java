@@ -53,6 +53,6 @@ public class ProxyDebugLocator {
 	}
 	
 	public String toString() {
-		return file + ":" + function + ":" + line + ":" + address.toString();	 
+		return file + ":" + function + ":" + line + ":" + address.toString();	 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

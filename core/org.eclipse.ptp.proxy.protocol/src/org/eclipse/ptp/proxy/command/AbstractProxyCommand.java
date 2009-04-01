@@ -41,7 +41,7 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	 */
 	public void addArgument(String arg) {
 		if (arg == null) {
-			args.add("");
+			args.add(""); //$NON-NLS-1$
 		} else {
 			args.add(arg);
 		}
@@ -77,15 +77,15 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	}
 
 	public String toString() {
-		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID();
+		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID(); //$NON-NLS-1$
 		
 		for (String arg : args) {
 			if (arg == null) {
-				str += " <null>";
-			} else if (arg.equals("")) {
-				str += " \"\"";
+				str += " <null>"; //$NON-NLS-1$
+			} else if (arg.equals("")) { //$NON-NLS-1$
+				str += " \"\""; //$NON-NLS-1$
 			} else {
-				str += " " + arg;
+				str += " " + arg; //$NON-NLS-1$
 			}
 		}
 		return str;
@@ -114,14 +114,14 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	 * @param arg
 	 */
 	protected void addArgument(boolean arg) {
-		addArgument(arg?"1":"0");
+		addArgument(arg?"1":"0"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
 	 * @param arg
 	 */
 	protected void addArgument(Character arg) {
-		args.add(arg==null ? "" : arg.toString());
+		args.add(arg==null ? "" : arg.toString()); //$NON-NLS-1$
 	}
 
 	/**

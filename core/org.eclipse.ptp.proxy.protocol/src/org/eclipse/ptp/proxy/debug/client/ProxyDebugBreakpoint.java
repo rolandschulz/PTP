@@ -55,7 +55,7 @@ public class ProxyDebugBreakpoint {
 	}
 	
 	public String toString() {
-		return getIgnore() + " " + getSpec() + " " + 
-			getDel() + " " + getType() + " " + getLocation().toString();	
+		return getIgnore() + " " + getSpec() + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+			getDel() + " " + getType() + " " + getLocation().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

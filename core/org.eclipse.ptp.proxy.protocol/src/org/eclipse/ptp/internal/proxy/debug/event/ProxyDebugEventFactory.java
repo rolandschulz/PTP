@@ -123,7 +123,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				int sigDep = Integer.parseInt(args[13]);
 				ProxyDebugStackFrame sigFrame = null;
 				
-				if (!(args[7].compareTo("*") == 0)) {
+				if (!(args[7].compareTo("*") == 0)) { //$NON-NLS-1$
 					sigFrame = toFrame(args[7], args[8], args[9], args[11], args[10]);
 				}
 	
@@ -396,7 +396,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 	}
 	
 	public static BigInteger decodeAddr(String str) {
-		String[] parts = str.split(":");
+		String[] parts = str.split(":"); //$NON-NLS-1$
 		int len = Integer.parseInt(parts[0], 16) - 1; // Skip trailing NULL
 		byte[] strBytes = new byte[len];
 		

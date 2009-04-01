@@ -19,3 +19,4 @@ Export-Package: org.eclipse.ptp.proxy.client;uses:="org.eclipse.ptp.proxy.event,
  org.eclipse.ptp.proxy.util
 Eclipse-LazyStart: true
 Bundle-Vendor: %pluginProvider
+Import-Package: org.eclipse.osgi.util

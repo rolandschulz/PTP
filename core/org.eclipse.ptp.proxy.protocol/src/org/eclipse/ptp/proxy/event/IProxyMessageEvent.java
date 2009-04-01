@@ -29,7 +29,7 @@ public interface IProxyMessageEvent extends IProxyEvent {
 		UNDEFINED
 	};
 	
-	public static final String LEVEL_ATTR = "messageLevel";
-	public static final String CODE_ATTR = "messageCode";
-	public static final String TEXT_ATTR = "messageText";
+	public static final String LEVEL_ATTR = "messageLevel"; //$NON-NLS-1$
+	public static final String CODE_ATTR = "messageCode"; //$NON-NLS-1$
+	public static final String TEXT_ATTR = "messageText"; //$NON-NLS-1$
 }

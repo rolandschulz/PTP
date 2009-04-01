@@ -34,12 +34,7 @@ public class ProxyDebugSignalsEvent extends AbstractProxyDebugEvent implements I
 		return signals;
 	}
 	public String toString() {
-		String res = "EVENT_DBG_SIGNALS transid=" + getTransactionID() + " " + this.getBitSet().toString();
-		/*
-		for (int i = 0; i<signals.length; i++) {
-			res += "\n " + signals[i].toString();
-		}
-		*/
+		String res = "EVENT_DBG_SIGNALS transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		return res;
 	}
 }

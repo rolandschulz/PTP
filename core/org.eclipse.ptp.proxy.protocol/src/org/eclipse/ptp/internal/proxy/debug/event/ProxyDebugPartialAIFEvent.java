@@ -40,13 +40,13 @@ public class ProxyDebugPartialAIFEvent extends AbstractProxyDebugEvent implement
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_PARTIAL_AIF transid=" + getTransactionID() + " " + this.getBitSet().toString();
+		String res = "EVENT_DBG_PARTIAL_AIF transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.data != null)
-			res += " " + this.data.toString();
+			res += " " + this.data.toString(); //$NON-NLS-1$
 		else
-			res += " AIFNULL";
+			res += " AIFNULL"; //$NON-NLS-1$
 		
-		res += ", name: " + name;
+		res += ", name: " + name; //$NON-NLS-1$
 		return res;
 	}
 }

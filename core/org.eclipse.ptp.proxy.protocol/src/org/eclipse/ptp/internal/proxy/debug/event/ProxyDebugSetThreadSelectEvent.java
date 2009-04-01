@@ -41,8 +41,8 @@ public class ProxyDebugSetThreadSelectEvent extends AbstractProxyDebugEvent impl
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_THREAD_SELECT transid=" + getTransactionID() + " " + this.getBitSet().toString();
-		res += "\n id: " + frame.toString();
+		String res = "EVENT_DBG_THREAD_SELECT transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
+		res += "\n id: " + frame.toString(); //$NON-NLS-1$
 		return res;
 	}
 }

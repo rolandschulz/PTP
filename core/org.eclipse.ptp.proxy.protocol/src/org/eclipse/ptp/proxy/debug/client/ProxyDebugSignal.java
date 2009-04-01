@@ -53,7 +53,7 @@ public class ProxyDebugSignal {
 		return desc;
 	}
 	public String toString() {
-		return getName() + " " + isStop() + " " + 
-			isPrint() + " " + isPass() + " " + getDescription();	
+		return getName() + " " + isStop() + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+			isPrint() + " " + isPass() + " " + getDescription(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

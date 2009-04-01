@@ -42,9 +42,9 @@ public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implem
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName;
+		String res = "EVENT_DBG_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.getFrame() != null)
-			res += " " + getFrame().toString();
+			res += " " + getFrame().toString(); //$NON-NLS-1$
 		return res;
 	}
 }

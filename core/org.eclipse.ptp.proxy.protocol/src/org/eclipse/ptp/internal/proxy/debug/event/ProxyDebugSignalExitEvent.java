@@ -40,6 +40,6 @@ public class ProxyDebugSignalExitEvent extends AbstractProxyDebugEvent implement
 	}
 
 	public String toString() {
-		return "EVENT_DBG_EXIT_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName + " " + this.signalMeaning;
+		return "EVENT_DBG_EXIT_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName + " " + this.signalMeaning; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }
