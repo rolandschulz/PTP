@@ -76,7 +76,8 @@ extends AbstractResourceManagerSelectionActionDelegate {
 	@Override
 	protected boolean isEnabledFor(IResourceManager rmManager) {
 		ResourceManagerAttributes.State state = rmManager.getState();
-		if (state == ResourceManagerAttributes.State.STARTED ||
+		if (state == ResourceManagerAttributes.State.STARTING ||
+				state == ResourceManagerAttributes.State.STARTED ||
 				state == ResourceManagerAttributes.State.ERROR) {
 			return true;
 		}
