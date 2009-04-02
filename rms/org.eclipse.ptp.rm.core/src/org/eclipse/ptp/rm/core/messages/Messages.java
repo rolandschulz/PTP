@@ -14,8 +14,12 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.core.messages.messages"; //$NON-NLS-1$
+	
 	public static String AbstractRemoteCommandJob_Exception_CommandFailed;
 	public static String AbstractRemoteCommandJob_Exception_InternalError;
+	public static String AbstractToolRuntimeSystem_0;
+	public static String AbstractToolRuntimeSystem_1;
+	public static String AbstractToolRuntimeSystem_2;
 	public static String AbstractToolRuntimeSystem_Exception_NoConnection;
 	public static String AbstractToolRuntimeSystem_Exception_NoRemoteServices;
 	public static String AbstractToolRuntimeSystem_Exception_ResourceManagerNotInitialized;

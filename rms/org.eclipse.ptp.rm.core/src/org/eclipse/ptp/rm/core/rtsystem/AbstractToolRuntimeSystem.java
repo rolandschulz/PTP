@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -115,10 +116,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/** Remote Service used to run commands on the remote host. */
 	protected IRemoteServices remoteServices = null;
 
-	/** Track if events are enabled. */
-	private boolean eventsEnabled = false;
-
-
 	protected IRemoteConnection connection = null;
 
 	private Thread jobQueueThread = null;
@@ -128,23 +125,23 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	/** Job to monitor remote system and is executed continuously. */
 	private Job continousMonitorJob;
-
+	
+	/** Progress monitor for startup. Used to cancel startup if necessary */
+	private IProgressMonitor startupMonitor = null;
+	
 	/** Jobs created by this RTS. */
-	Map<String, Job> jobs = Collections.synchronizedMap(new HashMap<String, Job>());
+	private Map<String, Job> jobs = Collections.synchronizedMap(new HashMap<String, Job>());
 
 	/** Jobs created, but not yet started. */
-	LinkedBlockingQueue<Job> pendingJobQueue = new LinkedBlockingQueue<Job>();
-
-	/** Jobs created and started. */
-	//	ConcurrentLinkedQueue<IToolRuntimeSystemJob> runningJobQueue = new ConcurrentLinkedQueue<IToolRuntimeSystemJob>();
+	protected LinkedBlockingQueue<Job> pendingJobQueue = new LinkedBlockingQueue<Job>();
 
 	/** Helper object to create events for the RM. */
 	private IRuntimeEventFactory eventFactory = new RuntimeEventFactory();
 
 	public AbstractToolRuntimeSystem(Integer id, AbstractToolRMConfiguration config, AttributeDefinitionManager manager) {
 		this.rmID = id.toString();
-		this.nextID = id + 1;
-		this.jobNumber = 0;
+		this.nextID = new Integer(id.intValue() + 1);
+		this.jobNumber = new Integer(0);
 		this.rmConfiguration = config;
 		this.attrMgr = manager;
 	}
@@ -155,56 +152,78 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
+		SubMonitor subMon;
+		
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		
+		synchronized (this) {
+			startupMonitor = monitor;
+		}
+		
+		monitor.beginTask(Messages.AbstractToolRuntimeSystem_0, 90);
+		monitor.subTask(Messages.AbstractToolRuntimeSystem_1);
+		
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: startup", rmConfiguration.getName()); //$NON-NLS-1$
-		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
-		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoRemoteServices));
-		}
-		IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
-		Assert.isNotNull(connectionManager);
-
-		connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
-		if (connection == null) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoConnection));
-		}
-
-		if (!connection.isOpen()) {
-			try {
-				connection.open(monitor);
-			} catch (RemoteConnectionException e) {
-				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, e.getMessage()));
-			}
-		}
-
-		if (monitor.isCanceled()) {
-			connection.close();
-			connection = null;
-			return;
-		}
-
+		
 		try {
-			doStartup(monitor);
-		} catch (CoreException e) {
-			connection.close();
-			connection = null;
-			throw e;
-		}
-
-		if (!monitor.isCanceled()) {
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
+			if (remoteServices == null) {
+				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoRemoteServices));
+			}
+			IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
+			Assert.isNotNull(connectionManager);
+			
+			monitor.worked(10);
+			monitor.subTask(Messages.AbstractToolRuntimeSystem_2);
+			subMon = SubMonitor.convert(monitor);
+	
+			connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
+			if (connection == null) {
+				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoConnection));
+			}
+	
+			if (!connection.isOpen()) {
+				try {
+					connection.open(subMon.newChild(50));
+				} catch (RemoteConnectionException e) {
+					throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, e.getMessage()));
+				}
+			}
+	
+			if (monitor.isCanceled()) {
+				connection.close();
+				return;
+			}
+	
+			try {
+				doStartup(subMon.newChild(40));
+			} catch (CoreException e) {
+				connection.close();
+				throw e;
+			}
+	
+			if (monitor.isCanceled()) {
+				connection.close();
+				return;
+			}
+			
 			Job discoverJob = createDiscoverJob();
 			if (discoverJob != null) {
 				discoverJob.schedule();
 			}
-
+	
 			if (jobQueueThread == null) {
 				jobQueueThread = new Thread(new JobRunner(), Messages.AbstractToolRuntimeSystem_JobQueueManagerThreadTitle);
 				jobQueueThread.start();
 			}
 			
 			fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
-		} else {
-			connection.close();
-			connection = null;
+		} finally {
+			synchronized (this) {
+				startupMonitor = null;
+			}
 		}
 	}
 
@@ -221,6 +240,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	public void shutdown() throws CoreException {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: shutdown", rmConfiguration.getName()); //$NON-NLS-1$
+		
 		doShutdown();
 
 		stopEvents();
@@ -229,9 +249,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		 * Stop jobs that might be in the pending queue.
 		 * Also stop the thread that dispatches pending jobs.
 		 */
-		jobQueueThread.interrupt();
-		for (Job job : pendingJobQueue) {
-			job.cancel();
+		if (jobQueueThread != null) {
+			jobQueueThread.interrupt();
+			for (Job job : pendingJobQueue) {
+				job.cancel();
+			}
 		}
 
 		/*
@@ -244,6 +266,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			iterator.remove();
 		}
 
+		synchronized (this) {
+			if (startupMonitor != null) {
+				startupMonitor.setCanceled(true);
+			}
+		}
+		
 		/*
 		 * Close the the connection.
 		 */
@@ -251,7 +279,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			connection.close();
 		}
 
-		connection = null;
 		jobQueueThread = null;
 		fireRuntimeShutdownStateEvent(eventFactory.newRuntimeShutdownStateEvent());
 	}
@@ -389,36 +416,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
-	 * Notify RM to change job attributes.
-	 *
-	 * @param id job ID
-	 * @param attrs new attributes
-	 */
-	//	protected void changeJobAttributes(String id, IAttribute<?, ?, ?>... attrs) {
-	//		ElementAttributeManager mgr = new ElementAttributeManager();
-	//		AttributeManager attrMgr = new AttributeManager();
-	//		for (IAttribute<?, ?, ?> attr : attrs) {
-	//			attrMgr.addAttribute(attr);
-	//		}
-	//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-	//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
-	//	}
-
-	//	/**
-	//	 * Notify RM to change job state.
-	//	 *
-	//	 * @param id job ID
-	//	 * @param state new state
-	//	 */
-	//	protected void changeJobState(String id, JobAttributes.State state) {
-	//		ElementAttributeManager mgr = new ElementAttributeManager();
-	//		AttributeManager attrMgr = new AttributeManager();
-	//		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(state));
-	//		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-	//		fireRuntimeJobChangeEvent(eventFactory.newRuntimeJobChangeEvent(mgr));
-	//	}
-
-	/**
 	 * Notify RM to create a new job.
 	 *
 	 * @param parentID parent element ID
@@ -511,7 +508,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
 		try {
-			attrMgr.addAttribute(NodeAttributes.getNumberAttributeDefinition().create(number));
+			attrMgr.addAttribute(NodeAttributes.getNumberAttributeDefinition().create(new Integer(number)));
 		} catch (IllegalValueException e) {
 			/*
 			 * This exception is not possible, since number is always valid.
@@ -563,7 +560,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.STARTING));
 		try {
-			attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(index));
+			attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(new Integer(index)));
 		} catch (IllegalValueException e) {
 			// This is not possible
 			Assert.isTrue(false);
