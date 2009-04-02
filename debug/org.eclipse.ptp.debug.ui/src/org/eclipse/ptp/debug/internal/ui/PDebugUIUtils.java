@@ -20,10 +20,15 @@ package org.eclipse.ptp.debug.internal.ui;
 
 import java.io.File;
 
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.internal.core.model.ExternalTranslationUnit;
 import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -139,43 +144,64 @@ public class PDebugUIUtils {
 	static public IEditorInput getEditorInput(Object element) {
 		if (element instanceof IMarker) {
 			IResource resource = ((IMarker) element).getResource();
-			if (resource instanceof IFile)
+			if (resource instanceof IFile) {
 				return new FileEditorInput((IFile) resource);
+			}
 		}
 		if (element instanceof IFile) {
-			IFile f = (IFile)element;
-			if  (f.exists())
-				return new FileEditorInput(f);
-			
-			return new ExternalEditorInput(new LocalFileStorage(f.getFullPath().toFile()));
+			return new FileEditorInput((IFile) element);
 		}
 		if (element instanceof IPBreakpoint) {
-			IPBreakpoint pbk = (IPBreakpoint) element;
+			IPBreakpoint b = (IPBreakpoint) element;
 			IFile file = null;
 			try {
-				String handle = pbk.getSourceHandle();
-				IPath path = new Path(handle);
-				if (path.isValidPath(handle)) {
-					IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path);
-					if (files.length > 0) {
-						file = files[0];
-					}
-					else {
-						File fsfile = new File(handle);
-						if (fsfile.isFile() && fsfile.exists()) {
-							return new ExternalEditorInput(new LocalFileStorage(fsfile));
+				String handle = b.getSourceHandle();
+				if (handle != null) {
+					IPath path = new Path(handle);
+					if (path.isValidPath(handle)) {
+						IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path);
+						if (files.length > 0) {
+							file = files[0];
+							
+							// now try to match any finding to the project in the breakpoint
+							IProject project = b.getMarker().getResource().getProject();
+							for (IFile f : files) {
+								if (f.getProject().equals(project)) {
+									file = f;
+									break;
+								}
+							}
+						}
+						else {
+							File fsfile = new File(handle);
+							if (fsfile.isFile() && fsfile.exists()) {
+								// create an ExternalEditorInput with an external tu so when you
+								// open the file from the breakpoints view it opens in the
+								// proper editor.
+								IProject project = b.getMarker().getResource().getProject();
+								if (project != null) {
+									ICProject cproject = CoreModel.getDefault().create(project);
+									String id = CoreModel.getRegistedContentTypeId(project, path.lastSegment());
+									ExternalTranslationUnit tu = new ExternalTranslationUnit(cproject, URIUtil.toURI(path), id);
+									return new ExternalEditorInput( tu );
+								}
+								else {
+									return new ExternalEditorInput(path);
+								}
+							}
 						}
 					}
 				}
-			} catch (CoreException e) {
+			} 
+			catch (CoreException e) {
 			}
 			if (file == null)
-				file = (IFile) pbk.getMarker().getResource().getAdapter(IFile.class);
+				file = (IFile) b.getMarker().getResource().getAdapter(IFile.class);
 			if (file != null)
 				return new FileEditorInput(file);
 		}
 		if (element instanceof FileStorage || element instanceof LocalFileStorage) {
-			return new ExternalEditorInput((IStorage) element);
+			return new ExternalEditorInput(((IStorage) element).getFullPath());
 		}
 		if (element instanceof PSourceNotFoundElement) {
 			return new CommonSourceNotFoundEditorInput((PSourceNotFoundElement) element);

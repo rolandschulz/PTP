@@ -27,3 +27,4 @@ Export-Package: org.eclipse.ptp.debug.ui,
  org.eclipse.ptp.debug.ui.events,
  org.eclipse.ptp.debug.ui.listeners,
  org.eclipse.ptp.debug.ui.views
+Import-Package: org.eclipse.core.filesystem
