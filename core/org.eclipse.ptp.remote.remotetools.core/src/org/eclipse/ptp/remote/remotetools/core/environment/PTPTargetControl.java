@@ -24,7 +24,6 @@ import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.environment.control.SSHTargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
@@ -36,7 +35,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
  * @author Daniel Felix Ferber
  * @since 1.2
  */
-public class PTPTargetControl extends SSHTargetControl implements ITargetControl, ITargetVariables {
+public class PTPTargetControl extends SSHTargetControl implements ITargetVariables {
 
 	private static final int NOT_OPERATIONAL = 1;
 	private static final int CONNECTING = 2;
@@ -154,13 +153,14 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 			disconnect();
 			setState(NOT_OPERATIONAL);
 			monitor.done();
-			return true;
+			throw e;
 		}
 		try {
 			executionManager = super.createRemoteExecutionManager();
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			setState(NOT_OPERATIONAL);
+			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
 		}
 		monitor.done();
 		return true;
@@ -205,6 +205,9 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetControl
 	 * @return new execution manager;
 	 */
 	public IRemoteExecutionManager createExecutionManager() throws RemoteConnectionException {
+		if (!isConnected()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
 		return super.createRemoteExecutionManager();
 	}
 

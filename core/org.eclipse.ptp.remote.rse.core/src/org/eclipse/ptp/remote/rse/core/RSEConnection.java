@@ -12,6 +12,8 @@ package org.eclipse.ptp.remote.rse.core;
 
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -189,12 +191,17 @@ public class RSEConnection implements IRemoteConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#open()
 	 */
-	public void open(final IProgressMonitor monitor) throws RemoteConnectionException {
+	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		
 		if (!subSystem.isConnected()) {
 			try {
-				subSystem.connect(monitor, false);
+				SubMonitor subMon = SubMonitor.convert(monitor);
+				subSystem.connect(subMon.newChild(1), false);
 			} catch (Exception e) {
-				// Ignore
+				throw new RemoteConnectionException(e.getMessage());
 			}
 			
 			if(!subSystem.isConnected()) {
