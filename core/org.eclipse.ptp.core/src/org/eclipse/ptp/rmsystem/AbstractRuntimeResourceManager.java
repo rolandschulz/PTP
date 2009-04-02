@@ -901,6 +901,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			runtimeSystem.startup(subMon.newChild(90));
 		} catch (CoreException e) {
 			runtimeSystem.removeRuntimeEventListener(this);
+			throw e;
 		}
 	}
 	
