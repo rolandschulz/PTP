@@ -60,7 +60,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.Activator;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.remote.ui.Messages;
+import org.eclipse.ptp.rm.remote.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -144,7 +144,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		}
 	}
 	
-	public static final String EMPTY_STRING = "";
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	public static final int VALIDATE_TIMER = 250;
 	private AbstractRemoteResourceManagerConfiguration config;
 	private String proxyPath = EMPTY_STRING;
@@ -295,7 +295,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 					try {
 						connection.open(monitor);
 						if (monitor.isCanceled()) {
-							throw new InterruptedException(Messages.getString("RemoteProxyConfigurationWizard.cancelMessage")); //$NON-NLS-1$
+							throw new InterruptedException(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_0);
 						}
 					} catch (RemoteConnectionException e) {
 						throw new InvocationTargetException(e);
@@ -306,12 +306,12 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			try {
 				new ProgressMonitorDialog(getShell()).run(true, true, op);
 			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(getShell(), Messages.getString("RemoteProxyConfigurationWizard.connectionError"), //$NON-NLS-1$
-						Messages.getString("RemoteProxyConfigurationWizard.connectionErrorMessage"),  //$NON-NLS-1$
+				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_1,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2,
 						new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getCause().getMessage()));
 			} catch (InterruptedException e) {
-				ErrorDialog.openError(getShell(), Messages.getString("RemoteProxyConfigurationWizard.connectionError"), //$NON-NLS-1$
-						Messages.getString("RemoteProxyConfigurationWizard.connectionErrorMessage"),  //$NON-NLS-1$
+				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2,
 						new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 			}
 		}
@@ -340,7 +340,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 * Remote provider
 		 */
 		Label label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteProxyConfigurationWizard.provider")); //$NON-NLS-1$
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_4);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -354,7 +354,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 * Proxy location
 		 */
 		label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteProxyConfigurationWizard.location")); //$NON-NLS-1$
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_5);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -364,13 +364,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		gd.horizontalSpan = 2;
 		connectionCombo.setLayoutData(gd);
 
-		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteProxyConfigurationWizard.newButton"), null); //$NON-NLS-1$
+		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6, null);
 
 		/*
 		 * Proxy path
 		 */
 		label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteProxyConfigurationWizard.path"));
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -383,13 +383,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		proxyPathText.setLayoutData(gd);
 		proxyPathText.addModifyListener(listener);
 		
-		browseButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteProxyConfigurationWizard.browseButton"), null); //$NON-NLS-1$
+		browseButton = SWTUtil.createPushButton(remoteComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, null);
 		browseButton.addSelectionListener(listener);
 		
 		/*
 		 * Proxy options
 		 */
-		optionsButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteProxyConfigurationWizard.optionsButton"), null); //$NON-NLS-1$
+		optionsButton = SWTUtil.createPushButton(remoteComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
 		optionsButton.addSelectionListener(listener);
 
 		/*
@@ -398,9 +398,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		mxGroup.setText(Messages.getString("RemoteProxyConfigurationWizard.mxOptions"));
+		mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
 		
-		noneButton = createRadioButton(mxGroup, Messages.getString("RemoteProxyConfigurationWizard.noneButton"), "mxGroup", listener); //$NON-NLS-1$ //$NON-NLS-2$
+		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11, "mxGroup", listener); //$NON-NLS-1$
 		noneButton.addSelectionListener(listener);
 		
 		/*
@@ -416,7 +416,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		addrComp.setLayoutData(gd);
 
 		label = new Label(addrComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteProxyConfigurationWizard.localAddress")); //$NON-NLS-1$
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_12);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -426,13 +426,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		gd.horizontalSpan = 1;
 		localAddrCombo.setLayoutData(gd);
 
-		portForwardingButton = createRadioButton(mxGroup, Messages.getString("RemoteProxyConfigurationWizard.portForwardingButton"), "mxGroup", listener); //$NON-NLS-1$ //$NON-NLS-2$
+		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13, "mxGroup", listener); //$NON-NLS-1$
 		portForwardingButton.addSelectionListener(listener);
 
 		/*
 		 * Manual launch
 		 */
-		manualButton = createCheckButton(parent, Messages.getString("RemoteProxyConfigurationWizard.manualButton")); //$NON-NLS-1$
+		manualButton = createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
 		manualButton.addSelectionListener(listener);
 
 		registerListeners();
@@ -568,7 +568,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 * If no localAddr has been specified in the configuration, select
 		 * a default one.
 		 */
-		if (!loading || localAddr.equals("")) {
+		if (!loading || localAddr.equals("")) { //$NON-NLS-1$
 			localAddr = localAddrCombo.getText();
 		}
 
@@ -706,8 +706,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected String createOptionsDialog(Shell shell, String initialOptions) {
 		InputDialog dialog = new InputDialog(shell, 
-				Messages.getResourceString("RemoteProxyConfigurationWizard.optionsTitle"), 
-				Messages.getString("RemoteProxyConfigurationWizard.options"),
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14, 
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15,
 				initialOptions, null);
 		if (dialog.open() == Dialog.OK) {
 			return dialog.getValue();
@@ -812,7 +812,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 					if (fileMgr != null) {
 						fileMgr.setConnection(connection);
 						String correctPath = proxyPathText.getText();
-						IPath selectedPath = fileMgr.browseFile(getShell(), Messages.getString("RemoteProxyConfigurationWizard.select"), correctPath); //$NON-NLS-1$
+						IPath selectedPath = fileMgr.browseFile(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16, correctPath);
 						if (selectedPath != null) {
 							proxyPathText.setText(selectedPath.toString());
 						}
@@ -915,7 +915,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		if (proxyPathText != null) {
 			String name = getFieldContent(proxyPathText.getText());
 			if (name == null || !proxyPathIsValid) {
-				setErrorMessage(Messages.getString("RemoteProxyConfigurationWizard.invalid")); //$NON-NLS-1$
+				setErrorMessage(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_17);
 				return false;
 			}
 		}

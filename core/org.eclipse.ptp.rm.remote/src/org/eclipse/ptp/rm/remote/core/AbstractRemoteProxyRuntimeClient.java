@@ -20,8 +20,10 @@ import java.util.List;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
@@ -37,10 +39,12 @@ import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.remote.messages.Messages;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
 	private IRemoteConnection connection = null;
+	private IProgressMonitor startupMonitor = null;
 	private AbstractRemoteResourceManagerConfiguration config;
 
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
@@ -75,6 +79,13 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		} catch (IOException e) {
 			PTPCorePlugin.log(e);
 		}
+		
+		synchronized (this) {
+			if (startupMonitor != null) {
+				startupMonitor.setCanceled(true);
+			}
+		}
+		
 		if (connection != null && connection.isOpen()) {
 			connection.close();
 		}
@@ -87,12 +98,24 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	 * @throws IOException
 	 */
 	public void startup(IProgressMonitor monitor) throws IOException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
 		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . ."); //$NON-NLS-1$
 			System.out.println("PROXY_SERVER path = '" + config.getName() + "'");  //$NON-NLS-1$  //$NON-NLS-2$
 		}
 		
+		synchronized (this) {
+			startupMonitor = monitor;
+		}
+		
+		monitor.beginTask(Messages.AbstractRemoteProxyRuntimeClient_0, 12);
+		
 		try {
+			monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_1);
+			
 			/*
 			 * This can fail if we are restarting the RM from saved information and the saved remote
 			 * services provider is no longer available...
@@ -101,9 +124,15 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			if (remoteServices == null) {
 				throw new IOException("Could not find remote services ID " + config.getRemoteServicesId());  //$NON-NLS-1$
 			}
+			
+			monitor.worked(5);
 
 			if (config.testOption(IRemoteProxyOptions.MANUAL_LAUNCH)) {
+				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_2);
+				
 				sessionCreate();
+				
+				monitor.worked(5);
 				
 				List<String> args = new ArrayList<String>();
 				args.add(config.getProxyServerPath());
@@ -123,8 +152,10 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 				
-				final String msg = "Waiting for manual launch of proxy: " + args.toString(); //$NON-NLS-1$
-				System.out.println(msg);
+				final String msg = Messages.AbstractRemoteProxyRuntimeClient_3 + args.toString();
+				
+				monitor.subTask(msg);
+				
 				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
 				PTPCorePlugin.log(info);
 			} else {
@@ -133,23 +164,39 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				if (connection == null) {
 					throw new IOException("No such connection: " + config.getConnectionName()); //$NON-NLS-1$
 				}
+				
+				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_4);
+				SubMonitor subMon = SubMonitor.convert(monitor);
+				
 				if (!connection.isOpen()) {
-					connection.open(monitor);
+					connection.open(subMon.newChild(4));
 				}
 				if (monitor.isCanceled()) {
+					connection.close();
 					return;
 				}
+				
+				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_5);
 				
 				/*
 				 * Check the remote proxy exists
 				 */
 				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-				IFileStore res = fileManager.getResource(new Path(config.getProxyServerPath()), monitor);
+				IFileStore res = fileManager.getResource(new Path(config.getProxyServerPath()), subMon.newChild(2));
 				if (!res.fetchInfo().exists()){
 					throw new IOException("Could not find proxy executable \"" + config.getProxyServerPath() + "\""); //$NON-NLS-1$  //$NON-NLS-2$
 				}
+				
+				if (monitor.isCanceled()) {
+					connection.close();
+					return;
+				}
+				
+				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_6);
 
 				sessionCreate();
+				
+				monitor.worked(1);
 
 				ArrayList<String> args = new ArrayList<String>();
 				args.add(config.getProxyServerPath());
@@ -158,11 +205,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 					int remotePort;
 					try {
-						remotePort = connection.forwardRemotePort("localhost", getSessionPort(), monitor); //$NON-NLS-1$
+						remotePort = connection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
 					} catch (RemoteConnectionException e) {
 						throw new IOException(e.getMessage());
 					}
 					if (monitor.isCanceled()) {
+						sessionFinish();
 						return;
 					}
 					args.add("--host=localhost"); //$NON-NLS-1$
@@ -181,8 +229,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 
+				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_7);
+				
 				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
 				IRemoteProcess process = processBuilder.start();
+				
+				monitor.worked(2);
 				
 				final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -217,6 +269,11 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					System.out.println(toString() + ": Waiting on accept."); //$NON-NLS-1$
 				}
 			}
+			
+			monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_8);
+			super.startup();
+			monitor.worked(2);
+
 		} catch (IOException e) {
 			try {
 				sessionFinish();
@@ -226,8 +283,11 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			throw new IOException("Failed to start proxy: " + e.getMessage()); //$NON-NLS-1$
 		} catch (RemoteConnectionException e) {
 			throw new IOException("Failed to start proxy: " + e.getMessage()); //$NON-NLS-1$
+		} finally {
+			synchronized(this) {
+				startupMonitor = null;
+			}
 		}
-		super.startup();
 	}
 
 	/**

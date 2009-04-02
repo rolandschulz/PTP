@@ -149,7 +149,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 */
 	public void addInvocationOptions(String optionString) {
 		if (!optionString.equals(EMPTY_STRING)) {
-			String[] options = optionString.split(" ");
+			String[] options = optionString.split(" "); //$NON-NLS-1$
 			
 			for (String option : options) {
 				this.invocationOptions.add(option);
@@ -187,7 +187,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		String opts = EMPTY_STRING;
 		for (int i = 0; i < invocationOptions.size(); i++) {
 			if (i > 0) {
-				opts += " ";
+				opts += " "; //$NON-NLS-1$
 			}
 			opts += invocationOptions.get(i);
 		}

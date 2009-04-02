@@ -33,7 +33,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.remote.ui.Messages;
+import org.eclipse.ptp.rm.remote.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -80,7 +80,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 	}
 	
-	public static final String EMPTY_STRING = "";
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private AbstractRemoteResourceManagerConfiguration config;
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
@@ -226,7 +226,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 * Remote provider
 		 */
 		Label label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteConfigurationWizard.provider")); //$NON-NLS-1$
+		label.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_0);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -240,7 +240,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 * Remote location
 		 */
 		label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteConfigurationWizard.location")); //$NON-NLS-1$
+		label.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_1);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -250,7 +250,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 2;
 		connectionCombo.setLayoutData(gd);
 
-		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.newButton"), null); //$NON-NLS-1$
+		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_2, null);
 
 		/*
 		 * Multiplexing options
@@ -258,9 +258,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		mxGroup.setText(Messages.getString("RemoteConfigurationWizard.mxOptions"));
+		mxGroup.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_3);
 		
-		noneButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.noneButton"), "mxGroup", listener); //$NON-NLS-1$ //$NON-NLS-2$
+		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_4, "mxGroup", listener); //$NON-NLS-1$
 		noneButton.addSelectionListener(listener);
 		
 		/*
@@ -276,7 +276,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		addrComp.setLayoutData(gd);
 
 		label = new Label(addrComp, SWT.NONE);
-		label.setText(Messages.getString("RemoteConfigurationWizard.localAddress")); //$NON-NLS-1$
+		label.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_5);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -286,7 +286,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 1;
 		localAddrCombo.setLayoutData(gd);
 
-		portForwardingButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.portForwardingButton"), "mxGroup", listener); //$NON-NLS-1$ //$NON-NLS-2$
+		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6, "mxGroup", listener); //$NON-NLS-1$
 		portForwardingButton.addSelectionListener(listener);
 
 		registerListeners();
@@ -407,7 +407,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 * If no localAddr has been specified in the configuration, select
 		 * a default one.
 		 */
-		if (!loading || localAddr.equals("")) {
+		if (!loading || localAddr.equals("")) { //$NON-NLS-1$
 			localAddr = localAddrCombo.getText();
 		}
 

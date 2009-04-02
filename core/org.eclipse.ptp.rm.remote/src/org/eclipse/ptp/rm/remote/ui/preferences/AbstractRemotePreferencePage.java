@@ -26,7 +26,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
-import org.eclipse.ptp.rm.remote.ui.Messages;
+import org.eclipse.ptp.rm.remote.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -77,7 +77,7 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		}
 	}
 
-	public static final String EMPTY_STRING = "";
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private String serverFile = EMPTY_STRING;
 	private boolean loading = true;
 	protected Text serverText = null;
@@ -282,39 +282,36 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		Group bGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		bGroup.setText(Messages.getString("RemotePreferencesPage.group_server"));
+		bGroup.setText(Messages.AbstractRemotePreferencePage_0);
 		
-		new Label(bGroup, SWT.WRAP).setText(Messages
-				.getString("RemotePreferencesPage.server_text"));
+		new Label(bGroup, SWT.WRAP).setText(Messages.AbstractRemotePreferencePage_1);
 		
 		Composite orteserver = new Composite(bGroup, SWT.NONE);
 		orteserver.setLayout(createGridLayout(3, false, 0, 0));
 		orteserver.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
-		new Label(orteserver, SWT.NONE).setText(Messages
-				.getString("RemotePreferencesPage.server_label"));
+		new Label(orteserver, SWT.NONE).setText(Messages.AbstractRemotePreferencePage_2);
 		serverText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
 		serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		serverText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(orteserver, Messages
-				.getString("RemotePreferencesPage.browseButton"), null);
+		browseButton = SWTUtil.createPushButton(orteserver, Messages.AbstractRemotePreferencePage_3, null);
 		browseButton.addSelectionListener(listener);
 		
 		Group mxGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		mxGroup.setText(Messages.getString("RemotePreferencesPage.mxOptions"));
+		mxGroup.setText(Messages.AbstractRemotePreferencePage_4);
 		
-		fNoneButton = createRadioButton(mxGroup, Messages.getString("RemotePreferencesPage.noneButton"), "mxGroup", listener);
-		fPortForwardingButton = createRadioButton(mxGroup, Messages.getString("RemotePreferencesPage.portForwardingButton"), "mxGroup", listener);
-		fStdioButton = createRadioButton(mxGroup, Messages.getString("RemotePreferencesPage.stdioButton"), "mxGroup", listener);
+		fNoneButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_5, "mxGroup", listener); //$NON-NLS-1$
+		fPortForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_6, "mxGroup", listener); //$NON-NLS-1$
+		fStdioButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_7, "mxGroup", listener); //$NON-NLS-1$
 
 		Group otherGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		otherGroup.setLayout(createGridLayout(1, true, 10, 10));
 		otherGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		otherGroup.setText(Messages.getString("RemotePreferencesPage.otherOptions"));
+		otherGroup.setText(Messages.AbstractRemotePreferencePage_8);
 
-		fManualButton = createCheckButton(otherGroup, Messages.getString("RemotePreferencesPage.manualButton"));
+		fManualButton = createCheckButton(otherGroup, Messages.AbstractRemotePreferencePage_9);
 
 		loadSaved();
 		defaultSetting();
@@ -363,8 +360,7 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 	protected void handlePathBrowseButtonSelected() 
 	{
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(Messages
-				.getString("RemotePreferencesPage.Select"));
+		dialog.setText(Messages.AbstractRemotePreferencePage_10);
 		String correctPath = getFieldContent(serverText.getText());
 		if (correctPath != null) {
 			File path = new File(correctPath);
@@ -385,15 +381,13 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 	{
 		String name = getFieldContent(serverText.getText());
 		if (name == null) {
-			setErrorMessage(Messages
-					.getString("RemotePreferencesPage.Invalid"));
+			setErrorMessage(Messages.AbstractRemotePreferencePage_11);
 			setValid(false);
 			return false;
 		} else {
 			File path = new File(name);
 			if (!path.exists() || !path.isFile()) {
-				setErrorMessage(Messages
-					.getString("RemotePreferencesPage.Invalid"));
+				setErrorMessage(Messages.AbstractRemotePreferencePage_11);
 				setValid(false);
 				return false;
 			}
