@@ -34,7 +34,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	public RSEConnectionManager(ISystemRegistry registry) {
 		this.registry = registry;
 		try {
-			this.fileSystem = EFS.getFileSystem("rse");
+			this.fileSystem = EFS.getFileSystem("rse"); //$NON-NLS-1$
 		} catch (CoreException e) {
 			// Could not find the rse filesystem!
 		}

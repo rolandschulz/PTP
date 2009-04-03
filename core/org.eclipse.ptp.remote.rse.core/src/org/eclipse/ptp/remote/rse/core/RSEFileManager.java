@@ -38,7 +38,7 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IPath getWorkingDirectory() {
-		return new Path("/"); // TODO: RSE doesn't provide any way to get this
+		return new Path("/"); // TODO: RSE doesn't provide any way to get this //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)
