@@ -13,12 +13,21 @@ package org.eclipse.ptp.remote.rse.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages {
+public class Messages extends NLS {
+	private static final String BUNDLE_ID = "org.eclipse.ptp.remote.rse.core.messages.messages"; //$NON-NLS-1$
+
 	public static String RSEConnection_close;
 	public static String RSEConnection_noPortFwd;
 	public static String RSEConnection_noShellService;
+
+	public static String RSEProcessBuilder_0;
 	
 	static {
-		NLS.initializeMessages("org.eclipse.ptp.remote.rse.core.messages.messages", Messages.class);
+		// load message values from bundle file
+		NLS.initializeMessages(BUNDLE_ID, Messages.class);
+	}
+
+	private Messages() {
+		// cannot create new instance
 	}
 }

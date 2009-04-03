@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.rse.core.messages.Messages;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
@@ -73,7 +74,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		String[] env = new String[remoteEnv.size()];
 		int pos = 0;
 		for (Map.Entry<String, String> entry: remoteEnv.entrySet()) {
-			env[pos++] = entry.getKey() + "=" + entry.getValue();
+			env[pos++] = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 		}
 		return env;
 	}
@@ -102,11 +103,11 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		String remoteCmd = "";  //$NON-NLS-1$
+		String remoteCmd = ""; //$NON-NLS-1$
 		
 		for (int i = 0; i < cmdArgs.size(); i++) {
 			if (i > 0) {
-				remoteCmd += " ";  //$NON-NLS-1$
+				remoteCmd += " "; //$NON-NLS-1$
 			}
 			remoteCmd += spaceEscapify(cmdArgs.get(i));
 		}
@@ -115,24 +116,24 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		IShellService shellService = connection.getRemoteShellService();
 		if (shellService == null) {
-			throw new IOException("Remote service not found");
+			throw new IOException(Messages.RSEProcessBuilder_0);
 		}
 		
 		// This is necessary because runCommand does not actually run the command right now.
 		IHostShell hostShell = null;
 		try {
-			String initialDir = "";
+			String initialDir = ""; //$NON-NLS-1$
 			if (directory() != null) {
 				initialDir = directory().toURI().getPath();
 			}
-			hostShell = shellService.runCommand(initialDir, remoteCmd, getEnvironment(), new NullProgressMonitor());  //$NON-NLS-1$
+			hostShell = shellService.runCommand(initialDir, remoteCmd, getEnvironment(), new NullProgressMonitor());
 		} catch (SystemMessageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
 		
-		return new RSEProcess(hostShell);
+		return new RSEProcess(hostShell, redirectErrorStream());
 	}
 	
 	private String spaceEscapify(String inputString) {
