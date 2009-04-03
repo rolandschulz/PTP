@@ -26,6 +26,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
+import org.eclipse.ptp.remote.core.NullInputStream;
 import org.eclipse.rse.services.shells.HostShellOutputStream;
 import org.eclipse.rse.services.shells.IHostOutput;
 import org.eclipse.rse.services.shells.IHostShell;
@@ -33,19 +34,26 @@ import org.eclipse.rse.services.shells.IHostShellChangeEvent;
 import org.eclipse.rse.services.shells.IHostShellOutputListener;
 
 public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutputListener {
+	private boolean mergeOutput;
 	private IHostShell hostShell;
-	private PipedInputStream inputStream = null;
-	private PipedInputStream errorStream = null;
+	private InputStream inputStream = null;
+	private InputStream errorStream = null;
 	private HostShellOutputStream outputStream = null;
 	private PipedOutputStream hostShellInput = null;
 	private PipedOutputStream hostShellError = null;
 	
-	public RSEProcess(IHostShell hostShell) throws IOException {
+	public RSEProcess(IHostShell hostShell, boolean mergeOutput) throws IOException {
 		this.hostShell = hostShell;
+		this.mergeOutput = mergeOutput;
 		hostShellInput = new PipedOutputStream();
-		hostShellError = new PipedOutputStream();
+		if (mergeOutput) {
+			hostShellError = hostShellInput;
+			errorStream = new NullInputStream();
+		} else {
+			hostShellError = new PipedOutputStream();
+			errorStream = new PipedInputStream(hostShellError);
+		}
 		inputStream = new PipedInputStream(hostShellInput);
-		errorStream = new PipedInputStream(hostShellError);
 		outputStream = new HostShellOutputStream(hostShell);
 		this.hostShell.getStandardOutputReader().addOutputListener(this);
 		this.hostShell.getStandardErrorReader().addOutputListener(this);
@@ -60,7 +68,9 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		notifyAll();
 		try {
 			hostShellInput.close();
-			hostShellError.close();
+			if (!mergeOutput) {
+				hostShellError.close();
+			}
 			inputStream.close();
 			errorStream.close();
 			outputStream.close();
@@ -131,7 +141,9 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 				throw new InterruptedException();
 			}
 			hostShellInput.close();
-			hostShellError.close();
+			if (!mergeOutput) {
+				hostShellError.close();
+			}
 			inputStream.close();
 			errorStream.close();
 			outputStream.close();

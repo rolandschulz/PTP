@@ -58,11 +58,11 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		String remoteCmd = "";
+		String remoteCmd = ""; //$NON-NLS-1$
 		
 		for (int i = 0; i < cmdArgs.size(); i++) {
 			if (i > 0) {
-				remoteCmd += " ";
+				remoteCmd += " "; //$NON-NLS-1$
 			}
 			remoteCmd += spaceEscapify(cmdArgs.get(i));
 		}
@@ -72,18 +72,18 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 			IRemoteExecutionTools exeTools = exeMgr.getExecutionTools();
 			IRemoteScript script = exeTools.createScript();
 			if(directory() != null) {
-				String setWorkingDirStr = "cd " + directory().toURI().getPath();
+				String setWorkingDirStr = "cd " + directory().toURI().getPath(); //$NON-NLS-1$
 				script.setScript(new String []{setWorkingDirStr, remoteCmd});
 			} else {
 				script.setScript(remoteCmd);
 			}
 			
 			for (Entry<String,String>  entry : environment().entrySet()) {
-				script.addEnvironment(entry.getKey()+"="+entry.getValue());
+				script.addEnvironment(entry.getKey()+"="+entry.getValue()); //$NON-NLS-1$
 			}
 
 			RemoteProcess process = exeTools.executeProcess(script);
-			return new RemoteToolsProcess(process);
+			return new RemoteToolsProcess(process, redirectErrorStream());
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		}
