@@ -138,7 +138,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	 * 
 	 */
 	protected void createContextMenu() {
-		MenuManager menuMgr = new MenuManager("#popupmenu");
+		MenuManager menuMgr = new MenuManager("#popupmenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {

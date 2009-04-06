@@ -57,6 +57,7 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -173,8 +174,8 @@ public class MachinesNodesView extends ViewPart {
 	private class MachineGraphicalRepresentation {
 		private ArrayList <NodeGraphicalRepresentation> nodes = null;
 		private Rectangle rectangle = null;
-		private String machineName = "";
-		private String machineID = "";
+		private String machineName = ""; //$NON-NLS-1$
+		private String machineID = ""; //$NON-NLS-1$
 		private static final int WIDTH = 50;
 		private static final int HEIGHT = 50;
 		private Color color = null;
@@ -280,8 +281,8 @@ public class MachinesNodesView extends ViewPart {
 
 	private class NodeGraphicalRepresentation {
 		private Rectangle rectangle = null;
-		private String nodeName = "";
-		private String nodeID = "";
+		private String nodeName = ""; //$NON-NLS-1$
+		private String nodeID = ""; //$NON-NLS-1$
 		private static final int WIDTH = 20;
 		private static final int HEIGHT = 20;
 		private boolean selected = false;
@@ -531,19 +532,19 @@ public class MachinesNodesView extends ViewPart {
 			 */
 			String additionalInfo= null;
 			if (elementSelected != null) {
-				additionalInfo="Selected: ";
+				additionalInfo=Messages.MachinesNodesView_0;
 				newGC.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 				if (elementSelected instanceof MachineGraphicalRepresentation) {
 					MachineGraphicalRepresentation machine = (MachineGraphicalRepresentation) elementSelected;
-					additionalInfo += "Machine name : " + machine.getMachineName() + " || ID: " + machine.getMachineID();
+					additionalInfo += Messages.MachinesNodesView_1 + machine.getMachineName() + Messages.MachinesNodesView_2 + machine.getMachineID();
 				}
 				else if (elementSelected instanceof NodeGraphicalRepresentation) {
 					NodeGraphicalRepresentation node = (NodeGraphicalRepresentation) elementSelected;
-					additionalInfo += "Node name : " + node.getNodeName() + " || ID: " + node.getNodeID();
+					additionalInfo += Messages.MachinesNodesView_3 + node.getNodeName() + Messages.MachinesNodesView_2 + node.getNodeID();
 					if (node.getNumberOfJobs() > 0) {
-						additionalInfo += " || jobs current running: ";
+						additionalInfo += Messages.MachinesNodesView_4;
 						for (String jobID: node.getJobsIDs())
-							additionalInfo += jobID + " ";
+							additionalInfo += jobID + " "; //$NON-NLS-1$
 					}
 				}
 				
@@ -620,7 +621,7 @@ public class MachinesNodesView extends ViewPart {
 								newGC.fillRectangle(nodegr.getGraphicalRepresentation());
 								newGC.setForeground(composite.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 								if (nodegr.getNumberOfJobs() > 9)
-									newGC.drawString("+", currentX + fontHeight/2, currentY);
+									newGC.drawString("+", currentX + fontHeight/2, currentY); //$NON-NLS-1$
 								else
 									newGC.drawString(String.valueOf(nodegr.getNumberOfJobs()), currentX + fontHeight/2, currentY);
 								newGC.drawRectangle(nodegr.getGraphicalRepresentation());
@@ -647,7 +648,7 @@ public class MachinesNodesView extends ViewPart {
 								newGC.fillRectangle(nodegr.getGraphicalRepresentation());
 								newGC.setForeground(composite.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 								if (nodegr.getNumberOfJobs() > 9)
-									newGC.drawString("+", currentX + fontHeight/2, currentY);
+									newGC.drawString("+", currentX + fontHeight/2, currentY); //$NON-NLS-1$
 								else
 									newGC.drawString(String.valueOf(nodegr.getNumberOfJobs()), currentX + fontHeight/2, currentY);
 								newGC.drawRectangle(nodegr.getGraphicalRepresentation());
@@ -673,7 +674,7 @@ public class MachinesNodesView extends ViewPart {
 							newGC.fillRectangle(nodegr.getGraphicalRepresentation());
 							newGC.setForeground(composite.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 							if (nodegr.getNumberOfJobs() > 9)
-								newGC.drawString("+", currentX + fontHeight/2, currentY);
+								newGC.drawString("+", currentX + fontHeight/2, currentY); //$NON-NLS-1$
 							else
 								newGC.drawString(String.valueOf(nodegr.getNumberOfJobs()), currentX + fontHeight/2, currentY);
 							newGC.drawRectangle(nodegr.getGraphicalRepresentation());
@@ -968,7 +969,7 @@ public class MachinesNodesView extends ViewPart {
 		private final ReentrantLock	waitLock = new ReentrantLock();
 		private List<Boolean> refreshList = new ArrayList<Boolean>();
 		public RefreshWorkbenchJob() {
-			super("Refreshing workbench...");
+			super(Messages.MachinesNodesView_5);
 		}
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			boolean refreshAll = isRefreshAll();

@@ -29,7 +29,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -50,12 +50,12 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
-	public static final String EMPTY_STRING = "";
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	protected Text outputDirText = null;
 	protected Button browseButton = null;
 	protected IntegerFieldEditor storeLineField = null;
 	private String outputDIR = EMPTY_STRING;
-	private String defaultOutputDIR = "/tmp";
+	private String defaultOutputDIR = "/tmp"; //$NON-NLS-1$
 	private int storeLine = PreferenceConstants.DEF_STORE_LINE;
 
 	public PTPPreferencesPage() {
@@ -108,20 +108,20 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(UIMessage.getResourceString("PTPPreferencesPage.group_output"));
+		aGroup.setText(Messages.PTPPreferencesPage_0);
 		Composite outputComposite = new Composite(aGroup, SWT.NONE);
 		outputComposite.setLayout(createGridLayout(3, false, 0, 0));
 		outputComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		new Label(outputComposite, SWT.NONE).setText(UIMessage.getResourceString("PTPPreferencesPage.output_text"));
+		new Label(outputComposite, SWT.NONE).setText(Messages.PTPPreferencesPage_1);
 		outputDirText = new Text(outputComposite, SWT.SINGLE | SWT.BORDER);
 		outputDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		outputDirText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(outputComposite, UIMessage.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton = SWTUtil.createPushButton(outputComposite, Messages.PTPPreferencesPage_2, null);
 		browseButton.addSelectionListener(listener);
 		Composite lineComposite = new Composite(aGroup, SWT.NONE);
 		lineComposite.setLayout(new FillLayout());
 		lineComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		storeLineField = new IntegerFieldEditor(PreferenceConstants.STORE_LINE, UIMessage.getResourceString("PTPPreferencesPage.store_line_text"), lineComposite);
+		storeLineField = new IntegerFieldEditor(PreferenceConstants.STORE_LINE, Messages.PTPPreferencesPage_3, lineComposite);
 		storeLineField.setPropertyChangeListener(listener);
 		storeLineField.setEmptyStringAllowed(false);
 	}
@@ -131,17 +131,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	}
 	private void loadSaved() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		// System.out.println("PREFS:");
-		// String[] foo = preferences.defaultPropertyNames();
-		// for(int i=0; i<foo.length; i++) {
-		// System.out.println("DEFAULT["+i+"] = "+foo[i]);
-		// }
-		// foo = preferences.propertyNames();
-		// for(int i=0; i<foo.length; i++) {
-		// System.out.println("non-default prop["+i+"] = "+foo[i]);
-		// }
 		outputDIR = preferences.getString(PreferenceConstants.OUTPUT_DIR);
-		if (outputDIR.equals(""))
+		if (outputDIR.equals("")) //$NON-NLS-1$
 			outputDIR = defaultOutputDIR;
 		if (outputDIR != null)
 			outputDirText.setText(outputDIR);
@@ -179,7 +170,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	}
 	protected void handleOutputDirectoryBrowseButtonSelected() {
 		DirectoryDialog dialog = new DirectoryDialog(getShell());
-		dialog.setText(UIMessage.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
+		dialog.setText(Messages.PTPPreferencesPage_4);
 		String currectDirPath = getFieldContent(outputDirText.getText());
 		if (currectDirPath != null) {
 			File path = new File(currectDirPath);
@@ -193,7 +184,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	protected boolean isValidOutputSetting() {
 		String name = getFieldContent(outputDirText.getText());
 		if (name == null) {
-			setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
+			setErrorMessage(Messages.PTPPreferencesPage_5);
 			setValid(false);
 			return false;
 		}
@@ -201,7 +192,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		if (!path.exists()) {
 			File parent = path.getParentFile();
 			if (parent == null || !parent.exists()) {
-				setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
+				setErrorMessage(Messages.PTPPreferencesPage_5);
 				setValid(false);
 				return false;
 			}

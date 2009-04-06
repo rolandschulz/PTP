@@ -31,6 +31,7 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.model.IElement;
@@ -45,7 +46,7 @@ public class MachineManager extends AbstractUIManager {
 	private Map<String, IElementHandler> machineElementHandlerList = new HashMap<String, IElementHandler>();
 	private Map<String, IPMachine> machineList = new HashMap<String, IPMachine>();
 	protected IPMachine cur_machine = null;
-	protected final String DEFAULT_TITLE = "Please select a machine";
+	protected final String DEFAULT_TITLE = Messages.MachineManager_0;
 	
 	/** 
 	 * Add a new machine to machineList. Add any new nodes to the element
@@ -108,7 +109,7 @@ public class MachineManager extends AbstractUIManager {
 	public IPNode findNode(String node_id) {
 		IPMachine machine = getCurrentMachine();
 		if (machine == null) {
-			System.out.println("\t*** POSSIBLE ERROR: Unable to find machine");
+			System.out.println(Messages.MachineManager_1);
 			return null;
 		}
 		return machine.getNodeById(node_id);
@@ -147,10 +148,10 @@ public class MachineManager extends AbstractUIManager {
 		if (machine != null) {
 			IResourceManager rm = machine.getResourceManager();
 			if (rm != null) {
-				return rm.getName() + ": " + machine.getName();
+				return rm.getName() + ": " + machine.getName(); //$NON-NLS-1$
 			}
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 	
 	/** Get machines
@@ -165,7 +166,7 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public String getName(String id) {
 		if (cur_machine == null)
-			return "";
+			return ""; //$NON-NLS-1$
 		return cur_machine.getName();
 	}
 	
@@ -224,21 +225,21 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public String getNodeStatusText(IPNode node) {
 		if (node == null) {
-			return "Unknown";
+			return Messages.MachineManager_2;
 		}
 		EnumeratedAttribute<NodeAttributes.State> nodeStateAttr =
 			node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 		if(nodeStateAttr == null) {
-			return "Unknown";
+			return Messages.MachineManager_2;
 		}
 		NodeAttributes.State nodeState = nodeStateAttr.getValue();
 		
 		if (nodeState == NodeAttributes.State.UP) {
 			if (node.getProcesses().length > 0) {
 				if (node.getProcesses()[0].getJob().isTerminated()) {
-					return "Exited";
+					return Messages.MachineManager_3;
 				}
-				return "Running";
+				return Messages.MachineManager_4;
 			}
 
 			EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =

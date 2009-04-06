@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.ptp.ui.views.AbstractParallelSetView;
@@ -29,7 +30,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelSetView;
  *
  */
 public class ZoomInAction extends ParallelAction {
-	public static final String name = "Zoom in";
+	public static final String name = Messages.ZoomInAction_0;
 	
 	/** Constructor
 	 * @param view

@@ -24,6 +24,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -112,7 +113,7 @@ public class UIUtils {
                         try {
                             displayView(viewID);
                         } catch (NullPointerException e) {
-                            System.out.println("Show View err: " + e.getMessage());
+                            System.out.println("Show View err: " + e.getMessage()); //$NON-NLS-1$
                         }
                     }
                 });
@@ -130,7 +131,7 @@ public class UIUtils {
                 try {
                     bench.showPerspective(perspectiveID, PTPUIPlugin.getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
-                    showErrorDialog("Display Error", "Cannot switch Perspective to: " + perspectiveID, e.getStatus());
+                    showErrorDialog(Messages.UIUtils_1, Messages.UIUtils_2 + perspectiveID, e.getStatus());
                 }
             }
         });
@@ -145,7 +146,7 @@ public class UIUtils {
         try {
             page.showView(viewID);
         } catch (PartInitException e) {
-            showErrorDialog("Display Error", "Cannot show View ID: " + viewID, e.getStatus());
+            showErrorDialog(Messages.UIUtils_3, Messages.UIUtils_4 + viewID, e.getStatus());
         }
     }
 

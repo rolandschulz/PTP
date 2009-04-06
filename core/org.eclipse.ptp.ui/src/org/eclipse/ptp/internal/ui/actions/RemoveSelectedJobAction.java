@@ -14,12 +14,13 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.managers.JobManager;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.ptp.ui.views.ParallelJobsView;
 
 public class RemoveSelectedJobAction extends ParallelAction {
-	public static final String name = "Remove Selected Job";
+	public static final String name = Messages.RemoveSelectedJobAction_0;
 	AbstractTableViewer jobViewer;
 
 	public RemoveSelectedJobAction(AbstractParallelElementView view,

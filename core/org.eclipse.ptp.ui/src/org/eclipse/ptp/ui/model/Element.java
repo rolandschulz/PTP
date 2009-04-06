@@ -26,8 +26,8 @@ import org.eclipse.ptp.core.elements.IPElement;
  *
  */
 public class Element extends PlatformObject implements IElement {
-	protected String id = "0";
-	protected String name = "";
+	protected String id = "0"; //$NON-NLS-1$
+	protected String name = ""; //$NON-NLS-1$
 	protected boolean registered = false;
 	protected IElement parent = null;
 	protected IPElement pElement = null;

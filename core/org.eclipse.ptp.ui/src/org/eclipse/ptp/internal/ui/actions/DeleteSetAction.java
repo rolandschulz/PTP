@@ -18,10 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -32,7 +34,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class DeleteSetAction extends ParallelAction {
-	public static final String name = "Delete Set";
+	public static final String name = Messages.DeleteSetAction_0;
 	
 	/** Constructor
 	 * @param view
@@ -56,7 +58,7 @@ public class DeleteSetAction extends ParallelAction {
 			if (setManager == null)
 				return;
 
-			if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements from this set?")) {
+			if (UIUtils.showQuestionDialog(NLS.bind(Messages.DeleteSetAction_1, set.getID()), Messages.DeleteSetAction_2)) {
 				IManager uiManager = view.getUIManager();
 				uiManager.removeSet(set.getID(), setManager);
 						

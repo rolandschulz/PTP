@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.ptp.ui.views.AbstractParallelSetView;
@@ -29,13 +30,13 @@ import org.eclipse.ptp.ui.views.AbstractParallelSetView;
  *
  */
 public class ZoomOutAction extends ParallelAction {
-	public static final String name = "Zoom out";
-	
+	public static final String name = Messages.ZoomOutAction_0;
+
 	/** Constructor
 	 * @param view
 	 */
 	public ZoomOutAction(AbstractParallelElementView view) {
-		super(name, view);
+		super(Messages.ZoomOutAction_0, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_ZOOMOUT_NORMAL);
 	}
 

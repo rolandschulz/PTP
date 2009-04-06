@@ -20,6 +20,7 @@
 package org.eclipse.ptp.ui;
 
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,53 +39,53 @@ import org.eclipse.swt.widgets.Shell;
 public class LegendDialog extends Dialog 
 {
 	private String rmStateText[] = {
-		"STARTING",
-		"STARTED",
-		"STOPPING",
-		"STOPPED",
-		"SUSPENDED",
-		"ERROR"
+		Messages.LegendDialog_0,
+		Messages.LegendDialog_1,
+		Messages.LegendDialog_2,
+		Messages.LegendDialog_3,
+		Messages.LegendDialog_4,
+		Messages.LegendDialog_5
 	};
 	
 	private String machineStateText[] = {
-		"UP",
-		"DOWN",
-		"ALERT",
-		"ERROR",
-		"UNKNOWN"
+		Messages.LegendDialog_6,
+		Messages.LegendDialog_7,
+		Messages.LegendDialog_8,
+		Messages.LegendDialog_9,
+		Messages.LegendDialog_10
 	};
 
 	private String jobStateText[] = {
-		"PENDING",
-		"STARTED",
-		"RUNNING",
-		"TERMINATED",
-		"SUSPENDED",
-		"ERROR",
-		"UNKNOWN"		
+		Messages.LegendDialog_11,
+		Messages.LegendDialog_12,
+		Messages.LegendDialog_13,
+		Messages.LegendDialog_14,
+		Messages.LegendDialog_15,
+		Messages.LegendDialog_16,
+		Messages.LegendDialog_17		
 	};
 	
 	private String nodeStateText[] = {
-		"UP",
-		"DOWN",
-		"ERROR",
-		"UNKNOWN",
-		"USER EXCLUSIVE",
-		"USER SHARED",
-		"OTHER EXCLUSIVE",
-		"OTHER SHARED",
-		"PROCESS RUNNING",
-		"PROCESS TERMINATED",
+		Messages.LegendDialog_18,
+		Messages.LegendDialog_19,
+		Messages.LegendDialog_20,
+		Messages.LegendDialog_21,
+		Messages.LegendDialog_22,
+		Messages.LegendDialog_23,
+		Messages.LegendDialog_24,
+		Messages.LegendDialog_25,
+		Messages.LegendDialog_26,
+		Messages.LegendDialog_27,
 	};
 	
 	private String processStateText[] = {
-		"STARTING",
-		"RUNNING",
-		"EXITED NORMALLY",
-		"EXITED WITH SIGNAL",
-		"SUSPENDED",
-		"ERROR",
-		"UNKNOWN"
+		Messages.LegendDialog_28,
+		Messages.LegendDialog_29,
+		Messages.LegendDialog_30,
+		Messages.LegendDialog_31,
+		Messages.LegendDialog_32,
+		Messages.LegendDialog_33,
+		Messages.LegendDialog_34
 	};
 	
 	/**
@@ -97,7 +98,7 @@ public class LegendDialog extends Dialog
 	
 	public LegendDialog(Shell parent, int style) {
 		super(parent, style);
-		setText("Legend");
+		setText(Messages.LegendDialog_35);
 	}
 	
 	public String open() {
@@ -122,7 +123,7 @@ public class LegendDialog extends Dialog
 		
 		/* the RM box */
 		Group box = new Group(shell, SWT.BORDER);
-		box.setText("Resource Manager Icons");
+		box.setText(Messages.LegendDialog_36);
 		FillLayout fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -153,7 +154,7 @@ public class LegendDialog extends Dialog
 		
 		/* the machines box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText("Machine Icons");
+		box.setText(Messages.LegendDialog_37);
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -182,7 +183,7 @@ public class LegendDialog extends Dialog
 		
 		/* the node box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText("Node Icons");
+		box.setText(Messages.LegendDialog_38);
 		GridLayout g = new GridLayout(2, true);
 		box.setLayout(g);
 		data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -211,7 +212,7 @@ public class LegendDialog extends Dialog
 		
 		/* the job box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText("Job Icons");
+		box.setText(Messages.LegendDialog_39);
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -240,7 +241,7 @@ public class LegendDialog extends Dialog
 				
 		/* the process box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText("Process Icons");
+		box.setText(Messages.LegendDialog_40);
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -268,7 +269,7 @@ public class LegendDialog extends Dialog
 		}
 		
         Button close = new Button(shell, SWT.PUSH);
-        close.setText("Close");
+        close.setText(Messages.LegendDialog_41);
         data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
         data.horizontalSpan = 2;
 		close.setLayoutData(data);

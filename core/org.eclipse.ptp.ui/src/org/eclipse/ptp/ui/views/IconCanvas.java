@@ -128,9 +128,9 @@ public class IconCanvas extends Canvas {
 	final static boolean DOUBLE_BUFFER;
 	static {
 		String platform = SWT.getPlatform();
-		IS_CARBON = "carbon".equals(platform);
-		IS_GTK = "gtk".equals(platform);
-		IS_MOTIF = "motif".equals(platform);
+		IS_CARBON = "carbon".equals(platform); //$NON-NLS-1$
+		IS_GTK = "gtk".equals(platform); //$NON-NLS-1$
+		IS_MOTIF = "motif".equals(platform); //$NON-NLS-1$
 		DOUBLE_BUFFER = !IS_CARBON;
 	}
 
@@ -2265,8 +2265,8 @@ public class IconCanvas extends Canvas {
 
 		//File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
 		//File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
-		File normalFile = new File("/home/clement/Desktop/workspace_1.1/org.eclipse.ptp.ui/icons/node/node_running.gif");
-		File selectedFile = new File("/home/clement/Desktop/workspace_1.1/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		File normalFile = new File("/home/clement/Desktop/workspace_1.1/org.eclipse.ptp.ui/icons/node/node_running.gif"); //$NON-NLS-1$
+		File selectedFile = new File("/home/clement/Desktop/workspace_1.1/org.eclipse.ptp.ui/icons/node/node_running_sel.gif"); //$NON-NLS-1$
 		
 		URL normalURL = null;
 		URL selectedlURL = null;
@@ -2274,7 +2274,7 @@ public class IconCanvas extends Canvas {
 			normalURL = normalFile.toURI().toURL();
 			selectedlURL = selectedFile.toURI().toURL();
 		} catch (Exception e) {
-			System.out.println("Cannot create the URL: " + e.getMessage());
+			System.out.println("Cannot create the URL: " + e.getMessage()); //$NON-NLS-1$
 			return;
 		}
 		final Image normalImage1 = ImageDescriptor.createFromURL(normalURL).createImage();
@@ -2309,10 +2309,10 @@ public class IconCanvas extends Canvas {
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
         	public String[] toolTipText(Object obj) {
         		//if (obj.toString().indexOf("1") > -1) {
-        		String t = "<i>12345678901234567890123456789a<br>";
-	    		t += "12345678901234567890</i>1<b>23456789</b>a";
-	    		t += "12345678901234567890123456789a";
-	       		return new String[] { "Object: " + obj, t };
+        		String t = "<i>12345678901234567890123456789a<br>"; //$NON-NLS-1$
+	    		t += "12345678901234567890</i>1<b>23456789</b>a"; //$NON-NLS-1$
+	    		t += "12345678901234567890123456789a"; //$NON-NLS-1$
+	       		return new String[] { "Object: " + obj, t }; //$NON-NLS-1$
         		//return new String[] { "" };
         		//}
         		/*

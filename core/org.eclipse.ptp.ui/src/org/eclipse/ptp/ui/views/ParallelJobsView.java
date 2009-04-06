@@ -79,6 +79,7 @@ import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.managers.JobManager;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -109,7 +110,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		public void handleEvent(IChangedProcessEvent e) {
 			if (e.getSource() instanceof IPJob) {
 				if (debug) {
-					System.err.println("----------------- IJobChildListener - IChangedProcessEvent: " + this);
+					System.err.println("----------------- IJobChildListener - IChangedProcessEvent: " + this); //$NON-NLS-1$
 				}
 				if (!((IPJob)e.getSource()).isDebug()) {
 					refresh(true);
@@ -123,7 +124,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		public void handleEvent(INewProcessEvent e) {
 			if (e.getSource() instanceof IPJob) {
 				if (debug) {
-					System.err.println("----------------- IJobChildListener - INewProcessEvent: " + this);
+					System.err.println("----------------- IJobChildListener - INewProcessEvent: " + this); //$NON-NLS-1$
 				}
 				for (IPProcess proc : e.getProcesses()) {
 					getJobManager().addProcess(proc);
@@ -144,7 +145,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		public void handleEvent(IRemoveProcessEvent e) {
 			if (e.getSource() instanceof IPJob) {
 				if (debug) {
-					System.err.println("----------------- IJobChildListener - IRemoveProcessEvent: " + this);
+					System.err.println("----------------- IJobChildListener - IRemoveProcessEvent: " + this); //$NON-NLS-1$
 				}
 				boolean isCurrent = e.getSource().getID().equals(getCurrentID());
 				for (IPProcess proc : e.getProcesses()) {
@@ -198,7 +199,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		
 		public void handleEvent(INewJobEvent e) {
 			if (debug) {
-				System.err.println("----------------- QueueChildListener - INewJobEvent: " + this);
+				System.err.println("----------------- QueueChildListener - INewJobEvent: " + this); //$NON-NLS-1$
 			}
 			IPJob lastJob = null;
 			for (IPJob job : e.getJobs()) {
@@ -215,7 +216,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		}
 		public void handleEvent(IRemoveJobEvent e) {
 			if (debug) {
-				System.err.println("----------------- QueueChildListener - IRemoveJobEvent: " + this);
+				System.err.println("----------------- QueueChildListener - IRemoveJobEvent: " + this); //$NON-NLS-1$
 			}
 			for (IPJob job : e.getJobs()) {
 				getJobManager().removeJob(job);
@@ -275,7 +276,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		private List<ISelection> refreshJobList = new ArrayList<ISelection>();
 		
 		public JobViewUpdateWorkbenchJob() {
-			super("Refreshing job view...");
+			super(Messages.ParallelJobsView_0);
 		}
 		
 		/* (non-Javadoc)
@@ -287,7 +288,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			
 			ISelection selection = getLastJobSelection();
 			if (debug) {
-				System.err.println("============= JobViewUpdateWorkbenchJob refresh: " + selection);
+				System.err.println("============= JobViewUpdateWorkbenchJob refresh: " + selection); //$NON-NLS-1$
 			}
 			if (!jobTableViewer.getTable().isDisposed()) {
 				jobTableViewer.setSelection(selection, true);
@@ -336,7 +337,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		public boolean shouldSchedule() {
 			int size = size();
 			if (debug) {
-				System.err.println("============= JobViewUpdateWorkbenchJob: " + refreshJobList.size());
+				System.err.println("============= JobViewUpdateWorkbenchJob: " + refreshJobList.size()); //$NON-NLS-1$
 			}
 			return (size == 1);
 		}
@@ -579,17 +580,17 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		StringBuffer buffer = new StringBuffer();
 		String num = proc.getProcessIndex();
 		if (num != null) {
-			buffer.append("Index: " + num);
-			buffer.append("\n");
+			buffer.append(Messages.ParallelJobsView_1 + num);
+			buffer.append(Messages.ParallelJobsView_2);
 		}
-		buffer.append("PID: " + proc.getPid());
+		buffer.append(Messages.ParallelJobsView_3 + proc.getPid());
 		IElementSet[] sets = setManager.getSetsWithElement(proc.getID());
 		if (sets.length > 1)
-			buffer.append("\nSet: ");
+			buffer.append(Messages.ParallelJobsView_4);
 		for (int i = 1; i < sets.length; i++) {
 			buffer.append(sets[i].getID());
 			if (i < sets.length - 1)
-				buffer.append(",");
+				buffer.append(","); //$NON-NLS-1$
 		}
 		// buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
 		return new String[] { buffer.toString() };
@@ -699,7 +700,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * Create Job context menu
 	 */
 	protected void createJobContextMenu() {
-		MenuManager menuMgr = new MenuManager("#jobpopupmenu");
+		MenuManager menuMgr = new MenuManager("#jobpopupmenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -747,7 +748,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				if (element instanceof IPJob) {
 					return ((IPJob) element).getName();
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		});
 		jobTableViewer.setContentProvider(new IStructuredContentProvider() {

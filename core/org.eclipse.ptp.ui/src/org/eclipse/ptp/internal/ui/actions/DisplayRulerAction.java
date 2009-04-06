@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
@@ -28,7 +29,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  * 
  */
 public class DisplayRulerAction extends ParallelAction {
-	public static final String name = "Show ruler";
+	public static final String name = Messages.DisplayRulerAction_0;
 	private boolean checked = false;
 	
 	/** Constructor

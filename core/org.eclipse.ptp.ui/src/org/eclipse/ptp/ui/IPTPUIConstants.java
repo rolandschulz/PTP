@@ -24,32 +24,32 @@ package org.eclipse.ptp.ui;
  */
 public interface IPTPUIConstants {
 	public static final String PLUGIN_ID = PTPUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
+	public static final String PREFIX = PLUGIN_ID + "."; //$NON-NLS-1$
 	
-	public static final String VIEW_PARALLELMACHINES = PREFIX + "views.parallelMachinesView";
-	public static final String VIEW_PARALLELJOBS = PREFIX + "views.parallelJobsView";
-	public static final String VIEW_JOBSLIST = PREFIX + "views.JobsListView";
-	public static final String VIEW_PARALLELProcess = PREFIX + "views.parallelProcessView";
-	public static final String VIEW_RESOURCEMANAGER = PREFIX + "views.resourceManagerView";
+	public static final String VIEW_PARALLELMACHINES = PREFIX + "views.parallelMachinesView"; //$NON-NLS-1$
+	public static final String VIEW_PARALLELJOBS = PREFIX + "views.parallelJobsView"; //$NON-NLS-1$
+	public static final String VIEW_JOBSLIST = PREFIX + "views.JobsListView"; //$NON-NLS-1$
+	public static final String VIEW_PARALLELProcess = PREFIX + "views.parallelProcessView"; //$NON-NLS-1$
+	public static final String VIEW_RESOURCEMANAGER = PREFIX + "views.resourceManagerView"; //$NON-NLS-1$
 
-	public static final String RM_REMOTE_SERVICES = PREFIX + "remoteServices";
+	public static final String RM_REMOTE_SERVICES = PREFIX + "remoteServices"; //$NON-NLS-1$
 	
-	public static final String PERSPECTIVE_RUN = PREFIX + "PTPRunPerspective";
+	public static final String PERSPECTIVE_RUN = PREFIX + "PTPRunPerspective"; //$NON-NLS-1$
 
-	public static final String SEARCH_PAGE = PREFIX + "PSearchPage";
-	public static final String SEARCH_RESULT_PAGE = PREFIX + "PSearchResultPage";
+	public static final String SEARCH_PAGE = PREFIX + "PSearchPage"; //$NON-NLS-1$
+	public static final String SEARCH_RESULT_PAGE = PREFIX + "PSearchResultPage"; //$NON-NLS-1$
 	
-    public static final String ACTION_SET = PREFIX + "actionSets";
-    public static final String ACTION_SHOW_LEGEND = PREFIX + "actions.showLegendAction";
+    public static final String ACTION_SET = PREFIX + "actionSets"; //$NON-NLS-1$
+    public static final String ACTION_SHOW_LEGEND = PREFIX + "actions.showLegendAction"; //$NON-NLS-1$
     
-    public static final String IUINAVIGATORGROUP = "navigatorgroup";
-    public static final String IUIACTIONGROUP = "actiongroup";
-    public static final String IUISETGROUP = "setgroup";
-    public static final String IUICHANGESETGROUP = "changesetgroup";
-    public static final String IUIVIEWGROUP = "viewgroup";
-    public static final String IUIZOOMGROUP = "zoomgroup";
-    public static final String IUIEMPTYGROUP = "emptygroup";
-    public static final String IUIJOBGROUP = "jobgroup";
+    public static final String IUINAVIGATORGROUP = "navigatorgroup"; //$NON-NLS-1$
+    public static final String IUIACTIONGROUP = "actiongroup"; //$NON-NLS-1$
+    public static final String IUISETGROUP = "setgroup"; //$NON-NLS-1$
+    public static final String IUICHANGESETGROUP = "changesetgroup"; //$NON-NLS-1$
+    public static final String IUIVIEWGROUP = "viewgroup"; //$NON-NLS-1$
+    public static final String IUIZOOMGROUP = "zoomgroup"; //$NON-NLS-1$
+    public static final String IUIEMPTYGROUP = "emptygroup"; //$NON-NLS-1$
+    public static final String IUIJOBGROUP = "jobgroup"; //$NON-NLS-1$
  	
 	public static final int INTERNAL_ERROR = 150;
 	public static final int STATUS_CODE_QUESTION = 10000;
@@ -57,13 +57,13 @@ public interface IPTPUIConstants {
 	public static final int STATUS_CODE_ERROR = 10002;
 	
 	//preferences
-	public static final String VIEW_ICON_SPACING_X = "icon_spacing_x";
-	public static final String VIEW_ICON_SPACING_Y = "icon_spacing_y";
-	public static final String VIEW_ICON_WIDTH = "icon_width";
-	public static final String VIEW_ICON_HEIGHT = "icon_height";
-	public static final String VIEW_TOOLTIP_SHOWALLTIME = "tt_show_all_time";
-	public static final String VIEW_TOOLTIP_TIMEOUT = "tt_timeout";
-	public static final String VIEW_TOOLTIP_ISWRAP = "tt_iswap";
+	public static final String VIEW_ICON_SPACING_X = "icon_spacing_x"; //$NON-NLS-1$
+	public static final String VIEW_ICON_SPACING_Y = "icon_spacing_y"; //$NON-NLS-1$
+	public static final String VIEW_ICON_WIDTH = "icon_width"; //$NON-NLS-1$
+	public static final String VIEW_ICON_HEIGHT = "icon_height"; //$NON-NLS-1$
+	public static final String VIEW_TOOLTIP_SHOWALLTIME = "tt_show_all_time"; //$NON-NLS-1$
+	public static final String VIEW_TOOLTIP_TIMEOUT = "tt_timeout"; //$NON-NLS-1$
+	public static final String VIEW_TOOLTIP_ISWRAP = "tt_iswap"; //$NON-NLS-1$
 	public static final int DEFAULT_VIEW_ICON_SPACING_X = 4;
 	public static final int DEFAULT_VIEW_ICON_SPACING_Y = 4;
 	public static final int DEFAULT_VIEW_ICON_WIDTH = 16;

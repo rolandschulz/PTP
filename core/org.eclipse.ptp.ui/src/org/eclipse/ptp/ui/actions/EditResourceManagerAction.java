@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
@@ -36,7 +37,7 @@ public class EditResourceManagerAction extends Action {
 	private final Shell shell;
 
 	public EditResourceManagerAction(Shell shell) {
-		super("Edit Resource Manager");
+		super(Messages.EditResourceManagerAction_0);
 		this.shell = shell;
 	}
 

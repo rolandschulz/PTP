@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -149,7 +150,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 */
 	protected void detailsSection() {
 		Section detailsSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR);
-		detailsSection.setText("Process details");
+		detailsSection.setText(Messages.ParallelProcessView_0);
 		detailsSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Composite detailsContainer = createClientContainer(detailsSection, toolkit, 3, true, 2, 2);
 		pidLabel = toolkit.createLabel(detailsContainer, null);
@@ -167,7 +168,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 */
 	protected void outputSection() {
 		Section outputSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR | Section.TWISTIE);
-		outputSection.setText("Program output");
+		outputSection.setText(Messages.ParallelProcessView_1);
 		outputSection.setLayoutData(new GridData(GridData.FILL_BOTH));
 		outputSection.setExpanded(true);
 		Composite ouputContainer = createClientContainer(outputSection, toolkit, 1, true, 2, 2);
@@ -201,13 +202,13 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 * Initialize the view
 	 */
 	public void initialText() {
-		pidLabel.setText("PID: N/A");
-		statusLabel.setText("Status: N/A");
-		outputText.setText("N/A");
+		pidLabel.setText(Messages.ParallelProcessView_2);
+		statusLabel.setText(Messages.ParallelProcessView_3);
+		outputText.setText(Messages.ParallelProcessView_4);
 		
 		if (process != null) {
-			pidLabel.setText("PID: " + process.getPid());
-			statusLabel.setText("Status: " + process.getState());
+			pidLabel.setText(Messages.ParallelProcessView_5 + process.getPid());
+			statusLabel.setText(Messages.ParallelProcessView_6 + process.getState());
 
 			/*
 			 * Set initial output text
@@ -225,12 +226,12 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				EnumeratedAttribute<ProcessAttributes.State> stateAttr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
 				if (stateAttr != null) {
 					ProcessAttributes.State state = stateAttr.getValue();
-					statusLabel.setText("Status: " + state.toString());
+					statusLabel.setText(Messages.ParallelProcessView_6 + state.toString());
 				} 
 				
 				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
 				if (stdoutAttr != null) {
-					outputText.append(stdoutAttr.getValue() + "\n");
+					outputText.append(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
 				}
 			}
 		});

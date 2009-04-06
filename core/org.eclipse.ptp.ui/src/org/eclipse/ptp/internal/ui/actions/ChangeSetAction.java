@@ -24,9 +24,10 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.GotoAction;
 import org.eclipse.ptp.ui.actions.GotoDropDownAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
@@ -34,8 +35,8 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class ChangeSetAction extends GotoDropDownAction {
-	public static final String name = "Change Set";
-    
+	public static final String name = Messages.ChangeSetAction_0;
+	
 	/** Constructor
 	 * @param view
 	 */

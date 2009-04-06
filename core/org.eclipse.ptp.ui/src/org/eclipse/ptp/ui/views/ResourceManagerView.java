@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
@@ -59,6 +60,7 @@ import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.EditResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -319,7 +321,7 @@ public class ResourceManagerView extends ViewPart {
 			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					IStatus status = new Status(IStatus.ERROR, PTPUIPlugin.PLUGIN_ID, e.getMessage());
-					ErrorDialog.openError(PTPUIPlugin.getDisplay().getActiveShell(), "Resource Manager Error", "The \"" + e.getSource().getName() + "\" resource manager reported the following error", status);
+					ErrorDialog.openError(PTPUIPlugin.getDisplay().getActiveShell(), Messages.ResourceManagerView_0, NLS.bind(Messages.ResourceManagerView_1, e.getSource().getName()), status);
 				}
 			});
 		}

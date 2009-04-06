@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 
 public class DebugUtil {
-	private static final String JOBS_VIEW_TRACING_OPTION = "org.eclipse.ptp.ui/views/jobs/tracing";
-	private static final String MACHINES_VIEW_TRACING_OPTION = "org.eclipse.ptp.ui/views/machines/tracing";
+	private static final String JOBS_VIEW_TRACING_OPTION = "org.eclipse.ptp.ui/views/jobs/tracing"; //$NON-NLS-1$
+	private static final String MACHINES_VIEW_TRACING_OPTION = "org.eclipse.ptp.ui/views/machines/tracing"; //$NON-NLS-1$
 
 	public static boolean JOBS_VIEW_TRACING = false;
 	public static boolean MACHINES_VIEW_TRACING = false; 

@@ -24,11 +24,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.ui.messages.Messages;
 
 public class StopResourceManagersObjectActionDelegate
 extends AbstractResourceManagerSelectionActionDelegate {
@@ -48,10 +49,8 @@ extends AbstractResourceManagerSelectionActionDelegate {
 			ResourceManagerAttributes.State state = rmManager.getState();
 			if (state == ResourceManagerAttributes.State.STARTED) {
 				boolean shutdown = MessageDialog.openConfirm(getTargetShell(),
-						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.Title"), //$NON-NLS-1$
-						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.Confirm") //$NON-NLS-1$
-						+ rmManager.getName()
-						+ UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManager")); //$NON-NLS-1$
+						Messages.StopResourceManagersObjectActionDelegate_0,
+						NLS.bind(Messages.StopResourceManagersObjectActionDelegate_1, rmManager.getName()));
 				if (!shutdown) {
 					return;
 				}
@@ -60,12 +59,11 @@ extends AbstractResourceManagerSelectionActionDelegate {
 			try {
 				rmManager.shutdown();
 			} catch (CoreException e) {
-				final String message = UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.UnableStopResourceManager") //$NON-NLS-1$
-						+ rmManager.getName() + "\""; //$NON-NLS-1$
+				final String message = NLS.bind(Messages.StopResourceManagersObjectActionDelegate_2, rmManager.getName());
 				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID,
 						1, message, e);
 				ErrorDialog dlg = new ErrorDialog(getTargetShell(),
-						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ErrorStopingResourceManager"), message, status, //$NON-NLS-1$
+						Messages.StopResourceManagersObjectActionDelegate_3, message, status,
 						IStatus.ERROR);
 				dlg.open();
 				PTPUIPlugin.log(status);

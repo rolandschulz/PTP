@@ -13,15 +13,16 @@ package org.eclipse.ptp.internal.ui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.views.ParallelJobsView;
 
 public class JobFocusAction extends Action {
 	private ParallelJobsView view = null;
 	
 	public JobFocusAction(ParallelJobsView view) {
-		super("Job Focus", IAction.AS_CHECK_BOX);
+		super(Messages.JobFocusAction_0, IAction.AS_CHECK_BOX);
 		this.view = view;
-		setToolTipText("Focus On New Job");
+		setToolTipText(Messages.JobFocusAction_1);
 	    setImageDescriptor(ParallelImages.ID_ICON_JOB_FOCUS_ENABLE);
 	    setDisabledImageDescriptor(ParallelImages.ID_ICON_JOB_FOCUS_DISABLE);
 	    this.setChecked(true);

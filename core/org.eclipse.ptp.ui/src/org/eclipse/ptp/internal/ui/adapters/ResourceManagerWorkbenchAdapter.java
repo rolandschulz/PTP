@@ -29,7 +29,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
@@ -96,10 +96,8 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 			IPMachine[] machines = rm.getMachines();
 			IPQueue[] queues = rm.getQueues();
 			return new Object[] {
-					makeChildContainer(parentElement,
-							UIMessage.getResourceString("ResourceManagerView.Machines"), machines), //$NON-NLS-1$
-					makeChildContainer(parentElement,
-							UIMessage.getResourceString("ResourceManagerView.Queues"), queues) }; //$NON-NLS-1$
+					makeChildContainer(parentElement, Messages.ResourceManagerWorkbenchAdapter_0, machines),
+					makeChildContainer(parentElement, Messages.ResourceManagerWorkbenchAdapter_1, queues) };
 		}
 		return null;
 	}

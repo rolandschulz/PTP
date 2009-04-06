@@ -22,20 +22,22 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.GotoAction;
 import org.eclipse.ptp.ui.actions.GotoDropDownAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 /**
  * @author clement chu
  *
  */
 public class CreateSetAction extends GotoDropDownAction {
-	public static final String name = "Create Set";
-    
+	public static final String name = Messages.CreateSetAction_0;
+
 	/** Constructor
 	 * @param view
 	 */
@@ -62,7 +64,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID, Object data) {
-		IAction action = new InternalSetAction("Add to set: " + e_name, id, view, this);
+		IAction action = new InternalSetAction(Messages.CreateSetAction_1 + e_name, id, view, this);
 		action.setEnabled(!curID.equals(id));
 		dropDownMenuMgr.add(action);
 	}	
@@ -87,15 +89,15 @@ public class CreateSetAction extends GotoDropDownAction {
 				IInputValidator inputValidator = new IInputValidator() {
 					public String isValid(String newText) {
 						if (newText == null || newText.length() == 0)
-							return "This field cannot be empty.";
+							return Messages.CreateSetAction_2;
 						
 						if (setManager.contains(newText))
-							return "Entered set name (" + newText + ") is already used.";						
+							return NLS.bind(Messages.CreateSetAction_5, newText);						
 
 						return null;
 					}
 				};
-				InputDialog inputDialog = new InputDialog(getShell(), "Create a new set name", "Please enter the new set name.", "", inputValidator);
+				InputDialog inputDialog = new InputDialog(getShell(), Messages.CreateSetAction_3, Messages.CreateSetAction_4, "", inputValidator); //$NON-NLS-1$
 				if (inputDialog.open() == InputDialog.CANCEL)
 					return;
 

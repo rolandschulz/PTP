@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.preferences;
 
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -39,7 +40,7 @@ public class RMPreferencesPage extends AbstractPreferencePage {
 	public RMPreferencesPage() {
 		super();
 		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
-		setDescription(PreferenceMessages.getString("RMPreferencesPage.desc"));
+		setDescription(Messages.RMPreferencesPage_0);
 	}
 	
 	/* (non-Javadoc)

@@ -19,8 +19,10 @@
 package org.eclipse.ptp.ui.preferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -53,7 +55,7 @@ public class ViewerPreferencesPage extends AbstractPreferencePage {
 		private int min = 0;
 		private int max = 10;
 		private Text textField = null;		
-		private String msg = "";
+		private String msg = ""; //$NON-NLS-1$
 		
 		/** Constructor
 		 * @param labelText
@@ -91,7 +93,7 @@ public class ViewerPreferencesPage extends AbstractPreferencePage {
         		}	        		
         	});
 			
-			new Label(parent, SWT.RIGHT).setText("(" + min + "-" + max + ")");
+			new Label(parent, SWT.RIGHT).setText("(" + min + "-" + max + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		
 		/** Set text field enabled
@@ -141,15 +143,15 @@ public class ViewerPreferencesPage extends AbstractPreferencePage {
 	     * @return
 	     */
 	    public boolean isValid() {
-	    	setErrorMessage("");
+	    	setErrorMessage(""); //$NON-NLS-1$
 	    	try {
 	    		int value = Integer.parseInt(textField.getText());
 	    		if (value < min || value > max) {
-	    			setErrorMessage("Value must be in the range of (" + min + "-" + max + ")");
+	    			setErrorMessage(NLS.bind(Messages.ViewerPreferencesPage_0, new Object[] {min, max}));
 	    			return false;
 	    		}
 	    	} catch (NumberFormatException e) {
-	    		setErrorMessage("Value must be integer: " + e.getMessage());
+	    		setErrorMessage(NLS.bind(Messages.ViewerPreferencesPage_1, e.getMessage()));
 	    		return false;
 	    	}
 	    	return true;
@@ -162,7 +164,7 @@ public class ViewerPreferencesPage extends AbstractPreferencePage {
 	public ViewerPreferencesPage() {
 		super();
 		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
-		setDescription(PreferenceMessages.getString("ViewerPreferencePage.desc"));
+		setDescription(Messages.ViewerPreferencesPage_2);
 	}
 	
 	/* (non-Javadoc)
@@ -190,10 +192,10 @@ public class ViewerPreferencesPage extends AbstractPreferencePage {
 	 * @param parent
 	 */
 	protected void createTooltipGroup(Composite parent) {
-		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("ViewerPreferencesPage.tooltipName"));
+		Composite group = createGroupComposite(parent, 1, false, Messages.ViewerPreferencesPage_3);
 		Composite compTooltip = createComposite(group, 1);
 
-		tooltipShowAllTimeButton = createCheckButton(compTooltip, PreferenceMessages.getString("ViewerPreferencesPage.tooltip_showAllTime"));
+		tooltipShowAllTimeButton = createCheckButton(compTooltip, Messages.ViewerPreferencesPage_4);
 		tooltipShowAllTimeButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				toolTipField.setEnabled(!tooltipShowAllTimeButton.getSelection());
@@ -201,8 +203,8 @@ public class ViewerPreferencesPage extends AbstractPreferencePage {
 					toolTipField.setValue((int)getPreferenceStore().getDefaultLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT));
 			}
 		});
-		toolTipField = new ViewIntFieldEditor(PreferenceMessages.getString("ViewerPreferencesPage.tooltip_timeout"), 1000, 10000, createComposite(compTooltip, 3));
-		tooltipIsWrapButton = createCheckButton(compTooltip, PreferenceMessages.getString("ViewerPreferencesPage.tooltip_iswrap"));
+		toolTipField = new ViewIntFieldEditor(Messages.ViewerPreferencesPage_5, 1000, 10000, createComposite(compTooltip, 3));
+		tooltipIsWrapButton = createCheckButton(compTooltip, Messages.ViewerPreferencesPage_6);
 	}
 	
 	/** Create icon group composite

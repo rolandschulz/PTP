@@ -116,15 +116,15 @@ public class JobConsole implements IJobChildListener {
 	 * @param msg output from process
 	 */
 	public void cout(String index, String msg) {
-		String output = "";
+		String output = ""; //$NON-NLS-1$
 		
 		if (prefix) {
-			String[] lines = msg.split("\n");
+			String[] lines = msg.split("\n"); //$NON-NLS-1$
 			for (int i = 0; i < lines.length; i++) {
 				if (i > 0) {
-					output += "\n";
+					output += "\n"; //$NON-NLS-1$
 				}
-				output += "[" + index + "] " + lines[i];
+				output += "[" + index + "] " + lines[i]; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		} else {
 			output = msg;
@@ -188,6 +188,6 @@ public class JobConsole implements IJobChildListener {
 		String rmName    = job.getQueue().getResourceManager().getName();
 		String queueName = job.getQueue().getName();
 		String jobName   = job.getName();
-		return rmName + ":" + queueName + ":" + jobName;
+		return rmName + ":" + queueName + ":" + jobName; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

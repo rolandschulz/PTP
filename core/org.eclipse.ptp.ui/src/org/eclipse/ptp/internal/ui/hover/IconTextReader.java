@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  */
 public class IconTextReader extends SubstitutionTextReader {
-	private static final String EMPTY_STRING= "";
+	private static final String EMPTY_STRING= ""; //$NON-NLS-1$
 	private static final Map<String, String> fgEntityLookup;
 	private static final Set<String> fgTags;
 	
@@ -57,13 +57,13 @@ public class IconTextReader extends SubstitutionTextReader {
 		fgTags.add(IIconHoverTag.INDENT_TAG);
 
 		fgEntityLookup= new HashMap<String, String>(7);
-		fgEntityLookup.put("lt", "<");
-		fgEntityLookup.put("gt", ">");
-		fgEntityLookup.put("nbsp", " ");
-		fgEntityLookup.put("amp", "&");
-		fgEntityLookup.put("circ", "^");
-		fgEntityLookup.put("tilde", "~");
-		fgEntityLookup.put("quot", "\"");		
+		fgEntityLookup.put("lt", "<"); //$NON-NLS-1$ //$NON-NLS-2$
+		fgEntityLookup.put("gt", ">"); //$NON-NLS-1$ //$NON-NLS-2$
+		fgEntityLookup.put("nbsp", " "); //$NON-NLS-1$ //$NON-NLS-2$
+		fgEntityLookup.put("amp", "&"); //$NON-NLS-1$ //$NON-NLS-2$
+		fgEntityLookup.put("circ", "^"); //$NON-NLS-1$ //$NON-NLS-2$
+		fgEntityLookup.put("tilde", "~"); //$NON-NLS-1$ //$NON-NLS-2$
+		fgEntityLookup.put("quot", "\"");		 //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private int fCounter= 0;
@@ -243,7 +243,7 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 
 		if (tag.equals(IIconHoverTag.INDENT_TAG)) {
-			return "\t" + EMPTY_STRING;
+			return "\t" + EMPTY_STRING; //$NON-NLS-1$
 		}
 
 		if (tag.equals(IIconHoverTag.NEXT_LINE_TAG)) {
@@ -377,7 +377,7 @@ public class IconTextReader extends SubstitutionTextReader {
 				return str;
 			}
 		}
-		return "&" + symbol; // not found
+		return "&" + symbol; // not found //$NON-NLS-1$
 	}
 
 	/** Get process entity

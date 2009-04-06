@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Clement chu
  */
 public class IconHoverPresenter implements DefaultInformationControl.IInformationPresenter {
-	private static final String LINE_DELIM = System.getProperty("line.separator", "\n");
+	private static final String LINE_DELIM = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	//private static final String LINE_INDENTATION = "  ";
 	private int fCounter;
 	private boolean fEnforceUpperLineLimit;
@@ -144,7 +144,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 			// display "..." if the content is over the shell size
 			if (line != null && buffer.length() > 0) {
 				append(buffer, LINE_DELIM, null);
-				append(buffer, "...", null);
+				append(buffer, "...", null); //$NON-NLS-1$
 			}
 			return trim(buffer, presentation);
 		} catch (IOException e) {
@@ -222,7 +222,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		while (end >= 0 && Character.isWhitespace(buffer.charAt(end)))
 			--end;
 		if (end == -1)
-			return "";
+			return ""; //$NON-NLS-1$
 		if (end < length - 1)
 			buffer.delete(end + 1, length);
 		else

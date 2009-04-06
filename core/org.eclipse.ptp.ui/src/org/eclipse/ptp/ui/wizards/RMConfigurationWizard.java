@@ -29,7 +29,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -55,7 +55,7 @@ public class RMConfigurationWizard extends Wizard {
 		public NameAndDescPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
-			setDescription(UIMessage.getResourceString("ConfigurationWizard.NameDesc")); //$NON-NLS-1$
+			setDescription(Messages.RMConfigurationWizard_0);
 		}
 
 		public void createControl(Composite parent) {
@@ -83,7 +83,7 @@ public class RMConfigurationWizard extends Wizard {
 
 			final Button useDefaultsButton = new Button(nameGroup,
 					SWT.TOGGLE | SWT.CHECK);
-			useDefaultsButton.setText(UIMessage.getResourceString("ConfigurationWizard.UseDefaultButtonLabel")); //$NON-NLS-1$
+			useDefaultsButton.setText(Messages.RMConfigurationWizard_1);
 			useDefaultsButton.setSelection(useDefaultNameAndDesc);
 			GridData buttonData = new GridData();
 			buttonData.horizontalSpan = 2;
@@ -108,7 +108,7 @@ public class RMConfigurationWizard extends Wizard {
 			});
 			
 			Label nameLabel = new Label(nameGroup, SWT.NONE);
-			nameLabel.setText(UIMessage.getResourceString("ConfigurationWizard.NameLabel")); //$NON-NLS-1$
+			nameLabel.setText(Messages.RMConfigurationWizard_2);
 			nameText = new Text(nameGroup, SWT.BORDER);
 			nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			nameText.setText(""); //$NON-NLS-1$
@@ -117,12 +117,12 @@ public class RMConfigurationWizard extends Wizard {
 					configs[selectedFactory].setName(nameText.getText());
 					if (nameText.getText().equals(EMPTY_STRING)) {
 						setPageComplete(false);
-						setErrorMessage("Please specify a resource manager name");
+						setErrorMessage(Messages.RMConfigurationWizard_3);
 					}
 				}});
 
 			Label descLabel = new Label(nameGroup, SWT.NONE);
-			descLabel.setText(UIMessage.getResourceString("ConfigurationWizard.DescriptionLabel")); //$NON-NLS-1$
+			descLabel.setText(Messages.RMConfigurationWizard_4);
 			descText = new Text(nameGroup, SWT.BORDER);
 			descText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			descText.setText(""); //$NON-NLS-1$
@@ -153,7 +153,7 @@ public class RMConfigurationWizard extends Wizard {
 		public SelectFactoryPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
-			setDescription(UIMessage.getResourceString("ConfigurationWizard.SelectFactoryDesc")); //$NON-NLS-1$
+			setDescription(Messages.RMConfigurationWizard_5);
 		}
 
 		public void createControl(Composite parent) {
@@ -184,7 +184,7 @@ public class RMConfigurationWizard extends Wizard {
 			}
 
 			Label factoryLabel = new Label(container, SWT.NONE);
-			factoryLabel.setText(UIMessage.getResourceString("ConfigurationWizard.ResourceManagerTypesLabel")); //$NON-NLS-1$
+			factoryLabel.setText(Messages.RMConfigurationWizard_6);
 			factoryList = new List(container, SWT.SINGLE | SWT.BORDER
 					| SWT.V_SCROLL);
 			factoryList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -241,9 +241,9 @@ public class RMConfigurationWizard extends Wizard {
 		this.cachedPages = new RMConfigurationWizardPage[factories.length][];
 		this.configs = new IResourceManagerConfiguration[factories.length];
 		this.selectFactoryPage = new SelectFactoryPage(
-				UIMessage.getResourceString("ConfigurationWizard.FirstWizardPageName")); //$NON-NLS-1$
+				Messages.RMConfigurationWizard_7);
 		this.nameAndDescPage = new NameAndDescPage(
-				UIMessage.getResourceString("ConfigurationWizard.SecondWizardPageName")); //$NON-NLS-1$
+				Messages.RMConfigurationWizard_8);
 		this.useDefaultNameAndDesc = true;
 		this.resourceManager = null;
 	}
