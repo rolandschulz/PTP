@@ -21,9 +21,11 @@ package org.eclipse.ptp.internal.ui.actions;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -34,7 +36,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class RemoveElementAction extends ParallelAction {
-	public static final String name = "Remove Elements";
+	public static final String name = Messages.RemoveElementAction_0;
 	
 	/** Constructor
 	 * @param view
@@ -57,7 +59,7 @@ public class RemoveElementAction extends ParallelAction {
 				if (setManager == null)
 					return;
 
-				if (UIUtils.showQuestionDialog("Remove Confirmation", "Are you sure you want to remove (" + elements.length + ") elements from this set?"))	{			
+				if (UIUtils.showQuestionDialog(Messages.RemoveElementAction_1, NLS.bind(Messages.RemoveElementAction_2, elements.length)))	{			
 					view.getUIManager().removeFromSet(elements, set.getID(), setManager);
 					view.selectSet((IElementSet)setManager.getElementByID(set.getID()));
 					view.updateTitle();

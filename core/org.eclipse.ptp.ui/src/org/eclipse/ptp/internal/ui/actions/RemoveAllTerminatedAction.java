@@ -21,6 +21,7 @@ package org.eclipse.ptp.internal.ui.actions;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.managers.JobManager;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
@@ -29,7 +30,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class RemoveAllTerminatedAction extends ParallelAction {
-	public static final String name = "Remove All Terminated";
+	public static final String name = Messages.RemoveAllTerminatedAction_0;
 	
 	/** Constructor
 	 * @param view

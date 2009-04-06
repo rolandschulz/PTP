@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ui.PlatformUI;
 
 public class StartResourceManagersObjectActionDelegate extends
@@ -64,7 +65,7 @@ public class StartResourceManagersObjectActionDelegate extends
 				if (t != null && t instanceof CoreException) {
 					status = ((CoreException)t).getStatus();
 				}
-				UIUtils.showErrorDialog("Start Resource Manager", "Failed to start resource manager", status);
+				UIUtils.showErrorDialog(Messages.StartResourceManagersObjectActionDelegate_0, Messages.StartResourceManagersObjectActionDelegate_1, status);
 			} catch (InterruptedException e) {
 				// Do nothing. Operation has been canceled.
 			}

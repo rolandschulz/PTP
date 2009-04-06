@@ -22,7 +22,7 @@ package org.eclipse.ptp.ui.views;
  *
  */
 public interface IToolTipProvider {
-	public final String[] NO_TOOLTIP = new String[] { "" };
+	public final String[] NO_TOOLTIP = new String[] { "" }; //$NON-NLS-1$
 	/** Get tooltip content
 	 * @param obj Selected element
 	 * @return content of tooltip

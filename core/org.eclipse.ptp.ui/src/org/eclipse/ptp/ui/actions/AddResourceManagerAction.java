@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -35,7 +36,7 @@ public class AddResourceManagerAction extends Action {
 	private final Shell shell;
 
 	public AddResourceManagerAction(Shell shell) {
-		super("Add Resource Manager...");
+		super(Messages.AddResourceManagerAction_0);
 		this.shell = shell;
 	}
 
@@ -46,8 +47,8 @@ public class AddResourceManagerAction extends Action {
 		final IResourceManagerFactory[] resourceManagerFactories = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFactories();
 		if (resourceManagerFactories.length == 0) {
 			MessageBox dialog = new MessageBox(shell, SWT.OK | SWT.ICON_INFORMATION);
-			dialog.setText("No Resource Managers Factories");
-			dialog.setMessage("No Resource Managers Factories are plugged into this application");
+			dialog.setText(Messages.AddResourceManagerAction_1);
+			dialog.setMessage(Messages.AddResourceManagerAction_2);
 			dialog.open();
 			return;
 		}

@@ -22,15 +22,15 @@ package org.eclipse.ptp.ui.hover;
  * 
  */
 public interface IIconHoverTag {
-	public final static String UNDERLINE_TAG = "u";
-	public final static String STRIKE_TAG = "s";
-	public final static String BOLD_TAG = "b";
-	public final static String ITALIC_TAG = "i";
-	public final static String P_TAG = "p";
-	public final static String KEY_TAG = "key";
-	public final static String HIGHLIGHT_TAG = "hl";
-	public final static String INDENT_TAG = "ind";
-	public final static String NEXT_LINE_TAG = "br";
+	public final static String UNDERLINE_TAG = "u"; //$NON-NLS-1$
+	public final static String STRIKE_TAG = "s"; //$NON-NLS-1$
+	public final static String BOLD_TAG = "b"; //$NON-NLS-1$
+	public final static String ITALIC_TAG = "i"; //$NON-NLS-1$
+	public final static String P_TAG = "p"; //$NON-NLS-1$
+	public final static String KEY_TAG = "key"; //$NON-NLS-1$
+	public final static String HIGHLIGHT_TAG = "hl"; //$NON-NLS-1$
+	public final static String INDENT_TAG = "ind"; //$NON-NLS-1$
+	public final static String NEXT_LINE_TAG = "br"; //$NON-NLS-1$
 		
 	public final static char CLOSED_TAG = '/';
 	public final static char START_TAG = '<';

@@ -239,7 +239,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 			{
 				IConfigurationElement ce = elements[i];
 				try {
-					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class");
+					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					Class rmFactoryClass = factory.getRMFactoryClass();
 					configurationWizardPageFactories.put(rmFactoryClass.getName(), factory);
 				} catch (CoreException e) {

@@ -31,8 +31,8 @@ public class ResourceManagerPropertySource extends PElementPropertySource {
 		super(resourceManager);
 		
 		this.resourceManager = resourceManager;
-		addDescriptor(new PropertyDescriptor("rm.machines", "num machines"));
-		addDescriptor(new PropertyDescriptor("rm.queues", "num queues"));
+		addDescriptor(new PropertyDescriptor("rm.machines", "num machines")); //$NON-NLS-1$ //$NON-NLS-2$
+		addDescriptor(new PropertyDescriptor("rm.queues", "num queues")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 	}
 
@@ -41,11 +41,11 @@ public class ResourceManagerPropertySource extends PElementPropertySource {
 		if (value != null) {
 			return value;
 		}
-		if ("rm.machines".equals(id)) {
+		if ("rm.machines".equals(id)) { //$NON-NLS-1$
 			final IPMachine[] machines = resourceManager.getMachines();
 			return Integer.toString(machines.length);
 		}
-		if ("rm.queues".equals(id)) {
+		if ("rm.queues".equals(id)) { //$NON-NLS-1$
 			final IPQueue[] queues = resourceManager.getQueues();
 			return Integer.toString(queues.length);
 		}

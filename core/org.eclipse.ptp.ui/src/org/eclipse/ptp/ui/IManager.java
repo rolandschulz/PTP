@@ -31,7 +31,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  *
  */
 public interface IManager {
-	public static final String EMPTY_ID = "";
+	public static final String EMPTY_ID = ""; //$NON-NLS-1$
 	public static final int CREATE_SET_TYPE = 0;
 	public static final int DELETE_SET_TYPE = 1;
 	public static final int CHANGE_SET_TYPE = 2;

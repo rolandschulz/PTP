@@ -89,7 +89,7 @@ public class LineBreakingReader {
 				fLine = null;
 			}
 			if (breakOffset == 1 && res.charAt(0) == '\t') {// added to prevent empty line
-				return "\t" + readLine(indent);
+				return "\t" + readLine(indent); //$NON-NLS-1$
 			}
 		} else {
 			res = fLine.substring(fOffset);
@@ -119,7 +119,7 @@ public class LineBreakingReader {
 			fLineLen = 0;
 		}
 		if (res.charAt(0) == '\t') {// added to prevent empty line
-			return "\t" + res;
+			return "\t" + res; //$NON-NLS-1$
 		}
 		return res;
 	}

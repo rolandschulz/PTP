@@ -21,6 +21,7 @@ package org.eclipse.ptp.ui;
 import java.io.IOException;
 import java.io.InputStream;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
@@ -70,7 +71,7 @@ public class OutputConsole extends MessageConsole {
 					}
 				}
 			};
-			thread = new Thread(runnable, "Output Console Monitor");
+			thread = new Thread(runnable, Messages.OutputConsole_0);
 			thread.start();
 		}
 	}

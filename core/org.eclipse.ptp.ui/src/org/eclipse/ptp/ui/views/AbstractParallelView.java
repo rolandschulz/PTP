@@ -82,7 +82,7 @@ public abstract class AbstractParallelView extends ViewPart {
 	private class ParallelViewPartListener implements IPartListener2 {
 		public void partActivated(IWorkbenchPartReference partRef) {
 			if (debug) {
-				System.err.println("-------------------- partActivated");
+				System.err.println("-------------------- partActivated"); //$NON-NLS-1$
 			}
 			repaint(true);
 		}

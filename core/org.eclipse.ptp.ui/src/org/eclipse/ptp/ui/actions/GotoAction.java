@@ -27,7 +27,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public abstract class GotoAction extends ParallelAction {
-	protected String id = "";
+	protected String id = ""; //$NON-NLS-1$
 	protected GotoDropDownAction action = null;
 	protected Object data;
 	

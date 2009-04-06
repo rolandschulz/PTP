@@ -36,6 +36,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.model.IElement;
@@ -52,7 +53,7 @@ public class JobManager extends AbstractUIManager {
 	protected Map<String, IPJob> jobList = new HashMap<String, IPJob>();
 	protected IPJob cur_job = null;
 	protected IPQueue cur_queue = null;
-	protected final String DEFAULT_TITLE = "Please select a job";
+	protected final String DEFAULT_TITLE = Messages.JobManager_0;
 
 	/** 
 	 * Add a new job to jobList. Check for any new processes and add these to
@@ -165,11 +166,11 @@ public class JobManager extends AbstractUIManager {
 			if (queue != null) {
 				IResourceManager rm = queue.getResourceManager();
 				if (rm != null) {
-					return rm.getName() + ": " + queue.getName() + ":" + job.getName();
+					return rm.getName() + ": " + queue.getName() + ":" + job.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 	
 	/** 
@@ -196,7 +197,7 @@ public class JobManager extends AbstractUIManager {
 	public String getName(String id) {
 		IPJob job = findJobById(id);
 		if (job == null)
-			return "";
+			return ""; //$NON-NLS-1$
 		return job.getName();
 	}
 	
@@ -209,7 +210,7 @@ public class JobManager extends AbstractUIManager {
 		if (proc != null) {
 			return proc.getState().toString();
 		}
-		return "Error";
+		return Messages.JobManager_1;
 	}
 	
 	/**

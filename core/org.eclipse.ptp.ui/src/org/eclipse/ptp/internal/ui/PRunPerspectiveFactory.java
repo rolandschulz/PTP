@@ -33,23 +33,23 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
  		String editorArea = layout.getEditorArea();
 		
-		IFolderLayout rmFolder= layout.createFolder("rmFolder", IPageLayout.LEFT, (float)0.50, editorArea);
+		IFolderLayout rmFolder= layout.createFolder("rmFolder", IPageLayout.LEFT, (float)0.50, editorArea); //$NON-NLS-1$
 		rmFolder.addView(IPTPUIConstants.VIEW_RESOURCEMANAGER);
 
-		IFolderLayout jobsFolder= layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float)0.75, "rmFolder");
+		IFolderLayout jobsFolder= layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float)0.75, "rmFolder"); //$NON-NLS-1$ //$NON-NLS-2$
 		jobsFolder.addView(IPTPUIConstants.VIEW_PARALLELJOBS);
 		jobsFolder.addView(IPTPUIConstants.VIEW_JOBSLIST);
 
-		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, (float)0.25, "rmFolder");
+		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, (float)0.25, "rmFolder"); //$NON-NLS-1$ //$NON-NLS-2$
 		machinesFolder.addView(IPTPUIConstants.VIEW_PARALLELMACHINES);
 		machinesFolder.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
-		IFolderLayout consoleFolder= layout.createFolder("consoleFolder", IPageLayout.BOTTOM, (float)0.75, editorArea);
+		IFolderLayout consoleFolder= layout.createFolder("consoleFolder", IPageLayout.BOTTOM, (float)0.75, editorArea); //$NON-NLS-1$
 		consoleFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		consoleFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
 		consoleFolder.addView(IPageLayout.ID_PROP_SHEET);
 		consoleFolder.addView(IPageLayout.ID_TASK_LIST);
-		consoleFolder.addView("org.eclipse.pde.runtime.LogView");
+		consoleFolder.addView("org.eclipse.pde.runtime.LogView"); //$NON-NLS-1$
 		
 		// set toolbar or menu icon
 		//layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
@@ -68,7 +68,7 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
-		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
+		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView"); //$NON-NLS-1$
 		
 		// link - things we should do
 		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELMACHINES);

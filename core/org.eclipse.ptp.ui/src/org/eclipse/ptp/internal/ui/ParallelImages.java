@@ -30,107 +30,107 @@ public class ParallelImages {
 
 	// ==== URLs for Icon Folders ==== 
 	
-	public final static URL ICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/");
-	public final static URL TOOLICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
-	public final static URL JOBICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/job/");
-	public final static URL PROCESSICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/process/");
-	public final static URL NODEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/node/");
-	public final static URL MACHINEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/machine/");
-	public final static URL RMICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/rm/");
+	public final static URL ICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/"); //$NON-NLS-1$
+	public final static URL TOOLICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/tool/"); //$NON-NLS-1$
+	public final static URL JOBICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/job/"); //$NON-NLS-1$
+	public final static URL PROCESSICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/process/"); //$NON-NLS-1$
+	public final static URL NODEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/node/"); //$NON-NLS-1$
+	public final static URL MACHINEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/machine/"); //$NON-NLS-1$
+	public final static URL RMICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/rm/"); //$NON-NLS-1$
 	
 	// ===== Icon Files =====
 
 	// CHANGE/DELETE SET
-	public static final String ICON_CHANGESET_NORMAL = "changeset_normal.gif";
-	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif";
-	public static final String ICON_DELETESET_NORMAL = "deleteset_normal.gif";
-	public static final String ICON_DELETEELEMENT_NORMAL = "deleteelement_normal.gif";
+	public static final String ICON_CHANGESET_NORMAL = "changeset_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_DELETESET_NORMAL = "deleteset_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_DELETEELEMENT_NORMAL = "deleteelement_normal.gif"; //$NON-NLS-1$
 
 	//ZOOM
-	public static final String ICON_ZOOMIN_NORMAL = "zoomin_normal.gif";
-	public static final String ICON_ZOOMOUT_NORMAL = "zoomout_normal.gif";
+	public static final String ICON_ZOOMIN_NORMAL = "zoomin_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_ZOOMOUT_NORMAL = "zoomout_normal.gif"; //$NON-NLS-1$
 	
 	// TOOLBAR
-	public static final String ICON_TERMINATE_JOB_DISABLE = "terminate_job_disable.gif";
-	public static final String ICON_TERMINATE_JOB_NORMAL = "terminate_job_normal.gif";
-	public static final String ICON_REMOVEALLTERMINATED_NORMAL = "remove_all_terminated_normal.gif";
-	public static final String ICON_REMOVETERMINATED_NORMAL = "remove_terminated_normal.gif";
-	public static final String ICON_JOB_FOCUS_DISABLE = "job_focus_disable.gif";
-	public static final String ICON_JOB_FOCUS_ENABLE = "job_focus_enable.gif";
+	public static final String ICON_TERMINATE_JOB_DISABLE = "terminate_job_disable.gif"; //$NON-NLS-1$
+	public static final String ICON_TERMINATE_JOB_NORMAL = "terminate_job_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_REMOVEALLTERMINATED_NORMAL = "remove_all_terminated_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_REMOVETERMINATED_NORMAL = "remove_terminated_normal.gif"; //$NON-NLS-1$
+	public static final String ICON_JOB_FOCUS_DISABLE = "job_focus_disable.gif"; //$NON-NLS-1$
+	public static final String ICON_JOB_FOCUS_ENABLE = "job_focus_enable.gif"; //$NON-NLS-1$
 	
 	// SHOW LEGEND
-	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif";
+	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif"; //$NON-NLS-1$
 
 	// JOB
-	public static final String IMG_JOB_PENDING = "job_pending.gif";
-	public static final String IMG_JOB_STARTED = "job_started.gif";
-	public static final String IMG_JOB_RUNNING = "job_running.gif";
-	public static final String IMG_JOB_TERMINATED = "job_terminated.gif";
-	public static final String IMG_JOB_SUSPENDED = "job_suspended.gif";
-	public static final String IMG_JOB_ERROR = "job_error.gif";
-	public static final String IMG_JOB_UNKNOWN = "job_unknown.gif";
-	public static final String IMG_DEBUG_JOB_PENDING = "debug_job_pending.gif";
-	public static final String IMG_DEBUG_JOB_STARTED = "debug_job_started.gif";
-	public static final String IMG_DEBUG_JOB_RUNNING = "debug_job_running.gif";
-	public static final String IMG_DEBUG_JOB_TERMINATED = "debug_job_terminated.gif";
-	public static final String IMG_DEBUG_JOB_SUSPENDED = "debug_job_suspended.gif";
-	public static final String IMG_DEBUG_JOB_ERROR = "debug_job_error.gif";
-	public static final String IMG_DEBUG_JOB_UNKNOWN = "debug_job_unknown.gif";
+	public static final String IMG_JOB_PENDING = "job_pending.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_STARTED = "job_started.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_RUNNING = "job_running.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_TERMINATED = "job_terminated.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_SUSPENDED = "job_suspended.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_ERROR = "job_error.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_UNKNOWN = "job_unknown.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_PENDING = "debug_job_pending.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_STARTED = "debug_job_started.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_RUNNING = "debug_job_running.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_TERMINATED = "debug_job_terminated.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_SUSPENDED = "debug_job_suspended.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_ERROR = "debug_job_error.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_UNKNOWN = "debug_job_unknown.gif"; //$NON-NLS-1$
 	
 	// NODE
-	public static final String IMG_NODE_USER_ALLOC_EXCL = "node_user_excl.gif";
-	public static final String IMG_NODE_USER_ALLOC_EXCL_SEL = "node_user_excl_sel.gif";
-	public static final String IMG_NODE_USER_ALLOC_SHARED = "node_user_shared.gif";
-	public static final String IMG_NODE_USER_ALLOC_SHARED_SEL = "node_user_shared_sel.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_EXCL = "node_other_excl.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_EXCL_SEL = "node_other_excl_sel.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_SHARED = "node_other_shared.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_SHARED_SEL = "node_other_shared_sel.gif";
-	public static final String IMG_NODE_DOWN = "node_down.gif";
-	public static final String IMG_NODE_DOWN_SEL = "node_down_sel.gif";
-	public static final String IMG_NODE_ERROR = "node_error.gif";
-	public static final String IMG_NODE_ERROR_SEL = "node_error_sel.gif";
-	public static final String IMG_NODE_EXITED_PROCESS = "node_exited.gif";
-	public static final String IMG_NODE_EXITED_PROCESS_SEL = "node_exited_sel.gif";
-	public static final String IMG_NODE_RUNNING_PROCESS = "node_running.gif";
-	public static final String IMG_NODE_RUNNING_PROCESS_SEL = "node_running_sel.gif";
-	public static final String IMG_NODE_UNKNOWN = "node_unknown.gif";
-	public static final String IMG_NODE_UNKNOWN_SEL = "node_unknown_sel.gif";
-	public static final String IMG_NODE_UP = "node_up.gif";
-	public static final String IMG_NODE_UP_SEL = "node_up_sel.gif";
+	public static final String IMG_NODE_USER_ALLOC_EXCL = "node_user_excl.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_USER_ALLOC_EXCL_SEL = "node_user_excl_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_USER_ALLOC_SHARED = "node_user_shared.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_USER_ALLOC_SHARED_SEL = "node_user_shared_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_OTHER_ALLOC_EXCL = "node_other_excl.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_OTHER_ALLOC_EXCL_SEL = "node_other_excl_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_OTHER_ALLOC_SHARED = "node_other_shared.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_OTHER_ALLOC_SHARED_SEL = "node_other_shared_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_DOWN = "node_down.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_DOWN_SEL = "node_down_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_ERROR = "node_error.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_ERROR_SEL = "node_error_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_EXITED_PROCESS = "node_exited.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_EXITED_PROCESS_SEL = "node_exited_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_RUNNING_PROCESS = "node_running.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_RUNNING_PROCESS_SEL = "node_running_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_UNKNOWN = "node_unknown.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_UNKNOWN_SEL = "node_unknown_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_UP = "node_up.gif"; //$NON-NLS-1$
+	public static final String IMG_NODE_UP_SEL = "node_up_sel.gif"; //$NON-NLS-1$
 	
 	// PROCESS
-	public static final String IMG_PROC_ERROR = "proc_error.gif";
-	public static final String IMG_PROC_ERROR_SEL = "proc_error_sel.gif"; 
-	public static final String IMG_PROC_EXITED = "proc_exited.gif";
-	public static final String IMG_PROC_EXITED_SEL = "proc_exited_sel.gif";
-	public static final String IMG_PROC_EXITED_SIGNAL = "proc_exited_signal.gif";
-	public static final String IMG_PROC_EXITED_SIGNAL_SEL = "proc_exited_signal_sel.gif";
-	public static final String IMG_PROC_RUNNING = "proc_running.gif";
-	public static final String IMG_PROC_RUNNING_SEL = "proc_running_sel.gif";
-	public static final String IMG_PROC_STARTING = "proc_starting.gif";
-	public static final String IMG_PROC_STARTING_SEL = "proc_starting_sel.gif";
-	public static final String IMG_PROC_SUSPENDED = "proc_suspended.gif";
-	public static final String IMG_PROC_SUSPENDED_SEL = "proc_suspended_sel.gif";
-	public static final String IMG_PROC_UNKNOWN = "proc_unknown.gif";
-	public static final String IMG_PROC_UNKNOWN_SEL = "proc_unknown_sel.gif";
+	public static final String IMG_PROC_ERROR = "proc_error.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_ERROR_SEL = "proc_error_sel.gif";  //$NON-NLS-1$
+	public static final String IMG_PROC_EXITED = "proc_exited.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_EXITED_SEL = "proc_exited_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_EXITED_SIGNAL = "proc_exited_signal.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_EXITED_SIGNAL_SEL = "proc_exited_signal_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_RUNNING = "proc_running.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_RUNNING_SEL = "proc_running_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_STARTING = "proc_starting.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_STARTING_SEL = "proc_starting_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_SUSPENDED = "proc_suspended.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_SUSPENDED_SEL = "proc_suspended_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_UNKNOWN = "proc_unknown.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_UNKNOWN_SEL = "proc_unknown_sel.gif"; //$NON-NLS-1$
 	
 	// MACHINE
-	public static final String IMG_MACHINE_UNKNOWN = "machine_unknown.gif";
-	public static final String IMG_MACHINE_UP = "machine_up.gif";
-	public static final String IMG_MACHINE_DOWN = "machine_down.gif";
-	public static final String IMG_MACHINE_ALERT = "machine_alert.gif";
-	public static final String IMG_MACHINE_ERROR = "machine_error.gif";
+	public static final String IMG_MACHINE_UNKNOWN = "machine_unknown.gif"; //$NON-NLS-1$
+	public static final String IMG_MACHINE_UP = "machine_up.gif"; //$NON-NLS-1$
+	public static final String IMG_MACHINE_DOWN = "machine_down.gif"; //$NON-NLS-1$
+	public static final String IMG_MACHINE_ALERT = "machine_alert.gif"; //$NON-NLS-1$
+	public static final String IMG_MACHINE_ERROR = "machine_error.gif"; //$NON-NLS-1$
 
 	// RESOURCE MANAGERS
-	public static final String IMG_RM_STOPPED = "rm_stopped.gif";
-	public static final String IMG_RM_STARTED = "rm_started.gif";
-	public static final String IMG_RM_STARTING = "rm_starting.gif";
-	public static final String IMG_RM_STOPPING = "rm_stopping.gif";
-	public static final String IMG_RM_SUSPENDED = "rm_suspended.gif";
-	public static final String IMG_RM_ERROR = "rm_error.gif";
-	public static final String IMG_RM_START = "start.gif";
-	public static final String IMG_RM_STOP = "stop.gif";
+	public static final String IMG_RM_STOPPED = "rm_stopped.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_STARTED = "rm_started.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_STARTING = "rm_starting.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_STOPPING = "rm_stopping.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_SUSPENDED = "rm_suspended.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_ERROR = "rm_error.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_START = "start.gif"; //$NON-NLS-1$
+	public static final String IMG_RM_STOP = "stop.gif"; //$NON-NLS-1$
 	
 	// ==== Image Descriptors ====
 	

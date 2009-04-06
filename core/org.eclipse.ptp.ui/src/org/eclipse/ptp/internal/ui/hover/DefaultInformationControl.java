@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.ui.hover;
 
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.ptp.ui.hover.IIconInformationControl;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
@@ -161,7 +162,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		if (showDetails) {
 			if (enableKey) {
 				Label labelField = new Label(hdComposite, SWT.RIGHT);
-				labelField.setText("Press ESC to close");
+				labelField.setText(Messages.DefaultInformationControl_0);
 				createHeadLabel(labelField);
 			}
 			
@@ -231,7 +232,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	 */
 	public void setHeader(String header) {
 		if (headerField != null) {
-			headerField.setText(header + " ");
+			headerField.setText(header + " "); //$NON-NLS-1$
 		}
 	}
 	/* (non-Javadoc)
@@ -247,7 +248,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 				fText.setText(content);
 				TextPresentation.applyTextPresentation(fPresentation, fText);
 			} else {
-				fText.setText("");
+				fText.setText(""); //$NON-NLS-1$
 			}
 		}
 	}

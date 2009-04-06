@@ -78,6 +78,7 @@ import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -344,11 +345,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	}
 
 	// view flag
-	public static final String BOTH_VIEW = "0";
+	public static final String BOTH_VIEW = "0"; //$NON-NLS-1$
 
-	public static final String MACHINE_VIEW = "1";
+	public static final String MACHINE_VIEW = "1"; //$NON-NLS-1$
 	
-	public static final String INFO_VIEW = "2";
+	public static final String INFO_VIEW = "2"; //$NON-NLS-1$
 	
 	private ListenerList listeners = new ListenerList();
 	
@@ -542,11 +543,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		buffer.append(node.getName());
 		IElementSet[] sets = setManager.getSetsWithElement(node.getID());
 		if (sets.length > 1)
-			buffer.append("\n Set: ");
+			buffer.append(Messages.ParallelMachinesView_0);
 		for (int i = 1; i < sets.length; i++) {
 			buffer.append(sets[i].getID());
 			if (i < sets.length - 1)
-				buffer.append(",");
+				buffer.append(","); //$NON-NLS-1$
 		}
 		// buffer.append("\nStatus: " + getMachineManager().getNodeStatusText(node));
 		return new String[] { buffer.toString() };
@@ -640,7 +641,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	}
 	
 	private IPNode getRegisteredNode() {
-		cur_selected_element_id = "";
+		cur_selected_element_id = ""; //$NON-NLS-1$
 		IElementHandler elementHandler = getCurrentElementHandler();
 		if (elementHandler == null || cur_element_set == null || elementHandler.totalRegistered() == 0)
 			return null;
@@ -692,7 +693,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		gdtext.horizontalAlignment = GridData.FILL;
 		gdtext.verticalAlignment = GridData.FILL;
 		nodeGroup.setLayoutData(gdtext);
-		nodeGroup.setText("Node Attributes");
+		nodeGroup.setText(Messages.ParallelMachinesView_1);
 		
 		Group procGroup = new Group(composite, SWT.BORDER);
 		procGroup.setLayout(new FillLayout());
@@ -702,16 +703,16 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		gdlist.horizontalAlignment = GridData.FILL;
 		gdlist.verticalAlignment = GridData.FILL;
 		procGroup.setLayoutData(gdlist);
-		procGroup.setText("Process Info");
+		procGroup.setText(Messages.ParallelMachinesView_2);
 		
 		nodeAttrTableViewer = new TableViewer(nodeGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		Table nodeAttrTable = nodeAttrTableViewer.getTable();
 		TableColumn col = new TableColumn(nodeAttrTable, SWT.LEFT);
-		col.setText("Attribute");
+		col.setText(Messages.ParallelMachinesView_3);
 		col.setWidth(80);
 		col.setResizable(true);
 		col = new TableColumn(nodeAttrTable, SWT.LEFT);
-		col.setText("Value");
+		col.setText(Messages.ParallelMachinesView_4);
 		col.setWidth(200);
 		col.setResizable(false);
 		nodeAttrTable.setHeaderVisible(true);
@@ -749,10 +750,10 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 					case 1:
 						return attr.getValueAsString();
 					default:
-						return "unknown " + columnIndex;
+						return Messages.ParallelMachinesView_5 + columnIndex;
 					}
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
@@ -812,7 +813,6 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			}
 		});
 		processTableViewer.setLabelProvider(new LabelProvider() {
-			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
 				if (element instanceof IPProcess) {
 					IPProcess process = (IPProcess) element;
@@ -823,9 +823,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			public String getText(Object element) {
 				if (element instanceof IPProcess) {
 					IPProcess process = (IPProcess) element;
-					return process.getJob().getName() + ":" + process.getName();
+					return process.getJob().getName() + ":" + process.getName(); //$NON-NLS-1$
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		});
 		processTableViewer.setContentProvider(new IStructuredContentProvider() {
@@ -845,8 +845,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			public int compare(Viewer viewer, Object p1, Object p2) {
 				IPProcess proc1 = (IPProcess)p1;
 				IPProcess proc2 = (IPProcess)p2;
-				String name1 = proc1.getJob().getName() + ":" + proc1.getName();
-				String name2 = proc2.getJob().getName() + ":" + proc2.getName();
+				String name1 = proc1.getJob().getName() + ":" + proc1.getName(); //$NON-NLS-1$
+				String name2 = proc2.getJob().getName() + ":" + proc2.getName(); //$NON-NLS-1$
 				return name1.compareTo(name2);
 			}
 		});
@@ -859,7 +859,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	 * Create context menu
 	 */
 	protected void createMachineContextMenu() {
-		MenuManager menuMgr = new MenuManager("#machinepopupmenu");
+		MenuManager menuMgr = new MenuManager("#machinepopupmenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -907,7 +907,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 				if (element instanceof IPMachine) {
 					return ((IPMachine) element).getName();
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		});
 		machineTableViewer.setContentProvider(new IStructuredContentProvider() {

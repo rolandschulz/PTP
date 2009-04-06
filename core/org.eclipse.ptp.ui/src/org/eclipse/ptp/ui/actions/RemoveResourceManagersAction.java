@@ -24,7 +24,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoveResourceManagersAction extends Action {
@@ -34,22 +34,22 @@ public class RemoveResourceManagersAction extends Action {
 	private final Shell shell;
 
 	public RemoveResourceManagersAction(Shell shell) {
-		super("Remove Resource Manager");
+		super(Messages.RemoveResourceManagersAction_0);
 		this.shell = shell;
 	}
 
 	public void run() {
-		String rmNames = "";
+		String rmNames = ""; //$NON-NLS-1$
 		for (int i = 0; i < selectedRMManagers.length; i++) {
 			if (i > 0) {
-				rmNames += ",";
+				rmNames += ","; //$NON-NLS-1$
 			}
-			rmNames += "\n\t" + selectedRMManagers[i].getName();
+			rmNames += "\n\t" + selectedRMManagers[i].getName(); //$NON-NLS-1$
 		}
 		
 		boolean remove = MessageDialog.openConfirm(shell,
-				UIMessage.getResourceString("RemoveResourceManagersAction.Title"), //$NON-NLS-1$
-				UIMessage.getResourceString("RemoveResourceManagersAction.Question") //$NON-NLS-1$
+				Messages.RemoveResourceManagersAction_0,
+				Messages.RemoveResourceManagersAction_1
 				+ rmNames);
 		
 		if (remove) {

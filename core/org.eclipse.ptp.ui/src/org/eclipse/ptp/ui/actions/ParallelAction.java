@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.widgets.Shell;
@@ -95,7 +96,7 @@ public abstract class ParallelAction extends Action {
 	 */
 	protected boolean validation(IElement[] elements) {
 		if (elements == null || elements.length == 0) {
-			UIUtils.showErrorDialog("No selected elements", "Please select some elements first", null);
+			UIUtils.showErrorDialog("No selected elements", "Please select some elements first", null); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		return true;

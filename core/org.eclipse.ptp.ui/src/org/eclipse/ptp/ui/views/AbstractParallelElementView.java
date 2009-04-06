@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -53,14 +54,14 @@ import org.eclipse.ui.progress.WorkbenchJob;
 public abstract class AbstractParallelElementView extends AbstractParallelView implements IIconCanvasActionListener,
 		IToolTipProvider, IImageProvider, IContentProvider, ISelectionChangedListener {
 
-	protected final String DEFAULT_TITLE = "Parallel";
+	protected final String DEFAULT_TITLE = Messages.AbstractParallelElementView_0;
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
 	protected int cur_set_size = 0;
 	protected ElementIconCanvas canvas = null;
 	// title
-	protected final String EMPTY_TITLE = " ";
+	protected final String EMPTY_TITLE = " "; //$NON-NLS-1$
 	protected Color registerColor = null;
 	
 	protected IconRefreshWorkbenchJob iconreFreshJob = new IconRefreshWorkbenchJob();
@@ -78,7 +79,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				showWhile(new Runnable() {
 					public void run() {
 						if (!canvas.isDisposed()) {
-							if (preferenceType.startsWith("icon")) {
+							if (preferenceType.startsWith("icon")) { //$NON-NLS-1$
 								IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
 								canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 								canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
@@ -148,7 +149,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param size element size
 	 */
 	protected void changeTitle(String title, String setName, int size) {
-		changeTitle(" " + title + " - " + setName + " [" + size + "]");
+		changeTitle(" " + title + " - " + setName + " [" + size + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 	/** Change view title
 	 * @param message Message of title
@@ -339,7 +340,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		if (obj instanceof IElement) {			
 			return getToolTipText(convertElementObject((IElement)obj));
 		}
-		return new String[] { "" };
+		return new String[] { "" }; //$NON-NLS-1$
 	}
 	public void update(Object obj, String content) {
 		canvas.updateToolTipText(obj, content);
@@ -416,12 +417,12 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		private final ReentrantLock	waitLock = new ReentrantLock();
 		private List<Boolean> refreshList = new ArrayList<Boolean>();
 		public IconRefreshWorkbenchJob() {
-			super("Refreshing icons...");
+			super(Messages.AbstractParallelElementView_1);
 		}
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			boolean refreshAll = isRefreshAll();
 			if (debug) {
-				System.err.println("---------- IconRefreshWorkbenchJob refresh: " + refreshAll);
+				System.err.println("---------- IconRefreshWorkbenchJob refresh: " + refreshAll); //$NON-NLS-1$
 			}
 			repaint(refreshAll);
 			if (!canvas.isDisposed()) {
@@ -446,7 +447,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		public boolean shouldSchedule() {
 			int size = size();
 			if (debug) {
-				System.err.println("---------- IconRefreshWorkbenchJob: " + refreshList.size());
+				System.err.println("---------- IconRefreshWorkbenchJob: " + refreshList.size()); //$NON-NLS-1$
 			}
 			return (size == 1);
 		}
