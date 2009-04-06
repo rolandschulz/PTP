@@ -69,7 +69,7 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 					//TODO: put internal in defined strings
 					if(tool.analysisCommands[i].toolGroup==null||!tool.analysisCommands[i].toolGroup.equals("internal"))
 					{
-						runTool=getToolCommand(tool.analysisCommands[i],configuration,outputLocation);//tool.analysisCommands[i].toolCommand;
+						runTool=getToolCommand(tool.analysisCommands[i],configuration,outputLocation,outputLocation);//tool.analysisCommands[i].toolCommand;
 						//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
 						if(tool.forAllLike!=null){
 							runTool=runTool.replace("%%FILE%%", currentFile);

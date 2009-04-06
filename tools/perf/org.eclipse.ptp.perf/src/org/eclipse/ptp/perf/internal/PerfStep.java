@@ -177,13 +177,14 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 //		return getToolArguments(app,configuration,"");
 //	}
 	
-	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration, String outputloc) throws CoreException
+	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration, String buildDir, String rootDir) throws CoreException
 	{
 		if(app==null)
 			return("");
 		//Formerly replaced with projectLocation global variable.  May be the same?
 		String allargs=app.getArguments(configuration);
-		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_LOCATION, outputloc);
+		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
+		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
 		allargs=allargs+parseInput(app)+" "+parseOutput(app);
 		return allargs;
 	}
@@ -292,12 +293,12 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	 * Returns the full tool command; the full path to the executable used by  app followed by any arguments, replacing the 
 	 * output location with the string provided by outputloc if necessary
 	 */
-	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration,String outputloc) throws CoreException
+	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration,String buildDir, String rootDir) throws CoreException
 	{
 		String command=getToolExecutable(app);
 		if (command==null)
 			return null;
 		
-		return command+" "+getToolArguments(app,configuration,outputloc);
+		return command+" "+getToolArguments(app,configuration,buildDir,rootDir);
 	}
 }

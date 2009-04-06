@@ -32,6 +32,7 @@ public interface ITAULaunchConfigurationConstants {
 	public static final String PAPI = "use_papi_library";
 	public static final String PERF = "use_perf_library";
 	public static final String TRACE = "use_tau_tracing";
+	public static final String PDT = "use_tau_with_PDT";
 	public static final String PHASE = "use_tau_phases";
 	public static final String OPENMP = "use_openmp";
 	public static final String OPARI = "use_opari";
@@ -70,6 +71,8 @@ public interface ITAULaunchConfigurationConstants {
 	
 	public static final String PAPISELECT = "papi_counter_type_selection";
 	
+	public static final String PDTSELECT = "pdt_or_compiler_inst_selection";
+	
 	/**
 	 * ID of the int specifying no, internally generated, or external-file-defined selective instrumentation
 	 */
@@ -79,9 +82,15 @@ public interface ITAULaunchConfigurationConstants {
 	 */
 	public static final String SELECT_COMMAND = "selective_instrumentation_arg"+ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;//.performance.options.configuration_id";
 	/**
-	 * ID of the selective instrumentation file
+	 * ID of the selective instrumentation file shown in the UI, if any
 	 */
-	public static final String SELECT_FILE = "selective_instrumentation_file_path";
+	public static final String SELECT_FILE = "selective_instrumentation_file_path_shown";
+	
+	/**
+	 * ID of the selective instrumentation file actually used
+	 */
+	//public static final String INTERNAL_SELECTIVE_FILE = "selective_instrumentation_file_path_used_by_TAU";
+	
 	/**
 	 * ID of variable to indicate use of automatic selective instrumentation file generation with tau_reduce
 	 */

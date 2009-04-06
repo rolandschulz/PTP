@@ -155,12 +155,12 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 			
 				confWC.setAttribute(appnameattrib, firstExecUtil);
 				
-				String otherUtils=getToolArguments(tool.execUtils[0],configuration, projectLocation);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
+				String otherUtils=getToolArguments(tool.execUtils[0],configuration, projectLocation, projectLocation);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
 				
 				for(int i=1;i<tool.execUtils.length;i++)
 				{
 					//TODO: Check paths of other tools
-					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration, projectLocation);//tool.execUtils[i].getCommand(configuration);
+					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration, projectLocation, projectLocation);//tool.execUtils[i].getCommand(configuration);
 				}
 				swappedArgs=true;
 				if(traceOn)System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+otherUtils+" "+prog+" "+arg);

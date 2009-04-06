@@ -48,6 +48,7 @@ import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
 import org.eclipse.ptp.perf.tau.papiselect.PapiListSelectionDialog;
 import org.eclipse.ptp.perf.tau.papiselect.papic.EventTreeDialog;
 import org.eclipse.ptp.perf.tau.perfdmf.views.PerfDMFView;
+import org.eclipse.ptp.perf.toolopts.ToolOption;
 import org.eclipse.ptp.perf.toolopts.ToolPane;
 import org.eclipse.ptp.perf.toolopts.ToolPaneListener;
 import org.eclipse.ptp.perf.toolopts.ToolsOptionsConstants;
@@ -181,7 +182,8 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 																					new CheckItem("perf", "Perflib", "",
 																							ITAULaunchConfigurationConstants.PERF, false),
 																							new CheckItem("trace", "Trace", "",
-																									ITAULaunchConfigurationConstants.TRACE, false), };
+																									ITAULaunchConfigurationConstants.TRACE, false),
+																									new CheckItem("pdt","PDT","",ITAULaunchConfigurationConstants.PDT,false)};
 
 	/**
 	 * The index of the mpi button in CheckItem list. Used to enable/disable tauinc.sh box
@@ -195,12 +197,19 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	 * The index of the papi button in CheckItem list.  This requires special treatment
 	 */
 	protected int papiIndex = 8;
+	protected int pdtIndex = 11;
 
 	protected Button papiSelect;
 
 	protected Button papiCountRadios[];
 
+	protected Button pdtRadios[];
+
 	protected Composite papiComp;
+
+	protected Composite pdtComp;
+
+	protected Composite mpiComp;
 
 	protected Composite selComp;
 
@@ -265,22 +274,22 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	//TODO:  This isn't generic.  We need to get this pane explicitly
 	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
 
-//	protected ToolPane custOpts=null;
+	//	protected ToolPane custOpts=null;
 
-//	private static File tauToolXML= null;
-//	/**
-//	* Initialize the file that defines the TAU compilation options pane
-//	*/
-//	static{
-//	try {
+	//	private static File tauToolXML= null;
+	//	/**
+	//	* Initialize the file that defines the TAU compilation options pane
+	//	*/
+	//	static{
+	//	try {
 
-//	URL testURL=Activator.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
-//	tauToolXML = new File(new URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ", "%20")));
+	//	URL testURL=Activator.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
+	//	tauToolXML = new File(new URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ", "%20")));
 
-//	} catch (Exception e) {
-//	e.printStackTrace();
-//	} 
-//	}
+	//	} catch (Exception e) {
+	//	e.printStackTrace();
+	//	} 
+	//	}
 
 	/**
 	 * Listen for activity in the TAU makefile combo-box, CheckItem widgets or other options
@@ -297,35 +306,52 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 			 */
 			if (source == makecombo) {
 				selmakefile = makecombo.getItem(makecombo.getSelectionIndex());
-				if ((selmakefile.indexOf("-papi") > 0)
-						&& (selmakefile.indexOf("-multiplecounters") > 0)) {
-					papiSelect.setEnabled(true);
-				} else {
-					papiSelect.setEnabled(false);
-				}
+				//				if ((selmakefile.indexOf("-papi") > 0)
+				//						&& (selmakefile.indexOf("-multiplecounters") > 0)) {
+				//					papiSelect.setEnabled(true);
+				//				} else {
+				//					papiSelect.setEnabled(false);
+				//				}
 
-//				if(noParallelRun.getSelection())
-//				{
-//				buildonlyCheck.setSelection(selmakefile.indexOf("-mpi")>0);
-//				}
+				//				if(noParallelRun.getSelection())
+				//				{
+				//				buildonlyCheck.setSelection(selmakefile.indexOf("-mpi")>0);
+				//				}
+				updateComboDerivedOptions(selmakefile);
 				updateLaunchConfigurationDialog();
 			}
-//			else
-//			if(source==buildonlyCheck){
-//			updateLaunchConfigurationDialog();
-//			}
-//			else
-//			if(source==noParallelRun){
-//			if(noParallelRun.getSelection()&&selmakefile.indexOf("-mpi")>0){
-//			buildonlyCheck.setSelection(true);
-//			}
-//			}
+			//			else
+			//			if(source==buildonlyCheck){
+			//			updateLaunchConfigurationDialog();
+			//			}
+			//			else
+			//			if(source==noParallelRun){
+			//			if(noParallelRun.getSelection()&&selmakefile.indexOf("-mpi")>0){
+			//			buildonlyCheck.setSelection(true);
+			//			}
+			//			}
 			else
 				if (source == browseSelfileButton) {
 					handleSelfileBrowseButtonSelected();
 				} else if (source == papiSelect) {
 					handlePapiSelect();
-				} else if (source.equals(selectRadios[2])) {
+				} 
+
+				else if(source.equals(selectRadios[0])||source.equals(selectRadios[3])){
+					if(selectRadios[0].getSelection()||selectRadios[3].getSelection()){
+						selectOpt.setSelected(false);
+						selectOpt.setArg("");
+						selectOpt.setEnabled(false);
+					}
+				}
+				else if(source.equals(selectRadios[1])){
+					if(selectRadios[1].getSelection()){
+						selectOpt.setSelected(true);
+						selectOpt.setArg(ToolsOptionsConstants.PROJECT_ROOT+File.separator+"tau.selective");
+						selectOpt.setEnabled(false);
+					}
+				}
+				else if (source.equals(selectRadios[2])) {
 					if (!selectRadios[2].getSelection()) {
 						selComp.setEnabled(false);
 						tauSelectFile.setEnabled(false);
@@ -334,7 +360,10 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 						selComp.setEnabled(true);
 						tauSelectFile.setEnabled(true);
 						tauSelectFile.setEnabled(true);
+						selectOpt.setSelected(true);
+						selectOpt.setArg(tauSelectFile.getText());
 					}
+					selectOpt.setEnabled(false);
 				}
 			/*
 			 *If not one of the above options, then one of the makefile selection options has been tripped
@@ -355,19 +384,6 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 					}
 				}
 
-			/*
-			 *If MPI box was checked enable tauinc box. Else, uncheck/disable tauinc box
-			 *@author raportil
-			 */
-			if (source == checks[mpiIndex].unitCheck||source==checks[callpathIndex].unitCheck) {
-				if (checks[mpiIndex].unitCheck.getSelection()&&checks[callpathIndex].unitCheck.getSelection()) {
-					runTauinc.setEnabled(true);
-				} else {
-					runTauinc.setSelection(false);
-					runTauinc.setEnabled(false);
-				}
-			}
-
 			updateLaunchConfigurationDialog();
 		}
 
@@ -378,6 +394,8 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
 			if (source == tauSelectFile) {
+				if(selectRadios[2].getSelection())
+					selectOpt.setArg(tauSelectFile.getText());
 			}
 			updateLaunchConfigurationDialog();
 		}
@@ -517,15 +535,14 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 		class makefilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
-				if ((name.indexOf("Makefile.tau") != 0)
-						|| (name.indexOf("-pdt") <= 0)) {
+				if ((name.indexOf("Makefile.tau") != 0)) {
 					return false;
 				}
 				/*Only include papi makefiles built with multiplecounters*/
-//				if (name.indexOf("-multiplecounters") <= 0
-//						&& (name.indexOf("-papi") > 0)) {
-//					return false;
-//				}
+				//				if (name.indexOf("-multiplecounters") <= 0
+				//						&& (name.indexOf("-papi") > 0)) {
+				//					return false;
+				//				}
 
 				return true;
 			}
@@ -585,22 +602,95 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				makecombo.add("No Valid Makefiles!");
 				makecombo.select(0);
 			}
-			String checkforpapi = makecombo.getItem(makecombo
+			String makeStub = makecombo.getItem(makecombo
 					.getSelectionIndex());
-			/*
-			 * If the new makefile has the right options, activate the papi selector
-			 */
 
-			if ((checkforpapi.indexOf("-papi") > 0)
-					&& (checkforpapi.indexOf("-multiplecounters") > 0)) {
-				papiSelect.setEnabled(true);
-			} else {
-				papiSelect.setEnabled(false);
-			}
+			updateComboDerivedOptions(makeStub);
+
+			//			/*
+			//			 * If the new makefile has the right options, activate the papi selector
+			//			 */
+			//
+			//			if ((checkMakeStub.indexOf("-papi") > 0)
+			//					&& (checkMakeStub.indexOf("-multiplecounters") > 0)) {
+			//				papiSelect.setEnabled(true);
+			//			} else {
+			//				papiSelect.setEnabled(false);
+			//			}
+			//			
+			//			/*
+			//			 * If the new makefile has no PDT, only compiler instrumentation is available
+			//			 */
+			//			if(checkMakeStub.indexOf("-pdt")>=0){
+			//				if(!pdtRadios[0].getEnabled()){
+			//					pdtRadios[0].setEnabled(true);
+			//					pdtRadios[0].setSelection(true);
+			//				}
+			//					
+			//				
+			//				//this.pdtRadios[1].setEnabled(true);
+			//			}else{
+			//				pdtRadios[0].setEnabled(false);
+			//				pdtRadios[1].setSelection(true);
+			//			}
+
 			makecombo.pack();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void updateComboDerivedOptions(String makeStub){
+		/*
+		 * If the new makefile has the right options, activate the papi selector
+		 */
+
+		if ((makeStub.indexOf("-papi") > 0)
+				&& (makeStub.indexOf("-multiplecounters") > 0)) {
+			papiSelect.setEnabled(true);
+		} else {
+			papiSelect.setEnabled(false);
+		}
+
+		/*
+		 * If the new makefile has no PDT, only compiler instrumentation is available
+		 */
+		if(makeStub.indexOf("-pdt")>=0){
+			if(!pdtRadios[0].getEnabled()){
+				pdtRadios[0].setEnabled(true);
+				pdtRadios[0].setSelection(true);
+				pdtOpt.setSelected(true);
+				pdtRadios[1].setSelection(false);
+				compOpt.setSelected(false);
+
+				tauOpts.OptUpdate();
+			}
+
+
+			//this.pdtRadios[1].setEnabled(true);
+		}else{
+			pdtRadios[0].setEnabled(false);
+			pdtRadios[0].setSelection(false);
+			pdtOpt.setSelected(false);
+			pdtRadios[1].setSelection(true);
+			compOpt.setSelected(true);
+
+			tauOpts.OptUpdate();
+		}
+
+
+		/*
+		 *If MPI box was checked enable tauinc box. Else, uncheck/disable tauinc box
+		 *@author raportil
+		 */
+		if (makeStub.indexOf("-callpath")>=0&&makeStub.indexOf("-mpi")>=0){
+			runTauinc.setEnabled(true);
+		} else {
+			runTauinc.setSelection(false);
+			runTauinc.setEnabled(false);
+
+		}
+
 	}
 
 	/**
@@ -674,22 +764,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 		for (int i = 0; i < checks.length; i++) {
 			/*Papi is a special case*/
-			if (i != papiIndex) {
-				checks[i].unitCheck = createCheckButton(anaComp,
-						checks[i].buttonText);
-				checks[i].unitCheck.setToolTipText(checks[i].toolText);
-				checks[i].unitCheck.addSelectionListener(listener);
-
-				/*
-				 * Put tauinc box below MPI box
-				 * @author raportil
-				 */
-				if (i == mpiIndex) {
-					runTauinc = createCheckButton(anaComp, "Generate MPI include list");
-					runTauinc.addSelectionListener(listener);
-				}
-
-			} else {
+			if (i == papiIndex){
 				papiComp = new Composite(anaComp, SWT.NONE);
 				papiComp.setLayout(createGridLayout(5, false, 0, 0));
 				papiComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -707,8 +782,43 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				"Preset Counters");
 				papiCountRadios[1] = createRadioButton(papiComp,
 				"Native Counters");
-//				papiCountRadios[2] = createRadioButton(papiComp,
-//				"PAPI-C");
+				//				papiCountRadios[2] = createRadioButton(papiComp,
+				//				"PAPI-C");
+			} else if(i == pdtIndex){
+				pdtComp = new Composite(anaComp,SWT.NONE);
+				pdtComp.setLayout(createGridLayout(5,false,0,0));
+				pdtComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				checks[i].unitCheck = createCheckButton(pdtComp,
+						checks[i].buttonText);
+				checks[i].unitCheck.setToolTipText(checks[i].toolText);
+				checks[i].unitCheck.addSelectionListener(listener);
+				pdtRadios = new Button[2];
+				pdtRadios[0] = createRadioButton(pdtComp,
+				"PDT Instrumentation");
+				pdtRadios[1] = createRadioButton(pdtComp,
+				"Compiler Instrumentation");
+			} else if(i == mpiIndex){
+				mpiComp = new Composite(anaComp,SWT.NONE);
+				mpiComp.setLayout(createGridLayout(5,false,0,0));
+				mpiComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				checks[i].unitCheck = createCheckButton(mpiComp,
+						checks[i].buttonText);
+				checks[i].unitCheck.setToolTipText(checks[i].toolText);
+				checks[i].unitCheck.addSelectionListener(listener);
+
+				/*
+				 * Put tauinc box below MPI box
+				 * @author raportil
+				 */
+
+				runTauinc = createCheckButton(mpiComp, "Generate MPI include list");
+				runTauinc.addSelectionListener(listener);
+			}
+			else{
+				checks[i].unitCheck = createCheckButton(anaComp,
+						checks[i].buttonText);
+				checks[i].unitCheck.setToolTipText(checks[i].toolText);
+				checks[i].unitCheck.addSelectionListener(listener);
 			}
 		}
 		/*
@@ -744,9 +854,9 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		 * 
 		 * */
 
-//		tauOpts.encloseOpts="\'";
-//		tauOpts.prependOpts="-tau_options=";
-//		tauOpts.separateOpts=" ";
+		//		tauOpts.encloseOpts="\'";
+		//		tauOpts.prependOpts="-tau_options=";
+		//		tauOpts.separateOpts=" ";
 
 		TabItem optTab = new TabItem(tabParent, SWT.NULL);
 		optTab.setText(tauOpts.toolName.trim());
@@ -838,14 +948,14 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		 * */
 		createVerticalSpacer(dataComp, 1);
 
-//		buildonlyCheck = createCheckButton(dataComp,
-//		"Build the instrumented executable but do not launch it");
-//		buildonlyCheck.addSelectionListener(listener);
-//		noParallelRun=createCheckButton(dataComp,"Auto-select the above for MPI-based makefiles");
-//		noParallelRun.addSelectionListener(listener);
-//		nocleanCheck = createCheckButton(dataComp,
-//		"Keep instrumented executable");
-//		nocleanCheck.addSelectionListener(listener);
+		//		buildonlyCheck = createCheckButton(dataComp,
+		//		"Build the instrumented executable but do not launch it");
+		//		buildonlyCheck.addSelectionListener(listener);
+		//		noParallelRun=createCheckButton(dataComp,"Auto-select the above for MPI-based makefiles");
+		//		noParallelRun.addSelectionListener(listener);
+		//		nocleanCheck = createCheckButton(dataComp,
+		//		"Keep instrumented executable");
+		//		nocleanCheck.addSelectionListener(listener);
 
 		Composite dbComp = new Composite(dataComp, SWT.NONE);
 		dbComp.setLayout(createGridLayout(2, false, 0, 0));
@@ -900,8 +1010,8 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				ITAULaunchConfigurationConstants.VAMPIRTRACE,
 				ITAULaunchConfigurationConstants.VAMPIRTRACE_DEF);
 
-//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.NOCLEAN,
-//		IPerformanceLaunchConfigurationConstants.NOCLEAN_DEF);
+		//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.NOCLEAN,
+		//		IPerformanceLaunchConfigurationConstants.NOCLEAN_DEF);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.KEEPPROFS,
 				ITAULaunchConfigurationConstants.KEEPPROFS_DEF);
 
@@ -917,6 +1027,10 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 		tauOpts.setDefaults(configuration);
 	}
+
+	ToolOption pdtOpt = null;//tauOpts.getOption("-optPDTInst");
+	ToolOption compOpt = null;// tauOpts.getOption("-optCompInst");
+	ToolOption selectOpt = null;
 
 	/**
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
@@ -957,15 +1071,38 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 					ITAULaunchConfigurationConstants.PAPISELECT, 0);
 			if(pcr>1)pcr=0;
 			papiCountRadios[pcr]
-					.setSelection(true);
+			                .setSelection(true);
+
+
+			int pdtSel=configuration.getAttribute(ITAULaunchConfigurationConstants.PDTSELECT, 0);
+			if(pdtSel>1)pdtSel=0;
+			pdtRadios[pdtSel].setSelection(true);
+			pdtOpt = tauOpts.getOption("-optPDTInst");
+			compOpt = tauOpts.getOption("-optCompInst");
+			if(pdtOpt!=null&&compOpt!=null){
+				pdtOpt.setEnabled(false);
+				compOpt.setEnabled(false);
+				if(pdtSel==0){
+					pdtOpt.setSelected(true);
+					compOpt.setSelected(false);
+				}
+				else
+				{
+					pdtOpt.setSelected(false);
+					compOpt.setSelected(true);
+				}
+			}
 
 			selmakefile = configuration.getAttribute(
 					ITAULaunchConfigurationConstants.TAU_MAKENAME, (String) null);
 
 			initMakeCombo();
 			reinitMakeChecks();
+
 			int selected = configuration.getAttribute(
 					ITAULaunchConfigurationConstants.SELECT, 0);
+
+
 
 			selectRadios[selected].setSelection(true);
 
@@ -978,18 +1115,24 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				tauSelectFile.setEnabled(false);
 			}
 
-//			buildonlyCheck.setSelection(configuration.getAttribute(
-//			IPerformanceLaunchConfigurationConstants.BUILDONLY, false));
-//			noParallelRun.setSelection(configuration.getAttribute(
-//			ITAULaunchConfigurationConstants.NOPARRUN, noPTP));
+			selectOpt=tauOpts.getOption("-optTauSelectFile");
+			if(selectOpt!=null){
+				selectOpt.setEnabled(false);
+				//selectOpt.setArg(configuration.getAttribute(ITAULaunchConfigurationConstants.INTERNAL_SELECTIVE_FILE, ""));
+			}
 
-//			if(noParallelRun.getSelection()&&selmakefile.indexOf("-mpi")>0)
-//			{
-//			buildonlyCheck.setSelection(true);
-//			}
+			//			buildonlyCheck.setSelection(configuration.getAttribute(
+			//			IPerformanceLaunchConfigurationConstants.BUILDONLY, false));
+			//			noParallelRun.setSelection(configuration.getAttribute(
+			//			ITAULaunchConfigurationConstants.NOPARRUN, noPTP));
 
-//			nocleanCheck.setSelection(configuration.getAttribute(
-//			IPerformanceLaunchConfigurationConstants.NOCLEAN, false));
+			//			if(noParallelRun.getSelection()&&selmakefile.indexOf("-mpi")>0)
+			//			{
+			//			buildonlyCheck.setSelection(true);
+			//			}
+
+			//			nocleanCheck.setSelection(configuration.getAttribute(
+			//			IPerformanceLaunchConfigurationConstants.NOCLEAN, false));
 
 			initDBCombo(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, (String)null));
 
@@ -1050,12 +1193,12 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 		configuration.setAttribute(tauOpts.configID, tauOpts.getOptionString());
 
-//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY,
-//		buildonlyCheck.getSelection());
-//		configuration.setAttribute(ITAULaunchConfigurationConstants.NOPARRUN,
-//		noParallelRun.getSelection());
-//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.NOCLEAN,
-//		nocleanCheck.getSelection());
+		//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY,
+		//		buildonlyCheck.getSelection());
+		//		configuration.setAttribute(ITAULaunchConfigurationConstants.NOPARRUN,
+		//		noParallelRun.getSelection());
+		//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.NOCLEAN,
+		//		nocleanCheck.getSelection());
 		configuration.setAttribute(ITAULaunchConfigurationConstants.KEEPPROFS,
 				keepprofsCheck.getSelection());
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PORTAL,
@@ -1103,10 +1246,17 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 			configuration.setAttribute(ITAULaunchConfigurationConstants.PAPISELECT,
 					1);
 		}
-//		else if (papiCountRadios[2].getSelection()){
-//			configuration.setAttribute(ITAULaunchConfigurationConstants.PAPISELECT,
-//					2);
-//		}
+
+		if(pdtRadios[0].getSelection()){
+			configuration.setAttribute(ITAULaunchConfigurationConstants.PDTSELECT, 0);
+		}else{
+			configuration.setAttribute(ITAULaunchConfigurationConstants.PDTSELECT, 1);
+		}
+
+		//		else if (papiCountRadios[2].getSelection()){
+		//			configuration.setAttribute(ITAULaunchConfigurationConstants.PAPISELECT,
+		//					2);
+		//		}
 
 		/**
 		 * Selective instrumentation file specification
@@ -1119,31 +1269,35 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 					break;
 				}
 			}
+//
+//			String selcommand="";
+//			String selpath="";
+//			if(selected==1)
+//			{
+//				//configuration.getLocation().toOSString();
+//				selpath=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+"tau.selective";
+//				selcommand="-optTauSelectFile="+selpath;
+//				configuration.setAttribute(ITAULaunchConfigurationConstants.INTERNAL_SELECTIVE_FILE, selpath);
+//			}
+//			else
+//				if(selected==2)
+//				{
+//					selpath=tauSelectFile.getText();
+//					configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_FILE, selpath);
+//					if(!selpath.equals(""))
+//					{
+//						selcommand="-optTauSelectFile="+selpath;
+//					}
+//					configuration.setAttribute(ITAULaunchConfigurationConstants.INTERNAL_SELECTIVE_FILE, selpath);
+//				}
 
-			String selcommand="";
-			String selpath="";
-			if(selected==1)
-			{
-				//configuration.getLocation().toOSString();
-				selpath=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+"tau.selective";
-				selcommand="-optTauSelectFile="+selpath;
-			}
-			else
-				if(selected==2)
-				{
-					selpath=tauSelectFile.getText();
-					configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_FILE, selpath);
-					if(!selpath.equals(""))
-						selcommand="-optTauSelectFile="+selpath;
-				}
-			
 			if(selected==3){
-					configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_REDUCE, true);
-				}
+				configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_REDUCE, true);
+			}
 			else{
 				configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_REDUCE, false);
 			}
-			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_COMMAND,selcommand);
+			//configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_COMMAND,selcommand);
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT,selected);
 		}
 		String tauMakeName=makecombo.getItem(makecombo.getSelectionIndex());
@@ -1157,11 +1311,11 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		//.setDefault("TAUCheckForAutoOptions",true);
 
 
-//		if(noParallelRun.getSelection()&&makecombo.getItem(makecombo.getSelectionIndex()).indexOf("-mpi")>0)
-//		{
-//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY,
-//		true);
-//		}
+		//		if(noParallelRun.getSelection()&&makecombo.getItem(makecombo.getSelectionIndex()).indexOf("-mpi")>0)
+		//		{
+		//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY,
+		//		true);
+		//		}
 
 	}
 
@@ -1272,13 +1426,13 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		try {
 
 			String papiBin=getPapiLoc();
-			
+
 			File pdir=new File(papiBin);
 			if(!pdir.isDirectory()||!pdir.canRead()){
 				return;
 			}
 			File pcxi=new File(papiBin+File.separator+"papi_xml_event_info");
-			
+
 
 			if(pcxi.exists())//papiCountRadios[2].getSelection())
 			{
@@ -1286,7 +1440,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				final String pTool="papi_xml_event_info";
 				File pDir=new File(papiBin);
 				String[]files=pDir.list(new FilenameFilter(){
-					
+
 					public boolean accept(File fi, String name) {
 						if(name.equals(pTool))
 							return true;
@@ -1300,9 +1454,9 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				}
 
 				EventTreeDialog treeD=new EventTreeDialog(getShell(),papiBin);
-//				if ((varmap != null) && (varmap.size() > 0)) {
-//				treeD.setInitialSelections(varmap.values().toArray());
-//				}
+				//				if ((varmap != null) && (varmap.size() > 0)) {
+				//				treeD.setInitialSelections(varmap.values().toArray());
+				//				}
 
 				if(treeD.open()==Window.OK)
 				{

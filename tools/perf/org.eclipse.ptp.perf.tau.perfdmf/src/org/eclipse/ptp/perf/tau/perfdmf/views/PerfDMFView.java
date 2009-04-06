@@ -73,8 +73,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
-import edu.uoregon.tau.perfdmf.DatabaseAPI;
-
 import edu.uoregon.tau.paraprof.GlobalDataWindow;
 import edu.uoregon.tau.paraprof.ParaProf;
 import edu.uoregon.tau.paraprof.ParaProfTrial;
@@ -480,7 +478,7 @@ public class PerfDMFView extends ViewPart {
 
                         TreeNode tp = new TreeNode(exp.getName(), exp);
 
-                        for (Iterator<Trial> it3 = dbApi.getTrialList().iterator(); it3.hasNext();) {
+                        for (Iterator<Trial> it3 = dbApi.getTrialList(false).iterator(); it3.hasNext();) {
                             Trial trial = (Trial) it3.next();
                             //System.out.println("--> " + trial.getName());
                             TreeNode to = new TreeNode(trial.getName(), trial);
@@ -603,7 +601,7 @@ public class PerfDMFView extends ViewPart {
         	dbApi.initialize(database);
 
 
-            dbApi.setTrial(trial.getID());
+            dbApi.setTrial(trial.getID(),false);
             DBDataSource dbDataSource = new DBDataSource(dbApi);
             dbDataSource.load();
             trial.setDataSource(dbDataSource);

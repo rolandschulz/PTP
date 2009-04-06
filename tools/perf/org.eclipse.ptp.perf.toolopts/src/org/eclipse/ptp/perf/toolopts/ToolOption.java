@@ -160,5 +160,36 @@ public class ToolOption {
 		useEquals=true;
 	}
 	
+	public String getName(){
+		return optName;
+	}
+	
+	public boolean setSelected(boolean set){
+		if(unitCheck==null){
+			return false;
+		}
+		unitCheck.setSelection(set);
+		return true;
+	}
+	public void setEnabled(boolean set){
+		if(unitCheck!=null){
+			unitCheck.setEnabled(set);
+		}
+		
+		if(browser!=null){
+			browser.setEnabled(set);
+		}
+		
+		if(argbox!=null){
+			argbox.setEnabled(set);
+		}
+	}
+	public void setArg(String arg){
+		if(argbox!=null){
+			boolean isOn=argbox.getEnabled();
+			argbox.setText(arg);
+			argbox.setEnabled(isOn);
+		}
+	}
 
 }

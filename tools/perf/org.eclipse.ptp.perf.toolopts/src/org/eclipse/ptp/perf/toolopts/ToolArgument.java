@@ -61,9 +61,10 @@ public class ToolArgument implements IAppInput{
 		
 	}
 	
-	public String getArg(String valLoc){
+	public String getArg(String buildDir, String rootDir){
 		String arg=getArg();
-		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_LOCATION, valLoc);
+		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
+		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
 		return arg;
 	}
 	
@@ -84,7 +85,7 @@ public class ToolArgument implements IAppInput{
 		{
 			if(localFile)
 			{
-				arg+=ToolsOptionsConstants.PROJECT_LOCATION+File.separator;
+				arg+=ToolsOptionsConstants.PROJECT_BUILD+File.separator;
 			}
 			arg+=value;
 		}

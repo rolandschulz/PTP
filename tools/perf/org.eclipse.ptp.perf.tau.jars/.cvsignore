@@ -10,3 +10,5 @@ jython.jar
 xerces.jar
 paraprof.jar
 jogl.jar
+jcommon-1.0.15.jar
+jfreechart-1.0.12.jar

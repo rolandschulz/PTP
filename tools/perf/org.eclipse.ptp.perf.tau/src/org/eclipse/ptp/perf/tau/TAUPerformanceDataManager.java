@@ -160,7 +160,13 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 		
 		/*Contains all tau configuration options in the makefile name, except pdt*/
 		String makename=getTauMakefile(configuration);
-		String projtype = makename.substring(makename.lastIndexOf("tau-")+4);
+		int tauDex=makename.lastIndexOf("tau-");
+		String projtype=null;
+		if(tauDex<0){
+			projtype="tau";
+		}
+		else
+		projtype = makename.substring(tauDex+4);
 		
 		//TODO: replace config check with makefile check
 		boolean tracout=(configuration.getAttribute(ITAULaunchConfigurationConstants.EPILOG, false)||

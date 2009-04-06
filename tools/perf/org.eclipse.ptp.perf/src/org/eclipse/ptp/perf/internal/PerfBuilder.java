@@ -78,10 +78,11 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		tool=btool;
 		initBuild(conf);
 	}
-	
+	private String rootLocation=null;
 	private void initBuild(ILaunchConfiguration conf)throws CoreException{
 		//apppathattrib=apa;
 		outputLocation=projectLocation;
+		rootLocation=projectLocation;
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
 		if(tool==null)return;
 		if(ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
@@ -156,10 +157,10 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			}
 //TODO:  Make this work again (i.e. distinguish between all-compiler and discrete compiler systems)
 			BufferedWriter makeOut = new BufferedWriter(new FileWriter(compilerInclude));
-			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation);
-			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration, outputLocation)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration, outputLocation)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration, outputLocation)+" "+allargs+"\n");
+			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation, rootLocation);
+			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration, outputLocation, rootLocation)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration, outputLocation, rootLocation)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration, outputLocation, rootLocation)+" "+allargs+"\n");
 			makeOut.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -349,7 +350,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		String allargs="";
 		if(tool.getGlobalCompiler()!=null && !tool.getGlobalCompiler().equals(tool.getCcCompiler()))
 		{
-			allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation);
+			allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation, rootLocation);
 		}
 		int numChanges=0;
 		for(int i =0;i<tools.length;i++){
@@ -381,15 +382,15 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			String toolid=tools[i].getId();
 			if(toolid.indexOf(".c.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration, outputLocation),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration, outputLocation, rootLocation),allargs,tool.replaceCompiler);
 			}
 			if(toolid.indexOf(".cpp.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration, outputLocation),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration, outputLocation, rootLocation),allargs,tool.replaceCompiler);
 			}
 			if(toolid.indexOf(".fortran.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration, outputLocation),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration, outputLocation, rootLocation),allargs,tool.replaceCompiler);
 			}
 		}
 		//System.out.println(tbpath+File.separator+"tau_xxx.sh"+tauCompilerArgs);

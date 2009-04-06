@@ -5,8 +5,6 @@ Bundle-SymbolicName: org.eclipse.ptp.perf.tau.jars
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: batik-combined.jar,
  jargs.jar,
- jcommon-0.9.6.jar,
- jfreechart-0.9.21.jar,
  jgraph.jar,
  jogl.jar,
  jython.jar,
@@ -14,7 +12,9 @@ Bundle-ClassPath: batik-combined.jar,
  perfdmf.jar,
  tau-common.jar,
  vis.jar,
- xerces.jar
+ xerces.jar,
+ jcommon-1.0.15.jar,
+ jfreechart-1.0.12.jar
 Bundle-Localization: plugin
 Export-Package: edu.uoregon.tau.common,
  edu.uoregon.tau.common.resources,
@@ -35,3 +35,4 @@ Export-Package: edu.uoregon.tau.common,
  edu.uoregon.tau.perfdmf.loader,
  edu.uoregon.tau.vis
 Bundle-Vendor: %pluginProvider
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -11,6 +11,16 @@
 			
 			<togoption label="DetectMemoryLeaks" optname="-optDetectMemoryLeaks" tooltip="Track mallocs/frees using TAU's memory wrapper"/>
 			
+			<togoption label="PdtGnuFortranParser" optname="-optPdtGnuFortranParser" tooltip="Specify the GNU gfortran PDT parser gfparse instead of f95parse"/>
+			
+			<togoption label="PdtCleanscapeParser" optname="-optPdtCleanscapeParser" tooltip="Specify the Cleanscape Fortran parser"/>
+			
+			<togoption label="PreProcess" optname="-optPreProcess" tooltip="Preprocess the source code before parsing. Uses /usr/bin/cpp -P by default."/>
+			
+			<togoption label="KeepFiles" optname="-optKeepFiles" tooltip="Does not remove intermediate .pdb and .inst.* files"/>
+			
+			<togoption label="Shared" optname="-optShared" tooltip="Use shared library version of TAU."/>					
+			
 			<togoption label="PdtDir" optname="-optPdtDir" tooltip="PDT architecture directory. Typically $(PDTDIR)/$(PDTARCHDIR)">
 				<optvalue type="dir"/>
 			</togoption>
@@ -43,10 +53,6 @@
 				<optvalue type="text"/>
 			</togoption>
 			
-			<togoption label="PdtGnuFortranParser" optname="-optPdtGnuFortranParser" tooltip="Specify the GNU gfortran PDT parser gfparse instead of f95parse"/>
-			
-			<togoption label="PdtCleanscapeParser" optname="-optPdtCleanscapeParser" tooltip="Specify the Cleanscape Fortran parser"/>
-			
 			<togoption label="PdtUser" optname="-optPdtUser" tooltip="Optional arguments for parsing source code">
 				<optvalue type="text"/>
 			</togoption>
@@ -54,9 +60,7 @@
 			<togoption label="TauInstr" optname="-optTauInstr" tooltip="Specify location of tau_instrumentor. Typically $(TAUROOT)/$(CONFIG_ARCH)/bin/tau_instrumentor">
 				<optvalue type="file"/>
 			</togoption>
-			
-			<togoption label="PreProcess" optname="-optPreProcess" tooltip="Preprocess the source code before parsing. Uses /usr/bin/cpp -P by default."/>
-			
+						
 			<togoption label="CPP" optname="-optCPP" tooltip="Specify an alternative preprocessor and pre-process the sources.">
 				<optvalue type="text"/>
 			</togoption>
@@ -67,10 +71,6 @@
 			
 			<togoption label="CPPReset" optname="-optCPPReset" tooltip="Reset C preprocessor options to the specified list.">
 				<optvalue type="text"/>
-			</togoption>
-			
-			<togoption label="TauSelectFile" optname="-optTauSelectFile" tooltip="Specify selective instrumentation file for tau_instrumentor">
-				<optvalue type="file"/>
 			</togoption>
 			
 			<togoption label="PDBFile" optname="-optPDBFile" tooltip="Specify PDB file for tau_instrumentor. Skips parsing stage.">
@@ -124,8 +124,6 @@
 			<togoption label="NoRevert" optname="-optNoRevert" tooltip="Exit on error. Does not revert to the original compilation rule on error."/>
 			<togoption label="Revert" optname="-optRevert" tooltip="Revert to the original compilation rule on error (default)."/>
 			
-			<togoption label="KeepFiles" optname="-optKeepFiles" tooltip="Does not remove intermediate .pdb and .inst.* files"/>
-			
 			<togoption label="AppCC" optname="-optAppCC" tooltip="pecifies the fallback C compiler.">
 				<optvalue type="text"/>
 			</togoption>
@@ -136,17 +134,18 @@
 				<optvalue type="text"/>
 			</togoption>
 			
-			<togoption label="Shared" optname="-optShared" tooltip="Use shared library version of TAU."/>
+			<togoption label="DisableHeaderInst" optname="-optDisableHeaderInst" tooltip="Disable instrumentation of headers"/>
 			
 			<togoption label="CompInst" optname="-optCompInst" tooltip="Use compiler-based instrumentation."/>
 			
 			<togoption label="PDTInst" optname="-optPDTInst" tooltip="Use PDT-based instrumentation."/>
 			
-			<togoption label="DisableHeaderInst" optname="-optDisableHeaderInst" tooltip="Disable instrumentation of headers"/>
+			<togoption label="TauSelectFile" optname="-optTauSelectFile" tooltip="Specify selective instrumentation file for tau_instrumentor">
+				<optvalue type="file"/>
+			</togoption>	
 			
 		</optionpane>
 		<optionpane title="tau_makefile" virtual="true"/>
-		<optionpane title="selective_instrumentation_arg" virtual="true"/>
 		</allcompilers>
 	</compile>
 	<execute if="use_automatic_tau_reduce"/>

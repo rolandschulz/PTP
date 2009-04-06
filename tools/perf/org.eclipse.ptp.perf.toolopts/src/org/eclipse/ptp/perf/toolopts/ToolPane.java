@@ -121,6 +121,8 @@ public class ToolPane  implements IAppInput{
 			}
 		}
 		optString.append(this.encloseOpts);
+		
+		updateOptDisplay();
 	}
 
 	/**
@@ -227,6 +229,15 @@ public class ToolPane  implements IAppInput{
 			return "";
 		
 		return optString.toString();
+	}
+	
+	public ToolOption getOption(String optName){
+		for(int i=0;i<options.length;i++){
+			if(options[i].getName().equals(optName)){
+				return options[i];
+			}
+		}
+		return null;
 	}
 	
 	/**

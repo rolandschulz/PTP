@@ -12,9 +12,9 @@ if [ ! -d "$1"/tools/src/ ] ; then
 fi
 
 cp "$1"/tools/src/contrib/batik-combined.jar .
-cp "$1"/tools/src/contrib/jcommon-0.9.6.jar .
+cp "$1"/tools/src/contrib/jcommon-1.0.15.jar .
 cp "$1"/tools/src/contrib/jargs.jar .
-cp "$1"/tools/src/contrib/jfreechart-0.9.21.jar .
+cp "$1"/tools/src/contrib/jfreechart-1.0.12.jar .
 cp "$1"/tools/src/contrib/jgraph.jar .
 cp "$1"/tools/src/contrib/jython.jar .
 cp "$1"/tools/src/contrib/jogl/jogl.jar .
