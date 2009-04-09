@@ -17,6 +17,7 @@ import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.text.CCompositeReconcilingStrategy;
@@ -442,7 +443,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
 	 */
 	public CContentOutlinePage getOutlinePage() {
 		if (fOutlinePage == null) {
-			fOutlinePage = new CContentOutlinePage(null);
+			fOutlinePage = new CContentOutlinePage(new CEditor());
 			fOutlinePage.addSelectionChangedListener(this);
 		}
 		setOutlinePageInput(fOutlinePage, getEditorInput());
@@ -458,7 +459,8 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
 		if (page != null) {
 			IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
 			IWorkingCopy workingCopy = manager.getWorkingCopy(input);
-			page.setInput(workingCopy);
+			if (workingCopy != null)
+			    page.setInput(workingCopy);
 		}
 	}
 
