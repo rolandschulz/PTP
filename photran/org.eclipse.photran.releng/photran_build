@@ -35,11 +35,11 @@ mkdir -p $STAGING_DIR
 cd $STAGING_DIR
 
 # remove the old build
-#rm -fr org.eclipse.photran
+rm -fr org.eclipse.photran
 
 # Check out the releng project
-#export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/technology
-#cvs co org.eclipse.photran/org.eclipse.photran.releng
+export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/technology
+cvs co org.eclipse.photran/org.eclipse.photran.releng
 
 # run the main script
 cd org.eclipse.photran/releng/org.eclipse.photran/org.eclipse.photran.releng

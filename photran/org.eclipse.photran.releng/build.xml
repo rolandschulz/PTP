@@ -101,43 +101,43 @@
 	
 	<target name="tag" depends="init">
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.cdtinterface"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.core.intel"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.intel"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.core.vpg"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.vpg"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.errorparsers.xlf"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.errorparsers.xlf"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.core"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.gnu.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.gnu.ui"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.intel.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.intel.ui"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.ui"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.managedbuilder.xlf.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.xlf.ui"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran.ui.vpg"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui.vpg"/>
 		</antcall>	
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.photran/org.eclipse.photran-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
 		</antcall>	
 	</target>
 </project>
