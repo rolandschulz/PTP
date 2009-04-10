@@ -59,7 +59,7 @@ cd results/plugins
 export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
 cvs co -r $TAG -d org.eclipse.ptp.rdt.core.remotejars org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.remotejars
 cvs co -r $TAG -d org.eclipse.ptp.rdt.core.stubs org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs
-cvs co -r cdt_5_0 -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
+cvs co -r $TAG -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
 
 cd org.eclipse.ptp.rdt.core.remotejars
 

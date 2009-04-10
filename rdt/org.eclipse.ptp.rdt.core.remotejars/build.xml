@@ -29,25 +29,28 @@
 	<property name="platformTempDir" value="${basedir}/platform.temp"/>
 	
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="R-3.4-200806172000"/>
-	<property name="platformBaseName" value="eclipse-platform-3.4"/>
-	<property name="cdtCoreVersion" value="5.0.2.200902130801"/>
+	<property name="platformVersion" value="S-3.5M6-2009031301000"/>
+	<property name="platformBaseName" value="eclipse-platform-3.5M6"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.5M6.zip"/>
+	<property name="icuBaseJar" value="com.ibm.icu.base_4.0.1.v20090109.jar"/>
+	
+	<property name="cdtCoreVersion" value="5.1.0.200903161435"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 
-	<property name="coreRuntimeVersion" value="3.4.0.v20080512"/>
+	<property name="coreRuntimeVersion" value="3.5.0.v20090306"/>
 	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
 	
-	<property name="equinoxVersion" value="3.4.0.v20080421-2006"/>
+	<property name="equinoxVersion" value="3.5.0.v20090310-1800"/>
 	<property name="equinoxJar" value="org.eclipse.equinox.common_${equinoxVersion}.jar"/>
 	
-	<property name="filesystemVersion" value="1.2.0.v20080604-1400"/>
+	<property name="filesystemVersion" value="1.2.0.v20090306"/>
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
 	<property name="rseVersion" value="R-3.0.3-200902181300"/>
 	<property name="dStoreBaseName" value="rseserver-3.0.3"/>
 	
-	<target name="fetch" depends="fetch.rse" unless="nofetch"/>
+	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="jar" depends="generate.build.scripts">
@@ -186,6 +189,13 @@
 		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" dest="${downloads}/${dStoreBaseName}-macosx.tar"/>
 	</target>
 	
+	<target name="fetch.icu">
+		<mkdir dir="${downloads}"/>
+		<get src="${platformBaseUrl}/${platformVersion}/${icuBaseZip}" dest="${downloads}/${icuBaseZip}"/>
+		<unzip src="${downloads}/${icuBaseZip}" dest="${downloads}"/>
+		<copy file="${downloads}/eclipse/plugins/${icuBaseJar}" todir="${platformTempDir}/eclipse/plugins"/>
+	</target>
+	
 	<target name="unpack.platform">
 		<!--Get platform jars from PTP build-->
 		<copy file="${basedir}/../../eclipse/plugins/${coreRuntimeJar}" todir="${platformTempDir}/eclipse/plugins"/>
@@ -245,7 +255,7 @@
 		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.rdt.core.miners.CDTMiner</concat>
 		
 		<!-- Add RDT JARs to the server script's classpath -->
-		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\stubs.jar"/>
+		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\${icuBaseJar};%ECLIPSEDIR%\stubs.jar"/>
 		<replace token=";%CLASSPATH%" value=";${rdtClassPath};%CLASSPATH%" file="${remoteServerTempDir}/setup.bat"/>
 	</target>
 		
@@ -265,6 +275,7 @@
 				<include name="${coreRuntimeJar}"/>
 				<include name="${filesystemJar}"/>
 				<include name="${equinoxJar}"/>
+				<include name="${icuBaseJar}"/>
 			</fileset>
 		</copy>
 	</target>
