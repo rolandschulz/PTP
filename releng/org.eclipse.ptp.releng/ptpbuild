@@ -69,6 +69,10 @@ echo `java -version`
 java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar \
 	-ws gtk -arch ppc -os linux -application org.eclipse.ant.core.antRunner
 
-} 2>&1 | tee $BUILD_LOG
+} >$BUILD_LOG 2>&1
+
+if grep -q 'BUILD FAILED' $BUILD_LOG; then
+	echo "BUILD FAILED. See $BUILD_LOG for details.
+fi
 
 exit 0
