@@ -72,7 +72,7 @@ java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equi
 } >$BUILD_LOG 2>&1
 
 if grep -q 'BUILD FAILED' $BUILD_LOG; then
-	echo "BUILD FAILED. See $BUILD_LOG for details.
+	echo "BUILD FAILED. See $BUILD_LOG for details."
 fi
 
 exit 0
