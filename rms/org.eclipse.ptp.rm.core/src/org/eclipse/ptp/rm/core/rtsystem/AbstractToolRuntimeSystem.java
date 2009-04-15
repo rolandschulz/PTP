@@ -102,10 +102,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	private String rmID;
 
 	/** Id generator for machines, queues and nodes. */
-	private Integer nextID;
+	private int nextID;
 
 	/** Id generator for jobs. */
-	private Integer jobNumber;
+	private int jobNumber;
 
 	/** A local reference of the RM configuration used by the RM manager that created the RTS. */
 	protected AbstractToolRMConfiguration rmConfiguration;
@@ -140,8 +140,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	public AbstractToolRuntimeSystem(Integer id, AbstractToolRMConfiguration config, AttributeDefinitionManager manager) {
 		this.rmID = id.toString();
-		this.nextID = new Integer(id.intValue() + 1);
-		this.jobNumber = new Integer(0);
+		this.nextID = id.intValue() + 1;
+		this.jobNumber = 0;
 		this.rmConfiguration = config;
 		this.attrMgr = manager;
 	}
@@ -634,7 +634,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	protected String generateID() {
 		// TODO: Add RM id?
-		String id = nextID.toString();
+		String id = Integer.toString(nextID);
 		nextID++;
 		return id;
 	}
@@ -652,13 +652,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return remoteServices.getProcessBuilder(connection, command);
 	}
 
-	public IRemoteProcessBuilder createProcessBuilder(List<String> command, String workdir) {
+	public IRemoteProcessBuilder createProcessBuilder(List<String> command, String workdir) throws IOException {
 		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 		IFileStore directory = null;
-		try {
+		if (fileManager != null) {
 			directory = fileManager.getResource(new Path(workdir), new NullProgressMonitor());
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 		processBuilder.directory(directory);
