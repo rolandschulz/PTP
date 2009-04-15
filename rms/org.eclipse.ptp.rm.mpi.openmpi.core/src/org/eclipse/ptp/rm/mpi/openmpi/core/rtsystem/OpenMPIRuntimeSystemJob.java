@@ -241,7 +241,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 		OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 		if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
-			getStderrObserver().addListener(parserPipedStreamListener);
+			 /* 
+			  * Fix for bug #271810 
+			  */
+			if (!rtSystem.getRemoteServices().getId().equals("org.eclipse.ptp.remote.RSERemoteServices")) { //$NON-NLS-1$
+				stderrObserver.addListener(parserPipedStreamListener);
+			} else {
+				stdoutObserver.addListener(parserPipedStreamListener);
+			}
 		} else if (configuration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 			getStdoutObserver().addListener(parserPipedStreamListener);
 		} else {
