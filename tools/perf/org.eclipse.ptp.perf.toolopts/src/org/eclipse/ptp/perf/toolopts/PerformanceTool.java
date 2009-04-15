@@ -8,6 +8,7 @@ public abstract class PerformanceTool {
 	public String toolName=null;
 	public String toolType=null;
 	public String requireTrue=null;
+	public ToolApp global = null;
 	
 	public boolean canRun(ILaunchConfiguration configuration){
 		

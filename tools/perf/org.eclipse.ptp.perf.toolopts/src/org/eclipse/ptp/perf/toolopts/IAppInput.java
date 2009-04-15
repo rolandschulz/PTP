@@ -1,5 +1,7 @@
 package org.eclipse.ptp.perf.toolopts;
 
+import java.util.Map;
+
 import org.eclipse.debug.core.ILaunchConfiguration;
 /**
  * This is the interface for an object that returns one or more elements of a command passed to a tool being executed
@@ -13,4 +15,6 @@ public interface IAppInput {
 	 * @return
 	 */
 	public String getArgument(ILaunchConfiguration configuration);
+	
+	public Map<String,String> getEnvVars(ILaunchConfiguration configuration);
 }

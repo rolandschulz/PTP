@@ -19,7 +19,9 @@ package org.eclipse.ptp.perf.internal;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
@@ -187,6 +189,23 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
 		allargs=allargs+parseInput(app)+" "+parseOutput(app);
 		return allargs;
+	}
+	
+	protected Map<String,String> getToolEnvVars(ToolApp app, ILaunchConfiguration configuration, String buildDir, String rootDir) throws CoreException
+	{
+		if(app==null){
+			return null;
+		}
+		Map<String,String> map = app.getEnvVars(configuration);
+		
+		Iterator<Entry<String,String>> mapIt = map.entrySet().iterator();
+		Entry<String,String> ent;
+		while(mapIt.hasNext()){
+			ent=mapIt.next();
+			ent.setValue(ent.getValue().replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir).replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir));
+		}
+		
+		return map;
 	}
 	
 	private String parseInput(ToolApp app)

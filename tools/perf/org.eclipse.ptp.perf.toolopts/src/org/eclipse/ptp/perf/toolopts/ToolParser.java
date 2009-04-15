@@ -56,6 +56,11 @@ public class ToolParser extends DefaultHandler{
 	private static final String EXECUTE="execute";
 	private static final String UTILITY="utility";
 	
+	/**
+	 * Indicates the use of a top level 'false' tool, to hold environment variables for the entire workflow step
+	 */
+	private static final String GLOBAL="global";
+	
 	
 	/**
 	 * Top level element of the analysis phase of analysis
@@ -76,6 +81,14 @@ public class ToolParser extends DefaultHandler{
 	private static final String VALUE = "optvalue";
 	private static final String DEFAULT = "default";
 	private static final String DEFSTATE = "defstate";
+	
+	private static final String SETON="seton";
+	private static final String SETOFF="setoff";
+	
+	/**
+	 * If this is true for a ui option it will only be used if its text field is not empty
+	 */
+	private static final String FIELDREQUIRED="fieldrequired";
 	
 	/**
 	 * Use of this attribute in a tool option indicates it is always activated
@@ -166,7 +179,13 @@ public class ToolParser extends DefaultHandler{
 	/**
 	 * Contains the list of argument strings for the current tool.
 	 */
-	private ArrayList<ToolArgument> currentArgs;
+	//private ArrayList<ToolArgument> currentArgs;
+	
+	/**
+	 * Contains the list of environment variable strings for the current tool.
+	 */
+	//private ArrayList<ToolArgument> currentVars;
+	
 	/**
 	 * The tool app currently being worked on
 	 */
@@ -174,6 +193,7 @@ public class ToolParser extends DefaultHandler{
 	
 	
 	private ArrayList<IAppInput> appInput;
+	//private ArrayList<IAppInput> appVars;
 	
 	private ArrayList<ToolOption> toolOptions;
 	private ToolOption actOpt;
@@ -279,6 +299,14 @@ public class ToolParser extends DefaultHandler{
 					currentTool.prependExecution=true;
 			}
 		}
+		else if(name.equals(GLOBAL)){
+			if(inTool&&currentTool!=null)
+			{
+				currentApp=new ToolApp();
+				//currentApp.toolCommand="GLOBAL";
+				currentApp.toolID=getAttribute("command",atts);;
+			}
+		}
 		else if(name.equals(ENVVAR)){
 			if(inParametric)
 			{
@@ -292,6 +320,33 @@ public class ToolParser extends DefaultHandler{
 				currentTool.para.varWeakBools.add(weak);
 			}
 			else{
+//				if(currentVars==null){
+//					currentVars=new ArrayList<ToolArgument>();
+//				}
+//				if(appVars==null){
+//					appVars=new ArrayList<IAppInput>();
+//				}
+				if(appInput==null)
+					appInput=new ArrayList<IAppInput>();
+				
+				boolean local=getBooleanAttribute("localdir",false,atts);
+				
+				String flag=getAttribute("flag",atts);
+				String val=getAttribute("value",atts);
+				String sep=getAttribute("separator",atts);
+				
+				String cval=getAttribute("confvalue",atts);
+				
+				ToolArgument tArg=new ToolArgument(flag,val,sep,local);
+				if(cval!=null)
+				{
+					tArg.setUseConfValue(true);
+					tArg.setConfValue(cval);
+				}
+				
+				//currentVars.add(tArg);
+				tArg.setType(ToolArgument.VAR);
+				appInput.add(tArg);
 				
 			}
 		}
@@ -309,8 +364,8 @@ public class ToolParser extends DefaultHandler{
 				currentTool.para.argWeakBools.add(weak);
 			}
 			else{
-			if(currentArgs==null)
-				currentArgs=new ArrayList<ToolArgument>();
+//			if(currentArgs==null)
+//				currentArgs=new ArrayList<ToolArgument>();
 			if(appInput==null)
 				appInput=new ArrayList<IAppInput>();
 			
@@ -336,7 +391,7 @@ public class ToolParser extends DefaultHandler{
 //			if(local){
 //				arg=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+arg;//Must be the same as IPerformanceLaunchConfigurationConstants.PROJECT_LOCATION
 //			}
-			currentArgs.add(tArg);
+			//currentArgs.add(tArg);
 			appInput.add(tArg);
 			}
 		}
@@ -385,6 +440,8 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(TOGOPT))
 		{
 			actOpt=new ToolOption();
+			//actOpt.isArgument=getBooleanAttribute(ARGUMENT,true,atts);
+			actOpt.isArgument=!getBooleanAttribute(ENVVAR,false,atts);
 			
 			actOpt.optLabel=getAttribute(LABEL, atts);
 			actOpt.optName=getAttribute(NAME,atts);
@@ -416,6 +473,17 @@ public class ToolParser extends DefaultHandler{
 						actOpt.type=ToolOption.NUMBER;
 					else if(type.equals("combo"))
 						actOpt.type=ToolOption.COMBO;
+					else if(type.equals("toggle")){
+						actOpt.type=ToolOption.TOGGLE;
+						String hold=getAttribute(SETON,atts);
+						if(hold==null){
+							hold="1";
+						}
+						actOpt.setOn=hold;
+						actOpt.setOff=getAttribute(SETOFF,atts);
+					}
+					
+					actOpt.fieldrequired=getBooleanAttribute(FIELDREQUIRED,false,atts);
 				}
 			}
 		}
@@ -429,11 +497,20 @@ public class ToolParser extends DefaultHandler{
 			currentApp.allInput=new IAppInput[appInput.size()];
 			appInput.toArray(currentApp.allInput);
 		}
-		if(currentArgs!=null&&currentArgs.size()>0)
-		{
-			currentApp.arguments=new ToolArgument[currentArgs.size()];
-			currentArgs.toArray(currentApp.arguments);
-		}
+//		if(appVars!=null&&appVars.size()>0){
+//			currentApp.allVars=new IAppInput[appVars.size()];
+//			appVars.toArray(currentApp.allVars);
+//		}
+//		if(currentArgs!=null&&currentArgs.size()>0)
+//		{
+//			currentApp.arguments=new ToolArgument[currentArgs.size()];
+//			currentArgs.toArray(currentApp.arguments);
+//		}
+//		if(currentVars!=null&&currentVars.size()>0)
+//		{
+//			currentApp.envVars=new ToolArgument[currentVars.size()];
+//			currentVars.toArray(currentApp.envVars);
+//		}
 		if(toolPanes!=null&&toolPanes.size()>0)
 		{
 			currentApp.toolPanes=new ToolPane[toolPanes.size()];
@@ -442,7 +519,7 @@ public class ToolParser extends DefaultHandler{
 		if(currentApp.toolID==null){
 			currentApp.toolID=currentTool.toolID;
 		}
-		currentArgs=null;
+		//currentArgs=null;
 		toolPanes=null;
 		appInput=null;
 		return currentApp;
@@ -551,7 +628,21 @@ public class ToolParser extends DefaultHandler{
 					toolOptions.add(actOpt);
 			}
 		}
-		
+		else if(name.equals(GLOBAL)){
+			ToolApp gApp = finishApp();
+			
+			if(inCompilation&&buildTool!=null){
+				buildTool.global=gApp;
+			}
+			else if(inExecution&&execTool!=null){
+				execTool.global=gApp;
+			}
+			else if(inAnalysis&&ppTool!=null){
+				ppTool.global=gApp;
+			}
+			
+			currentApp=null;
+		}
 		tagStack.pop();
 		content.pop();
 	}

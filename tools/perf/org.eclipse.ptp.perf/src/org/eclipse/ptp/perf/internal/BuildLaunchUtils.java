@@ -137,6 +137,35 @@ public class BuildLaunchUtils {
 		}
 	}
 	
+	
+	public static void verifyRequestToolPath(PerformanceProcess tool, boolean force){
+		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+
+		Shell ourshell = PlatformUI.getWorkbench().getDisplay()
+				.getActiveShell();
+		Iterator<Map.Entry<String,String>> eIt = null;
+		Map.Entry<String,String> me = null;
+		String entry=null;
+
+		
+			eIt = tool.groupApp.entrySet().iterator();
+			while (eIt.hasNext()) 
+			{
+				me = eIt.next();
+				entry=me.getKey();
+				
+				if(entry.equals("internal"))
+					continue;
+				
+				String toolBinID=IPerformanceLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry;
+				if (force||pstore.getString(toolBinID).equals("")) 
+				{
+					pstore.setValue(toolBinID,
+									BuildLaunchUtils.findToolBinPath((String) me.getValue(), null,entry, ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+				}
+			}
+	}
+	
 	/**
 	 * This locates name of the parent of the directory containing the given tool.
 	 * @param The name of the tool whose directory is being located
@@ -175,6 +204,8 @@ public class BuildLaunchUtils {
 		} else
 			return null;
 	}
+	
+
 	
 	/**
 	 * Given a string as a starting point, this asks the user for

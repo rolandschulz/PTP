@@ -166,6 +166,9 @@ public class Activator extends AbstractUIPlugin {
 						insertPanes(pt.analysisCommands[k].toolPanes,paneList);
 					}
 				}
+				if(t.global!=null){
+					insertPanes(t.global.toolPanes,paneList);
+				}
 			}
 		}
 		
@@ -296,6 +299,7 @@ public class Activator extends AbstractUIPlugin {
 			tools=ToolMaker.makeTools(files.get(i)); //PerformanceProcess.getSample();//new PerformanceProcess[1];;
 			}catch(Exception e){
 				tools=null;
+				e.printStackTrace();
 				System.out.println("Problem reading "+files.get(i).toString());
 			}
 			//numOTools=otherTools.length;

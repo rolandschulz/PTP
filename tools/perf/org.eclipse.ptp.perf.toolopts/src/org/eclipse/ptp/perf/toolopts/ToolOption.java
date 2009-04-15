@@ -35,6 +35,7 @@ public class ToolOption {
 	public static final int COMBO = 4;
 	public static final int NUMBER = 5;
 	public static final int SUBOPT = 6;
+	public static final int TOGGLE = 7;
 	
 	/**
 	 * The check button to activate/deactivate this option if it is optional
@@ -109,6 +110,23 @@ public class ToolOption {
 	
 	protected Combo combopt;
 	
+	/**
+	 * If true this option is for an argument, if false it is for an environment variable
+	 */
+	protected boolean isArgument=true;
+	
+	protected String setOn="";
+	protected String setOff=null;
+	protected boolean fieldrequired=false;
+	
+	/**
+	 * Sets if this is an argument or an env variable.
+	 * @param isarg
+	 */
+	public void setIsArgumetn(boolean isarg){
+		isArgument=isarg;
+	}
+	
 	//This will eventually be used to hold subordinate options.
 //	protected ArrayList subopts;
 
@@ -164,6 +182,18 @@ public class ToolOption {
 		return optName;
 	}
 	
+	public boolean getSelected(){
+		if(unitCheck==null){
+			return false;
+		}
+		return unitCheck.getSelection();
+	}
+	
+	/**
+	 * Sets this option's selected status.  Returns true upon success or false if there is no widget to set.
+	 * @param set
+	 * @return
+	 */
 	public boolean setSelected(boolean set){
 		if(unitCheck==null){
 			return false;

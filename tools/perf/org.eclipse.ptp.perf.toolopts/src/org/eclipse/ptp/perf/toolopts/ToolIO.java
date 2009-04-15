@@ -1,5 +1,7 @@
 package org.eclipse.ptp.perf.toolopts;
 
+import java.util.Map;
+
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 
@@ -30,7 +32,7 @@ public class ToolIO implements IAppInput{
 
 
 
-	public String getArgument(ILaunchConfiguration configuration) {
+	public String getArgument(ILaunchConfiguration configuration) {//TODO: What is this doing?
 		String arg = "";
 		if(pathFlag!=null){
 			arg+=pathFlag+" ";
@@ -38,9 +40,12 @@ public class ToolIO implements IAppInput{
 		arg+=ID;
 		return null;
 	}
+	
+	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {//TODO: What about this?
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	
-	
 	
 //	public String getArg()
 //	{

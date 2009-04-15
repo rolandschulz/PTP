@@ -1,6 +1,8 @@
 package org.eclipse.ptp.perf.internal;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 //import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.core.resources.IFile;
@@ -45,6 +47,9 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	private String saveArgs=null;
 	private String savePath=null;
 	private boolean swappedArgs=false;
+	
+	private Map<String,String> saveEnv=null;
+	private boolean swappedEnv=false;
 	
 	/**
 	 * False implies that no execution is to take place (either because of an error, or user request)
@@ -141,6 +146,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 			saveArgs=arg;
 			
 			//List utilList=tool.execUtils;
+			Map<String,String> envMap=new LinkedHashMap <String,String>();
 			if(tool.execUtils!=null&&tool.execUtils.length>0)
 			{
 				//Iterator utilIt=utilList.iterator();
@@ -165,7 +171,29 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 				swappedArgs=true;
 				if(traceOn)System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+otherUtils+" "+prog+" "+arg);
 				confWC.setAttribute(appargattrib, otherUtils+" "+prog+" "+arg);
+				
+				
+				for(int i = 0;i<tool.execUtils.length;i++){
+					envMap.putAll(tool.execUtils[i].getEnvVars(configuration));
+				}
 			}
+			if(tool.global!=null)
+			{
+				envMap.putAll(tool.global.getEnvVars(configuration));
+			}
+			System.out.println(envMap);//TODO: Actually use this
+			if(envMap.size()>0){
+				saveEnv = confWC.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
+				Map<String,String> newvars=null;
+				if(saveEnv!=null)
+					newvars = new LinkedHashMap<String,String>(saveEnv);
+				else
+					newvars=new LinkedHashMap<String,String>();
+				newvars.putAll(envMap);
+				swappedEnv=true;
+				confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, newvars);
+			}
+			
 		}
 		configuration = confWC.doSave();
 		
@@ -229,6 +257,10 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 		{
 			confWC.setAttribute(appnameattrib, saveApp);
 			confWC.setAttribute(appargattrib, saveArgs);
+		}
+		
+		if(tool!=null&&swappedEnv){
+			confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, saveEnv);
 		}
 		
 		confWC.setAttribute(appnameattrib, application);

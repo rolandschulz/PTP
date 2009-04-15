@@ -20,7 +20,6 @@ package org.eclipse.ptp.perf.ui;
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
@@ -478,7 +477,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			}
 		}
 		
-		BuildLaunchUtils.getAllToolPaths(tools, false);
+		//BuildLaunchUtils.getAllToolPaths(tools, false);
 		
 //		Shell ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 //		Iterator eIt=null;
@@ -590,6 +589,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //		else
 		if(tools!=null&&tools.length>=1)
 		{
+			BuildLaunchUtils.verifyRequestToolPath(tools[toolTypes.getSelectionIndex()],false);
 			/*In theory his is moot!*/
 //			if(toolTypes.getSelectionIndex()==0)
 //				configuration.setAttribute(TAULAUNCH, true);
@@ -620,6 +620,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			panes[i].performApply(configuration);
 			
 			configuration.setAttribute(panes[i].configID, panes[i].getOptionString());
+			configuration.setAttribute(panes[i].configVarID, panes[i].getVarMap());
 		}
 	}
 

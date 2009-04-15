@@ -1,6 +1,8 @@
 package org.eclipse.ptp.perf.toolopts;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -14,10 +16,53 @@ public class ToolArgument implements IAppInput{
 	private boolean localFile=false;
 	private boolean useConfValue=false;
 	
+	public static int ARG=0;
+	public static int VAR=1;
+	private int type = ARG;
+	
+	public void setType(int t){
+		type = t;
+	}
+	
+	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
+		if(type!=VAR||flag==null)
+			return null;
+		Map<String,String> map = new LinkedHashMap<String,String>();
+		
+		String val="";
+		if(value!=null)
+		{
+			if(localFile)
+			{
+				val+=ToolsOptionsConstants.PROJECT_BUILD+File.separator;
+			}
+			val+=value;
+		}
+		
+		if(isUseConfValue())
+		{
+			String cval="";
+			try {
+				cval=configuration.getAttribute(getConfValue(), "");
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+			val=val.replace(ToolsOptionsConstants.CONF_VALUE, cval);
+		}
+		
+		map.put(flag, val);
+		return map;
+	}
+	
 	/**
 	 * Builds and returns the argument from the elements defined in this object
 	 */
 	public String getArgument(ILaunchConfiguration configuration){
+		
+		if(type!=ARG){
+			return null;
+		}
+		
 		if(isUseConfValue())
 		{
 			String carg=getArg();
@@ -61,14 +106,14 @@ public class ToolArgument implements IAppInput{
 		
 	}
 	
-	public String getArg(String buildDir, String rootDir){
+	private String getArg(String buildDir, String rootDir){
 		String arg=getArg();
 		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
 		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
 		return arg;
 	}
 	
-	public String getArg(){
+	private String getArg(){
 		
 		String arg="";
 		if(flag!=null)

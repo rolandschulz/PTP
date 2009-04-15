@@ -79,8 +79,8 @@ public class ToolMaker {
 	 */
 	protected static ToolOption finishToolOption(ToolOption toolopt, String paneID){
 		
-		if(toolopt.type>5)
-			toolopt.type=0;
+//		if(toolopt.type>7)
+//			toolopt.type=0;
 		String upname;
 		if(toolopt.optName!=null)
 		{
@@ -182,7 +182,7 @@ public class ToolMaker {
 	 * @param checkListener  The listener that defines behavior for this tool's check boxe and value field, if any
 	 */
 	protected static void displayToolOption(Composite comp, ToolOption toolOpt, SelectionListener browseListener, ToolPaneListener checkListener){
-		if (toolOpt.type == ToolOption.BOOL) {
+		if (toolOpt.type == ToolOption.BOOL || toolOpt.type == ToolOption.TOGGLE) {
 			initializeCheckLabel(comp,toolOpt);
 			new Label(comp, SWT.NULL);
 			new Label(comp, SWT.NULL);

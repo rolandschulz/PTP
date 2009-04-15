@@ -320,6 +320,17 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				updateComboDerivedOptions(selmakefile);
 				updateLaunchConfigurationDialog();
 			}
+			else if (source == pdtRadios[0]||source == pdtRadios[1]){
+				if(pdtRadios[0].getSelection()){
+					pdtOpt.setSelected(true);
+					compOpt.setSelected(false);
+				}
+				else{
+					pdtOpt.setSelected(false);
+					compOpt.setSelected(true);
+				}
+				tauOpts.OptUpdate();
+			}
 			//			else
 			//			if(source==buildonlyCheck){
 			//			updateLaunchConfigurationDialog();
@@ -547,7 +558,15 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				return true;
 			}
 		}
-		tlpath = binpath.substring(0,binpath.lastIndexOf(File.separator)) + File.separator + "lib";
+		
+		if(binpath==null||binpath.length()==0)
+			return null;
+		
+		int lastSlash=binpath.lastIndexOf(File.separator);
+		if(lastSlash<0)
+			return null;
+		
+		tlpath = binpath.substring(0,lastSlash) + File.separator + "lib";
 		File taulib = new File(tlpath);
 		File[] mfiles = null;
 		makefilter mfilter = new makefilter();
@@ -658,10 +677,10 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		if(makeStub.indexOf("-pdt")>=0){
 			if(!pdtRadios[0].getEnabled()){
 				pdtRadios[0].setEnabled(true);
-				pdtRadios[0].setSelection(true);
-				pdtOpt.setSelected(true);
-				pdtRadios[1].setSelection(false);
-				compOpt.setSelected(false);
+				//pdtRadios[0].setSelection(true);
+				//pdtOpt.setSelected(true);
+				//pdtRadios[1].setSelection(false);
+				//compOpt.setSelected(false);
 
 				tauOpts.OptUpdate();
 			}
@@ -797,6 +816,8 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				"PDT Instrumentation");
 				pdtRadios[1] = createRadioButton(pdtComp,
 				"Compiler Instrumentation");
+				pdtRadios[0].addSelectionListener(listener);
+				pdtRadios[1].addSelectionListener(listener);
 			} else if(i == mpiIndex){
 				mpiComp = new Composite(anaComp,SWT.NONE);
 				mpiComp.setLayout(createGridLayout(5,false,0,0));
@@ -1155,8 +1176,13 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 	private void initDBCombo(String selected)
 	{
-		String[] dbs = PerfDMFView.getDatabaseNames();
-
+		String[] dbs = null;
+		try{
+		dbs = PerfDMFView.getDatabaseNames();
+		}catch(java.lang.NoClassDefFoundError e){
+			System.out.println("Warning: Tau Jars Not Found");
+		}
+		
 		dbCombo.clearSelection();
 		dbCombo.removeAll();
 		if(dbs==null||dbs.length<1)
@@ -1192,6 +1218,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		tauOpts.performApply(configuration);
 
 		configuration.setAttribute(tauOpts.configID, tauOpts.getOptionString());
+		configuration.setAttribute(tauOpts.configVarID, tauOpts.getVarMap());
 
 		//		configuration.setAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY,
 		//		buildonlyCheck.getSelection());

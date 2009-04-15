@@ -17,6 +17,9 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.toolopts;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
@@ -39,16 +42,9 @@ public class ToolApp {
 	/**
 	 * The array of string arguments assoicated with this tool
 	 */
-	public ToolArgument[] arguments=null;
+	//public ToolArgument[] arguments=null;
+	//public ToolArgument[] envVars=null;//TODO: use this
 	
-	
-	
-//	public String queryText=null;
-//	public String queryMessage=null;
-	
-//	public String outputID=null;
-//	public String outputType=null;
-//	public String outputArg=null;
 	
 	/**
 	 * Matched to available output ID's to determine the path and arguments to files to be read/processed
@@ -70,6 +66,7 @@ public class ToolApp {
 	 * The array of all ToolPanes and ToolArguments, in the order they were defined in the tool xml document
 	 */
 	public IAppInput[] allInput=null;
+	//public IAppInput[] allVars=null;//TODO: use this
 	
 	/**
 	 * The file to which the standard out of this tool must be written
@@ -78,6 +75,56 @@ public class ToolApp {
 	
 	public ToolIO[] inputArgs=null;
 	public ToolIO[] outputArgs=null;
+	
+	
+	/**
+	 * Builds and concatenates all arguments from the defined sources (toolArgument and toolPane objects)
+	 */
+	public String getArguments(ILaunchConfiguration configuration) throws CoreException
+	{
+		String input = "";
+		
+		if(allInput!=null)
+		for(int i=0;i<allInput.length;i++){
+			if(allInput[i]!=null){
+				String nextArg=allInput[i].getArgument(configuration);
+				if(nextArg!=null){
+					input+=nextArg;//allInput[i].getArgument(configuration);
+					input+=" ";
+				}
+			}
+		}
+		return input;//getArgs(configuration)+" "+getPaneArgs(configuration);
+	}
+	
+	/**
+	 * Builds and concatenates all envVars from the defined sources (toolArgument and toolPane objects)
+	 */
+	public Map<String,String> getEnvVars(ILaunchConfiguration configuration) throws CoreException
+	{
+		LinkedHashMap<String,String> vars = new LinkedHashMap<String,String>();
+		
+		if(allInput!=null)
+		for(int i=0;i<allInput.length;i++){
+			if(allInput[i]!=null){
+				Map<String,String> test = allInput[i].getEnvVars(configuration);
+				if(test!=null)
+					vars.putAll(test);
+			}
+		}
+		return vars;//getArgs(configuration)+" "+getPaneArgs(configuration);
+	}
+
+	
+	
+	
+	
+//	public String queryText=null;
+//	public String queryMessage=null;
+	
+//	public String outputID=null;
+//	public String outputType=null;
+//	public String outputArg=null;
 	
 //	/**
 //	 * Returns the tool command followed by any arguments for this tool
@@ -94,23 +141,6 @@ public class ToolApp {
 //		
 //		return command;
 //	}
-	
-	/**
-	 * Builds and concatenates all arguments from the defined sources (toolArgument and toolPane objects)
-	 */
-	public String getArguments(ILaunchConfiguration configuration) throws CoreException
-	{
-		String input = "";
-		
-		if(allInput!=null)
-		for(int i=0;i<allInput.length;i++){
-			if(allInput[i]!=null){
-				input+=allInput[i].getArgument(configuration);
-				input+=" ";
-			}
-		}
-		return input;//getArgs(configuration)+" "+getPaneArgs(configuration);
-	}
 	
 //	public String[] getCommandArray(ILaunchConfiguration configuration) throws CoreException
 //	{
