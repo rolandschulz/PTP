@@ -37,7 +37,9 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 	private static final String TAG_PERIODIC_MONITOR_TIME = "periodicMonitorTime"; //$NON-NLS-1$
 	private static final String TAG_CONTINUOUS_MONITOR_CMD = "continuousMonitorCmd"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_INSTALL_PATH = "remoteInstallPath"; //$NON-NLS-1$
-	private static final String TAG_USE_DEFAULTS = "useToolDefaults"; //$NON-NLS-1$
+	private static final String TAG_USE_TOOL_DEFAULTS = "useToolDefaults"; //$NON-NLS-1$
+	private static final String TAG_USE_INSTALL_DEFAULTS = "useInstallDefaults"; //$NON-NLS-1$
+	private static final String TAG_COMMANDS_ENABLED = "commandsEnabled"; //$NON-NLS-1$
 
 	public static final int CAP_LAUNCH = 1 << 0;
 	public static final int CAP_DISCOVER = 1 << 1;
@@ -62,15 +64,18 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 		private String continuousMonitorCmd;
 		private String remoteInstallPath;
 		private boolean useToolDefaults;
+		private boolean useInstallDefaults;
+		private boolean commandsEnabled;
 
 		public ToolsConfig() {
-			this(new RemoteConfig(), null, null, null, null, 0, null, null, true);
+			this(new RemoteConfig(), null, null, null, null, 0, null, null, true, true, true);
 		}
 
 		public ToolsConfig(RemoteConfig remoteConfig, String launchCmd, String debugCmd,
 				String discoverCmd, String periodicMonitorCmd,
 				int periodicMonitorTime, String continuousMonitorCmd,
-				String remoteInstallPath, boolean useToolDefaults) {
+				String remoteInstallPath, boolean useToolDefaults,
+				boolean useInstallDefaults, boolean commandsEnabled) {
 			super();
 			this.remoteConfig = remoteConfig;
 			this.launchCmd = launchCmd;
@@ -81,6 +86,8 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 			this.continuousMonitorCmd = continuousMonitorCmd;
 			this.remoteInstallPath = remoteInstallPath;
 			this.useToolDefaults = useToolDefaults;
+			this.useInstallDefaults = useInstallDefaults;
+			this.commandsEnabled = commandsEnabled;
 		}
 
 		public RemoteConfig getRemoteConfig() {
@@ -147,12 +154,28 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 			this.remoteInstallPath = remoteInstallPath;
 		}
 
-		public boolean useToolDefaults() {
+		public boolean getUseToolDefaults() {
 			return useToolDefaults;
+		}
+
+		public boolean getUseInstallDefaults() {
+			return useInstallDefaults;
+		}
+
+		public boolean getCommandsEnabled() {
+			return commandsEnabled;
 		}
 
 		public void setUseToolDefaults(boolean useToolDefaults) {
 			this.useToolDefaults = useToolDefaults;
+		}
+
+		public void setUseInstallDefaults(boolean useInstallDefaults) {
+			this.useInstallDefaults = useInstallDefaults;
+		}
+
+		public void setCommandsEnabled(boolean commandsEnabled) {
+			this.commandsEnabled = commandsEnabled;
 		}
 	}
 
@@ -164,6 +187,8 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 	private String continuousMonitorCmd;
 	private String remoteInstallPath;
 	private boolean useToolDefaults;
+	private boolean useInstallDefaults;
+	private boolean commandsEnabled;
 	private int capabilities;
 
 	public static ToolsConfig loadTool(IResourceManagerFactory factory,
@@ -174,17 +199,17 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 		String debugCmd = memento.getString(TAG_DEBUG_CMD);
 		String discoverCmd = memento.getString(TAG_DISCOVER_CMD);
 		String periodicMonitorCmd = memento.getString(TAG_PERIODIC_MONITOR_CMD);
-		Integer periodicMonitorTime = memento
-		.getInteger(TAG_PERIODIC_MONITOR_TIME);
-		String continuousMonitorCmd = memento
-		.getString(TAG_CONTINUOUS_MONITOR_CMD);
+		Integer periodicMonitorTime = memento.getInteger(TAG_PERIODIC_MONITOR_TIME);
+		String continuousMonitorCmd = memento.getString(TAG_CONTINUOUS_MONITOR_CMD);
 		String remoteInstallPath = memento.getString(TAG_REMOTE_INSTALL_PATH);
-		boolean useToolDefaults = Boolean.parseBoolean(memento
-				.getString(TAG_USE_DEFAULTS));
+		boolean useToolDefaults = memento.getBoolean(TAG_USE_TOOL_DEFAULTS).booleanValue();
+		boolean useInstallDefaults = memento.getBoolean(TAG_USE_INSTALL_DEFAULTS).booleanValue();
+		boolean commandsEnabled = memento.getBoolean(TAG_COMMANDS_ENABLED).booleanValue();
 
 		ToolsConfig config = new ToolsConfig(remoteConfig, launchCmd, debugCmd,
-				discoverCmd, periodicMonitorCmd, periodicMonitorTime,
-				continuousMonitorCmd, remoteInstallPath, useToolDefaults);
+				discoverCmd, periodicMonitorCmd, periodicMonitorTime.intValue(),
+				continuousMonitorCmd, remoteInstallPath, useToolDefaults, 
+				useInstallDefaults, commandsEnabled);
 		return config;
 	}
 
@@ -199,14 +224,17 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 		this.periodicMonitorTime = toolsConfig.getPeriodicMonitorTime();
 		this.continuousMonitorCmd = toolsConfig.getContinuousMonitorCmd();
 		this.remoteInstallPath = toolsConfig.getRemoteInstallPath();
-		this.useToolDefaults = toolsConfig.useToolDefaults();
+		this.useToolDefaults = toolsConfig.getUseToolDefaults();
+		this.useInstallDefaults = toolsConfig.getUseInstallDefaults();
+		this.commandsEnabled = toolsConfig.getCommandsEnabled();
 	}
 
 	public AbstractToolRMConfiguration(int capabilities,
 			AbstractToolRMFactory factory, RemoteConfig config, String toolId,
 			String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd,
 			int periodicMonitorTime, String continuousMonitorCmd,
-			String remoteInstallPath, boolean useToolDefaults) {
+			String remoteInstallPath, boolean useToolDefaults,
+			boolean useInstallDefaults, boolean commandsEnabled) {
 		super(config, factory);
 		this.capabilities = capabilities;
 		setLaunchCmd(launchCmd);
@@ -217,6 +245,8 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 		setContinuousMonitorCmd(continuousMonitorCmd);
 		setRemoteInstallPath(remoteInstallPath);
 		setUseToolDefaults(useToolDefaults);
+		setUseInstallDefaults(useInstallDefaults);
+		setCommandsEnabled(commandsEnabled);
 	}
 
 	@Override
@@ -232,7 +262,9 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 		memento.putInteger(TAG_PERIODIC_MONITOR_TIME, periodicMonitorTime);
 		memento.putString(TAG_CONTINUOUS_MONITOR_CMD, continuousMonitorCmd);
 		memento.putString(TAG_REMOTE_INSTALL_PATH, remoteInstallPath);
-		memento.putString(TAG_USE_DEFAULTS, Boolean.toString(useToolDefaults));
+		memento.putBoolean(TAG_USE_TOOL_DEFAULTS, useToolDefaults);
+		memento.putBoolean(TAG_USE_INSTALL_DEFAULTS, useInstallDefaults);
+		memento.putBoolean(TAG_COMMANDS_ENABLED, commandsEnabled);
 	}
 
 	abstract public void setDefaultNameAndDesc();
@@ -293,12 +325,27 @@ AbstractRemoteResourceManagerConfiguration implements Cloneable {
 		this.remoteInstallPath = remoteInstallPath;
 	}
 
-	public boolean useToolDefaults() {
+	public boolean getUseToolDefaults() {
 		return useToolDefaults;
+	}
+	public boolean getUseInstallDefaults() {
+		return useInstallDefaults;
+	}
+
+	public boolean getCommandsEnabled() {
+		return commandsEnabled;
 	}
 
 	public void setUseToolDefaults(boolean useToolDefaults) {
 		this.useToolDefaults = useToolDefaults;
+	}
+
+	public void setUseInstallDefaults(boolean useInstallDefaults) {
+		this.useInstallDefaults = useInstallDefaults;
+	}
+
+	public void setCommandsEnabled(boolean commandsEnabled) {
+		this.commandsEnabled = commandsEnabled;
 	}
 
 	public boolean hasDiscoverCmd() {

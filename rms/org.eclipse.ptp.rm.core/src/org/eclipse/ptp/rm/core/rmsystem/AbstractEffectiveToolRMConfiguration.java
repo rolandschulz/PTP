@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rm.core.rmsystem;
 
+import org.eclipse.core.runtime.Path;
+
 /**
  * Stores the tool configuration attributes that shall be used, according the
  * the "useDefault" attribute from the resource manager configuration, and
@@ -53,10 +55,10 @@ public class AbstractEffectiveToolRMConfiguration {
 	}
 
 	protected String completeCommand(String command) {
-		if (remoteInstallPath == null) return command;
-		if (remoteInstallPath.length() == 0) return command;
-		// TODO: Remove this hard-coded path calculation!
-		return remoteInstallPath+"/"+command.trim(); //$NON-NLS-1$
+		if (remoteInstallPath == null || remoteInstallPath.length() == 0) {
+			return command;
+		}
+		return new Path(remoteInstallPath).append(command.trim()).toString();
 	}
 
 	public String getLaunchCmd() {
@@ -113,6 +115,10 @@ public class AbstractEffectiveToolRMConfiguration {
 		return (capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0
 		&& periodicMonitorCmd != null
 		&& !periodicMonitorCmd.trim().equals(EMPTY_STRING);
+	}
+	
+	protected AbstractToolRMConfiguration getConfiguration() {
+		return configuration;
 	}
 
 	protected int getCapabilities() {

@@ -28,6 +28,5 @@ public abstract class AbstractToolsPreferenceManager {
 	public static final String PREFS_PERIODIC_MONITOR_CMD = "periodicMonitorCmd"; //$NON-NLS-1$
 	public static final String PREFS_PERIODIC_MONITOR_TIME = "periodicMonitorTime"; //$NON-NLS-1$
 	public static final String PREFS_CONTINUOUS_MONITOR_CMD = "continuousMonitorCmd"; //$NON-NLS-1$
-	public static final String PREFS_REMOTE_INSTALL_PATH = "remoteInstallPAth"; //$NON-NLS-1$
-	//	public static final String PREFS_USE_DEFAULTS = "useDefaults"; //$NON-NLS-1$
+	public static final String PREFS_REMOTE_INSTALL_PATH = "remoteInstallPath"; //$NON-NLS-1$
 }
