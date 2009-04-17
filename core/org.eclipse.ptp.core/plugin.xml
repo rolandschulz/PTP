@@ -2,6 +2,12 @@
 <?eclipse version="3.0"?>
 <plugin>
    <extension-point id="resourceManagers" name="Resource Managers" schema="schema/resourceManagers.exsd"/>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.core.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 		
 </plugin>

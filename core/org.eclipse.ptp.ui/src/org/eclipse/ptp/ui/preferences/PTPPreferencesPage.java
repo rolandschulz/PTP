@@ -28,7 +28,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -56,12 +55,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	protected IntegerFieldEditor storeLineField = null;
 	private String outputDIR = EMPTY_STRING;
 	private String defaultOutputDIR = "/tmp"; //$NON-NLS-1$
-	private int storeLine = PreferenceConstants.DEF_STORE_LINE;
-
-	public PTPPreferencesPage() {
-		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
-		// setDescription(UIMessage.getResourceString("PTPPreferencesPage.preferencesDescription"));
-	}
+	private int storeLine = PreferenceConstants.DEFAULT_STORE_LINES;
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
 		public void widgetSelected(SelectionEvent e) {
@@ -121,7 +115,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Composite lineComposite = new Composite(aGroup, SWT.NONE);
 		lineComposite.setLayout(new FillLayout());
 		lineComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		storeLineField = new IntegerFieldEditor(PreferenceConstants.STORE_LINE, Messages.PTPPreferencesPage_3, lineComposite);
+		storeLineField = new IntegerFieldEditor(PreferenceConstants.PREFS_STORE_LINES, Messages.PTPPreferencesPage_3, lineComposite);
 		storeLineField.setPropertyChangeListener(listener);
 		storeLineField.setEmptyStringAllowed(false);
 	}
@@ -131,12 +125,12 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	}
 	private void loadSaved() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		outputDIR = preferences.getString(PreferenceConstants.OUTPUT_DIR);
+		outputDIR = preferences.getString(PreferenceConstants.PREFS_OUTPUT_DIR);
 		if (outputDIR.equals("")) //$NON-NLS-1$
 			outputDIR = defaultOutputDIR;
 		if (outputDIR != null)
 			outputDirText.setText(outputDIR);
-		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
+		storeLine = preferences.getInt(PreferenceConstants.PREFS_STORE_LINES);
 		storeLineField.setStringValue(String.valueOf(storeLine));
 	}
 	/* do stuff on init() of preferences, if anything */
@@ -155,8 +149,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	public boolean performOk() {
 		store();
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		preferences.setValue(PreferenceConstants.OUTPUT_DIR, outputDIR);
-		preferences.setValue(PreferenceConstants.STORE_LINE, storeLine);
+		preferences.setValue(PreferenceConstants.PREFS_OUTPUT_DIR, outputDIR);
+		preferences.setValue(PreferenceConstants.PREFS_STORE_LINES, storeLine);
 		PTPCorePlugin.getDefault().savePluginPreferences();
 		/*
 		 * IModelManager manager = PTPCorePlugin.getDefault().getModelManager(); 

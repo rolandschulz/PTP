@@ -275,13 +275,13 @@ public class PProcess extends Parent implements IPProcessControl {
 	 */
 	private void setOutputStore() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		outputDirPath = preferences.getString(PreferenceConstants.OUTPUT_DIR);
-		storeLines = preferences.getInt(PreferenceConstants.STORE_LINE);
+		outputDirPath = preferences.getString(PreferenceConstants.PREFS_OUTPUT_DIR);
+		storeLines = preferences.getInt(PreferenceConstants.PREFS_STORE_LINES);
 		if (outputDirPath == null || outputDirPath.length() == 0) {
-			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(PreferenceConstants.DEF_OUTPUT_DIR_NAME).toOSString();
+			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME).toOSString();
 		}
 		if (storeLines == 0) {
-			storeLines = PreferenceConstants.DEF_STORE_LINE;
+			storeLines = PreferenceConstants.DEFAULT_STORE_LINES;
 		}
 		File outputDirectory = new File(outputDirPath);
 		if (!outputDirectory.exists()) {

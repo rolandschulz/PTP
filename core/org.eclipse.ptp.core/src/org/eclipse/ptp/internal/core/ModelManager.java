@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -228,9 +229,11 @@ public class ModelManager implements IModelManager {
         ResourceManagerPersistence rmp = new ResourceManagerPersistence();
         rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
         IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
-        IResourceManagerControl[] rmsNeedStarting = rmp.getResourceManagerControlsNeedStarting();
         addResourceManagers(resourceManagers);
-        startResourceManagers(rmsNeedStarting);
+        if (PTPCorePlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.PREFS_AUTO_START_RMS)) {
+            IResourceManagerControl[] rmsNeedStarting = rmp.getResourceManagerControlsNeedStarting();
+        	startResourceManagers(rmsNeedStarting);
+        }
 	}
 
 	/* (non-Javadoc)
