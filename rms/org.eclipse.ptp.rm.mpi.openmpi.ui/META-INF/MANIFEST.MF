@@ -21,6 +21,5 @@ Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.mpi.openmpi.ui,
  org.eclipse.ptp.rm.mpi.openmpi.ui.launch,
  org.eclipse.ptp.rm.mpi.openmpi.ui.messages,
- org.eclipse.ptp.rm.mpi.openmpi.ui.preferences,
  org.eclipse.ptp.rm.mpi.openmpi.ui.wizards
 Bundle-Vendor: %pluginProvider
