@@ -50,7 +50,7 @@ RMConfigurationWizardPage {
 		return listener;
 	}
 
-	protected WizardPageDataSource getDataSource() {
+	public WizardPageDataSource getDataSource() {
 		return dataSource;
 	}
 
@@ -67,7 +67,7 @@ RMConfigurationWizardPage {
 		super.setVisible(visible);
 	}
 
-	abstract protected void updateControls();
+	abstract public void updateControls();
 
 	/**
 	 * Convenience method for creating a button widget.
