@@ -28,14 +28,14 @@ import org.osgi.framework.Bundle;
  * @author Daniel Felix Ferber
  *
  */
-public class OpenMPI13Defaults {
+public class OpenMPIAutoDefaults {
 
 	public static String LAUNCH_CMD = null;
 	public static String DEBUG_CMD = null;
 	public static String DISCOVER_CMD = null;
 	public static String PATH = null;
 
-	private static String defaultsResourcePath = "/data/defaults-OpenMPI-1.3.properties"; //$NON-NLS-1$
+	private static String defaultsResourcePath = "/data/defaults-OpenMPI-auto.properties"; //$NON-NLS-1$
 
 	public static void loadDefaults() throws CoreException {
 		Path defaultsPropertiesPath = new Path(defaultsResourcePath);
@@ -73,6 +73,7 @@ public class OpenMPI13Defaults {
 		if (value == null) {
 			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPIDefaults_MissingValue, key)));
 		}
+		
 		return value;
 	}
 
