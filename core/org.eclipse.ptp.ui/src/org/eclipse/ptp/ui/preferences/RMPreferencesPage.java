@@ -18,11 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.preferences;
 
-import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -33,14 +38,18 @@ import org.eclipse.swt.widgets.Control;
  */
 public class RMPreferencesPage extends AbstractPreferencePage {
 	protected Combo remoteServicesCombo;
+	protected Button startRMsButton;
+	
+	protected boolean startRMs = true;
+	protected Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
 	/** Constructor
 	 * 
 	 */
 	public RMPreferencesPage() {
 		super();
-		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
 		setDescription(Messages.RMPreferencesPage_0);
+		preferences.setDefault(PreferenceConstants.PREFS_AUTO_START_RMS, PreferenceConstants.DEFAULT_AUTO_START);
 	}
 	
 	/* (non-Javadoc)
@@ -57,6 +66,14 @@ public class RMPreferencesPage extends AbstractPreferencePage {
 		data.verticalAlignment = GridData.FILL;
 		data.horizontalAlignment = GridData.FILL;
 		composite.setLayoutData(data);
+		
+		startRMsButton = createCheckButton(composite, Messages.RMPreferencesPage_1);
+		startRMsButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}			
+		});
+		startRMsButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+		startRMsButton.setSelection(preferences.getBoolean(PreferenceConstants.PREFS_AUTO_START_RMS));
 
 		return composite;
 	}
@@ -65,6 +82,7 @@ public class RMPreferencesPage extends AbstractPreferencePage {
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	public void performDefaults() { 
+		startRMsButton.setSelection(PreferenceConstants.DEFAULT_AUTO_START);
 		super.performDefaults();
 	}
 	
@@ -72,6 +90,8 @@ public class RMPreferencesPage extends AbstractPreferencePage {
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
+		preferences.setValue(PreferenceConstants.PREFS_AUTO_START_RMS, startRMsButton.getSelection());
+		PTPCorePlugin.getDefault().savePluginPreferences();
 		return true;
 	}
 	
