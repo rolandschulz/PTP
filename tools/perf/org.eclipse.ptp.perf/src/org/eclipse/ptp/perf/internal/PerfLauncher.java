@@ -181,7 +181,7 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 			{
 				envMap.putAll(tool.global.getEnvVars(configuration));
 			}
-			System.out.println(envMap);//TODO: Actually use this
+			//System.out.println(envMap);
 			if(envMap.size()>0){
 				saveEnv = confWC.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
 				Map<String,String> newvars=null;

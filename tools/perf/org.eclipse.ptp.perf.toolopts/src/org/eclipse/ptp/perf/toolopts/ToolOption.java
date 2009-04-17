@@ -95,7 +95,7 @@ public class ToolOption {
 	 * Connect the option name and value with an equals if true
 	 * otherwise use whitespace.
 	 */
-	protected boolean useEquals;
+	//private boolean useEquals;
 	
 
 	/**
@@ -175,7 +175,7 @@ public class ToolOption {
 		type=0;
 		defState=false;
 		defText="";
-		useEquals=true;
+		//useEquals=true;
 	}
 	
 	public String getName(){

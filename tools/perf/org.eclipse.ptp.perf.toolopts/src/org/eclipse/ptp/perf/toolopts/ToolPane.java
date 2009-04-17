@@ -208,8 +208,11 @@ public class ToolPane implements IAppInput {
 					if(options[i].argbox!=null)
 					{
 						String text = options[i].argbox.getText();
-						if(!options[i].fieldrequired||text.trim().length()>0)
+						if(!options[i].fieldrequired||text.trim().length()>0){
 							varMap.put(options[i].optName,text);
+						}else{
+							varMap.remove(options[i].optName);
+						}
 					}else{
 						if(options[i].type==ToolOption.TOGGLE){
 							if(options[i].setOn!=null)
@@ -230,7 +233,12 @@ public class ToolPane implements IAppInput {
 				}
 				if(options[i].type==ToolOption.TOGGLE){
 					if(options[i].setOff!=null)
+					{
 						varMap.put(options[i].optName,options[i].setOff);
+					}
+					else{
+						varMap.remove(options[i].optName);
+					}
 				}
 			}
 		}

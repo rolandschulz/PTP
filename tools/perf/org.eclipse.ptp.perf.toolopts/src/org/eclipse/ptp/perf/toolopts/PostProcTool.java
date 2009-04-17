@@ -7,4 +7,5 @@ public class PostProcTool extends PerformanceTool {
 	public ToolApp[] analysisCommands=null;
 	public boolean useDefaultLocation=false;
 	public String forAllLike=null;
+	public int depth=-1;
 }

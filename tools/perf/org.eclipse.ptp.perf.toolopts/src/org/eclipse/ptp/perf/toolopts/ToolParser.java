@@ -275,6 +275,12 @@ public class ToolParser extends DefaultHandler{
 			ppTool.requireTrue=getAttribute("if",atts);
 			ppTool.useDefaultLocation=getBooleanAttribute("defaultloc",false,atts);
 			ppTool.forAllLike=getAttribute("foralllike",atts);
+			String depthS=getAttribute("depth",atts);
+			if(depthS!=null){
+				int depth=Integer.parseInt(depthS);
+				ppTool.depth=depth;
+			}
+			
 		}
 		else if(name.equals(PARAMETRIC)&&inTool&&!inParametric&&currentTool!=null){
 			inParametric=true;
@@ -304,7 +310,7 @@ public class ToolParser extends DefaultHandler{
 			{
 				currentApp=new ToolApp();
 				//currentApp.toolCommand="GLOBAL";
-				currentApp.toolID=getAttribute("command",atts);;
+				currentApp.toolID=getAttribute("command",atts);
 			}
 		}
 		else if(name.equals(ENVVAR)){
@@ -454,7 +460,7 @@ public class ToolParser extends DefaultHandler{
 		{
 			if(actOpt!=null&&tagStack.peek().equals(TOGOPT))
 			{
-				actOpt.useEquals=getBooleanAttribute("equals",true,atts);
+				//actOpt.useEquals=getBooleanAttribute("equals",true,atts);
 				actOpt.defText=getAttribute(DEFAULT,atts);
 				String type=getAttribute("type",atts);
 				if(type!=null)

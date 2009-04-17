@@ -3,7 +3,6 @@ package org.eclipse.ptp.perf.internal;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -177,7 +176,7 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 					}};
 				
 					LinkedHashSet<File> fileSet=new LinkedHashSet<File>();
-					findFiles(fileSet,workDir,-1,ffn);
+					findFiles(fileSet,workDir,tool.depth,ffn);
 				//String[] files=workDir.list(ffn);
 				if(fileSet.size()<=0){
 					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"No Valid Files Found",null);
