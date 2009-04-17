@@ -40,6 +40,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -56,65 +57,13 @@ import org.eclipse.swt.widgets.Text;
  */
 public class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
 
-	//	protected boolean listenerEnabled = false;
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
-	private IRemoteServices remoteServices = null;
-	private IRemoteConnection connection = null;
-
-	protected Text launchCmdText = null;
-	protected Text debugCmdText = null;
-	protected Text discoverCmdText = null;
-	protected Text continuousMonitorCmdText = null;
-	protected Text periodicMonitorCmdText = null;
-	protected Spinner periodicMonitorTimeSpinner = null;
-	protected Text remoteInstallPathText = null;
-	protected Button browseButton = null;
-	protected Button defaultButton = null;
-
-	protected int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
-
-	protected class WidgetListener extends WizardPageWidgetListener {
-		@Override
-		protected void doModifyText(ModifyEvent evt) {
-			Object source = evt.getSource();
-			if(source == launchCmdText ||
-					source == debugCmdText ||
-					source == discoverCmdText ||
-					source == periodicMonitorCmdText ||
-					source == continuousMonitorCmdText ||
-					source == periodicMonitorTimeSpinner ||
-					source == remoteInstallPathText) {
-				resetErrorMessages();
-				getDataSource().storeAndValidate();
-			} else {
-				assert false;
-			}
-		}
-
-		@Override
-		protected void doWidgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if (source == browseButton) {
-				handlePathBrowseButtonSelected();
-			} else if (source == defaultButton)  {
-				resetErrorMessages();
-				getDataSource().storeAndValidate();
-				updateControls();
-			} else {
-				assert false;
-			}
-		}
-	}
-
-	protected  class DataSource extends WizardPageDataSource {
-		protected DataSource(AbstractConfigurationWizardPage page) {
-			super(page);
-		}
-
+	protected class DataSource extends WizardPageDataSource {
 		private AbstractToolRMConfiguration config = null;
 
+		private boolean commandsEnabled = false;
 		private boolean useToolDefaults = false;
+		private boolean useInstallDefaults = false;
+
 		private String launchCmd = null;
 		private String debugCmd = null;
 		private String discoverCmd = null;
@@ -122,27 +71,13 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		private int periodicMonitorTime = 0;
 		private String continuousMonitorCmd = null;
 		private String remoteInstallPath = null;
-
-		public void setCommandFields(String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd, int periodicMonitorTime, String continuousMonitorCmd, String remoteInstallPath) {
-			this.launchCmd = launchCmd;
-			this.debugCmd = debugCmd;
-			this.discoverCmd = discoverCmd;
-			this.periodicMonitorCmd = periodicMonitorCmd;
-			this.periodicMonitorTime = periodicMonitorTime;
-			this.continuousMonitorCmd = continuousMonitorCmd;
-			this.remoteInstallPath = remoteInstallPath;
+		
+		protected DataSource(AbstractConfigurationWizardPage page) {
+			super(page);
 		}
 
-		public void setUseDefaults(boolean useToolDefaults) {
-			this.useToolDefaults = useToolDefaults;
-		}
-
-		public boolean isUseDefaults() {
-			return useToolDefaults;
-		}
-
-		public String getLaunchCmd() {
-			return launchCmd;
+		public String getContinuousMonitorCmd() {
+			return continuousMonitorCmd;
 		}
 
 		public String getDebugCmd() {
@@ -153,6 +88,10 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			return discoverCmd;
 		}
 
+		public String getLaunchCmd() {
+			return launchCmd;
+		}
+
 		public String getPeriodicMonitorCmd() {
 			return periodicMonitorCmd;
 		}
@@ -161,17 +100,57 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			return periodicMonitorTime;
 		}
 
-		public String getContinuousMonitorCmd() {
-			return continuousMonitorCmd;
-		}
-
 		public String getRemoteInstallPath() {
 			return remoteInstallPath;
 		}
 
+		public boolean getCommandsEnabled() {
+			return commandsEnabled;
+		}
+
+		public boolean getInstallDefaults() {
+			return useInstallDefaults;
+		}
+
+		public boolean getUseDefaults() {
+			return useToolDefaults;
+		}
+
+		public void setCommandFields(String launchCmd, String debugCmd, String discoverCmd, 
+				String periodicMonitorCmd, int periodicMonitorTime, String continuousMonitorCmd, 
+				String remoteInstallPath) {
+			this.launchCmd = launchCmd;
+			this.debugCmd = debugCmd;
+			this.discoverCmd = discoverCmd;
+			this.periodicMonitorCmd = periodicMonitorCmd;
+			this.periodicMonitorTime = periodicMonitorTime;
+			this.continuousMonitorCmd = continuousMonitorCmd;
+			this.remoteInstallPath = remoteInstallPath;
+		}
+
+		@Override
+		public void setConfig(IResourceManagerConfiguration configuration) {
+			super.setConfig(configuration);
+			// Store a local reference to the configuration
+			this.config = (AbstractToolRMConfiguration) configuration;
+		}
+
+		public void setCommandsEnabled(boolean enable) {
+			this.commandsEnabled = enable;
+		}
+		
+		public void setInstallDefaults(boolean useInstallDefaults) {
+			this.useInstallDefaults = useInstallDefaults;
+		}
+		
+		public void setUseDefaults(boolean useToolDefaults) {
+			this.useToolDefaults = useToolDefaults;
+		}
+
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			useToolDefaults = defaultButton.getSelection();
+			useToolDefaults = defaultCmdButton.getSelection();
+			useInstallDefaults = defaultInstallButton.getSelection();
 
 			if (launchCmdText != null) {
 				launchCmd = extractText(launchCmdText);
@@ -197,23 +176,30 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		}
 
 		@Override
-		protected void validateLocal() throws ValidationException {
-			if (! useToolDefaults) {
-				if (launchCmdText != null && launchCmd == null) {
-					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingLaunchCommand);
-				}
-				if (debugCmdText != null && debugCmd == null) {
-					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDebugCommand);
-				}
-				if (discoverCmdText != null) {
-					if (discoverCmd == null) {
-						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDiscoverCommand);
-					}
-					if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
-						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_InvalidPeriodicMonitorCommandTimeRange);
-					}
-				}
+		protected void copyToFields() {
+			if (launchCmdText != null) {
+				applyText(launchCmdText, launchCmd);
 			}
+			if (debugCmdText != null) {
+				applyText(debugCmdText, debugCmd);
+			}
+			if (discoverCmdText != null) {
+				applyText(discoverCmdText, discoverCmd);
+			}
+			if (periodicMonitorCmdText != null) {
+				applyText(periodicMonitorCmdText, periodicMonitorCmd);
+			}
+			if (periodicMonitorTimeSpinner != null) {
+				periodicMonitorTimeSpinner.setSelection(periodicMonitorTime);
+			}
+			if (continuousMonitorCmdText != null) {
+				applyText(continuousMonitorCmdText, continuousMonitorCmd);
+			}
+			if (remoteInstallPathText != null) {
+				applyText(remoteInstallPathText, remoteInstallPath);
+			}
+			defaultCmdButton.setSelection(useToolDefaults);
+			defaultInstallButton.setSelection(useInstallDefaults);
 		}
 
 		@Override
@@ -240,6 +226,13 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 				config.setRemoteInstallPath(remoteInstallPath);
 			}
 			config.setUseToolDefaults(useToolDefaults);
+			config.setUseInstallDefaults(useInstallDefaults);
+			config.setCommandsEnabled(commandsEnabled);
+		}
+
+		@Override
+		protected void loadDefault() {
+			// not available
 		}
 
 		@Override
@@ -265,33 +258,9 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			if (remoteInstallPathText != null) {
 				remoteInstallPath = config.getRemoteInstallPath();
 			}
-			useToolDefaults = config.useToolDefaults();
-		}
-
-		@Override
-		protected void copyToFields() {
-			if (launchCmdText != null) {
-				applyText(launchCmdText, launchCmd);
-			}
-			if (debugCmdText != null) {
-				applyText(debugCmdText, debugCmd);
-			}
-			if (discoverCmdText != null) {
-				applyText(discoverCmdText, discoverCmd);
-			}
-			if (periodicMonitorCmdText != null) {
-				applyText(periodicMonitorCmdText, periodicMonitorCmd);
-			}
-			if (periodicMonitorTimeSpinner != null) {
-				periodicMonitorTimeSpinner.setSelection(periodicMonitorTime);
-			}
-			if (continuousMonitorCmdText != null) {
-				applyText(continuousMonitorCmdText, continuousMonitorCmd);
-			}
-			if (remoteInstallPathText != null) {
-				applyText(remoteInstallPathText, remoteInstallPath);
-			}
-			defaultButton.setSelection(useToolDefaults);
+			useToolDefaults = config.getUseToolDefaults();
+			useInstallDefaults = config.getUseInstallDefaults();
+			commandsEnabled = config.getCommandsEnabled();
 		}
 
 		@Override
@@ -300,17 +269,79 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		}
 
 		@Override
-		public void setConfig(IResourceManagerConfiguration configuration) {
-			super.setConfig(configuration);
-			// Store a local reference to the configuration
-			this.config = (AbstractToolRMConfiguration) configuration;
+		protected void validateLocal() throws ValidationException {
+			if (! useToolDefaults) {
+				if (launchCmdText != null && launchCmd == null) {
+					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingLaunchCommand);
+				}
+				if (debugCmdText != null && debugCmd == null) {
+					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDebugCommand);
+				}
+				if (discoverCmdText != null) {
+					if (discoverCmd == null) {
+						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDiscoverCommand);
+					}
+					if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
+						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_InvalidPeriodicMonitorCommandTimeRange);
+					}
+				}
+			}
+		}
+	}
+
+	protected class WidgetListener extends WizardPageWidgetListener {
+		@Override
+		protected void doModifyText(ModifyEvent evt) {
+			Object source = evt.getSource();
+			if(source == launchCmdText ||
+					source == debugCmdText ||
+					source == discoverCmdText ||
+					source == periodicMonitorCmdText ||
+					source == continuousMonitorCmdText ||
+					source == periodicMonitorTimeSpinner ||
+					source == remoteInstallPathText) {
+				resetErrorMessages();
+				getDataSource().storeAndValidate();
+			} else {
+				assert false;
+			}
 		}
 
 		@Override
-		protected void loadDefault() {
-			// not available
+		protected void doWidgetSelected(SelectionEvent e) {
+			Object source = e.getSource();
+			if (source == browseButton) {
+				handlePathBrowseButtonSelected();
+			} else if (source == defaultCmdButton || source == defaultInstallButton)  {
+				resetErrorMessages();
+				getDataSource().storeAndValidate();
+				updateControls();
+			} else {
+				assert false;
+			}
 		}
 	}
+
+	//	protected boolean listenerEnabled = false;
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
+	
+	private IRemoteServices remoteServices = null;
+	private IRemoteConnection connection = null;
+
+	protected Text launchCmdText = null;
+	protected Text debugCmdText = null;
+	protected Text discoverCmdText = null;
+	protected Text continuousMonitorCmdText = null;
+	protected Text periodicMonitorCmdText = null;
+	protected Spinner periodicMonitorTimeSpinner = null;
+	protected Text remoteInstallPathText = null;
+	protected Button browseButton = null;
+	protected Button defaultCmdButton = null;
+	protected Button defaultInstallButton = null;
+	
+	protected boolean isEnabled;
+
+	protected int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
 
 	public AbstractToolRMConfigurationWizardPage(RMConfigurationWizard wizard, int capabilities, String pageName, String title, String description) {
 		super(wizard, pageName);
@@ -319,9 +350,150 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		setDescription(description);
 	}
 
+	/**
+	 * Update wizard UI selections from settings. This should be called whenever any
+	 * settings are changed.
+	 */
 	@Override
-	protected WizardPageWidgetListener createListener() {
-		return new WidgetListener();
+	public void updateControls() {
+		boolean enabled = ((DataSource)getDataSource()).getCommandsEnabled();
+		
+		defaultCmdButton.setEnabled(enabled);
+
+		if (enabled) {
+			enabled = !defaultCmdButton.getSelection();
+		}
+
+		if (launchCmdText != null) {
+			launchCmdText.setEnabled(enabled);
+		}
+		if (debugCmdText != null) {
+			debugCmdText.setEnabled(enabled);
+		}
+		if (discoverCmdText != null) {
+			discoverCmdText.setEnabled(enabled);
+		}
+		if (periodicMonitorCmdText != null) {
+			periodicMonitorCmdText.setEnabled(enabled);
+		}
+		if (periodicMonitorTimeSpinner != null) {
+			periodicMonitorTimeSpinner.setEnabled(enabled);
+		}
+		if (continuousMonitorCmdText != null) {
+			continuousMonitorCmdText.setEnabled(enabled);
+		}
+		
+		enabled = !defaultInstallButton.getSelection();
+
+		if (remoteInstallPathText != null) {
+			remoteInstallPathText.setEnabled(enabled);
+		}
+	}
+
+
+	protected void createContents(Composite parent) {
+		Composite contents = new Composite(parent, SWT.NONE);
+		contents.setLayout(new GridLayout(4, false));
+		contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Group cmdGroup = new Group(contents, SWT.SHADOW_ETCHED_IN);
+		cmdGroup.setLayout(new GridLayout(4, false));
+		cmdGroup.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+		cmdGroup.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_CommandGroup);
+
+		/*
+		 * Default commands button
+		 */
+		defaultCmdButton = createCheckButton(cmdGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_UseDefaultSettings);
+		defaultCmdButton.addSelectionListener(getWidgetListener());
+		defaultCmdButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+
+		/*
+		 * launch cmd
+		 */
+		if ((capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0) {
+			Label label = new Label(cmdGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_LaunchCommand);
+
+			launchCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
+			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			launchCmdText.addModifyListener(getWidgetListener());
+
+			label = new Label(cmdGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DebugCommand);
+
+			debugCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
+			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			debugCmdText.addModifyListener(getWidgetListener());
+		}
+
+		/*
+		 * discover cmd
+		 */
+		if ((capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0) {
+			Label label = new Label(cmdGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DiscoverCommand);
+
+			discoverCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
+			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			discoverCmdText.addModifyListener(getWidgetListener());
+		}
+
+		/*
+		 * Periodic monitor cmd and time
+		 */
+		if ((capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
+			Label label = new Label(cmdGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommand);
+
+			periodicMonitorCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
+			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+			periodicMonitorCmdText.addModifyListener(getWidgetListener());
+
+			label = new Label(cmdGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommandPeriod);
+
+			periodicMonitorTimeSpinner = new Spinner(cmdGroup, SWT.SINGLE | SWT.BORDER);
+			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+			periodicMonitorTimeSpinner.addModifyListener(getWidgetListener());
+		}
+
+		/*
+		 * Continuous monitor cmd
+		 */
+		if ((capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
+			Label label = new Label(cmdGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_ContinuousMinitorCommand);
+
+			continuousMonitorCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
+			continuousMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			continuousMonitorCmdText.addModifyListener(getWidgetListener());
+		}
+
+		/*
+		 * Installation path
+		 */
+		if ((capabilities & AbstractToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
+			Group pathGroup = new Group(contents, SWT.SHADOW_ETCHED_IN);
+			pathGroup.setLayout(new GridLayout(4, false));
+			pathGroup.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+			pathGroup.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationGroup);
+
+			defaultInstallButton = createCheckButton(pathGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationDefault);
+			defaultInstallButton.addSelectionListener(getWidgetListener());
+			defaultInstallButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+
+			Label label = new Label(pathGroup, SWT.NONE);
+			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationLocation);
+
+			remoteInstallPathText = new Text(pathGroup, SWT.SINGLE | SWT.BORDER);
+			remoteInstallPathText.addModifyListener(getWidgetListener());
+			remoteInstallPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+			browseButton = SWTUtil.createPushButton(pathGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationButton, null);
+			browseButton.addSelectionListener(getWidgetListener());
+			browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		}
 	}
 
 	@Override
@@ -329,6 +501,10 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		return new DataSource(this);
 	}
 
+	@Override
+	protected WizardPageWidgetListener createListener() {
+		return new WidgetListener();
+	}
 
 	@Override
 	protected Composite doCreateContents(Composite parent) {
@@ -347,102 +523,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		return contents;
 	}
-
-	protected void createContents(Composite parent) {
-		Composite contents = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 4;
-		contents.setLayout(layout);
-
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		contents.setLayoutData(gd);
-
-		/*
-		 * Default button
-		 */
-		defaultButton = createCheckButton(contents, Messages.AbstractToolRMConfigurationWizardPage_Label_UseDefaultSettings);
-		defaultButton.addSelectionListener(getWidgetListener());
-		defaultButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
-
-		/*
-		 * launch cmd
-		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0) {
-			Label label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_LaunchCommand);
-
-			launchCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			launchCmdText.addModifyListener(getWidgetListener());
-
-			label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DebugCommand);
-
-			debugCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			debugCmdText.addModifyListener(getWidgetListener());
-		}
-
-		/*
-		 * discover cmd
-		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0) {
-			Label label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DiscoverCommand);
-
-			discoverCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			discoverCmdText.addModifyListener(getWidgetListener());
-		}
-
-		/*
-		 * Periodic monitor cmd and time
-		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
-			Label label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommand);
-
-			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			periodicMonitorCmdText.addModifyListener(getWidgetListener());
-
-			label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommandPeriod);
-
-			periodicMonitorTimeSpinner = new Spinner(contents, SWT.SINGLE | SWT.BORDER);
-			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
-			periodicMonitorTimeSpinner.addModifyListener(getWidgetListener());
-		}
-
-		/*
-		 * Continuous monitor cmd
-		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
-			Label label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_ContinuousMinitorCommand);
-
-			continuousMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			continuousMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			continuousMonitorCmdText.addModifyListener(getWidgetListener());
-		}
-
-		/*
-		 * Installation path
-		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
-			Label label = new Label(contents, SWT.NONE);
-			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PathInstallation);
-
-			remoteInstallPathText = new Text(contents, SWT.SINGLE | SWT.BORDER);
-			remoteInstallPathText.addModifyListener(getWidgetListener());
-			remoteInstallPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-			browseButton = SWTUtil.createPushButton(contents, "Browse", null); //$NON-NLS-1$
-			browseButton.addSelectionListener(getWidgetListener());
-			browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		}
-	}
-
+	
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
@@ -501,39 +582,5 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 				remoteInstallPathText.setText(selectedPath.toString());
 			}
 		}
-	}
-
-	/**
-	 * Update wizard UI selections from settings. This should be called whenever any
-	 * settings are changed.
-	 */
-	@Override
-	protected void updateControls() {
-		boolean enabled = ! defaultButton.getSelection();
-
-		if (launchCmdText != null) {
-			launchCmdText.setEnabled(enabled);
-		}
-		if (debugCmdText != null) {
-			debugCmdText.setEnabled(enabled);
-		}
-		if (discoverCmdText != null) {
-			discoverCmdText.setEnabled(enabled);
-		}
-		if (periodicMonitorCmdText != null) {
-			periodicMonitorCmdText.setEnabled(enabled);
-		}
-		if (periodicMonitorTimeSpinner != null) {
-			periodicMonitorTimeSpinner.setEnabled(enabled);
-		}
-		if (continuousMonitorCmdText != null) {
-			continuousMonitorCmdText.setEnabled(enabled);
-		}
-		//		if (remoteInstallPathText != null) {
-		//			remoteInstallPathText.setEnabled(enabled);
-		//		}
-		//		if (browseButton != null) {
-		//			browseButton.setEnabled(enabled);
-		//		}
 	}
 }

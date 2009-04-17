@@ -123,7 +123,9 @@ AbstractToolRMConfiguration implements Cloneable {
 				getPeriodicMonitorTime(),
 				getContinuousMonitorCmd(),
 				getRemoteInstallPath(),
-				useToolDefaults());
+				getUseToolDefaults(),
+				getUseInstallDefaults(),
+				getCommandsEnabled());
 		MPICH2Config openMpiConfig = new MPICH2Config(toolsConfig, getVersionId());
 
 		return new MPICH2ResourceManagerConfiguration(

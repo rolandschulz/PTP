@@ -18,7 +18,7 @@ AbstractEffectiveToolRMConfiguration {
 		String periodicCmd = null;
 		int periodicTime = 0;
 		String remoteInstallPath = null;
-		if (MPICH2configuration.useToolDefaults()) {
+		if (MPICH2configuration.getUseToolDefaults()) {
 			Preferences preferences = MPICH2PreferenceManager.getPreferences();
 			launchCmd = preferences.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DEBUG_CMD);
