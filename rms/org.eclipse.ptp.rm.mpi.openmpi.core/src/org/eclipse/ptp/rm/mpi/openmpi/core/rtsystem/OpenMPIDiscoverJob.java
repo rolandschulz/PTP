@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -30,7 +32,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -107,7 +108,32 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			 * TODO: validate lines and write to log if invalid lines were found.
 			 */
 			parseOmpiInfo(output, info);
-
+			
+			/*
+			 * Check and/or set the OMPI version in the configuration. NOTE that this may change any
+			 * subsequent commands that are queried!
+			 */
+			String fullVersion = info.get("ompi:version:full"); //$NON-NLS-1$
+			if (fullVersion != null) {
+				Pattern p = Pattern.compile("^(\\d+\\.\\d+).*"); //$NON-NLS-1$
+				Matcher m = p.matcher(fullVersion);
+				if (m.matches()) {
+					String version = m.group(1);
+					String rmVersion = rmConfiguration.getVersionId();
+					if (!rmConfiguration.validateVersion(version)) {
+						throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
+					}
+					if (!rmVersion.equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO) && !version.equals(rmVersion)) {
+						throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
+					}
+					rmConfiguration.setDetectedVersion(version); // NOTE: this only persists while the RM is running
+				} else {
+					throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, fullVersion)));
+				}
+			} else {
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), Messages.OpenMPIDiscoverJob_Exception_UnableToDetermineVersion));
+			}
+			
 			/*
 			 * STEP 2:
 			 * Read file that describes machine geography.
@@ -130,14 +156,13 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 
 				// Add node to model
 				String nodeId = rts.createNode(machineID, host.getName(), rankCounter++);
-				IPNode node = machine.getNodeById(nodeId);
 				rts.setNodeIDForName(host.getName(), nodeId);
 
 				// Add processor information to node.
 				AttributeManager attrManager = new AttributeManager();
 				if (host.getNumProcessors() != 0) {
 					try {
-						attrManager.addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(host.getNumProcessors()));
+						attrManager.addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(Integer.valueOf(host.getNumProcessors())));
 					} catch (IllegalValueException e) {
 						// This situation is not possible since host.getNumProcessors() is always valid.
 						assert false;
@@ -145,7 +170,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				}
 				if (host.getMaxNumProcessors() != 0) {
 					try {
-						attrManager.addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(host.getMaxNumProcessors()));
+						attrManager.addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(Integer.valueOf(host.getMaxNumProcessors())));
 					} catch (IllegalValueException e) {
 						// This situation is not possible since host.getMaxNumProcessors() is always valid.
 						assert false;
@@ -168,9 +193,9 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 				machine.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(Messages.OpenMPIDiscoverJob_Exception_HostFileParseError));
 			}
-			if (hostMap.hasParseErrors() || hasSomeError)
+			if (hostMap.hasParseErrors() || hasSomeError) {
 				throw new CoreException(new Status(IStatus.WARNING, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIDiscoverJob_Exception_HostFileErrors));
-
+			}
 		} catch (CoreException e) {
 			/*
 			 * Show message of core exception and change machine status to error.
@@ -233,7 +258,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 		
 		if (hostFilePath == null) {
-			if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			if (rmConfiguration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Missing mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandMissingHostFilePath));
 			}
@@ -249,7 +274,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "hostFilePath: {0}", hostFilePath); //$NON-NLS-1$
 
 		if (!hostFilePath.isAbsolute()) {
-			if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			if (rmConfiguration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFilePathNotAbsolute, hostFilePath)));
 			}
 			
@@ -290,7 +315,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		 * Only for Open MPI 1.2. On 1.3, there is no default host file assumed.
 		 */
 		if (hostMap.count() == 0) {
-			if (rmConfiguration.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			if (rmConfiguration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 				// This was not correct for remote hosts. Worked only for local hosts.
 				//					try {
 				//						InetAddress localhost = InetAddress.getLocalHost();
@@ -325,7 +350,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			// Ignore
 		}
 		if (process.exitValue() != 0)
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, process.exitValue())));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, Integer.valueOf(process.exitValue()))));
 		String hostname = br.readLine();
 		if (hostname == null)
 			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse));

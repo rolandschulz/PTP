@@ -34,7 +34,6 @@ public class OpenMPI12Defaults {
 	public static String DEBUG_CMD = null;
 	public static String DISCOVER_CMD = null;
 	public static String PATH = null;
-	public static boolean USE_DEFAULTS = false;
 
 	private static String defaultsResourcePath = "/data/defaults-OpenMPI-1.2.properties"; //$NON-NLS-1$
 
@@ -47,7 +46,6 @@ public class OpenMPI12Defaults {
 		DEBUG_CMD = getString(bundle, properties, "DEBUG_CMD"); //$NON-NLS-1$
 		DISCOVER_CMD = getString(bundle, properties, "DISCOVER_CMD"); //$NON-NLS-1$
 		PATH = getString(bundle, properties, "PATH"); //$NON-NLS-1$
-		USE_DEFAULTS = getBoolean(bundle, properties, "USE_DEFAULTS"); //$NON-NLS-1$
 
 		assert LAUNCH_CMD != null;
 		assert DEBUG_CMD != null;
@@ -65,17 +63,17 @@ public class OpenMPI12Defaults {
 
 
 		} catch (IOException e) {
-			throw OpenMPIPlugin.coreErrorException(Messages.OpenMPI12Defaults_Exception_FailedReadFile, e);
+			throw OpenMPIPlugin.coreErrorException(Messages.OpenMPIDefaults_Exception_FailedReadFile, e);
 		}
 		return properties;
 	}
 
 	public static String getString(Bundle bundle, Properties properties, String key) throws CoreException {
 		String value = properties.getProperty(key);
-		if (value == null)
-			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPI12Defaults_MissingValue, key)));
-		else
-			return value;
+		if (value == null) {
+			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPIDefaults_MissingValue, key)));
+		}
+		return value;
 	}
 
 	public static int getInteger(Bundle bundle, Properties properties, String key) throws CoreException {
@@ -83,7 +81,7 @@ public class OpenMPI12Defaults {
 		try {
 			return Integer.parseInt(value);
 		} catch (NumberFormatException e) {
-			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPI12Defaults_FailedParseInteger, key)));
+			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPIDefaults_FailedParseInteger, key)));
 		}
 	}
 

@@ -13,14 +13,13 @@ package org.eclipse.ptp.rm.mpi.openmpi.core;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 
-
 /**
  * 
  * @author Daniel Felix Ferber
  *
  */
-public class OpenMPI12PreferenceManager extends AbstractToolsPreferenceManager {
-	public static final String PREFIX = "openmpi-1.2-"; //$NON-NLS-1$
+public class OpenMPIAutoPreferenceManager extends AbstractToolsPreferenceManager {
+	public static final String PREFIX = "openmpi-auto-"; //$NON-NLS-1$
 
 	public static Preferences getPreferences() {
 		return OpenMPIPlugin.getDefault().getPluginPreferences();
@@ -33,9 +32,9 @@ public class OpenMPI12PreferenceManager extends AbstractToolsPreferenceManager {
 	public static void initializePreferences() {
 		Preferences preferences = OpenMPIPlugin.getDefault().getPluginPreferences();
 		// Initialize only preferences as in OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
-		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, OpenMPI12Defaults.LAUNCH_CMD);
-		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, OpenMPI12Defaults.DEBUG_CMD);
-		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, OpenMPI12Defaults.DISCOVER_CMD);
-		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, OpenMPI12Defaults.PATH);
+		preferences.setDefault(PREFIX + PREFS_LAUNCH_CMD, OpenMPIAutoDefaults.LAUNCH_CMD);
+		preferences.setDefault(PREFIX + PREFS_DEBUG_CMD, OpenMPIAutoDefaults.DEBUG_CMD);
+		preferences.setDefault(PREFIX + PREFS_DISCOVER_CMD, OpenMPIAutoDefaults.DISCOVER_CMD);
+		preferences.setDefault(PREFIX + PREFS_REMOTE_INSTALL_PATH, OpenMPIAutoDefaults.PATH);
 	}
 }

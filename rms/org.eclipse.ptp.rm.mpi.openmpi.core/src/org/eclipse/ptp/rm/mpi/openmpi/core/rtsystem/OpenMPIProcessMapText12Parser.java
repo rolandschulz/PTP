@@ -87,12 +87,12 @@ public class OpenMPIProcessMapText12Parser {
 			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
 		}
 
-		p = Pattern.compile("\\s*Cell:\\s*(\\S*)\\s*Nodename:\\s*(\\S*)\\s*Launch id:\\s*(\\S*)\\s*Username:\\s*(\\S*)"); //$NON-NLS-1$
+		p = Pattern.compile("\\s*Cell:\\s*(\\S*)\\s*Nodename:\\s*(\\S*)\\s*Launch id:\\s*(\\S*)\\s*Username:\\s*(\\S*).*"); //$NON-NLS-1$
 		String nodeName = ""; //$NON-NLS-1$
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 4) {
+			if (m.matches()) {
 				try {
 					nodeName = m.group(2);
 				} catch (NumberFormatException e) {
@@ -109,7 +109,7 @@ public class OpenMPIProcessMapText12Parser {
 		OpenMPIProcessMap.Node node = new OpenMPIProcessMap.Node(nodeName);
 		map.addNode(node);
 
-		p = Pattern.compile("\\s*Daemon name:"); //$NON-NLS-1$
+		p = Pattern.compile("\\s*Daemon name:.*"); //$NON-NLS-1$
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
@@ -121,7 +121,7 @@ public class OpenMPIProcessMapText12Parser {
 			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
 		}
 		
-		p = Pattern.compile("\\s*Data type:\\s*\\S*\\s*Data Value:\\s*\\S*"); //$NON-NLS-1$
+		p = Pattern.compile("\\s*Data type:\\s*\\S*\\s*Data Value:\\s*\\S*.*"); //$NON-NLS-1$
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
@@ -133,13 +133,13 @@ public class OpenMPIProcessMapText12Parser {
 			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
 		}
 		
-		p = Pattern.compile("\\s*Oversubscribed:\\s*(\\S*)\\s*Num elements in procs list:\\s*(\\d*)"); //$NON-NLS-1$
+		p = Pattern.compile("\\s*Oversubscribed:\\s*(\\S*)\\s*Num elements in procs list:\\s*(\\d*).*"); //$NON-NLS-1$
 		
 		int numProcesses = 0;
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 2) {
+			if (m.matches()) {
 				try {
 					String s = m.group(1);
 					if (s.equalsIgnoreCase("true")) { //$NON-NLS-1$
@@ -162,10 +162,10 @@ public class OpenMPIProcessMapText12Parser {
 			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
 		}
 
-		p = Pattern.compile("\\s*Mapped proc:"); //$NON-NLS-1$
-		Pattern p2 = Pattern.compile("\\s*Proc Name:\\s*(\\S*)"); //$NON-NLS-1$
-		Pattern p3 = Pattern.compile("\\s*Data type:\\s*\\S*\\s*Data Value:\\s*\\S*"); //$NON-NLS-1$
-		Pattern p4 = Pattern.compile("\\s*Proc Rank:\\s*(\\d*)\\s*Proc PID:\\s*(\\d*)\\s*App_context index:\\s*(\\d*)"); //$NON-NLS-1$
+		p = Pattern.compile("\\s*Mapped proc:.*"); //$NON-NLS-1$
+		Pattern p2 = Pattern.compile("\\s*Proc Name:\\s*(\\S*).*"); //$NON-NLS-1$
+		Pattern p3 = Pattern.compile("\\s*Data type:\\s*\\S*\\s*Data Value:\\s*\\S*.*"); //$NON-NLS-1$
+		Pattern p4 = Pattern.compile("\\s*Proc Rank:\\s*(\\d*)\\s*Proc PID:\\s*(\\d*)\\s*App_context index:\\s*(\\d*).*"); //$NON-NLS-1$
 
 		for (int i = 0; i < numProcesses; i ++) {
 			String processName = ""; //$NON-NLS-1$
@@ -187,7 +187,7 @@ public class OpenMPIProcessMapText12Parser {
 			// Proc Name:
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p2.matcher(line);
-				if (m.matches() && m.groupCount() == 1) {
+				if (m.matches()) {
 					processName = m.group(1);
 					break;
 				}
@@ -210,7 +210,7 @@ public class OpenMPIProcessMapText12Parser {
 			// Proc Rank:
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p4.matcher(line);
-				if (m.matches() && m.groupCount() == 3) {
+				if (m.matches()) {
 					try {
 						String s = m.group(1);
 						processIndex = Integer.parseInt(s);
@@ -246,12 +246,12 @@ public class OpenMPIProcessMapText12Parser {
 	 *		Num elements in nodes list: 1
 	 */
 	private void readNumElements(BufferedReader reader) throws IOException {
-		Pattern p = Pattern.compile("\\s*Num elements in nodes list:\\s*(\\d*)"); //$NON-NLS-1$
+		Pattern p = Pattern.compile("\\s*Num elements in nodes list:\\s*(\\d*).*"); //$NON-NLS-1$
 		String line;
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 1) {
+			if (m.matches()) {
 				try {
 					String s = m.group(1);
 					numNodes = Integer.parseInt(s);
@@ -292,7 +292,7 @@ public class OpenMPIProcessMapText12Parser {
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
 	
-			if (m.matches() && m.groupCount() == 2) {
+			if (m.matches()) {
 				try {
 					String s = m.group(1);
 					applicationIndex = Integer.parseInt(s);
@@ -310,11 +310,11 @@ public class OpenMPIProcessMapText12Parser {
 			throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
 		}
 		
-		p = Pattern.compile("\\s*Num procs:\\s*(\\d*)"); //$NON-NLS-1$
+		p = Pattern.compile("\\s*Num procs:\\s*(\\d*).*"); //$NON-NLS-1$
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 1) {
+			if (m.matches()) {
 				try {
 					String s = m.group(1);
 					numberOfProcessors = Integer.parseInt(s);
@@ -345,18 +345,18 @@ public class OpenMPIProcessMapText12Parser {
 
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 1) {
+			if (m.matches()) {
 				String s = m.group(1).trim();
 				application.getAttributeManager().addAttribute(OpenMPIApplicationAttributes.getEffectiveOpenMPIWorkingDirAttributeDefinition().create(s));
 				break;
 			}
 			
 			m = p1.matcher(line);
-			if (m.matches() && m.groupCount() == 1) {
+			if (m.matches()) {
 				arguments.add(m.group(1));
 			} else {
 				m = p2.matcher(line);
-				if (m.matches() && m.groupCount() == 1) {
+				if (m.matches()) {
 					environment.add(m.group(1));
 				}
 			}
@@ -374,7 +374,7 @@ public class OpenMPIProcessMapText12Parser {
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 1) {
+			if (m.matches()) {
 				try {
 					String s = m.group(1);
 					num_maps = Integer.parseInt(s);
@@ -409,7 +409,7 @@ public class OpenMPIProcessMapText12Parser {
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 3) {
+			if (m.matches()) {
 				try {
 					String s = m.group(1);
 					try {
@@ -453,7 +453,7 @@ public class OpenMPIProcessMapText12Parser {
 		
 		while ((line = reader.readLine()) != null) {
 			Matcher m = p.matcher(line);
-			if (m.matches() && m.groupCount() == 4) {
+			if (m.matches()) {
 				try {
 					map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getHostnameAttributeDefinition().create(m.group(1)));
 					try {

@@ -14,13 +14,10 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.openmpi.core.messages.messages"; //$NON-NLS-1$
-	public static String OpenMPI12Defaults_Exception_FailedReadFile;
-	public static String OpenMPI12Defaults_FailedParseInteger;
-	public static String OpenMPI12Defaults_MissingValue;
 	
-	public static String OpenMPI13Defaults_Exception_FailedReadFile;
-	public static String OpenMPI13Defaults_FailedParseInteger;
-	public static String OpenMPI13Defaults_MissingValue;
+	public static String OpenMPIDefaults_Exception_FailedReadFile;
+	public static String OpenMPIDefaults_FailedParseInteger;
+	public static String OpenMPIDefaults_MissingValue;
 	
 	public static String OpenMPIApplicationAttributes_effectiveOpenMPIEnvAttrDef_description;
 	public static String OpenMPIApplicationAttributes_effectiveOpenMPIEnvAttrDef_title;
@@ -87,6 +84,8 @@ public class Messages extends NLS {
 	public static String OpenMPIDiscoverJob_name;
 	public static String OpenMPIDiscoverJob_parsingErrorMessage;
 	public static String OpenMPIDiscoverJob_processErrorMessage;
+	public static String OpenMPIDiscoverJob_Exception_UnableToDetermineVersion;
+	public static String OpenMPIDiscoverJob_Exception_InvalidVersion;
 	
 	public static String OpenMPIProcessMapText12Parser_Exception_InvalidLine;
 	public static String OpenMPIProcessMapText12Parser_Exception_MissingDisplayMapInformation;
@@ -104,6 +103,8 @@ public class Messages extends NLS {
 	public static String OpenMPIRuntimeSystemJob_ProcessName;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithSignal;
+	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailureDetected;
+	
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

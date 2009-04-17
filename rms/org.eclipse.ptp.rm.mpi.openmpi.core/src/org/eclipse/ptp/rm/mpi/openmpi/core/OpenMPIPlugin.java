@@ -45,8 +45,10 @@ public class OpenMPIPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		OpenMPIAutoDefaults.loadDefaults();
 		OpenMPI12Defaults.loadDefaults();
 		OpenMPI13Defaults.loadDefaults();
+		OpenMPIAutoPreferenceManager.initializePreferences();
 		OpenMPI12PreferenceManager.initializePreferences();
 		OpenMPI13PreferenceManager.initializePreferences();
 	}

@@ -15,7 +15,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIAutoPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
@@ -32,8 +32,10 @@ AbstractToolRMConfiguration implements Cloneable {
 
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
-	public static final String VERSION_12 = "openmpi-1.2"; //$NON-NLS-1$
-	public static final String VERSION_13 = "openmpi-1.3"; //$NON-NLS-1$
+	public static final String VERSION_UNKNOWN = "unknown"; //$NON-NLS-1$
+	public static final String VERSION_AUTO = "auto"; //$NON-NLS-1$
+	public static final String VERSION_12 = "1.2"; //$NON-NLS-1$
+	public static final String VERSION_13 = "1.3"; //$NON-NLS-1$
 
 
 	/**
@@ -73,8 +75,16 @@ AbstractToolRMConfiguration implements Cloneable {
 		}
 	}
 
+	/*
+	 * Version that is selected when configuring the RM
+	 */
 	private String versionId;
-
+	/*
+	 * Actual version that is used to select correct commands. This version
+	 * only persists while the RM is running.
+	 */
+	private String detectedVersion;
+	
 	public static OpenMpiConfig loadOpenMpiConfig(IResourceManagerFactory factory,
 			IMemento memento) {
 		ToolsConfig toolsConfig = loadTool(factory, memento);
@@ -96,22 +106,19 @@ AbstractToolRMConfiguration implements Cloneable {
 		super(OPENMPI_CAPABILITIES, new ToolsConfig(), factory);
 
 		/*
-		 * By default, assume openmpi 1.3 configuration.
+		 * By default, assume openmpi auto configuration.
 		 */
-		Preferences prefs = OpenMPI13PreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD));
-		setDebugCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD));
-		setDiscoverCmd(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD));
-		setRemoteInstallPath(prefs.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-		//		setUseToolDefaults(prefs.getBoolean(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_USE_DEFAULTS));
-		setVersionId(VERSION_13);
+		Preferences prefs = OpenMPIAutoPreferenceManager.getPreferences();
+		setLaunchCmd(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_DEBUG_CMD));
+		setDiscoverCmd(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_DISCOVER_CMD));
+		setRemoteInstallPath(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+		setVersionId(VERSION_AUTO);
+		setDetectedVersion(VERSION_UNKNOWN);
 	}
 
 	public OpenMPIResourceManagerConfiguration(OpenMPIResourceManagerFactory factory,
 			OpenMpiConfig config) {
-		/*
-		 * By default, assume openmpi 1.3 configuration.
-		 */
 		super(OPENMPI_CAPABILITIES, config.getToolsConfig(), factory);
 		setVersionId(config.getVersionId());
 	}
@@ -133,7 +140,9 @@ AbstractToolRMConfiguration implements Cloneable {
 				getPeriodicMonitorTime(),
 				getContinuousMonitorCmd(),
 				getRemoteInstallPath(),
-				useToolDefaults());
+				getUseToolDefaults(),
+				getUseInstallDefaults(),
+				getCommandsEnabled());
 		OpenMpiConfig openMpiConfig = new OpenMpiConfig(toolsConfig, getVersionId());
 
 		return new OpenMPIResourceManagerConfiguration(
@@ -157,11 +166,46 @@ AbstractToolRMConfiguration implements Cloneable {
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
 
+	/**
+	 * Get the version selected when configuring the RM
+	 * 
+	 * @return string representing the Open MPI version
+	 */
 	public String getVersionId() {
 		return versionId;
 	}
 
+	/**
+	 * Set the version that is selected when configuring the RM
+	 * 
+	 * @param versionId string representing the Open MPI version
+	 */
 	public void setVersionId(String versionId) {
 		this.versionId = versionId;
+	}
+
+	/**
+	 * Get the detected Open MPI version. Only the major and minor version
+	 * numbers are used. Any point or beta release information is discarded.
+	 * 
+	 * @return string representing the detected version 
+	 *         or "unknown" if no version has been detected
+	 */
+	public String getDetectedVersion() {
+		return detectedVersion;
+	}
+
+	/**
+	 * Set the detected Open MPI version.
+	 * 
+	 * @param version string representing the detected version
+	 */
+	public void setDetectedVersion(String version) {
+		this.detectedVersion = version;
+	}
+
+	public boolean validateVersion(String version) {
+		return version.equals(VERSION_12)
+			|| version.equals(VERSION_13);
 	}
 }
