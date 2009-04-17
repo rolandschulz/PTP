@@ -9,10 +9,10 @@ import org.osgi.framework.BundleContext;
 public class RemoteToolsAdapterCorePlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core.remotetools";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core.remotetools"; //$NON-NLS-1$
 
 	// The remote services ID
-	public static final String SERVICES_ID = "org.eclipse.ptp.remote.RemoteTools";
+	public static final String SERVICES_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
 
 	// The shared instance
 	private static RemoteToolsAdapterCorePlugin plugin;
