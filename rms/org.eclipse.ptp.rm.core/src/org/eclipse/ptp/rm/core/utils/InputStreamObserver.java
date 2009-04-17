@@ -152,13 +152,15 @@ public class InputStreamObserver extends Thread {
 				if (killed) {
 					streamClosed();
 					break;
-				} else if (e instanceof EOFException) {
+				}
+
+				if (e instanceof EOFException) {
 					streamClosed();
 					break;
-				} else {
-					streamError(e);
-					break;
 				}
+
+				streamError(e);
+				break;
 			} catch (NullPointerException e) {
 				/*
 				 * When the stream is closed, Java may raise a
@@ -168,10 +170,10 @@ public class InputStreamObserver extends Thread {
 				if (killed) {
 					streamClosed();
 					break;
-				} else {
-					streamError(e);
-					break;
 				}
+				
+				streamError(e);
+				break;
 			}
 		}
 		log("Finished observing"); //$NON-NLS-1$
