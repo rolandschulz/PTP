@@ -328,8 +328,8 @@ public class PerfRecompMainTab extends CMainTab implements ILaunchConfigurationT
 					return false;
 				}
 			}
-			
-			if(config.getAttribute(IPerformanceLaunchConfigurationConstants.USE_EXEC_UTIL, false)&&!config.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_RECOMPILE, false))
+			else
+			//if(config.getAttribute(IPerformanceLaunchConfigurationConstants.USE_EXEC_UTIL, false)&&!config.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_RECOMPILE, false))
 			{
 				name = fProgText.getText().trim();
 				if (name.length() == 0) {
@@ -403,7 +403,7 @@ public class PerfRecompMainTab extends CMainTab implements ILaunchConfigurationT
 				boolean useExecUtil=config.getAttribute(IPerformanceLaunchConfigurationConstants.USE_EXEC_UTIL, false);
 				boolean perfRecompile=config.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_RECOMPILE, false);
 			
-				if(perfRecompile||(!perfRecompile&&!useExecUtil))
+				if(perfRecompile)//||(!perfRecompile&&!useExecUtil))
 				{
 					buildConfComp.setEnabled(true);
 					buildConfCombo.setEnabled(true);
@@ -416,15 +416,11 @@ public class PerfRecompMainTab extends CMainTab implements ILaunchConfigurationT
 						buildConfCombo.select(buildConfCombo.indexOf(programName));
 					else
 						buildConfCombo.select(0);
+					
+					exeComp.setEnabled(false);
+					fProgText.setEnabled(false);
 				}
 				else
-				{
-					buildConfComp.setEnabled(false);
-					buildConfCombo.setEnabled(false);
-					
-				}
-			
-				if(useExecUtil&&!perfRecompile)
 				{
 					exeComp.setEnabled(true);
 					fProgText.setEnabled(true);
@@ -434,12 +430,27 @@ public class PerfRecompMainTab extends CMainTab implements ILaunchConfigurationT
 						LaunchUIPlugin.log(ce);
 					}
 					fProgText.setText(programName);
+					buildConfComp.setEnabled(false);
+					buildConfCombo.setEnabled(false);
+					
 				}
-				else
-				{
-					exeComp.setEnabled(false);
-					fProgText.setEnabled(false);
-				}
+			
+//				if(useExecUtil&&!perfRecompile)
+//				{
+//					exeComp.setEnabled(true);
+//					fProgText.setEnabled(true);
+//					try {
+//						programName = config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, EMPTY_STRING);
+//					} catch (CoreException ce) {
+//						LaunchUIPlugin.log(ce);
+//					}
+//					fProgText.setText(programName);
+//				}
+//				else
+//				{
+//					exeComp.setEnabled(false);
+//					fProgText.setEnabled(false);
+//				}
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
