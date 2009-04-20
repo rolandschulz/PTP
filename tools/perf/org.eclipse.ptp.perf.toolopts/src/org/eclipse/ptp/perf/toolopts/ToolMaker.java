@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * A factory-class for the generation and management of PerformanceTools and their subordinate elements
@@ -57,14 +58,14 @@ public class ToolMaker {
 		ToolParser tparser = new ToolParser();
 		try {
 			factory.newSAXParser().parse(tooldef, tparser);
+		}catch (SAXParseException e) {
+			System.err.println("Error in workflow definition "+e.getSystemId()+" at line "+e.getLineNumber()+", column "+e.getColumnNumber());
+			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		PerformanceProcess[] tparr = new PerformanceProcess[tparser.performanceTools.size()];
