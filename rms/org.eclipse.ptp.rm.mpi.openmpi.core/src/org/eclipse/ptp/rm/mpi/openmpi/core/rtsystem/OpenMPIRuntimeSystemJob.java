@@ -407,13 +407,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
 		if (process.exitValue() != 0) {
 			if (!terminateJobFlag) {
-				if ((process.exitValue() & 0177) == 0) {
-					int exit_code = (process.exitValue()>>8) & 0xff;
-					changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(exit_code)));
-				} else {
-					int signal = process.exitValue() & 0177;
-					changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithSignal, new Integer(signal)));
-				}
+				changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(process.exitValue())));
 				return JobAttributes.State.ERROR;
 			}
 			
