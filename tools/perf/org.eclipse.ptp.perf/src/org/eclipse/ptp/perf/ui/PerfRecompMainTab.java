@@ -400,7 +400,7 @@ public class PerfRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			
 		try {
 				//TODO: If both usage types are false we go with TAU (recompile only).  Find a better way to check this.
-				boolean useExecUtil=config.getAttribute(IPerformanceLaunchConfigurationConstants.USE_EXEC_UTIL, false);
+				//boolean useExecUtil=config.getAttribute(IPerformanceLaunchConfigurationConstants.USE_EXEC_UTIL, false);
 				boolean perfRecompile=config.getAttribute(IPerformanceLaunchConfigurationConstants.PERF_RECOMPILE, false);
 			
 				if(perfRecompile)//||(!perfRecompile&&!useExecUtil))
