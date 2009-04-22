@@ -16,11 +16,8 @@
 TAG=HEAD
 # main staging directory
 BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
-BUILD_LOG=$BUILD_DIR/ptpbuild_`date +%Y%m%d%H%M`.log
 
-{
-
-args=`getopt t: $*`
+args=`getopt d:t: $*`
 
 if [ $? != 0 ]; then
 	echo "usage: ptpbuild [-t tag] [-d build_dir] [build_args]"
@@ -38,6 +35,9 @@ do
 	esac
 done
 
+BUILD_LOG=$BUILD_DIR/ptpbuild_"$TAG"_`date +%Y%m%d%H%M`.log
+
+{
 # create the releng staging directory and go there
 mkdir -p $BUILD_DIR && cd $BUILD_DIR
 
