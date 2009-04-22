@@ -38,7 +38,7 @@ do
 	esac
 done
 
-BUILD_LOG=$BUILD_DIR/ptpbuild_$TAG_`date +%Y%m%d%H%M`.log
+BUILD_LOG=$BUILD_DIR/ptpbuild_${TAG}_`date +%Y%m%d%H%M`.log
 
 {
 # create the releng staging directory and go there
