@@ -14,13 +14,15 @@
 # launching the build script in the releng project
 
 TAG=HEAD
+CDT_TAG=HEAD
+
 # main staging directory
 BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
 
 args=`getopt d:t: $*`
 
 if [ $? != 0 ]; then
-	echo "usage: ptpbuild [-t tag] [-d build_dir] [build_args]"
+	echo "usage: ptpbuild [-t tag] [-c cdt_tag] [-d build_dir] [build_args]"
 	exit 1
 fi
 
@@ -29,13 +31,14 @@ for i
 do
 	case "$i"
 	in
-	-t) TAG="$2"; shift; shift;;
+	-c) CDT_TAG="$2"; shift; shift;;
 	-d) BUILD_DIR="$2"; shift; shift;;
+	-t) TAG="$2"; shift; shift;;
 	--) shift; break;;
 	esac
 done
 
-BUILD_LOG=$BUILD_DIR/ptpbuild_"$TAG"_`date +%Y%m%d%H%M`.log
+BUILD_LOG=$BUILD_DIR/ptpbuild_$TAG_`date +%Y%m%d%H%M`.log
 
 {
 # create the releng staging directory and go there
@@ -59,7 +62,7 @@ cd results/plugins
 export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
 cvs co -r $TAG -d org.eclipse.ptp.rdt.core.remotejars org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.remotejars
 cvs co -r $TAG -d org.eclipse.ptp.rdt.core.stubs org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs
-cvs co -r $TAG -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
+cvs co -r $CDT_TAG -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
 
 cd org.eclipse.ptp.rdt.core.remotejars
 
