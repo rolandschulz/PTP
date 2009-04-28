@@ -24,7 +24,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 	private IIndexFileLocation includesLocation;
 	
 	private long includedByTimestamp;
-	private String name;
+	private String name, fullName;
 	private int nameLength;
 	private int nameOffset;
 	private boolean isActive;
@@ -66,6 +66,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 		
 		includedByTimestamp = include.getIncludedBy().getTimestamp();
 		name = include.getName();
+		fullName = include.getFullName();
 		nameLength = include.getNameLength();
 		nameOffset = include.getNameOffset();
 		isActive = include.isActive();
@@ -157,6 +158,10 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 	public boolean isResolvedByHeuristics() throws CoreException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public String getFullName() throws CoreException {
+		return fullName;
 	}
 
 }
