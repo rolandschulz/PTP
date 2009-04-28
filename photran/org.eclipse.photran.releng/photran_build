@@ -14,11 +14,9 @@
 # launching the build script in the releng project
 
 TAG=HEAD
+
 # main staging directory
 BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
-BUILD_LOG=$BUILD_DIR/photran_build_`date +%Y%m%d%H%M`.log
-
-{
 
 args=`getopt t: $*`
 
@@ -38,6 +36,9 @@ do
 	esac
 done
 
+BUILD_LOG=$BUILD_DIR/photran_build_${TAG}_`date +%Y%m%d%H%M`.log
+
+{
 # create the releng staging directory and go there
 mkdir -p $BUILD_DIR && cd $BUILD_DIR
 

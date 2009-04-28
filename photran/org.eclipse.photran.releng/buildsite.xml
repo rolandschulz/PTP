@@ -9,13 +9,13 @@
 			Optional features adding error parsers and managed build toolchains for various vendors&apos; Fortran compilers
 		</description>
     </category-def>
-	<feature id="org.eclipse.photran_feature" url="features/org.eclipse.photran_@buildVersion@.jar" version="@buildVersion@">
+	<feature id="org.eclipse.photran" url="features/org.eclipse.photran_@buildVersion@.jar" version="@buildVersion@">
 		<category name="Photran Base Distribution"/>
 	</feature>
 	<feature id="org.eclipse.photran.intel" url="features/org.eclipse.photran.intel_@buildVersion@.jar" version="@buildVersion@" os="linux">
 		<category name="Photran Compiler Support"/>
 	</feature>
-	<feature id="org.eclipse.photran.xlf_feature" url="features/org.eclipse.photran.xlf_@buildVersion@.jar" version="@buildVersion@">
+	<feature id="org.eclipse.photran.xlf" url="features/org.eclipse.photran.xlf_@buildVersion@.jar" version="@buildVersion@">
 		<category name="Photran Compiler Support"/>
 	</feature>
 </site>
