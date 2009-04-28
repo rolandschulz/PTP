@@ -1,47 +1,62 @@
 #!/bin/sh
 #
-# photran build wrapper script
+# Photran wrapper script
 #
-# Usage: photran_build version [build_args]
+# Usage: photran_build [-t tag] [-d build_dir] [build_args]
 #
-# where version is the current Photran version being built and
-# build_args are any other arguments you want to pass to the
-# build script.
+# where
+#
+# tag is the CVS tag used to check out the releng project (default HEAD)
+# build_dir is the location that the build will take place
+# build_args are any arguments you want to pass to the build script
 #
 # set up anything environment specific that needs to be done before
 # launching the build script in the releng project
 
-if [ $# -lt 1 ]; then
-	echo "usage: photran_build version [build_args]"
+TAG=HEAD
+# main staging directory
+BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
+BUILD_LOG=$BUILD_DIR/photran_build_`date +%Y%m%d%H%M`.log
+
+{
+
+args=`getopt t: $*`
+
+if [ $? != 0 ]; then
+	echo "usage: photran_build [-t tag] [-d build_dir] [build_args]"
 	exit 1
 fi
 
-# Version of Photran we're building
-PHOTRAN_VERSION=$1; shift
-
-# main staging directory
-STAGING_DIR=/opt/public/download-staging.priv/tools/ptp/releng
-
-# download location for builds
-BUILDS_DIR=/home/www/tools/ptp/photran/builds/$PHOTRAN_VERSION
-
-if [ ! -d $BUILDS_DIR ]; then
-        echo "$BUILDS_DIR doesn't exist, please create first"
-        exit 1
-fi
+set -- $args
+for i
+do
+	case "$i"
+	in
+	-t) TAG="$2"; shift; shift;;
+	-d) BUILD_DIR="$2"; shift; shift;;
+	--) shift; break;;
+	esac
+done
 
 # create the releng staging directory and go there
-mkdir -p $STAGING_DIR
-cd $STAGING_DIR
+mkdir -p $BUILD_DIR && cd $BUILD_DIR
 
 # remove the old build
 rm -fr org.eclipse.photran
 
 # Check out the releng project
 export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/technology
-cvs co org.eclipse.photran/org.eclipse.photran.releng
+cvs co -r $TAG -d org.eclipse.photran org.eclipse.photran/org.eclipse.photran.releng
 
 # run the main script
-cd org.eclipse.photran/releng/org.eclipse.photran/org.eclipse.photran.releng
-sh build.sh $* 2>&1 | tee $STAGING_DIR/build.log
+cd org.eclipse.photran
+sh build.sh $*
+
+} >$BUILD_LOG 2>&1
+
+if grep -q 'BUILD FAILED' $BUILD_LOG; then
+	echo "BUILD FAILED. See $BUILD_LOG for details."
+fi
+
+exit 0
 

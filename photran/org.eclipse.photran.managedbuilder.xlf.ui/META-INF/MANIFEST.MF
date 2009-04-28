@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: IBM XL Compiler Tool Chain
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.managedbuilder.xlf.ui;singleton:=true
 Bundle-Version: 4.0.5.qualifier
-Bundle-Vendor: LANL
+Bundle-Vendor: %providerName
 Bundle-Localization: plugin

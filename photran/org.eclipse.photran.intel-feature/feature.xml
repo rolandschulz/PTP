@@ -19,11 +19,17 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/technology/photran/updates/eclipse3.4cdt5.0"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/4.0"/>
    </url>
 
    <requires>
-      <import feature="org.eclipse.photran_feature" version="4.0.5" match="perfect"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.photran.core"/>
+      <import plugin="org.eclipse.photran.managedbuilder.core"/>
+      <import plugin="org.eclipse.core.resources"/>
    </requires>
 
    <plugin

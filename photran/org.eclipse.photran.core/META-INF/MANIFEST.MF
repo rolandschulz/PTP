@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Photran Core Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.core; singleton:=true
 Bundle-Version: 4.0.5.qualifier
 Bundle-ClassPath: photrancore.jar
 Bundle-Activator: org.eclipse.photran.core.FortranCorePlugin
-Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.internal.core.lexer,

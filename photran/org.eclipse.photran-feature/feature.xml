@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.photran_feature"
+      id="org.eclipse.photran"
       label="%featureName"
       version="4.0.5.qualifier"
       provider-name="%providerName">
@@ -18,10 +18,30 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/technology/photran/updates/eclipse3.4cdt5.0"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/4.0"/>
    </url>
 
    <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.cdt.make.ui"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.cdt.debug.ui"/>
       <import feature="org.eclipse.cdt" version="5.0.1" match="compatible"/>
    </requires>
 

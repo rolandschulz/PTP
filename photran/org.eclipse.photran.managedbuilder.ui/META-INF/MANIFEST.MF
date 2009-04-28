@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Photran Managed Builder UI Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.managedbuilder.ui; singleton:=true
 Bundle-Version: 4.0.5.qualifier
 Bundle-ClassPath: photranmngbuildui.jar
 Bundle-Activator: org.eclipse.photran.managedbuilder.internal.ui.ManagedBuilderUIPlugin
-Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.managedbuilder.internal.ui
 Require-Bundle: org.eclipse.core.resources,

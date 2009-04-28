@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Photran XLF Error Parser Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.errorparsers.xlf; singleton:=true
 Bundle-Version: 4.0.5.qualifier
 Bundle-Activator: org.eclipse.photran.errorparsers.xlf.Activator
@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.photran.errorparsers.xlf
+Bundle-Vendor: %providerName

@@ -18,15 +18,15 @@
    </license>
 
    <includes
+         id="org.eclipse.photran"
+         version="0.0.0"/>
+
+   <includes
          id="org.eclipse.photran.intel"
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.photran.xlf_feature"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.photran_feature"
+         id="org.eclipse.photran.xlf"
          version="0.0.0"/>
 
 </feature>
