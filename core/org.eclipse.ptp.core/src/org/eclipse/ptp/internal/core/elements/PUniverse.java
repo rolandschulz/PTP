@@ -30,7 +30,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 
-public class PUniverse extends PElement implements IPUniverseControl {
+public class PUniverse extends Parent implements IPUniverseControl {
 	private static final int RMID_SHIFT = 24;
 	private static IAttribute<?,?,?>[] getDefaultAttributes(String name) {
 		StringAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(name);
