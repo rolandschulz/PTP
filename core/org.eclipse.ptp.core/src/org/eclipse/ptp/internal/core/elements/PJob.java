@@ -42,15 +42,17 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
+import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.internal.core.elements.events.ChangedProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.JobChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 
-public class PJob extends Parent implements IPJobControl {
+public class PJob extends Parent implements IPJobControl, IProcessListener {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private final Map<String, IPProcessControl> indexMap = 
@@ -115,6 +117,7 @@ public class PJob extends Parent implements IPJobControl {
 				indexMap.put(idx, process);
 			}
 			processes.add(process);
+			process.addElementListener(this);
 		}
 		
 		fireNewProcesses(processes);
@@ -192,6 +195,17 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	public State getState() {
 		return getAttribute(JobAttributes.getStateAttributeDefinition()).getValue();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+	 */
+	public void handleEvent(IProcessChangeEvent e) {
+		if (!childListeners.isEmpty()) {
+			Collection<IPProcess> procs = new ArrayList<IPProcess>();
+			procs.add(e.getSource());
+			fireChangedProcesses(procs);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -286,7 +300,7 @@ public class PJob extends Parent implements IPJobControl {
 			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
-
+	
 	/**
 	 * Notify listeners when a new process is created.
 	 * 
@@ -314,7 +328,6 @@ public class PJob extends Parent implements IPJobControl {
 			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
