@@ -93,12 +93,12 @@ import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
-import org.eclipse.ptp.internal.core.elements.PElement;
 import org.eclipse.ptp.internal.core.elements.PJob;
 import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
 import org.eclipse.ptp.internal.core.elements.PProcess;
 import org.eclipse.ptp.internal.core.elements.PQueue;
+import org.eclipse.ptp.internal.core.elements.Parent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewMachineEvent;
@@ -113,7 +113,7 @@ import org.eclipse.ptp.internal.core.elements.events.ResourceManagerSubmitJobErr
  * @author rsqrd
  * 
  */
-public abstract class AbstractResourceManager extends PElement implements IResourceManager, IResourceManagerControl {
+public abstract class AbstractResourceManager extends Parent implements IResourceManager, IResourceManagerControl {
 
 	private static IAttribute<?, ?, ?>[] getDefaultAttributes(IResourceManagerConfiguration config) {
 		ArrayList<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
@@ -693,7 +693,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
-	 * Add a collection of machines to the model. This will result in a
+	 * Add a collection of nodes to the model. This will result in a
 	 * INewNodeEvent being propagated to listeners on the machine.
 	 * 
 	 * @param machine
