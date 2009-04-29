@@ -4,7 +4,7 @@
 		Photran (Fortran Development Tools)
 	</description>
    	<category-def name="Photran Base Distribution" label="Photran (Fortran Development Tools)"/>
-	<category-def name="Photran Compiler Support" label="Photran Compiler Support">
+	<category-def name="Fortran Compiler Support" label="Fortran Compiler Support">
 		<description>
 			Optional features adding error parsers and managed build toolchains for various vendors&apos; Fortran compilers
 		</description>
@@ -13,9 +13,9 @@
 		<category name="Photran Base Distribution"/>
 	</feature>
 	<feature id="org.eclipse.photran.intel" url="features/org.eclipse.photran.intel_@buildVersion@.jar" version="@buildVersion@" os="linux">
-		<category name="Photran Compiler Support"/>
+		<category name="Fortran Compiler Support"/>
 	</feature>
 	<feature id="org.eclipse.photran.xlf" url="features/org.eclipse.photran.xlf_@buildVersion@.jar" version="@buildVersion@">
-		<category name="Photran Compiler Support"/>
+		<category name="Fortran Compiler Support"/>
 	</feature>
 </site>
