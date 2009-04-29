@@ -47,36 +47,44 @@ public abstract class Parent extends PElement {
 	}
 
 	/**
-	 * @param member
+	 * Add a child element.
+	 * 
+	 * @param member child to add
 	 */
 	protected void addChild(IPElementControl member) {
 		getElementInfo().addChild(member);
 	}
 
 	/**
-	 * @param key
-	 * @return
+	 * Find a child element using the key
+	 * 
+	 * @param key key used to identify the child
+	 * @return IPElementControl of the child, or null
 	 */
 	protected IPElementControl findChild(String key) {
 		return getElementInfo().findChild(key);
 	}
 
 	/**
-	 * @return
+	 * Get all the children known by this parent
+	 * 
+	 * @return array of IPElementControls containing children
 	 */
 	protected IPElementControl[] getChildren() {
 		return getElementInfo().getChildren();
 	}
 
 	/**
-	 * @param member
+	 * Remove a child element.
+	 * 
+	 * @param member child to remove
 	 */
 	protected void removeChild(IPElement member) {
 		getElementInfo().removeChild(member);
 	}
 
 	/**
-	 * 
+	 * Remove all the children of this parent.
 	 */
 	protected void removeChildren() {
 		getElementInfo().removeChildren();
