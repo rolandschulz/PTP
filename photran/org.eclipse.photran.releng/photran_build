@@ -46,8 +46,8 @@ mkdir -p $BUILD_DIR && cd $BUILD_DIR
 rm -fr org.eclipse.photran
 
 # Check out the releng project
-export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/technology
-cvs co -r $TAG -d org.eclipse.photran org.eclipse.photran/org.eclipse.photran.releng
+export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
+cvs co -r $TAG -d org.eclipse.photran org.eclipse.ptp/photran/org.eclipse.photran.releng
 
 # run the main script
 cd org.eclipse.photran
