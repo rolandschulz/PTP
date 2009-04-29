@@ -2,8 +2,8 @@
 feature@org.eclipse.photran.master=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.master
 
 ! Photran features
-feature@org.eclipse.photran_feature=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran-feature
-feature@org.eclipse.photran.xlf_feature=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature
+feature@org.eclipse.photran=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran-feature
+feature@org.eclipse.photran.xlf=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature
 feature@org.eclipse.photran.intel=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.intel-feature
 
 ! Plugins
