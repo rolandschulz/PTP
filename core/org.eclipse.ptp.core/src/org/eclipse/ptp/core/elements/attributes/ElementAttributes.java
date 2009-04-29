@@ -16,7 +16,7 @@ import org.eclipse.ptp.core.messages.Messages;
 
 
 /**
- * Job attributes
+ * Element attributes
  */
 public class ElementAttributes {
 	/*
