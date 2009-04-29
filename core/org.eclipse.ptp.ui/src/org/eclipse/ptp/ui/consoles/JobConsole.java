@@ -14,25 +14,26 @@
 
 package org.eclipse.ptp.ui.consoles;
 
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.core.elements.listeners.IProcessListener;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-public class JobConsole implements IJobChildListener {
-
+public class JobConsole implements IJobChildListener, IProcessListener {
 	/** 
 	 * search for console name first, if non-existed, 
 	 * create a new one
@@ -51,7 +52,7 @@ public class JobConsole implements IJobChildListener {
 		}
 		return myConsole;
 	}
-
+	
 	/**
 	 * search and return a message console with given name
 	 * 
@@ -80,16 +81,24 @@ public class JobConsole implements IJobChildListener {
 		MessageConsoleStream out = myConsole.newMessageStream();
 		out.println(msg);		
 	}
+
+	private Color red;
 	
 	private MessageConsole myConsole;	// MessageConsole associated with this job
-	private MessageConsoleStream myConsoleStream;	// Output stream for the console
+	private MessageConsoleStream outputStream;	// Output stream for the console
+	private MessageConsoleStream errorStream;	// Error stream for the console
 	// TODO get this flag from preferences
-	private boolean prefix = true;	// Flag indicating if output should be prefixed with process index
+	private boolean prefix = false;	// Flag indicating if output should be prefixed with process index
 	
 	public JobConsole(IPJob job) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
 		IConsoleManager conMan = plugin.getConsoleManager();
 		boolean haveConsole = false;
+		ConsolePlugin.getStandardDisplay().syncExec(new Runnable() {
+			public void run() {
+				red = ConsolePlugin.getStandardDisplay().getSystemColor(SWT.COLOR_RED);
+			}
+		});
 		// check if this id is already associated with a console
 		// if it is, no new console will be created
 		IConsole[] existing = conMan.getConsoles();
@@ -103,7 +112,9 @@ public class JobConsole implements IJobChildListener {
 		}
 		if (!haveConsole) {
 			myConsole = new MessageConsole(id, null);
-			myConsoleStream = myConsole.newMessageStream();
+			outputStream = myConsole.newMessageStream();
+			errorStream = myConsole.newMessageStream();
+			errorStream.setColor(red);
 			conMan.addConsoles(new IConsole[] {myConsole});
 		}
 	}
@@ -115,7 +126,7 @@ public class JobConsole implements IJobChildListener {
 	 * @param index prefix added to each line of output
 	 * @param msg output from process
 	 */
-	public void cout(String index, String msg) {
+	public void cout(String index, String msg, MessageConsoleStream stream) {
 		String output = ""; //$NON-NLS-1$
 		
 		if (prefix) {
@@ -130,40 +141,54 @@ public class JobConsole implements IJobChildListener {
 			output = msg;
 		}
 		
-		myConsoleStream.println(output);				
+		stream.println(output);				
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 	 */
 	public void handleEvent(IChangedProcessEvent e) {
-		for (IPProcess process : e.getProcesses()) {
-			StringAttribute stdout = process.getAttribute(
-						ProcessAttributes.getStdoutAttributeDefinition());
-			EnumeratedAttribute<State> state = process.getAttribute(
-						ProcessAttributes.getStateAttributeDefinition());
-			IntegerAttribute index = process.getAttribute(
-						ProcessAttributes.getIndexAttributeDefinition());
-			if (state.getValue() == State.RUNNING && stdout != null) {
-				cout(index.getValueAsString(), stdout.getValueAsString());			
-			}
-		}
+		// Ignore event
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
 	 */
 	public void handleEvent(INewProcessEvent e) {
-		// Nothing to do
+		for (IPProcess process : e.getProcesses()) {
+			process.addElementListener(this);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+	 */
+	public void handleEvent(IProcessChangeEvent e) {
+		IntegerAttribute index = e.getSource().getAttribute(
+				ProcessAttributes.getIndexAttributeDefinition());
+		if (index != null) {
+			StringAttribute stdout = e.getAttributes().getAttribute(
+					ProcessAttributes.getStdoutAttributeDefinition());
+			if (stdout != null) {
+				cout(index.getValueAsString(), stdout.getValueAsString(), outputStream);
+			}
+			StringAttribute stderr = e.getAttributes().getAttribute(
+					ProcessAttributes.getStderrAttributeDefinition());
+			if (stderr != null) {
+				cout(index.getValueAsString(), stderr.getValueAsString(), errorStream);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 	 */
 	public void handleEvent(IRemoveProcessEvent e) {
-		// Nothing to do
+		for (IPProcess process : e.getProcesses()) {
+			process.removeElementListener(this);
+		}
 	}
-
+	
 	/**
 	 * @param name
 	 * @return
@@ -177,7 +202,7 @@ public class JobConsole implements IJobChildListener {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Generate a unique name for the job
 	 * 
