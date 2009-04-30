@@ -62,6 +62,14 @@ public interface IServiceModelManager {
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
 	
+	
+	/**
+	 * Returns true if the given project has a configuration.
+	 * 
+	 */
+	public boolean isConfigured(IProject project);
+	
+	
 	/**
 	 * Get all the services that have been registered with the system.
 	 * 
