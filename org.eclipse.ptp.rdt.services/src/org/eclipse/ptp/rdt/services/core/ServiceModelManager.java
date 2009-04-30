@@ -165,6 +165,10 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	
+	public boolean isConfigured(IProject project) {
+		return configurations.containsKey(project);
+	}
+	
 	/**
 	 * @param desc
 	 * @return
