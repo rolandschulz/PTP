@@ -28,6 +28,8 @@ public class RemoteCompletionProposalAdapter extends AbstractCompletionProposalA
 	@Override
 	protected IContentAssistService getService(IProject project) {
 		ServiceModelManager manager = ServiceModelManager.getInstance();
+		if(!manager.isConfigured(project))
+			return null;
 		IServiceConfiguration config = manager.getActiveConfiguration(project);
 		if (config == null) {
 			return null;
