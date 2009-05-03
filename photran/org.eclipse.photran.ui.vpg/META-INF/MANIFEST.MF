@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Photran Virtual Program Graph UI Plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.ui.vpg;singleton:=true
 Bundle-Version: 4.0.5.qualifier
 Bundle-Activator: org.eclipse.photran.ui.vpg.Activator
-Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.photran.ui,
