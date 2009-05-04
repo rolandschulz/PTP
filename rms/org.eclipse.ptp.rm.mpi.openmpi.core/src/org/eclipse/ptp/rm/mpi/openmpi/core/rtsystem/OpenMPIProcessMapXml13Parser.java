@@ -8,11 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,11 +25,13 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Node;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -41,154 +43,24 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  */
 public class OpenMPIProcessMapXml13Parser {
+	private final static String rootTag = "ompi"; //$NON-NLS-1$
+	private final static String mapTag = "map"; //$NON-NLS-1$
+	private final static String hostTag = "host"; //$NON-NLS-1$
+	private final static String processTag = "process"; //$NON-NLS-1$
+	private final static String nodeResolveTag = "noderesolve"; //$NON-NLS-1$
+	private final static String stdoutTag = "stdout"; //$NON-NLS-1$
+	private final static String stderrTag = "stderr"; //$NON-NLS-1$
+
+	private final static String nameAttribute = "name"; //$NON-NLS-1$
+	private final static String resolvedAttribute = "resolved"; //$NON-NLS-1$
+	private final static String rankAttribute = "rank"; //$NON-NLS-1$
+	private final static String slotsAttribute = "slots"; //$NON-NLS-1$
+	private final static String maxSlotsAttribute = "max_slots"; //$NON-NLS-1$
+	
 	private OpenMPIProcessMapXml13Parser() {
 		// Do not allow instances.
 	}
 	
-	/*
-	 * Attempt to clean up quasi-XML output by 1.3.0 
-	 * 
-	 * We know the following:
-	 * - the XML is malformed because it doesn't include a root element
-	 * - XML between the <map> and </map> tags should be well formed
-	 * - <noderesolve> elements precede the <map>
-	 * - there may be garbage preceding the first <noderesolve> and after the </map>
-	 * 
-	 * We need to:
-	 * - inject a root element
-	 * - ignore anything prior to the first and after the last XML tags
-	 * 
-	 * To simplify the parsing (so we don't need to build a full XML parser) we assume
-	 * that:
-	 * - the XML begins with 0 or more <noderesolve> elements followed by a <map> element
-	 * - <noderesolve> elements are always empty-element tags
-	 * - there is only one <map> element
-	 * - the final XML tag is </map>
-	 */
-	private class OpenMPI130InputStream extends FilterInputStream {
-		private final static int PROLOG = 0;
-		private final static int START_TAG = 1;
-		private final static int XML = 2;
-		private final static int EPILOG = 3;
-	
-		private int state = PROLOG;
-		//private Queue<Integer> saved = new ConcurrentLinkedQueue<Integer>();
-		private StringBuffer prolog = new StringBuffer();
-		private StringBuffer epilog = new StringBuffer(6);
-		
-		protected OpenMPI130InputStream(InputStream in) {
-			super(in);
-		}
-
-		/* (non-Javadoc)
-		 * @see java.io.FilterInputStream#read()
-		 */
-		@Override
-		public int read() throws IOException {
-			while (state != EPILOG) {
-				int ch = super.read();
-				if (ch < 0) {
-					return -1;
-				}
-				switch (state) {
-				case PROLOG:
-					// Ignore anything except a less-than
-					if (ch == '<') {
-						state = START_TAG;
-						prolog.append((char)ch);
-					}
-					break;
-					
-				case START_TAG:
-					// Find matching greater-than. If we encounter
-					// another less-than, assume that this is the new 
-					// starting point
-					switch (ch) {
-					case '<':
-						prolog.delete(0, prolog.length());
-						break;
-						
-					case '>':
-						state = XML;
-						prolog.insert(0, "<ompi>"); //$NON-NLS-1$
-						break;
-					}
-					prolog.append((char)ch);
-					break;
-				
-				case XML:
-					epilog.append((char)ch);
-					ch = epilog.charAt(0);
-					if (epilog.length() >= 6) {
-						if (epilog.substring(epilog.length()-6).equals("</map>")) { //$NON-NLS-1$
-							epilog.append("</ompi>"); //$NON-NLS-1$
-							state = EPILOG;
-							break;
-						}
-					}
-					if (prolog.length() > 0) {
-						ch = prolog.charAt(0);
-						prolog.deleteCharAt(0);
-						return ch;
-					}
-					epilog.deleteCharAt(0);
-					return ch;
-				}
-			}
-			
-			if (prolog.length() > 0) {
-				int ch = prolog.charAt(0);
-				prolog.deleteCharAt(0);
-				return ch;
-			}
-			if (epilog.length() > 0) {
-				int ch = epilog.charAt(0);
-				epilog.deleteCharAt(0);
-				return ch;
-			}
-			return -1;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.io.FilterInputStream#read(byte[], int, int)
-		 */
-		@Override
-		public int read(byte[] b, int off, int len) throws IOException {
-			if (len == 0) {
-				return 0;
-			}
-
-			int pos = off;
-			
-			for (int i = 0; i < len && available() > 0; i++) {
-				int ch = read();
-				if (ch < 0) {
-					return -1;
-				}
-				b[pos++] = (byte) (ch & 0xff);
-			}
-			
-			return pos - off;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.io.FilterInputStream#markSupported()
-		 */
-		@Override
-		public boolean markSupported() {
-			return false;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.io.FilterInputStream#available()
-		 */
-		@Override
-		public int available() throws IOException {
-			return state == PROLOG ? 1 : prolog.length() + epilog.length();
-		}
-		
-	}
-
 	private class StackContextHandler extends DefaultHandler {
 		Stack<ContextHandler> handlers = new Stack<ContextHandler>();
 
@@ -196,24 +68,26 @@ public class OpenMPIProcessMapXml13Parser {
 			handlers.push(documentHandler);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#startDocument()
+		 */
 		@Override
 		public void startDocument() throws SAXException {
 			super.startDocument();
-			// Notify listeners that parsing has started
-			for (Object listener : listeners.getListeners()) {
-				try {
-					((IOpenMpiProcessMapXml13ParserListener ) listener).startDocument();
-				} catch (Exception e) {
-					OpenMPIPlugin.log(e);
-				}
-			}
+			notifyStart();
 		}
 
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#endDocument()
+		 */
 		@Override
 		public void endDocument() throws SAXException {
 			super.endDocument();
 		}
 
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+		 */
 		@Override
 		public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 			super.startElement(uri, localName, name, attributes);
@@ -235,6 +109,19 @@ public class OpenMPIProcessMapXml13Parser {
 			handlers.push(childHandler);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+		 */
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			super.characters(ch, start, length);
+			ContextHandler handler = handlers.peek();
+			handler.characters(ch, start, length);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+		 */
 		@Override
 		public void endElement(String uri, String localName, String name) throws SAXException {
 			super.endElement(uri, localName, name);
@@ -245,11 +132,17 @@ public class OpenMPIProcessMapXml13Parser {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
+		 */
 		@Override
 		public void error(SAXParseException e) throws SAXException {
 			super.error(e);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
+		 */
 		@Override
 		public void fatalError(SAXParseException e) throws SAXException {
 			super.fatalError(e);
@@ -259,11 +152,6 @@ public class OpenMPIProcessMapXml13Parser {
 	protected final OpenMPIProcessMap map = new OpenMPIProcessMap();
 	protected final StackContextHandler handler = new StackContextHandler(new DocumentHandler());
 	protected final ListenerList listeners = new ListenerList();
-
-	public static interface IOpenMpiProcessMapXml13ParserListener {
-		void startDocument();
-		void endDocument();
-	}
 
 	public class UnknownElementException extends SAXException {
 		private static final long serialVersionUID = 1L;
@@ -307,7 +195,7 @@ public class OpenMPIProcessMapXml13Parser {
 		}
 		/** Called when reading the beginning of the tag. */
 		public void start() throws SAXException {
-			// Empty
+			// Ignore
 		}
 		/** Called for each argument found at the beginning of the tag. */
 		public void setAttribute(String name, String value) throws SAXException {
@@ -315,18 +203,22 @@ public class OpenMPIProcessMapXml13Parser {
 		}
 		/** Called when all attributes have been read and tag content is going to be read. */
 		public void prepare() throws SAXException {
-			// Empty
+			// Ignore
+		}
+		/** Called with characters from the element. */
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			// Ignore
 		}
 		/** Called when finished reading the end of the tag. */
 		public void finish() throws SAXException {
-			// Empty
+			// Ignore
 		}
 	}
 
 	public class DocumentHandler extends ContextHandler {
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
-			if (name.equalsIgnoreCase("ompi")) { //$NON-NLS-1$
+			if (name.equalsIgnoreCase(rootTag)) {
 				return new OmpiHandler();
 			}
 			return super.newElement(name);
@@ -336,12 +228,12 @@ public class OpenMPIProcessMapXml13Parser {
 	public class OmpiHandler extends ContextHandler {
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
-			if (name.equalsIgnoreCase("map")) { //$NON-NLS-1$
+			if (name.equalsIgnoreCase(mapTag)) {
 				return new MapHandler();
-			} else if (name.equalsIgnoreCase("noderesolve")) { //$NON-NLS-1$
-				return new NodeResolveHandler();
-			} else if (name.equalsIgnoreCase("allocation")) { //$NON-NLS-1$
-				return null; // ignore
+			} else if (name.equalsIgnoreCase(stdoutTag)) {
+				return new StdoutHandler();
+			} else if (name.equalsIgnoreCase(stderrTag)) {
+				return new StderrHandler();
 			} else {
 				return super.newElement(name);
 			}
@@ -350,15 +242,7 @@ public class OpenMPIProcessMapXml13Parser {
 		@Override
 		public void finish() throws SAXException {
 			super.finish();
-			// Notify listeners that end has been reached.
-			for (Object listener : listeners.getListeners()) {
-				try {
-					((IOpenMpiProcessMapXml13ParserListener ) listener).endDocument();
-				} catch (Exception e) {
-					OpenMPIPlugin.log(e);
-				}
-			}
-
+			notifyFinish();
 			// Throw exception to force stop parsing.
 			// Or else, the parser would complain about content not allows after in trailing section.
 			throw new ParseInterruptedException();
@@ -367,46 +251,128 @@ public class OpenMPIProcessMapXml13Parser {
 	}
 	
 	public class MapHandler extends ContextHandler {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#newElement(java.lang.String)
+		 */
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
-			if (name.equalsIgnoreCase("host")) { //$NON-NLS-1$
+			if (name.equalsIgnoreCase(hostTag)) {
 				return new HostHandler();
 			}
 			return super.newElement(name);
 		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#finish()
+		 */
+		@Override
+		public void finish() throws SAXException {
+			notifyFinishMap(map.getAttributeManager());
+		}
 	}
 
-	public class NodeResolveHandler extends ContextHandler {
-		private String nodeName = null;
-		private String resolvedName = null;
+	public class StdoutHandler extends ContextHandler {
+		private Process process = null;
+		private StringBuffer content = new StringBuffer();
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#setAttribute(java.lang.String, java.lang.String)
+		 */
 		@Override
 		public void setAttribute(String name, String value) throws SAXException {
-			if (name.equalsIgnoreCase("name")) { //$NON-NLS-1$
-				nodeName = value;
-			} else if (name.equalsIgnoreCase("resolved")) { //$NON-NLS-1$
-				resolvedName = value;
+			if (name.equalsIgnoreCase(rankAttribute)) {
+				try {
+					int rank = Integer.parseInt(value);
+					if (rank < 0) {
+						throw new InvalidIntegerAttributeException(name, value);
+					}
+					process = map.getProcesses().get(rank);
+					if (process == null) {
+						throw new InvalidIntegerAttributeException(name, value);
+					}
+				} catch (NumberFormatException e) {
+					throw new InvalidIntegerAttributeException(name, value);
+				}
 			} else {
 				super.setAttribute(name, value);
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#characters(char[], int, int)
+		 */
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			content.append(ch, start, length);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#finish()
+		 */
 		@Override
 		public void finish() throws SAXException {
-			if (nodeName == null) {
-				throw new MissingAttributeException("name"); //$NON-NLS-1$
+			notifyStdout(process, new String(content));
+		}
+	}
+	
+	public class StderrHandler extends ContextHandler {
+		private Process process = null;
+		private StringBuffer content = new StringBuffer();
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#setAttribute(java.lang.String, java.lang.String)
+		 */
+		@Override
+		public void setAttribute(String name, String value) throws SAXException {
+			if (name.equalsIgnoreCase(rankAttribute)) {
+				try {
+					int rank = Integer.parseInt(value);
+					if (rank < 0) {
+						throw new InvalidIntegerAttributeException(name, value);
+					}
+					process = map.getProcesses().get(rank);
+					if (process == null) {
+						throw new InvalidIntegerAttributeException(name, value);
+					}
+				} catch (NumberFormatException e) {
+					throw new InvalidIntegerAttributeException(name, value);
+				}
+			} else {
+				super.setAttribute(name, value);
 			}
-			if (resolvedName == null) {
-				throw new MissingAttributeException("resolved"); //$NON-NLS-1$
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#characters(char[], int, int)
+		 */
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			content.append(ch, start, length);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMapXml13Parser.ContextHandler#finish()
+		 */
+		@Override
+		public void finish() throws SAXException {
+			notifyStderr(process, new String(content));
+		}
+	}
+	
+	public class NodeResolveHandler extends ContextHandler {
+		private Node node;
+
+		public NodeResolveHandler(Node node) {
+			this.node = node;
+		}
+		
+		@Override
+		public void setAttribute(String name, String value) throws SAXException {
+			if (name.equalsIgnoreCase(resolvedAttribute)) {
+				node.addResolvedName(value);
+			} else {
+				super.setAttribute(name, value);
 			}
-			
-			Node node = map.getNode(resolvedName);
-			if (node == null) {
-				node = new Node(resolvedName);
-				map.addNode(node);
-			}
-			node.addResolvedName(nodeName);
-			super.finish();
 		}
 	}
 
@@ -422,17 +388,19 @@ public class OpenMPIProcessMapXml13Parser {
 
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
-			if (name.equalsIgnoreCase("process")) { //$NON-NLS-1$
+			if (name.equalsIgnoreCase(processTag)) {
 				return new ProcessHandler(node);
+			} else if (name.equalsIgnoreCase(nodeResolveTag)) {
+				return new NodeResolveHandler(node);
 			}
 			return super.newElement(name);
 		}
 
 		@Override
 		public void setAttribute(String name, String value) throws SAXException {
-			if (name.equalsIgnoreCase("name")) { //$NON-NLS-1$
+			if (name.equalsIgnoreCase(nameAttribute)) {
 				this.name = value;
-			} else if (name.equalsIgnoreCase("slots")) { //$NON-NLS-1$
+			} else if (name.equalsIgnoreCase(slotsAttribute)) {
 				try {
 					num_slots = Integer.parseInt(value);
 					if (num_slots < 0)
@@ -441,7 +409,7 @@ public class OpenMPIProcessMapXml13Parser {
 				} catch (NumberFormatException e) {
 					throw new InvalidIntegerAttributeException(name, value);
 				}
-			} else if (name.equalsIgnoreCase("max_slots")) { //$NON-NLS-1$
+			} else if (name.equalsIgnoreCase(maxSlotsAttribute)) {
 				try {
 					max_slots = Integer.parseInt(value);
 					if (max_slots < 0)
@@ -460,10 +428,10 @@ public class OpenMPIProcessMapXml13Parser {
 		@Override
 		public void prepare() throws SAXException {
 			if (name == null) {
-				throw new MissingAttributeException("name"); //$NON-NLS-1$
+				throw new MissingAttributeException(nameAttribute);
 			}
 			if (! has_num_slots) {
-				throw new MissingAttributeException("slots"); //$NON-NLS-1$
+				throw new MissingAttributeException(slotsAttribute);
 			}
 			node = map.getNode(name);
 			if (node == null) {
@@ -471,14 +439,14 @@ public class OpenMPIProcessMapXml13Parser {
 				map.addNode(node);
 			}
 			try {
-				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(num_slots));
+				node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(Integer.valueOf(num_slots)));
 			} catch (IllegalValueException e) {
 				// This is not possible
 				OpenMPIPlugin.log(e);
 			}
 			if (has_max_slots) {
 				try {
-					node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(max_slots));
+					node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(Integer.valueOf(max_slots)));
 				} catch (IllegalValueException e) {
 					// This is not possible
 					OpenMPIPlugin.log(e);
@@ -493,7 +461,7 @@ public class OpenMPIProcessMapXml13Parser {
 			 * If yes, then the node is oversubscribed.
 			 */
 			assert node != null;
-			node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(processes.size() > num_slots));
+			node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(Boolean.valueOf(processes.size() > num_slots)));
 			super.finish();
 		}
 	}
@@ -508,11 +476,12 @@ public class OpenMPIProcessMapXml13Parser {
 
 		@Override
 		public void setAttribute(String name, String value) throws SAXException {
-			if (name.equalsIgnoreCase("rank")) { //$NON-NLS-1$
+			if (name.equalsIgnoreCase(rankAttribute)) {
 				try {
 					rank = Integer.parseInt(value);
-					if (rank < 0)
+					if (rank < 0) {
 						throw new InvalidIntegerAttributeException(name, value);
+					}
 				} catch (NumberFormatException e) {
 					throw new InvalidIntegerAttributeException(name, value);
 				}
@@ -525,22 +494,22 @@ public class OpenMPIProcessMapXml13Parser {
 		public void finish() throws SAXException {
 			OpenMPIProcessMap.Process process = new OpenMPIProcessMap.Process(node, rank, Integer.toString(rank), 1);
 			map.addProcess(process);
+			notifyNewProcess(process);
 			super.finish();
 		}
 	}
 
-	public static OpenMPIProcessMap parse(InputStream is) throws IOException {
-		return parse(is, null);
+	public static void parse(InputStream is) throws IOException {
+		parse(is, null);
 	}
 
-	public static OpenMPIProcessMap parse(InputStream is, IOpenMpiProcessMapXml13ParserListener listener) throws IOException {
+	public static void parse(InputStream is, IOpenMPIProcessMapParserListener listener) throws IOException {
 		OpenMPIProcessMapXml13Parser parser = new OpenMPIProcessMapXml13Parser();
 		if (listener != null) {
 			parser.addListener(listener);
 		}
 		try {
-			OpenMPI130InputStream ois = parser.new OpenMPI130InputStream(is);
-			BufferedInputStream bis = new BufferedInputStream(ois);
+			BufferedInputStream bis = new BufferedInputStream(is);
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
 			saxParser.parse(bis, parser.handler);
@@ -551,21 +520,92 @@ public class OpenMPIProcessMapXml13Parser {
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		return parser.map;
 	}
 
-	public void addListener(IOpenMpiProcessMapXml13ParserListener listener) {
+	public void addListener(IOpenMPIProcessMapParserListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(IOpenMpiProcessMapXml13ParserListener listener) {
+	public void removeListener(IOpenMPIProcessMapParserListener listener) {
 		listeners.remove(listener);
 	}
 
+	protected void notifyStart() {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).start();
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+	
+	protected void notifyFinish() {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).finish();
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+	
+	protected void notifyFinishMap(AttributeManager manager) {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).finishMap(manager);
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+
+	protected void notifyNewProcess(Process proc) {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).newProcess(proc);
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+
+	protected void notifyStdout(Process process, String output) {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).stdout(process, output);
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+	
+	protected void notifyStderr(Process process, String output) {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).stderr(process, output);
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+	
 	public static void main(String[] args) {
 		try {
 			FileInputStream is = new FileInputStream("xml_sample.txt"); //$NON-NLS-1$
-			OpenMPIProcessMap map = OpenMPIProcessMapXml13Parser.parse(is);
+			OpenMPIProcessMapXml13Parser.parse(is);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
