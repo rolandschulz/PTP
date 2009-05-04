@@ -1,39 +1,41 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly marked, 
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
  * so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ *
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  *******************************************************************************/
- 
+
  /**
  * @author Clement chu
- * 
+ *
  */
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
+#include "MIResult.h"
+#include "MIValue.h"
 #include "MIOOBRecord.h"
 #include "CLIOutput.h"
 
 #include "signalinfo.h"
 
-static int 
-getBoolean(char* value) 
+static int
+getBoolean(char* value)
 {
 	if (value != NULL && strncmp(value, "Yes", 3) == 0) {
 		return 1;
@@ -41,17 +43,17 @@ getBoolean(char* value)
 	return 0;
 }
 
-void 
-CLIGetSigHandleList(MICommand *cmd, List** signals) 
+void
+CLIGetSigHandleList(MICommand *cmd, List** signals)
 {
 	List *oobs;
 	MIOOBRecord *oob;
 	char *text = NULL;
-	
+
 	const char* delims[] = { " ", "\\" };
 	char *token, *pch;
 	int i;
-	
+
 	signalinfo *sig;
 	*signals = NewList();
 
@@ -64,7 +66,7 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 		if (*text == '\0' || *text == '\\') {
 			continue;
 		}
-		
+
 		if (strncmp(text, "Signal", 6) != 0 && strncmp(text, "Use", 3) != 0 && strncmp(text, "info", 4) != 0) {
 			token = strdup(text);
 			pch = strstr(token, delims[0]);
@@ -76,7 +78,7 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 				if (*pch == '\0') {
 					break;
 				}
-				
+
 				*pch = '\0';
 				pch++;
 				while (*pch == ' ' || *pch =='t') { //remove whitespace or t character
@@ -108,18 +110,18 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 			}
 			free(token);
 			free(pch);
-			AddToList(*signals, (void *)sig);			
+			AddToList(*signals, (void *)sig);
 		}
 	}
 }
 
-double 
+double
 CLIGetGDBVersion(MICommand *cmd)
 {
 	List *			oobs;
 	MIOOBRecord *	oob;
 	char *			text;
-	
+
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
 		return -1.0;
 	}
@@ -137,7 +139,7 @@ CLIGetGDBVersion(MICommand *cmd)
 		while (*text == ' ') {
 			text++;
 		}
-		
+
 		/*
 		 * linux self: GUN gdb 6.5.0
 		 * fedore: GNU gdb Red Hat Linux (6.5-8.fc6rh)
@@ -148,13 +150,13 @@ CLIGetGDBVersion(MICommand *cmd)
 			 * bypass "GNU gdb"
 			 */
 			text += 8;
-			
+
 			/*
 			 * find first digit
 			 */
 			while (*text != '\0' && !isdigit(*text))
 				text++;
-				
+
 			/*
 			 * Convert whatever is here to a double
 			 */
@@ -166,11 +168,12 @@ CLIGetGDBVersion(MICommand *cmd)
 }
 
 char *
-CLIGetPTypeInfo(MICommand *cmd) {
-	List *oobs;
-	MIOOBRecord *oob;
-	char *text = NULL;
-	char *p = NULL;
+CLIGetPTypeInfo(MICommand *cmd)
+{
+	List *			oobs;
+	MIOOBRecord *	oob;
+	char *			text = NULL;
+	char *			p = NULL;
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
 		return NULL;
@@ -203,7 +206,7 @@ CLIGetPTypeInfo(MICommand *cmd) {
 }
 
 CLIInfoThreadsInfo *
-CLIInfoThreadsInfoNew(void) 
+CLIInfoThreadsInfoNew(void)
 {
 	CLIInfoThreadsInfo * info;
 	info = (CLIInfoThreadsInfo *)malloc(sizeof(CLIInfoThreadsInfo));
@@ -213,13 +216,13 @@ CLIInfoThreadsInfoNew(void)
 }
 
 CLIInfoThreadsInfo *
-CLIGetInfoThreadsInfo(MICommand *cmd) 
+CLIGetInfoThreadsInfo(MICommand *cmd)
 {
-	List *oobs;
-	MIOOBRecord *oob;
-	CLIInfoThreadsInfo * info = CLIInfoThreadsInfoNew();
-	char * text = NULL;
-	char * id = NULL;
+	List *					oobs;
+	MIOOBRecord *			oob;
+	CLIInfoThreadsInfo *	info = CLIInfoThreadsInfoNew();
+	char * 					text = NULL;
+	char *					id = NULL;
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
 		return info;
@@ -233,7 +236,7 @@ CLIGetInfoThreadsInfo(MICommand *cmd)
 	info->thread_ids = NewList();
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
 		text = oob->cstring;
-		
+
 		if (*text == '\0') {
 			continue;
 		}
@@ -260,3 +263,108 @@ CLIGetInfoThreadsInfo(MICommand *cmd)
 	}
 	return info;
 }
+
+CLIInfoProcInfo *
+CLIInfoProcInfoNew()
+{
+	CLIInfoProcInfo *	info;
+	info = (CLIInfoProcInfo *)malloc(sizeof(CLIInfoProcInfo));
+	info->pid = -1;
+	info->cmdline = NULL;
+	info->cwd = NULL;
+	info->exe = NULL;
+	return info;
+}
+
+void
+CLIInfoProcInfoFree(CLIInfoProcInfo *info)
+{
+	if (info->cmdline != NULL) {
+		free(info->cmdline);
+	}
+	if (info->cwd != NULL) {
+		free(info->cwd);
+	}
+	if (info->exe != NULL) {
+		free(info->exe);
+	}
+	free(info);
+}
+
+#ifdef __APPLE__
+CLIInfoProcInfo *
+MIGetInfoProcInfo(MICommand *cmd)
+{
+	char *				str = "";
+	MIResult *			result;
+	MIValue *			value;
+	MIResultRecord *	rr;
+	CLIInfoProcInfo *	info = CLIInfoProcInfoNew();
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return info;
+
+	rr = cmd->output->rr;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		value = result->value;
+		if (value->type == MIValueTypeConst) {
+			str = value->cstring;
+		}
+		if (strcmp(result->variable, "process-id") == 0) {
+			info->pid = (int)strtol(str, NULL, 10);
+		}
+	}
+
+	return info;
+}
+#else /* __APPLE__ */
+CLIInfoProcInfo *
+MIGetInfoProcInfo(MICommand *cmd)
+{
+	int					len;
+	List *				oobs;
+	MIOOBRecord *		oob;
+	char *				text = NULL;
+	CLIInfoProcInfo *	info = CLIInfoProcInfoNew();
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
+		return info;
+
+	oobs = cmd->output->oobs;
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		text = oob->cstring;
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			text++;
+		}
+
+		if (strncmp(text, "process", 7) == 0) {
+			text += 8; /* bypass " " */
+			if (text != NULL) {
+				info->pid = (int)strtol(text, NULL, 10);
+			}
+		} else if (strncmp(text, "cmdline", 7) == 0) {
+			text += 11; /* bypass " = '" */
+			len = strlen(text) - 1; /* exclude "'" */
+			info->cmdline = (char *)malloc(len + 1);
+			memcpy(info->cmdline, text, len);
+			info->cmdline[len] = '\0';
+		} else if (strncmp(text, "cwd", 3) == 0) {
+			text += 7; /* bypass " = '" */
+			len = strlen(text) - 1; /* exclude "'" */
+			info->cwd = (char *)malloc(len + 1);
+			memcpy(info->cwd, text, len);
+			info->cwd[len] = '\0';
+		} else if (strncmp(text, "exe", 3) == 0) {
+			text += 7; /* bypass " = '" */
+			len = strlen(text) - 1; /* exclude "'" */
+			info->exe = (char *)malloc(len + 1);
+			memcpy(info->exe, text, len);
+			info->exe[len] = '\0';
+		}
+	}
+	return NULL;
+}
+#endif /* __APPLE__ */
