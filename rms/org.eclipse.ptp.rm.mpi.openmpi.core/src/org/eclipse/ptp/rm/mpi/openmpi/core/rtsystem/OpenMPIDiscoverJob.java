@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -113,22 +111,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			 * Check and/or set the OMPI version in the configuration. NOTE that this may change any
 			 * subsequent commands that are queried!
 			 */
-			String fullVersion = info.get("ompi:version:full"); //$NON-NLS-1$
-			if (fullVersion != null) {
-				Pattern p = Pattern.compile("^(\\d+\\.\\d+).*"); //$NON-NLS-1$
-				Matcher m = p.matcher(fullVersion);
-				if (m.matches()) {
-					String version = m.group(1);
-					String rmVersion = rmConfiguration.getVersionId();
-					if (!rmConfiguration.validateVersion(version)) {
-						throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
-					}
-					if (!rmVersion.equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO) && !version.equals(rmVersion)) {
-						throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
-					}
-					rmConfiguration.setDetectedVersion(version); // NOTE: this only persists while the RM is running
-				} else {
-					throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, fullVersion)));
+			String version = info.get("ompi:version:full"); //$NON-NLS-1$
+			if (version != null) {
+				if (!rmConfiguration.setDetectedVersion(version)) {
+					throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
 				}
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), Messages.OpenMPIDiscoverJob_Exception_UnableToDetermineVersion));
