@@ -726,13 +726,13 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		 * Map containing a list of processes that are linked to nodes
 		 */
 		Map<IPNodeControl, List<IPProcessControl>> nodeProcMap = new HashMap<IPNodeControl, List<IPProcessControl>>();
-
+		
 		for (IPProcessControl process : processes) {
 			/*
 			 * Find the node ID attribute and add the process to the list for
 			 * each node. Remove the attribute from the attribute manager.
 			 */
-			StringAttribute attr = (StringAttribute) process.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+			StringAttribute attr = process.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
 			if (attr != null) {
 				IPNodeControl node = getNodeControl(attr.getValue());
 				if (node != null) {
@@ -743,21 +743,22 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 					}
 					procs.add(process);
 				}
-				process.removeAttribute(attr);
 			}
-
+			
 			processesById.put(process.getID(), process);
 		}
-
-		job.addProcesses(processes);
-
+		
 		/*
 		 * Bulk add the processes to the nodes
 		 */
 		for (Map.Entry<IPNodeControl, List<IPProcessControl>> entry : nodeProcMap.entrySet()) {
 			entry.getKey().addProcesses(entry.getValue());
 		}
-
+		
+		/*
+		 * Add processes to the job
+		 */
+		job.addProcesses(processes);
 	}
 
 	/**
@@ -1222,7 +1223,8 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	}
 
 	/**
-	 * Update attributes on a collection of processes.
+	 * Update attributes on a collection of processes. If the nodeId attribute is specified
+	 * then the processes will be moved to the new node.
 	 * 
 	 * @param job
 	 *            parent of processes
@@ -1233,7 +1235,60 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @return true if updated
 	 */
 	protected boolean updateProcesses(IPJobControl job, Collection<IPProcessControl> processes, AttributeManager attrs) {
+		StringAttribute nodeId = attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+		if (nodeId != null) {
+			Map<IPNodeControl, List<IPProcessControl>> nodeProcMap = new HashMap<IPNodeControl, List<IPProcessControl>>();
+			List<IPProcessControl> noNodeList = new ArrayList<IPProcessControl>();
+			
+			/*
+			 * Generate two data structures. The first will contain a list of existing processes on each node except
+			 * the new node (nodeProcMap), the second will contain processes that are not currently assigned to 
+			 * nodes (noNodeList).
+			 */
+			for (IPProcessControl process : processes) {
+				StringAttribute attr = process.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+				if (attr == null) {
+					noNodeList.add(process);
+				} else if (!attr.getValue().equals(nodeId.getValue())) {
+					IPNodeControl node = getNodeControl(attr.getValue());
+					if (node != null) {
+						List<IPProcessControl> procs = nodeProcMap.get(node);
+						if (procs == null) {
+							procs = new ArrayList<IPProcessControl>();
+							nodeProcMap.put(node, procs);
+						}
+						procs.add(process);
+					}
+				}
+			}
+	
+			/*
+			 * Remove processes from their nodes
+			 */
+			/*
+			 * Bulk remove the processes to the nodes
+			 */
+			for (Map.Entry<IPNodeControl, List<IPProcessControl>> entry : nodeProcMap.entrySet()) {
+				entry.getKey().removeProcesses(entry.getValue());
+			}
+			
+			/*
+			 * Now add processes that aren't already on the node to the new node
+			 */
+			IPNodeControl node = getNodeControl(nodeId.getValue());
+			if (node != null) {
+				for (List<IPProcessControl> procs : nodeProcMap.values()) {
+					node.addProcesses(procs);
+				}
+				node.addProcesses(noNodeList);
+			}
+		}
+		
+		/*
+		 * Update attributes
+		 */
 		job.addProcessAttributes(processes, attrs.getAttributes());
+		
 		return true;
 	}
 	
