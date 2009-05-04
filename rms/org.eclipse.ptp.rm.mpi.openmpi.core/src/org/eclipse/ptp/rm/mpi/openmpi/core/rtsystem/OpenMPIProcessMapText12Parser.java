@@ -20,14 +20,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIApplicationAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes.MappingMode;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 
 /**
  * 
@@ -38,15 +41,22 @@ public class OpenMPIProcessMapText12Parser {
 	private OpenMPIProcessMapText12Parser() {
 		// Do not allow instances.
 	}
+	
+	protected OpenMPIProcessMap map = new OpenMPIProcessMap();
+	protected final ListenerList listeners = new ListenerList();
+	protected int numApplications;
+	protected int numNodes;
 
-	OpenMPIProcessMap map = new OpenMPIProcessMap();
-	int numApplications;
-	int numNodes;
-
-	public static OpenMPIProcessMap parse(InputStream is) throws IOException {
+	public static void parse(InputStream is, IOpenMPIProcessMapParserListener listener) throws IOException {
 		OpenMPIProcessMapText12Parser parser = new OpenMPIProcessMapText12Parser();
+		if (listener != null) {
+			parser.addListener(listener);
+		}
+		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 1);
 
+		parser.notifyStart();
+		
 		parser.readStart(reader);
 		parser.readVpid(reader);
 		for (int i = 0; i < parser.numApplications; i++) {
@@ -56,10 +66,22 @@ public class OpenMPIProcessMapText12Parser {
 		for (int i = 0; i < parser.numNodes; i++) {
 			parser.readMappedNode(reader, i);
 		}
+		
+		parser.notifyFinish();
 
-		return parser.map;
+		if (listener != null) {
+			parser.removeListener(listener);
+		}
 	}
 
+	public void addListener(IOpenMPIProcessMapParserListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(IOpenMPIProcessMapParserListener listener) {
+		listeners.remove(listener);
+	}
+	
 	/*
 	 * Find mapped node information, ignoring anything else. Format should be:
 	 * 
@@ -143,9 +165,9 @@ public class OpenMPIProcessMapText12Parser {
 				try {
 					String s = m.group(1);
 					if (s.equalsIgnoreCase("true")) { //$NON-NLS-1$
-						node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(true));
+						node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(Boolean.TRUE));
 					} else if (s.equalsIgnoreCase("false")) { //$NON-NLS-1$
-						node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(false));
+						node.getAttributeManager().addAttribute(OpenMPINodeAttributes.getOversubscribedAttributeDefinition().create(Boolean.FALSE));
 					} else {
 						throw new IOException(NLS.bind(Messages.OpenMPIProcessMapText12Parser_Exception_InvalidLine, line));
 					}
@@ -230,13 +252,15 @@ public class OpenMPIProcessMapText12Parser {
 			}
 
 			OpenMPIProcessMap.Process proc = new OpenMPIProcessMap.Process(node, processIndex, processName, applicationIndex);
-			map.addProcess(proc);
 			try {
-				proc.getAttributeManager().addAttribute(ProcessAttributes.getPIDAttributeDefinition().create(processPid));
+				proc.getAttributeManager().addAttribute(ProcessAttributes.getPIDAttributeDefinition().create(Integer.valueOf(processPid)));
 			} catch (IllegalValueException e) {
 				// This is not possible.
 				assert false;
 			}
+
+			map.addProcess(proc);
+			notifyNewProcess(proc);
 		}
 	}
 
@@ -413,14 +437,14 @@ public class OpenMPIProcessMapText12Parser {
 				try {
 					String s = m.group(1);
 					try {
-						map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidStartAttributeDefinition().create(Integer.parseInt(s)));
+						map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidStartAttributeDefinition().create(Integer.valueOf(s)));
 					} catch (IllegalValueException e) {
 						// This is not possible.
 						assert false;
 					}
 					s = m.group(2);
 					try {
-						map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidRangeAttributeDefinition().create(Integer.parseInt(s)));
+						map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getVpidRangeAttributeDefinition().create(Integer.valueOf(s)));
 					} catch (IllegalValueException e) {
 						// This is not possible.
 						assert false;
@@ -457,7 +481,7 @@ public class OpenMPIProcessMapText12Parser {
 				try {
 					map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getHostnameAttributeDefinition().create(m.group(1)));
 					try {
-						map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMpiJobIdAttributeDefinition().create(Integer.parseInt(m.group(3))));
+						map.getAttributeManager().addAttribute(OpenMPIJobAttributes.getMpiJobIdAttributeDefinition().create(Integer.valueOf(m.group(3))));
 					} catch (IllegalValueException e) {
 						// This is not possible.
 						assert false;
@@ -483,10 +507,58 @@ public class OpenMPIProcessMapText12Parser {
 		}
 	}
 	
+	protected void notifyStart() {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).start();
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+	
+	protected void notifyFinish() {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).finish();
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}	
+	
+	protected void notifyFinishMap() {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).finishMap(map.getAttributeManager());
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+
+	protected void notifyNewProcess(Process proc) {
+		// Notify listeners that end has been reached.
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((IOpenMPIProcessMapParserListener) listener).newProcess(proc);
+			} catch (Exception e) {
+				OpenMPIPlugin.log(e);
+			}
+		}
+
+	}
+	
 	public static void main(String[] args) {
 		try {
 			FileInputStream is = new FileInputStream("test.txt"); //$NON-NLS-1$
-			OpenMPIProcessMapText12Parser.parse(is);
+			OpenMPIProcessMapText12Parser.parse(is, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
