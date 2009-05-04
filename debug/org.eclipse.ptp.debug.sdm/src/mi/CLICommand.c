@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly  
+ * to produce derivative works, such modified software should be clearly
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,27 +54,39 @@ CLIPType(char *name) {
 	return cmd;
 }
 
-MICommand * 
+MICommand *
 CLIListSignals(char *name) {
 	MICommand * cmd;
 	cmd = MICommandNew("info signals", MIResultRecordDONE);
 	if (name != NULL) {
 		MICommandAddOption(cmd, name, NULL);
-	}	
+	}
 	return cmd;
 }
-	
-MICommand * 
+
+MICommand *
 CLISignalInfo(char *arg) {
 	MICommand * cmd;
 	cmd = MICommandNew("signal", MIResultRecordDONE);
 	MICommandAddOption(cmd, arg, NULL);
 	return cmd;
-}	
+}
 
-MICommand * 
+MICommand *
 CLIFrame(void) {
 	MICommand * cmd;
 	cmd = MICommandNew("frame", MIResultRecordDONE);
 	return cmd;
-}	
+}
+
+MICommand *
+CLIInfoProc(void) {
+	MICommand * cmd;
+#ifdef __APPLE__
+	cmd = MICommandNew("info pid", MIResultRecordDONE);
+#else /* __APPLE__ */
+	cmd = MICommandNew("info proc", MIResultRecordDONE);
+#endif /* __APPLE__ */
+	return cmd;
+}
+
