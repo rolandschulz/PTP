@@ -544,37 +544,54 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 		return id;
 	}
-
+	
 	/**
-	 * Notify RM to create a new process.
+	 * Create a single process.
 	 *
-	 * @param parentID the id of the job the process belongs to
-	 * @param name the name of the process
-	 * @param index the index (rank) of the process
+	 * @param jobId the parent job that the process belongs to
 	 * @return the id of the new process
 	 */
-	public String createProcess(String parentID, String name, int index) {
+	public String createProcess(String jobId, int index, String nodeId) {
 		String id = generateID();
 		ElementAttributeManager mgr = new ElementAttributeManager();
 		AttributeManager attrMgr = new AttributeManager();
-
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.STARTING));
+		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(String.valueOf(index)));
 		try {
-			attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(new Integer(index)));
+			attrMgr.addAttribute(ProcessAttributes.getIndexAttributeDefinition().create(Integer.valueOf(index)));
 		} catch (IllegalValueException e) {
-			// This is not possible
-			Assert.isTrue(false);
+			assert false;
 		}
-		attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(parentID));
-		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
+		if (nodeId != null) {
+			attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeId));
+		}
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		fireRuntimeNewProcessEvent(eventFactory.newRuntimeNewProcessEvent(parentID, mgr));
+		fireRuntimeNewProcessEvent(eventFactory.newRuntimeNewProcessEvent(jobId, mgr));
 
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new process #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
 
 		return id;
 	}
 
+	/**
+	 * Create num new processes with process indexes 0 to num-1.
+	 *
+	 * @param job the parent job that the processes belong to
+	 */
+	public void createProcesses(String jobId, int num) {
+		for (int index = 0; index < num; index++) {
+			createProcess(jobId, index, null);
+		}
+
+		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: created {1} new processes", rmConfiguration.getName(), Integer.valueOf(num)); //$NON-NLS-1$
+	}
+
+	/**
+	 * Change attributes of a process
+	 * 
+	 * @param processID
+	 * @param changedAttrMgr
+	 */
 	public void changeProcess(String processID, AttributeManager changedAttrMgr) {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttributes(changedAttrMgr.getAttributes());
@@ -588,6 +605,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 	}
 
+	/**
+	 * Change attributes of a job
+	 * 
+	 * @param jobID
+	 * @param changedAttrMgr
+	 */
 	public void changeJob(String jobID, AttributeManager changedAttrMgr) {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttributes(changedAttrMgr.getAttributes());
@@ -601,6 +624,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 	}
 
+	/**
+	 * Change attributes of a node
+	 * 
+	 * @param nodeID
+	 * @param changedAttrMgr
+	 */
 	public void changeNode(String nodeID, AttributeManager changedAttrMgr) {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttributes(changedAttrMgr.getAttributes());
@@ -614,6 +643,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 	}
 
+	/**
+	 * Change attributes of a machine
+	 * 
+	 * @param machineID
+	 * @param changedAttrMgr
+	 */
 	public void changeMachine(String machineID, AttributeManager changedAttrMgr) {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttributes(changedAttrMgr.getAttributes());
@@ -637,6 +672,18 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String id = Integer.toString(nextID);
 		nextID++;
 		return id;
+	}
+	
+	/**
+	 * Generate a range set of count IDs
+	 * 
+	 * @param count number of IDs to generate
+	 * @return range set containing IDs
+	 */
+	protected RangeSet generateIdRange(int count) {
+		int start = nextID;
+		nextID += count;
+		return new RangeSet(start, nextID - 1);
 	}
 
 	/**

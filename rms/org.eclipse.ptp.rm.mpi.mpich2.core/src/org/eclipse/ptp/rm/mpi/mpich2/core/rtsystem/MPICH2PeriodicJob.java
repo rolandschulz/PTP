@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -20,11 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
@@ -85,7 +82,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			if (jobMap == null) {
 				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage()));
 			}
-
+			
 			/*
 			 * Update model according to data. First create any new jobs.
 			 */
@@ -106,19 +103,9 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 						throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null));
 					}
 	
-					String processName = Integer.toString(job.getRank());
-					String processID = rts.createProcess(job.getJobAlias(), processName, job.getRank());
+					String processID = rts.createProcess(job.getJobAlias(), job.getRank(), nodeID);
+					
 					process = (IPProcessControl)pJob.getProcessById(processID);
-	
-					IPNode node = machine.getNodeById(nodeID);
-	
-					/*
-					 * Although one could call processControl.addNode(node) to assign the process to the node, this does not work.
-					 * It is necessary to call nodeControl.addProcesses(processControl) instead.
-					 */
-					IPNodeControl nodeControl = (IPNodeControl) node;
-					nodeControl.addProcesses(Arrays.asList(new IPProcessControl[] {process}));
-
 					process.setState(ProcessAttributes.State.RUNNING);
 				}
 			}
