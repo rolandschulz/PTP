@@ -214,7 +214,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		final IPProcess procZero;
 		if (!configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
-				|| configuration.getPointVersion() < 1) {
+				|| configuration.getServiceVersion() < 1) {
 			procZero = ipJob.getProcessByIndex(0);
 		} else {
 			procZero = null;
@@ -355,7 +355,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 						});
 					} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
 						InputStream is;
-						if (configuration.getPointVersion() > 0) {
+						if (configuration.getServiceVersion() > 0) {
 							is = new OpenMPI131InputStream(parserInputStream);
 						} else {
 							is = new OpenMPI130InputStream(parserInputStream);
