@@ -1292,6 +1292,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --without-LoadLeveler   disable support for LoadLeveler
   --with-ll-header=DIR    local LoadLeveler header directory [none]
 
 Some influential environment variables:
@@ -2269,6 +2270,15 @@ echo "$as_me: error: proxy directory not found" >&2;}
 fi
 
 
+# Check whether --with-LoadLeveler was given.
+if test "${with_LoadLeveler+set}" = set; then
+  withval=$with_LoadLeveler; with_loadleveler=no
+else
+  with_loadleveler=yes
+fi
+
+if test "x$with_loadleveler" = "xyes" ; then
+
 # Check whether --with-ll-header was given.
 if test "${with_ll_header+set}" = set; then
   withval=$with_ll_header; llinclude=-I$withval
@@ -2276,7 +2286,8 @@ else
   llinclude=""
 fi
 
-lldir="$llinclude -I/opt/ibmll/LoadL/full/include -I/usr/lpp/LoadL/full/include"
+	lldir="$llinclude -I/opt/ibmll/LoadL/full/include -I/usr/lpp/LoadL/full/include"
+fi
 
 
 ac_ext=c
@@ -4426,7 +4437,8 @@ _ACEOF
 
 fi
 
-# On IRIX 5.3, sys/types and inttypes.h are conflicting.
+if test "x$with_loadleveler" = "xyes" ; then
+	# On IRIX 5.3, sys/types and inttypes.h are conflicting.
 
 
 
@@ -4635,6 +4647,7 @@ fi
 
 done
 
+fi
 
 { echo "$as_me:$LINENO: checking return type of signal handlers" >&5
 echo $ECHO_N "checking return type of signal handlers... $ECHO_C" >&6; }
