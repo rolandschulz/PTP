@@ -27,8 +27,8 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	private ProcessFactory localProcessBuilder;
-
 	private Map<String, String> remoteEnv = new HashMap<String, String>();
+	
 	public LocalProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
 		remoteEnv.putAll(System.getenv());
@@ -55,7 +55,7 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		String environmentArray[] = new String[environment().size()];
 		int index = 0;
 		for (Entry<String,String>  entry : environment().entrySet()) {
-			environmentArray[index++] = entry.getKey()+"="+entry.getValue();
+			environmentArray[index++] = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 		}
 		Process localProc;
 		if (directory() != null) {
@@ -68,6 +68,6 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		} else {
 			localProc = localProcessBuilder.exec(commandArray, environmentArray);
 		}
-		return new LocalProcess(localProc);
+		return new LocalProcess(localProc, redirectErrorStream());
 	}
 }
