@@ -31,7 +31,7 @@ if test ! -d $PROXY; then
 	fi
 fi
 
-AC_ARG_WITH([LoadLeveler], AS_HELP_STRING([--without-loadleveler],
+AC_ARG_WITH([LoadLeveler], AS_HELP_STRING([--without-LoadLeveler],
 					[disable support for LoadLeveler]),
 	    [with_loadleveler=no], [with_loadleveler=yes])
 if test "x$with_loadleveler" = "xyes" ; then
