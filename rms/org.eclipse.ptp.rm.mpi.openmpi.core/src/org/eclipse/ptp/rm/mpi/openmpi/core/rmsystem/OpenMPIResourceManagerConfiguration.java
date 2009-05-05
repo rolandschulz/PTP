@@ -103,7 +103,7 @@ AbstractToolRMConfiguration implements Cloneable {
 	 */
 	private int majorVersion = 0;
 	private int minorVersion = 0;
-	private int pointVersion = 0;
+	private int serviceVersion = 0;
 
 	public OpenMPIResourceManagerConfiguration(OpenMPIResourceManagerFactory factory) {
 		super(OPENMPI_CAPABILITIES, new ToolsConfig(), factory);
@@ -166,12 +166,12 @@ AbstractToolRMConfiguration implements Cloneable {
 	}
 
 	/**
-	 * Get the detected Open MPI point version.
+	 * Get the detected Open MPI service version.
 	 * 
 	 * @return the detected point version (default 0)
 	 */
-	public int getPointVersion() {
-		return pointVersion;
+	public int getServiceVersion() {
+		return serviceVersion;
 	}
 
 	/**
@@ -222,7 +222,7 @@ AbstractToolRMConfiguration implements Cloneable {
 			majorVersion = Integer.valueOf(m.group(1)).intValue();
 			minorVersion = Integer.valueOf(m.group(2)).intValue();
 			if (m.group(3) != null) {
-				pointVersion = Integer.valueOf(m.group(4)).intValue();
+				serviceVersion = Integer.valueOf(m.group(4)).intValue();
 			}
 			if (!validateVersion()) {
 				return false;
