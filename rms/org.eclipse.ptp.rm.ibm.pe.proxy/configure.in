@@ -31,10 +31,15 @@ if test ! -d $PROXY; then
 	fi
 fi
 
-AC_ARG_WITH(ll-header, AC_HELP_STRING([--with-ll-header=DIR], 
+AC_ARG_WITH([LoadLeveler], AS_HELP_STRING([--without-loadleveler],
+					[disable support for LoadLeveler]),
+	    [with_loadleveler=no], [with_loadleveler=yes])
+if test "x$with_loadleveler" = "xyes" ; then
+	AC_ARG_WITH(ll-header, AC_HELP_STRING([--with-ll-header=DIR], 
 			[local LoadLeveler header directory @<:@none@:>@]),
 			[llinclude=-I$withval], [llinclude=""])
-lldir="$llinclude -I/opt/ibmll/LoadL/full/include -I/usr/lpp/LoadL/full/include"
+	lldir="$llinclude -I/opt/ibmll/LoadL/full/include -I/usr/lpp/LoadL/full/include"
+fi
 
 dnl
 dnl Check for programs.
@@ -67,7 +72,9 @@ dnl Check for header files.
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([llapi.h], [CFLAGS="$CFLAGS -DHAVE_LLAPI_H"])
+if test "x$with_loadleveler" = "xyes" ; then
+	AC_CHECK_HEADERS([llapi.h], [CFLAGS="$CFLAGS -DHAVE_LLAPI_H"])
+fi
 
 dnl
 dnl Check for types
