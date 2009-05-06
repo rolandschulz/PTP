@@ -20,14 +20,12 @@ import org.eclipse.core.filesystem.IFileStore;
 public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuilder {
 	private List<String> commandArgs;
 	private IRemoteConnection remoteConnection;
-	private IFileStore remoteDir;
-	private boolean redirectErrorStream;
+	private IFileStore remoteDir = null;
+	private boolean redirectErrorStream = false;
 	
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, List<String> command) {
 		remoteConnection = conn;
 		commandArgs = command;
-		remoteDir = null;
-		redirectErrorStream = false;
 	}
 	
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, String... command) {
