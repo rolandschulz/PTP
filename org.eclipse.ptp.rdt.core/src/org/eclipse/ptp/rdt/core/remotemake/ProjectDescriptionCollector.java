@@ -28,6 +28,7 @@ import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector3;
 import org.eclipse.cdt.make.core.scannerconfig.InfoContext;
 import org.eclipse.cdt.make.core.scannerconfig.ScannerInfoTypes;
 import org.eclipse.cdt.make.core.scannerconfig.IDiscoveredPathManager.IDiscoveredPathInfo;
+import org.eclipse.cdt.make.internal.core.scannerconfig.DiscoveredPathInfo;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -35,6 +36,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.core.RDTLog;
 
 public class ProjectDescriptionCollector implements IScannerInfoCollector3 {
+
+	private IProject fProject;
+
+	private InfoContext fInfoContext;
+
 
 	@SuppressWarnings("unchecked")
 	public void contributeToScannerConfig(Object resource, Map/*<ScannerInfoTypes, List<String>>*/ scannerInfo) {
@@ -48,13 +54,17 @@ public class ProjectDescriptionCollector implements IScannerInfoCollector3 {
 		ICProjectDescription projectDescription = CoreModel.getDefault().getProjectDescription(project, true);
 		
 		for(ICConfigurationDescription config : projectDescription.getConfigurations()) {
-			for(ICLanguageSetting setting : config.getRootFolderDescription().getLanguageSettings()) {
-				
-				List<String> paths = info.get(ScannerInfoTypes.INCLUDE_PATHS);
-				addSettingEntries(setting, ICSettingEntry.INCLUDE_PATH, paths, INCLUDE_PATH_FACTORY);
-				
-				List<String> macros = info.get(ScannerInfoTypes.SYMBOL_DEFINITIONS);
-				addSettingEntries(setting, ICSettingEntry.MACRO, macros, MACRO_FACTORY);
+			if (config.getRootFolderDescription() != null) {
+				for (ICLanguageSetting setting : config
+						.getRootFolderDescription().getLanguageSettings()) {
+
+					List<String> paths = info.get(ScannerInfoTypes.INCLUDE_PATHS);
+					addSettingEntries(setting, ICSettingEntry.INCLUDE_PATH, paths, INCLUDE_PATH_FACTORY);
+
+					List<String> macros = info.get(ScannerInfoTypes.SYMBOL_DEFINITIONS);
+					addSettingEntries(setting, ICSettingEntry.MACRO, macros,
+							MACRO_FACTORY);
+				}
 			}
 		}
 		
@@ -114,13 +124,19 @@ public class ProjectDescriptionCollector implements IScannerInfoCollector3 {
 	}
 
 	public void setInfoContext(InfoContext context) {
+		fInfoContext = context;
+		fProject = fInfoContext.getProject();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector2#createPathInfoObject()
+	 */
 	public IDiscoveredPathInfo createPathInfoObject() {
-		return null;
+		return new DiscoveredPathInfo(fProject);
 	}
 
 	public void setProject(IProject project) {
+		fProject = project;
 	}
 
 
