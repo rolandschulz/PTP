@@ -69,10 +69,12 @@ public class AttributeManager {
 	 * @param def
 	 */
 	private <T extends Comparable<? super T>> void addAttributeToArrayAttribute(ArrayAttribute<T> attr) {
-		ArrayAttributeDefinition<T> def = attr.getDefinition();
-		ArrayAttribute<T> exAttr = (ArrayAttribute<T>)map.get(def);
-		final List<T> value = attr.getValue();
-		exAttr.addAll(value);
+		synchronized (map) {
+			ArrayAttributeDefinition<T> def = attr.getDefinition();
+			ArrayAttribute<T> exAttr = (ArrayAttribute<T>)map.get(def);
+			final List<T> value = attr.getValue();
+			exAttr.addAll(value);
+		}
 	}
 
 	/**
@@ -105,7 +107,9 @@ public class AttributeManager {
 	 * @return
 	 */
 	public IAttribute<?,?,?>[] getAttributes() {
-		return map.values().toArray(new IAttribute[map.size()]);
+		synchronized (map) {
+			return map.values().toArray(new IAttribute[map.size()]);
+		}
 	}
 	
 	/**
@@ -129,14 +133,18 @@ public class AttributeManager {
 	 * @return
 	 */
 	public IAttributeDefinition<?,?,?>[] getKeys() {
-		return map.keySet().toArray(new IAttributeDefinition[0]);
+		synchronized (map) {
+			return map.keySet().toArray(new IAttributeDefinition[0]);
+		}
 	}
 	
 	/**
 	 * @param attr
 	 */
 	public void removeAttribute(IAttribute<?,?,?> attr) {
-		map.remove(attr.getDefinition());
+		synchronized (map) {
+			map.remove(attr.getDefinition());
+		}
 	}
 	
 	/**
