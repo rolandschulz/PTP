@@ -46,6 +46,13 @@ public interface IRemoteServicesDelegate {
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
 	
 	/**
+	 * Gets the directory separator on the target system.
+	 * 
+	 * @return String
+	 */
+	public String getDirectorySeparator(IRemoteConnection conn);
+	
+	/**
 	 * Initialize the remote service.
 	 * 
 	 * @return true if successfully initialized, false otherwise

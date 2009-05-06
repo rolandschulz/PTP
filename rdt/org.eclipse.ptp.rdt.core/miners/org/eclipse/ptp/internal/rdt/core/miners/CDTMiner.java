@@ -1347,7 +1347,9 @@ public class CDTMiner extends Miner {
 	}
 	
 	private IIndexFileLocation createLocation(String hostName, IIndexFileLocation location) throws URISyntaxException {
-		return new RemoteIndexFileLocation(null, new URI("rse://" + hostName + location.getFullPath())); //$NON-NLS-1$
+		URI uri = location.getURI();
+		URI newURI = new URI("rse", hostName, uri.getPath(), null, null); //$NON-NLS-1$
+		return new RemoteIndexFileLocation(null, newURI);
 	}
 
 	protected void handleUnregisterScope(DataElement scopeName, DataElement status) {

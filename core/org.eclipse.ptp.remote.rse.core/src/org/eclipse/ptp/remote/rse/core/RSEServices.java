@@ -18,6 +18,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
@@ -84,5 +85,22 @@ public class RSEServices implements IRemoteServicesDelegate {
 
 		connMgr = new RSEConnectionManager(registry);
 		return true;
+	}
+
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		if (!(conn instanceof RSEConnection)) {
+			return null;
+		}
+		
+		RSEConnection rseConnection = (RSEConnection) conn;
+		IRSESystemType systemType = rseConnection.getHost().getSystemType();
+		
+		if(systemType.isWindows()) {
+			return "\\"; //$NON-NLS-1$
+		}
+		
+		else {
+			return "/"; //$NON-NLS-1$
+		}
 	}
 }

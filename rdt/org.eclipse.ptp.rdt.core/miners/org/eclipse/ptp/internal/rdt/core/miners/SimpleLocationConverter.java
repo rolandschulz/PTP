@@ -30,17 +30,10 @@ public class SimpleLocationConverter implements IIndexLocationConverter {
 	
 	public IIndexFileLocation fromInternalFormat(String raw) {
 		try {
-			IPath path = new Path(raw);
-			StringBuilder buffer = new StringBuilder();
-			if (fScheme != null) {
-				buffer.append(fScheme);
-				buffer.append("://"); //$NON-NLS-1$
-				if (fHost != null) {
-					buffer.append(fHost);
-				}
-			}
-			buffer.append(path.toPortableString());
-			URI uri = new URI(buffer.toString());
+			URI internalURI = new URI(raw);
+			IPath path = new Path(internalURI.getPath());
+
+			URI uri = new URI(fScheme, fHost, path.toString(), null, null);
 			return new RemoteIndexFileLocation(null, uri);
 		} catch (URISyntaxException e) {
 			throw new IllegalArgumentException(e);
