@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright (c) 2005 The Regents of the University of California.
  * This material was produced under U.S. Government contract W-7405-ENG-36
@@ -217,7 +216,7 @@ static int shutdown_proxy(void);
 static void job_enqueue(jobinfo *, pid_t);
 static void post_error(int trans_id, int type, char *msg);
 static void post_submitjob_error(int trans_id, char *subid, char *msg);
-static char **create_exec_parmlist(char *execname, char *targetname, char *args, char *helper);
+static char **create_exec_parmlist(char *execname, char *targetname, int arg_count, char **args, char *helper);
 static char **create_child_sdm_parmlist(char *debugger_path, char *debugger_name, int debug_args_count, char **debug_args);
 static char **create_debug_parmlist(char *debugger_name, int debug_args_count, char **debug_args);
 static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem,
@@ -942,7 +941,7 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     char *debugger_path;
     char *debugger_name;
     char **debug_args;
-    char *argp;
+    char **argp;
     char *jobid;
     char *cp;
     char *cwd;
@@ -962,7 +961,10 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     jobinfo *debugger_job;
 #endif
     int i;
+    int argp_count;
+    int argp_limit;
     int debug_arg_count;
+    int debug_arg_limit;
     int label_io;
     int split_io;
     int status;
@@ -997,12 +999,17 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     mp_rdma_count_set = 0;
     mp_rdma_count_value[0] = '\0';
     debug_arg_count = 0;
+    debug_arg_limit = 10;
+    argp_count = 0;
+    argp_limit = 10;
     debug_sdm_mode = 0;
     /*
      * Process arguments passed to this function
      */
     TRACE_DETAIL("+++ Parsing arguments\n");
-    debug_args = (char **) malloc(10 * sizeof(char *));
+    argp = (char **) malloc(argp_limit * sizeof(char *));
+    malloc_check(argp, __FUNCTION__, __LINE__);
+    debug_args = (char **) malloc(debug_arg_limit * sizeof(char *));
     malloc_check(debug_args, __FUNCTION__, __LINE__);
     for (i = 0; args[i] != NULL; i++) {
 	/*
@@ -1149,7 +1156,13 @@ PE_submit_job(int trans_id, int nargs, char *args[])
 			cwd = strdup(cp);
 		}
 		else if (strcmp(args[i], JOB_PROG_ARGS_ATTR) == 0) {
-		    argp = strdup(cp);
+		    argp[argp_count] = strdup(cp);
+                    argp_count = argp_count + 1;
+                    if (argp_count >= argp_limit) {
+                        argp_limit = argp_limit + 10;
+                        argp = (char **) realloc(argp, argp_limit * sizeof(char *));
+                        malloc_check(argp, __FUNCTION__, __LINE__);
+                    }
 		}
 		else if (strcmp(args[i], JOB_EXEC_PATH_ATTR) == 0) {
 		    execdir = strdup(cp);
@@ -1165,6 +1178,11 @@ PE_submit_job(int trans_id, int nargs, char *args[])
 		else if (strcmp(args[i], JOB_DEBUG_ARGS_ATTR) == 0) {
 		    debug_args[debug_arg_count] = strdup(cp);
 		    debug_arg_count = debug_arg_count + 1;
+                    if (debug_arg_count >= debug_arg_limit) {
+                        debug_arg_limit = debug_arg_limit + 10;
+                        debug_args = (char **) realloc(debug_args, debug_arg_limit * sizeof(char *));
+                        malloc_check(debug_args, __FUNCTION__, __LINE__);
+                    }
 		}
 		else if (strcmp(args[i], JOB_DEBUG_FLAG_ATTR) == 0) {
 		    debug_sdm_mode = 1;
@@ -1367,7 +1385,7 @@ PE_submit_job(int trans_id, int nargs, char *args[])
 	    argv = create_child_sdm_parmlist(debugger_path, debugger_name, debug_arg_count, debug_args);
 	}
 	else {
-	    argv = create_exec_parmlist(POE, poe_target, argp, pmd_helper);
+	    argv = create_exec_parmlist(POE, poe_target, argp_count, argp, pmd_helper);
 	}
 	/*
 	 * Connect stdio to pipes or files owned by parent process (the
@@ -3149,123 +3167,40 @@ monitor_LoadLeveler_jobs(void *job_ident)
 
 /**************************************************************************/
 char **
-create_exec_parmlist(char *execname, char *targetname, char *args, char *helper)
+create_exec_parmlist(char *execname, char *targetname, int arg_count, char **args, char *helper)
 {
-    char *tokenized_args;
-    char *cp;
+      /*
+       * Create parameter list for invoking application using PE. Copy
+       * the execname (/usr/bin/poe), the target executable, the 
+       * debug helper, if present, then the program arguments and a 
+       * trailing null into the program arguments array and then
+       * return that array.
+       */
     char **argv;
     int i;
-    int arg_count;
-    int state;
-    char quote;
-    /*
-     * Process argument list to 'poe' command. This is done in two passes
-     * The first pass determines how many arguments there are so that argv
-     * can be allocated, and terminates each arg with a '\0'.  The first
-     * pass ignores whitespace outside of quoted strings when counting
-     * and tokenizing args. It must preserve spaces within quoted strings
-     * and also deal with quoted strings within an arg, for instance
-     * 'This is an arg with a "quoted string" inside'
-     */
+    int arg_idx;
+    int num_args;
+
     TRACE_ENTRY;
-    arg_count = 3;
-    if (helper)
-    	arg_count++;
-    if (args == NULL) {
-	argv = malloc(arg_count * sizeof(char *));
-	malloc_check(argv, __FUNCTION__, __LINE__);
-	i = 0;
-	argv[i++] = execname;
-#ifdef PE_DUAL_POE_DEBUG
-	if (helper)
-		argv[i++] = helper;
-#endif
-	argv[i++] = targetname;
-	argv[i++] = NULL;
+    num_args = 3 + arg_count;
+    if (helper) {
+    	num_args++;
     }
-    else {
-	quote = '\0';
-	tokenized_args = strdup(args);
-	cp = tokenized_args;
-	state = SKIPPING_SPACES;
-	while (*cp != '\0') {
-	    switch (*cp) {
-		case ' ':
-		    if (state == PARSING_UNQUOTED_ARG) {
-				arg_count++;
-			*cp = '\0';
-			state = SKIPPING_SPACES;
-		    }
-		    break;
-		case '"':
-		case '\'':
-		    if (state == PARSING_QUOTED_ARG) {
-			if (*cp == quote) {
-				arg_count++;
-			    quote = '\0';
-			    *cp = '\0';
-			    state = SKIPPING_SPACES;
-			}
-			else {
-			    quote = *cp;
-			    state = PARSING_QUOTED_ARG;
-			}
-		    }
-		    break;
-		default:
-		    if (state == SKIPPING_SPACES) {
-			state = PARSING_UNQUOTED_ARG;
-		    }
-	    }
-	    cp++;
-	}
-	if (state != SKIPPING_SPACES) {
-	    /*
-	     * Last arg is terminated by ending '\0' so needs to be counted here
-	     */
-		arg_count++;
-	}
-	/*
-	 * The second pass allocates argv, with one extra slot for the
-	 * poe executable, one for the name of the executable invoked by
-	 * poe and one for the terminating null pointer. It then builds the
-	 * argv array by scanning for the start of each arg, skipping
-	 * over an initial quote, if present. The trailing quote in a
-	 * quoted arg was removed by the first pass tokenizing step.
-	 */
-	argv = malloc(sizeof(char *) * arg_count);
-	malloc_check(argv, __FUNCTION__, __LINE__);
-	i = 0;
-	argv[i++] = execname;
+    argv = malloc(num_args * sizeof(char *));
+    malloc_check(argv, __FUNCTION__, __LINE__);
+    i = 0;
+    argv[i++] = execname;
 #ifdef PE_DUAL_POE_DEBUG
-	if (helper)
-		argv[i++] = helper;
-#endif
-	argv[i++] = targetname;
-	cp = tokenized_args;
-	state = SKIPPING_SPACES;
-	while (i < (arg_count + 2)) {
-	    if (state == SKIPPING_SPACES) {
-		if (*cp != ' ') {
-		    state = SKIPPING_CHARS;
-		    if ((*cp == '"') || (*cp == '\'')) {
-			argv[i] = cp + 1;
-		    }
-		    else {
-			argv[i] = cp;
-		    }
-		    i++;
-		}
-	    }
-	    else {
-		if (*cp == '\0') {
-		    state = SKIPPING_SPACES;
-		}
-	    }
-	    cp++;
-	}
-	argv[i] = NULL;
+    if (helper) {
+	argv[i++] = helper;
     }
+#endif
+    argv[i++] = targetname;
+    arg_idx = 0;
+    while (arg_idx < arg_count) {
+	argv[i++] = args[arg_idx++];
+    }
+    argv[i++] = NULL;
     TRACE_EXIT;
     return argv;
 }
