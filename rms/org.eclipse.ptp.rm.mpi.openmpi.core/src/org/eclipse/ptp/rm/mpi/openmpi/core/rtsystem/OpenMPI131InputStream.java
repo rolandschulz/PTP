@@ -92,14 +92,29 @@ public class OpenMPI131InputStream extends FilterInputStream {
 
 		int pos = off;
 		
-		for (int i = 0; i < len && available() > 0; i++) {
+		/*
+		 * Only read available bytes so that we return as soon as possible.
+		 * If there are no bytes available, then we read at least one to
+		 * block until more are available.
+		 * 
+		 * This allows the parser to update immediately there is data
+		 * available, rather than waiting for the end of document.
+		 */
+		int avail = available();
+		if (avail > len) {
+			avail = len;
+		} else if (avail == 0) {
+			avail = 1;
+		}
+		
+		for (int i = 0; i < avail; i++) {
 			int ch = read();
 			if (ch < 0) {
 				return -1;
 			}
 			b[pos++] = (byte) (ch & 0xff);
 		}
-		
+	
 		return pos - off;
 	}
 
@@ -116,18 +131,23 @@ public class OpenMPI131InputStream extends FilterInputStream {
 	 */
 	@Override
 	public int available() throws IOException {
+		int available = 0;
+	
 		switch (state) {
 		case PROLOG:
-			return startTag.length();
+			available = startTag.length();
+			break;
 			
 		case XML:
-			return extra.length() + endTag.length() + super.available();
+			available = extra.length() + super.available();
+			break;
 			
 		case EPILOG:
-			return extra.length();
+			available = extra.length();
+			break;
 		}
 		
-		return 0;
+		return available;
 	}
 	
 }
