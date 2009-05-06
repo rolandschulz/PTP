@@ -59,12 +59,12 @@ import org.eclipse.ptp.utils.core.linux.ArgumentParser;
  */
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {
 
-	protected String jobID;
-	protected String queueID;
-	protected boolean debug = false;
-	protected IRemoteProcess process = null;
-	protected AttributeManager attrMgr;
-	protected AbstractToolRuntimeSystem rtSystem;
+	private String jobID;
+	private String queueID;
+	private boolean debug = false;
+	private IRemoteProcess process = null;
+	private AttributeManager attrMgr;
+	private AbstractToolRuntimeSystem rtSystem;
 
 	protected boolean terminateJobFlag = false;
 
@@ -77,6 +77,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		this.queueID = queueID;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IToolRuntimeSystemJob.class) {
@@ -85,26 +88,50 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		return super.getAdapter(adapter);
 	}
 
+	/**
+	 * Get the queue id for this job
+	 * 
+	 * @return queue id
+	 */
 	public String getQueueID() {
 		return queueID;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#getJobID()
+	 */
 	public String getJobID() {
 		return jobID;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#getRtSystem()
+	 */
 	public AbstractToolRuntimeSystem getRtSystem() {
 		return rtSystem;
 	}
 
+	/**
+	 * Get the job attribute manager.
+	 * 
+	 * @return attribute manager
+	 */
 	public AttributeManager getAttrMgr() {
 		return attrMgr;
 	}
 	
+	/**
+	 * See if this is a debug job
+	 * 
+	 * @return true if this is a debug job
+	 */
 	public boolean isDebug() {
 		return debug;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
@@ -176,9 +203,18 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_CreateCommand, e);
 			}
 
+			IRemoteProcessBuilder processBuilder;
+			try {
+				processBuilder = getRtSystem().createProcessBuilder(command, directory);
+			} catch (IOException e) {
+				changeJobState(JobAttributes.State.ERROR);
+				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
+			}
+			processBuilder.environment().putAll(environment);
+			
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle before execution", getJobID()); //$NON-NLS-1$
-				doBeforeExecution(monitor);
+				doBeforeExecution(monitor, processBuilder);
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
@@ -193,10 +229,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			 * Execute remote command for the job.
 			 */
 			try {
-				IRemoteProcessBuilder processBuilder = rtSystem.createProcessBuilder(command, directory);
-				processBuilder.environment().putAll(environment);
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: start", getJobID()); //$NON-NLS-1$
-				process = processBuilder.start();
+				setProcess(processBuilder.start());
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.ERROR);
 				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecuteCommand, e);
@@ -232,15 +266,6 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
 
-
-			//			try {
-			//				DebugUtil.trace(DebugUtil.COMMAND_TRACING, "RTS job #{0}: wait to finish", jobID); //$NON-NLS-1$
-			//				process.waitFor();
-			//			} catch (InterruptedException e) {
-			//				changeJobState(JobAttributes.State.ERROR);
-			//				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Failed while terminating the command.", e);
-			//			}
-
 			JobAttributes.State state;
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle finish", getJobID()); //$NON-NLS-1$
@@ -256,7 +281,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", getJobID()); //$NON-NLS-1$
-			final IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID());
+			final IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID());
 			if (rm != null) {
 				final IPQueue queue = rm.getQueueById(getQueueID());
 				if (queue != null) {
@@ -281,18 +306,59 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		}
 	}
 
+	/**
+	 * Prepare for job execution. Called to allow any actions to be taken to prepare for execution.
+	 * 
+	 * @param monitor progress monitor
+	 * @throws CoreException
+	 */
 	abstract protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException;
 
+	/**
+	 * Clean up after execution.
+	 * 
+	 * @param monitor progress monitor
+	 */
 	abstract protected void doExecutionCleanUp(IProgressMonitor monitor);
 
+	/**
+	 * Wait for execution to complete. Should block until execution has completed or
+	 * the progress monitor is cancelled.
+	 * 
+	 * @param monitor progress monitor
+	 * @throws CoreException
+	 */
 	abstract protected void doWaitExecution(IProgressMonitor monitor) throws CoreException;
 
+	/**
+	 * Called once execution has finished. Returns the job state that should be set.
+	 * 
+	 * @param monitor progress monitor
+	 * @return
+	 * @throws CoreException
+	 */
 	abstract protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException;
 
+	/**
+	 * Called once execution of the job has started.
+	 * 
+	 * @param monitor progress monitor
+	 * @throws CoreException
+	 */
 	abstract protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException;
 
-	abstract protected void doBeforeExecution(IProgressMonitor monitor) throws CoreException;
+	/**
+	 * Called just prior to starting job. Allows implementers to modify the process startup.
+	 * 
+	 * @param monitor progress monitor
+	 * @param builder process builder that will be used to create the job
+	 * @throws CoreException
+	 */
+	abstract protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException;
 
+	/**
+	 * Called when a job is terminated.
+	 */
 	abstract protected void doTerminateJob();
 
 	/**
@@ -303,7 +369,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		EnumeratedAttribute<JobAttributes.State> state = JobAttributes.getStateAttributeDefinition().create(newState);
 		AttributeManager attrManager = new AttributeManager();
 		attrManager.addAttribute(state);
-		rtSystem.changeJob(getJobID(), attrManager);
+		getRtSystem().changeJob(getJobID(), attrManager);
 	}
 	
 	/**
@@ -314,7 +380,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		StringAttribute message = JobAttributes.getStatusMessageAttributeDefinition().create(newMessage);
 		AttributeManager attrManager = new AttributeManager();
 		attrManager.addAttribute(message);
-		rtSystem.changeJob(getJobID(), attrManager);
+		getRtSystem().changeJob(getJobID(), attrManager);
 	}
 
 	/**
@@ -661,17 +727,41 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		return result;
 	}
 
+	/**
+	 * Terminate the job.
+	 */
 	public void terminate() {
 		terminateJobFlag = true;
-		if (process != null) {
-			process.destroy();
+		if (getProcess() != null) {
+			getProcess().destroy();
 		}
 		doTerminateJob();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
+	 */
 	@Override
 	protected void canceling() {
 		terminate();
 		super.canceling();
+	}
+	
+	/**
+	 * Get the remote execution command process
+	 * 
+	 * @return remote process
+	 */
+	protected IRemoteProcess getProcess() {
+		return process;
+	}
+
+	/**
+	 * Set the remote execution command process
+	 * 
+	 * @param remote process
+	 */
+	protected void setProcess(IRemoteProcess process) {
+		this.process = process;
 	}
 }
