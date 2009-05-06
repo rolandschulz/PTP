@@ -49,8 +49,10 @@ public class RDTMainWizardPage extends CDTMainWizardPage {
 		
 		while(iterator.hasNext()) {
 			EntryDescriptor ed = (EntryDescriptor) iterator.next();
-			if(ed.getId().startsWith(RemoteMakefileWizard.ID)) {  // both the category and the template start with this
-				filteredList.add(ed);			}
+			if(ed.getId().startsWith("org.eclipse.ptp.rdt")) {  // both the category and the template start with this //$NON-NLS-1$
+				filteredList.add(ed);
+			}
+			
 		}
 		
 		return filteredList;

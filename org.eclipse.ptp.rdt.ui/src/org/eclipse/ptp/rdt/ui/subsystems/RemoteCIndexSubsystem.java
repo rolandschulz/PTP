@@ -77,6 +77,7 @@ import org.eclipse.rse.connectorservice.dstore.util.StatusMonitorFactory;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.SubSystem;
+import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -110,7 +111,12 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	 */
 	@Override
 	public void initializeSubSystem(IProgressMonitor monitor) {
-		super.initializeSubSystem(monitor);
+		try {
+			super.initializeSubSystem(monitor);
+		} catch (SystemMessageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		fInitializedProjects = new HashSet<IProject>();
 		fProjectOpenListener = new ProjectChangeListener(this);

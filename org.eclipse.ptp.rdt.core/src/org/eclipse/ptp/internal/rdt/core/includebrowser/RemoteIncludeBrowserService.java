@@ -24,7 +24,16 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 	{
 		if (include != null) 
 		{
-			IIndexFileLocation location = new RemoteIndexFileLocation(include.getLocationURI().getPath(), null);
+			
+			//String projectLocation = include.getCProject().getProject().getLocationURI().getPath();
+			//if(include.getLocationURI().getPath().startsWith(projectLocation)) {
+				// internal files use the URI field
+				IIndexFileLocation location = new RemoteIndexFileLocation(include.getParent().getPath().toString(), include.getLocationURI());
+			//}
+			
+			//else {
+				// external files use the fullp
+			//}
 			
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(include.getCProject().getProject(), null);
@@ -48,7 +57,8 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(project.getProject(), monitor);
 			
-			location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
+			//location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
+			location = new RemoteIndexFileLocation(location);
 			
 			return subsystem.findIncludedBy(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
 		}
@@ -63,7 +73,8 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(project.getProject(), monitor);
 			
-			location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
+			//location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
+			 location = new RemoteIndexFileLocation(location);
 			
 			return subsystem.findIncludesTo(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
 		}
@@ -78,7 +89,8 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(project.getProject(), monitor);
 			
-			location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
+			//location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
+			 location = new RemoteIndexFileLocation(location);
 			
 			return subsystem.isIndexed(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
 		}

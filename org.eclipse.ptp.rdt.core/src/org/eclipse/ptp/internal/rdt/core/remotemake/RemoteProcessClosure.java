@@ -162,7 +162,7 @@ public class RemoteProcessClosure {
 		runNonBlocking();
 
 		boolean finished = false;
-		while (!finished) {
+		while (!finished && !fProcess.isCompleted()) {
 			try {
 				fProcess.waitFor();
 			} catch (InterruptedException e) {
@@ -197,7 +197,7 @@ public class RemoteProcessClosure {
 
 	public boolean isAlive() {
 		if (fProcess != null) {
-			if (fOutputReader.isAlive() || fErrorReader.isAlive()) {
+			if (!fProcess.isCompleted() && (fOutputReader.isAlive() || fErrorReader.isAlive())) {
 				return true;
 			}
 			fProcess = null;
