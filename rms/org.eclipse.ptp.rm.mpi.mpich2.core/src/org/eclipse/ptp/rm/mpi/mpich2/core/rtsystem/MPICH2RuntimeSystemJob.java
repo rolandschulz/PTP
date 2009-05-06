@@ -41,6 +41,7 @@ import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
@@ -147,7 +148,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	}
 
 	@Override
-	protected void doBeforeExecution(IProgressMonitor monitor) throws CoreException {
+	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 		ipJob.addChildListener(jobChildListener);
@@ -155,8 +156,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionCleanUp(IProgressMonitor monitor) {
-		if (process != null) {
-			process.destroy();
+		if (getProcess() != null) {
+			getProcess().destroy();
 		}
 		if (stderrObserver != null) {
 			stderrObserver.kill();
@@ -173,19 +174,13 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	@Override
 	protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException {
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
-		if (process.exitValue() != 0) {
+		if (getProcess().exitValue() != 0) {
 			if (!terminateJobFlag) {
-				if ((process.exitValue() & 0177) == 0) {
-					int exit_code = (process.exitValue()>>8) & 0xff;
-					changeJobStatusMessage(NLS.bind(Messages.MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(exit_code)));
-				} else {
-					int signal = process.exitValue() & 0177;
-					changeJobStatusMessage(NLS.bind(Messages.MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithSignal, new Integer(signal)));
-				}
+				changeJobStatusMessage(NLS.bind(Messages.MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(getProcess().exitValue())));
 				return JobAttributes.State.ERROR;
 			}
 			
-			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", getJobID(), new Integer(getProcess().exitValue())); //$NON-NLS-1$
 		}
 		return JobAttributes.State.TERMINATED;
 	}
@@ -299,8 +294,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		stdoutThread.start();
 		stderrThread.start();
 
-		stderrObserver = new InputStreamObserver(process.getErrorStream());
-		stdoutObserver = new InputStreamObserver(process.getInputStream());
+		stderrObserver = new InputStreamObserver(getProcess().getErrorStream());
+		stdoutObserver = new InputStreamObserver(getProcess().getInputStream());
 
 		stdoutObserver.addListener(stdoutPipedStreamListener);
 		stderrObserver.addListener(stderrPipedStreamListener);
@@ -318,7 +313,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * We know that a MPICH2 job has a number of processes attribute
 		 */
 		int numProcs = 1;
-		IntegerAttribute numProcsAttr = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
+		IntegerAttribute numProcsAttr = getAttrMgr().getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		if (numProcsAttr != null) {
 			numProcs = numProcsAttr.getValue().intValue();
 		}
@@ -375,7 +370,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * The jobid is used to alias the MPICH2 job so that it can be matched later.
 		 */
-		newAttributes.add(MPICH2JobAttributes.getJobIdAttributeDefinition().create(jobID));
+		newAttributes.add(MPICH2JobAttributes.getJobIdAttributeDefinition().create(getJobID()));
 		
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
 	}
@@ -398,14 +393,14 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * Wait until both stdout and stderr stop because stream are closed.
 		 * This means that the process has finished.
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 		try {
 			stderrObserver.join();
 		} catch (InterruptedException e1) {
 			// Ignore
 		}
 
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stdout thread to finish", getJobID()); //$NON-NLS-1$
 		try {
 			stdoutObserver.join();
 		} catch (InterruptedException e1) {
@@ -415,14 +410,14 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", getJobID()); //$NON-NLS-1$
 		try {
-			process.waitFor();
+			getProcess().waitFor();
 		} catch (InterruptedException e) {
 			// Ignore
 		}
 
-		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", jobID); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", getJobID()); //$NON-NLS-1$
 	}
 
 }
