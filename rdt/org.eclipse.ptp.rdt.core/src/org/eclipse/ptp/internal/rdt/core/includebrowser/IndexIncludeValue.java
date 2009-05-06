@@ -51,17 +51,17 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 		{
 			
 			if (converter != null)
-				includedByLocation = converter.fromInternalFormat(include.getIncludedByLocation().getFullPath());
+				includedByLocation = converter.fromInternalFormat(include.getIncludedByLocation().getURI().toString());
 			
-			includedByLocation = new RemoteIndexFileLocation(include.getIncludedByLocation().getFullPath(), includedByLocation.getURI()); 
+			//includedByLocation = new RemoteIndexFileLocation(include.getIncludedByLocation()); 
 		}
 		if (include.getIncludesLocation() != null)
 		{
 			
 			if (converter != null)
-				includesLocation = converter.fromInternalFormat(include.getIncludesLocation().getFullPath());
+				includesLocation = converter.fromInternalFormat(include.getIncludesLocation().getURI().toString());
 			
-			includesLocation = new RemoteIndexFileLocation(include.getIncludesLocation().getFullPath(), includesLocation.getURI());
+			//includesLocation = new RemoteIndexFileLocation(include.getIncludesLocation());
 		}
 		
 		includedByTimestamp = include.getIncludedBy().getTimestamp();

@@ -81,4 +81,9 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 		}
 		return true;
 	}
+
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		// dunno if there is a way to do this for Remote Tools... just return the forward slash
+		return "/";
+	}
 }

@@ -167,4 +167,9 @@ public class RemoteServicesProxy implements IRemoteServices {
 			}
 		}
 	}
+
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		loadServices();
+		return delegate.getDirectorySeparator(conn);
+	}
 }

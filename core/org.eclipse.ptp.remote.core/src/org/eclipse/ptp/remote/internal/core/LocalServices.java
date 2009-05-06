@@ -61,4 +61,12 @@ public class LocalServices implements IRemoteServicesDelegate {
 		connMgr = new LocalConnectionManager();
 		return true;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		return System.getProperty("file.separator", "/");
+	}
+
 }
