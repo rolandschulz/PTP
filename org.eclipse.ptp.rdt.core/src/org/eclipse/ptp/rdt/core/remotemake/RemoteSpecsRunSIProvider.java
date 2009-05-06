@@ -28,12 +28,12 @@ import org.eclipse.ptp.rdt.core.RDTLog;
 
 
 /**
- * Gets the command to run gcc from the scanner discovery extension point
+ * Gets the command to run the compiler from the scanner discovery extension point
  * and prepares it to run.
  * 
  * @author Mike Kucera
  */
-public class RemoteGCCSpecsRunSIProvider extends RemoteRunSIProvider {
+public class RemoteSpecsRunSIProvider extends RemoteRunSIProvider {
 
 	public static final String SPECS_FILE_PATH_VAR = "${specs_file_path}";   //$NON-NLS-1$
 	public static final String SPECS_FOLDER_NAME   = ".specs"; //$NON-NLS-1$
