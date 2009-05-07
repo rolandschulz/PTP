@@ -150,7 +150,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 *            the exception to be logged
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 	}    
 
 	// Active remote services plugins (not necessarily loaded)
@@ -197,22 +197,14 @@ public class PTPRemoteCorePlugin extends Plugin {
 
 	/**
 	 * Retrieve the default remote services plugin. The default is the LocalServices
-	 * provider if it exists, the last plugin otherwise.
+	 * provider, which is guaranteed to exist.
 	 * 
 	 * @return default remote services provider
 	 */
-	public synchronized IRemoteServices getDefaultServices() {
+	public IRemoteServices getDefaultServices() {
 		if (defaultRemoteServices == null) {
-			IRemoteServices[] allServices = getAllRemoteServices();
-			defaultRemoteServices = allServices[allServices.length-1];
-			for (IRemoteServices services : allServices) {
-				if (services.getId().equals(LocalServices.LocalServicesId)) {
-					defaultRemoteServices = services;
-					break;
-				}
-			}
+			defaultRemoteServices = getRemoteServices(LocalServices.LocalServicesId);
 		}
-		
 		return defaultRemoteServices;
 	}
 	
@@ -225,7 +217,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 		retrieveRemoteServices();
 		return allRemoteServicesById.get(id);
 	}
-
+	
 	/**
 	 * Get the remote services identified by a URI
 	 * 
