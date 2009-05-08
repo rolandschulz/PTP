@@ -71,7 +71,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
@@ -327,10 +326,9 @@ public class SDMDebugger implements IPDebugger {
 
 		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
 		IResourceManagerConfiguration conf = rm.getConfiguration();
-		AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
 		IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-		IRemoteConnection rconn = rconnMgr.getConnection(remConf.getConnectionName());
+		IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
 		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
 
 		try {
