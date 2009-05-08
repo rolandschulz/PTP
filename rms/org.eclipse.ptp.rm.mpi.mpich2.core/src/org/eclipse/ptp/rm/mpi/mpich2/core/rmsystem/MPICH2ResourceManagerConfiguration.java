@@ -109,9 +109,9 @@ AbstractToolRMConfiguration implements Cloneable {
 	@Override
 	public Object clone() {
 		CommonConfig commonConf = new CommonConfig(getName(),
-				getDescription(), getUniqueName());
+				getDescription(), getUniqueName(),
+				getRemoteServicesId(), getConnectionName());
 		RemoteConfig remoteConf = new RemoteConfig(commonConf,
-				getRemoteServicesId(), getConnectionName(),
 				getProxyServerPath(), getLocalAddress(),
 				getInvocationOptionsStr(), getOptions());
 		ToolsConfig toolsConfig = new ToolsConfig(

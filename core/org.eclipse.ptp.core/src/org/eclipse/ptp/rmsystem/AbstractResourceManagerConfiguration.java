@@ -25,30 +25,59 @@ import org.eclipse.ui.IMemento;
 public abstract class AbstractResourceManagerConfiguration implements IResourceManagerConfiguration {
 
 	static public class CommonConfig {
+		private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+		
 		private final String name;
 		private final String description;
 		private final String uniqueName;
+		private final String connectionName;
+		private final String remoteServicesID;
 
 		public CommonConfig() {
-			this("", "", generateUniqueName()); //$NON-NLS-1$ //$NON-NLS-2$
+			this(EMPTY_STRING, EMPTY_STRING, generateUniqueName(), EMPTY_STRING, EMPTY_STRING);
 		}
 
-		public CommonConfig(String name, String desc, String uniqueName) {
+		public CommonConfig(String name, String desc, String uniqueName, String connectionName, String remoteServicesID) {
 			this.name = name;
 			this.description = desc;
 			this.uniqueName = uniqueName;
+			this.connectionName = connectionName;
+			this.remoteServicesID = remoteServicesID;
 		}
 		
+		/**
+		 * @return the description
+		 */
 		public String getDescription() {
 			return description;
 		}
 
+		/**
+		 * @return the name
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * @return the uniqueName
+		 */
 		public String getUniqueName() {
 			return uniqueName;
+		}
+
+		/**
+		 * @return the connectionName
+		 */
+		private String getConnectionName() {
+			return connectionName;
+		}
+
+		/**
+		 * @return the remoteServicesID
+		 */
+		private String getRemoteServicesID() {
+			return remoteServicesID;
 		}		
 	}
 
@@ -56,7 +85,9 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
 	private static final String TAG_FACTORY_ID = "factoryId"; //$NON-NLS-1$
-
+	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
+	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
+	
 	/**
 	 * @param factory
 	 * @param memento
@@ -73,19 +104,25 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		String name = memento.getString(TAG_NAME);
 		String desc = memento.getString(TAG_DESCRIPTION);
 		String uniqueName = memento.getString(TAG_UNIQUE_NAME);
-		return new CommonConfig(name, desc, uniqueName);
+		String connectionName = memento.getString(TAG_CONNECTION_NAME);
+		String remoteServicesID = memento.getString(TAG_REMOTE_SERVICES_ID);
+		return new CommonConfig(name, desc, uniqueName, connectionName, remoteServicesID);
 	}
 	
 	protected static String generateUniqueName() {
 		long time = System.currentTimeMillis();
 		return "RMID:" + Long.toString(time); //$NON-NLS-1$
 	}
-
+	
 	private String description;
 	private String name;
+	private String connectionName;
+	private String remoteServicesID;
+	
 	private final String resourceManagerId;
 	private final String resourceManagerType;
 	private final String uniqueName;
+	
 	private final IResourceManagerFactory factory;
 	
 	/**
@@ -100,9 +137,11 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		this.resourceManagerId = factory.getId();
 		this.resourceManagerType = factory.getName();
 		this.uniqueName = commonConfig.getUniqueName();
+		this.connectionName = commonConfig.getConnectionName();
+		this.remoteServicesID = commonConfig.getRemoteServicesID();
 		this.factory = factory;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
@@ -110,7 +149,14 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public Object clone() {
 		return null;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getConnectionName()
+	 */
+	public String getConnectionName() {
+		return connectionName;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
 	 */
@@ -126,12 +172,19 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public IResourceManagerFactory getFactory() {
 		return factory;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getName()
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getRemoteServicesId()
+	 */
+	public String getRemoteServicesId() {
+		return remoteServicesID;
 	}
 	
 	/* (non-Javadoc)
@@ -147,14 +200,14 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public String getType() {
 		return resourceManagerType;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
 	public String getUniqueName() {
 		return uniqueName;
 	}
-
+	
 	/**
 	 * Save the common parts of this config then save the rest
 	 * @param memento
@@ -164,6 +217,15 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		memento.putString(TAG_NAME, getName());
 		memento.putString(TAG_DESCRIPTION, getDescription());
 		memento.putString(TAG_UNIQUE_NAME, getUniqueName());
+		memento.putString(TAG_REMOTE_SERVICES_ID, getRemoteServicesId());
+		memento.putString(TAG_CONNECTION_NAME, getConnectionName());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setConnectionName(java.lang.String)
+	 */
+	public void setConnectionName(String connectionName) {
+		this.connectionName = connectionName;
 	}
 
 	/* (non-Javadoc)
@@ -178,5 +240,12 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setRemoteServicesId(java.lang.String)
+	 */
+	public void setRemoteServicesId(String id) {
+		this.remoteServicesID = id;
 	}
 }
