@@ -24,7 +24,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {UNKNOWN, STARTING, RUNNING, FINISHED, ERROR};
@@ -86,7 +86,7 @@ public class SDMRunner extends Job {
 			/*
 			 * Prepare remote connection.
 			 */
-			AbstractRemoteResourceManagerConfiguration configuration = (AbstractRemoteResourceManagerConfiguration) rmControl.getConfiguration();
+			IResourceManagerConfiguration configuration = rmControl.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(configuration.getRemoteServicesId());
 			IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
 			IRemoteConnection connection = connectionManager.getConnection(configuration.getConnectionName());

@@ -343,12 +343,14 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				resourceManager = rm;
 				AbstractRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
 				if (config != null) {
-					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING))
+					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 						return getRemoteConnection().getAddress();
-					else
+					} else {
 						return  config.getLocalAddress();
-				} else
+					}
+				} else {
 					return "localhost"; //$NON-NLS-1$
+				}
 			}
 		}
 		return address;
@@ -362,8 +364,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private AbstractRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
 		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration)
+			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
 				return (AbstractRemoteResourceManagerConfiguration)rmConfig;
+			}
 		}
 		return null;
 
@@ -374,15 +377,13 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return remote services
 	 */
 	private IRemoteServices getRemoteServices() {
-		if (resourceManager == null)
+		if (resourceManager == null) {
 			return null;
+		}
 
 		if (remoteServices == null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
-				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConfig.getRemoteServicesId());
-			}
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId());
 		}
 		return remoteServices;
 	}
@@ -394,8 +395,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	private IRemoteUIServices getRemoteUIServices() {
 		IRemoteServices rsrv = getRemoteServices();
-		if (rsrv != null)
+		if (rsrv != null) {
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
+		}
 		return null;
 	}
 
@@ -407,9 +409,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteConnection getRemoteConnection() {
 		IRemoteServices rsrv = getRemoteServices();
 		if (rsrv != null) {
-			AbstractRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
-			if (config != null)
-				return rsrv.getConnectionManager().getConnection(config.getConnectionName());
+			return rsrv.getConnectionManager().getConnection(resourceManager.getConfiguration().getConnectionName());
 		}
 		return null;
 	}
@@ -420,8 +420,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return cleaned up content
 	 */
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 		return text;
 	}
 }
