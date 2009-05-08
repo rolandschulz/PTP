@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.core"
       label="%featureName"
-      version="2.1.1.qualifier"
+      version="3.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp.core"
       image="eclipse_update_120.jpg">
@@ -20,7 +20,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/3.0"/>
    </url>
 
    <requires>
