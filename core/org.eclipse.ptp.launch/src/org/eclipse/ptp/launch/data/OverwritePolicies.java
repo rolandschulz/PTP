@@ -11,6 +11,9 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.data;
 
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public interface OverwritePolicies {
 	
 	public static final int UNKNOWN = 0;

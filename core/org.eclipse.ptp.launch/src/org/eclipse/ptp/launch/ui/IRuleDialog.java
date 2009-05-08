@@ -13,6 +13,9 @@ package org.eclipse.ptp.launch.ui;
 
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public interface IRuleDialog {
 	public ISynchronizationRule getRuleWorkingCopy();
 }

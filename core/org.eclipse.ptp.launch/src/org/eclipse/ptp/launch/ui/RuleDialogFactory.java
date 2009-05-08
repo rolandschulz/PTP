@@ -17,7 +17,9 @@ import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.UploadRule;
 import org.eclipse.swt.widgets.Shell;
 
-
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public class RuleDialogFactory {
 	
 	/**

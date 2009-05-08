@@ -16,13 +16,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.launch.internal.LinuxPath;
-import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.UploadRule;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
-
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 class SynchronizationRuleLabelProvider implements ILabelProvider {
 	Image uploadRuleImage = null;
 	Image downloadRuleImage = null;
@@ -120,7 +121,7 @@ class SynchronizationRuleLabelProvider implements ILabelProvider {
 					if (! remotePath.isAbsolute()) {
 						remotePath = remoteWorkingPath.append(remotePath);
 					}
-					result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationLabel+LinuxPath.toString(remotePath);
+					result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationLabel+remotePath.toOSString();
 				}
 				if (rule.isAsExecutable() || rule.isAsReadOnly() || rule.isPreserveTimeStamp() || rule.isDownloadBack()) {
 					result += '\n' + Messages.EnhancedSynchronizeTab_UploadLabel_OptionsLabel;			

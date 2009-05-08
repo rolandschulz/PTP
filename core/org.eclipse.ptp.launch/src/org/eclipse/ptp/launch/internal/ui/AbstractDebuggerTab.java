@@ -34,6 +34,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	protected ILaunchConfigurationWorkingCopy fWorkingCopy;
 	protected IPDebugConfiguration fCurrentDebugConfig;

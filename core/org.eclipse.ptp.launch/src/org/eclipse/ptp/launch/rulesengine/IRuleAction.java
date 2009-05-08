@@ -13,7 +13,9 @@ package org.eclipse.ptp.launch.rulesengine;
 
 import org.eclipse.core.runtime.CoreException;
 
-
+/**
+ * TODO NEEDS TO BE DOCUMENTED
+ */
 public interface IRuleAction {
 	public void run() throws CoreException;
 }

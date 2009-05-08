@@ -19,8 +19,10 @@ package org.eclipse.ptp.launch.ui.extensions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.messages.Messages;
 
 
 /**
@@ -45,8 +47,7 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 */
 	public IRMLaunchConfigurationDynamicTab create(IResourceManager rm) throws CoreException {
 		if (!getResourceManagerClass().isInstance(rm)) {
-			throw makeCoreException("Resource manager: " + rm.getName() + 
-			" is not of expected type");
+			throw makeCoreException(NLS.bind(Messages.AbstractRMLaunchConfigurationFactory_0, rm.getName()));
 		}
 		return doCreate(rm);
 	}

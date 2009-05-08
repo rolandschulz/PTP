@@ -48,26 +48,29 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
-
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 
-	Composite content;
+	protected Composite content;
 
-	Text localDirectoryText;
-	Button localDirectoryButton;
-	Button localWorkspaceButton;
+	protected Text localDirectoryText;
+	protected Button localDirectoryButton;
+	protected Button localWorkspaceButton;
 
-	List fileList;
-	Button addFilesButton;
-	Button editFileButton;
-	Button removeFilesButton;
+	protected List fileList;
+	protected Button addFilesButton;
+	protected Button editFileButton;
+	protected Button removeFilesButton;
 	
-	Button asReadOnlyButton, asExecutableButton;
-	Button preserveTimeStampButton;
-	ComboGroup overwritePolicyCombo;
+	protected Button asReadOnlyButton;
+	protected Button asExecutableButton;
+	protected Button preserveTimeStampButton;
+	protected ComboGroup overwritePolicyCombo;
 	
-	DownloadRule downloadRule;
-	IPath lastSelectedDirectory = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+	protected DownloadRule downloadRule;
+	protected IPath lastSelectedDirectory = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 	
 	private int listenersEnabled = 0;
 	
@@ -86,7 +89,6 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		content = new Composite(parent, SWT.BORDER);
 		GridLayout layout = new GridLayout();
 		content.setLayout(layout);
-//		Layout l = content.getParent().getLayout();
 		content.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 		setTitle(Messages.DownloadRuleDialog_Title);
 		setMessage(Messages.DownloadRuleDialog_Message);
@@ -437,10 +439,10 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 	}
 
 	private void handleaddFilesButtonEvent() {
-		InputDialog inputDialog = new InputDialog(getShell(), Messages.DownloadRuleDialog_AddFileDialog_Title, Messages.DownloadRuleDialog_AddFileDialog_Message, "", null); //$NON-NLS-3$ //$NON-NLS-1$
+		InputDialog inputDialog = new InputDialog(getShell(), Messages.DownloadRuleDialog_AddFileDialog_Title, Messages.DownloadRuleDialog_AddFileDialog_Message, "", null); //$NON-NLS-1$
 		inputDialog.setBlockOnOpen(true);
 		if (inputDialog.open() == Dialog.OK) {
-			ArrayList list = new ArrayList(Arrays.asList(fileList.getItems()));
+			ArrayList<String> list = new ArrayList<String>(Arrays.asList(fileList.getItems()));
 			list.add(inputDialog.getValue());
 			String s[] = new String[list.size()];
 			s = (String[]) list.toArray(s);
@@ -472,7 +474,7 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			return;
 		}
 		
-		HashSet fileSet = new HashSet(Arrays.asList(fileList.getItems()));
+		HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
 		for (int i = 0; i < selection.length; i++) {
 			String string = selection[i];
 			fileSet.remove(string);

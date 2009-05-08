@@ -19,8 +19,12 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.launch.messages.Messages;
 
 /*
+ * TODO: NEEDS TO BE DOCUMENTED!
+ * 
  * Represents an upload rule.
  * It describes how to copy a list of local files or local directories into a single remote directory.
  * A local file is copied into the remote directory.
@@ -63,11 +67,11 @@ public class DownloadRule implements ISynchronizationRule {
 		 */
 		{
 			if (list.length < 1) {
-				throwError("The string is not a valid rule for "+this.getClass().getName()); //$NON-NLS-1$
+				throwError(Messages.DownloadRule_0+this.getClass().getName());
 			}
 			String s = list[0];
 			if (! s.equalsIgnoreCase(SerializationKeys.TYPE_DOWNLOAD)) {
-				throwError("The string is not a valid rule for "+this.getClass().getName()); //$NON-NLS-1$
+				throwError(Messages.DownloadRule_0+this.getClass().getName());
 			}
 		}
 		for (int i = 1; i < list.length; i++) {
@@ -77,7 +81,7 @@ public class DownloadRule implements ISynchronizationRule {
 			 */
 			int p = s.indexOf(' ');
 			if (p == -1) {
-				logError("Invalid rule entry: "+s); //$NON-NLS-1$
+				logError(Messages.DownloadRule_1+s);
 				continue;
 			}
 			String key = s.substring(0, p);
@@ -116,7 +120,7 @@ public class DownloadRule implements ISynchronizationRule {
 			} else if (value.equalsIgnoreCase(SerializationKeys.KEY_OVERWRITE_POLICY_SKIP)) {
 				overwritePolicy = OverwritePolicies.SKIP;
 			} else {
-				logError("Unknown overwrite policy: "+value); //$NON-NLS-1$
+				logError(Messages.DownloadRule_2+value);
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_FLAGS)) {
 			String flags[] = value.split(" "); //$NON-NLS-1$
@@ -125,7 +129,7 @@ public class DownloadRule implements ISynchronizationRule {
 				if (flag.equalsIgnoreCase(SerializationKeys.KEY_FLAGS_TIMESTAMP)) {
 					preserveTimeStamp = true;
 				} else {
-					logError("Unknown flag: "+flag); //$NON-NLS-1$
+					logError(Messages.DownloadRule_3+flag);
 				}
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_REMOTE_PATH)) {
@@ -139,16 +143,16 @@ public class DownloadRule implements ISynchronizationRule {
 				} else if (flag.equalsIgnoreCase(SerializationKeys.KEY_PERMISSIONS_READONLY)) {
 					asReadOnly = true;
 				} else {
-					logError("Unknown permission: "+flag); //$NON-NLS-1$
+					logError(Messages.DownloadRule_4+flag);
 				}
 			}			
 		} else {
-			logError("Unknown key: "+key); //$NON-NLS-1$
+			logError(Messages.DownloadRule_5+key);
 		}
 	}
 
 	private void logError(String string) {
-		// TODO Auto-generated method stub
+		// TODO NEEDS TO BE IMPLEMENTED
 	}
 
 	/*
@@ -391,7 +395,7 @@ public class DownloadRule implements ISynchronizationRule {
 	}
 	
 	public String toLabel() {
-		String result = "DOWNLOAD "+Integer.toString(remoteFileList.size())+" item(s) back to "+localDirectory; //$NON-NLS-1$ //$NON-NLS-2$
+		String result = NLS.bind(Messages.DownloadRule_6, new Object[]{Integer.toString(remoteFileList.size()), localDirectory});
 		return result;
 	}
 

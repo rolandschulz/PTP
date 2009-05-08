@@ -11,7 +11,9 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.data;
 
-
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 interface SerializationKeys {
 	public static String TYPE_UPLOAD = "upload"; //$NON-NLS-1$
 	public static String TYPE_DOWNLOAD = "download"; //$NON-NLS-1$

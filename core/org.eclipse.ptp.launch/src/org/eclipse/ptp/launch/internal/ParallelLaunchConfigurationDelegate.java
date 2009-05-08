@@ -76,8 +76,9 @@ extends AbstractParallelLaunchConfigurationDelegate {
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								if (monitor.isCanceled())
+								if (monitor.isCanceled()) {
 									throw new InterruptedException("The job is cancelled."); //$NON-NLS-1$
+								}
 								monitor.beginTask("Debugger has started, waiting for connection...", 1); //$NON-NLS-1$
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch, project, execPath);
@@ -107,7 +108,7 @@ extends AbstractParallelLaunchConfigurationDelegate {
 								msg = t.getMessage();
 							}
 							System.out.println("Error completing debug job launch: " + msg); //$NON-NLS-1$
-							PTPLaunchPlugin.errorDialog("Error completing debug job launch", t);
+							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, t);
 							PTPLaunchPlugin.log(t);
 							terminateJob(job);
 						}
@@ -119,7 +120,7 @@ extends AbstractParallelLaunchConfigurationDelegate {
 				 */
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						PTPLaunchPlugin.errorDialog("Error completing launch", e.getStatus());
+						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
 					}
 				});
 				PTPLaunchPlugin.log(e);
@@ -131,7 +132,7 @@ extends AbstractParallelLaunchConfigurationDelegate {
 	}
 
 	@Override
-	protected void doCleanuoLaunch(ILaunchConfiguration configuration,
+	protected void doCleanupLaunch(ILaunchConfiguration configuration,
 			String mode, IPLaunch launch, AttributeManager attrMgr,
 			IPDebugger debugger, IPJob job) {
 		if (debugger != null) {
@@ -159,15 +160,15 @@ extends AbstractParallelLaunchConfigurationDelegate {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("", 250);
-		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { "Launching " + configuration.getName() })); //$NON-NLS-1$ $NON-NLS-2$
+		monitor.beginTask("", 250); //$NON-NLS-1$
+		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { Messages.ParallelLaunchConfigurationDelegate_3 + configuration.getName() })); //$NON-NLS-1$ $NON-NLS-2$
 		if (monitor.isCanceled())
 			return;
 		IPDebugger debugger = null;
 		IPJob job = null;
 
 		monitor.worked(10);
-		monitor.subTask("Copying data . . .");
+		monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
 
 		AttributeManager attrManager = getAttributeManager(configuration, mode);
 

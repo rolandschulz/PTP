@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
@@ -28,10 +29,12 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
 import org.eclipse.ptp.launch.data.UploadRule;
-import org.eclipse.ptp.launch.internal.LinuxPath;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
-
+/**
+ * TODO NEEDS TO BE DOCUMENTED
+ */
 public class UploadRuleAction implements IRuleAction {
 
 	private final ILaunchProcessCallback process;
@@ -97,19 +100,18 @@ public class UploadRuleAction implements IRuleAction {
 		 */
 		String execPath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String)null);
 
-
-		IPath defaultRemotePath = LinuxPath.fromString(execPath).removeLastSegments(1);//configuration.getRemoteDirectoryPath();
+		IPath defaultRemotePath = new Path(execPath).removeLastSegments(1);//configuration.getRemoteDirectoryPath();
 		IPath remotePathParent = null;
 		if (rule.isDefaultRemoteDirectory()) {
 			remotePathParent = defaultRemotePath;
 		} else {
-			remotePathParent = LinuxPath.fromString(rule.getRemoteDirectory());
+			remotePathParent = new Path(rule.getRemoteDirectory());
 			if (! remotePathParent.isAbsolute()) {
 				remotePathParent = defaultRemotePath.append(remotePathParent);
 			}
 		}
 		remotePathParent = remotePathParent.removeTrailingSeparator();
-		Assert.isTrue(remotePathParent.isAbsolute(), "remotePathWoLastSegment.isAbsolute()");
+		Assert.isTrue(remotePathParent.isAbsolute(), "remotePathWoLastSegment.isAbsolute()"); //$NON-NLS-1$
 
 		/*// Generate the FileStore for the remote path
 		IFileStore remoteFileStore = null;
@@ -135,7 +137,7 @@ public class UploadRuleAction implements IRuleAction {
 				localPath = workingDir.append(localPath);
 			}
 			localPath = localPath.removeTrailingSeparator();
-			Assert.isTrue(localPath.isAbsolute(), "localPath.isAbsolute()");
+			Assert.isTrue(localPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
 			localPaths[i] = localPath;
 		}
 
@@ -151,7 +153,7 @@ public class UploadRuleAction implements IRuleAction {
 				IRemoteFileManager localFileManager = process.getLocalFileManager(configuration);
 				localFileStore = localFileManager.getResource(localPath, monitor);
 			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving local resource", e));
+				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.UploadRuleAction_0, e));
 			}
 			IFileInfo localFileInfo = localFileStore.fetchInfo();
 
@@ -171,7 +173,7 @@ public class UploadRuleAction implements IRuleAction {
 			try {
 				remoteFileStore = remoteFileManager.getResource(remotePath, monitor);
 			} catch (IOException e1) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving remote resource", e1));
+				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.UploadRuleAction_1, e1));
 			}
 
 			/*
@@ -181,7 +183,7 @@ public class UploadRuleAction implements IRuleAction {
 				IFileStore parentFileStore = remoteFileManager.getResource(remotePathParent, monitor);
 				parentFileStore.mkdir(EFS.NONE, monitor);
 			} catch (IOException e1) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving remote resource", e1));
+				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.UploadRuleAction_1, e1));
 			}
 
 

@@ -14,7 +14,6 @@ package org.eclipse.ptp.launch.ui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
@@ -53,6 +52,7 @@ import org.eclipse.swt.widgets.List;
 
 
 /**
+ * TODO: NEEDS TO BE DOCUMENTED
  * 
  * @author Daniel Felix Ferber
  * @since 1.1
@@ -69,7 +69,7 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	protected Button syncBeforeButton;
 	protected Button syncAfterButton;
 	
-	protected ArrayList rules = new ArrayList();
+	protected ArrayList<ISynchronizationRule> rules = new ArrayList<ISynchronizationRule>();
 	protected SynchronizationRuleLabelProvider ruleLabelProvider;
 
 	boolean dataChanged = false;
@@ -282,7 +282,7 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_BEFORE,
 				false);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, 
-				new ArrayList());
+				new ArrayList<String>());
 	}
 
 	/*
@@ -291,6 +291,7 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	// FIXME Set data initialization
+	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		dataChanged = false;
 		try {
@@ -300,13 +301,12 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 			syncBeforeButton.setSelection(configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.ATTR_SYNC_BEFORE,
 					false));
-			java.util.List list = configuration.getAttribute(
+			java.util.List<String> ruleList = configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES,
-					new ArrayList());
+					new ArrayList<String>());
 			rules.clear();
-			for (Iterator iter = list.iterator(); iter.hasNext();) {
-				String string = (String) iter.next();
-				ISynchronizationRule rule = RuleFactory.createRuleFromString(string);
+			for (String ruleStr : ruleList) {
+				ISynchronizationRule rule = RuleFactory.createRuleFromString(ruleStr);
 				rules.add(rule);
 			}
 
@@ -319,8 +319,8 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 			// TODO: Add another field to the interface to represent the working dir?
 			String execFile = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String)null);
 			if(execFile == null) {
-				String plugid = PTPLaunchPlugin.getDefault().getUniqueIdentifier();
-				String message = "No working directory available";
+				String plugid = PTPLaunchPlugin.getUniqueIdentifier();
+				String message = Messages.EnhancedSynchronizeTab_0;
 				throw new CoreException(new Status(Status.ERROR, plugid, message));
 			}
 			/*String defaultRemoteWorkingDirectory = "";LaunchPreferences.getPreferenceStore().getString(
@@ -363,9 +363,8 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_AFTER, syncAfterButton.getSelection());
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_BEFORE, syncBeforeButton.getSelection());
-		ArrayList list = new ArrayList();
-		for (Iterator iter = rules.iterator(); iter.hasNext();) {
-			ISynchronizationRule rule = (ISynchronizationRule) iter.next();
+		ArrayList<String> list = new ArrayList<String>();
+		for (ISynchronizationRule rule : rules) {
 			list.add(rule.toString());
 		}
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, list);
@@ -414,7 +413,7 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		if (ruleList.getSelectionCount() != 1) return;
 		
 		int index = ruleList.getSelectionIndex();
-		ISynchronizationRule rule = (ISynchronizationRule) rules.get(index);
+		ISynchronizationRule rule = rules.get(index);
 		Dialog dialog = RuleDialogFactory.createDialogForRule(getShell(), rule);
 		if (dialog != null) {
 			if (dialog.open() == Dialog.OK) {
@@ -434,7 +433,7 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		if (ruleList.getSelectionCount() == 0) return;
 
 		int indexes[] = ruleList.getSelectionIndices();
-		HashSet set = new HashSet();
+		HashSet<ISynchronizationRule> set = new HashSet<ISynchronizationRule>();
 		for (int i = 0; i < indexes.length; i++) {
 			int index = indexes[i];
 			set.add(rules.get(index));

@@ -20,37 +20,36 @@ package org.eclipse.ptp.launch.internal.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.swt.graphics.Image;
 
 public class LaunchImages {
-	private static final String NAME_PREFIX = "org.eclipse.ptp.launch."; //$NON-NLS-1$
-	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
-    
-	private static URL iconBaseURL = null;
-	
-	static {
-		String pathSuffix = "icons/";
-		iconBaseURL = PTPLaunchPlugin.getDefault().getBundle().getEntry(pathSuffix);
-	}
-	
+	private static final String NAME_PREFIX= PTPLaunchPlugin.PLUGIN_ID + '.';
+	private static final int NAME_PREFIX_LENGTH= NAME_PREFIX.length();
+
 	// The plugin registry
-	private static ImageRegistry imageRegistry = null;
-	private static HashMap<String,ImageDescriptor> avoidSWTErrorMap = null;
+	private static ImageRegistry imageRegistry = new ImageRegistry();
+
+	// Subdirectory (under the package containing this class) where 16 color images are
+	private static URL fgIconBaseURL;
+	static {
+		fgIconBaseURL= Platform.getBundle(PTPLaunchPlugin.getUniqueIdentifier()).getEntry("/icons/"); //$NON-NLS-1$
+	}	
 
 	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif"; //$NON-NLS-1$
 	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif"; //$NON-NLS-1$
-	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif"; //$NON-NLS-1
+	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif"; //$NON-NLS-1$
 	
 	public static final ImageDescriptor DESC_PARALLEL_TAB = createManaged(IMG_PARALLEL_TAB);
 	public static final ImageDescriptor DESC_ARGUMENTS_TAB = createManaged(IMG_ARGUMENTS_TAB);
 	public static final ImageDescriptor DESC_MAIN_TAB = createManaged(IMG_MAIN_TAB);	
 	public static final ImageDescriptor DESC_DEBUGGER_TAB = createManaged(IMG_DEBUGGER_TAB);	
+	
 	/**
 	 * Returns the image managed under the given key in this registry.
 	 * 
@@ -60,41 +59,39 @@ public class LaunchImages {
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}
+	
 	public static ImageDescriptor getDescriptor(String key) {
 		return getImageRegistry().getDescriptor(key);
 	}
+
 	
-	private static ImageRegistry getImageRegistry() {
-		if (imageRegistry == null) {
-			imageRegistry = new ImageRegistry();
-			for (String key : avoidSWTErrorMap.keySet()) {
-				imageRegistry.put(key, (ImageDescriptor) avoidSWTErrorMap.get(key));
-			}
-			avoidSWTErrorMap = null;
-		}
+	/**
+	 * Helper method to access the image registry from the JavaPlugin class.
+	 */
+	static ImageRegistry getImageRegistry() {
 		return imageRegistry;
 	}
 	
 	private static ImageDescriptor createManaged(String name) {
-		try {
-			ImageDescriptor result = ImageDescriptor.createFromURL(makeIconFileURL(name.substring(NAME_PREFIX_LENGTH)));
-			if (avoidSWTErrorMap == null) {
-				avoidSWTErrorMap = new HashMap<String,ImageDescriptor>(); 
-			}
-			avoidSWTErrorMap.put(name, result);
-			if (imageRegistry != null) {
-			    System.out.println("Internal Error: Image registry already defined"); //$NON-NLS-1$
-			}
-			return result;
-		} catch (MalformedURLException e) {
-			return ImageDescriptor.getMissingImageDescriptor();
-		}
+		return createManaged(imageRegistry, name);
 	}
 	
-	private static URL makeIconFileURL(String name) throws MalformedURLException {
-		if (iconBaseURL == null)
-			throw new MalformedURLException();
-			
-		return new URL(iconBaseURL, name);
+	private static ImageDescriptor createManaged(ImageRegistry registry, String name) {
+		ImageDescriptor result= ImageDescriptor.createFromURL(makeIconFileURL(name.substring(NAME_PREFIX_LENGTH)));
+		registry.put(name, result);
+		return result;
+	}
+	
+	public static Image get(String key) {
+		return imageRegistry.get(key);
+	}
+
+	private static URL makeIconFileURL(String name) {
+		try {
+			return new URL(fgIconBaseURL, name);
+		} catch (MalformedURLException e) {
+			PTPLaunchPlugin.log(e);
+			return null;
+		}
 	}	
 }

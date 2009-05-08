@@ -32,6 +32,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public class DebuggerTab extends AbstractDebuggerTab {
 	final protected boolean fAttachMode;
 
@@ -191,13 +194,13 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			if (debugConfigs[i].supportsMode(mode)) {
 				list.add(debugConfigs[i]);
 				// select first exact matching debugger for requested selection
-				if (!noDefault && defaultSelection.equals("")) {
+				if (!noDefault && defaultSelection.equals("")) { //$NON-NLS-1$
 					defaultSelection = debugConfigs[i].getID();
 				}
 			}
 		}
 		// if no selection meaning nothing in config the force initdefault on tab
-		setInitializeDefault(selection.equals("") ? true : false);
+		setInitializeDefault(selection.equals("") ? true : false); //$NON-NLS-1$
 		loadDebuggerCombo((IPDebugConfiguration[])list.toArray(new IPDebugConfiguration[list.size()]), defaultSelection);
 	}
 

@@ -22,6 +22,7 @@ import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.messages.Messages;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch launch = null;
@@ -87,7 +88,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		if (isTerminated()) {
 			return fExitValue;
 		}
-		throw new DebugException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR, "Exit value not available", null));
+		throw new DebugException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.RuntimeProcess_0, null));
 	}
 	
 	protected void terminated() {
@@ -139,7 +140,6 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 * IJobListener interface
 	 **************************************************************************************************************************************************************************************************/
 
-	@SuppressWarnings("unchecked")
 	public void handleEvent(IJobChangeEvent e) {
 		EnumeratedAttribute<JobAttributes.State> attr = e.getAttributes().getAttribute(JobAttributes.getStateAttributeDefinition());
 		if (attr != null) {

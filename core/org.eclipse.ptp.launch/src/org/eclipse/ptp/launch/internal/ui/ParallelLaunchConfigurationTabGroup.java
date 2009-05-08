@@ -31,7 +31,10 @@ import org.eclipse.ptp.launch.ui.EnvironmentTab;
 import org.eclipse.ptp.launch.ui.ResourcesTab;
 
 /**
+ * Main parallel launch configuration tab group.
  * 
+ * This defines the order and type of tabs that will be displayed when a new parallel
+ * launch configuration is created.
  */
 public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
