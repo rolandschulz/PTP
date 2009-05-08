@@ -11,9 +11,7 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.rulesengine;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -25,14 +23,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
-import org.eclipse.ptp.launch.internal.LinuxPath;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
-
+/**
+ * TODO NEEDS TO BE DOCUMENTED
+ */
 public class DownloadBackAction implements IRuleAction {
 	
 	private ILaunchProcessCallback process;
@@ -73,7 +71,7 @@ public class DownloadBackAction implements IRuleAction {
 			localFileStore = localFileManager.getResource(localPath, monitor);
 			} catch (IOException e) {
 				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-						"Error retrieving resource", e));
+						Messages.DownloadBackAction_0, e));
 			}
 			
 			doDownload(remoteFileStore, localFileStore);

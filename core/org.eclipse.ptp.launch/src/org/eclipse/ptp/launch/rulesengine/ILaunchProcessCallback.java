@@ -16,14 +16,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
-
-
+/**
+ * TODO NEEDS TO BE DOCUMENTED
+ */
 public interface ILaunchProcessCallback {
-	//public PrintWriter getOutputWriter();
-	//public PrintWriter getErrorWriter();
-	//public ExecutionConfiguration getConfiguration();
 	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException;
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration) throws CoreException;
-	//public IRemoteExecutionManager getExecutionManager();
 	public void addSynchronizationRule(ISynchronizationRule downloadBackRule);
 }

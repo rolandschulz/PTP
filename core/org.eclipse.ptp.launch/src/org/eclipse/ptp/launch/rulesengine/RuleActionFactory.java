@@ -20,7 +20,9 @@ import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.UploadRule;
 
-
+/**
+ * TODO NEEDS TO BE DOCUMENTED
+ */
 public class RuleActionFactory {
 	
 	private ILaunchProcessCallback process;

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ptp.launch.messages.Messages;
 
 
 public class DownloadBackRule implements ISynchronizationRule {
@@ -56,7 +57,7 @@ public class DownloadBackRule implements ISynchronizationRule {
 	}
 
 	public String toLabel() {
-		return "Internal download back rule"; //$NON-NLS-1$
+		return Messages.DownloadBackRule_0;
 	}
 
 	public void validate() throws CoreException {

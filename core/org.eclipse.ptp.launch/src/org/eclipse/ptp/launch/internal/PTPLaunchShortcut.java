@@ -36,14 +36,15 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
 /**
- *
+ * TODO: NEEDS TO BE DOCUMENTED
  */
 public class PTPLaunchShortcut implements ILaunchShortcut {
-    public static final String LauncherGroupID = "org.eclipse.debug.ui.launchGroup.run";
+    public static final String LauncherGroupID = "org.eclipse.debug.ui.launchGroup.run"; //$NON-NLS-1$
     
 	/**
 	 * @see ILaunchShortcut#launch(IEditorPart, String)
@@ -65,7 +66,7 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 	
 	public void launch(Object element, String mode) {
 	    if (!(element instanceof IFile)) {
-	        MessageDialog.openInformation(PTPLaunchPlugin.getActiveWorkbenchShell(), "Incorrect file", "Please select parallel program file");
+	        MessageDialog.openInformation(PTPLaunchPlugin.getActiveWorkbenchShell(), Messages.PTPLaunchShortcut_0, Messages.PTPLaunchShortcut_1);
 	        return;
 	    }
 	        
@@ -89,7 +90,7 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 		try {
 		    ILaunchConfiguration[] configs = lm.getLaunchConfigurations(configType);
 		    for (int i=0; i<configs.length; i++) {
-		        if (configs[i].getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName))
+		        if (configs[i].getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) //$NON-NLS-1$
 		            return configs[i];
 		    }
 		    ILaunchConfigurationWorkingCopy wc = configType.newInstance(file.getProject(), projectName);		    

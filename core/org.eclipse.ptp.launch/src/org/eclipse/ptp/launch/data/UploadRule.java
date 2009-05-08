@@ -19,8 +19,11 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.launch.messages.Messages;
 
 /*
+ * TODO: NEEDS TO BE DOCUMENTED
  * Represents an upload rule.
  * It describes how to copy a list of local files or local directories into a single remote directory.
  * A local file is copied into the remote directory.
@@ -68,11 +71,11 @@ public class UploadRule implements ISynchronizationRule {
 		 */
 		{
 			if (list.length < 1) {
-				throwError("The string is not a valid rule for "+this.getClass().getName()); //$NON-NLS-1$
+				throwError(Messages.UploadRule_0+this.getClass().getName());
 			}
 			String s = list[0];
 			if (! s.equalsIgnoreCase(SerializationKeys.TYPE_UPLOAD)) {
-				throwError("The string is not a valid rule for "+this.getClass().getName()); //$NON-NLS-1$
+				throwError(Messages.UploadRule_0+this.getClass().getName());
 			}
 		}
 		for (int i = 1; i < list.length; i++) {
@@ -82,7 +85,7 @@ public class UploadRule implements ISynchronizationRule {
 			 */
 			int p = s.indexOf(' ');
 			if (p == -1) {
-				logError("Invalid rule entry: "+s); //$NON-NLS-1$
+				logError(Messages.UploadRule_1+s);
 				continue;
 			}
 			String key = s.substring(0, p);
@@ -123,7 +126,7 @@ public class UploadRule implements ISynchronizationRule {
 			} else if (value.equalsIgnoreCase(SerializationKeys.KEY_OVERWRITE_POLICY_SKIP)) {
 				overwritePolicy = OverwritePolicies.SKIP;
 			} else {
-				logError("Unknown overwrite policy: "+value); //$NON-NLS-1$
+				logError(Messages.UploadRule_2+value);
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_FLAGS)) {
 			String flags[] = value.split(" "); //$NON-NLS-1$
@@ -136,7 +139,7 @@ public class UploadRule implements ISynchronizationRule {
 				} else if (flag.equalsIgnoreCase(SerializationKeys.KEY_FLAGS_DOWNLOAD_BACK)) {
 					downloadBack = true;
 				} else {
-					logError("Unknown flag: "+flag); //$NON-NLS-1$
+					logError(Messages.UploadRule_3+flag);
 				}
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_LOCAL_PATH)) {
@@ -150,16 +153,16 @@ public class UploadRule implements ISynchronizationRule {
 				} else if (flag.equalsIgnoreCase(SerializationKeys.KEY_PERMISSIONS_READONLY)) {
 					asReadOnly = true;
 				} else {
-					logError("Unknown permission: "+flag); //$NON-NLS-1$
+					logError(Messages.UploadRule_4+flag);
 				}
 			}			
 		} else {
-			logError("Unknown key: "+key); //$NON-NLS-1$
+			logError(Messages.UploadRule_5+key);
 		}
 	}
 
 	private void logError(String string) {
-		// TODO Auto-generated method stub
+		// TODO NEEDS TO BE IMPLEMENTED
 	}
 
 	/*
@@ -449,7 +452,7 @@ public class UploadRule implements ISynchronizationRule {
 	}
 
 	public String toLabel() {
-		String result = "UPLOAD "+Integer.toString(localFileList.size())+" item(s) \nto "+remoteDirectory; //$NON-NLS-1$ //$NON-NLS-2$
+		String result = NLS.bind(Messages.UploadRule_6, new Object[]{Integer.toString(localFileList.size()), remoteDirectory});
 		return result;
 	}
 	

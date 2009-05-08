@@ -22,6 +22,15 @@ public class Messages extends NLS {
 	public static String Launch_common_DebuggerColon;
 	public static String Launch_common_Error;
 
+	public static String ApplicationTab_0;
+	public static String ApplicationTab_1;
+	public static String ApplicationTab_2;
+	public static String ApplicationTab_3;
+	public static String ApplicationTab_4;
+	public static String ApplicationTab_5;
+	public static String ApplicationTab_6;
+	public static String ApplicationTab_7;
+
 	public static String ApplicationTab_Main;
 	public static String ApplicationTab_RM_Selection_Label;
 	public static String ApplicationTab_Project_Label;
@@ -46,6 +55,8 @@ public class Messages extends NLS {
 	public static String ResourcesTab_No_Launch_Configuration;
 	public static String ResourcesTab_Resource_Manager_Not_Started;
 
+	public static String RuntimeProcess_0;
+
 	public static String ArgumentsTab_Arguments;
 	public static String ArgumentsTab_Parallel_Program_Arguments;
 
@@ -69,8 +80,17 @@ public class Messages extends NLS {
 	public static String WorkingDirectoryBlock_Working_directory_is_not_a_directory;
 	public static String WorkingDirectoryBlock_Project_or_folder_does_not_exist;
 
+	public static String ParallelLaunchConfigurationDelegate_0;
+	public static String ParallelLaunchConfigurationDelegate_1;
+	public static String ParallelLaunchConfigurationDelegate_3;
+	public static String ParallelLaunchConfigurationDelegate_4;
+
 	public static String ParallelLaunchConfigurationDelegate_Invalid_launch_object;
 
+	public static String PTPLaunchShortcut_0;
+	public static String PTPLaunchShortcut_1;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_0;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_not_specified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project;
 	public static String AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified;
@@ -100,6 +120,22 @@ public class Messages extends NLS {
 	public static String LauncherExecutionTab_Tab_Title;
 	public static String LauncherExecutionTab_Validation_ObserverAndNoConsole;
 
+	public static String DownloadBackAction_0;
+
+	public static String DownloadBackRule_0;
+
+	public static String DownloadRule_0;
+	public static String DownloadRule_1;
+	public static String DownloadRule_2;
+	public static String DownloadRule_3;
+	public static String DownloadRule_4;
+	public static String DownloadRule_5;
+	public static String DownloadRule_6;
+	public static String DownloadRule_7;
+
+	public static String DownloadRuleAction_0;
+	public static String DownloadRuleAction_1;
+
 	public static String DownloadRuleDialog_AddFileDialog_Message;
 	public static String DownloadRuleDialog_AddFileDialog_Title;
 	public static String DownloadRuleDialog_DestinationFrame_FileSystemButton;
@@ -124,6 +160,8 @@ public class Messages extends NLS {
 	public static String DownloadRuleDialog_OptionsFrame_Title;
 	public static String DownloadRuleDialog_Title;
 	public static String DownloadRuleDialog_WorkspaceDialog_Title;
+
+	public static String EnhancedSynchronizeTab_0;
 
 	public static String EnhancedSynchronizeTab_DownloadLabel_DestinationLabel;
 	public static String EnhancedSynchronizeTab_DownloadLabel_DestinationMissing;
@@ -164,6 +202,18 @@ public class Messages extends NLS {
 	public static String EnhancedSynchronizeTab_UploadLabel_OptionsLabel;
 	public static String EnhancedSynchronizeTab_UploadLabel_Type;
 
+	public static String UploadRule_0;
+	public static String UploadRule_1;
+	public static String UploadRule_2;
+	public static String UploadRule_3;
+	public static String UploadRule_4;
+	public static String UploadRule_5;
+	public static String UploadRule_6;
+	public static String UploadRule_7;
+
+	public static String UploadRuleAction_0;
+	public static String UploadRuleAction_1;
+
 	public static String UploadRuleDialog_FileButtonsFrame_AddDirectoryButton;
 	public static String UploadRuleDialog_FileButtonsFrame_AddFilesButton;
 	public static String UploadRuleDialog_FileButtonsFrame_AddWorkspaceButton;
@@ -190,6 +240,8 @@ public class Messages extends NLS {
 	public static String UploadRuleDialog_RemoteDirectoryFrame_LabelDirectory;
 	public static String UploadRuleDialog_RemoteDirectoryFrame_Title;
 	public static String UploadRuleDialog_Title;
+
+	public static String AbstractRMLaunchConfigurationFactory_0;
 
 	static {
 		// initialize resource bundle

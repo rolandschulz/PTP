@@ -67,6 +67,7 @@ import org.osgi.framework.BundleContext;
 public class PTPLaunchPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp.launch"; //$NON-NLS-1$
     public static final String EXTENSION_POINT_ID = "rmLaunchConfigurations"; //$NON-NLS-1$
+	public static final String RESOURCE_BUNDLE = PLUGIN_ID + ".LaunchPluginResources"; //$NON-NLS-1$
 
 	//The shared instance.
 	private static PTPLaunchPlugin plugin;
@@ -95,7 +96,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		log(t);
 		Shell shell = getActiveWorkbenchShell();
 		if (shell != null) {
-			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null); //$NON-NLS-1$	
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null);
 			ErrorDialog.openError(shell, Messages.Launch_common_Error, message, status);
 		}
 	}
@@ -150,7 +151,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.launch", path); //$NON-NLS-1$
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}    
 
 	/**
@@ -198,7 +199,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 *            the exception to be logged
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 	}	
 	
 	/**
@@ -230,8 +231,9 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public ResourceBundle getResourceBundle() {
 		try {
-			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.launch.LaunchPluginResources"); //$NON-NLS-1$
+			if (resourceBundle == null) {
+				resourceBundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
+			}
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -347,7 +349,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 			{
 				IConfigurationElement ce = elements[i];
 				try {
-					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce.createExecutableExtension("class");
+					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					Class<? extends IResourceManager> resourceManagerClass = factory.getResourceManagerClass();
 					rmLaunchConfigurationFactories.put(resourceManagerClass, factory);
 				} catch (CoreException e) {

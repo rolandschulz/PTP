@@ -26,18 +26,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.launch.data.DownloadBackRule;
 import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
+import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
-
+/**
+ * TODO NEEDS TO BE DOCUMENTED
+ */
 public class DownloadRuleAction implements IRuleAction {
 
 	private final ILaunchProcessCallback process;
 	private final DownloadRule rule;
 	private final ILaunchConfiguration configuration;
-	private DownloadBackRule downloadBackRule;
+	//private DownloadBackRule downloadBackRule;
 	private final IProgressMonitor monitor;
 
 	public DownloadRuleAction(ILaunchProcessCallback process, ILaunchConfiguration configuration, 
@@ -97,7 +99,7 @@ public class DownloadRuleAction implements IRuleAction {
 		try {
 			localFileParentResource = localFileManager.getResource(localParentPath, monitor);
 		} catch (IOException e) {
-			throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving local resource", e));
+			throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.DownloadRuleAction_0, e));
 		}
 		IFileInfo localFileParentInfo = localFileParentResource.fetchInfo();
 		
@@ -109,7 +111,7 @@ public class DownloadRuleAction implements IRuleAction {
 		// Download all remote paths
 		IPath remotePaths [] = rule.getRemoteFilesAsPathArray();
 		IPath remoteWorkingPath = new Path(configuration.getAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, "")).removeLastSegments(1);
+				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, "")).removeLastSegments(1); //$NON-NLS-1$
 		for(int i = 0; i < remotePaths.length; i++) {
 			IPath remotePath = remotePaths[i];
 			
@@ -123,7 +125,7 @@ public class DownloadRuleAction implements IRuleAction {
 				IRemoteFileManager remoteFileManager = process.getRemoteFileManager(configuration);
 				remoteFileStore = remoteFileManager.getResource(remotePath, monitor);
 			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving remote resource", e));
+				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.DownloadRuleAction_1, e));
 			}
 			
 			// Check if the remote resource exists
@@ -144,7 +146,7 @@ public class DownloadRuleAction implements IRuleAction {
 			try {
 				localFileStore = localFileManager.getResource(localPath, monitor);
 			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, "Error retrieving local resource", e));
+				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.DownloadRuleAction_0, e));
 			}
 
 			doDownload(remoteFileStore, remotePath, localFileStore, localPath);
