@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -155,7 +156,8 @@ extends AbstractParallelLaunchConfigurationDelegate {
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		if (!(launch instanceof IPLaunch)) {
-			abort(Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object, null, 0);
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
 		}
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
