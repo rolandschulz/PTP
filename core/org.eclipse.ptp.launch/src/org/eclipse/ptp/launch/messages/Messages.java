@@ -30,6 +30,12 @@ public class Messages extends NLS {
 	public static String ApplicationTab_5;
 	public static String ApplicationTab_6;
 	public static String ApplicationTab_7;
+	public static String ApplicationTab_8;
+	public static String ApplicationTab_9;
+	public static String ApplicationTab_10;
+	public static String ApplicationTab_11;
+	public static String ApplicationTab_12;
+	public static String ApplicationTab_13;
 
 	public static String ApplicationTab_Main;
 	public static String ApplicationTab_RM_Selection_Label;
@@ -92,9 +98,6 @@ public class Messages extends NLS {
 
 	public static String AbstractParallelLaunchConfigurationDelegate_0;
 	public static String AbstractParallelLaunchConfigurationDelegate_1;
-	public static String AbstractParallelLaunchConfigurationDelegate_2;
-	public static String AbstractParallelLaunchConfigurationDelegate_3;
-	public static String AbstractParallelLaunchConfigurationDelegate_4;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_not_specified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project;
 	public static String AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified;
@@ -111,8 +114,14 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_Error_converting_rules;
 	public static String AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support;
 	public static String AbstractParallelLaunchConfigurationDelegate_Unsupported_resource_manager_type;
-	public static String AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services;
-	public static String AbstractParallelLaunchConfigurationDelegate_Error_fetching_resource;
+	
+	public static String PTPLaunchPlugin_0;
+	public static String PTPLaunchPlugin_1;
+	public static String PTPLaunchPlugin_2;
+	public static String PTPLaunchPlugin_3;
+	public static String PTPLaunchPlugin_4;
+	public static String PTPLaunchPlugin_5;
+	public static String PTPLaunchPlugin_6;
 	
 	public static String LauncherExecutionTab_ArgumentsFrame_CommandLineLabel;
 	public static String LauncherExecutionTab_ArgumentsFrame_Title;

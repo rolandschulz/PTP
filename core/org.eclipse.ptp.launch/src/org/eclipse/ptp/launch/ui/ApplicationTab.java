@@ -41,7 +41,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -52,7 +51,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -461,23 +460,43 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			}
 			initPath = getProject().getLocationURI().getPath();
 		}
-		IResourceManager rm = getResourceManager(getLaunchConfiguration());
-		AbstractRemoteResourceManagerConfiguration rmConf = (AbstractRemoteResourceManagerConfiguration) ((IResourceManagerControl)rm).getConfiguration();
-		IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConf.getRemoteServicesId());
-		IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remServices);
-		if (remServices != null && remUIServices != null) {
-			IRemoteConnection remCon = remServices.getConnectionManager().getConnection(rmConf.getConnectionName());
-			if (remCon != null) {
-				IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
-				if (fileMgr != null) {
-					fileMgr.setConnection(remCon);
-					fileMgr.showConnections(false);
-					IPath path = fileMgr.browseFile(getShell(), Messages.ApplicationTab_6, initPath);
-					if (path != null) {
-						appText.setText(path.toString());
+		
+		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(getLaunchConfiguration());
+		if (rm != null) {
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+			if (remoteServices != null) {
+				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+				if (remoteUIServices != null) {
+					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+					if (connMgr != null) {
+						IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
+						if (conn != null) {
+							IRemoteUIFileManager fileManager = remoteUIServices.getUIFileManager();
+							if (fileManager != null) {
+								fileManager.setConnection(conn);
+								fileManager.showConnections(false);
+								IPath path = fileManager.browseFile(getShell(), Messages.ApplicationTab_6, initPath);
+								if (path != null) {
+									appText.setText(path.toString());
+								}
+							} else {
+								setErrorMessage(Messages.ApplicationTab_8);
+							}
+						} else {
+							setErrorMessage(Messages.ApplicationTab_9);
+						}
+					} else {
+						setErrorMessage(Messages.ApplicationTab_10);
 					}
+				} else {
+					setErrorMessage(Messages.ApplicationTab_11);
 				}
+			} else {
+				setErrorMessage(Messages.ApplicationTab_12);
 			}
+		} else {
+			setErrorMessage(Messages.ApplicationTab_13);
 		}
 	}
 
