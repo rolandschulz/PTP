@@ -109,7 +109,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.utils.core.linux.ArgumentParser;
 
@@ -118,8 +117,10 @@ import org.eclipse.ptp.utils.core.linux.ArgumentParser;
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		LaunchConfigurationDelegate implements ILaunchProcessCallback {
-	private List<ISynchronizationRule> extraSynchronizationRules;
-	public enum JobStatus {SUBMITTED, COMPLETED, ERROR}
+	/**
+	 * Status of the job submission (NOT the job itself)
+	 */
+	public enum JobSubStatus {SUBMITTED, COMPLETED, ERROR}
 
 	/**
 	 * The JobSubmission class encapsulates all the information used in
@@ -134,7 +135,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		private IPLaunch launch;
 		private AttributeManager attrMgr;
 		private IPDebugger debugger;
-		private JobStatus status = JobStatus.SUBMITTED;
+		private JobSubStatus status = JobSubStatus.SUBMITTED;
 		private final ReentrantLock subLock = new ReentrantLock();;
 		private final Condition subCondition = subLock.newCondition();
 
@@ -153,10 +154,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		 *
 		 * @return the state
 		 */
-		public JobStatus waitFor(IProgressMonitor monitor) {
+		public JobSubStatus waitFor(IProgressMonitor monitor) {
 			subLock.lock();
 			try {
-				while (!monitor.isCanceled() && status != JobStatus.SUBMITTED) {
+				while (!monitor.isCanceled() && status != JobSubStatus.SUBMITTED) {
 					try {
 						subCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -224,13 +225,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		 */
 		public void setError(String error) {
 			this.error = error;
-			setStatus(JobStatus.ERROR);
+			setStatus(JobSubStatus.ERROR);
 		}
 
 		/**
 		 * set the current status
 		 */
-		public void setStatus(JobStatus status) {
+		public void setStatus(JobSubStatus status) {
 			subLock.lock();
 			try {
 				this.status = status;
@@ -281,35 +282,43 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		 */
 		public void handleEvent(IChangedJobEvent e) {
 			for (IPJob job : e.getJobs()) {
-				/*
-				 * If the job state has changed to running, find the JobSubmission that
-				 * corresponds to this job and perform remainder of job launch actions
-				 */
 				StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 				if (subIdAttr != null) {
 					IAttribute<?,?,?> stateAttr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
 					if (stateAttr != null) {
 						JobAttributes.State state = (JobAttributes.State)((EnumeratedAttribute<?>)stateAttr).getValue();
-						if (state == JobAttributes.State.RUNNING) {
-							JobSubmission jobSub = jobSubmissions.remove(subIdAttr.getValue());
-							if (jobSub != null) {
-								jobSub.setStatus(JobStatus.COMPLETED);
+						JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
+						if (jobSub != null) {
+							switch (state) {
+							case RUNNING:
+								/*
+								 * When the job starts running call back to notify that job submission is completed.
+								 */
+								jobSub.setStatus(JobSubStatus.COMPLETED);
 								doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
-							}
-						} else if(state == JobAttributes.State.TERMINATED || state == JobAttributes.State.ERROR) {
-							JobSubmission jobSub = jobInfos.remove(subIdAttr.getValue());
-							if(jobSub != null) {
-								if (state == JobAttributes.State.TERMINATED) {
-									ILaunchConfiguration lconf = jobSub.getConfiguration();
-									// If needed, copy data back.
-									try {
-										// Get the list of paths to be copied back.
-										doPosLaunchSynchronization(lconf);
-									} catch (CoreException e1) {
-										PTPLaunchPlugin.log(e1);
-									}
+								break;
+								
+							case TERMINATED:
+								/*
+								 * When the job terminates, do any post launch data synchronization.
+								 */
+								ILaunchConfiguration lconf = jobSub.getConfiguration();
+								// If needed, copy data back.
+								try {
+									// Get the list of paths to be copied back.
+									doPostLaunchSynchronization(lconf);
+								} catch (CoreException e1) {
+									PTPLaunchPlugin.log(e1);
 								}
-								doCleanuoLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
+								/* Drop through */
+								
+							case ERROR:
+								/*
+								 * Job has terminated, so clean up.
+								 */
+								doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
+								jobSubmissions.remove(jobSub);
+								break;
 							}
 						}
 					}
@@ -561,8 +570,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false);
 	}
 
+	/*
+	 * Total number of jobs submitted 
+	 */
 	private int jobCount = 0;
-
 	/*
 	 * Model listeners
 	 */
@@ -575,10 +586,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 */
 	protected Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	/*
-	 * Temporary workaround. Leave a copy of jobSubmissions to get job information even after the submission.
+	 * Data synchronization rules
 	 */
-	protected Map<String, JobSubmission> jobInfos = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
-
+	private List<ISynchronizationRule> extraSynchronizationRules;
+	
 	public AbstractParallelLaunchConfigurationDelegate() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
@@ -624,18 +635,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
 
 	/**
-	 * Abort the job launch if anything goes wrong.
-	 *
-	 * @param message
-	 * @param exception
-	 * @param code
-	 * @throws CoreException
-	 */
-	protected void abort(String message, Throwable exception, int code) throws CoreException {
-	    throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), code, message, exception));
-	}
-
-	/**
 	 * This method is called when the job state changes to RUNNING. This allows the launcher to
 	 * complete the job launch.
 	 *
@@ -649,17 +648,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,
 			AttributeManager mgr, IPDebugger debugger, IPJob job);
 
-	protected abstract void doCleanuoLaunch(ILaunchConfiguration configuration,
+	/**
+	 * @param configuration
+	 * @param mode
+	 * @param launch
+	 * @param attrMgr
+	 * @param debugger
+	 * @param job
+	 */
+	protected abstract void doCleanupLaunch(ILaunchConfiguration configuration,
 			String mode, IPLaunch launch, AttributeManager attrMgr,
 			IPDebugger debugger, IPJob job);
-
-//	protected void doCleanupJobLaunch(ILaunchConfiguration configuration, String mode,
-//			IPLaunch launch, AttributeManager attrMgr, IPDebugger debugger,
-//			IPJob job) {
-//		if (debugger != null) {
-//			debugger.cleanup(configuration, attrMgr, launch);
-//		}
-//	}
 
 	/**
 	 * Get all the attributes specified in the launch configuration.
@@ -672,7 +671,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected AttributeManager getAttributeManager(ILaunchConfiguration configuration, String mode) throws CoreException {
 		IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager, null, 0);
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 		}
 
 		AttributeManager attrMgr = new AttributeManager();
@@ -746,14 +746,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @throws CoreException
 	 */
 	protected IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
-		IPDebugConfiguration dbgCfg = null;
-		try {
-			dbgCfg = PTPDebugCorePlugin.getDefault().getDebugConfiguration(getDebuggerID(config));
-		} catch (CoreException e) {
-			System.out.println("ParallelLaunchConfigurationDelegate.getDebugConfig() Error"); //$NON-NLS-1$
-			throw e;
-		}
-		return dbgCfg;
+		return PTPDebugCorePlugin.getDefault().getDebugConfiguration(getDebuggerID(config));
 	}
 
 	/**
@@ -793,17 +786,20 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		IProject project = verifyProject(configuration);
 		String fileName = getProgramName(configuration);
 		if (fileName == null)
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified, null, IStatus.INFO);
+			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified));
 
 		IPath programPath = new Path(fileName);
 		if (!programPath.isAbsolute()) {
 			programPath = project.getFile(programPath).getLocation();
 		}
 		if (!programPath.toFile().exists()) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST,
+					Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
 					new FileNotFoundException(
-							NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {programPath.toString()})),
-							IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+							NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {programPath.toString()})))
+			);
 		}
 		/* --old
 		IFile programPath = project.getFile(fileName);
@@ -924,19 +920,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 
 		final IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager, null, 0);
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 		}
 
 		JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
 		jobSubmissions.put(jobSub.getId(), jobSub);
-		jobInfos.put(jobSub.getId(), jobSub);
 
 		rm.submitJob(jobSub.getId(), configuration, attrMgr, monitor);
 
-		JobStatus status = jobSub.waitFor(monitor);
+		JobSubStatus status = jobSub.waitFor(monitor);
 
-		if (status == JobStatus.ERROR) {
-			abort(jobSub.getError(), null, IStatus.ERROR);
+		if (status == JobSubStatus.ERROR) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, jobSub.getError()));
 		}
 	}
 
@@ -983,8 +979,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		try {
 			verifyResource(dbgPath, configuration);
 		} catch (CoreException e) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found,
-					new FileNotFoundException(e.getLocalizedMessage()), IStatus.INFO);
+			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found,
+					new FileNotFoundException(e.getLocalizedMessage())));
 		}
 	}
 
@@ -1003,9 +1000,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			try {
 				return verifyResource(exePath, configuration);
 			} catch (CoreException e) {
-				abort(Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
-						new FileNotFoundException(e.getLocalizedMessage()),	IStatus.INFO);
-				return null;
+				throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
+						new FileNotFoundException(e.getLocalizedMessage())));
 			}
 		}
 	}
@@ -1034,12 +1031,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
     protected IProject verifyProject(ILaunchConfiguration configuration) throws CoreException {
         String proName = getProjectName(configuration);
         if (proName == null) {
-   			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Project_not_specified, null, IStatus.INFO);
+			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_Project_not_specified));
         }
 
         IProject project = getProject(proName);
         if (project == null || !project.exists() || !project.isOpen()) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project, null, IStatus.INFO);
+			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project));
         }
 
         return project;
@@ -1054,30 +1053,41 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
 		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
 		if (rm == null) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager, null, IStatus.ERROR);
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 		}
 		
 		IResourceManagerConfiguration conf = rm.getConfiguration();
-		if (!(conf instanceof AbstractRemoteResourceManagerConfiguration)) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Unsupported_resource_manager_type, null, IStatus.ERROR);
-		}
-		
-		AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
 		if (remoteServices == null) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services, null, IStatus.ERROR);
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services));
 		}
 		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
+		if (connMgr == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.AbstractParallelLaunchConfigurationDelegate_1));
+		}
+		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
+		if (conn == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_2));
+		}
 		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		if (fileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_3));
+		}
 		IPath resPath = new Path(path);
 		try {
 			IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
 			if (!res.fetchInfo().exists()) {
-				abort(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {path}), null, IStatus.INFO);
+				throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+						NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {path})));
 			}
 		} catch (IOException e) {
-			abort(Messages.AbstractParallelLaunchConfigurationDelegate_Error_fetching_resource, e.getCause(), IStatus.ERROR);
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.AbstractParallelLaunchConfigurationDelegate_Error_fetching_resource, e.getCause()));
 		}
 		return resPath;
 	}
@@ -1101,7 +1111,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 
 			// Check if local path is valid
 			if(localPath == null) {
-				// Throws exception
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+						Messages.AbstractParallelLaunchConfigurationDelegate_4));
 			}
 
 			// Copy data
@@ -1119,45 +1130,29 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @throws CoreException
 	 */
 	protected void copyFileFromRemoteHost(String remotePath, String localPath, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+		IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);
+		if (remoteFileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_0));
+		}
 
-		/*IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
-		if (rm != null) {
-			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+		try {
+			IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
 
-				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.core.LocalServices");
-				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-				if (remoteServices != null && localServices != null) {
-					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed*/
-					IRemoteFileManager localFileManager = getLocalFileManager(configuration);//localServices.getFileManager(lconn);
-
-					/*IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-					IRemoteConnection rconn = rconnMgr.getConnection(remConf.getConnectionName());*/
-					IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);//remoteServices.getFileManager(rconn);
-
-					try {
-						IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
-
-						if(!rres.fetchInfo().exists()) {
-							// Local file not found!
-							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-									Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
-						}
-						IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
-
-						// Copy file
-						rres.copy(lres, EFS.OVERWRITE, monitor);
-					} catch (IOException e) {
-						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-								Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_remote_resource_info));
-					}
-	/*			}
-			} else {
-				// FIXME: work out what to do for RM's that don't extend AbstractRemoteResourceManagerConfiguration
+			if(!rres.fetchInfo().exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+						Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
 			}
-		}*/
+			IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
+
+			// Copy file
+			rres.copy(lres, EFS.OVERWRITE, monitor);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_remote_resource_info));
+		}
 	}
 
 	/**
@@ -1171,26 +1166,29 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 */
 	protected void copyFileToRemoteHost(String localPath, String remotePath, ILaunchConfiguration configuration,
 			IProgressMonitor monitor) throws CoreException {
-					IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+		IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+		IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);
+		if (remoteFileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_0));
+		}
 
-					IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);
+		try {
+			IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
+			if(!lres.fetchInfo().exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+						Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
+			}
+			IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
 
-					try {
-						IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
-						if(!lres.fetchInfo().exists()) {
-							// Local file not found!
-							throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-									Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
-						}
-						IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
+			// Copy file
+			lres.copy(rres, EFS.OVERWRITE, monitor);
 
-						// Copy file
-						lres.copy(rres, EFS.OVERWRITE, monitor);
-
-					} catch (IOException e) {
-						throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-								Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_local_resource_info));
-					}
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_local_resource_info));
+		}
 	}
 
 	/**
@@ -1243,7 +1241,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		}
 	}
 
-	protected void doPosLaunchSynchronization(ILaunchConfiguration configuration)  throws CoreException {
+	/**
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void doPostLaunchSynchronization(ILaunchConfiguration configuration)  throws CoreException {
 		boolean syncAfter;
 		syncAfter = configuration.getAttribute(
 				IPTPLaunchConfigurationConstants.ATTR_SYNC_AFTER, false);
@@ -1289,50 +1291,54 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 
 	// Methods below implement the ILaunchProcessCallback interface
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#addSynchronizationRule(org.eclipse.ptp.launch.data.ISynchronizationRule)
+	 */
 	public void addSynchronizationRule(ISynchronizationRule rule) {
 		extraSynchronizationRules.add(rule);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#getLocalFileManager(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
-		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
-		if (rm != null) {
-			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.LocalServices"); //$NON-NLS-1$
-				if (localServices != null) {
-					IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-					IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
-					IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
-
-					return localFileManager;
-				}
-			}
-		}
-
-		return null;
+		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		assert (localServices != null);
+		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
+		assert (lconnMgr != null);
+		IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
+		assert (lconn != null);
+		IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
+		assert (localFileManager != null);
+		return localFileManager;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#getRemoteFileManager(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration) throws CoreException {
 		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-
-				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-				if (remoteServices != null) {
-
-					IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-					IRemoteConnection rconn = rconnMgr.getConnection(remConf.getConnectionName());
-					IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
-
-					return remoteFileManager;
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+			if (remoteServices != null) {
+				IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
+				if (rconnMgr != null) {
+					IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
+					if (rconn != null && rconn.isOpen()) {
+						return remoteServices.getFileManager(rconn);
+					}
 				}
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
 	protected static String [] getEnvironmentToAppend(ILaunchConfiguration configuration) throws CoreException {
 		Map<?,?> defaultEnv = null;
 		Map<?,?> configEnv = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, defaultEnv);
