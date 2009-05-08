@@ -16,7 +16,7 @@
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/galileo/mylyn-3.1.0.v20090315-1500-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/S-3.1M6-200903192015/RSE-SDK-3.1M6.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
-		<property name="branchVersion" value="2.2.0"/>
+		<property name="branchVersion" value="3.0.0"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
