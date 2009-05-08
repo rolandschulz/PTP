@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
@@ -53,7 +54,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -302,32 +302,43 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
 		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
-		if (rm != null) {
-			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
-				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
-				if (remoteServices != null) {
-					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-					IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
-					IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
-					try {
-						IPath resPath = new Path(path);
-						IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
-						if (res.fetchInfo().exists()) {
-							return resPath;
-						}
-					} catch (IOException e) {
-					}
-				}
-			} else {
-				IPath resPath = new Path(path);
-				if (resPath.toFile().exists()) {
-					return resPath;
-				}
-			}
+		if (rm == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.PTPLaunchPlugin_4));
 		}
-		return null;
+		IResourceManagerConfiguration conf = rm.getConfiguration();
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+		if (remoteServices == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.PTPLaunchPlugin_0));
+		}
+		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+		if (connMgr == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.PTPLaunchPlugin_1));
+		}
+		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
+		if (conn == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.PTPLaunchPlugin_2));
+		}
+		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		if (fileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.PTPLaunchPlugin_3));
+		}
+		IPath resPath = new Path(path);
+		try {
+			IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
+			if (!res.fetchInfo().exists()) {
+				throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+						NLS.bind(Messages.PTPLaunchPlugin_5, new Object[] {path})));
+			}
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+					Messages.PTPLaunchPlugin_6, e.getCause()));
+		}
+		return resPath;
 	}
 
 	/**

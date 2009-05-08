@@ -1051,45 +1051,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * @throws CoreException
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
-		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
-		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
-		}
-		
-		IResourceManagerConfiguration conf = rm.getConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
-		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services));
-		}
-		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		if (connMgr == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_1));
-		}
-		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
-		if (conn == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.AbstractParallelLaunchConfigurationDelegate_2));
-		}
-		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
-		if (fileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.AbstractParallelLaunchConfigurationDelegate_3));
-		}
-		IPath resPath = new Path(path);
-		try {
-			IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
-			if (!res.fetchInfo().exists()) {
-				throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
-						NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] {path})));
-			}
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_Error_fetching_resource, e.getCause()));
-		}
-		return resPath;
+		return PTPLaunchPlugin.getDefault().verifyResource(path, configuration);
 	}
 
 	/**
@@ -1112,7 +1074,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			// Check if local path is valid
 			if(localPath == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-						Messages.AbstractParallelLaunchConfigurationDelegate_4));
+						Messages.AbstractParallelLaunchConfigurationDelegate_1));
 			}
 
 			// Copy data
