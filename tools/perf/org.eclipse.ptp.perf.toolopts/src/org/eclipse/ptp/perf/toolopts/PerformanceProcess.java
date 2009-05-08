@@ -52,6 +52,12 @@ public class PerformanceProcess {
 	public String toolName=null;
 	
 	/**
+	 * If true there will be no automatic assumptions about when execute steps must be performed.  
+	 * Automatic execution will not take place after build steps!
+	 */
+	public boolean explicitExecution=false;
+	
+	/**
 	 * If true the program is recompiled with performance-analysis specific modifications
 	 */
 	public boolean recompile=false;

@@ -20,6 +20,8 @@ package org.eclipse.ptp.perf.tau;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -398,16 +400,21 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			public void run() {
 				//String tbpath = BuildLaunchUtils.getToolPath("tau");
 
+				List<String> paraCommand = new ArrayList<String>();
 
 				String ppkname = projname + "_" + projtype + "_" + projtrial+ ".ppk";
 				String paraprof = "";
 				if(tbpath!=null && tbpath.length()>0)
 					paraprof+= tbpath + File.separator;
-				paraprof+= "paraprof --pack " + ppkname;
-				System.out.println(paraprof);
+				paraprof+= "paraprof"; 
+				String pack = "--pack " + ppkname;
+				System.out.println(paraprof+" "+pack);
 				ppk = directory + File.separator + ppkname;
+				
+				paraCommand.add(paraprof);
+				paraCommand.add(pack);
 
-				BuildLaunchUtils.runTool(paraprof, null,new File(directory));
+				BuildLaunchUtils.runTool(paraCommand, null,new File(directory));
 			}}
 		
 		ppPaker ppp=new ppPaker();
@@ -558,8 +565,16 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 	
 	private static void runPerfEx(String directory, String database, String projname, String projtype, String perfExScript){
 		
-		String script=perfExScript+" -c "+database+" -p app="+projname+",exp="+projtype;
+		
+		List<String> script = new ArrayList<String>();
+		script.add(perfExScript);
+		script.add(" -c "+database);
+		script.add(" -p app="+projname+",exp="+projtype);
+		
+		//String script=perfExScript+" -c "+database+" -p app="+projname+",exp="+projtype;
 
+		
+		
 		BuildLaunchUtils.runTool(script, null,new File(directory));
 	}
 	
@@ -628,12 +643,13 @@ public class TAUPerformanceDataManager extends AbstractPerformanceDataManager{
 			return;
 		}
 
-		String perf2tau = "";
+		List<String> command = new ArrayList<String>();
+		String perf2tau="";
 		if(tbpath!=null && tbpath.length()>0)
 			perf2tau+=tbpath+File.separator;
 		perf2tau+="perf2tau";
-		
-		BuildLaunchUtils.runTool(perf2tau,null,dir);
+		command.add(perf2tau);
+		BuildLaunchUtils.runTool(command,null,dir);
 		
 	}
 

@@ -18,8 +18,10 @@
 package org.eclipse.ptp.perf.internal;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -319,5 +321,20 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 			return null;
 		
 		return command+" "+getToolArguments(app,configuration,buildDir,rootDir);
+	}
+	
+	/**
+	 * Returns the full tool command; the full path to the executable used by  app followed by any arguments, replacing the 
+	 * output location with the string provided by outputloc if necessary
+	 */
+	protected List<String> getToolCommandList(ToolApp app, ILaunchConfiguration configuration,String buildDir, String rootDir) throws CoreException
+	{
+		List<String> command= new ArrayList<String>();
+		command.add(getToolExecutable(app));
+		if (command.get(0)==null)
+			return null;
+		
+		command.add(getToolArguments(app,configuration,buildDir,rootDir));
+		return command;
 	}
 }

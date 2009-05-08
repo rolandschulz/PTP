@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -61,23 +62,27 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 			if(tool.analysisCommands!=null&&tool.analysisCommands.length>0)
 			{
 				File projectLoc=new File(outputLocation);
-				String runTool;
+				List<String> runTool;
 				//String toolPath;
 				for(int i=0;i<tool.analysisCommands.length;i++)
 				{
 					//TODO: put internal in defined strings
 					if(tool.analysisCommands[i].toolGroup==null||!tool.analysisCommands[i].toolGroup.equals("internal"))
 					{
-						runTool=getToolCommand(tool.analysisCommands[i],configuration,outputLocation,outputLocation);//tool.analysisCommands[i].toolCommand;
+						runTool=getToolCommandList(tool.analysisCommands[i],configuration,outputLocation,outputLocation);//tool.analysisCommands[i].toolCommand;
 						//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
 						if(tool.forAllLike!=null){
-							runTool=runTool.replace("%%FILE%%", currentFile);
 							File getname = new File(currentFile);
 							String name = getname.getName();
 							if(name.contains(".")){
 								name = name.substring(0,name.lastIndexOf("."));
 							}
-							runTool=runTool.replace("%%FILENAME%%", name);
+							for(int runDex=0;runDex<runTool.size();runDex++){
+								String s = runTool.get(runDex);
+								s=s.replace("%%FILE%%", currentFile);
+								s=s.replace("%%FILENAME%%", name);
+								runTool.set(runDex, s);
+							}
 						}
 						if(runTool!=null)
 						{

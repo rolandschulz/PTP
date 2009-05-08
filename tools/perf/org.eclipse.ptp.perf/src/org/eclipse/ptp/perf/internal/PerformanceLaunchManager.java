@@ -79,29 +79,30 @@ public class PerformanceLaunchManager {
 	{
 		final ILaunch launch = launchIn;
 		
-		
-		//System.out.println("The Class Is: "+launch.getClass().getName());
-		
+		//This is the main chunk of data for the workflow being launched
 		PerformanceProcess pproc = Activator.getTool(configuration.getAttribute(IPerformanceLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
 		
+		//Are we using parametric launching?  Then go do that instead.
 		boolean useParam=configuration.getAttribute(org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants.PARA_USE_PARAMETRIC, false)||(pproc.para!=null&&pproc.para.runParametric);
 		if(useParam)
 		{
-			//PerformanceParametricLaunchManager pmetlaunch=new PerformanceParametricLaunchManager();
 			PerformanceParametricLaunchManager.launch(configuration,paraDel,lf,mode, launchIn, monitor);// tool, 
 			return;
 		}
-		//else
 		
-		
+		//The path to the built program
 		String bProgPath=null;
+		//The built executable
 		String bOutLoc=null;
-		//boolean built=false;
+		//Has the executable been executed?
 		boolean ran=false;
 		PerfBuilder builder = null;
 		PerfLauncher launcher=null;
 		
+		//This workflow should only build, not run any execute or analyze steps
 		boolean buildOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.BUILDONLY, false);
+		
+		//This workflow should only analyze and skip any build or execute steps
 		boolean analyzeOnly=configuration.getAttribute(IPerformanceLaunchConfigurationConstants.ANALYZEONLY, false);
 		
 		BuildTool bt = pproc.getFirstBuilder(configuration);
@@ -109,32 +110,35 @@ public class PerformanceLaunchManager {
 		ExecTool et = pproc.getFirstRunner(configuration);
 		
 		
-		
+		//If build only, just run the first build process and we're done
 		if(buildOnly){
 			builder = new PerfBuilder(configuration, bt);
 			runStep(builder);
 			return;
 		}
 		
+		//If analyzeOnly has been set, or we have only analysis tools and no exec tools then this is an analyzeOnly case
 		analyzeOnly=analyzeOnly||(bt==null&&ppt!=null&&et==null);
 		
+		//If analyze only just run the first analysis step and we're done.  //TODO: There may be cases where we have multiple analysis steps and nothing else!
 		if(analyzeOnly){
-			//String lookdir="somedir";
 			PerfPostlaunch analyzer=new PerfPostlaunch(configuration,ppt,null);
 			runStep(analyzer);
 			return;
 		}
 		
-		
+		//If there is no recompilation step to do...
 		if(!pproc.recompile){
+			//Make and run a new null-builder to initialize the stuff we need from the build step anyway
 			builder = new PerfBuilder(configuration, null);
 			if(!runStep(builder)){
 				return;
 			}
 			bProgPath=builder.getProgramPath();
 			bOutLoc=builder.getOutputLocation();
-			//built=true;
-			if(!pproc.prependExecution&&!(pproc.perfTools.get(0) instanceof ExecTool)){
+			//If there is no special execution instruction and the first workflow step is not an execution step...  //TODO: And we haven't indicated to ignore this
+			if(!pproc.prependExecution&&!(pproc.perfTools.get(0) instanceof ExecTool)&&!pproc.explicitExecution){
+				//Run the newly built executable
 				launcher = new PerfLauncher(configuration,null,	bProgPath,paraDel,launch);
 				
 				if(!runStep(launcher)){
@@ -144,15 +148,17 @@ public class PerformanceLaunchManager {
 			}
 		}
 
-		
-		for(int i=0;i<pproc.perfTools.size();i++){//PerformanceTool t : pproc.perfTools){
+		//Now for every performance step...
+		for(int i=0;i<pproc.perfTools.size();i++){
 			PerformanceTool t = pproc.perfTools.get(i);
 			
-			if(!t.canRun(configuration))//!canRun(configuration,t.requireTrue))
+			//If this step isn't activated, skip it
+			if(!t.canRun(configuration))
 			{
 				continue;
 			}
 			
+			//If this step is a build tool...
 			if(t instanceof BuildTool)
 			{
 				/**
@@ -167,7 +173,8 @@ public class PerformanceLaunchManager {
 				bOutLoc=builder.getOutputLocation();
 				//built=true;
 				
-				if(!pproc.prependExecution&&!ran&&i<pproc.perfTools.size()-1&&!(pproc.perfTools.get(i+1) instanceof ExecTool)){
+				//If there is no exec step specified and the next step is not an exec step, we'd better perform the execution ourselves...
+				if(!pproc.prependExecution&&!ran&&i<pproc.perfTools.size()-1&&!(pproc.perfTools.get(i+1) instanceof ExecTool)&&!pproc.explicitExecution){
 					launcher = new PerfLauncher(configuration,null,	bProgPath,paraDel,launch);
 					
 					if(!runStep(launcher)){

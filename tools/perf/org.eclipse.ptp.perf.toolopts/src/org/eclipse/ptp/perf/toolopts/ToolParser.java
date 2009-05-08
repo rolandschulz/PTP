@@ -242,6 +242,7 @@ public class ToolParser extends DefaultHandler{
 			currentTool=new PerformanceProcess();
 			currentTool.toolName=getAttribute("name",atts);
 			currentTool.toolID= getAttribute("id",atts);
+			currentTool.explicitExecution=getBooleanAttribute("explicitexecution",false,atts);
 			if(currentTool.toolID==null)
 			{
 				currentTool.toolID=currentTool.toolName;

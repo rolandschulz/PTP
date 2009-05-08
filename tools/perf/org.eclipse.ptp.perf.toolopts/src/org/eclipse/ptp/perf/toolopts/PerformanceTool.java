@@ -10,6 +10,11 @@ public abstract class PerformanceTool {
 	public String requireTrue=null;
 	public ToolApp global = null;
 	
+	/**
+	 * Determines if this this performance tool can be executed based on if the value of 'requireTrue' is set to true or false in the configuration.
+	 * @param configuration
+	 * @return
+	 */
 	public boolean canRun(ILaunchConfiguration configuration){
 		
 		if(requireTrue==null||configuration==null){
@@ -19,7 +24,6 @@ public abstract class PerformanceTool {
 		try {
 			res= configuration.getAttribute(requireTrue, false);
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return res;

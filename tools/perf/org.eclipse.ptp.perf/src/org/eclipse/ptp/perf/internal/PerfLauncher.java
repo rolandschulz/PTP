@@ -169,8 +169,9 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration, projectLocation, projectLocation);//tool.execUtils[i].getCommand(configuration);
 				}
 				swappedArgs=true;
-				if(traceOn)System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+otherUtils+" "+prog+" "+arg);
-				confWC.setAttribute(appargattrib, otherUtils+" "+prog+" "+arg);
+				String toArgs=otherUtils+" "+prog+" "+arg;
+				System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+"|"+toArgs);
+				confWC.setAttribute(appargattrib, toArgs);
 				
 				
 				for(int i = 0;i<tool.execUtils.length;i++){

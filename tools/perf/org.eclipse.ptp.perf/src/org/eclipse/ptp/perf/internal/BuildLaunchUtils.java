@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -178,7 +179,7 @@ public class BuildLaunchUtils {
 			return null;
 		String pPath = null;
 		try {
-			Process p = Runtime.getRuntime().exec("which "+toolname);
+			Process p = new ProcessBuilder("which",toolname).start();//Runtime.getRuntime().exec("which "+toolname);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p
 					.getInputStream()));
 			pPath = reader.readLine();
@@ -254,42 +255,12 @@ public class BuildLaunchUtils {
 	 * @param env A list of environment variables to associate with the tool
 	 * @param directory The directory where the tool is invoked
 	 */
-	public static boolean runTool(String tool, String[] env, File directory)
-	{
-//		String s = new String();
-//		try {
-//			Process p = Runtime.getRuntime().exec(tool, env, directory);
-//			int i = p.waitFor();
-//			if (i == 0)
-//			{
-//				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//				//read the output from the command
-//				while ((s = stdInput.readLine()) != null) 
-//				{
-//					System.out.println(s);
-//				}
-//			}
-//			else 
-//			{
-//				BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//				//read the output from the command
-//				while ((s = stdErr.readLine()) != null) 
-//				{
-//					System.err.println(s);
-//				}
-//				return false;
-//			}
-//		}
-//		catch (Exception e) {
-//			e.printStackTrace();
-//			return false;
-//			}
-//		return true;
-		
+	public static boolean runTool(List<String> tool, Map<String,String> env, File directory)
+	{		
 		return runTool(tool,env,directory,null);
 	}
 	
-	public static boolean runTool(String tool, String[] env, File directory, String output){
+	public static boolean runTool(List<String> tool, Map<String,String> env, File directory, String output){
 		int eval=-1;
 		try{
 		
@@ -304,7 +275,14 @@ public class BuildLaunchUtils {
 				}
 				fos=new FileOutputStream(output);
 			}
-			Process p = Runtime.getRuntime().exec(tool, env, directory);
+			
+			ProcessBuilder pb = new ProcessBuilder(tool);
+			pb.directory(directory);
+			if(env!=null){
+				pb.environment().putAll(env);
+			}
+			
+			Process p = pb.start();//Runtime.getRuntime().exec(tool, env, directory);
 			StreamRunner outRun=new StreamRunner(p.getInputStream(),"out",fos);
 			StreamRunner errRun=new StreamRunner(p.getErrorStream(),"err",null);
 			outRun.start();
