@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
-            id="org.eclipse.ptp.perf.tau.selinstfort.AddAtomicEvent"
-            targetID="#FortranEditorContextMenu">
+            id="org.eclipse.ptp.perf.tau.selinstfort.fixed.AddAtomicEvent"
+            targetID="#FixedFormFortranEditorContextMenu">
          <action
                class="org.eclipse.ptp.perf.tau.selinstfort.popup.actions.Instrument"
                enablesFor="*"
@@ -20,8 +20,8 @@
                path="additions"/>
       </viewerContribution>
       <viewerContribution
-            id="org.eclipse.ptp.perf.tau.selinstfort.AddIncrementalEvent"
-            targetID="#FortranEditorContextMenu">
+            id="org.eclipse.ptp.perf.tau.selinstfort.fixed.AddIncrementalEvent"
+            targetID="#FixedFormFortranEditorContextMenu">
          <action
                class="org.eclipse.ptp.perf.tau.selinstfort.popup.actions.IncrementInstrument"
                enablesFor="*"
@@ -35,6 +35,41 @@
                label="Selective Instrumentation"
                path="additions"/>
       </viewerContribution>
+      
+      
+      <viewerContribution
+            id="org.eclipse.ptp.perf.tau.selinstfort.free.AddAtomicEvent"
+            targetID="#FreeFormFortranEditorContextMenu">
+         <action
+               class="org.eclipse.ptp.perf.tau.selinstfort.popup.actions.Instrument"
+               enablesFor="*"
+               id="org.eclipse.ptp.perf.tau.selinstfort.te.Select"
+               label="Insert TAU Atomic User Defined Event"
+               menubarPath="org.eclipse.ptp.perf.tau.selinstfort.menu1/group1">
+            <selection class="org.eclipse.jface.text.ITextSelection"/>
+         </action>
+         <menu
+               id="org.eclipse.ptp.perf.tau.selinstfort.menu1"
+               label="Selective Instrumentation"
+               path="additions"/>
+      </viewerContribution>
+      <viewerContribution
+            id="org.eclipse.ptp.perf.tau.selinstfort.free.AddIncrementalEvent"
+            targetID="#FreeFormFortranEditorContextMenu">
+         <action
+               class="org.eclipse.ptp.perf.tau.selinstfort.popup.actions.IncrementInstrument"
+               enablesFor="*"
+               id="org.eclipse.ptp.perf.tau.selinstfort.te.SelectInstFunc"
+               label="Insert TAU Interval (start/stop) User Defined Event"
+               menubarPath="org.eclipse.ptp.perf.tau.selinstfort.menu1/group1">
+            <selection class="org.eclipse.jface.text.ITextSelection"/>
+         </action>
+         <menu
+               id="org.eclipse.ptp.perf.tau.selinstfort.menu1"
+               label="Selective Instrumentation"
+               path="additions"/>
+      </viewerContribution>
+      
    </extension>
 
 </plugin>
