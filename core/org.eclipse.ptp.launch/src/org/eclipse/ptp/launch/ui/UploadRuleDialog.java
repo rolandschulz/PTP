@@ -49,7 +49,9 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 
-
+/**
+ * TODO: NEEDS TO BE DOCUMENTED
+ */
 public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 
 	Composite content;
@@ -299,31 +301,47 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		return frame;
 	}
 	
-	class PathIterator implements Iterator {
-		Iterator internalIterator;
-		
-		public PathIterator(Iterator internalIterator) {
-			this.internalIterator = internalIterator;
+	private class PathIterable implements Iterable<IPath> {
+		private class PathIterator implements Iterator<IPath> {
+			private Iterator<String> internalIterator;
+			
+			public PathIterator(String [] array) {
+				this.internalIterator = (Iterator<String>) Arrays.asList(array).iterator();
+			}
+	
+			/* (non-Javadoc)
+			 * @see java.util.Iterator#hasNext()
+			 */
+			public boolean hasNext() {
+				return internalIterator.hasNext();
+			}
+			
+			/* (non-Javadoc)
+			 * @see java.util.Iterator#next()
+			 */
+			public IPath next() {
+				return new Path((String)internalIterator.next());
+			}
+			
+			/* (non-Javadoc)
+			 * @see java.util.Iterator#remove()
+			 */
+			public void remove() {
+				internalIterator.remove();
+			}
 		}
 		
-		public PathIterator(String [] array) {
-			this.internalIterator = Arrays.asList(array).iterator();
+		private PathIterator iterator;
+		
+		public PathIterable(String [] array) {
+			iterator = new PathIterator(array);
 		}
 
-		public PathIterator(java.util.List list) {
-			this.internalIterator = list.iterator();
-		}
-
-		public boolean hasNext() {
-			return internalIterator.hasNext();
-		}
-		
-		public Object next() {
-			return new Path((String)internalIterator.next());
-		}
-		
-		public void remove() {
-			internalIterator.remove();
+		/* (non-Javadoc)
+		 * @see java.lang.Iterable#iterator()
+		 */
+		public Iterator<IPath> iterator() {
+			return iterator;
 		}
 	}
 	
@@ -346,14 +364,13 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			 */
 			IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			IPath fileRoot = new Path(fileDialog.getFilterPath());
-			HashSet fileSet = new HashSet(Arrays.asList(fileList.getItems()));
-			for (Iterator iter = new PathIterator(fileDialog.getFileNames()); iter.hasNext();) {
+			HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
+			for (IPath path : new PathIterable(fileDialog.getFileNames())) {
 				/*
 				 * If not absolute, the make it absolute according to path in dialog.
 				 * This is due behaviour how FileDialog returns selected files.
 				 */
-				IPath path = (IPath) iter.next();
-				if (! path.isAbsolute()) {
+				if (!path.isAbsolute()) {
 					path = fileRoot.append(path);
 				}
 				
@@ -391,7 +408,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		String newPath = directoryDialog.open();
 
 		if (newPath != null) {
-			HashSet fileSet = new HashSet(Arrays.asList(fileList.getItems()));
+			HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
 			IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			IPath path = new Path(newPath);
 			
@@ -420,7 +437,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			 * Save lastSelectedDirectory. There is a bug in DirectoryDialog.
 			 * The method getFilterPath does not return the expected path.
 			 * The bug will be fixed in Eclipse 3.4.
-			 * The workarount takes the parent of the selected directory as lastSelectedDirectory.
+			 * The workaround takes the parent of the selected directory as lastSelectedDirectory.
 			 */
 			lastSelectedDirectory = new Path(newPath);
 			lastSelectedDirectory = lastSelectedDirectory.removeLastSegments(1).removeTrailingSeparator();
@@ -435,9 +452,8 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		 * Otherwise, they are ignored and removed.
 		 */
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		ArrayList resourceList = new ArrayList();
-		for (Iterator iter = new PathIterator(fileList.getItems()); iter.hasNext();) {
-			IPath path = (IPath) iter.next();
+		ArrayList<IResource> resourceList = new ArrayList<IResource>();
+		for (IPath path : new PathIterable(fileList.getItems())) {
 			if (path.isAbsolute()) {
 				continue;
 			}
@@ -469,9 +485,8 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			/*
 			 * Filter only absolute path. Relative paths are removed.
 			 */
-			HashSet newFileList = new HashSet();
-			for (Iterator iter = new PathIterator(fileList.getItems()); iter.hasNext();) {
-				IPath path = (IPath) iter.next();
+			HashSet<String> newFileList = new HashSet<String>();
+			for (IPath path : new PathIterable(fileList.getItems())) {
 				if (! path.isAbsolute()) {
 					continue;
 				}
@@ -500,7 +515,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			return;
 		}
 		
-		HashSet fileSet = new HashSet(Arrays.asList(fileList.getItems()));
+		HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
 		for (int i = 0; i < selection.length; i++) {
 			String string = selection[i];
 			fileSet.remove(string);

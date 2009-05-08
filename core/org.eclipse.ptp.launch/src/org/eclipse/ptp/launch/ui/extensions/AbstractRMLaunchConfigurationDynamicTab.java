@@ -36,7 +36,7 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
  *
  */
 public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaunchConfigurationDynamicTab {
-	public static final String EMPTY_STRING = "";
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
 	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();

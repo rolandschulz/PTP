@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- *
+ * TODO: NEEDS TO BE DOCUMENTED
  */
 public class ArgumentsTab extends LaunchConfigurationTab {
     protected Text argumentText = null;

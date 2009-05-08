@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 /**
- *
+ * TODO: NEEDS TO BE DOCUMENTED
  */
 public class WorkingDirectoryBlock extends LaunchConfigurationTab {
     protected Button useDefaultWorkingDirButton = null;
@@ -243,7 +243,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	 */
 	protected void setDefaultWorkingDir(ILaunchConfiguration configuration) {
 		if (configuration == null) {
-			workingDirText.setText(System.getProperty("user.dir"));
+			workingDirText.setText(System.getProperty("user.dir")); //$NON-NLS-1$
 			localDirButton.setSelection(true);
 			workspaceDirButton.setSelection(false);
 			return;

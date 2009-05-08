@@ -35,11 +35,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
 /**
- *
+ * TODO: NEEDS TO BE DOCUMENTED
  */
 public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab {
-    public static final String DEFAULT_VALUE = "0";
-    public static final String EMPTY_STRING = "";
+    public static final String DEFAULT_VALUE = "0"; //$NON-NLS-1$
+    public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private ILaunchConfiguration launchConfiguration = null;
 
