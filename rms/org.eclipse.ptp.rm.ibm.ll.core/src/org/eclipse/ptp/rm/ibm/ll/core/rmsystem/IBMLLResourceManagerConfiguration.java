@@ -62,9 +62,9 @@ final public class IBMLLResourceManagerConfiguration extends AbstractRemoteResou
 	@Override
 	public Object clone() {
 		CommonConfig commonConf = new CommonConfig(getName(),
-				getDescription(), getUniqueName());
+				getDescription(), getUniqueName(),
+				getRemoteServicesId(), getConnectionName());
 		RemoteConfig remoteConf = new RemoteConfig(commonConf,
-				getRemoteServicesId(), getConnectionName(),
 				getProxyServerPath(), getLocalAddress(),
 				getInvocationOptionsStr(), getOptions());
 		return new IBMLLResourceManagerConfiguration(
@@ -75,12 +75,12 @@ final public class IBMLLResourceManagerConfiguration extends AbstractRemoteResou
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
 	 */
 	public void setDefaultNameAndDesc() {
-		String name = "IBMLL";
+		String name = "IBMLL"; //$NON-NLS-1$
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals("")) {
-			name += "@" + conn;
+		if (conn != null && !conn.equals("")) { //$NON-NLS-1$
+			name += "@" + conn; //$NON-NLS-1$
 		}
 		setName(name);
-		setDescription("IBMLL Resource Manager");
+		setDescription("IBMLL Resource Manager"); //$NON-NLS-1$
 	}
 }

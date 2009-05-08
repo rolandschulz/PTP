@@ -36,15 +36,15 @@ final public class PEResourceManagerConfiguration extends AbstractRemoteResource
 
     	// Values of tags used as memento keys should be prefixed with 'PE_' to ensure no
     	// collisions with other proxy's settings
-    private static final String TAG_USE_LOADLEVELER = "PE_UseLoadLeveler";
-    private static final String TAG_DEBUG_LEVEL = "PE_DebugLevel";
-    private static final String TAG_RUN_MINIPROXY = "PE_RunMiniproxy";
-    private static final String TAG_SUSPEND_PROXY = "PE_SuspendProxy";
-    private static final String TAG_LOADLEVELER_MODE = "PE_LoadLevelerMode";
-    private static final String TAG_MIN_NODE_POLL_INTERVAL = "PE_NodeMinPollInterval";
-    private static final String TAG_MAX_NODE_POLL_INTERVAL = "PE_NodeMaxPollInterval";
-    private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval";
-    private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride";
+    private static final String TAG_USE_LOADLEVELER = "PE_UseLoadLeveler"; //$NON-NLS-1$
+    private static final String TAG_DEBUG_LEVEL = "PE_DebugLevel"; //$NON-NLS-1$
+    private static final String TAG_RUN_MINIPROXY = "PE_RunMiniproxy"; //$NON-NLS-1$
+    private static final String TAG_SUSPEND_PROXY = "PE_SuspendProxy"; //$NON-NLS-1$
+    private static final String TAG_LOADLEVELER_MODE = "PE_LoadLevelerMode"; //$NON-NLS-1$
+    private static final String TAG_MIN_NODE_POLL_INTERVAL = "PE_NodeMinPollInterval"; //$NON-NLS-1$
+    private static final String TAG_MAX_NODE_POLL_INTERVAL = "PE_NodeMaxPollInterval"; //$NON-NLS-1$
+    private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
+    private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
     private String useLoadLeveler;
     private String runMiniproxy;
     private String debugLevel;
@@ -105,7 +105,7 @@ final public class PEResourceManagerConfiguration extends AbstractRemoteResource
 
     public PEResourceManagerConfiguration(PEResourceManagerFactory factory)
     {
-	this(factory, new RemoteConfig(), "N", "Y", "None", "N", "d", "", "", "", "");
+	this(factory, new RemoteConfig(), "N", "Y", "None", "N", "d", "", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 	setDefaultNameAndDesc();
     }
 	/*
@@ -116,9 +116,9 @@ final public class PEResourceManagerConfiguration extends AbstractRemoteResource
 	@Override
 	public Object clone() {
 		CommonConfig commonConf = new CommonConfig(getName(),
-				getDescription(), getUniqueName());
+				getDescription(), getUniqueName(),
+				getRemoteServicesId(), getConnectionName());
 		RemoteConfig remoteConf = new RemoteConfig(commonConf,
-				getRemoteServicesId(), getConnectionName(),
 				getProxyServerPath(), getLocalAddress(),
 				getInvocationOptionsStr(), getOptions());
 		return new PEResourceManagerConfiguration(
@@ -135,13 +135,13 @@ final public class PEResourceManagerConfiguration extends AbstractRemoteResource
      */
     public void setDefaultNameAndDesc()
     {
-	String name = "PE";
+	String name = "PE"; //$NON-NLS-1$
 	String conn = getConnectionName();
-	if (conn != null && !conn.equals("")) {
-	    name += "@" + conn;
+	if (conn != null && !conn.equals("")) { //$NON-NLS-1$
+	    name += "@" + conn; //$NON-NLS-1$
 	}
 	setName(name);
-	setDescription("PE Resource Manager");
+	setDescription("PE Resource Manager"); //$NON-NLS-1$
     }
 
     /**

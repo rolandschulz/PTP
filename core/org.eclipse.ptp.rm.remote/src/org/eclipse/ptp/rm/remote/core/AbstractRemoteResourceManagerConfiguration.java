@@ -37,22 +37,18 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 */
 	static public class RemoteConfig {
 		private final CommonConfig commonConfig;
-		private final String remoteServicesId;
-		private final String connectionName;
 		private final String proxyPath;
 		private final String localAddress;
 		private final String invocationOptions;
 		private final int options;
 
 		public RemoteConfig() {
-			this(new CommonConfig(), null, null, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, IRemoteProxyOptions.NONE);
+			this(new CommonConfig(),EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, IRemoteProxyOptions.NONE);
 		}
 		
-		public RemoteConfig(CommonConfig config, String remoteId, String conn, String path, 
+		public RemoteConfig(CommonConfig config, String path, 
 				    String localAddr, String invocationOptions, int options) {
 			this.commonConfig = config;
-			this.remoteServicesId = remoteId;
-			this.connectionName = conn;
 			this.proxyPath = path;
 			this.localAddress = localAddr;
 			this.invocationOptions = invocationOptions;
@@ -63,10 +59,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 			return commonConfig;
 		}
 		
-		public String getConnectionName() {
-			return connectionName;
-		}
-
 		public String getInvocationOptions() {
 		    return invocationOptions;
 		}
@@ -82,17 +74,11 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		public String getProxyPath() {
 			return proxyPath;
 		}
-
-		public String getRemoteServicesId() {
-			return remoteServicesId;
-		}
 	}
 	
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$
-	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
-	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 	private static final String TAG_INVOCATION_OPTIONS = "invocationOptions"; //$NON-NLS-1$
 	private static final String TAG_LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
 
@@ -108,22 +94,18 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 
 		CommonConfig commonConfig = loadCommon(factory, memento);
 		
-		String remoteServicesId = memento.getString(TAG_REMOTE_SERVICES_ID);
-		String connectionName = memento.getString(TAG_CONNECTION_NAME);
 		String proxyServerPath = memento.getString(TAG_PROXY_PATH);
 		String localAddress = memento.getString(TAG_LOCAL_ADDRESS);
 		int options = Integer.parseInt(memento.getString(TAG_OPTIONS));
 		String invocationOptions = memento.getString(TAG_INVOCATION_OPTIONS);
 
 		RemoteConfig config = 
-			new RemoteConfig(commonConfig, remoteServicesId, connectionName, proxyServerPath,
+			new RemoteConfig(commonConfig, proxyServerPath,
 					 localAddress, invocationOptions, options);
 
 		return config;
 	}
 	
-	private String remoteServicesId;
-	private String connectionName;
 	private String proxyServerPath;
 	private String localAddress;
 	private List<String> invocationOptions;
@@ -132,8 +114,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public AbstractRemoteResourceManagerConfiguration(RemoteConfig remoteConfig, 
 			IResourceManagerFactory factory) {
 		super(remoteConfig.getCommonConfig(), factory);
-		this.remoteServicesId = remoteConfig.getRemoteServicesId();
-		this.connectionName = remoteConfig.getConnectionName();
 		this.proxyServerPath = remoteConfig.getProxyPath();
 		this.localAddress = remoteConfig.getLocalAddress();
 		this.options = remoteConfig.getOptions();
@@ -155,16 +135,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 				this.invocationOptions.add(option);
 			}
 		}
-	}
-	
-	/**
-	 * Get the connection name. This is a string used by the remote subsystem to
-	 * identify a particular connection.
-	 * 
-	 * @return connection name
-	 */
-	public String getConnectionName() {
-		return connectionName;
 	}
 	
 	/**
@@ -220,36 +190,16 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public String getProxyServerPath() {
 		return proxyServerPath;
 	}
-	
-	/**
-	 * Get the ID of the remote services subsystem.
-	 * 
-	 * @return
-	 */
-	public String getRemoteServicesId() {
-		return remoteServicesId;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration#save(org.eclipse.ui.IMemento)
 	 */
 	public void save(IMemento memento) {
 		super.save(memento);
-		memento.putString(TAG_REMOTE_SERVICES_ID, remoteServicesId);
-		memento.putString(TAG_CONNECTION_NAME, connectionName);
 		memento.putString(TAG_PROXY_PATH, proxyServerPath);
 		memento.putString(TAG_LOCAL_ADDRESS, localAddress);
 		memento.putString(TAG_OPTIONS, Integer.toString(options));
 		memento.putString(TAG_INVOCATION_OPTIONS, getInvocationOptionsStr());
-	}
-
-	/**
-	 * Set the connection name.
-	 * 
-	 * @param connectionName
-	 */
-	public void setConnectionName(String connectionName) {
-		this.connectionName = connectionName;
 	}
 
 	/**
@@ -288,14 +238,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 */
 	public void setProxyServerPath(String proxyServerPath) {
 		this.proxyServerPath = proxyServerPath;
-	}
-	
-	/**
-	 * Set the remote services subsystem id
-	 * @param id
-	 */
-	public void setRemoteServicesId(String id) {
-		this.remoteServicesId = id;
 	}
 
 	/**
