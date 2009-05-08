@@ -32,7 +32,7 @@ import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 
 public class PEPreferenceManager
 {
-    private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy";
+    private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy"; //$NON-NLS-1$
     private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
     private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
 
@@ -60,25 +60,25 @@ public class PEPreferenceManager
     {
 	Preferences preferences = Activator.getDefault().getPluginPreferences();
 
-	String server = "";
+	String server = ""; //$NON-NLS-1$
 
 	if (PROXY_EXECUTABLE_PATH != null) {
 	    server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
 	} else {
-	    server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
+	    server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME); //$NON-NLS-1$
 	    if (server == null) {
-		server = "";
+		server = ""; //$NON-NLS-1$
 	    }
 	}
 
 	preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
 	preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
 	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_OPTION, PEPreferenceConstants.OPTION_NO);
-	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_MODE, "d");
-	preferences.setDefault(PEPreferenceConstants.JOB_POLL_INTERVAL, "30");
-	preferences.setDefault(PEPreferenceConstants.NODE_MIN_POLL_INTERVAL, "30");
-	preferences.setDefault(PEPreferenceConstants.NODE_MAX_POLL_INTERVAL, "120");
-	preferences.setDefault(PEPreferenceConstants.LIBRARY_OVERRIDE, "");
+	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_MODE, "d"); //$NON-NLS-1$
+	preferences.setDefault(PEPreferenceConstants.JOB_POLL_INTERVAL, "30"); //$NON-NLS-1$
+	preferences.setDefault(PEPreferenceConstants.NODE_MIN_POLL_INTERVAL, "30"); //$NON-NLS-1$
+	preferences.setDefault(PEPreferenceConstants.NODE_MAX_POLL_INTERVAL, "120"); //$NON-NLS-1$
+	preferences.setDefault(PEPreferenceConstants.LIBRARY_OVERRIDE, ""); //$NON-NLS-1$
 	preferences.setDefault(PEPreferenceConstants.RUN_MINIPROXY, PEPreferenceConstants.OPTION_YES);
 	preferences.setDefault(PEPreferenceConstants.TRACE_LEVEL, PEPreferenceConstants.TRACE_NOTHING);
     }
