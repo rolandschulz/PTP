@@ -11,7 +11,6 @@
 package org.eclipse.photran.cdtinterface.ui;
 
 import org.eclipse.cdt.core.CProjectNature;
-import org.eclipse.cdt.ui.newui.UIMessages;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -25,8 +24,9 @@ public class FortranProjectWizard extends CDTCommonProjectWizard
 
 	public FortranProjectWizard()
 	{
-		super(UIMessages.getString("Fortran Project"),  //$NON-NLS-1$
-			  UIMessages.getString("Create Fortran project of selected type")); //$NON-NLS-1$
+//		super(UIMessages.getString("Fortran Project"),  //$NON-NLS-1$
+//			  UIMessages.getString("Create Fortran project of selected type")); //$NON-NLS-1$
+        super("Fortran Project", "Create a Fortran project of the selected type");
 	}
 
 	public String[] getNatures()
