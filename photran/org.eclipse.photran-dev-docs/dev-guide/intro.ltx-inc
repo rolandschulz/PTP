@@ -1,7 +1,7 @@
 % Introduction
 \vspace{-0.5in}
 
-Photran is an IDE for Fortran 90/95 and Fortran 77 that is built on top of
+Photran is an IDE for Fortran 77, 90, 95, and 2003 that is built on top of
 Eclipse. It is structured as an Eclipse feature, in other words, as a set of
 plug-ins that are designed to be used together. Starting with version 3.0, it is
 an extension of C/C++ Development Tools (CDT), the Eclipse IDE for C/C++.
@@ -11,9 +11,10 @@ languages into CDT, allowing the Fortran support code to be in its own set of
 plug-ins.
 
 Our purpose in writing Photran was to create a refactoring tool for Fortran.
-Thus, Photran has a complete parser and program representation. Photran adds a
-Fortran editor and several preference pages to the CDT user interface, as
-well as a Fortran Managed Make project type.
+Thus, Photran has a complete parser and program representation. Photran also
+adds a Fortran editor and several preference pages to the CDT user interface,
+as well as Fortran-specific project wizards and support for several Fortran
+compilers.
 
 \vspace{-0.2in}
 

@@ -92,7 +92,7 @@ All tests in org.eclipse.photran.core.vpg.tests should pass. Test suites and
 test cases are placed in the ``failing'' plug-in project until all of their
 tests pass.
 
-These plug-ins \textit{must} be run as a ``JUnit Plug-in Test'' ()\textbf{not} a
+These plug-ins \textit{must} be run as a ``JUnit Plug-in Test'' (\textbf{not} a
 ``JUnit Test''). In the launch configuration, the environment variable TESTING
 must be set to some non-empty value. (This ensures that the VPG will not try to
 run in the background and interfere with testing.)

@@ -1,11 +1,8 @@
 % Getting the Photran Sources from CVS
 
-\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.4} and a 
-\textbf{Java 5} or later JVM. We recommend the 
+\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.4} (Ganymede)
+and a \textbf{Java 5} or later JVM. We recommend the 
 \href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.}
-
-If you already have CDT 5.0 installed and do not need to edit the CDT source 
-code, Part~I can be skipped.
 
 \newcounter{running_counter}
 \textbf{Part~I.  Check out the CDT 5.0 sources from CVS}
@@ -13,13 +10,13 @@ code, Part~I can be skipped.
 \begin{enumerate}
 	\item  In Eclipse, switch to the CVS Repository Exploring perspective.
 	\item  Right-click the CVS Repositories view; choose New, Repository Location
-	\item  In the dialog box, enter the following information, then click Finish: \\
+	\item  In the dialog box, enter the following information, then click Finish. \\
 	\begin{tabular}{ll}
-	         Host name:       & dev.eclipse.org \\
-	         Repository path: & /cvsroot/tools \\
-	         Username:        & anonymous \\
-	         Password:        & (no password) \\
-	         Connection type: & pserver \\
+	        Host name:       & dev.eclipse.org \\
+	        Repository path: & /cvsroot/tools \\
+	        Username:        & anonymous \\
+	        Password:        & (no password) \\
+	        Connection type: & pserver \\
 	\end{tabular}
 	\item  In the CVS Repositories view
 	       \begin{itemize}
@@ -58,50 +55,17 @@ code, Part~I can be skipped.
 \textbf{Part~II.  Check out the Photran sources from CVS}
 \begin{enumerate}
 	\setcounter{enumi}{\value{running_counter}}
-	\item In Eclipse, switch to the CVS Repository Exploring perspective.
-	\item Right-click the CVS Repositories view; choose New, Repository Location
-	\pagebreak
-	\item Enter the following information, then click Finish: \\
-	\textit{If you are a Photran committer:} \\
-	\begin{tabular}{ll}
-	        Host name:       & dev.eclipse.org \\
-	        Repository path: & /cvsroot/technology \\
-	        Username/passwd: & (your eclipse.org committer username and password) \\
-	        Connection type: & extssh \\
-	\textit{Otherwise:} \\
-	        Host name:       & dev.eclipse.org \\
-	        Repository path: & /cvsroot/technology \\
-	        Username:        & anonymous \\
-	        Password:        & (no password) \\
-	        Connection type: & pserver \\
-	\end{tabular}
-	\item Expand the node for dev.eclipse.org:/home/technology,
-	    then expand HEAD (in the CVS Repositories view), then expand
-	    org.eclipse.photran
-	\item  Check out the following projects under org.eclipse.photran:
-	       \begin{itemize}
-	       \item  org.eclipse.photran-dev-docs (if you intend to contribute to the documentation)
-	       \item  org.eclipse.photran-samples (sample Fortran programs)
-	       \item  org.eclipse.photran.cdtinterface
-	       \item  org.eclipse.photran.core
-	       \item  org.eclipse.photran.core.intel
-	       \item  org.eclipse.photran.core.vpg
-	       \item  org.eclipse.photran.core.vpg.tests
-	       \item  org.eclipse.photran.core.vpg.tests.failing
-	       \item  org.eclipse.photran.errorparsers.xlf
-	       \item  org.eclipse.photran.managedbuilder.core
-	       \item  org.eclipse.photran.managedbuilder.gnu.ui
-	       \item  org.eclipse.photran.managedbuilder.intel.ui
-	       \item  org.eclipse.photran.managedbuilder.ui
-	       \item  org.eclipse.photran.managedbuilder.xlf.ui
-	       \item  org.eclipse.photran.ui
-	       \item  org.eclipse.photran.ui.vpg
-	       \end{itemize}
-	       (The debug and launch plug-ins are not part of Photran 4.0 and will not
-         compile. The analysis and refactoring plug-ins have been deprecated;
-         they do not contain any files, since that functionality is in the VPG
-         plug-ins.)
-
+	\item Under ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,''
+	    expand HEAD, then expand
+	    org.eclipse.ptp, then expand
+	    photran
+	\item  Click on the first entry under ``photran''
+	       (it should be org.eclipse.photran-dev-docs), then shift-click on the last entry
+	       under ``photran'' (it should be org.eclipse.photran.xlf-feature).
+	       All of the intervening plug-ins should now be selected.
+	       Right-click on any of the selected plug-ins, and select
+	       Check Out from the pop-up menu.
+	       (Check out will take several minutes.)
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}
 The sources should all compile (albeit with lots of warnings).
@@ -122,31 +86,4 @@ The sources should all compile (albeit with lots of warnings).
 	refactoring engine require closed-source code that is not available in CVS. 
 	A warning will appear in the JUnit runner if this code is not available.}
 	\setcounter{running_counter}{\value{enumi}}
-\end{enumerate}
-
-\vspace{1em}
-\noindent\textbf{Part~IV. Deploying Photran Feature}
-\begin{enumerate}
-	\setcounter{enumi}{\value{running_counter}}
-	\item If you are interested in creating a \emph{deployable feature} for
-        Photran, you also need to check out these \textbf{additional} four 
-        projects from CVS:
-				\begin{itemize}
-					\item org.eclipse.photran-feature
-          \item org.eclipse.photran.intel-feature
-					\item org.eclipse.photran.vpg-feature
-					\item org.eclipse.photran.xlf-feature
-				\end{itemize}
-	\item In Eclipse, select File $>$ Export\ldots
-	\item In the dialog that pops-up, select Plug-in Development $>$ Deployable features.
-	\item Click next.
-	\item In the list, select
-		\begin{itemize}
-			\item org.eclipse.photran\_feature (4.0.4)
-			\item org.eclipse.photran.intel (4.0.4)
-			\item org.eclipse.photran.vpg\_feature (4.0.4)
-			\item org.eclipse.photran.xlf\_feature (4.0.4)
-		\end{itemize}		
-	\item Specify a destination folder to export those features. Click Finish.
-	\item The Photran features are ready for deployment.
 \end{enumerate}

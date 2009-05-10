@@ -1,0 +1,28 @@
+% removed from app-cvs.ltx-inc
+
+\vspace{1em}
+\noindent\textbf{Part~IV. Deploying Photran Feature}
+\begin{enumerate}
+	\setcounter{enumi}{\value{running_counter}}
+	\item If you are interested in creating a \emph{deployable feature} for
+        Photran, you also need to check out these \textbf{additional} four 
+        projects from CVS:
+				\begin{itemize}
+					\item org.eclipse.photran-feature
+          \item org.eclipse.photran.intel-feature
+					\item org.eclipse.photran.vpg-feature
+					\item org.eclipse.photran.xlf-feature
+				\end{itemize}
+	\item In Eclipse, select File $>$ Export\ldots
+	\item In the dialog that pops-up, select Plug-in Development $>$ Deployable features.
+	\item Click next.
+	\item In the list, select
+		\begin{itemize}
+			\item org.eclipse.photran\_feature (4.0.4)
+			\item org.eclipse.photran.intel (4.0.4)
+			\item org.eclipse.photran.vpg\_feature (4.0.4)
+			\item org.eclipse.photran.xlf\_feature (4.0.4)
+		\end{itemize}		
+	\item Specify a destination folder to export those features. Click Finish.
+	\item The Photran features are ready for deployment.
+\end{enumerate}
