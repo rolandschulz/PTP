@@ -16,6 +16,15 @@ adds a Fortran editor and several preference pages to the CDT user interface,
 as well as Fortran-specific project wizards and support for several Fortran
 compilers.
 
+Photran is part of the Parallel Tools Platform (PTP) project at the
+Eclipse Foundation, which provides the Web site, CVS repository, and
+Bugzilla repository.  The Web site is 
+\href{http://www.eclipse.org/photran}{http://www.eclipse.org/photran},
+and bugs can be submitted at
+\href{https://bugs.eclipse.org}{https://bugs.eclipse.org}
+under Tools $>$ PTP by selecting one of the ``Photran'' components.
+
+
 \vspace{-0.2in}
 
 \section{How To Read This Guide} 
