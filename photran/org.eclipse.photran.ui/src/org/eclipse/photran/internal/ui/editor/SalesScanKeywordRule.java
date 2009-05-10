@@ -455,15 +455,15 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         
         public boolean retainAsKeyword(int column)
         {
-//            System.out.println();
-//            System.out.println("Column " + column + ": " + line.substring(column));
-//            System.out.println("OC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical);
-//            int precedingKeywordOffset = findPrecedingKeyword(column);
-//            String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
-//            System.out.println("Preceding token is " + precedingKeyword + " (column " + precedingKeywordOffset + ")");
-//            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
-//            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
-//            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
+            System.out.println();
+            System.out.println("Column " + column + ": " + line.substring(column));
+            System.out.println("OC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical);
+            int precedingKeywordOffset = findPrecedingKeyword(column);
+            String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
+            System.out.println("Preceding token is " + precedingKeyword + " (column " + precedingKeywordOffset + ")");
+            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
+            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
+            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
             
             return internalRetainAsKeyword(column, keyword);
         }
@@ -510,8 +510,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private boolean applyPrecedingKeywordRules(String keyword, String precedingKeyword)
         {
             // N.B. These rules depend on the token preceding this one
-            if (isType(keyword))
-                return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit");
+            if (isType(keyword) && !keyword.equalsIgnoreCase("type"))
+                return isPrefixSpec(precedingKeyword)|| precedingKeyword.equalsIgnoreCase("implicit");
             else if (isPrefixSpec(keyword))
                 return isType(precedingKeyword);
             else if (keyword.equalsIgnoreCase("case"))
@@ -530,7 +530,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("do");
             // BEGIN FORTRAN 2003
             else if (keyword.equalsIgnoreCase("type"))
-                return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit") || precedingKeyword.equalsIgnoreCase("end")
+                return isPrefixSpec(precedingKeyword)
+                    || precedingKeyword.equalsIgnoreCase("implicit")
+                    || precedingKeyword.equalsIgnoreCase("end")
                     || precedingKeyword.equalsIgnoreCase("select");
             else if (keyword.equalsIgnoreCase("interface"))
                 return precedingKeyword.equalsIgnoreCase("abstract") || precedingKeyword.equalsIgnoreCase("end");
