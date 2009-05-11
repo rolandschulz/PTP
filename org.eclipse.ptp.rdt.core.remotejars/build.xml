@@ -50,6 +50,8 @@
 	<property name="rseVersion" value="R-3.0.3-200902181300"/>
 	<property name="dStoreBaseName" value="rseserver-3.0.3"/>
 	
+	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
+	
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
 	
@@ -219,30 +221,36 @@
 	<target name="prepare.script.linux">
 		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar"/>
 		<replace token=":$oldClasspath" value=":${rdtClassPath}:$oldClasspath" file="${remoteServerTempDir}/server.pl"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.pl"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$ENV{CLASSPATH}=&quot;$plugins_dir:$plugins_dir/dstore_extra_server.jar:$plugins_dir/dstore_core.jar:$plugins_dir/dstore_miners.jar:$plugins_dir/clientserver.jar"/>
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPath}" file="${remoteServerTempDir}/daemon.pl"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
 	
 	<target name="prepare.script.unix">
 		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$ENV{CLASSPATH}=&quot;$plugins_dir:$plugins_dir/dstore_extra_server.jar:$plugins_dir/dstore_core.jar:$plugins_dir/dstore_miners.jar:$plugins_dir/clientserver.jar"/>
 		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar"/>				
-		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>	
+		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
 	
 	<target name="prepare.script.macosx">
 		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$classpath = &quot;$plugin_dir"/>
 		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar"/>				
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
 	
 	<target name="prepare.remote.zip">
@@ -257,6 +265,8 @@
 		<!-- Add RDT JARs to the server script's classpath -->
 		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\${icuBaseJar};%ECLIPSEDIR%\stubs.jar"/>
 		<replace token=";%CLASSPATH%" value=";${rdtClassPath};%CLASSPATH%" file="${remoteServerTempDir}/setup.bat"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.bat"/>
+		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.bat"/>
 	</target>
 		
 	<target name="assemble.remote">
