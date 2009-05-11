@@ -5,7 +5,8 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
-            id="org.eclipse.ptp.openmpi.core.resourcemanager"/>
+            id="org.eclipse.ptp.openmpi.core.resourcemanager"
+            name="Open MPI"/>
    </extension>
 
 </plugin>

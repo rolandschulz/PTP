@@ -39,19 +39,19 @@ public abstract class AbstractResourceManagerFactory implements
 	private String name;
 	private String id;
 
-	/**
-	 * @param name
-	 */
-	public AbstractResourceManagerFactory(final String name) {
-		this.name = name;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManagerFactory#create(org.eclipse.ptp.rm.IRMConfiguration)
 	 */
 	public abstract IResourceManagerControl create(IResourceManagerConfiguration configuration);
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
+	 */
+	public String getId() {
+		return this.id;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -62,14 +62,21 @@ public abstract class AbstractResourceManagerFactory implements
 		return name;
 	}
 
+	/**
+	 * Set the extension point ID
+	 * 
+	 * @param id
+	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
+	/**
+	 * Set the extension point name
+	 * 
+	 * @param name
 	 */
-	public String getId() {
-		return this.id;
+	public void setName(String name) {
+		this.name = name;
 	}
 }

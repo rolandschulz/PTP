@@ -10,7 +10,8 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory"
-            id="org.eclipse.ptp.ibmll.core.resourcemanager"/>
+            id="org.eclipse.ptp.ibmll.core.resourcemanager"
+            name="IBM LoadLeveler"/>
    </extension>
 
 </plugin>

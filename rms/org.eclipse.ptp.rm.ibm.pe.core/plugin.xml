@@ -10,7 +10,8 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerFactory"
-            id="org.eclipse.ptp.ibmpe.core.resourcemanager"/>
+            id="org.eclipse.ptp.ibmpe.core.resourcemanager"
+            name="IBM Parallel Environment"/>
    </extension>
 
 </plugin>

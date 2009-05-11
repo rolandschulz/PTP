@@ -149,6 +149,7 @@ public class ModelManager implements IModelManager {
 				try {
 					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					factory.setId(ce.getAttribute("id")); //$NON-NLS-1$
+					factory.setName(ce.getAttribute("name")); //$NON-NLS-1$
 					factoryList.add(factory);
 				} catch (CoreException e) {
 					PTPCorePlugin.log(e);

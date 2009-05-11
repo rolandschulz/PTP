@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
@@ -24,16 +23,6 @@ import org.eclipse.ui.IMemento;
  *
  */
 public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory {
-
-	public MPICH2ResourceManagerFactory() {
-		// QUESTION: Wouldnt it be better to take name from extension point?
-		// Extension point already has a name.
-		super(Messages.MPICH2ResourceManagerFactory_ResourceManagerName);
-	}
-
-	protected MPICH2ResourceManagerFactory(String name) {
-		super(name);
-	}
 
 	public IResourceManagerConfiguration copyConfiguration(
 			IResourceManagerConfiguration configuration) {

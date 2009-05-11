@@ -58,7 +58,6 @@ public class Messages extends NLS {
 
 	public static String MPICH2ResourceManagerConfiguration_defaultDescription;
 	public static String MPICH2ResourceManagerConfiguration_defaultName;
-	public static String MPICH2ResourceManagerFactory_ResourceManagerName;
 
 	public static String MPICH2DiscoverJob_defaultQueueName;
 	public static String MPICH2DiscoverJob_Exception_DiscoverCommandFailed;
