@@ -37,10 +37,6 @@ import org.eclipse.ui.IMemento;
 
 public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 
-	public PEResourceManagerFactory() {
-		super("IBM Parallel Environment"); //$NON-NLS-1$
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */

@@ -60,7 +60,6 @@ public class Messages extends NLS {
 
 	public static String OpenMPIResourceManagerConfiguration_defaultDescription;
 	public static String OpenMPIResourceManagerConfiguration_defaultName;
-	public static String OpenMPIResourceManagerFactory_ResourceManagerName;
 
 	public static String OpenMPIDiscoverJob_defaultQueueName;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandFailed;

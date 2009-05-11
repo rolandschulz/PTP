@@ -22,10 +22,6 @@ import org.eclipse.ui.IMemento;
  */
 public abstract class AbstractToolRMFactory extends AbstractResourceManagerFactory {
 
-	public AbstractToolRMFactory(String name) {
-		super(name);
-	}
-
 	public IResourceManagerConfiguration copyConfiguration(
 			IResourceManagerConfiguration configuration) {
 		return (IResourceManagerConfiguration) configuration.clone();

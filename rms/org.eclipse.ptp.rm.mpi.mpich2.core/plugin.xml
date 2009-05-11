@@ -5,7 +5,8 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory"
-            id="org.eclipse.ptp.mpich2.core.resourcemanager"/>
+            id="org.eclipse.ptp.mpich2.core.resourcemanager"
+            name="MPICH2"/>
    </extension>
 
 </plugin>

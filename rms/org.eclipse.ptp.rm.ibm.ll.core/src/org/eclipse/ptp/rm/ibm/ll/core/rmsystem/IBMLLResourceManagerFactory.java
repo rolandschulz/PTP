@@ -33,10 +33,6 @@ import org.eclipse.ui.IMemento;
 
 public class IBMLLResourceManagerFactory extends AbstractResourceManagerFactory {
 
-	public IBMLLResourceManagerFactory() {
-		super("IBM LoadLeveler"); //$NON-NLS-1$
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
