@@ -250,27 +250,29 @@ extends AbstractParallelLaunchConfigurationDelegate {
 	 * @param perspectiveID
 	 */
 	protected void switchPerspective(final String perspectiveID) {
-		Display display = Display.getCurrent();
-		if (display == null) {
-			display = Display.getDefault();
-		}
-		if (display != null && !display.isDisposed()) {
-			display.syncExec(new Runnable() {
-				public void run() {
-					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
-					if (window != null) {
-						IWorkbenchPage page = window.getActivePage();
-						if (page != null) {
-							if (page.getPerspective().getId().equals(perspectiveID))
-								return;
-
-							try {
-								window.getWorkbench().showPerspective(perspectiveID, window);
-							} catch (WorkbenchException e) { }
+		if (perspectiveID != null) {
+			Display display = Display.getCurrent();
+			if (display == null) {
+				display = Display.getDefault();
+			}
+			if (display != null && !display.isDisposed()) {
+				display.syncExec(new Runnable() {
+					public void run() {
+						IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
+						if (window != null) {
+							IWorkbenchPage page = window.getActivePage();
+							if (page != null) {
+								if (page.getPerspective().getId().equals(perspectiveID))
+									return;
+	
+								try {
+									window.getWorkbench().showPerspective(perspectiveID, window);
+								} catch (WorkbenchException e) { }
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 }
