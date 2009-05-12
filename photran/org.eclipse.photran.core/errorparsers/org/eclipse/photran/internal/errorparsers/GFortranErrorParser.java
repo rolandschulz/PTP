@@ -16,10 +16,13 @@ import java.util.regex.Pattern;
 import org.eclipse.cdt.core.ErrorParserManager;
 import org.eclipse.cdt.core.IErrorParser;
 import org.eclipse.cdt.core.IMarkerGenerator;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 
 /**
  * An error parser for GNU Fortran 4.x
+ * 
+ * @author Jeff Overbey
  */
 public class GFortranErrorParser implements IErrorParser
 {
@@ -42,7 +45,8 @@ public class GFortranErrorParser implements IErrorParser
     Error: Array 'pointee' at (1) cannot have a deferred shape
     ================================================================================*/
     
-    private static final Pattern startLine = Pattern.compile("^(.+):([0-9]+)\\.([0-9]+):$");
+    //                                                          1          2    3       4   5
+    private static final Pattern startLine = Pattern.compile("^(In file )?(.+):([0-9]+)(\\.([0-9]+):)?$");
     private static final Pattern errorLine = Pattern.compile("^(Fatal )?Error: .*");
     private static final Pattern warningLine = Pattern.compile("^Warning: .*");
     
@@ -70,8 +74,8 @@ public class GFortranErrorParser implements IErrorParser
             Matcher startLineMatcher = startLine.matcher(line);
             if (startLineMatcher.matches())
             {
-                String filename = startLineMatcher.group(1);
-                int lineNumber = Integer.parseInt(startLineMatcher.group(2));
+                String filename = startLineMatcher.group(2);
+                int lineNumber = Integer.parseInt(startLineMatcher.group(3));
                 currentState = new AccumulateErrorMessageLines(filename, lineNumber, line);
             }
             return false;
@@ -95,8 +99,8 @@ public class GFortranErrorParser implements IErrorParser
 	    
         public boolean processLine(String line, ErrorParserManager eoParser)
         {
-            errorMessage.append("\n");
-            errorMessage.append(line);
+            //errorMessage.append("\n");
+            //errorMessage.append(line);
             linesAccumulated++;
             
             Matcher errorMatcher = errorLine.matcher(line);
@@ -105,12 +109,16 @@ public class GFortranErrorParser implements IErrorParser
             if (errorMatcher.matches())
             {
                 // Matched "Error: Description" or "Fatal Error: Description"
+                errorMessage.append(" ");
+                errorMessage.append(line);
                 addMarker(eoParser, true);
                 return true;
             }
             else if (warningMatcher.matches())
             {
                 // Matched "Warning: Description"
+                errorMessage.append(" ");
+                errorMessage.append(line);
                 addMarker(eoParser, false);
                 return true;
             }
@@ -129,13 +137,29 @@ public class GFortranErrorParser implements IErrorParser
 
         private void addMarker(ErrorParserManager eoParser, boolean isError)
         {
-            IResource file = eoParser.findFileName(filename);
+            IResource file = findFile(eoParser);
             eoParser.generateMarker(file,
                 lineNumber,
                 errorMessage.toString(),
                 isError ? IMarkerGenerator.SEVERITY_ERROR_RESOURCE : IMarkerGenerator.SEVERITY_WARNING,
                 null);
             currentState = new WaitForStartLine();
+        }
+
+        private IFile findFile(ErrorParserManager eoParser)
+        {
+            IFile result = eoParser.findFileName(filename);
+            if (result != null) return result;
+            
+            // The managed build system prefixes ../ to filenames.
+            // So (this is a hack) if the file can't be found and
+            // it starts with ../ try removing that and hope that
+            // maybe it will refer to a workspace location.
+            
+            if (filename.startsWith("../") || filename.startsWith("..\\"))
+                return eoParser.findFileName(filename.substring(3));
+            
+            return null;
         }
 	}
 }
