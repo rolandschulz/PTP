@@ -26,7 +26,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.internal.ParallelLaunchConfigurationDelegate;
+import org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 import org.eclipse.ptp.perf.internal.ILaunchFactory;
 import org.eclipse.ptp.perf.internal.PerformanceLaunchManager;
