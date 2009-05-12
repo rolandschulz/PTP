@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.launch.internal;
+package org.eclipse.ptp.launch;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -59,7 +59,6 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -95,7 +94,6 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.launch.data.RuleFactory;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -126,6 +124,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 * The JobSubmission class encapsulates all the information used in
 	 * a job submission. Once the job is created *and starts running*,
 	 * this information is used to complete the launch.
+	 * 
+	 * TODO: Add persistence to job submissions so that Eclipse sessions
+	 * can be restarted without losing the submission information. The
+	 * persistence will also need to deal with starting the debugger for
+	 * persisted debug jobs.
 	 */
 	private class JobSubmission {
 		private ILaunchConfiguration configuration;
@@ -284,12 +287,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			for (IPJob job : e.getJobs()) {
 				StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 				if (subIdAttr != null) {
-					IAttribute<?,?,?> stateAttr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
+					EnumeratedAttribute<JobAttributes.State> stateAttr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
 					if (stateAttr != null) {
-						JobAttributes.State state = (JobAttributes.State)((EnumeratedAttribute<?>)stateAttr).getValue();
 						JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
 						if (jobSub != null) {
-							switch (state) {
+							switch (stateAttr.getValue()) {
 							case RUNNING:
 								/*
 								 * When the job starts running call back to notify that job submission is completed.
@@ -322,6 +324,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 							}
 						}
 					}
+					PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
 				}
 			}
 		}
@@ -331,28 +334,15 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(INewJobEvent e) {
+			/*
+			 * Notify listeners that the job state has changed (in this case the job should be in pending state)
+			 */
 			for (IPJob job : e.getJobs()) {
-				/*
-				 * If the new job is one that we launched, check to see if it's in our list
-				 * of job submissions. If not, assume that we have reconnected to a session
-				 * so we need to re-create the launch configuration that was used launch it.
-				 * If it's a debug job, and it has not yet started running, then
-				 * start a debug session. It's possible the job will never run, so we
-				 * need to clean up any debug sessions before exiting Eclipse.
-				 */
-				StringAttribute subAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-				if (subAttr != null) {
-					IAttribute<?,?,?> launchAttr = job.getAttribute(JobAttributes.getLaunchedByPTPFlagAttributeDefinition());
-					if (launchAttr != null && ((BooleanAttribute)launchAttr).getValue()) {
-						JobSubmission jobSub = jobSubmissions.get(subAttr.getValue());
-						if (jobSub == null) {
-							// recreate launch configuration
-							// jobSub = ....;
-							// jobSubmissions.put(job, jobSub);
-						}
-						IAttribute<?,?,?> debugAttr = job.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
-						if (debugAttr != null && ((BooleanAttribute)debugAttr).getValue()) {
-						}
+				StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				if (subIdAttr != null) {
+					EnumeratedAttribute<JobAttributes.State> stateAttr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
+					if (stateAttr != null) {
+						PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
 					}
 				}
 			}
@@ -607,6 +597,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	 */
 	private List<ISynchronizationRule> extraSynchronizationRules;
 	
+	/**
+	 * Constructor
+	 */
 	public AbstractParallelLaunchConfigurationDelegate() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
@@ -620,7 +613,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		    mm.addListener(modelManagerChildListener);
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#addSynchronizationRule(org.eclipse.ptp.launch.data.ISynchronizationRule)
 	 */

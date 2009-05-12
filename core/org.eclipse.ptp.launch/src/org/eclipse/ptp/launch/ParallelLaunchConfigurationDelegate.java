@@ -16,7 +16,7 @@
  *
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.launch.internal;
+package org.eclipse.ptp.launch;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -46,18 +46,111 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.WorkbenchException;
+
 /**
- *
+ * A launch configuration delegate for launching jobs via the
+ * PTP resource manager mechanism.
  */
-public class ParallelLaunchConfigurationDelegate
-extends AbstractParallelLaunchConfigurationDelegate {
+public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		if (!(launch instanceof IPLaunch)) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+					Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
+		}
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		monitor.beginTask("", 250); //$NON-NLS-1$
+		monitor.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
+		if (monitor.isCanceled())
+			return;
+		IPDebugger debugger = null;
+		IPJob job = null;
+
+		monitor.worked(10);
+		monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
+
+		AttributeManager attrManager = getAttributeManager(configuration, mode);
+
+		// All copy pre-"job submission" occurs here
+		copyExecutable(configuration, monitor);
+		doPreLaunchSynchronization(configuration, monitor);
+
+		//switch perspective
+		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
+		try {
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				// show ptp debug view
+				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+				monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_6); 
+
+				/*
+				 * Create the debugger extension, then the connection point for the debug server.
+				 * The debug server is launched via the submitJob() command.
+				 */
+
+				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				debugger = debugConfig.getDebugger();
+				debugger.initialize(configuration, attrManager, monitor);
+				if (monitor.isCanceled())
+					return;
+				debugger.getLaunchAttributes(configuration, attrManager);
+			}
+
+			monitor.worked(10);
+			monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_7); 
+
+			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
+
+			monitor.worked(10);
+		} catch (CoreException e) {
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
+			}
+			if (e.getStatus().getCode() != IStatus.CANCEL)
+				throw e;
+		} finally {
+			monitor.done();
+		}
+	}
+
+	/**
+	 * Terminate a job.
+	 * 
+	 * @param job job to terminate
+	 */
+	private void terminateJob(final IPJob job) {
+		try {
+			IResourceManager rm = job.getQueue().getResourceManager();
+			rm.terminateJob(job);
+		} catch (CoreException e1) {
+			// Ignore, but log
+			PTPLaunchPlugin.log(e1);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCleanupLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.ptp.debug.core.IPDebugger, org.eclipse.ptp.core.elements.IPJob)
+	 */
+	@Override
+	protected void doCleanupLaunch(ILaunchConfiguration configuration,
+			String mode, IPLaunch launch, AttributeManager attrMgr,
+			IPDebugger debugger, IPJob job) {
+		if (debugger != null) {
+			debugger.cleanup(configuration, attrMgr, launch);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
@@ -122,90 +215,6 @@ extends AbstractParallelLaunchConfigurationDelegate {
 			}
 		} else {
 			new RuntimeProcess(launch, job, null);
-		}
-	}
-
-	@Override
-	protected void doCleanupLaunch(ILaunchConfiguration configuration,
-			String mode, IPLaunch launch, AttributeManager attrMgr,
-			IPDebugger debugger, IPJob job) {
-		if (debugger != null) {
-			debugger.cleanup(configuration, attrMgr, launch);
-		}
-	}
-
-	private void terminateJob(final IPJob job) {
-		try {
-			IResourceManager rm = job.getQueue().getResourceManager();
-			rm.terminateJob(job);
-		} catch (CoreException e1) {
-			// Ignore, but log
-			PTPLaunchPlugin.log(e1);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
-		if (!(launch instanceof IPLaunch)) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
-		}
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		monitor.beginTask("", 250); //$NON-NLS-1$
-		monitor.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
-		if (monitor.isCanceled())
-			return;
-		IPDebugger debugger = null;
-		IPJob job = null;
-
-		monitor.worked(10);
-		monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
-
-		AttributeManager attrManager = getAttributeManager(configuration, mode);
-
-		// All copy pre-"job submission" occurs here
-		copyExecutable(configuration, monitor);
-		doPreLaunchSynchronization(configuration, monitor);
-
-		//switch perspective
-		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
-		try {
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				// show ptp debug view
-				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_6); 
-
-				/*
-				 * Create the debugger extension, then the connection point for the debug server.
-				 * The debug server is launched via the submitJob() command.
-				 */
-
-				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-				debugger = debugConfig.getDebugger();
-				debugger.initialize(configuration, attrManager, monitor);
-				if (monitor.isCanceled())
-					return;
-				debugger.getLaunchAttributes(configuration, attrManager);
-			}
-
-			monitor.worked(10);
-			monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_7); 
-
-			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
-
-			monitor.worked(10);
-		} catch (CoreException e) {
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
-			}
-			if (e.getStatus().getCode() != IStatus.CANCEL)
-				throw e;
-		} finally {
-			monitor.done();
 		}
 	}
 

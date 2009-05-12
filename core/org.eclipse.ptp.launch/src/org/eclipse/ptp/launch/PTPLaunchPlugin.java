@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -44,8 +45,10 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
@@ -100,7 +103,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 			ErrorDialog.openError(shell, Messages.Launch_common_Error, message, status);
 		}
 	}
-	
+
 	/**
 	 * Convenience method to get the currently active page
 	 * 
@@ -113,7 +116,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none
 	 * 
@@ -126,7 +129,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Convenience method to get the currently active workbench window
 	 * 
@@ -152,7 +155,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}    
+	}
 
 	/**
 	 * Returns the string from the plugin's resource bundle,
@@ -200,8 +203,8 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
-	}	
-	
+	}    
+
 	/**
 	 * Logs an internal error with the specified message.
 	 * 
@@ -210,22 +213,37 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public static void logErrorMessage(String message) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
-	}	
-	
+	}
+
+	/*
+	 * Launch notification listeners
+	 */
+	private ListenerList listeners = new ListenerList();
+
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
+	
 	// Map of resource managers to launch configuration factories
 	private final Map<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories =
-		new HashMap<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory>();
-
+		new HashMap<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory>();	
+	
 	/**
 	 * The constructor.
 	 */
 	public PTPLaunchPlugin() {
 		super();
 		plugin = this;
+	}	
+	
+	/**
+	 * Add a listener for ILaunchNotification events
+	 * 
+	 * @param listener listener to add
+	 */
+	public void addLaunchNotificationListener(ILaunchNotification listener) {
+		listeners.add(listener);
 	}
-
+	
 	/**
 	 * Returns the plugin's resource bundle,
 	 */
@@ -240,37 +258,6 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		return resourceBundle;
 	}
 
-	/**
-	 * Find the launch configuration factory for a resource manager
-	 * 
-	 * @param rm resource manager
-	 * @return launch configuration factory
-	 */
-	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManager rm) {
-		if (rm == null) {
-			return null;
-		}
-		return rmLaunchConfigurationFactories.get(rm.getClass());
-	}
-
-	/**
-	 * This method is called upon plug-in activation
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		retrieveRMLaunchConfigurationFactories();
-	}
-	
-	/**
-	 * This method is called when the plug-in is stopped
-	 */
-	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
-		rmLaunchConfigurationFactories.clear();
-		plugin = null;
-		resourceBundle = null;
-	}
-	
 	/**
 	 * Find the resource manager that corresponds to the unique name specified in the configuration
 	 * 
@@ -289,6 +276,61 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Find the launch configuration factory for a resource manager
+	 * 
+	 * @param rm resource manager
+	 * @return launch configuration factory
+	 */
+	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManager rm) {
+		if (rm == null) {
+			return null;
+		}
+		return rmLaunchConfigurationFactories.get(rm.getClass());
+	}
+
+	/**
+	 * Notify listeners when a job changes status
+	 * 
+	 * @param job job that has changed status
+	 */
+	public void notifyJobStateChange(IPJob job, JobAttributes.State state) {
+		for (Object listener : listeners.getListeners()) {
+			try {
+				((ILaunchNotification) listener).jobStateChange(job, state);
+			} catch (Exception e) {
+				PTPLaunchPlugin.log(e);
+			}
+		}
+	}
+
+	/**
+	 * Remove a listener for ILaunchNotification events
+	 * 
+	 * @param listener listener to remove
+	 */
+	public void removeLaunchNotificationListener(ILaunchNotification listener) {
+		listeners.remove(listener);
+	}
+	
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		retrieveRMLaunchConfigurationFactories();
+	}
+	
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		rmLaunchConfigurationFactories.clear();
+		plugin = null;
+		resourceBundle = null;
 	}
 
 	/**

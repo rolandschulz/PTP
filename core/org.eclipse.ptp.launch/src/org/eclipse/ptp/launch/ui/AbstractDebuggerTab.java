@@ -8,7 +8,7 @@
  * Contributors:
  *     QNX Software Systems - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.launch.internal.ui;
+package org.eclipse.ptp.launch.ui;
 
 import java.util.Map;
 
@@ -20,8 +20,8 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.messages.Messages;
-import org.eclipse.ptp.launch.ui.LaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
