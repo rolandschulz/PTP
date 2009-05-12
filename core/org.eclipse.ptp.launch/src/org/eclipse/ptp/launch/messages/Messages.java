@@ -88,8 +88,16 @@ public class Messages extends NLS {
 
 	public static String ParallelLaunchConfigurationDelegate_0;
 	public static String ParallelLaunchConfigurationDelegate_1;
+
+	public static String ParallelLaunchConfigurationDelegate_2;
 	public static String ParallelLaunchConfigurationDelegate_3;
 	public static String ParallelLaunchConfigurationDelegate_4;
+
+	public static String ParallelLaunchConfigurationDelegate_5;
+
+	public static String ParallelLaunchConfigurationDelegate_6;
+
+	public static String ParallelLaunchConfigurationDelegate_7;
 
 	public static String ParallelLaunchConfigurationDelegate_Invalid_launch_object;
 
