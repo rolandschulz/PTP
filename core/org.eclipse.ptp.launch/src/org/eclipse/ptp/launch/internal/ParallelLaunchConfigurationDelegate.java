@@ -19,7 +19,6 @@
 package org.eclipse.ptp.launch.internal;
 
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -35,6 +34,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -78,9 +78,9 @@ extends AbstractParallelLaunchConfigurationDelegate {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								if (monitor.isCanceled()) {
-									throw new InterruptedException("The job is cancelled."); //$NON-NLS-1$
+									throw new InterruptedException(Messages.ParallelLaunchConfigurationDelegate_2); 
 								}
-								monitor.beginTask("Debugger has started, waiting for connection...", 1); //$NON-NLS-1$
+								monitor.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 1); 
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch, project, execPath);
 
@@ -100,17 +100,10 @@ extends AbstractParallelLaunchConfigurationDelegate {
 						try {
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
 						} catch (InterruptedException e) {
-							System.out.println("Debug job launch interrupted: " + e.getMessage()); //$NON-NLS-1$
 							terminateJob(job);
 						} catch (InvocationTargetException e) {
-							String msg = e.getMessage();
-							Throwable t = e.getCause();
-							if (t != null) {
-								msg = t.getMessage();
-							}
-							System.out.println("Error completing debug job launch: " + msg); //$NON-NLS-1$
-							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, t);
-							PTPLaunchPlugin.log(t);
+							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getCause());
+							PTPLaunchPlugin.log(e.getCause());
 							terminateJob(job);
 						}
 					}
@@ -163,7 +156,7 @@ extends AbstractParallelLaunchConfigurationDelegate {
 			monitor = new NullProgressMonitor();
 		}
 		monitor.beginTask("", 250); //$NON-NLS-1$
-		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { Messages.ParallelLaunchConfigurationDelegate_3 + configuration.getName() })); //$NON-NLS-1$ $NON-NLS-2$
+		monitor.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
 		if (monitor.isCanceled())
 			return;
 		IPDebugger debugger = null;
@@ -184,7 +177,7 @@ extends AbstractParallelLaunchConfigurationDelegate {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				monitor.subTask("Configuring debug setting . . ."); //$NON-NLS-1$
+				monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_6); 
 
 				/*
 				 * Create the debugger extension, then the connection point for the debug server.
@@ -200,7 +193,7 @@ extends AbstractParallelLaunchConfigurationDelegate {
 			}
 
 			monitor.worked(10);
-			monitor.subTask("Submitting the job . . ."); //$NON-NLS-1$
+			monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_7); 
 
 			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
 
