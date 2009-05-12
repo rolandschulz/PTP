@@ -45,10 +45,20 @@ public class GFortranErrorParser implements IErrorParser
     Error: Array 'pointee' at (1) cannot have a deferred shape
     ================================================================================*/
     
-    //                                                          1          2    3       4   5
+    //                                                                     Filename
+    //                                                                     |    Line        Column
+    //                                                                     |    |           |
+    //                                    Regex group number    1          2    3       4   5
     private static final Pattern startLine = Pattern.compile("^(In file )?(.+):([0-9]+)(\\.([0-9]+):)?$");
     private static final Pattern errorLine = Pattern.compile("^(Fatal )?Error: .*");
     private static final Pattern warningLine = Pattern.compile("^Warning: .*");
+    
+    /*
+     * This error parser uses the GoF State pattern.  It starts in the first of two states: 
+     * 
+     * (1) WaitForStartLine
+     * (2) AccumulateErrorMessageLines
+     */
     
     private IErrorParser currentState = new WaitForStartLine();
 
@@ -61,12 +71,22 @@ public class GFortranErrorParser implements IErrorParser
      * another error parser will still have a chance to handle these lines if we
      * do make a mistake.
      */
-    
+
+    /**
+     * @see IErrorParser#processLine(String, ErrorParserManager)
+     */
 	public boolean processLine(String line, ErrorParserManager eoParser)
 	{
 	    return currentState.processLine(line, eoParser);
 	}
 
+	/**
+	 * STATE 1: WAITING FOR A START LINE
+	 * <p>
+	 * This is the state of the error parser when it is waiting for a line like
+	 * <pre>cray-pointers.f90:56.21:</pre>
+	 * When it finds one, it switches to the next state (Accumulating an Error Message).
+	 */
 	private class WaitForStartLine implements IErrorParser
 	{
         public boolean processLine(String line, ErrorParserManager eoParser)
@@ -82,6 +102,22 @@ public class GFortranErrorParser implements IErrorParser
         }
 	}
 	
+    /**
+     * STATE 2: ACCUMULATING ERROR MESSAGE
+     * <p>
+     * This is the state of the error parser after it has seen a line like
+     * <pre>cray-pointers.f90:56.21:</pre>.
+     * The next several lines contain a source pointer and error message, like
+     * <pre>
+     *     subroutine example3()
+     *                         2
+     *     Error: Global name 'example3' at (1) is already being used as a SUBROUTINE at (2)
+     * </pre>
+     * In this state, we skip the first several lines (presumably the source pointer),
+     * and when we see a line starting with "Fatal Error:", "Error:", or "Warning:",
+     * we display that message in the Problems view, and the error parser returns to
+     * its initial state, waiting for the next line.
+     */
 	private class AccumulateErrorMessageLines implements IErrorParser
 	{
 	    private String filename;
