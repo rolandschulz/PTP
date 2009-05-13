@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -560,15 +559,12 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @see org.eclipse.ptp.rm.IResourceManager#startUp(IProgressMonitor monitor)
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		if (getState() == ResourceManagerAttributes.State.STOPPED) {
 			setState(ResourceManagerAttributes.State.STARTING);
-			if (monitor == null) {
-				monitor = new NullProgressMonitor();
-			}
-			monitor.beginTask(Messages.AbstractResourceManager_1 + getName(), 10);
+			monitor.subTask(Messages.AbstractResourceManager_1 + getName());
 			try {
 				initialize();
-				SubMonitor subMon = SubMonitor.convert(monitor);
 				doStartup(subMon.newChild(100));
 			} catch (CoreException e) {
 				setState(ResourceManagerAttributes.State.ERROR);
