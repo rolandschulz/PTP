@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.launch.internal.ui;
+package org.eclipse.ptp.launch.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
