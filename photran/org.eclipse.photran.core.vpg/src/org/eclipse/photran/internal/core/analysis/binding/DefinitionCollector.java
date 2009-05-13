@@ -563,7 +563,7 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        throw new Notification("ENTRY statements are not currently supported.");
+        // TODO Implement ENTRY statements
         
 //        // TO-DO: No syntax for function entries (with result parameter)
 //        // Then declare local result variable with entry name if no result exists
