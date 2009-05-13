@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -232,12 +233,12 @@ public abstract class AbstractRuntimeResourceManager extends
 		 * and inform upper levels of the problem.
 		 */
 		for (JobSubmission sub : jobSubmissions.values()) {
-			sub.setError("Fatal error ocurred in runtime system"); //$NON-NLS-1$
+			sub.setError(Messages.AbstractRuntimeResourceManager_6); 
 		}
 		jobSubmissions.clear();
 		
 		setState(ResourceManagerAttributes.State.ERROR);
-		fireError("Fatal error ocurred in runtime system"); //$NON-NLS-1$
+		fireError(Messages.AbstractRuntimeResourceManager_6); 
 	}
 	
 	/* (non-Javadoc)
@@ -264,7 +265,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedJobs.add(job);
 				} else {
-					PTPCorePlugin.log("JobChange: unknown node " + elementId); //$NON-NLS-1$
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_7 + elementId); 
 				}
 			}
 
@@ -292,7 +293,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (machine != null) {
 					machines.add(machine);
 				} else {
-					System.out.println("MachineChange: unknown machine " + elementId); //$NON-NLS-1$
+					System.out.println(Messages.AbstractRuntimeResourceManager_8 + elementId); 
 				}
 			}
 			
@@ -481,7 +482,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedNodes.add(node);
 				} else {
-					PTPCorePlugin.log("NodeChange: unknown node " + elementId); //$NON-NLS-1$
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_9 + elementId); 
 				}
 			}
 
@@ -517,7 +518,7 @@ public abstract class AbstractRuntimeResourceManager extends
 					}
 					changedProcesses.add(process);
 				} else {
-					PTPCorePlugin.log("ProcessChange: unknown process " + elementId); //$NON-NLS-1$
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_10 + elementId); 
 				}
 			}
 			
@@ -754,7 +755,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		if (job != null) {
 			name = job.getName();
 		}
-		fireError(Messages.AbstractRuntimeResourceManager_4 + name + Messages.AbstractRuntimeResourceManager_5 + e.getErrorMessage());
+		fireError(NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[]{name, e.getErrorMessage()}));
 	}
 
 	/**
@@ -882,8 +883,8 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		monitor.beginTask("Runtime resource manager startup", 100); //$NON-NLS-1$
-		monitor.subTask("Creating runtime system"); //$NON-NLS-1$
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_11); 
 		
 		runtimeSystem = doCreateRuntimeSystem();
 		
@@ -892,12 +893,11 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		monitor.worked(10);
-		monitor.subTask("Starting runtime system"); //$NON-NLS-1$
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_5); 
 
 		runtimeSystem.addRuntimeEventListener(this);
 
 		try {
-			SubMonitor subMon = SubMonitor.convert(monitor);
 			runtimeSystem.startup(subMon.newChild(90));
 		} catch (CoreException e) {
 			runtimeSystem.removeRuntimeEventListener(this);
