@@ -140,7 +140,7 @@ public class Definition implements Serializable, Comparable<Definition>
     
     public boolean matches(String canonicalizedName)
     {
-    	return canonicalizedName.equals(this.canonicalizedName);
+    	return canonicalizedName != null && canonicalizedName.equals(this.canonicalizedName);
     }
 
     void markAsSubprogramArgument()
