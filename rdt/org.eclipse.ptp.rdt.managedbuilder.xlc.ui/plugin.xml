@@ -43,12 +43,12 @@
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  superClass="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.builder1"
-					  id="org.eclipse.ptp.rdt.manangedbuilder.xlc.builder.exe.debug">		              
+					  superClass="org.eclipse.ptp.rdt.managedbuilder.xlc.builder.base"
+					  id="org.eclipse.ptp.rdt.managedbuilder.xlc.builder.exe.debug">		              
 			      </builder>
 			      <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.exe.debug"
-                      superClass="cdt.managedbuild.tool.xlc.cpp.compiler">
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.base">
                       <option
                           id="org.eclipse.ptp.rdt.xlc.cpp.compiler.exe.debug.option.optimization.level"
                           defaultValue="xlc.c.compiler.optimization.level.none"
@@ -62,7 +62,7 @@
                   </tool>
                   <tool
 					  id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.exe.debug"
-                      superClass="cdt.managedbuild.tool.xlc.c.compiler">
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.base">
 					  <option
 						  id="org.eclipse.ptp.rdt.xlc.c.compiler.exe.debug.option.optimization.level"
 						  defaultValue="xlc.c.optimization.level.none"
@@ -76,11 +76,11 @@
                   </tool>
                   <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.debug"
-                      superClass="cdt.managedbuild.tool.xlc.c.linker">
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.base">
                   </tool>
                   <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.debug"
-                      superClass="cdt.managedbuild.tool.xlc.cpp.linker">
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.base">
                   </tool>                  
 				  <tool
 					  id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.assembler.exe.debug"
@@ -108,12 +108,12 @@
 		              archList="all">		              
 		          </targetPlatform>
 				  <builder
-				  	  superClass="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.builder1"
+				  	  superClass="org.eclipse.ptp.rdt.managedbuilder.xlc.builder.base"
 				      id="org.eclipse.ptp.rdt.managedbuilder.xlc.builder.release">
 				  </builder> 
 				  <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.exe.release"
-                      superClass="cdt.managedbuild.tool.xlc.cpp.compiler">                     
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.base">                     
 					  <option
 						  id="org.eclipse.ptp.rdt.xlc.cpp.compiler.exe.release.option.optimization.level"
 						  defaultValue="xlc.c.optimization.level.Level5"
@@ -127,7 +127,7 @@
                   </tool>
                   <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.exe.release"
-                      superClass="cdt.managedbuild.tool.xlc.c.compiler">                          
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.base">                          
 					  <option
 						  id="org.eclipse.ptp.rdt.xlc.c.compiler.exe.release.option.optimization.level"
 						  defaultValue="xlc.c.optimization.level.Level5"
@@ -141,20 +141,52 @@
                   </tool>
                   <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.release"
-                      superClass="cdt.managedbuild.tool.xlc.c.linker">
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.base">
                   </tool> 
                   <tool
                       id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.release"
-                      superClass="cdt.managedbuild.tool.xlc.cpp.linker">
+                      superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.base">
                   </tool>  
 				  <tool
 					  id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.assembler.exe.release"
-					  superClass="cdt.managedbuild.tool.xlc.assembler">
+					  superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.assembler.exe.base">
 				  </tool>
             </toolChain>
             
 		</configuration>
-	</projectType>	      		
+	</projectType>	
+	<toolChain
+                  archList="all"
+                  configurationEnvironmentSupplier="RemoteConfigurationEnvironmentSupplier"
+                  id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.base"
+                  name="%ToolChainName.Dbg"
+                  osList="all"
+                  targetTool="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.debug;org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.debug">
+			  	  <builder
+					  superClass="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.builder1"
+					  id="org.eclipse.ptp.rdt.managedbuilder.xlc.builder.base">		              
+			      </builder>
+			      <tool
+                      id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.base"
+                      superClass="cdt.managedbuild.tool.xlc.cpp.compiler">
+                  </tool>
+                  <tool
+					  id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.base"
+                      superClass="cdt.managedbuild.tool.xlc.c.compiler">
+                  </tool>
+                  <tool
+                      id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.base"
+                      superClass="cdt.managedbuild.tool.xlc.c.linker">
+                  </tool>
+                  <tool
+                      id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.base"
+                      superClass="cdt.managedbuild.tool.xlc.cpp.linker">
+                  </tool>                  
+				  <tool
+					  id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.assembler.exe.base"
+					  superClass="cdt.managedbuild.tool.xlc.assembler">
+				  </tool>
+			 </toolChain>        		
    </extension>
    <extension
          id="RemoteXLCPerProjectProfile"
