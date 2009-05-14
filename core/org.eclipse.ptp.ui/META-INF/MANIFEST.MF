@@ -19,7 +19,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
  org.eclipse.ptp.core,
  org.eclipse.ptp.utils.ui
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.ui,
  org.eclipse.ptp.ui.actions,
  org.eclipse.ptp.ui.listeners,
@@ -30,3 +30,4 @@ Export-Package: org.eclipse.ptp.ui,
  org.eclipse.ptp.ui.views,
  org.eclipse.ptp.ui.wizards
 Bundle-ClassPath: ptpui.jar
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
