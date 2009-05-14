@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -98,9 +97,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	 * @throws IOException
 	 */
 	public void startup(IProgressMonitor monitor) throws IOException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
+		SubMonitor subMon = SubMonitor.convert(monitor, 12);
 
 		if (DebugOptions.CLIENT_TRACING) {
 			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . ."); //$NON-NLS-1$
@@ -110,8 +107,6 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		synchronized (this) {
 			startupMonitor = monitor;
 		}
-		
-		monitor.beginTask(Messages.AbstractRemoteProxyRuntimeClient_0, 12);
 		
 		try {
 			monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_1);
@@ -166,7 +161,6 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				}
 				
 				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_4);
-				SubMonitor subMon = SubMonitor.convert(monitor);
 				
 				if (!connection.isOpen()) {
 					connection.open(subMon.newChild(4));
