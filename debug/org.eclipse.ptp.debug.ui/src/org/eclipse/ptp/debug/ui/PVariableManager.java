@@ -1,4 +1,4 @@
-package org.eclipse.ptp.debug.internal.ui;
+package org.eclipse.ptp.debug.ui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.views.IToolTipProvider;
 
 /**

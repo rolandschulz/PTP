@@ -82,6 +82,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeStruct;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceNotFoundElement;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.graphics.Image;

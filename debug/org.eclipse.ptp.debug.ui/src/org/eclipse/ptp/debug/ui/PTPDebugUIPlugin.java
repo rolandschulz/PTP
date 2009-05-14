@@ -36,7 +36,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
-import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.sourcelookup.DefaultSourceLocator;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.swt.widgets.Display;

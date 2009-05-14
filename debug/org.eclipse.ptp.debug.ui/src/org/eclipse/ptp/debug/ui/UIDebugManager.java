@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui;
+package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -44,7 +44,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.internal.ui.PAnnotationManager;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.OutputConsole;
 import org.eclipse.ptp.ui.managers.JobManager;

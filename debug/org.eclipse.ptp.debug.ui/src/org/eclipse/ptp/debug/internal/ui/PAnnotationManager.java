@@ -66,6 +66,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest;
 import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.ui.IManager;

@@ -21,9 +21,9 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
-import org.eclipse.ptp.debug.internal.ui.PVariableManager;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.PVariableManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 
 /**
