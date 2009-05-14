@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.debug.internal.ui.PVariableManager.PVariableInfo;
+import org.eclipse.ptp.debug.ui.PVariableManager.PVariableInfo;
 import org.eclipse.swt.graphics.Image;
 
 /**

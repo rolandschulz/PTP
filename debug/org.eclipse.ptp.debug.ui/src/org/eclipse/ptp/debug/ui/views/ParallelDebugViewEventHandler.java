@@ -29,9 +29,9 @@ import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.IPDebugRegisterInfo;
 import org.eclipse.ptp.debug.internal.ui.PDebugUIUtils;
-import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 

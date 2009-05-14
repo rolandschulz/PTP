@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.debug.internal.ui.PVariableManager;
+import org.eclipse.ptp.debug.ui.PVariableManager;
 
 /**
  * @author Clement chu

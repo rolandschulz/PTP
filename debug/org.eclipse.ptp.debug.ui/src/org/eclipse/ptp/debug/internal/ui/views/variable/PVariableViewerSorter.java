@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.debug.internal.ui.PVariableManager.PVariableInfo;
+import org.eclipse.ptp.debug.ui.PVariableManager.PVariableInfo;
 
 /**
  * @author Clement chu

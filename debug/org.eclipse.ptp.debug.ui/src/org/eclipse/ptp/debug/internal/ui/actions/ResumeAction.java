@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
-import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
