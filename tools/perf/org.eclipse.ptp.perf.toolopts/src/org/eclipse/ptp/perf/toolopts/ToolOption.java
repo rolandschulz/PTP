@@ -92,6 +92,11 @@ public class ToolOption {
 	protected String toolTip;
 	
 	/**
+	 * Context sensitive help info for entry widget
+	 */
+	protected String valueToolTip;
+	
+	/**
 	 * Connect the option name and value with an equals if true
 	 * otherwise use whitespace.
 	 */

@@ -464,6 +464,7 @@ public class ToolParser extends DefaultHandler{
 				//actOpt.useEquals=getBooleanAttribute("equals",true,atts);
 				actOpt.defText=getAttribute(DEFAULT,atts);
 				String type=getAttribute("type",atts);
+				actOpt.valueToolTip=getAttribute("TIP",atts);
 				if(type!=null)
 				{
 					type = type.toLowerCase();

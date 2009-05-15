@@ -27,10 +27,13 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
 
+
 /**
  * Launches sequential C/C++ (or Fortran) applications after rebuilding them with performance tool instrumentation
  */
 public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements IPerformanceLaunchConfigurationConstants{
+	
+	private boolean initialized=false;
 	
 	/**
 	 * The primary launch command of this launch configuration delegate.  The operations in this function are divided into
@@ -38,6 +41,12 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{
+		
+		if(initialized){
+			super.launch(configuration, mode, launchIn, monitor);
+			return;
+		}
+		
 		//TODO:  This is a special case for TAU.  It should be merged into the general performance framework
 		//TAULaunch tool=null; 
 		//if(configuration.getAttribute(TAULAUNCH, TAULAUNCH_DEF))
@@ -56,9 +65,10 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 		wc.doSave();
 		
 		ILaunchFactory lf = null;//TODO: Make a real non-parallel launch factory class.
-		
-		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new LocalRunLaunchDelegate(),lf);//,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
+		initialized=true;
+		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(this,lf);//,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 		plaunch.launch(configuration, mode, launchIn, monitor);//,tool
+		initialized=false;
 		
 	}
 }

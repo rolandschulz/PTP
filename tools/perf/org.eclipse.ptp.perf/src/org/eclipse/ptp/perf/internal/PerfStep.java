@@ -181,16 +181,46 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 //		return getToolArguments(app,configuration,"");
 //	}
 	
-	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration, String buildDir, String rootDir) throws CoreException
+	
+	protected List<String> getToolArgumentList(ToolApp app, ILaunchConfiguration configuration, String buildDir, String rootDir) throws CoreException
 	{
 		if(app==null)
-			return("");
+			return null;
 		//Formerly replaced with projectLocation global variable.  May be the same?
-		String allargs=app.getArguments(configuration);
-		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
-		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
-		allargs=allargs+parseInput(app)+" "+parseOutput(app);
+		List<String> allargs=app.getArguments(configuration);
+		
+		for(int i=0;i<allargs.size();i++){
+			String tmp = allargs.get(i);
+			tmp=tmp.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
+			tmp=tmp.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
+			allargs.set(i, tmp);
+		}
+		String io = parseInput(app).trim();
+		if(io.length()>0)
+			allargs.add(io);
+		io = parseOutput(app).trim();
+		if(io.length()>0)
+			allargs.add(io);
 		return allargs;
+	}
+	
+	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration, String buildDir, String rootDir) throws CoreException
+	{
+		List<String> argList = getToolArgumentList(app,configuration,buildDir,rootDir);
+		String args="";
+		if(argList==null)
+			return(args);
+		
+		for(String a : argList){
+			args+=a+" ";
+		}
+		
+		//Formerly replaced with projectLocation global variable.  May be the same?
+//		String allargs=app.getArguments(configuration);
+//		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
+//		allargs=allargs.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
+//		allargs=allargs+parseInput(app)+" "+parseOutput(app);
+		return args;
 	}
 	
 	protected Map<String,String> getToolEnvVars(ToolApp app, ILaunchConfiguration configuration, String buildDir, String rootDir) throws CoreException
@@ -330,11 +360,17 @@ public abstract class PerfStep extends Job implements IPerformanceLaunchConfigur
 	protected List<String> getToolCommandList(ToolApp app, ILaunchConfiguration configuration,String buildDir, String rootDir) throws CoreException
 	{
 		List<String> command= new ArrayList<String>();
-		command.add(getToolExecutable(app));
-		if (command.get(0)==null)
+		String exec = getToolExecutable(app);
+		if(exec==null)
 			return null;
 		
-		command.add(getToolArguments(app,configuration,buildDir,rootDir));
+		command.add(exec.trim());
+		
+		List<String> args = getToolArgumentList(app,configuration,buildDir,rootDir);
+		if(args==null){
+			return command;
+		}
+		command.addAll(args);
 		return command;
 	}
 }

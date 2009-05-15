@@ -17,7 +17,9 @@
  ****************************************************************************/
 package org.eclipse.ptp.perf.toolopts;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -80,17 +82,29 @@ public class ToolApp {
 	/**
 	 * Builds and concatenates all arguments from the defined sources (toolArgument and toolPane objects)
 	 */
-	public String getArguments(ILaunchConfiguration configuration) throws CoreException
+	public List<String> getArguments(ILaunchConfiguration configuration) throws CoreException
 	{
-		String input = "";
+		List<String> input = new ArrayList<String>();
 		
 		if(allInput!=null)
 		for(int i=0;i<allInput.length;i++){
 			if(allInput[i]!=null){
 				String nextArg=allInput[i].getArgument(configuration);
 				if(nextArg!=null){
-					input+=nextArg;//allInput[i].getArgument(configuration);
-					input+=" ";
+					nextArg=nextArg.trim();
+					
+					if(nextArg.length()>0)
+					{
+						int space = nextArg.indexOf(' ');
+						if(nextArg.indexOf('-')==0&&space>0){
+							input.add(nextArg.substring(0,space).trim());
+							nextArg=nextArg.substring(space).trim();
+						}
+
+						input.add(nextArg);
+					}
+//					input+=nextArg;//allInput[i].getArgument(configuration);
+//					input+=" ";
 				}
 			}
 		}

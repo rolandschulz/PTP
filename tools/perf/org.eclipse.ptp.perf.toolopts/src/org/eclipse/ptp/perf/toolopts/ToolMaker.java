@@ -183,24 +183,31 @@ public class ToolMaker {
 	 * @param checkListener  The listener that defines behavior for this tool's check boxe and value field, if any
 	 */
 	protected static void displayToolOption(Composite comp, ToolOption toolOpt, SelectionListener browseListener, ToolPaneListener checkListener){
+		//If this option is a boolean or a toggle we don't need any widgets but the checkbox
 		if (toolOpt.type == ToolOption.BOOL || toolOpt.type == ToolOption.TOGGLE) {
 			initializeCheckLabel(comp,toolOpt);
 			new Label(comp, SWT.NULL);
 			new Label(comp, SWT.NULL);
-		} else if (toolOpt.type == ToolOption.TEXT) {
+		} 
+		//If this option is text only we just need the argbox
+		else if (toolOpt.type == ToolOption.TEXT) {
 			initializeCheckLabel(comp,toolOpt);
 
 			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
 			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
 			if(checkListener!=null)
 				toolOpt.argbox.addModifyListener((ModifyListener)checkListener);
 
 			new Label(comp, SWT.NULL);
-		} else {
+		} 
+		//This is a widget with a browse button, so build it accordingly
+		else {
 			initializeCheckLabel(comp,toolOpt);
 
 			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
 			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
 
 			if(checkListener != null)
 			toolOpt.argbox.addModifyListener((ModifyListener)checkListener);
@@ -253,7 +260,7 @@ public class ToolMaker {
 	 */
 	protected static void optBrowse(ToolOption opt){
 		
-		String dialogText=opt.toolTip;
+		String dialogText=opt.valueToolTip;
 		if(dialogText==null)
 		{
 			dialogText=opt.optLabel;
