@@ -37,12 +37,12 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 			this(EMPTY_STRING, EMPTY_STRING, generateUniqueName(), EMPTY_STRING, EMPTY_STRING);
 		}
 
-		public CommonConfig(String name, String desc, String uniqueName, String connectionName, String remoteServicesID) {
+		public CommonConfig(String name, String desc, String uniqueName, String remoteServicesID, String connectionName) {
 			this.name = name;
 			this.description = desc;
 			this.uniqueName = uniqueName;
-			this.connectionName = connectionName;
 			this.remoteServicesID = remoteServicesID;
+			this.connectionName = connectionName;
 		}
 		
 		/**
@@ -104,9 +104,9 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		String name = memento.getString(TAG_NAME);
 		String desc = memento.getString(TAG_DESCRIPTION);
 		String uniqueName = memento.getString(TAG_UNIQUE_NAME);
-		String connectionName = memento.getString(TAG_CONNECTION_NAME);
 		String remoteServicesID = memento.getString(TAG_REMOTE_SERVICES_ID);
-		return new CommonConfig(name, desc, uniqueName, connectionName, remoteServicesID);
+		String connectionName = memento.getString(TAG_CONNECTION_NAME);
+		return new CommonConfig(name, desc, uniqueName, remoteServicesID, connectionName);
 	}
 	
 	protected static String generateUniqueName() {
