@@ -17,9 +17,10 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.messages.Messages;
 
 public class LocalServices implements IRemoteServicesDelegate {
-	public static final String LocalServicesId = "org.eclipse.ptp.remote.LocalServices";
+	public static final String LocalServicesId = "org.eclipse.ptp.remote.LocalServices"; //$NON-NLS-1$
 	
 	private IRemoteConnectionManager connMgr;
 	
@@ -66,7 +67,7 @@ public class LocalServices implements IRemoteServicesDelegate {
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public String getDirectorySeparator(IRemoteConnection conn) {
-		return System.getProperty("file.separator", "/");
+		return System.getProperty("file.separator", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }
