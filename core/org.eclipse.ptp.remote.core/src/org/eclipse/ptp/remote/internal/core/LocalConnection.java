@@ -16,6 +16,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
+import org.eclipse.ptp.remote.core.messages.Messages;
 
 public class LocalConnection implements IRemoteConnection {
 	private String name;
@@ -27,9 +28,9 @@ public class LocalConnection implements IRemoteConnection {
 	
 	public LocalConnection(IRemoteConnectionManager conMgr) {
 		this.conMgr = conMgr;
-		this.name = "Local";
-		this.address = "localhost";
-		this.username = System.getProperty("user.name");
+		this.name = Messages.LocalConnection_0;
+		this.address = Messages.LocalConnection_1;
+		this.username = System.getProperty("user.name"); //$NON-NLS-1$
 		this.connected = true;
 	}
 	/* (non-Javadoc)
@@ -57,7 +58,7 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public void forwardLocalPort(int localPort, String fwdAddress,
 			int fwdPort) throws RemoteConnectionException {
-		throw new UnableToForwardPortException("Port forwarding not supported");
+		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
 	
 	/* (non-Javadoc)
@@ -65,7 +66,7 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public int forwardLocalPort(String fwdAddress, int fwdPort,
 			IProgressMonitor monitor) throws RemoteConnectionException {
-		throw new UnableToForwardPortException("Port forwarding not supported");
+		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
 	
 	/* (non-Javadoc)
@@ -73,7 +74,7 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public void forwardRemotePort(int remotePort, String fwdAddress,
 			int fwdPort) throws RemoteConnectionException {
-		throw new UnableToForwardPortException("Port forwarding not supported");
+		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
 	
 	/* (non-Javadoc)
@@ -81,7 +82,7 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public int forwardRemotePort(String fwdAddress, int fwdPort,
 			IProgressMonitor monitor) throws RemoteConnectionException {
-		throw new UnableToForwardPortException("Port forwarding not supported");
+		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
 	
 	/* (non-Javadoc)
