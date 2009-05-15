@@ -19,9 +19,9 @@ import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 
 public interface ITargetElement {
 
-	public abstract Map getAttributes();
+	public abstract Map<String, String> getAttributes();
 
-	public abstract void setAttributes(Map attributes);
+	public abstract void setAttributes(Map<String, String> attributes);
 
 	public abstract String getName();
 

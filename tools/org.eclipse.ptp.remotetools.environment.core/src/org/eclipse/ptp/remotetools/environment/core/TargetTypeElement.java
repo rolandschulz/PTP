@@ -27,18 +27,17 @@ public class TargetTypeElement {
 	private String name;
 	private TargetEnvironmentManager manager;
 	private ITargetTypeExtension extension;
-	private List elements;
+	private List<ITargetElement> elements = new ArrayList<ITargetElement>();
 	
 	public TargetTypeElement(String name,ITargetTypeExtension env,TargetEnvironmentManager model) {
 		super();
 		this.name = name;
 		this.extension = env;
-		this.elements = new ArrayList();
 		this.manager = model;
 		
 	}
 
-	public List getElements() {
+	public List<ITargetElement> getElements() {
 		return elements;
 	}
 

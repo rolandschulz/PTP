@@ -27,7 +27,7 @@ import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 public class TargetElement implements ITargetElement {
 
 	private TargetTypeElement type;
-	private Map attributes;
+	private Map<String, String> attributes;
 	private String name;
 	private String id;
 	private ITargetControl control;
@@ -40,14 +40,14 @@ public class TargetElement implements ITargetElement {
 		this.id = id;
 	}
 	
-	public TargetElement(TargetTypeElement type, String name, Map attrs, String id) {
+	public TargetElement(TargetTypeElement type, String name, Map<String, String> attrs, String id) {
 		this(type, id);
 		this.attributes = attrs;
 		this.name = name;
 		this.type = type;
 	}
 	
-	public void update(Map attr) {
+	public void update(Map<String, String> attr) {
 		try {
 			ITargetControl ctrl = getControl();
 			if (attr == null) {
@@ -64,14 +64,14 @@ public class TargetElement implements ITargetElement {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getAttributes()
 	 */
-	public Map getAttributes() {
+	public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#setAttributes(java.util.Map)
 	 */
-	public void setAttributes(Map attributes) {
+	public void setAttributes(Map<String, String> attributes) {
 		this.attributes = attributes;
 		if (getStatus() == ITargetStatus.STOPPED) {
 			update(attributes);
