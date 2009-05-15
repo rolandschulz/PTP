@@ -16,18 +16,19 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
@@ -50,32 +51,26 @@ import org.eclipse.ui.XMLMemento;
  */
 public class TargetEnvironmentManager {
 
-	private static String ENVIRONMENTS = "Environments";
-	private static String ENVIRONMENTS_TYPE = "Type";
-	private static String ENVIRONMENTS_TYPE_NAME = "Name";
-	private static String ENVIRONMENTS_TYPE_CONFIG = "Configuration";
-	private static String ENVIRONMENTS_TYPE_CONFIG_NAME = "CfgName";
+	private static String ENVIRONMENTS = "Environments"; //$NON-NLS-1$
+	private static String ENVIRONMENTS_TYPE = "Type"; //$NON-NLS-1$
+	private static String ENVIRONMENTS_TYPE_NAME = "Name"; //$NON-NLS-1$
+	private static String ENVIRONMENTS_TYPE_CONFIG = "Configuration"; //$NON-NLS-1$
+	private static String ENVIRONMENTS_TYPE_CONFIG_NAME = "CfgName"; //$NON-NLS-1$
 	
-	private List targetTypeElements;
-	private List eventListeners = new ArrayList();
-	private List modelChangedListeners = new ArrayList();
+	private List<TargetTypeElement> targetTypeElements = new ArrayList<TargetTypeElement>();
+	private ListenerList eventListeners = new ListenerList();
+	private ListenerList modelChangedListeners = new ListenerList();
 	
-	private TargetEnvironmentEventManager manager;
-	
-	private Map storedCypherEnvToKeyMap;
+	private Map<String, Set<String>> storedCypherEnvToKeyMap;
 	
 	public TargetEnvironmentManager() {
 		
 		super();
-		Map targets = EnvironmentPlugin.getDefault().getControls();
-		targetTypeElements = new ArrayList();
-		manager = new TargetEnvironmentEventManager(this);
-		
-		URL pluginURL = EnvironmentPlugin.getDefault().getBundle().getEntry("/");
-		Map cypherEnvTypeMap = Platform.getAuthorizationInfo(pluginURL, "", "");
+		Map<String, ITargetTypeExtension> targets = EnvironmentPlugin.getDefault().getControls();
+		ISecurePreferences cypherEnvTypeMap = SecurePreferencesFactory.getDefault();
 		
 		// Create a map that contains (environment type name, cipher key set) tuples
-		 storedCypherEnvToKeyMap = new HashMap();
+		storedCypherEnvToKeyMap = new HashMap<String, Set<String>>();
 			
 		File file = EnvironmentPlugin.getDefault().getStateLocation().append(EnvironmentPlugin.FILENAME).toFile();
 		XMLMemento memento;
@@ -84,7 +79,7 @@ public class TargetEnvironmentManager {
 			FileReader reader = new FileReader(file);
 			try {
 				memento = XMLMemento.createReadRoot(reader);
-				targets = initContentFromFile(memento,targets,cypherEnvTypeMap);
+				targets = initContentFromFile(memento, targets, cypherEnvTypeMap);
 			}
 			catch (WorkbenchException exc) {
 				memento = XMLMemento.createWriteRoot(ENVIRONMENTS);
@@ -94,11 +89,9 @@ public class TargetEnvironmentManager {
 			e.printStackTrace();
 		}
 		
-		Iterator keys = targets.keySet().iterator();
-		Set cipherKeySet = new HashSet();
-		while (keys.hasNext()) {
-			String name = (String)keys.next();
-			ITargetTypeExtension env = (ITargetTypeExtension) targets.get(name);
+		Set<String> cipherKeySet = new HashSet<String>();
+		for (String name : targets.keySet()) {
+			ITargetTypeExtension env = targets.get(name);
 			targetTypeElements.add(new TargetTypeElement(name,env,this));
 			
 			// Also save the ciphered key names
@@ -107,7 +100,7 @@ public class TargetEnvironmentManager {
 			
 			// Add all key names to the set
 			if(controlKeysCypher != null) {
-				List keyList = Arrays.asList(controlKeysCypher);
+				List<String> keyList = Arrays.asList(controlKeysCypher);
 				cipherKeySet.addAll(keyList);
 			}
 			
@@ -117,26 +110,27 @@ public class TargetEnvironmentManager {
 		
 	}
 	
-	public Map initContentFromFile(XMLMemento memento,Map targets, Map cypherEnvTypeMap) {
+	public Map<String, ITargetTypeExtension> initContentFromFile(XMLMemento memento, 
+			Map<String, ITargetTypeExtension> targets, ISecurePreferences cypherEnvTypeMap) {
 		
 		IMemento[] children = memento.getChildren(ENVIRONMENTS_TYPE);
 		for (int i = 0; i < children.length; i++) {
 			String name = children[i].getString(ENVIRONMENTS_TYPE_NAME);
-			ITargetTypeExtension env = (ITargetTypeExtension) targets.get(name);
+			ITargetTypeExtension env = targets.get(name);
 			// Get config name map from the given type name.
-			Map cypherConfigNameMap = null;
+			ISecurePreferences cypherConfigNameMap = null;
 			// Set null if the parent map is null.
-			if(cypherEnvTypeMap != null) cypherConfigNameMap = (Map)cypherEnvTypeMap.get(name);
+			if(cypherEnvTypeMap != null) cypherConfigNameMap = cypherEnvTypeMap.node(name);
 			if (env != null) {
 //				 Create cipher key set that will contain the name of the keys that are ciphered
-				Set cipherKeySet = new HashSet();
+				Set<String> cipherKeySet = new HashSet<String>();
 				
 //				 Get cryptographed keys
 				String [] controlKeysCypher = env.getControlAttributeNamesForCipheredKeys();
 				
 				// Add all key names to the set
 				if(controlKeysCypher != null) {
-					List keyList = Arrays.asList(controlKeysCypher);
+					List<String> keyList = Arrays.asList(controlKeysCypher);
 					cipherKeySet.addAll(keyList);
 				}
 				
@@ -148,25 +142,29 @@ public class TargetEnvironmentManager {
 				for (int j = 0; j < childrenElements.length; j++) {
 					String nameElement = childrenElements[j].getString(ENVIRONMENTS_TYPE_CONFIG_NAME);
 					
-					Map attrsElement = new HashMap();
+					Map<String,String> attrsElement = new HashMap<String,String>();
 					String[] controlKeys = env.getControlAttributeNames();
 					for (int k = 0; k < controlKeys.length; k++) {
 						attrsElement.put(controlKeys[k],childrenElements[j].getString(controlKeys[k]));
 					}
 					
 					// Get password key map from the given configuration name
-					Map cypherPasswdKeyMap = null;
+					ISecurePreferences cypherPasswdKeyMap = null;
 					// Set null if the parent map is null
-					if(cypherConfigNameMap != null) cypherPasswdKeyMap = (Map)cypherConfigNameMap.get(nameElement);
+					if(cypherConfigNameMap != null) cypherPasswdKeyMap = cypherConfigNameMap.node(nameElement);
 					
 					if(controlKeysCypher != null) {
 						for(int k=0; k < controlKeysCypher.length; k++) {
 							// Insert into key into the hash set to f
-	//						// Get the passwords or set them to empty string, if map not available.
+							// Get the passwords or set them to empty string, if map not available.
 							if(cypherPasswdKeyMap == null) {
-								attrsElement.put(controlKeysCypher[k], "");
+								attrsElement.put(controlKeysCypher[k], ""); //$NON-NLS-1$
 							} else {
-								attrsElement.put(controlKeysCypher[k], cypherPasswdKeyMap.get(controlKeysCypher[k]));
+								try {
+									attrsElement.put(controlKeysCypher[k], cypherPasswdKeyMap.get(controlKeysCypher[k], "")); //$NON-NLS-1$
+								} catch (StorageException e) {
+									attrsElement.put(controlKeysCypher[k], ""); //$NON-NLS-1$
+								}
 							}
 							// Include key name in the set
 							cipherKeySet.add(controlKeysCypher[k]);
@@ -198,43 +196,36 @@ public class TargetEnvironmentManager {
 		
 	}
 	
-	public void writeToFile() {
+	public void writeToFile() throws StorageException {
 		
 		// Create new ciphered Environment type map
-		Map cypherEnvTypeMap = new HashMap();
+		ISecurePreferences cypherEnvTypeMap = SecurePreferencesFactory.getDefault();
 		
 		File file = EnvironmentPlugin.getDefault().getStateLocation().append(EnvironmentPlugin.FILENAME).toFile();
-		Iterator iterator = targetTypeElements.iterator();
 		XMLMemento memento = XMLMemento.createWriteRoot(ENVIRONMENTS);		
-		while (iterator.hasNext()) {
-			TargetTypeElement type = ((TargetTypeElement)iterator.next());
+		for (TargetTypeElement type : targetTypeElements) {
 		    IMemento typeMemento = memento.createChild(ENVIRONMENTS_TYPE);
 		    typeMemento.putString(ENVIRONMENTS_TYPE_NAME, type.getName());
 			
 		    // Create new ciphered configuration map
-		    Map cypherConfigNameMap = new HashMap();
+		    ISecurePreferences cypherConfigNameMap = cypherEnvTypeMap.node(type.getName());
 		    
 		    // Get set of ciphered keys for this environment type name
-		    Set cypherKeySet = (Set)storedCypherEnvToKeyMap.get(type.getName());
+		    Set<String> cypherKeySet = storedCypherEnvToKeyMap.get(type.getName());
 		    
-			Iterator elements = type.getElements().iterator();
-			while (elements.hasNext()) {
-				ITargetElement element = (ITargetElement) elements.next();
+		    for (ITargetElement element : type.getElements()) {
 				IMemento elementMemento = typeMemento.createChild(ENVIRONMENTS_TYPE_CONFIG);
 				elementMemento.putString(ENVIRONMENTS_TYPE_CONFIG_NAME,element.getName());
 				
-				Map elementAttr = element.getAttributes();
+				Map<String, String> elementAttr = element.getAttributes();
 				
 				// Create new ciphered password key map
-				Map cypherPasswdKeyMap = new HashMap();
+				ISecurePreferences cypherPasswdKeyMap = cypherConfigNameMap.node(element.getName());
 				
-				Iterator attrKeys = elementAttr.keySet().iterator();
-				while (attrKeys.hasNext()) {
-					String key = (String) attrKeys.next();
-					
+				for (String key : elementAttr.keySet()) {
 					// If is ciphered put it as a value to the ciphered password key map
 					if(cypherKeySet.contains(key)) {
-						cypherPasswdKeyMap.put(key, (String) elementAttr.get(key));
+						cypherPasswdKeyMap.put(key, (String) elementAttr.get(key), true);
 					} else {
 						elementMemento.putString(key,(String) elementAttr.get(key));
 					}
@@ -244,19 +235,7 @@ public class TargetEnvironmentManager {
 				elementMemento.putString(EnvironmentPlugin.ATTR_CORE_ENVIRONMENTID,
 						element.getId());
 			
-				// Fill ciphered configuration map with (configuration name, ciph passwd key map) tuples
-				cypherConfigNameMap.put(element.getName(), cypherPasswdKeyMap);
 			}
-			// Fill ciphered environment type map with (environment type name, ciph config map) tuples
-			cypherEnvTypeMap.put(type.getName(), cypherConfigNameMap);
-		}
-		
-		URL pluginURL = EnvironmentPlugin.getDefault().getBundle().getEntry("/");
-		try {
-			Platform.addAuthorizationInfo(pluginURL, "", "", cypherEnvTypeMap);
-		} catch (CoreException e1) {
-			// Generates a runtime exception containing the CoreException
-			throw new RuntimeException(e1);
 		}
 		
 		Writer writer;
@@ -270,15 +249,14 @@ public class TargetEnvironmentManager {
 		
 	}
 
-	public List getTypeElements() {
+	public List<TargetTypeElement> getTypeElements() {
 		return targetTypeElements;
 	}
 	
 	public synchronized ITargetElement[] getConfigElements() {
-		List rsp = new ArrayList();
-		Iterator i = targetTypeElements.iterator();
-		while (i.hasNext()) {
-			rsp.addAll( ((TargetTypeElement)i.next()).getElements() );
+		List<ITargetElement> rsp = new ArrayList<ITargetElement>();
+		for (TargetTypeElement element : targetTypeElements) {
+			rsp.addAll( element.getElements() );
 		}
 		
 		ITargetElement[] rspObj = null;
@@ -297,7 +275,7 @@ public class TargetEnvironmentManager {
 	
 	public synchronized void addModelEventListener (ITargetEventListener listener)
 	{
-		if (listener != null && !eventListeners.contains (listener))
+		if (listener != null)
 		{
 			eventListeners.add (listener);
 		}
@@ -310,7 +288,7 @@ public class TargetEnvironmentManager {
 
 	public synchronized void removeModelEventListener (ITargetEventListener listener)
 	{
-		if (listener != null && eventListeners.contains(listener))
+		if (listener != null)
 		{
 			eventListeners.remove (listener);
 		}
@@ -323,7 +301,7 @@ public class TargetEnvironmentManager {
 	
 	public synchronized void addModelChangedListener (ITargetEnvironmentEventListener listener)
 	{
-		if (listener != null && !modelChangedListeners.contains (listener))
+		if (listener != null)
 		{
 			modelChangedListeners.add (listener);
 		}
@@ -336,7 +314,7 @@ public class TargetEnvironmentManager {
 
 	public synchronized void removeModelChangedListener (ITargetEnvironmentEventListener listener)
 	{
-		if (listener != null && modelChangedListeners.contains(listener))
+		if (listener != null)
 		{
 			modelChangedListeners.remove (listener);
 		}
@@ -344,17 +322,13 @@ public class TargetEnvironmentManager {
 
 	public void fireModelChanged(int action,ITargetElement oldElement,TargetElement newElement) {
 		
-		Iterator i = modelChangedListeners.iterator();
-		
 		if (oldElement == null && newElement != null) {
-			while (i.hasNext()) {
-				ITargetEnvironmentEventListener listener = (ITargetEnvironmentEventListener) i.next();
-				listener.elementAdded(newElement);
+			for (Object listener : modelChangedListeners.getListeners()) {
+				((ITargetEnvironmentEventListener)listener).elementAdded(newElement);
 			}
 		} else if (oldElement != null && newElement == null) {
-			while (i.hasNext()) {
-				ITargetEnvironmentEventListener listener = (ITargetEnvironmentEventListener) i.next();
-				listener.elementRemoved(oldElement);
+			for (Object listener : modelChangedListeners.getListeners()) {
+				((ITargetEnvironmentEventListener)listener).elementRemoved(oldElement);
 			}
 		}
 		
@@ -379,12 +353,9 @@ public class TargetEnvironmentManager {
 		}
 		element.setStatus(status);
 		
-		Iterator i = eventListeners.iterator();
-		while (i.hasNext()) {
-			ITargetEventListener listener = (ITargetEventListener) i.next();
-			listener.handleStateChangeEvent(status, element);
+		for (Object listener : eventListeners.getListeners()) {
+			((ITargetEventListener)listener).handleStateChangeEvent(status, element);
 		}
-		
 	}
 	
 	// Implementation of methods from the ITargetProvider
@@ -409,7 +380,7 @@ public class TargetEnvironmentManager {
 
 	public String[] getAllConfigNames() {
 		ITargetElement[] elements = getConfigElements();
-		List names = new ArrayList();
+		List<String> names = new ArrayList<String>();
 		if (elements != null) {
 			for (int i = 0; i < elements.length; i++)
 			{
