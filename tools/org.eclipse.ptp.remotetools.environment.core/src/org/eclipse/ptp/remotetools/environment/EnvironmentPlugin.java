@@ -13,7 +13,6 @@ package org.eclipse.ptp.remotetools.environment;
 
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ChildrenProviderManager;
-import org.eclipse.ptp.remotetools.environment.core.TargetElement;
+import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 import org.eclipse.ptp.remotetools.environment.extension.ITargetTypeExtension;
@@ -56,8 +55,8 @@ public class EnvironmentPlugin extends Plugin {
 		plugin = this;
 	}
 
-	public Map getControls() {
-		final Map controls = new HashMap();
+	public Map<String, ITargetTypeExtension> getControls() {
+		final Map<String, ITargetTypeExtension> controls = new HashMap<String, ITargetTypeExtension>();
 		ProcessExtensions.process(EXT_CONTROLS_ID, new IProcessMemberVisitor() {
 
 			public Object process(IExtension extension, IConfigurationElement member) {
@@ -66,7 +65,7 @@ public class EnvironmentPlugin extends Plugin {
 					
 					mprovider = member.createExecutableExtension("class"); //$NON-NLS-1$
 					if ( ITargetTypeExtension.class.isAssignableFrom(mprovider.getClass()) ) {
-						controls.put(member.getAttribute("name"),mprovider); //$NON-NLS-1$
+						controls.put(member.getAttribute("name"), (ITargetTypeExtension)mprovider); //$NON-NLS-1$
 					}
 				} catch (CoreException e) {
 					mprovider = null;
@@ -115,20 +114,19 @@ public class EnvironmentPlugin extends Plugin {
 	 * 
 	 * @param Class The class that implements the ITargetTypeExtension interface
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized void destroyTypeElements(Class extensionClass) {
 		// Find the TargetTypeElement that contains an extension which class is
 		// equivalent to the argument.
-		List typeList = getTargetsManager().getTypeElements();
-		for(Iterator typeIt = typeList.iterator(); typeIt.hasNext();) {
-			TargetTypeElement typeElement = (TargetTypeElement)typeIt.next();
+		List<TargetTypeElement> typeList = getTargetsManager().getTypeElements();
+		for (TargetTypeElement typeElement : typeList) {
 			if(typeElement.getExtension().getClass().equals(extensionClass)) {
 				// NOTE: At this point the called plugin should not be closed, so
 				// its safe to play around with its values.
 				
 				// Call the destroy method of all elements of the given type
-				List elemList = typeElement.getElements();
-				for(Iterator elemIt = elemList.iterator(); elemIt.hasNext();) {
-					TargetElement el = (TargetElement)elemIt.next();		
+				List<ITargetElement> elemList = typeElement.getElements();
+				for (ITargetElement el : elemList) {
 					try { // Errors could happen when disabling the environment. Just ignore.
 						ITargetControl ctl = el.getControl();
 						ctl.destroy();
