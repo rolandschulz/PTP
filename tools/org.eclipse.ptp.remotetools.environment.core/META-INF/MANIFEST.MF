@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.utils,
  org.eclipse.core.filesystem,
+ org.eclipse.equinox.security;bundle-version="1.0.1",
  org.eclipse.ptp.utils.core;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.remotetools.environment,
