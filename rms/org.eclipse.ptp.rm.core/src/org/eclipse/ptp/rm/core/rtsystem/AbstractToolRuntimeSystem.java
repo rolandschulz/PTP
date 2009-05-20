@@ -152,17 +152,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMon;
-		
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
+		SubMonitor subMon = SubMonitor.convert(monitor, 90);
 		
 		synchronized (this) {
 			startupMonitor = monitor;
 		}
 		
-		monitor.beginTask(Messages.AbstractToolRuntimeSystem_0, 90);
 		monitor.subTask(Messages.AbstractToolRuntimeSystem_1);
 		
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: startup", rmConfiguration.getName()); //$NON-NLS-1$
@@ -177,7 +172,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			
 			monitor.worked(10);
 			monitor.subTask(Messages.AbstractToolRuntimeSystem_2);
-			subMon = SubMonitor.convert(monitor);
 	
 			connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
 			if (connection == null) {
