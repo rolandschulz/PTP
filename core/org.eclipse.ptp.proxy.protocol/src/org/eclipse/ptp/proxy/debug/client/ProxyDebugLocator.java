@@ -33,6 +33,9 @@ public class ProxyDebugLocator {
 		this.file = file;
 		this.function = function;
 		this.line = Integer.parseInt(line);
+		if (address == null) {
+			address = ""; //$NON-NLS-1$
+		}
 		this.address = ProtocolUtil.decodeAddress(address);
 	}
 	
