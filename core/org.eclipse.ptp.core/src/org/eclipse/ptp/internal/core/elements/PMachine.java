@@ -105,7 +105,6 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util.Collection)
 	 */
 	public void addNodes(Collection<IPNodeControl> nodeControls) {
-		assert(getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).getValue().equals(getNodes().length));
 		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
 		
 		for (IPNodeControl node : nodeControls) {
@@ -114,7 +113,7 @@ public class PMachine extends Parent implements IPMachineControl {
 		}
 		
 		try {
-			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getNodes().length);
+			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getChildren().length);
         } catch (IllegalValueException e) {
             // FIXME
             throw new RuntimeException(e);
@@ -201,7 +200,14 @@ public class PMachine extends Parent implements IPMachineControl {
 			nodes.add(node);
 		}
 		
-		fireRemoveNodes(nodes);
+		try {
+			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getChildren().length);
+        } catch (IllegalValueException e) {
+            // FIXME
+            throw new RuntimeException(e);
+        }
+
+        fireRemoveNodes(nodes);
 	}
 
 	/* (non-Javadoc)
@@ -215,6 +221,12 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @see org.eclipse.ptp.core.elements.IPMachine#totalNodes()
 	 */
 	public int totalNodes() {
+		try {
+			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getChildren().length);
+        } catch (IllegalValueException e) {
+            // FIXME
+            throw new RuntimeException(e);
+        }
 		return size();
 	}
 	
