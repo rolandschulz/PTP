@@ -88,15 +88,11 @@ public class Messages extends NLS {
 
 	public static String ParallelLaunchConfigurationDelegate_0;
 	public static String ParallelLaunchConfigurationDelegate_1;
-
 	public static String ParallelLaunchConfigurationDelegate_2;
 	public static String ParallelLaunchConfigurationDelegate_3;
 	public static String ParallelLaunchConfigurationDelegate_4;
-
 	public static String ParallelLaunchConfigurationDelegate_5;
-
 	public static String ParallelLaunchConfigurationDelegate_6;
-
 	public static String ParallelLaunchConfigurationDelegate_7;
 
 	public static String ParallelLaunchConfigurationDelegate_Invalid_launch_object;
@@ -152,7 +148,6 @@ public class Messages extends NLS {
 	public static String DownloadRule_4;
 	public static String DownloadRule_5;
 	public static String DownloadRule_6;
-	public static String DownloadRule_7;
 
 	public static String DownloadRuleAction_0;
 	public static String DownloadRuleAction_1;
@@ -230,7 +225,6 @@ public class Messages extends NLS {
 	public static String UploadRule_4;
 	public static String UploadRule_5;
 	public static String UploadRule_6;
-	public static String UploadRule_7;
 
 	public static String UploadRuleAction_0;
 	public static String UploadRuleAction_1;
