@@ -245,31 +245,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	}
 	public void refresh(boolean all) {
 		refresh(all, false);
-		/*
-		WorkbenchJob uiJob = new WorkbenchJob("Refreshing icons...") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				repaint(all);
-				if (!canvas.isDisposed()) {
-					canvas.redraw();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.schedule();
-		*/
-		/*
-		getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				if (all)
-					updateAction();
-				repaint(all);
-				if (!canvas.isDisposed()) {
-					canvas.redraw();
-				}
-			}
-		});
-		 */
 	}
 	public abstract void updateAction();
 	// Set element info
@@ -449,7 +424,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			if (debug) {
 				System.err.println("---------- IconRefreshWorkbenchJob: " + refreshList.size()); //$NON-NLS-1$
 			}
-			return (size == 1);
+			return (size > 0);
 		}
 		private int size() {
 			waitLock.lock();
