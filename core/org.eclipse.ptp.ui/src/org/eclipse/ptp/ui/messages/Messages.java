@@ -16,7 +16,6 @@ public class Messages extends NLS {
 	public static String CreateSetAction_3;
 	public static String CreateSetAction_4;
 	public static String CreateSetAction_5;
-	public static String CreateSetAction_6;
 	public static String DefaultInformationControl_0;
 	public static String DeleteSetAction_0;
 	public static String DeleteSetAction_1;
@@ -109,7 +108,6 @@ public class Messages extends NLS {
 	public static String RemoveElementAction_0;
 	public static String RemoveElementAction_1;
 	public static String RemoveElementAction_2;
-	public static String RemoveElementAction_3;
 	public static String RemoveResourceManagersAction_0;
 	public static String RemoveResourceManagersAction_1;
 	public static String RemoveSelectedJobAction_0;
