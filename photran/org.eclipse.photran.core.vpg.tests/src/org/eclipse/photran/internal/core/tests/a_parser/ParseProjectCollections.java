@@ -15,12 +15,12 @@ import java.io.IOException;
 
 import junit.framework.Test;
 
-import org.eclipse.photran.internal.core.tests.FailingParserTestSuite;
+import org.eclipse.photran.internal.core.tests.ParserTestSuite;
 
-public class ParseProjectConfidentialLAPACK
+public class ParseProjectCollections
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.lapack", true, false) {};
+        return new ParserTestSuite("../../org.eclipse.photran-projects.collections", false, false) {};
     }
 }

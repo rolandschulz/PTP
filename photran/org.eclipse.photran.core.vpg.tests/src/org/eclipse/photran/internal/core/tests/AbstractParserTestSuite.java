@@ -10,11 +10,16 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.tests;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestSuite;
 
@@ -39,7 +44,7 @@ public abstract class AbstractParserTestSuite extends TestSuite
         setName(getDescription(directorySuffix, isFixedForm, mustExist));
 
         File dir = new File(directory);
-        if (dir.exists()) processDirectory(dir);
+        if (dir.exists()) processDirectory(dir, getFilesToSkip(dir));
     }
 
     protected String getDescription(String directorySuffix, boolean isFixedForm, boolean mustExist)
@@ -82,18 +87,58 @@ public abstract class AbstractParserTestSuite extends TestSuite
     {
         return TEST_ROOT + directorySuffix + (directorySuffix.endsWith("/") ? "" : "/");
     }
-    
-    private void processDirectory(File dir)
+
+    protected Set<String> getFilesToSkip(File dir)
     {
-        if (isFixedForm)
-            for (File file : dir.listFiles(FIXED_FORM_FILENAME_FILTER))
-                addTest(createTestFor(file, isFixedForm, describe(file)));
+        File list = new File(dir, "PHOTRAN-PARSER-ERRORS.txt");
+        if (list.exists() && list.canRead())
+            return filesListedIn(list);
         else
-            for (File file : dir.listFiles(FREE_FORM_FILENAME_FILTER))
-                addTest(createTestFor(file, isFixedForm, describe(file)));
+            return Collections.<String>emptySet();
+    }
+
+    protected Set<String> filesListedIn(File list)
+    {
+        try
+        {
+            Set<String> result = new HashSet<String>();
+            
+            BufferedReader r = new BufferedReader(new FileReader(list));
+            for (String line = r.readLine(); line != null; line = r.readLine())
+            {
+                line = line.trim().toLowerCase();
+                if (!line.equals(""))
+                    result.add(line.trim().toLowerCase());
+            }
+            
+            return result;
+        }
+        catch (IOException e)
+        {
+            throw new Error(e);
+        }
+    }
+
+    private void processDirectory(File dir, Set<String> filenamesToSkip)
+    {
+        addTestsFor(
+            dir.listFiles(isFixedForm ? FIXED_FORM_FILENAME_FILTER : FREE_FORM_FILENAME_FILTER),
+            filenamesToSkip);
         
         for (File subdir : dir.listFiles(DIRECTORY_FILTER))
-            processDirectory(subdir);
+            processDirectory(subdir, filenamesToSkip);
+    }
+    
+    private void addTestsFor(File[] filesInDirectory, Set<String> filenamesToSkip)
+    {
+        for (File file : filesInDirectory)
+            if (!shouldSkip(file, filenamesToSkip))
+                addTest(createTestFor(file, isFixedForm, describe(file)));
+    }
+
+    protected boolean shouldSkip(File file, Set<String> filenamesToSkip)
+    {
+        return filenamesToSkip.contains(file.getName().toLowerCase());
     }
 
     protected abstract AbstractParserTestCase createTestFor(File file, boolean isFixedForm, String fileDescription);

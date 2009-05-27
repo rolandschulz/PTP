@@ -11,15 +11,12 @@
 package org.eclipse.photran.internal.core.tests;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
 import org.eclipse.photran.core.vpg.util.SemanticError;
-import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -78,6 +75,7 @@ public abstract class AbstractParserTestCase extends TestCase
         }
         catch (Throwable t)
         {
+            System.err.println(file.getName());
             throw new Exception(fileDescription, t);
         }
     }
