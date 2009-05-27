@@ -2178,9 +2178,10 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R840
 <StopStmt> ::=
-  | (inline):<LblDef> -:T_STOP                    -:T_EOS
-  | (inline):<LblDef> -:T_STOP    intConst:T_ICON -:T_EOS
-  | (inline):<LblDef> -:T_STOP stringConst:T_SCON -:T_EOS
+  | (inline):<LblDef> -:T_STOP                     -:T_EOS
+  | (inline):<LblDef> -:T_STOP    intConst:T_ICON  -:T_EOS
+  | (inline):<LblDef> -:T_STOP stringConst:T_SCON  -:T_EOS
+  | (inline):<LblDef> -:T_STOP    paramVar:T_IDENT -:T_EOS
 
 # R841 chain rule deleted
 
@@ -2784,11 +2785,18 @@ ASTAttrSpecNode:<ProcAttrSpec> ::=   # Merges with R503 <AttrSpec>
 
 # R1217 chain rule deleted
 <FunctionStmt> ::=
-  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                  -:T_RPAREN                                                                -:T_EOS
-  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                  -:T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN -:T_EOS
-  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN                                                                -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                -:T_RPAREN                                                                            -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                -:T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN                                                                            -:T_EOS
   | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN -:T_EOS
   | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> (error) T_EOS
+# F03 R1224
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                -:T_RPAREN hiddenTBind8(omit):T_BIND hiddenLParen8(omit):T_LPAREN hiddenTIdent8(omit):T_IDENT hiddenRParen8(omit):T_RPAREN                                                                                                                                                                                            -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                -:T_RPAREN hiddenTBind8(omit):T_BIND hiddenLParen8(omit):T_LPAREN hiddenTIdent8(omit):T_IDENT hiddenRParen8(omit):T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN                                                                                                                 -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN hiddenTBind8(omit):T_BIND hiddenLParen8(omit):T_LPAREN hiddenTIdent8(omit):T_IDENT hiddenRParen8(omit):T_RPAREN hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN                                                                                                                 -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN                -:T_RPAREN                                                                                                                 hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN hiddenTBind9(omit):T_BIND hiddenLParen9(omit):T_LPAREN hiddenTIdent9(omit):T_IDENT hiddenRParen9(omit):T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN hiddenTBind8(omit):T_BIND hiddenLParen8(omit):T_LPAREN hiddenTIdent8(omit):T_IDENT hiddenRParen8(omit):T_RPAREN                                                                            hiddenTBind9(omit):T_BIND hiddenLParen9(omit):T_LPAREN hiddenTIdent9(omit):T_IDENT hiddenRParen9(omit):T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<FunctionPrefix> <FunctionName> -:T_LPAREN <FunctionPars> -:T_RPAREN                                                                                                                 hasResultClause(bool):T_RESULT -:T_LPAREN Result(inline):<Name> -:T_RPAREN hiddenTBind9(omit):T_BIND hiddenLParen9(omit):T_LPAREN hiddenTIdent9(omit):T_IDENT hiddenRParen9(omit):T_RPAREN -:T_EOS
 
 (list):<FunctionPars> ::=
   | <FunctionPar>
@@ -2826,10 +2834,13 @@ ASTAttrSpecNode:<ProcAttrSpec> ::=   # Merges with R503 <AttrSpec>
 
 # R1222
 <SubroutineStmt> ::=
-  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName>                                          -:T_EOS
-  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN                    -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName>                                        -:T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN                  -:T_RPAREN -:T_EOS
   | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN <SubroutinePars> -:T_RPAREN -:T_EOS
   | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> (error) T_EOS
+# F03 R1232
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN                  -:T_RPAREN -:T_BIND -:T_LPAREN -:T_IDENT -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN <SubroutinePars> -:T_RPAREN -:T_BIND -:T_LPAREN -:T_IDENT -:T_RPAREN -:T_EOS
 
 <SubroutinePrefix> ::=
   |                    -:T_SUBROUTINE

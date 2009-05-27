@@ -30,6 +30,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     org.eclipse.photran.internal.core.lexer.Token hiddenTStop; // in ASTStopStmtNode
     org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTStopStmtNode
     org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTStopStmtNode
+    org.eclipse.photran.internal.core.lexer.Token paramVar; // in ASTStopStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTStopStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -65,6 +66,17 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     }
 
 
+    public org.eclipse.photran.internal.core.lexer.Token getParamVar()
+    {
+        return this.paramVar;
+    }
+
+    public void setParamVar(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.paramVar = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTStopStmtNode(this);
@@ -74,7 +86,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
 
     @Override protected int getNumASTFields()
     {
-        return 5;
+        return 6;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -85,7 +97,8 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
         case 1:  return this.hiddenTStop;
         case 2:  return this.stringConst;
         case 3:  return this.intConst;
-        case 4:  return this.hiddenTEos;
+        case 4:  return this.paramVar;
+        case 5:  return this.hiddenTEos;
         default: return null;
         }
     }
@@ -98,7 +111,8 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
         case 1:  this.hiddenTStop = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.paramVar = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

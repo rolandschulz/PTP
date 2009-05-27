@@ -33,10 +33,18 @@ public class ASTFunctionStmtNode extends ASTNodeWithErrorRecoverySymbols
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTFunctionStmtNode
     IASTListNode<ASTFunctionParNode> functionPars; // in ASTFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTBind8; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenLParen8; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTIdent8; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenRParen8; // in ASTFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hasResultClause; // in ASTFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen2; // in ASTFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen2; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTBind9; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenLParen9; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenTIdent9; // in ASTFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenHiddenRParen9; // in ASTFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTFunctionStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -113,7 +121,7 @@ public class ASTFunctionStmtNode extends ASTNodeWithErrorRecoverySymbols
 
     @Override protected int getNumASTFields()
     {
-        return 12;
+        return 20;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -127,11 +135,19 @@ public class ASTFunctionStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 4:  return this.hiddenTLparen;
         case 5:  return this.functionPars;
         case 6:  return this.hiddenTRparen;
-        case 7:  return this.hasResultClause;
-        case 8:  return this.hiddenTLparen2;
-        case 9:  return this.name;
-        case 10: return this.hiddenTRparen2;
-        case 11: return this.hiddenTEos;
+        case 7:  return this.hiddenHiddenTBind8;
+        case 8:  return this.hiddenHiddenLParen8;
+        case 9:  return this.hiddenHiddenTIdent8;
+        case 10: return this.hiddenHiddenRParen8;
+        case 11: return this.hasResultClause;
+        case 12: return this.hiddenTLparen2;
+        case 13: return this.name;
+        case 14: return this.hiddenTRparen2;
+        case 15: return this.hiddenHiddenTBind9;
+        case 16: return this.hiddenHiddenLParen9;
+        case 17: return this.hiddenHiddenTIdent9;
+        case 18: return this.hiddenHiddenRParen9;
+        case 19: return this.hiddenTEos;
         default: return null;
         }
     }
@@ -147,11 +163,19 @@ public class ASTFunctionStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.functionPars = (IASTListNode<ASTFunctionParNode>)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hasResultClause = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 11: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenHiddenTBind8 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenHiddenLParen8 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.hiddenHiddenTIdent8 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenHiddenRParen8 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.hasResultClause = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 12: this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 13: this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 14: this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 15: this.hiddenHiddenTBind9 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 16: this.hiddenHiddenLParen9 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 17: this.hiddenHiddenTIdent9 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 18: this.hiddenHiddenRParen9 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 19: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

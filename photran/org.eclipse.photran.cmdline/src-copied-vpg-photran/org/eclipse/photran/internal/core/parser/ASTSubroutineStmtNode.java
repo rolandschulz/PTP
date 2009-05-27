@@ -33,6 +33,10 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTSubroutineStmtNode
     IASTListNode<ASTSubroutineParNode> subroutinePars; // in ASTSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTBind; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen2; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTIdent; // in ASTSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen2; // in ASTSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTSubroutineStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -87,7 +91,7 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
 
     @Override protected int getNumASTFields()
     {
-        return 8;
+        return 12;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -101,7 +105,11 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 4:  return this.hiddenTLparen;
         case 5:  return this.subroutinePars;
         case 6:  return this.hiddenTRparen;
-        case 7:  return this.hiddenTEos;
+        case 7:  return this.hiddenTBind;
+        case 8:  return this.hiddenTLparen2;
+        case 9:  return this.hiddenTIdent;
+        case 10: return this.hiddenTRparen2;
+        case 11: return this.hiddenTEos;
         default: return null;
         }
     }
@@ -117,7 +125,11 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTBind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.hiddenTIdent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -814,6 +814,7 @@ public class FreeFormLexerPhase2 implements ILexer
         if (idPos >= tokenStream.size()) return -1;
         
         // Now make sure the only thing left at this level is RESULT
+        // Fortran 2003 -- or BIND
         for (++i; i < tokenStream.size(); i++)
         {
             // Ignore tokens in parenthesis for this scan
@@ -821,7 +822,12 @@ public class FreeFormLexerPhase2 implements ILexer
             {
                 IToken t = (IToken)tokenStream.elementAt(i);
                 
-                if (t.getTerminal() != Terminal.T_RPAREN && t.getTerminal() != Terminal.T_RESULT && t.getTerminal() != Terminal.T_EOS)
+                if (t.getTerminal() != Terminal.T_RPAREN
+                    && t.getTerminal() != Terminal.T_RESULT
+                    && t.getTerminal() != Terminal.T_EOS
+                    // Fortran 2003
+                    && t.getTerminal() != Terminal.T_BIND
+                    )
                     return -1;
             }
         }
