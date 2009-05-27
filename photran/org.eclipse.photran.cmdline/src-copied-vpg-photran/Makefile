@@ -22,7 +22,7 @@ copy:
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/refactoring/infrastructure org/eclipse/photran/internal/core/refactoring/
 	#cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/properties org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/parser/org .
-	cp -f $(ROOT)/org.eclipse.photran.core.vpg/parser/fortran95.bnf .
+	cp -f $(ROOT)/org.eclipse.photran.core.vpg/parser/fortran2003.bnf .
 	mkdir bz
 	mkdir bz/over
 	mkdir bz/over/vpg
