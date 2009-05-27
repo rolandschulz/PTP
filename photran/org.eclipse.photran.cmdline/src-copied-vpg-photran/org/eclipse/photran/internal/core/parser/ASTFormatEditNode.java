@@ -26,10 +26,21 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTFormatEditNode extends ASTNode
 {
+    org.eclipse.photran.internal.core.lexer.Token hexConst; // in ASTFormatEditNode
     org.eclipse.photran.internal.core.lexer.Token pConst; // in ASTFormatEditNode
     org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTFormatEditNode
     ASTEditElementNode editElement; // in ASTFormatEditNode
-    org.eclipse.photran.internal.core.lexer.Token hexConst; // in ASTFormatEditNode
+
+    public org.eclipse.photran.internal.core.lexer.Token getHexConst()
+    {
+        return this.hexConst;
+    }
+
+    public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hexConst = newValue;
+    }
+
 
     public org.eclipse.photran.internal.core.lexer.Token getPConst()
     {
@@ -64,17 +75,6 @@ public class ASTFormatEditNode extends ASTNode
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getHexConst()
-    {
-        return this.hexConst;
-    }
-
-    public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hexConst = newValue;
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFormatEditNode(this);
@@ -90,10 +90,10 @@ public class ASTFormatEditNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.pConst;
-        case 1:  return this.intConst;
-        case 2:  return this.editElement;
-        case 3:  return this.hexConst;
+        case 0:  return this.hexConst;
+        case 1:  return this.pConst;
+        case 2:  return this.intConst;
+        case 3:  return this.editElement;
         default: return null;
         }
     }
@@ -102,10 +102,10 @@ public class ASTFormatEditNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.editElement = (ASTEditElementNode)value; return;
-        case 3:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.editElement = (ASTEditElementNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

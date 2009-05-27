@@ -27,16 +27,27 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTLoopControlNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTWhile; // in ASTLoopControlNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTLoopControlNode
+    IExpr whileExpr; // in ASTLoopControlNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTLoopControlNode
     org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTLoopControlNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTLoopControlNode
-    ASTExprNode lb; // in ASTLoopControlNode
+    IExpr lb; // in ASTLoopControlNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTLoopControlNode
-    ASTExprNode ub; // in ASTLoopControlNode
+    IExpr ub; // in ASTLoopControlNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma2; // in ASTLoopControlNode
-    ASTExprNode step; // in ASTLoopControlNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTLoopControlNode
-    ASTExprNode whileExpr; // in ASTLoopControlNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTLoopControlNode
+    IExpr step; // in ASTLoopControlNode
+
+    public IExpr getWhileExpr()
+    {
+        return this.whileExpr;
+    }
+
+    public void setWhileExpr(IExpr newValue)
+    {
+        this.whileExpr = newValue;
+    }
+
 
     public org.eclipse.photran.internal.core.lexer.Token getVariableName()
     {
@@ -49,47 +60,36 @@ public class ASTLoopControlNode extends ASTNode
     }
 
 
-    public ASTExprNode getLb()
+    public IExpr getLb()
     {
         return this.lb;
     }
 
-    public void setLb(ASTExprNode newValue)
+    public void setLb(IExpr newValue)
     {
         this.lb = newValue;
     }
 
 
-    public ASTExprNode getUb()
+    public IExpr getUb()
     {
         return this.ub;
     }
 
-    public void setUb(ASTExprNode newValue)
+    public void setUb(IExpr newValue)
     {
         this.ub = newValue;
     }
 
 
-    public ASTExprNode getStep()
+    public IExpr getStep()
     {
         return this.step;
     }
 
-    public void setStep(ASTExprNode newValue)
+    public void setStep(IExpr newValue)
     {
         this.step = newValue;
-    }
-
-
-    public ASTExprNode getWhileExpr()
-    {
-        return this.whileExpr;
-    }
-
-    public void setWhileExpr(ASTExprNode newValue)
-    {
-        this.whileExpr = newValue;
     }
 
 
@@ -109,16 +109,16 @@ public class ASTLoopControlNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTWhile;
-        case 1:  return this.variableName;
-        case 2:  return this.hiddenTEquals;
-        case 3:  return this.lb;
-        case 4:  return this.hiddenTComma;
-        case 5:  return this.ub;
-        case 6:  return this.hiddenTComma2;
-        case 7:  return this.step;
-        case 8:  return this.hiddenTLparen;
-        case 9:  return this.whileExpr;
-        case 10: return this.hiddenTRparen;
+        case 1:  return this.hiddenTLparen;
+        case 2:  return this.whileExpr;
+        case 3:  return this.hiddenTRparen;
+        case 4:  return this.variableName;
+        case 5:  return this.hiddenTEquals;
+        case 6:  return this.lb;
+        case 7:  return this.hiddenTComma;
+        case 8:  return this.ub;
+        case 9:  return this.hiddenTComma2;
+        case 10: return this.step;
         default: return null;
         }
     }
@@ -128,16 +128,16 @@ public class ASTLoopControlNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTWhile = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.lb = (ASTExprNode)value; return;
-        case 4:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.ub = (ASTExprNode)value; return;
-        case 6:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.step = (ASTExprNode)value; return;
-        case 8:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.whileExpr = (ASTExprNode)value; return;
-        case 10: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.whileExpr = (IExpr)value; return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.lb = (IExpr)value; return;
+        case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.ub = (IExpr)value; return;
+        case 9:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.step = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -27,7 +27,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTEndSelectStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndSelectStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndSelectStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndbeforeselect; // in ASTEndSelectStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSelect; // in ASTEndSelectStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEndselect; // in ASTEndSelectStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndSelectStmtNode
@@ -71,7 +71,7 @@ public class ASTEndSelectStmtNode extends ASTNode
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTEnd;
+        case 1:  return this.hiddenTEndbeforeselect;
         case 2:  return this.hiddenTSelect;
         case 3:  return this.hiddenTEndselect;
         case 4:  return this.endName;
@@ -85,7 +85,7 @@ public class ASTEndSelectStmtNode extends ASTNode
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEndbeforeselect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTEndselect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;

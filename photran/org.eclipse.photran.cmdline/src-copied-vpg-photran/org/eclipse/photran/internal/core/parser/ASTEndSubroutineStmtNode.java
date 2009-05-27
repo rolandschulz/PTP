@@ -28,8 +28,8 @@ public class ASTEndSubroutineStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndSubroutineStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTSubroutine; // in ASTEndSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEndsubroutine; // in ASTEndSubroutineStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSubroutine; // in ASTEndSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndSubroutineStmtNode
 
@@ -72,8 +72,8 @@ public class ASTEndSubroutineStmtNode extends ASTNode
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTEnd;
-        case 2:  return this.hiddenTSubroutine;
-        case 3:  return this.hiddenTEndsubroutine;
+        case 2:  return this.hiddenTEndsubroutine;
+        case 3:  return this.hiddenTSubroutine;
         case 4:  return this.endName;
         case 5:  return this.hiddenTEos;
         default: return null;
@@ -86,8 +86,8 @@ public class ASTEndSubroutineStmtNode extends ASTNode
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTEndsubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEndsubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

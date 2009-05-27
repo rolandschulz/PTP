@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTGotoStmtNode extends ASTNode implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTGotoStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTGoto; // in ASTGotoStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTGo; // in ASTGotoStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTTo; // in ASTGotoStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTGoto; // in ASTGotoStmtNode
     ASTLblRefNode gotoLblRef; // in ASTGotoStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTGotoStmtNode
 
@@ -72,9 +72,9 @@ public class ASTGotoStmtNode extends ASTNode implements IActionStmt
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTGo;
-        case 2:  return this.hiddenTTo;
-        case 3:  return this.hiddenTGoto;
+        case 1:  return this.hiddenTGoto;
+        case 2:  return this.hiddenTGo;
+        case 3:  return this.hiddenTTo;
         case 4:  return this.gotoLblRef;
         case 5:  return this.hiddenTEos;
         default: return null;
@@ -86,9 +86,9 @@ public class ASTGotoStmtNode extends ASTNode implements IActionStmt
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.gotoLblRef = (ASTLblRefNode)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

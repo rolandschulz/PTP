@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTComponentArraySpecNode extends ASTNode
 {
-    IASTListNode<ASTExplicitShapeSpecNode> explicitShapeSpecList; // in ASTComponentArraySpecNode
     IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList; // in ASTComponentArraySpecNode
-
-    public IASTListNode<ASTExplicitShapeSpecNode> getExplicitShapeSpecList()
-    {
-        return this.explicitShapeSpecList;
-    }
-
-    public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
-    {
-        this.explicitShapeSpecList = newValue;
-    }
-
+    IASTListNode<ASTExplicitShapeSpecNode> explicitShapeSpecList; // in ASTComponentArraySpecNode
 
     public IASTListNode<ASTDeferredShapeSpecListNode> getDeferredShapeSpecList()
     {
@@ -48,6 +37,17 @@ public class ASTComponentArraySpecNode extends ASTNode
     public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
     {
         this.deferredShapeSpecList = newValue;
+    }
+
+
+    public IASTListNode<ASTExplicitShapeSpecNode> getExplicitShapeSpecList()
+    {
+        return this.explicitShapeSpecList;
+    }
+
+    public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
+    {
+        this.explicitShapeSpecList = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTComponentArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.explicitShapeSpecList;
-        case 1:  return this.deferredShapeSpecList;
+        case 0:  return this.deferredShapeSpecList;
+        case 1:  return this.explicitShapeSpecList;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTComponentArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
-        case 1:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
+        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
+        case 1:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

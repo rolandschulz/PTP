@@ -28,9 +28,9 @@ public class ASTMaskedElseWhereConstructNode extends ASTNode
 {
     ASTMaskedElseWhereStmtNode maskedElseWhereStmt; // in ASTMaskedElseWhereConstructNode
     IASTListNode<IWhereBodyConstruct> whereBodyConstructBlock; // in ASTMaskedElseWhereConstructNode
-    ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTMaskedElseWhereConstructNode
-    ASTEndWhereStmtNode endWhereStmt; // in ASTMaskedElseWhereConstructNode
     ASTElseWhereConstructNode elseWhereConstruct; // in ASTMaskedElseWhereConstructNode
+    ASTEndWhereStmtNode endWhereStmt; // in ASTMaskedElseWhereConstructNode
+    ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTMaskedElseWhereConstructNode
 
     public ASTMaskedElseWhereStmtNode getMaskedElseWhereStmt()
     {
@@ -54,14 +54,14 @@ public class ASTMaskedElseWhereConstructNode extends ASTNode
     }
 
 
-    public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
+    public ASTElseWhereConstructNode getElseWhereConstruct()
     {
-        return this.maskedElseWhereConstruct;
+        return this.elseWhereConstruct;
     }
 
-    public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
+    public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
     {
-        this.maskedElseWhereConstruct = newValue;
+        this.elseWhereConstruct = newValue;
     }
 
 
@@ -76,14 +76,14 @@ public class ASTMaskedElseWhereConstructNode extends ASTNode
     }
 
 
-    public ASTElseWhereConstructNode getElseWhereConstruct()
+    public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
     {
-        return this.elseWhereConstruct;
+        return this.maskedElseWhereConstruct;
     }
 
-    public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
+    public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
     {
-        this.elseWhereConstruct = newValue;
+        this.maskedElseWhereConstruct = newValue;
     }
 
 
@@ -104,9 +104,9 @@ public class ASTMaskedElseWhereConstructNode extends ASTNode
         {
         case 0:  return this.maskedElseWhereStmt;
         case 1:  return this.whereBodyConstructBlock;
-        case 2:  return this.maskedElseWhereConstruct;
+        case 2:  return this.elseWhereConstruct;
         case 3:  return this.endWhereStmt;
-        case 4:  return this.elseWhereConstruct;
+        case 4:  return this.maskedElseWhereConstruct;
         default: return null;
         }
     }
@@ -117,9 +117,9 @@ public class ASTMaskedElseWhereConstructNode extends ASTNode
         {
         case 0:  this.maskedElseWhereStmt = (ASTMaskedElseWhereStmtNode)value; return;
         case 1:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
-        case 2:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
+        case 2:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
         case 3:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
-        case 4:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
+        case 4:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

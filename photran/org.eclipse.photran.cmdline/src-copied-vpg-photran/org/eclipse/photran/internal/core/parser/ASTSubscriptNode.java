@@ -26,14 +26,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTSubscriptNode extends ASTNode
 {
-    ASTExprNode subscriptExpr; // in ASTSubscriptNode
+    IExpr subscriptExpr; // in ASTSubscriptNode
 
-    public ASTExprNode getSubscriptExpr()
+    public IExpr getSubscriptExpr()
     {
         return this.subscriptExpr;
     }
 
-    public void setSubscriptExpr(ASTExprNode newValue)
+    public void setSubscriptExpr(IExpr newValue)
     {
         this.subscriptExpr = newValue;
     }
@@ -63,7 +63,7 @@ public class ASTSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.subscriptExpr = (ASTExprNode)value; return;
+        case 0:  this.subscriptExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

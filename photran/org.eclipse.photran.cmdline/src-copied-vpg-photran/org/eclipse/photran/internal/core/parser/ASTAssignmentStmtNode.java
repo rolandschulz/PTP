@@ -29,8 +29,8 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     ASTLblDefNode lblDef; // in ASTAssignmentStmtNode
     ASTNameNode lhsVariable; // in ASTAssignmentStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTAssignmentStmtNode
-    IASTListNode<ASTSFExprListNode> lhsExprList; // in ASTAssignmentStmtNode
     IASTListNode<ASTSFDummyArgNameListNode> lhsNameList; // in ASTAssignmentStmtNode
+    IASTListNode<ASTSFExprListNode> lhsExprList; // in ASTAssignmentStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAssignmentStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTPercent; // in ASTAssignmentStmtNode
     IASTListNode<ASTDataRefNode> derivedTypeComponentRef; // in ASTAssignmentStmtNode
@@ -38,10 +38,10 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     IASTListNode<ASTSectionSubscriptNode> componentSectionSubscriptList; // in ASTAssignmentStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenRparen2; // in ASTAssignmentStmtNode
     ASTSubstringRangeNode substringRange; // in ASTAssignmentStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTAssignmentStmtNode
-    ASTExprNode rhs; // in ASTAssignmentStmtNode
     org.eclipse.photran.internal.core.lexer.Token isPointerAssignment; // in ASTAssignmentStmtNode
     ASTTargetNode target; // in ASTAssignmentStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTAssignmentStmtNode
+    IExpr rhs; // in ASTAssignmentStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTAssignmentStmtNode
 
     public ASTLblDefNode getLblDef()
@@ -66,17 +66,6 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     }
 
 
-    public IASTListNode<ASTSFExprListNode> getLhsExprList()
-    {
-        return this.lhsExprList;
-    }
-
-    public void setLhsExprList(IASTListNode<ASTSFExprListNode> newValue)
-    {
-        this.lhsExprList = newValue;
-    }
-
-
     public IASTListNode<ASTSFDummyArgNameListNode> getLhsNameList()
     {
         return this.lhsNameList;
@@ -85,6 +74,17 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     public void setLhsNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
     {
         this.lhsNameList = newValue;
+    }
+
+
+    public IASTListNode<ASTSFExprListNode> getLhsExprList()
+    {
+        return this.lhsExprList;
+    }
+
+    public void setLhsExprList(IASTListNode<ASTSFExprListNode> newValue)
+    {
+        this.lhsExprList = newValue;
     }
 
 
@@ -121,17 +121,6 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     }
 
 
-    public ASTExprNode getRhs()
-    {
-        return this.rhs;
-    }
-
-    public void setRhs(ASTExprNode newValue)
-    {
-        this.rhs = newValue;
-    }
-
-
     public boolean isPointerAssignment()
     {
         return this.isPointerAssignment != null;
@@ -151,6 +140,17 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     public void setTarget(ASTTargetNode newValue)
     {
         this.target = newValue;
+    }
+
+
+    public IExpr getRhs()
+    {
+        return this.rhs;
+    }
+
+    public void setRhs(IExpr newValue)
+    {
+        this.rhs = newValue;
     }
 
 
@@ -179,8 +179,8 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
         case 0:  return this.lblDef;
         case 1:  return this.lhsVariable;
         case 2:  return this.hiddenTLparen;
-        case 3:  return this.lhsExprList;
-        case 4:  return this.lhsNameList;
+        case 3:  return this.lhsNameList;
+        case 4:  return this.lhsExprList;
         case 5:  return this.hiddenTRparen;
         case 6:  return this.hiddenTPercent;
         case 7:  return this.derivedTypeComponentRef;
@@ -188,10 +188,10 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
         case 9:  return this.componentSectionSubscriptList;
         case 10: return this.hiddenRparen2;
         case 11: return this.substringRange;
-        case 12: return this.hiddenTEquals;
-        case 13: return this.rhs;
-        case 14: return this.isPointerAssignment;
-        case 15: return this.target;
+        case 12: return this.isPointerAssignment;
+        case 13: return this.target;
+        case 14: return this.hiddenTEquals;
+        case 15: return this.rhs;
         case 16: return this.hiddenTEos;
         default: return null;
         }
@@ -204,8 +204,8 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
         case 0:  this.lblDef = (ASTLblDefNode)value; return;
         case 1:  this.lhsVariable = (ASTNameNode)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.lhsExprList = (IASTListNode<ASTSFExprListNode>)value; return;
-        case 4:  this.lhsNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
+        case 3:  this.lhsNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
+        case 4:  this.lhsExprList = (IASTListNode<ASTSFExprListNode>)value; return;
         case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; return;
@@ -213,10 +213,10 @@ public class ASTAssignmentStmtNode extends ASTNodeWithErrorRecoverySymbols imple
         case 9:  this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 10: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 11: this.substringRange = (ASTSubstringRangeNode)value; return;
-        case 12: this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 13: this.rhs = (ASTExprNode)value; return;
-        case 14: this.isPointerAssignment = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 15: this.target = (ASTTargetNode)value; return;
+        case 12: this.isPointerAssignment = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 13: this.target = (ASTTargetNode)value; return;
+        case 14: this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 15: this.rhs = (IExpr)value; return;
         case 16: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

@@ -26,14 +26,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTMaskExprNode extends ASTNode
 {
-    ASTExprNode maskExpr; // in ASTMaskExprNode
+    IExpr maskExpr; // in ASTMaskExprNode
 
-    public ASTExprNode getMaskExpr()
+    public IExpr getMaskExpr()
     {
         return this.maskExpr;
     }
 
-    public void setMaskExpr(ASTExprNode newValue)
+    public void setMaskExpr(IExpr newValue)
     {
         this.maskExpr = newValue;
     }
@@ -63,7 +63,7 @@ public class ASTMaskExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.maskExpr = (ASTExprNode)value; return;
+        case 0:  this.maskExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

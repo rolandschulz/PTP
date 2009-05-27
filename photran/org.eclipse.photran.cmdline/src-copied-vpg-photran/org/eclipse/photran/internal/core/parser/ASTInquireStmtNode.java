@@ -29,9 +29,9 @@ public class ASTInquireStmtNode extends ASTNode implements IActionStmt
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTInquireStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTInquire; // in ASTInquireStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTInquireStmtNode
-    IASTListNode<ASTInquireSpecListNode> inquireSpecList; // in ASTInquireStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIolengtheq; // in ASTInquireStmtNode
     ASTScalarVariableNode ioLengthVar; // in ASTInquireStmtNode
+    IASTListNode<ASTInquireSpecListNode> inquireSpecList; // in ASTInquireStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTInquireStmtNode
     ASTOutputItemListNode outputItemList; // in ASTInquireStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTInquireStmtNode
@@ -47,17 +47,6 @@ public class ASTInquireStmtNode extends ASTNode implements IActionStmt
     }
 
 
-    public IASTListNode<ASTInquireSpecListNode> getInquireSpecList()
-    {
-        return this.inquireSpecList;
-    }
-
-    public void setInquireSpecList(IASTListNode<ASTInquireSpecListNode> newValue)
-    {
-        this.inquireSpecList = newValue;
-    }
-
-
     public ASTScalarVariableNode getIoLengthVar()
     {
         return this.ioLengthVar;
@@ -66,6 +55,17 @@ public class ASTInquireStmtNode extends ASTNode implements IActionStmt
     public void setIoLengthVar(ASTScalarVariableNode newValue)
     {
         this.ioLengthVar = newValue;
+    }
+
+
+    public IASTListNode<ASTInquireSpecListNode> getInquireSpecList()
+    {
+        return this.inquireSpecList;
+    }
+
+    public void setInquireSpecList(IASTListNode<ASTInquireSpecListNode> newValue)
+    {
+        this.inquireSpecList = newValue;
     }
 
 
@@ -99,9 +99,9 @@ public class ASTInquireStmtNode extends ASTNode implements IActionStmt
         case 0:  return this.label;
         case 1:  return this.hiddenTInquire;
         case 2:  return this.hiddenTLparen;
-        case 3:  return this.inquireSpecList;
-        case 4:  return this.hiddenTIolengtheq;
-        case 5:  return this.ioLengthVar;
+        case 3:  return this.hiddenTIolengtheq;
+        case 4:  return this.ioLengthVar;
+        case 5:  return this.inquireSpecList;
         case 6:  return this.hiddenTRparen;
         case 7:  return this.outputItemList;
         case 8:  return this.hiddenTEos;
@@ -116,9 +116,9 @@ public class ASTInquireStmtNode extends ASTNode implements IActionStmt
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTInquire = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.inquireSpecList = (IASTListNode<ASTInquireSpecListNode>)value; return;
-        case 4:  this.hiddenTIolengtheq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.ioLengthVar = (ASTScalarVariableNode)value; return;
+        case 3:  this.hiddenTIolengtheq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.ioLengthVar = (ASTScalarVariableNode)value; return;
+        case 5:  this.inquireSpecList = (IASTListNode<ASTInquireSpecListNode>)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.outputItemList = (ASTOutputItemListNode)value; return;
         case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;

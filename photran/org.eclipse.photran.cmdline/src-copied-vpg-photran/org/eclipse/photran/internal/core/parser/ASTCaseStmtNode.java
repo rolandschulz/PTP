@@ -30,8 +30,8 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     org.eclipse.photran.internal.core.lexer.Token hiddenTCase; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCaseStmtNode
     IASTListNode<ASTCaseValueRangeNode> caseValueRangeListSelector; // in ASTCaseStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseStmtNode
     ASTNameNode name; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCaseStmtNode
 
@@ -99,8 +99,8 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         case 1:  return this.hiddenTCase;
         case 2:  return this.hiddenTLparen;
         case 3:  return this.caseValueRangeListSelector;
-        case 4:  return this.hasDefaultSelector;
-        case 5:  return this.hiddenTRparen;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.hasDefaultSelector;
         case 6:  return this.name;
         case 7:  return this.hiddenTEos;
         default: return null;
@@ -115,8 +115,8 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         case 1:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; return;
-        case 4:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.name = (ASTNameNode)value; return;
         case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

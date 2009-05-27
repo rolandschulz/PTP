@@ -28,7 +28,7 @@ public class ASTFunctionArgNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTFunctionArgNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEquals; // in ASTFunctionArgNode
-    ASTExprNode expr; // in ASTFunctionArgNode
+    IExpr expr; // in ASTFunctionArgNode
 
     public org.eclipse.photran.internal.core.lexer.Token getName()
     {
@@ -41,12 +41,12 @@ public class ASTFunctionArgNode extends ASTNode
     }
 
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -80,7 +80,7 @@ public class ASTFunctionArgNode extends ASTNode
         {
         case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.expr = (ASTExprNode)value; return;
+        case 2:  this.expr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

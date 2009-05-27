@@ -27,10 +27,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTSFExprNode extends ASTNode
 {
     ASTSFTermNode SFTerm; // in ASTSFExprNode
-    ASTSFExprNode lhsExpr; // in ASTSFExprNode
     ASTSignNode rhs; // in ASTSFExprNode
+    ASTSFExprNode lhsExpr; // in ASTSFExprNode
     ASTOperatorNode addOp; // in ASTSFExprNode
-    ASTAddOperandNode rhsExpr; // in ASTSFExprNode
+    IExpr rhsExpr; // in ASTSFExprNode
 
     public ASTSFTermNode getSFTerm()
     {
@@ -40,17 +40,6 @@ public class ASTSFExprNode extends ASTNode
     public void setSFTerm(ASTSFTermNode newValue)
     {
         this.SFTerm = newValue;
-    }
-
-
-    public ASTSFExprNode getLhsExpr()
-    {
-        return this.lhsExpr;
-    }
-
-    public void setLhsExpr(ASTSFExprNode newValue)
-    {
-        this.lhsExpr = newValue;
     }
 
 
@@ -65,6 +54,17 @@ public class ASTSFExprNode extends ASTNode
     }
 
 
+    public ASTSFExprNode getLhsExpr()
+    {
+        return this.lhsExpr;
+    }
+
+    public void setLhsExpr(ASTSFExprNode newValue)
+    {
+        this.lhsExpr = newValue;
+    }
+
+
     public ASTOperatorNode getAddOp()
     {
         return this.addOp;
@@ -76,12 +76,12 @@ public class ASTSFExprNode extends ASTNode
     }
 
 
-    public ASTAddOperandNode getRhsExpr()
+    public IExpr getRhsExpr()
     {
         return this.rhsExpr;
     }
 
-    public void setRhsExpr(ASTAddOperandNode newValue)
+    public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
     }
@@ -103,8 +103,8 @@ public class ASTSFExprNode extends ASTNode
         switch (index)
         {
         case 0:  return this.SFTerm;
-        case 1:  return this.lhsExpr;
-        case 2:  return this.rhs;
+        case 1:  return this.rhs;
+        case 2:  return this.lhsExpr;
         case 3:  return this.addOp;
         case 4:  return this.rhsExpr;
         default: return null;
@@ -116,10 +116,10 @@ public class ASTSFExprNode extends ASTNode
         switch (index)
         {
         case 0:  this.SFTerm = (ASTSFTermNode)value; return;
-        case 1:  this.lhsExpr = (ASTSFExprNode)value; return;
-        case 2:  this.rhs = (ASTSignNode)value; return;
+        case 1:  this.rhs = (ASTSignNode)value; return;
+        case 2:  this.lhsExpr = (ASTSFExprNode)value; return;
         case 3:  this.addOp = (ASTOperatorNode)value; return;
-        case 4:  this.rhsExpr = (ASTAddOperandNode)value; return;
+        case 4:  this.rhsExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

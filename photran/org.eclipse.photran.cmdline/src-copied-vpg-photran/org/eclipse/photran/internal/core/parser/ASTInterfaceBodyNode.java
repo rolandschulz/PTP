@@ -29,8 +29,8 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     ASTFunctionStmtNode functionStmt; // in ASTInterfaceBodyNode
     ASTSubroutineStmtNode subroutineStmt; // in ASTInterfaceBodyNode
     IASTListNode<ISpecificationPartConstruct> subprogramInterfaceBody; // in ASTInterfaceBodyNode
-    ASTEndSubroutineStmtNode endSubroutineStmt; // in ASTInterfaceBodyNode
     ASTEndFunctionStmtNode endFunctionStmt; // in ASTInterfaceBodyNode
+    ASTEndSubroutineStmtNode endSubroutineStmt; // in ASTInterfaceBodyNode
 
     public ASTFunctionStmtNode getFunctionStmt()
     {
@@ -65,17 +65,6 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     }
 
 
-    public ASTEndSubroutineStmtNode getEndSubroutineStmt()
-    {
-        return this.endSubroutineStmt;
-    }
-
-    public void setEndSubroutineStmt(ASTEndSubroutineStmtNode newValue)
-    {
-        this.endSubroutineStmt = newValue;
-    }
-
-
     public ASTEndFunctionStmtNode getEndFunctionStmt()
     {
         return this.endFunctionStmt;
@@ -84,6 +73,17 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     public void setEndFunctionStmt(ASTEndFunctionStmtNode newValue)
     {
         this.endFunctionStmt = newValue;
+    }
+
+
+    public ASTEndSubroutineStmtNode getEndSubroutineStmt()
+    {
+        return this.endSubroutineStmt;
+    }
+
+    public void setEndSubroutineStmt(ASTEndSubroutineStmtNode newValue)
+    {
+        this.endSubroutineStmt = newValue;
     }
 
 
@@ -106,8 +106,8 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
         case 0:  return this.functionStmt;
         case 1:  return this.subroutineStmt;
         case 2:  return this.subprogramInterfaceBody;
-        case 3:  return this.endSubroutineStmt;
-        case 4:  return this.endFunctionStmt;
+        case 3:  return this.endFunctionStmt;
+        case 4:  return this.endSubroutineStmt;
         default: return null;
         }
     }
@@ -119,8 +119,8 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
         case 0:  this.functionStmt = (ASTFunctionStmtNode)value; return;
         case 1:  this.subroutineStmt = (ASTSubroutineStmtNode)value; return;
         case 2:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; return;
-        case 3:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
-        case 4:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; return;
+        case 3:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; return;
+        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -26,19 +26,19 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTArraySpecNode extends ASTNode
 {
-    IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList; // in ASTArraySpecNode
-    ASTAssumedSizeSpecNode assumedSizeSpec; // in ASTArraySpecNode
     IASTListNode<ASTAssumedShapeSpecListNode> assumedShapeSpecList; // in ASTArraySpecNode
+    ASTAssumedSizeSpecNode assumedSizeSpec; // in ASTArraySpecNode
     IASTListNode<ASTExplicitShapeSpecNode> explicitShapeSpecList; // in ASTArraySpecNode
+    IASTListNode<ASTDeferredShapeSpecListNode> deferredShapeSpecList; // in ASTArraySpecNode
 
-    public IASTListNode<ASTDeferredShapeSpecListNode> getDeferredShapeSpecList()
+    public IASTListNode<ASTAssumedShapeSpecListNode> getAssumedShapeSpecList()
     {
-        return this.deferredShapeSpecList;
+        return this.assumedShapeSpecList;
     }
 
-    public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
+    public void setAssumedShapeSpecList(IASTListNode<ASTAssumedShapeSpecListNode> newValue)
     {
-        this.deferredShapeSpecList = newValue;
+        this.assumedShapeSpecList = newValue;
     }
 
 
@@ -53,17 +53,6 @@ public class ASTArraySpecNode extends ASTNode
     }
 
 
-    public IASTListNode<ASTAssumedShapeSpecListNode> getAssumedShapeSpecList()
-    {
-        return this.assumedShapeSpecList;
-    }
-
-    public void setAssumedShapeSpecList(IASTListNode<ASTAssumedShapeSpecListNode> newValue)
-    {
-        this.assumedShapeSpecList = newValue;
-    }
-
-
     public IASTListNode<ASTExplicitShapeSpecNode> getExplicitShapeSpecList()
     {
         return this.explicitShapeSpecList;
@@ -72,6 +61,17 @@ public class ASTArraySpecNode extends ASTNode
     public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
     {
         this.explicitShapeSpecList = newValue;
+    }
+
+
+    public IASTListNode<ASTDeferredShapeSpecListNode> getDeferredShapeSpecList()
+    {
+        return this.deferredShapeSpecList;
+    }
+
+    public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
+    {
+        this.deferredShapeSpecList = newValue;
     }
 
 
@@ -90,10 +90,10 @@ public class ASTArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.deferredShapeSpecList;
+        case 0:  return this.assumedShapeSpecList;
         case 1:  return this.assumedSizeSpec;
-        case 2:  return this.assumedShapeSpecList;
-        case 3:  return this.explicitShapeSpecList;
+        case 2:  return this.explicitShapeSpecList;
+        case 3:  return this.deferredShapeSpecList;
         default: return null;
         }
     }
@@ -102,10 +102,10 @@ public class ASTArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
+        case 0:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value; return;
         case 1:  this.assumedSizeSpec = (ASTAssumedSizeSpecNode)value; return;
-        case 2:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value; return;
-        case 3:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
+        case 2:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
+        case 3:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -27,8 +27,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTEndWhereStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndWhereStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEndwhere; // in ASTEndWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTEndWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndWhereStmtNode
@@ -71,8 +71,8 @@ public class ASTEndWhereStmtNode extends ASTNode
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTEnd;
-        case 2:  return this.hiddenTEndwhere;
+        case 1:  return this.hiddenTEndwhere;
+        case 2:  return this.hiddenTEnd;
         case 3:  return this.hiddenTWhere;
         case 4:  return this.endName;
         case 5:  return this.hiddenTEos;
@@ -85,8 +85,8 @@ public class ASTEndWhereStmtNode extends ASTNode
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEndwhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEndwhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;

@@ -24,31 +24,31 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTComplexConstNode extends ASTNode
+public class ASTComplexConstNode extends ASTNode implements IUnsignedArithmeticConst
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTComplexConstNode
-    ASTExprNode realPart; // in ASTComplexConstNode
+    IExpr realPart; // in ASTComplexConstNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTComplexConstNode
-    ASTExprNode complexPart; // in ASTComplexConstNode
+    IExpr complexPart; // in ASTComplexConstNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTComplexConstNode
 
-    public ASTExprNode getRealPart()
+    public IExpr getRealPart()
     {
         return this.realPart;
     }
 
-    public void setRealPart(ASTExprNode newValue)
+    public void setRealPart(IExpr newValue)
     {
         this.realPart = newValue;
     }
 
 
-    public ASTExprNode getComplexPart()
+    public IExpr getComplexPart()
     {
         return this.complexPart;
     }
 
-    public void setComplexPart(ASTExprNode newValue)
+    public void setComplexPart(IExpr newValue)
     {
         this.complexPart = newValue;
     }
@@ -57,6 +57,7 @@ public class ASTComplexConstNode extends ASTNode
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTComplexConstNode(this);
+        visitor.visitIUnsignedArithmeticConst(this);
         visitor.visitASTNode(this);
     }
 
@@ -83,9 +84,9 @@ public class ASTComplexConstNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.realPart = (ASTExprNode)value; return;
+        case 1:  this.realPart = (IExpr)value; return;
         case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.complexPart = (ASTExprNode)value; return;
+        case 3:  this.complexPart = (IExpr)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

@@ -27,20 +27,20 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTPositionSpecNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTErreq; // in ASTPositionSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTIostateq; // in ASTPositionSpecNode
-    ASTScalarVariableNode ioStatVar; // in ASTPositionSpecNode
+    ASTLblRefNode errLbl; // in ASTPositionSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTUniteq; // in ASTPositionSpecNode
     ASTUnitIdentifierNode unitIdentifier; // in ASTPositionSpecNode
-    ASTLblRefNode errLbl; // in ASTPositionSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTIostateq; // in ASTPositionSpecNode
+    ASTScalarVariableNode ioStatVar; // in ASTPositionSpecNode
 
-    public ASTScalarVariableNode getIoStatVar()
+    public ASTLblRefNode getErrLbl()
     {
-        return this.ioStatVar;
+        return this.errLbl;
     }
 
-    public void setIoStatVar(ASTScalarVariableNode newValue)
+    public void setErrLbl(ASTLblRefNode newValue)
     {
-        this.ioStatVar = newValue;
+        this.errLbl = newValue;
     }
 
 
@@ -55,14 +55,14 @@ public class ASTPositionSpecNode extends ASTNode
     }
 
 
-    public ASTLblRefNode getErrLbl()
+    public ASTScalarVariableNode getIoStatVar()
     {
-        return this.errLbl;
+        return this.ioStatVar;
     }
 
-    public void setErrLbl(ASTLblRefNode newValue)
+    public void setIoStatVar(ASTScalarVariableNode newValue)
     {
-        this.errLbl = newValue;
+        this.ioStatVar = newValue;
     }
 
 
@@ -82,11 +82,11 @@ public class ASTPositionSpecNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTErreq;
-        case 1:  return this.hiddenTIostateq;
-        case 2:  return this.ioStatVar;
-        case 3:  return this.hiddenTUniteq;
-        case 4:  return this.unitIdentifier;
-        case 5:  return this.errLbl;
+        case 1:  return this.errLbl;
+        case 2:  return this.hiddenTUniteq;
+        case 3:  return this.unitIdentifier;
+        case 4:  return this.hiddenTIostateq;
+        case 5:  return this.ioStatVar;
         default: return null;
         }
     }
@@ -96,11 +96,11 @@ public class ASTPositionSpecNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.ioStatVar = (ASTScalarVariableNode)value; return;
-        case 3:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
-        case 5:  this.errLbl = (ASTLblRefNode)value; return;
+        case 1:  this.errLbl = (ASTLblRefNode)value; return;
+        case 2:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 4:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.ioStatVar = (ASTScalarVariableNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

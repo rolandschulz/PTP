@@ -24,11 +24,13 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTArrayConstructorNode extends ASTNode
+public class ASTArrayConstructorNode extends ASTNode implements IExpr
 {
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLbracket; // in ASTArrayConstructorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparenslash; // in ASTArrayConstructorNode
     IASTListNode<ASTAcValueNode> acValueList; // in ASTArrayConstructorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSlashrparen; // in ASTArrayConstructorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRbracket; // in ASTArrayConstructorNode
 
     public IASTListNode<ASTAcValueNode> getAcValueList()
     {
@@ -44,21 +46,24 @@ public class ASTArrayConstructorNode extends ASTNode
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTArrayConstructorNode(this);
+        visitor.visitIExpr(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 3;
+        return 5;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.hiddenTLparenslash;
-        case 1:  return this.acValueList;
-        case 2:  return this.hiddenTSlashrparen;
+        case 0:  return this.hiddenTLbracket;
+        case 1:  return this.hiddenTLparenslash;
+        case 2:  return this.acValueList;
+        case 3:  return this.hiddenTSlashrparen;
+        case 4:  return this.hiddenTRbracket;
         default: return null;
         }
     }
@@ -67,9 +72,11 @@ public class ASTArrayConstructorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparenslash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.acValueList = (IASTListNode<ASTAcValueNode>)value; return;
-        case 2:  this.hiddenTSlashrparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTLparenslash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.acValueList = (IASTListNode<ASTAcValueNode>)value; return;
+        case 3:  this.hiddenTSlashrparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

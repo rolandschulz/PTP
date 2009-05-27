@@ -31,4 +31,5 @@ public abstract class TypeProcessor<T>
     public T ifFunctionType(String name, FunctionType functionType) {return null;}
     public T ifUnknown(Type type) {return null;}
     public T ifUnclassified(Type type) {return null;}
+    public T ifError(Type type) {return null;}
 }

@@ -28,8 +28,8 @@ public class ASTEndModuleStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndModuleStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndModuleStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTModule; // in ASTEndModuleStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEndmodule; // in ASTEndModuleStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTModule; // in ASTEndModuleStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndModuleStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndModuleStmtNode
 
@@ -72,8 +72,8 @@ public class ASTEndModuleStmtNode extends ASTNode
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTEnd;
-        case 2:  return this.hiddenTModule;
-        case 3:  return this.hiddenTEndmodule;
+        case 2:  return this.hiddenTEndmodule;
+        case 3:  return this.hiddenTModule;
         case 4:  return this.endName;
         case 5:  return this.hiddenTEos;
         default: return null;
@@ -86,8 +86,8 @@ public class ASTEndModuleStmtNode extends ASTNode
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTEndmodule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEndmodule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

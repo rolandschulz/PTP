@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTAcValueNode extends ASTNode
 {
-    ASTExprNode expr; // in ASTAcValueNode
     ASTAcImpliedDoNode acImpliedDo; // in ASTAcValueNode
-
-    public ASTExprNode getExpr()
-    {
-        return this.expr;
-    }
-
-    public void setExpr(ASTExprNode newValue)
-    {
-        this.expr = newValue;
-    }
-
+    IExpr expr; // in ASTAcValueNode
 
     public ASTAcImpliedDoNode getAcImpliedDo()
     {
@@ -48,6 +37,17 @@ public class ASTAcValueNode extends ASTNode
     public void setAcImpliedDo(ASTAcImpliedDoNode newValue)
     {
         this.acImpliedDo = newValue;
+    }
+
+
+    public IExpr getExpr()
+    {
+        return this.expr;
+    }
+
+    public void setExpr(IExpr newValue)
+    {
+        this.expr = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTAcValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.expr;
-        case 1:  return this.acImpliedDo;
+        case 0:  return this.acImpliedDo;
+        case 1:  return this.expr;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTAcValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.expr = (ASTExprNode)value; return;
-        case 1:  this.acImpliedDo = (ASTAcImpliedDoNode)value; return;
+        case 0:  this.acImpliedDo = (ASTAcImpliedDoNode)value; return;
+        case 1:  this.expr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

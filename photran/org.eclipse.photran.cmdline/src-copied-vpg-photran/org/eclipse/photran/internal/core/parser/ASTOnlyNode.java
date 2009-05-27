@@ -27,9 +27,17 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTOnlyNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token newName; // in ASTOnlyNode
-    org.eclipse.photran.internal.core.lexer.Token isRenamed; // in ASTOnlyNode
-    org.eclipse.photran.internal.core.lexer.Token name; // in ASTOnlyNode
     ASTGenericSpecNode genericSpec; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token isOperator; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTOnlyNode
+    IDefinedOperator newOp; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token isRenamed; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTOperator; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen2; // in ASTOnlyNode
+    IDefinedOperator oldOp; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token name; // in ASTOnlyNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen2; // in ASTOnlyNode
 
     public org.eclipse.photran.internal.core.lexer.Token getNewName()
     {
@@ -39,28 +47,6 @@ public class ASTOnlyNode extends ASTNode
     public void setNewName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.newName = newValue;
-    }
-
-
-    public boolean isRenamed()
-    {
-        return this.isRenamed != null;
-    }
-
-    public void setIsRenamed(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isRenamed = newValue;
-    }
-
-
-    public org.eclipse.photran.internal.core.lexer.Token getName()
-    {
-        return this.name;
-    }
-
-    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.name = newValue;
     }
 
 
@@ -75,6 +61,61 @@ public class ASTOnlyNode extends ASTNode
     }
 
 
+    public boolean isOperator()
+    {
+        return this.isOperator != null;
+    }
+
+    public void setIsOperator(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isOperator = newValue;
+    }
+
+
+    public IDefinedOperator getNewOp()
+    {
+        return this.newOp;
+    }
+
+    public void setNewOp(IDefinedOperator newValue)
+    {
+        this.newOp = newValue;
+    }
+
+
+    public boolean isRenamed()
+    {
+        return this.isRenamed != null;
+    }
+
+    public void setIsRenamed(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isRenamed = newValue;
+    }
+
+
+    public IDefinedOperator getOldOp()
+    {
+        return this.oldOp;
+    }
+
+    public void setOldOp(IDefinedOperator newValue)
+    {
+        this.oldOp = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getName()
+    {
+        return this.name;
+    }
+
+    public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.name = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTOnlyNode(this);
@@ -83,7 +124,7 @@ public class ASTOnlyNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 12;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -91,9 +132,17 @@ public class ASTOnlyNode extends ASTNode
         switch (index)
         {
         case 0:  return this.newName;
-        case 1:  return this.isRenamed;
-        case 2:  return this.name;
-        case 3:  return this.genericSpec;
+        case 1:  return this.genericSpec;
+        case 2:  return this.isOperator;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.newOp;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.isRenamed;
+        case 7:  return this.hiddenTOperator;
+        case 8:  return this.hiddenTLparen2;
+        case 9:  return this.oldOp;
+        case 10: return this.name;
+        case 11: return this.hiddenTRparen2;
         default: return null;
         }
     }
@@ -103,9 +152,17 @@ public class ASTOnlyNode extends ASTNode
         switch (index)
         {
         case 0:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isRenamed = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.genericSpec = (ASTGenericSpecNode)value; return;
+        case 1:  this.genericSpec = (ASTGenericSpecNode)value; return;
+        case 2:  this.isOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.newOp = (IDefinedOperator)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.isRenamed = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 9:  this.oldOp = (IDefinedOperator)value; return;
+        case 10: this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

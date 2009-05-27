@@ -28,7 +28,7 @@ public class ASTAssumedSizeSpecNode extends ASTNode
 {
     IASTListNode<ASTExplicitShapeSpecNode> explicitShapeSpecList; // in ASTAssumedSizeSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTAssumedSizeSpecNode
-    ASTExprNode lb; // in ASTAssumedSizeSpecNode
+    IExpr lb; // in ASTAssumedSizeSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTAssumedSizeSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTAssumedSizeSpecNode
 
@@ -43,12 +43,12 @@ public class ASTAssumedSizeSpecNode extends ASTNode
     }
 
 
-    public ASTExprNode getLb()
+    public IExpr getLb()
     {
         return this.lb;
     }
 
-    public void setLb(ASTExprNode newValue)
+    public void setLb(IExpr newValue)
     {
         this.lb = newValue;
     }
@@ -84,7 +84,7 @@ public class ASTAssumedSizeSpecNode extends ASTNode
         {
         case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
         case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.lb = (ASTExprNode)value; return;
+        case 2:  this.lb = (IExpr)value; return;
         case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

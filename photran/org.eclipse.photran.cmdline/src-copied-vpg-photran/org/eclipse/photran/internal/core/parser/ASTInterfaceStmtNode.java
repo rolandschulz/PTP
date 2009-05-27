@@ -27,6 +27,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTInterfaceStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTInterfaceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isAbstract; // in ASTInterfaceStmtNode
     org.eclipse.photran.internal.core.lexer.Token interfaceToken; // in ASTInterfaceStmtNode
     ASTGenericNameNode genericName; // in ASTInterfaceStmtNode
     ASTGenericSpecNode genericSpec; // in ASTInterfaceStmtNode
@@ -40,6 +41,17 @@ public class ASTInterfaceStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+    }
+
+
+    public boolean isAbstract()
+    {
+        return this.isAbstract != null;
+    }
+
+    public void setIsAbstract(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAbstract = newValue;
     }
 
 
@@ -84,7 +96,7 @@ public class ASTInterfaceStmtNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 5;
+        return 6;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -92,10 +104,11 @@ public class ASTInterfaceStmtNode extends ASTNode
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.interfaceToken;
-        case 2:  return this.genericName;
-        case 3:  return this.genericSpec;
-        case 4:  return this.hiddenTEos;
+        case 1:  return this.isAbstract;
+        case 2:  return this.interfaceToken;
+        case 3:  return this.genericName;
+        case 4:  return this.genericSpec;
+        case 5:  return this.hiddenTEos;
         default: return null;
         }
     }
@@ -105,10 +118,11 @@ public class ASTInterfaceStmtNode extends ASTNode
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.interfaceToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.genericName = (ASTGenericNameNode)value; return;
-        case 3:  this.genericSpec = (ASTGenericSpecNode)value; return;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.interfaceToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.genericName = (ASTGenericNameNode)value; return;
+        case 4:  this.genericSpec = (ASTGenericSpecNode)value; return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

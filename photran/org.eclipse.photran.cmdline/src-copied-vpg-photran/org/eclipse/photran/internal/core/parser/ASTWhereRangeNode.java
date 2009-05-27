@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTWhereRangeNode extends ASTNode
 {
     IASTListNode<IWhereBodyConstruct> whereBodyConstructBlock; // in ASTWhereRangeNode
-    ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTWhereRangeNode
     ASTEndWhereStmtNode endWhereStmt; // in ASTWhereRangeNode
     ASTElseWhereConstructNode elseWhereConstruct; // in ASTWhereRangeNode
+    ASTMaskedElseWhereConstructNode maskedElseWhereConstruct; // in ASTWhereRangeNode
 
     public IASTListNode<IWhereBodyConstruct> getWhereBodyConstructBlock()
     {
@@ -39,17 +39,6 @@ public class ASTWhereRangeNode extends ASTNode
     public void setWhereBodyConstructBlock(IASTListNode<IWhereBodyConstruct> newValue)
     {
         this.whereBodyConstructBlock = newValue;
-    }
-
-
-    public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
-    {
-        return this.maskedElseWhereConstruct;
-    }
-
-    public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
-    {
-        this.maskedElseWhereConstruct = newValue;
     }
 
 
@@ -75,6 +64,17 @@ public class ASTWhereRangeNode extends ASTNode
     }
 
 
+    public ASTMaskedElseWhereConstructNode getMaskedElseWhereConstruct()
+    {
+        return this.maskedElseWhereConstruct;
+    }
+
+    public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
+    {
+        this.maskedElseWhereConstruct = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTWhereRangeNode(this);
@@ -91,9 +91,9 @@ public class ASTWhereRangeNode extends ASTNode
         switch (index)
         {
         case 0:  return this.whereBodyConstructBlock;
-        case 1:  return this.maskedElseWhereConstruct;
-        case 2:  return this.endWhereStmt;
-        case 3:  return this.elseWhereConstruct;
+        case 1:  return this.endWhereStmt;
+        case 2:  return this.elseWhereConstruct;
+        case 3:  return this.maskedElseWhereConstruct;
         default: return null;
         }
     }
@@ -103,9 +103,9 @@ public class ASTWhereRangeNode extends ASTNode
         switch (index)
         {
         case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
-        case 1:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
-        case 2:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
-        case 3:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
+        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
+        case 2:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
+        case 3:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

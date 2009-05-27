@@ -26,7 +26,19 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTExecutableProgramNode extends ScopingNode
 {
+    ASTEmptyProgramNode emptyProgram; // in ASTExecutableProgramNode
     IASTListNode<IProgramUnit> programUnitList; // in ASTExecutableProgramNode
+
+    public ASTEmptyProgramNode getEmptyProgram()
+    {
+        return this.emptyProgram;
+    }
+
+    public void setEmptyProgram(ASTEmptyProgramNode newValue)
+    {
+        this.emptyProgram = newValue;
+    }
+
 
     public IASTListNode<IProgramUnit> getProgramUnitList()
     {
@@ -47,14 +59,15 @@ public class ASTExecutableProgramNode extends ScopingNode
 
     @Override protected int getNumASTFields()
     {
-        return 1;
+        return 2;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.programUnitList;
+        case 0:  return this.emptyProgram;
+        case 1:  return this.programUnitList;
         default: return null;
         }
     }
@@ -63,7 +76,8 @@ public class ASTExecutableProgramNode extends ScopingNode
     {
         switch (index)
         {
-        case 0:  this.programUnitList = (IASTListNode<IProgramUnit>)value; return;
+        case 0:  this.emptyProgram = (ASTEmptyProgramNode)value; return;
+        case 1:  this.programUnitList = (IASTListNode<IProgramUnit>)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

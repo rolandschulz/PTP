@@ -26,22 +26,22 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTEditElementNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token floatConst; // in ASTEditElementNode
-    org.eclipse.photran.internal.core.lexer.Token hollerith; // in ASTEditElementNode
     org.eclipse.photran.internal.core.lexer.Token identifier; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token hollerith; // in ASTEditElementNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTEditElementNode
     IASTListNode<ASTFmtSpecNode> fmtSpec; // in ASTEditElementNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTEditElementNode
+    org.eclipse.photran.internal.core.lexer.Token floatConst; // in ASTEditElementNode
     org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTEditElementNode
 
-    public org.eclipse.photran.internal.core.lexer.Token getFloatConst()
+    public org.eclipse.photran.internal.core.lexer.Token getIdentifier()
     {
-        return this.floatConst;
+        return this.identifier;
     }
 
-    public void setFloatConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIdentifier(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.floatConst = newValue;
+        this.identifier = newValue;
     }
 
 
@@ -56,17 +56,6 @@ public class ASTEditElementNode extends ASTNode
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getIdentifier()
-    {
-        return this.identifier;
-    }
-
-    public void setIdentifier(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.identifier = newValue;
-    }
-
-
     public IASTListNode<ASTFmtSpecNode> getFmtSpec()
     {
         return this.fmtSpec;
@@ -75,6 +64,17 @@ public class ASTEditElementNode extends ASTNode
     public void setFmtSpec(IASTListNode<ASTFmtSpecNode> newValue)
     {
         this.fmtSpec = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getFloatConst()
+    {
+        return this.floatConst;
+    }
+
+    public void setFloatConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.floatConst = newValue;
     }
 
 
@@ -104,12 +104,12 @@ public class ASTEditElementNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.floatConst;
+        case 0:  return this.identifier;
         case 1:  return this.hollerith;
-        case 2:  return this.identifier;
-        case 3:  return this.hiddenTLparen;
-        case 4:  return this.fmtSpec;
-        case 5:  return this.hiddenTRparen;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.fmtSpec;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.floatConst;
         case 6:  return this.stringConst;
         default: return null;
         }
@@ -119,12 +119,12 @@ public class ASTEditElementNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value; return;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value; return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

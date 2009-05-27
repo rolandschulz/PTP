@@ -26,22 +26,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTArrayElementNode extends ASTNode implements IDataIDoObject
 {
-    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTArrayElementNode
     IASTListNode<ASTStructureComponentNode> structureComponent; // in ASTArrayElementNode
+    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTArrayElementNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTArrayElementNode
     IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTArrayElementNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTArrayElementNode
-
-    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
-    {
-        return this.variableName;
-    }
-
-    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.variableName = newValue;
-    }
-
 
     public IASTListNode<ASTStructureComponentNode> getStructureComponent()
     {
@@ -51,6 +40,17 @@ public class ASTArrayElementNode extends ASTNode implements IDataIDoObject
     public void setStructureComponent(IASTListNode<ASTStructureComponentNode> newValue)
     {
         this.structureComponent = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
+    {
+        return this.variableName;
+    }
+
+    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.variableName = newValue;
     }
 
 
@@ -81,8 +81,8 @@ public class ASTArrayElementNode extends ASTNode implements IDataIDoObject
     {
         switch (index)
         {
-        case 0:  return this.variableName;
-        case 1:  return this.structureComponent;
+        case 0:  return this.structureComponent;
+        case 1:  return this.variableName;
         case 2:  return this.hiddenTLparen;
         case 3:  return this.sectionSubscriptList;
         case 4:  return this.hiddenTRparen;
@@ -94,8 +94,8 @@ public class ASTArrayElementNode extends ASTNode implements IDataIDoObject
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.structureComponent = (IASTListNode<ASTStructureComponentNode>)value; return;
+        case 0:  this.structureComponent = (IASTListNode<ASTStructureComponentNode>)value; return;
+        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;

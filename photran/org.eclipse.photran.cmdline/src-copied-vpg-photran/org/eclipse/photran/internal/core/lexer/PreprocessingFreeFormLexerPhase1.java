@@ -61,7 +61,7 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
      * FILE.F90               INC.FH
      * ===================    ===================
      * program p              ! Comment B
-     *   ! Comment            integer :: i
+     *   ! Comment A          integer :: i
      *   include "inc.fh"
      * end program p
      * </pre>
@@ -81,7 +81,11 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
         String whiteBefore = token.getWhiteBefore();
         int charsFromIncludeFile = tokenTextStartOffset - fileStartOffset;
         if (charsFromIncludeFile > 0)
-            token.setWhiteBefore(whiteBefore.substring(0, whiteBefore.length() - charsFromIncludeFile));
+        {
+            int charsToKeep = whiteBefore.length() - charsFromIncludeFile;
+            charsToKeep = Math.max(charsToKeep, 0); // TODO: Why is whiteBefore "" when it shouldn't be?
+            token.setWhiteBefore(whiteBefore.substring(0, charsToKeep));
+        }
     }
 
     /**
@@ -107,6 +111,7 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
         String whiteBefore = token.getWhiteBefore();
         int charsFromRealFile = tokenTextStartOffset - fileStartOffset;
         int charsToTrim = whiteBefore.length() - charsFromRealFile;
+        charsToTrim = Math.max(charsToTrim, 0); // TODO: Why does this go negative?
         token.setWhiteBefore(whiteBefore.substring(charsToTrim));
     }
 

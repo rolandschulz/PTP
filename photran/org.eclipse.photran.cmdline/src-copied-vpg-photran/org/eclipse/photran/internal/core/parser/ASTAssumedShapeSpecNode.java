@@ -26,15 +26,15 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTAssumedShapeSpecNode extends ASTNode
 {
-    ASTExprNode lb; // in ASTAssumedShapeSpecNode
+    IExpr lb; // in ASTAssumedShapeSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTAssumedShapeSpecNode
 
-    public ASTExprNode getLb()
+    public IExpr getLb()
     {
         return this.lb;
     }
 
-    public void setLb(ASTExprNode newValue)
+    public void setLb(IExpr newValue)
     {
         this.lb = newValue;
     }
@@ -65,7 +65,7 @@ public class ASTAssumedShapeSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (ASTExprNode)value; return;
+        case 0:  this.lb = (IExpr)value; return;
         case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

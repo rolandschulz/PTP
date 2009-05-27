@@ -26,56 +26,89 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTInquireSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hiddenTExisteq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTActioneq; // in ASTInquireSpecNode
-    ASTScalarVariableNode existVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTNextreceq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTFileeq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTNumbereq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTOpenedeq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTReadeq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTUniteq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTReadwriteeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode readVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAsynchronouseq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRoundeq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTWriteeq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAccesseq; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTDelimeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode numberVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTFormattedeq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTIostateq; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTUnformattedeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode readWriteVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode delimVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTBlankeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode unformattedVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTDecimaleq; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRecleq; // in ASTInquireSpecNode
-    ASTExprNode reclExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTPositioneq; // in ASTInquireSpecNode
+    IExpr reclExpr; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTNameeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode nameVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTStreameq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTExisteq; // in ASTInquireSpecNode
+    ASTScalarVariableNode existVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTFormattedeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode formattedVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTIostateq; // in ASTInquireSpecNode
+    ASTScalarVariableNode ioStatVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTPoseq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTFormeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode streamVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode roundExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTNumbereq; // in ASTInquireSpecNode
+    ASTScalarVariableNode asyncExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTDirecteq; // in ASTInquireSpecNode
+    ASTScalarVariableNode decimalExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTIomsgeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode iomsgExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEncodingeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode encodingExpr; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSequentialeq; // in ASTInquireSpecNode
     ASTScalarVariableNode sequentialVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTDirecteq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTPendingeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode positionVar; // in ASTInquireSpecNode
     ASTScalarVariableNode directVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTPositioneq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSizeeq; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTFileeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode numberVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUnformattedeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode sizeVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTNextreceq; // in ASTInquireSpecNode
+    ASTScalarVariableNode nextRecVar; // in ASTInquireSpecNode
     ASTCExprNode fileExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTOpenedeq; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTErreq; // in ASTInquireSpecNode
     ASTLblRefNode errVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTSigneq; // in ASTInquireSpecNode
+    ASTScalarVariableNode signExpr; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTBlankeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode blankVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode posVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTIdeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode idVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode unformattedVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTActioneq; // in ASTInquireSpecNode
+    ASTScalarVariableNode actionVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTUniteq; // in ASTInquireSpecNode
+    ASTUnitIdentifierNode unitIdentifier; // in ASTInquireSpecNode
+    ASTScalarVariableNode formVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode nameVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTReadeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode readVar; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTNamedeq; // in ASTInquireSpecNode
     ASTScalarVariableNode namedVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTWriteeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode writeVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTFormeq; // in ASTInquireSpecNode
-    ASTScalarVariableNode formVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode openedVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode blankVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode formattedVar; // in ASTInquireSpecNode
-    ASTUnitIdentifierNode unitIdentifier; // in ASTInquireSpecNode
-    ASTScalarVariableNode positionVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode ioStatVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode nextRecVar; // in ASTInquireSpecNode
-    ASTScalarVariableNode actionVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode pendingVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode delimVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode accessVar; // in ASTInquireSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTPadeq; // in ASTInquireSpecNode
     ASTScalarVariableNode padVar; // in ASTInquireSpecNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTAccesseq; // in ASTInquireSpecNode
-    ASTScalarVariableNode accessVar; // in ASTInquireSpecNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTReadwriteeq; // in ASTInquireSpecNode
+    ASTScalarVariableNode readWriteVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode openedVar; // in ASTInquireSpecNode
+    ASTScalarVariableNode writeVar; // in ASTInquireSpecNode
+
+    public IExpr getReclExpr()
+    {
+        return this.reclExpr;
+    }
+
+    public void setReclExpr(IExpr newValue)
+    {
+        this.reclExpr = newValue;
+    }
+
 
     public ASTScalarVariableNode getExistVar()
     {
@@ -88,80 +121,91 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
-    public ASTScalarVariableNode getReadVar()
+    public ASTScalarVariableNode getFormattedVar()
     {
-        return this.readVar;
+        return this.formattedVar;
     }
 
-    public void setReadVar(ASTScalarVariableNode newValue)
+    public void setFormattedVar(ASTScalarVariableNode newValue)
     {
-        this.readVar = newValue;
-    }
-
-
-    public ASTScalarVariableNode getNumberVar()
-    {
-        return this.numberVar;
-    }
-
-    public void setNumberVar(ASTScalarVariableNode newValue)
-    {
-        this.numberVar = newValue;
+        this.formattedVar = newValue;
     }
 
 
-    public ASTScalarVariableNode getReadWriteVar()
+    public ASTScalarVariableNode getIoStatVar()
     {
-        return this.readWriteVar;
+        return this.ioStatVar;
     }
 
-    public void setReadWriteVar(ASTScalarVariableNode newValue)
+    public void setIoStatVar(ASTScalarVariableNode newValue)
     {
-        this.readWriteVar = newValue;
-    }
-
-
-    public ASTScalarVariableNode getDelimVar()
-    {
-        return this.delimVar;
-    }
-
-    public void setDelimVar(ASTScalarVariableNode newValue)
-    {
-        this.delimVar = newValue;
+        this.ioStatVar = newValue;
     }
 
 
-    public ASTScalarVariableNode getUnformattedVar()
+    public ASTScalarVariableNode getStreamVar()
     {
-        return this.unformattedVar;
+        return this.streamVar;
     }
 
-    public void setUnformattedVar(ASTScalarVariableNode newValue)
+    public void setStreamVar(ASTScalarVariableNode newValue)
     {
-        this.unformattedVar = newValue;
-    }
-
-
-    public ASTExprNode getReclExpr()
-    {
-        return this.reclExpr;
-    }
-
-    public void setReclExpr(ASTExprNode newValue)
-    {
-        this.reclExpr = newValue;
+        this.streamVar = newValue;
     }
 
 
-    public ASTScalarVariableNode getNameVar()
+    public ASTScalarVariableNode getRoundExpr()
     {
-        return this.nameVar;
+        return this.roundExpr;
     }
 
-    public void setNameVar(ASTScalarVariableNode newValue)
+    public void setRoundExpr(ASTScalarVariableNode newValue)
     {
-        this.nameVar = newValue;
+        this.roundExpr = newValue;
+    }
+
+
+    public ASTScalarVariableNode getAsyncExpr()
+    {
+        return this.asyncExpr;
+    }
+
+    public void setAsyncExpr(ASTScalarVariableNode newValue)
+    {
+        this.asyncExpr = newValue;
+    }
+
+
+    public ASTScalarVariableNode getDecimalExpr()
+    {
+        return this.decimalExpr;
+    }
+
+    public void setDecimalExpr(ASTScalarVariableNode newValue)
+    {
+        this.decimalExpr = newValue;
+    }
+
+
+    public ASTScalarVariableNode getIomsgExpr()
+    {
+        return this.iomsgExpr;
+    }
+
+    public void setIomsgExpr(ASTScalarVariableNode newValue)
+    {
+        this.iomsgExpr = newValue;
+    }
+
+
+    public ASTScalarVariableNode getEncodingExpr()
+    {
+        return this.encodingExpr;
+    }
+
+    public void setEncodingExpr(ASTScalarVariableNode newValue)
+    {
+        this.encodingExpr = newValue;
     }
 
 
@@ -176,6 +220,17 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
+    public ASTScalarVariableNode getPositionVar()
+    {
+        return this.positionVar;
+    }
+
+    public void setPositionVar(ASTScalarVariableNode newValue)
+    {
+        this.positionVar = newValue;
+    }
+
+
     public ASTScalarVariableNode getDirectVar()
     {
         return this.directVar;
@@ -184,6 +239,39 @@ public class ASTInquireSpecNode extends ASTNode
     public void setDirectVar(ASTScalarVariableNode newValue)
     {
         this.directVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getNumberVar()
+    {
+        return this.numberVar;
+    }
+
+    public void setNumberVar(ASTScalarVariableNode newValue)
+    {
+        this.numberVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getSizeVar()
+    {
+        return this.sizeVar;
+    }
+
+    public void setSizeVar(ASTScalarVariableNode newValue)
+    {
+        this.sizeVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getNextRecVar()
+    {
+        return this.nextRecVar;
+    }
+
+    public void setNextRecVar(ASTScalarVariableNode newValue)
+    {
+        this.nextRecVar = newValue;
     }
 
 
@@ -209,47 +297,14 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
-    public ASTScalarVariableNode getNamedVar()
+    public ASTScalarVariableNode getSignExpr()
     {
-        return this.namedVar;
+        return this.signExpr;
     }
 
-    public void setNamedVar(ASTScalarVariableNode newValue)
+    public void setSignExpr(ASTScalarVariableNode newValue)
     {
-        this.namedVar = newValue;
-    }
-
-
-    public ASTScalarVariableNode getWriteVar()
-    {
-        return this.writeVar;
-    }
-
-    public void setWriteVar(ASTScalarVariableNode newValue)
-    {
-        this.writeVar = newValue;
-    }
-
-
-    public ASTScalarVariableNode getFormVar()
-    {
-        return this.formVar;
-    }
-
-    public void setFormVar(ASTScalarVariableNode newValue)
-    {
-        this.formVar = newValue;
-    }
-
-
-    public ASTScalarVariableNode getOpenedVar()
-    {
-        return this.openedVar;
-    }
-
-    public void setOpenedVar(ASTScalarVariableNode newValue)
-    {
-        this.openedVar = newValue;
+        this.signExpr = newValue;
     }
 
 
@@ -264,58 +319,36 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
-    public ASTScalarVariableNode getFormattedVar()
+    public ASTScalarVariableNode getPosVar()
     {
-        return this.formattedVar;
+        return this.posVar;
     }
 
-    public void setFormattedVar(ASTScalarVariableNode newValue)
+    public void setPosVar(ASTScalarVariableNode newValue)
     {
-        this.formattedVar = newValue;
-    }
-
-
-    public ASTUnitIdentifierNode getUnitIdentifier()
-    {
-        return this.unitIdentifier;
-    }
-
-    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
-    {
-        this.unitIdentifier = newValue;
+        this.posVar = newValue;
     }
 
 
-    public ASTScalarVariableNode getPositionVar()
+    public ASTScalarVariableNode getIdVar()
     {
-        return this.positionVar;
+        return this.idVar;
     }
 
-    public void setPositionVar(ASTScalarVariableNode newValue)
+    public void setIdVar(ASTScalarVariableNode newValue)
     {
-        this.positionVar = newValue;
-    }
-
-
-    public ASTScalarVariableNode getIoStatVar()
-    {
-        return this.ioStatVar;
-    }
-
-    public void setIoStatVar(ASTScalarVariableNode newValue)
-    {
-        this.ioStatVar = newValue;
+        this.idVar = newValue;
     }
 
 
-    public ASTScalarVariableNode getNextRecVar()
+    public ASTScalarVariableNode getUnformattedVar()
     {
-        return this.nextRecVar;
+        return this.unformattedVar;
     }
 
-    public void setNextRecVar(ASTScalarVariableNode newValue)
+    public void setUnformattedVar(ASTScalarVariableNode newValue)
     {
-        this.nextRecVar = newValue;
+        this.unformattedVar = newValue;
     }
 
 
@@ -330,14 +363,80 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
-    public ASTScalarVariableNode getPadVar()
+    public ASTUnitIdentifierNode getUnitIdentifier()
     {
-        return this.padVar;
+        return this.unitIdentifier;
     }
 
-    public void setPadVar(ASTScalarVariableNode newValue)
+    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
-        this.padVar = newValue;
+        this.unitIdentifier = newValue;
+    }
+
+
+    public ASTScalarVariableNode getFormVar()
+    {
+        return this.formVar;
+    }
+
+    public void setFormVar(ASTScalarVariableNode newValue)
+    {
+        this.formVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getNameVar()
+    {
+        return this.nameVar;
+    }
+
+    public void setNameVar(ASTScalarVariableNode newValue)
+    {
+        this.nameVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getReadVar()
+    {
+        return this.readVar;
+    }
+
+    public void setReadVar(ASTScalarVariableNode newValue)
+    {
+        this.readVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getNamedVar()
+    {
+        return this.namedVar;
+    }
+
+    public void setNamedVar(ASTScalarVariableNode newValue)
+    {
+        this.namedVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getPendingVar()
+    {
+        return this.pendingVar;
+    }
+
+    public void setPendingVar(ASTScalarVariableNode newValue)
+    {
+        this.pendingVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getDelimVar()
+    {
+        return this.delimVar;
+    }
+
+    public void setDelimVar(ASTScalarVariableNode newValue)
+    {
+        this.delimVar = newValue;
     }
 
 
@@ -352,6 +451,50 @@ public class ASTInquireSpecNode extends ASTNode
     }
 
 
+    public ASTScalarVariableNode getPadVar()
+    {
+        return this.padVar;
+    }
+
+    public void setPadVar(ASTScalarVariableNode newValue)
+    {
+        this.padVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getReadWriteVar()
+    {
+        return this.readWriteVar;
+    }
+
+    public void setReadWriteVar(ASTScalarVariableNode newValue)
+    {
+        this.readWriteVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getOpenedVar()
+    {
+        return this.openedVar;
+    }
+
+    public void setOpenedVar(ASTScalarVariableNode newValue)
+    {
+        this.openedVar = newValue;
+    }
+
+
+    public ASTScalarVariableNode getWriteVar()
+    {
+        return this.writeVar;
+    }
+
+    public void setWriteVar(ASTScalarVariableNode newValue)
+    {
+        this.writeVar = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTInquireSpecNode(this);
@@ -360,63 +503,85 @@ public class ASTInquireSpecNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 50;
+        return 72;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.hiddenTExisteq;
-        case 1:  return this.hiddenTActioneq;
-        case 2:  return this.existVar;
-        case 3:  return this.hiddenTNextreceq;
-        case 4:  return this.hiddenTFileeq;
-        case 5:  return this.hiddenTNumbereq;
-        case 6:  return this.hiddenTOpenedeq;
-        case 7:  return this.hiddenTReadeq;
-        case 8:  return this.hiddenTUniteq;
-        case 9:  return this.hiddenTReadwriteeq;
-        case 10: return this.readVar;
-        case 11: return this.hiddenTDelimeq;
-        case 12: return this.numberVar;
+        case 0:  return this.hiddenTAsynchronouseq;
+        case 1:  return this.hiddenTRoundeq;
+        case 2:  return this.hiddenTWriteeq;
+        case 3:  return this.hiddenTAccesseq;
+        case 4:  return this.hiddenTDelimeq;
+        case 5:  return this.hiddenTDecimaleq;
+        case 6:  return this.hiddenTRecleq;
+        case 7:  return this.hiddenTPositioneq;
+        case 8:  return this.reclExpr;
+        case 9:  return this.hiddenTNameeq;
+        case 10: return this.hiddenTStreameq;
+        case 11: return this.hiddenTExisteq;
+        case 12: return this.existVar;
         case 13: return this.hiddenTFormattedeq;
-        case 14: return this.hiddenTIostateq;
-        case 15: return this.hiddenTUnformattedeq;
-        case 16: return this.readWriteVar;
-        case 17: return this.delimVar;
-        case 18: return this.hiddenTBlankeq;
-        case 19: return this.unformattedVar;
-        case 20: return this.hiddenTRecleq;
-        case 21: return this.reclExpr;
-        case 22: return this.hiddenTNameeq;
-        case 23: return this.nameVar;
-        case 24: return this.hiddenTSequentialeq;
-        case 25: return this.sequentialVar;
-        case 26: return this.hiddenTDirecteq;
-        case 27: return this.directVar;
-        case 28: return this.hiddenTPositioneq;
-        case 29: return this.fileExpr;
-        case 30: return this.hiddenTErreq;
-        case 31: return this.errVar;
-        case 32: return this.hiddenTNamedeq;
-        case 33: return this.namedVar;
-        case 34: return this.hiddenTWriteeq;
-        case 35: return this.writeVar;
-        case 36: return this.hiddenTFormeq;
-        case 37: return this.formVar;
-        case 38: return this.openedVar;
-        case 39: return this.blankVar;
-        case 40: return this.formattedVar;
-        case 41: return this.unitIdentifier;
-        case 42: return this.positionVar;
-        case 43: return this.ioStatVar;
-        case 44: return this.nextRecVar;
-        case 45: return this.actionVar;
-        case 46: return this.hiddenTPadeq;
-        case 47: return this.padVar;
-        case 48: return this.hiddenTAccesseq;
-        case 49: return this.accessVar;
+        case 14: return this.formattedVar;
+        case 15: return this.hiddenTIostateq;
+        case 16: return this.ioStatVar;
+        case 17: return this.hiddenTPoseq;
+        case 18: return this.hiddenTFormeq;
+        case 19: return this.streamVar;
+        case 20: return this.roundExpr;
+        case 21: return this.hiddenTNumbereq;
+        case 22: return this.asyncExpr;
+        case 23: return this.hiddenTDirecteq;
+        case 24: return this.decimalExpr;
+        case 25: return this.hiddenTIomsgeq;
+        case 26: return this.iomsgExpr;
+        case 27: return this.hiddenTEncodingeq;
+        case 28: return this.encodingExpr;
+        case 29: return this.hiddenTSequentialeq;
+        case 30: return this.sequentialVar;
+        case 31: return this.hiddenTPendingeq;
+        case 32: return this.positionVar;
+        case 33: return this.directVar;
+        case 34: return this.hiddenTSizeeq;
+        case 35: return this.hiddenTFileeq;
+        case 36: return this.numberVar;
+        case 37: return this.hiddenTUnformattedeq;
+        case 38: return this.sizeVar;
+        case 39: return this.hiddenTNextreceq;
+        case 40: return this.nextRecVar;
+        case 41: return this.fileExpr;
+        case 42: return this.hiddenTOpenedeq;
+        case 43: return this.hiddenTErreq;
+        case 44: return this.errVar;
+        case 45: return this.hiddenTSigneq;
+        case 46: return this.signExpr;
+        case 47: return this.hiddenTBlankeq;
+        case 48: return this.blankVar;
+        case 49: return this.posVar;
+        case 50: return this.hiddenTIdeq;
+        case 51: return this.idVar;
+        case 52: return this.unformattedVar;
+        case 53: return this.hiddenTActioneq;
+        case 54: return this.actionVar;
+        case 55: return this.hiddenTUniteq;
+        case 56: return this.unitIdentifier;
+        case 57: return this.formVar;
+        case 58: return this.nameVar;
+        case 59: return this.hiddenTReadeq;
+        case 60: return this.readVar;
+        case 61: return this.hiddenTNamedeq;
+        case 62: return this.namedVar;
+        case 63: return this.pendingVar;
+        case 64: return this.delimVar;
+        case 65: return this.accessVar;
+        case 66: return this.hiddenTPadeq;
+        case 67: return this.padVar;
+        case 68: return this.hiddenTReadwriteeq;
+        case 69: return this.readWriteVar;
+        case 70: return this.openedVar;
+        case 71: return this.writeVar;
         default: return null;
         }
     }
@@ -425,56 +590,78 @@ public class ASTInquireSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTExisteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTActioneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.existVar = (ASTScalarVariableNode)value; return;
-        case 3:  this.hiddenTNextreceq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTFileeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTNumbereq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTOpenedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTReadeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.hiddenTReadwriteeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.readVar = (ASTScalarVariableNode)value; return;
-        case 11: this.hiddenTDelimeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 12: this.numberVar = (ASTScalarVariableNode)value; return;
+        case 0:  this.hiddenTAsynchronouseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTRoundeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTWriteeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTAccesseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTDelimeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTDecimaleq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.hiddenTRecleq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTPositioneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.reclExpr = (IExpr)value; return;
+        case 9:  this.hiddenTNameeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenTStreameq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.hiddenTExisteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 12: this.existVar = (ASTScalarVariableNode)value; return;
         case 13: this.hiddenTFormattedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 14: this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 15: this.hiddenTUnformattedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 16: this.readWriteVar = (ASTScalarVariableNode)value; return;
-        case 17: this.delimVar = (ASTScalarVariableNode)value; return;
-        case 18: this.hiddenTBlankeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 19: this.unformattedVar = (ASTScalarVariableNode)value; return;
-        case 20: this.hiddenTRecleq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 21: this.reclExpr = (ASTExprNode)value; return;
-        case 22: this.hiddenTNameeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 23: this.nameVar = (ASTScalarVariableNode)value; return;
-        case 24: this.hiddenTSequentialeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 25: this.sequentialVar = (ASTScalarVariableNode)value; return;
-        case 26: this.hiddenTDirecteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 27: this.directVar = (ASTScalarVariableNode)value; return;
-        case 28: this.hiddenTPositioneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 29: this.fileExpr = (ASTCExprNode)value; return;
-        case 30: this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 31: this.errVar = (ASTLblRefNode)value; return;
-        case 32: this.hiddenTNamedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 33: this.namedVar = (ASTScalarVariableNode)value; return;
-        case 34: this.hiddenTWriteeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 35: this.writeVar = (ASTScalarVariableNode)value; return;
-        case 36: this.hiddenTFormeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 37: this.formVar = (ASTScalarVariableNode)value; return;
-        case 38: this.openedVar = (ASTScalarVariableNode)value; return;
-        case 39: this.blankVar = (ASTScalarVariableNode)value; return;
-        case 40: this.formattedVar = (ASTScalarVariableNode)value; return;
-        case 41: this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
-        case 42: this.positionVar = (ASTScalarVariableNode)value; return;
-        case 43: this.ioStatVar = (ASTScalarVariableNode)value; return;
-        case 44: this.nextRecVar = (ASTScalarVariableNode)value; return;
-        case 45: this.actionVar = (ASTScalarVariableNode)value; return;
-        case 46: this.hiddenTPadeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 47: this.padVar = (ASTScalarVariableNode)value; return;
-        case 48: this.hiddenTAccesseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 49: this.accessVar = (ASTScalarVariableNode)value; return;
+        case 14: this.formattedVar = (ASTScalarVariableNode)value; return;
+        case 15: this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 16: this.ioStatVar = (ASTScalarVariableNode)value; return;
+        case 17: this.hiddenTPoseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 18: this.hiddenTFormeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 19: this.streamVar = (ASTScalarVariableNode)value; return;
+        case 20: this.roundExpr = (ASTScalarVariableNode)value; return;
+        case 21: this.hiddenTNumbereq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 22: this.asyncExpr = (ASTScalarVariableNode)value; return;
+        case 23: this.hiddenTDirecteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 24: this.decimalExpr = (ASTScalarVariableNode)value; return;
+        case 25: this.hiddenTIomsgeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 26: this.iomsgExpr = (ASTScalarVariableNode)value; return;
+        case 27: this.hiddenTEncodingeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 28: this.encodingExpr = (ASTScalarVariableNode)value; return;
+        case 29: this.hiddenTSequentialeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 30: this.sequentialVar = (ASTScalarVariableNode)value; return;
+        case 31: this.hiddenTPendingeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 32: this.positionVar = (ASTScalarVariableNode)value; return;
+        case 33: this.directVar = (ASTScalarVariableNode)value; return;
+        case 34: this.hiddenTSizeeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 35: this.hiddenTFileeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 36: this.numberVar = (ASTScalarVariableNode)value; return;
+        case 37: this.hiddenTUnformattedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 38: this.sizeVar = (ASTScalarVariableNode)value; return;
+        case 39: this.hiddenTNextreceq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 40: this.nextRecVar = (ASTScalarVariableNode)value; return;
+        case 41: this.fileExpr = (ASTCExprNode)value; return;
+        case 42: this.hiddenTOpenedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 43: this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 44: this.errVar = (ASTLblRefNode)value; return;
+        case 45: this.hiddenTSigneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 46: this.signExpr = (ASTScalarVariableNode)value; return;
+        case 47: this.hiddenTBlankeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 48: this.blankVar = (ASTScalarVariableNode)value; return;
+        case 49: this.posVar = (ASTScalarVariableNode)value; return;
+        case 50: this.hiddenTIdeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 51: this.idVar = (ASTScalarVariableNode)value; return;
+        case 52: this.unformattedVar = (ASTScalarVariableNode)value; return;
+        case 53: this.hiddenTActioneq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 54: this.actionVar = (ASTScalarVariableNode)value; return;
+        case 55: this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 56: this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 57: this.formVar = (ASTScalarVariableNode)value; return;
+        case 58: this.nameVar = (ASTScalarVariableNode)value; return;
+        case 59: this.hiddenTReadeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 60: this.readVar = (ASTScalarVariableNode)value; return;
+        case 61: this.hiddenTNamedeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 62: this.namedVar = (ASTScalarVariableNode)value; return;
+        case 63: this.pendingVar = (ASTScalarVariableNode)value; return;
+        case 64: this.delimVar = (ASTScalarVariableNode)value; return;
+        case 65: this.accessVar = (ASTScalarVariableNode)value; return;
+        case 66: this.hiddenTPadeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 67: this.padVar = (ASTScalarVariableNode)value; return;
+        case 68: this.hiddenTReadwriteeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 69: this.readWriteVar = (ASTScalarVariableNode)value; return;
+        case 70: this.openedVar = (ASTScalarVariableNode)value; return;
+        case 71: this.writeVar = (ASTScalarVariableNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTAllocateObjectNode extends ASTNode
 {
-    ASTFieldSelectorNode fieldSelector; // in ASTAllocateObjectNode
     ASTVariableNameNode variableName; // in ASTAllocateObjectNode
-
-    public ASTFieldSelectorNode getFieldSelector()
-    {
-        return this.fieldSelector;
-    }
-
-    public void setFieldSelector(ASTFieldSelectorNode newValue)
-    {
-        this.fieldSelector = newValue;
-    }
-
+    ASTFieldSelectorNode fieldSelector; // in ASTAllocateObjectNode
 
     public ASTVariableNameNode getVariableName()
     {
@@ -48,6 +37,17 @@ public class ASTAllocateObjectNode extends ASTNode
     public void setVariableName(ASTVariableNameNode newValue)
     {
         this.variableName = newValue;
+    }
+
+
+    public ASTFieldSelectorNode getFieldSelector()
+    {
+        return this.fieldSelector;
+    }
+
+    public void setFieldSelector(ASTFieldSelectorNode newValue)
+    {
+        this.fieldSelector = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTAllocateObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.fieldSelector;
-        case 1:  return this.variableName;
+        case 0:  return this.variableName;
+        case 1:  return this.fieldSelector;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTAllocateObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
-        case 1:  this.variableName = (ASTVariableNameNode)value; return;
+        case 0:  this.variableName = (ASTVariableNameNode)value; return;
+        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

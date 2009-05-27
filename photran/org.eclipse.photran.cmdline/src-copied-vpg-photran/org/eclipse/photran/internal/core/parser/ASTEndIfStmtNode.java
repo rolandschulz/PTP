@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTEndIfStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndIfStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEndif; // in ASTEndIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIf; // in ASTEndIfStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndif; // in ASTEndIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndIfStmtNode
 
@@ -71,9 +71,9 @@ public class ASTEndIfStmtNode extends ASTNode
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTEndif;
-        case 2:  return this.hiddenTEnd;
-        case 3:  return this.hiddenTIf;
+        case 1:  return this.hiddenTEnd;
+        case 2:  return this.hiddenTIf;
+        case 3:  return this.hiddenTEndif;
         case 4:  return this.endName;
         case 5:  return this.hiddenTEos;
         default: return null;
@@ -85,9 +85,9 @@ public class ASTEndIfStmtNode extends ASTNode
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEndif = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTEndif = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

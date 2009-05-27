@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTSFTermNode extends ASTNode
 {
     ASTSFTermNode lhsExpr; // in ASTSFTermNode
-    ASTOperatorNode multOp; // in ASTSFTermNode
-    ASTMultOperandNode rhsExpr; // in ASTSFTermNode
     ASTSFFactorNode SFFactor; // in ASTSFTermNode
+    ASTOperatorNode multOp; // in ASTSFTermNode
+    IExpr rhsExpr; // in ASTSFTermNode
 
     public ASTSFTermNode getLhsExpr()
     {
@@ -39,6 +39,17 @@ public class ASTSFTermNode extends ASTNode
     public void setLhsExpr(ASTSFTermNode newValue)
     {
         this.lhsExpr = newValue;
+    }
+
+
+    public ASTSFFactorNode getSFFactor()
+    {
+        return this.SFFactor;
+    }
+
+    public void setSFFactor(ASTSFFactorNode newValue)
+    {
+        this.SFFactor = newValue;
     }
 
 
@@ -53,25 +64,14 @@ public class ASTSFTermNode extends ASTNode
     }
 
 
-    public ASTMultOperandNode getRhsExpr()
+    public IExpr getRhsExpr()
     {
         return this.rhsExpr;
     }
 
-    public void setRhsExpr(ASTMultOperandNode newValue)
+    public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
-    }
-
-
-    public ASTSFFactorNode getSFFactor()
-    {
-        return this.SFFactor;
-    }
-
-    public void setSFFactor(ASTSFFactorNode newValue)
-    {
-        this.SFFactor = newValue;
     }
 
 
@@ -91,9 +91,9 @@ public class ASTSFTermNode extends ASTNode
         switch (index)
         {
         case 0:  return this.lhsExpr;
-        case 1:  return this.multOp;
-        case 2:  return this.rhsExpr;
-        case 3:  return this.SFFactor;
+        case 1:  return this.SFFactor;
+        case 2:  return this.multOp;
+        case 3:  return this.rhsExpr;
         default: return null;
         }
     }
@@ -103,9 +103,9 @@ public class ASTSFTermNode extends ASTNode
         switch (index)
         {
         case 0:  this.lhsExpr = (ASTSFTermNode)value; return;
-        case 1:  this.multOp = (ASTOperatorNode)value; return;
-        case 2:  this.rhsExpr = (ASTMultOperandNode)value; return;
-        case 3:  this.SFFactor = (ASTSFFactorNode)value; return;
+        case 1:  this.SFFactor = (ASTSFFactorNode)value; return;
+        case 2:  this.multOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhsExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

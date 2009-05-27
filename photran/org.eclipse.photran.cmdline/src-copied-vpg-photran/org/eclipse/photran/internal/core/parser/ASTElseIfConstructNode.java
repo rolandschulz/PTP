@@ -28,9 +28,9 @@ public class ASTElseIfConstructNode extends ASTNode
 {
     ASTElseIfStmtNode elseIfStmt; // in ASTElseIfConstructNode
     IASTListNode<IExecutionPartConstruct> conditionalBody; // in ASTElseIfConstructNode
+    ASTEndIfStmtNode endIfStmt; // in ASTElseIfConstructNode
     ASTElseIfConstructNode elseIfConstruct; // in ASTElseIfConstructNode
     ASTElseConstructNode elseConstruct; // in ASTElseIfConstructNode
-    ASTEndIfStmtNode endIfStmt; // in ASTElseIfConstructNode
 
     public ASTElseIfStmtNode getElseIfStmt()
     {
@@ -51,6 +51,17 @@ public class ASTElseIfConstructNode extends ASTNode
     public void setConditionalBody(IASTListNode<IExecutionPartConstruct> newValue)
     {
         this.conditionalBody = newValue;
+    }
+
+
+    public ASTEndIfStmtNode getEndIfStmt()
+    {
+        return this.endIfStmt;
+    }
+
+    public void setEndIfStmt(ASTEndIfStmtNode newValue)
+    {
+        this.endIfStmt = newValue;
     }
 
 
@@ -76,17 +87,6 @@ public class ASTElseIfConstructNode extends ASTNode
     }
 
 
-    public ASTEndIfStmtNode getEndIfStmt()
-    {
-        return this.endIfStmt;
-    }
-
-    public void setEndIfStmt(ASTEndIfStmtNode newValue)
-    {
-        this.endIfStmt = newValue;
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTElseIfConstructNode(this);
@@ -104,9 +104,9 @@ public class ASTElseIfConstructNode extends ASTNode
         {
         case 0:  return this.elseIfStmt;
         case 1:  return this.conditionalBody;
-        case 2:  return this.elseIfConstruct;
-        case 3:  return this.elseConstruct;
-        case 4:  return this.endIfStmt;
+        case 2:  return this.endIfStmt;
+        case 3:  return this.elseIfConstruct;
+        case 4:  return this.elseConstruct;
         default: return null;
         }
     }
@@ -117,9 +117,9 @@ public class ASTElseIfConstructNode extends ASTNode
         {
         case 0:  this.elseIfStmt = (ASTElseIfStmtNode)value; return;
         case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value; return;
-        case 2:  this.elseIfConstruct = (ASTElseIfConstructNode)value; return;
-        case 3:  this.elseConstruct = (ASTElseConstructNode)value; return;
-        case 4:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
+        case 2:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
+        case 3:  this.elseIfConstruct = (ASTElseIfConstructNode)value; return;
+        case 4:  this.elseConstruct = (ASTElseConstructNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

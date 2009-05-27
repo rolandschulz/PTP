@@ -26,23 +26,12 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputItem
 {
-    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTVariableNode
     IASTListNode<ASTDataRefNode> dataRef; // in ASTVariableNode
+    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTVariableNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTVariableNode
     IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTVariableNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTVariableNode
     ASTSubstringRangeNode substringRange; // in ASTVariableNode
-
-    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
-    {
-        return this.stringConst;
-    }
-
-    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.stringConst = newValue;
-    }
-
 
     public IASTListNode<ASTDataRefNode> getDataRef()
     {
@@ -52,6 +41,17 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     public void setDataRef(IASTListNode<ASTDataRefNode> newValue)
     {
         this.dataRef = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
+    {
+        return this.stringConst;
+    }
+
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.stringConst = newValue;
     }
 
 
@@ -94,8 +94,8 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     {
         switch (index)
         {
-        case 0:  return this.stringConst;
-        case 1:  return this.dataRef;
+        case 0:  return this.dataRef;
+        case 1:  return this.stringConst;
         case 2:  return this.hiddenTLparen;
         case 3:  return this.sectionSubscriptList;
         case 4:  return this.hiddenTRparen;
@@ -108,8 +108,8 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     {
         switch (index)
         {
-        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.dataRef = (IASTListNode<ASTDataRefNode>)value; return;
+        case 0:  this.dataRef = (IASTListNode<ASTDataRefNode>)value; return;
+        case 1:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;

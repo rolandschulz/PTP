@@ -27,19 +27,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTCloseSpecListNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTCloseSpecListNode
-    ASTUnitIdentifierNode unitIdentifier; // in ASTCloseSpecListNode
     ASTCloseSpecNode closeSpec; // in ASTCloseSpecListNode
-
-    public ASTUnitIdentifierNode getUnitIdentifier()
-    {
-        return this.unitIdentifier;
-    }
-
-    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
-    {
-        this.unitIdentifier = newValue;
-    }
-
+    ASTUnitIdentifierNode unitIdentifier; // in ASTCloseSpecListNode
 
     public ASTCloseSpecNode getCloseSpec()
     {
@@ -49,6 +38,17 @@ public class ASTCloseSpecListNode extends ASTNode
     public void setCloseSpec(ASTCloseSpecNode newValue)
     {
         this.closeSpec = newValue;
+    }
+
+
+    public ASTUnitIdentifierNode getUnitIdentifier()
+    {
+        return this.unitIdentifier;
+    }
+
+    public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
+    {
+        this.unitIdentifier = newValue;
     }
 
 
@@ -68,8 +68,8 @@ public class ASTCloseSpecListNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTComma;
-        case 1:  return this.unitIdentifier;
-        case 2:  return this.closeSpec;
+        case 1:  return this.closeSpec;
+        case 2:  return this.unitIdentifier;
         default: return null;
         }
     }
@@ -79,8 +79,8 @@ public class ASTCloseSpecListNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
-        case 2:  this.closeSpec = (ASTCloseSpecNode)value; return;
+        case 1:  this.closeSpec = (ASTCloseSpecNode)value; return;
+        case 2:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

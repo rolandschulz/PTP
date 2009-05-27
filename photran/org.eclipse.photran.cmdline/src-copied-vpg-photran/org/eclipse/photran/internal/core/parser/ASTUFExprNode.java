@@ -28,9 +28,9 @@ public class ASTUFExprNode extends ASTNode
 {
     ASTUFExprNode lhsExpr; // in ASTUFExprNode
     ASTSignNode rhs2; // in ASTUFExprNode
-    ASTUFTermNode UFTerm; // in ASTUFExprNode
     ASTOperatorNode addOp; // in ASTUFExprNode
     ASTUFTermNode rhsExpr; // in ASTUFExprNode
+    ASTUFTermNode UFTerm; // in ASTUFExprNode
 
     public ASTUFExprNode getLhsExpr()
     {
@@ -51,17 +51,6 @@ public class ASTUFExprNode extends ASTNode
     public void setRhs2(ASTSignNode newValue)
     {
         this.rhs2 = newValue;
-    }
-
-
-    public ASTUFTermNode getUFTerm()
-    {
-        return this.UFTerm;
-    }
-
-    public void setUFTerm(ASTUFTermNode newValue)
-    {
-        this.UFTerm = newValue;
     }
 
 
@@ -87,6 +76,17 @@ public class ASTUFExprNode extends ASTNode
     }
 
 
+    public ASTUFTermNode getUFTerm()
+    {
+        return this.UFTerm;
+    }
+
+    public void setUFTerm(ASTUFTermNode newValue)
+    {
+        this.UFTerm = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTUFExprNode(this);
@@ -104,9 +104,9 @@ public class ASTUFExprNode extends ASTNode
         {
         case 0:  return this.lhsExpr;
         case 1:  return this.rhs2;
-        case 2:  return this.UFTerm;
-        case 3:  return this.addOp;
-        case 4:  return this.rhsExpr;
+        case 2:  return this.addOp;
+        case 3:  return this.rhsExpr;
+        case 4:  return this.UFTerm;
         default: return null;
         }
     }
@@ -117,9 +117,9 @@ public class ASTUFExprNode extends ASTNode
         {
         case 0:  this.lhsExpr = (ASTUFExprNode)value; return;
         case 1:  this.rhs2 = (ASTSignNode)value; return;
-        case 2:  this.UFTerm = (ASTUFTermNode)value; return;
-        case 3:  this.addOp = (ASTOperatorNode)value; return;
-        case 4:  this.rhsExpr = (ASTUFTermNode)value; return;
+        case 2:  this.addOp = (ASTOperatorNode)value; return;
+        case 3:  this.rhsExpr = (ASTUFTermNode)value; return;
+        case 4:  this.UFTerm = (ASTUFTermNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

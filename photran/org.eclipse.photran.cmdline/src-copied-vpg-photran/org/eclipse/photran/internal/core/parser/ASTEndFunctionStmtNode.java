@@ -27,8 +27,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTEndFunctionStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndFunctionStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEndfunction; // in ASTEndFunctionStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTFunction; // in ASTEndFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndFunctionStmtNode
@@ -71,8 +71,8 @@ public class ASTEndFunctionStmtNode extends ASTNode
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTEnd;
-        case 2:  return this.hiddenTEndfunction;
+        case 1:  return this.hiddenTEndfunction;
+        case 2:  return this.hiddenTEnd;
         case 3:  return this.hiddenTFunction;
         case 4:  return this.endName;
         case 5:  return this.hiddenTEos;
@@ -85,8 +85,8 @@ public class ASTEndFunctionStmtNode extends ASTNode
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEndfunction = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEndfunction = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTFunction = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;

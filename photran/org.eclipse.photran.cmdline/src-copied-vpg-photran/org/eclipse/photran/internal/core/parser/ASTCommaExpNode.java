@@ -27,14 +27,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTCommaExpNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTCommaExpNode
-    ASTExprNode expr; // in ASTCommaExpNode
+    IExpr expr; // in ASTCommaExpNode
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -66,7 +66,7 @@ public class ASTCommaExpNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.expr = (ASTExprNode)value; return;
+        case 1:  this.expr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

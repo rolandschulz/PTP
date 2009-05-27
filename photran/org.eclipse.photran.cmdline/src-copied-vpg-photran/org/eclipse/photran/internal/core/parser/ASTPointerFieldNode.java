@@ -26,25 +26,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTPointerFieldNode extends ASTNode
 {
-    ASTNameNode name; // in ASTPointerFieldNode
     ASTFieldSelectorNode fieldSelector; // in ASTPointerFieldNode
+    ASTNameNode name; // in ASTPointerFieldNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTPointerFieldNode
     IASTListNode<ASTSFExprListNode> SFExprList; // in ASTPointerFieldNode
     IASTListNode<ASTSFDummyArgNameListNode> SFDummyArgNameList; // in ASTPointerFieldNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTPointerFieldNode
     org.eclipse.photran.internal.core.lexer.Token hasDerivedTypeComponentRef; // in ASTPointerFieldNode
     ASTNameNode componentName; // in ASTPointerFieldNode
-
-    public ASTNameNode getName()
-    {
-        return this.name;
-    }
-
-    public void setName(ASTNameNode newValue)
-    {
-        this.name = newValue;
-    }
-
 
     public ASTFieldSelectorNode getFieldSelector()
     {
@@ -54,6 +43,17 @@ public class ASTPointerFieldNode extends ASTNode
     public void setFieldSelector(ASTFieldSelectorNode newValue)
     {
         this.fieldSelector = newValue;
+    }
+
+
+    public ASTNameNode getName()
+    {
+        return this.name;
+    }
+
+    public void setName(ASTNameNode newValue)
+    {
+        this.name = newValue;
     }
 
 
@@ -116,8 +116,8 @@ public class ASTPointerFieldNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.name;
-        case 1:  return this.fieldSelector;
+        case 0:  return this.fieldSelector;
+        case 1:  return this.name;
         case 2:  return this.hiddenTLparen;
         case 3:  return this.SFExprList;
         case 4:  return this.SFDummyArgNameList;
@@ -132,8 +132,8 @@ public class ASTPointerFieldNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value; return;
-        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
+        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
+        case 1:  this.name = (ASTNameNode)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.SFExprList = (IASTListNode<ASTSFExprListNode>)value; return;
         case 4:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;

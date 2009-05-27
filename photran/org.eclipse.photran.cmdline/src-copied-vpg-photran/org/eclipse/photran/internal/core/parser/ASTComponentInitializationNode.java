@@ -31,7 +31,7 @@ public class ASTComponentInitializationNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTComponentInitializationNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTComponentInitializationNode
     org.eclipse.photran.internal.core.lexer.Token assignsExpr; // in ASTComponentInitializationNode
-    ASTExprNode assignedExpr; // in ASTComponentInitializationNode
+    IExpr assignedExpr; // in ASTComponentInitializationNode
 
     public boolean assignsNull()
     {
@@ -55,12 +55,12 @@ public class ASTComponentInitializationNode extends ASTNode
     }
 
 
-    public ASTExprNode getAssignedExpr()
+    public IExpr getAssignedExpr()
     {
         return this.assignedExpr;
     }
 
-    public void setAssignedExpr(ASTExprNode newValue)
+    public void setAssignedExpr(IExpr newValue)
     {
         this.assignedExpr = newValue;
     }
@@ -100,7 +100,7 @@ public class ASTComponentInitializationNode extends ASTNode
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.assignsExpr = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.assignedExpr = (ASTExprNode)value; return;
+        case 5:  this.assignedExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

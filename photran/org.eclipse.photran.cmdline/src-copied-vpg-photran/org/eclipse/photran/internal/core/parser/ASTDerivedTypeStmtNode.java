@@ -29,10 +29,13 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTDerivedTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTType; // in ASTDerivedTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTDerivedTypeStmtNode
-    ASTAccessSpecNode accessSpec; // in ASTDerivedTypeStmtNode
+    IASTListNode<ASTTypeAttrSpecNode> typeAttrSpecList; // in ASTDerivedTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTDerivedTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTDerivedTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token typeName; // in ASTDerivedTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDerivedTypeStmtNode
+    IASTListNode<ASTTypeParamNameNode> typeParamNameList; // in ASTDerivedTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDerivedTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTDerivedTypeStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -46,14 +49,14 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     }
 
 
-    public ASTAccessSpecNode getAccessSpec()
+    public IASTListNode<ASTTypeAttrSpecNode> getTypeAttrSpecList()
     {
-        return this.accessSpec;
+        return this.typeAttrSpecList;
     }
 
-    public void setAccessSpec(ASTAccessSpecNode newValue)
+    public void setTypeAttrSpecList(IASTListNode<ASTTypeAttrSpecNode> newValue)
     {
-        this.accessSpec = newValue;
+        this.typeAttrSpecList = newValue;
     }
 
 
@@ -68,6 +71,17 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     }
 
 
+    public IASTListNode<ASTTypeParamNameNode> getTypeParamNameList()
+    {
+        return this.typeParamNameList;
+    }
+
+    public void setTypeParamNameList(IASTListNode<ASTTypeParamNameNode> newValue)
+    {
+        this.typeParamNameList = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDerivedTypeStmtNode(this);
@@ -76,7 +90,7 @@ public class ASTDerivedTypeStmtNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 8;
+        return 11;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -86,11 +100,14 @@ public class ASTDerivedTypeStmtNode extends ASTNode
         case 0:  return this.label;
         case 1:  return this.hiddenTType;
         case 2:  return this.hiddenTComma;
-        case 3:  return this.accessSpec;
+        case 3:  return this.typeAttrSpecList;
         case 4:  return this.hiddenTColon;
         case 5:  return this.hiddenTColon2;
         case 6:  return this.typeName;
-        case 7:  return this.hiddenTEos;
+        case 7:  return this.hiddenTLparen;
+        case 8:  return this.typeParamNameList;
+        case 9:  return this.hiddenTRparen;
+        case 10: return this.hiddenTEos;
         default: return null;
         }
     }
@@ -102,11 +119,14 @@ public class ASTDerivedTypeStmtNode extends ASTNode
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.accessSpec = (ASTAccessSpecNode)value; return;
+        case 3:  this.typeAttrSpecList = (IASTListNode<ASTTypeAttrSpecNode>)value; return;
         case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.typeParamNameList = (IASTListNode<ASTTypeParamNameNode>)value; return;
+        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

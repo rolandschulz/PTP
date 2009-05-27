@@ -26,33 +26,12 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTCharLengthNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharLengthNode
-    ASTExprNode lengthExpr; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharLengthNode
+    IExpr lengthExpr; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCharLengthNode
-
-    public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
-    {
-        return this.constIntLength;
-    }
-
-    public void setConstIntLength(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.constIntLength = newValue;
-    }
-
-
-    public ASTExprNode getLengthExpr()
-    {
-        return this.lengthExpr;
-    }
-
-    public void setLengthExpr(ASTExprNode newValue)
-    {
-        this.lengthExpr = newValue;
-    }
-
 
     public boolean isAssumedLength()
     {
@@ -65,6 +44,39 @@ public class ASTCharLengthNode extends ASTNode
     }
 
 
+    public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
+    {
+        return this.constIntLength;
+    }
+
+    public void setConstIntLength(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.constIntLength = newValue;
+    }
+
+
+    public IExpr getLengthExpr()
+    {
+        return this.lengthExpr;
+    }
+
+    public void setLengthExpr(IExpr newValue)
+    {
+        this.lengthExpr = newValue;
+    }
+
+
+    public boolean isColon()
+    {
+        return this.isColon != null;
+    }
+
+    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isColon = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCharLengthNode(this);
@@ -73,18 +85,19 @@ public class ASTCharLengthNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 5;
+        return 6;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.constIntLength;
-        case 1:  return this.hiddenTLparen;
-        case 2:  return this.lengthExpr;
-        case 3:  return this.isAssumedLength;
-        case 4:  return this.hiddenTRparen;
+        case 0:  return this.hiddenTLparen;
+        case 1:  return this.isAssumedLength;
+        case 2:  return this.constIntLength;
+        case 3:  return this.lengthExpr;
+        case 4:  return this.isColon;
+        case 5:  return this.hiddenTRparen;
         default: return null;
         }
     }
@@ -93,11 +106,12 @@ public class ASTCharLengthNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.lengthExpr = (ASTExprNode)value; return;
-        case 3:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.lengthExpr = (IExpr)value; return;
+        case 4:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

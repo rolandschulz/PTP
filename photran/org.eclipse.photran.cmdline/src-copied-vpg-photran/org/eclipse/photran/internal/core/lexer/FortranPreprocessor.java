@@ -153,6 +153,7 @@ public final class FortranPreprocessor extends InputStream
     {
         LineInputStream currentStream = streamStack.topStream;
         if (currentStream.atBOL()) checkForInclude();
+        currentStream = streamStack.topStream;
         if (currentStream.atEOF()) finishInclude();
         int result = currentStream.read();
         if (result >= 0)

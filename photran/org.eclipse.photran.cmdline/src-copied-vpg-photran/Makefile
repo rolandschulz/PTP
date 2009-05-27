@@ -18,7 +18,7 @@ copy:
 	cp -R $(ROOT)/org.eclipse.photran.core/lexer/org/eclipse/photran/internal/core/lexer org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/core/vpg org/eclipse/photran/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/analysis org/eclipse/photran/internal/core/
-	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/parser org/eclipse/photran/internal/core/
+	#cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/parser org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/refactoring/infrastructure org/eclipse/photran/internal/core/refactoring/
 	#cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/properties org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/parser/org .

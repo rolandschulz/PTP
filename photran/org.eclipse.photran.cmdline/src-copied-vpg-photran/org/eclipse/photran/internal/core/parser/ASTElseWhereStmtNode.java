@@ -28,8 +28,8 @@ public class ASTElseWhereStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTElse; // in ASTElseWhereStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTElsewhere; // in ASTElseWhereStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTWhere; // in ASTElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTElseWhereStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTElseWhereStmtNode
 
@@ -72,8 +72,8 @@ public class ASTElseWhereStmtNode extends ASTNode
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTElse;
-        case 2:  return this.hiddenTWhere;
-        case 3:  return this.hiddenTElsewhere;
+        case 2:  return this.hiddenTElsewhere;
+        case 3:  return this.hiddenTWhere;
         case 4:  return this.endName;
         case 5:  return this.hiddenTEos;
         default: return null;
@@ -86,8 +86,8 @@ public class ASTElseWhereStmtNode extends ASTNode
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTElsewhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTElsewhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTWhere = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

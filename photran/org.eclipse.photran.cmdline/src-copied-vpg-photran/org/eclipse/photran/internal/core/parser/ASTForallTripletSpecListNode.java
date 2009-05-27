@@ -32,7 +32,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTForallTripletSpecListNode
     ASTSubscriptNode ub; // in ASTForallTripletSpecListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon2; // in ASTForallTripletSpecListNode
-    ASTExprNode stepExpr; // in ASTForallTripletSpecListNode
+    IExpr stepExpr; // in ASTForallTripletSpecListNode
 
     public ASTNameNode getName()
     {
@@ -67,12 +67,12 @@ public class ASTForallTripletSpecListNode extends ASTNode
     }
 
 
-    public ASTExprNode getStepExpr()
+    public IExpr getStepExpr()
     {
         return this.stepExpr;
     }
 
-    public void setStepExpr(ASTExprNode newValue)
+    public void setStepExpr(IExpr newValue)
     {
         this.stepExpr = newValue;
     }
@@ -114,7 +114,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
         case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.ub = (ASTSubscriptNode)value; return;
         case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.stepExpr = (ASTExprNode)value; return;
+        case 6:  this.stepExpr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

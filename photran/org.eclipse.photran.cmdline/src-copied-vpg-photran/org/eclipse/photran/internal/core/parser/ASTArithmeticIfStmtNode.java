@@ -29,7 +29,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTArithmeticIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIf; // in ASTArithmeticIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTArithmeticIfStmtNode
-    ASTExprNode expr; // in ASTArithmeticIfStmtNode
+    IExpr expr; // in ASTArithmeticIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTArithmeticIfStmtNode
     ASTLblRefNode first; // in ASTArithmeticIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTArithmeticIfStmtNode
@@ -49,12 +49,12 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     }
 
 
-    public ASTExprNode getExpr()
+    public IExpr getExpr()
     {
         return this.expr;
     }
 
-    public void setExpr(ASTExprNode newValue)
+    public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
     }
@@ -131,7 +131,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.expr = (ASTExprNode)value; return;
+        case 3:  this.expr = (IExpr)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.first = (ASTLblRefNode)value; return;
         case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;

@@ -28,10 +28,10 @@ public class ASTBackspaceStmtNode extends ASTNode implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTBackspaceStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTBackspace; // in ASTBackspaceStmtNode
+    ASTUnitIdentifierNode unitIdentifier; // in ASTBackspaceStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTBackspaceStmtNode
     IASTListNode<ASTPositionSpecListNode> positionSpecList; // in ASTBackspaceStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTBackspaceStmtNode
-    ASTUnitIdentifierNode unitIdentifier; // in ASTBackspaceStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTBackspaceStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -45,17 +45,6 @@ public class ASTBackspaceStmtNode extends ASTNode implements IActionStmt
     }
 
 
-    public IASTListNode<ASTPositionSpecListNode> getPositionSpecList()
-    {
-        return this.positionSpecList;
-    }
-
-    public void setPositionSpecList(IASTListNode<ASTPositionSpecListNode> newValue)
-    {
-        this.positionSpecList = newValue;
-    }
-
-
     public ASTUnitIdentifierNode getUnitIdentifier()
     {
         return this.unitIdentifier;
@@ -64,6 +53,17 @@ public class ASTBackspaceStmtNode extends ASTNode implements IActionStmt
     public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
         this.unitIdentifier = newValue;
+    }
+
+
+    public IASTListNode<ASTPositionSpecListNode> getPositionSpecList()
+    {
+        return this.positionSpecList;
+    }
+
+    public void setPositionSpecList(IASTListNode<ASTPositionSpecListNode> newValue)
+    {
+        this.positionSpecList = newValue;
     }
 
 
@@ -85,10 +85,10 @@ public class ASTBackspaceStmtNode extends ASTNode implements IActionStmt
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTBackspace;
-        case 2:  return this.hiddenTLparen;
-        case 3:  return this.positionSpecList;
-        case 4:  return this.hiddenTRparen;
-        case 5:  return this.unitIdentifier;
+        case 2:  return this.unitIdentifier;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.positionSpecList;
+        case 5:  return this.hiddenTRparen;
         case 6:  return this.hiddenTEos;
         default: return null;
         }
@@ -100,10 +100,10 @@ public class ASTBackspaceStmtNode extends ASTNode implements IActionStmt
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTBackspace = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.positionSpecList = (IASTListNode<ASTPositionSpecListNode>)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 2:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.positionSpecList = (IASTListNode<ASTPositionSpecListNode>)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

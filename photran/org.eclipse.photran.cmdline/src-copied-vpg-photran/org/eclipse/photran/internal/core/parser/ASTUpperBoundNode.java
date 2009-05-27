@@ -26,14 +26,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTUpperBoundNode extends ASTNode
 {
-    ASTExprNode ub; // in ASTUpperBoundNode
+    IExpr ub; // in ASTUpperBoundNode
 
-    public ASTExprNode getUb()
+    public IExpr getUb()
     {
         return this.ub;
     }
 
-    public void setUb(ASTExprNode newValue)
+    public void setUb(IExpr newValue)
     {
         this.ub = newValue;
     }
@@ -63,7 +63,7 @@ public class ASTUpperBoundNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.ub = (ASTExprNode)value; return;
+        case 0:  this.ub = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

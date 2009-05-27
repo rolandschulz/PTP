@@ -26,8 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTInquireSpecListNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTInquireSpecListNode
     ASTUnitIdentifierNode unitIdentifier; // in ASTInquireSpecListNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTInquireSpecListNode
     ASTInquireSpecNode inquireSpec; // in ASTInquireSpecListNode
 
     public ASTUnitIdentifierNode getUnitIdentifier()
@@ -67,8 +67,8 @@ public class ASTInquireSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.hiddenTComma;
-        case 1:  return this.unitIdentifier;
+        case 0:  return this.unitIdentifier;
+        case 1:  return this.hiddenTComma;
         case 2:  return this.inquireSpec;
         default: return null;
         }
@@ -78,8 +78,8 @@ public class ASTInquireSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.inquireSpec = (ASTInquireSpecNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

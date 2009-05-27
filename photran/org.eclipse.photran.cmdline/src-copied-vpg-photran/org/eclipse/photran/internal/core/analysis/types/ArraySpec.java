@@ -64,7 +64,7 @@ public class ArraySpec implements Serializable
     private void parseExplicitShapeArray(IASTListNode<ASTExplicitShapeSpecNode> node)
     {
         for (int i = 0; i < node.size(); i++)
-            dimensions.add(0, new Dimension(node.get(i)));
+            dimensions.add(new Dimension(node.get(i)));
     }
     
     //    # R519

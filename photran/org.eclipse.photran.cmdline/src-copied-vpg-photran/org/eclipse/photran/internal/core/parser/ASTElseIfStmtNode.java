@@ -27,11 +27,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTElseIfStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTElseif; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTElse; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIf; // in ASTElseIfStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTElseif; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTElseIfStmtNode
-    ASTExprNode guardingExpression; // in ASTElseIfStmtNode
+    IExpr guardingExpression; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTThen; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTElseIfStmtNode
@@ -48,12 +48,12 @@ public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols
     }
 
 
-    public ASTExprNode getGuardingExpression()
+    public IExpr getGuardingExpression()
     {
         return this.guardingExpression;
     }
 
-    public void setGuardingExpression(ASTExprNode newValue)
+    public void setGuardingExpression(IExpr newValue)
     {
         this.guardingExpression = newValue;
     }
@@ -86,9 +86,9 @@ public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTElseif;
-        case 2:  return this.hiddenTElse;
-        case 3:  return this.hiddenTIf;
+        case 1:  return this.hiddenTElse;
+        case 2:  return this.hiddenTIf;
+        case 3:  return this.hiddenTElseif;
         case 4:  return this.hiddenTLparen;
         case 5:  return this.guardingExpression;
         case 6:  return this.hiddenTRparen;
@@ -104,11 +104,11 @@ public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTElseif = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTElseif = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.guardingExpression = (ASTExprNode)value; return;
+        case 5:  this.guardingExpression = (IExpr)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.hiddenTThen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 8:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;

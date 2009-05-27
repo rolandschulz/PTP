@@ -29,7 +29,7 @@ public class ASTIfStmtNode extends ASTNode implements IActionStmt
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token tIf; // in ASTIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTIfStmtNode
-    ASTExprNode guardingExpression; // in ASTIfStmtNode
+    IExpr guardingExpression; // in ASTIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTIfStmtNode
     IActionStmt actionStmt; // in ASTIfStmtNode
 
@@ -55,12 +55,12 @@ public class ASTIfStmtNode extends ASTNode implements IActionStmt
     }
 
 
-    public ASTExprNode getGuardingExpression()
+    public IExpr getGuardingExpression()
     {
         return this.guardingExpression;
     }
 
-    public void setGuardingExpression(ASTExprNode newValue)
+    public void setGuardingExpression(IExpr newValue)
     {
         this.guardingExpression = newValue;
     }
@@ -110,7 +110,7 @@ public class ASTIfStmtNode extends ASTNode implements IActionStmt
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.tIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.guardingExpression = (ASTExprNode)value; return;
+        case 3:  this.guardingExpression = (IExpr)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.actionStmt = (IActionStmt)value; return;
         default: throw new IllegalArgumentException("Invalid index");

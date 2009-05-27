@@ -17,6 +17,25 @@ package org.eclipse.photran.internal.core.lexer;
  */
 public final class Terminal
 {
+    public static final Terminal SKIP = new Terminal("(skip)");
+    public static final Terminal T_IMPORT = new Terminal("import");
+    public static final Terminal T_NON_INTRINSIC = new Terminal("non_intrinsic");
+    public static final Terminal T_WAIT = new Terminal("wait");
+    public static final Terminal T_LBRACKET = new Terminal("[");
+    public static final Terminal T_RBRACKET = new Terminal("]");
+    public static final Terminal T_ENDBEFORESELECT = new Terminal("end");
+    public static final Terminal T_STREAMEQ = new Terminal("stream=");
+    public static final Terminal T_PENDINGEQ = new Terminal("pending=");
+    public static final Terminal T_POSEQ = new Terminal("pos=");
+    public static final Terminal T_IDEQ = new Terminal("id=");
+    public static final Terminal T_SIGNEQ = new Terminal("sign=");
+    public static final Terminal T_ROUNDEQ = new Terminal("round=");
+    public static final Terminal T_IOMSGEQ = new Terminal("iomsg=");
+    public static final Terminal T_ENCODINGEQ = new Terminal("encoding=");
+    public static final Terminal T_DECIMALEQ = new Terminal("decimal=");
+    public static final Terminal T_ASYNCHRONOUSEQ = new Terminal("asynchronous=");
+    public static final Terminal T_IS = new Terminal("is");
+    public static final Terminal T_ASSOCIATE = new Terminal("associate");
     public static final Terminal T_WRITEEQ = new Terminal("write=");
     public static final Terminal T_RESULT = new Terminal("result");
     public static final Terminal T_ENDSUBROUTINE = new Terminal("endsubroutine");
@@ -208,6 +227,26 @@ public final class Terminal
     public static final Terminal T_HCON = new Terminal("Hollerith constant");
     public static final Terminal T_EXIT = new Terminal("exit");
     public static final Terminal T_UNEXPECTED_CHARACTER = new Terminal("extraneous character");
+    
+    // New for Fortran 2003
+    public static final Terminal T_EXTENDS = new Terminal("extends");
+    public static final Terminal T_ABSTRACT = new Terminal("abstract");
+    public static final Terminal T_BIND = new Terminal("bind");
+    public static final Terminal T_PASS = new Terminal("pass");
+    public static final Terminal T_NOPASS = new Terminal("nopass");
+    public static final Terminal T_GENERIC = new Terminal("generic");
+    public static final Terminal T_NON_OVERRIDABLE = new Terminal("non_overridable");
+    public static final Terminal T_DEFERRED = new Terminal("deferred");
+    public static final Terminal T_FINAL = new Terminal("final");
+    public static final Terminal T_KIND = new Terminal("kind");
+    public static final Terminal T_LEN = new Terminal("len");
+    public static final Terminal T_ENUM = new Terminal("enum");
+    public static final Terminal T_ENUMERATOR = new Terminal("enumerator");
+    public static final Terminal T_CLASS = new Terminal("class");
+    public static final Terminal T_ASYNCHRONOUS = new Terminal("asynchronous");
+    public static final Terminal T_PROTECTED = new Terminal("protected");
+    public static final Terminal T_VALUE = new Terminal("value");
+    public static final Terminal T_VOLATILE = new Terminal("volatile");
 
     private String description;
 

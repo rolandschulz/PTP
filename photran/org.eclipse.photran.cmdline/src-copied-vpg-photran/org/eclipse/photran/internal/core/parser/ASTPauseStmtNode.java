@@ -28,8 +28,8 @@ public class ASTPauseStmtNode extends ASTNode implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTPauseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTPause; // in ASTPauseStmtNode
-    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTPauseStmtNode
     org.eclipse.photran.internal.core.lexer.Token intConst; // in ASTPauseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTPauseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTPauseStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
@@ -43,17 +43,6 @@ public class ASTPauseStmtNode extends ASTNode implements IActionStmt
     }
 
 
-    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
-    {
-        return this.stringConst;
-    }
-
-    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.stringConst = newValue;
-    }
-
-
     public org.eclipse.photran.internal.core.lexer.Token getIntConst()
     {
         return this.intConst;
@@ -62,6 +51,17 @@ public class ASTPauseStmtNode extends ASTNode implements IActionStmt
     public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intConst = newValue;
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getStringConst()
+    {
+        return this.stringConst;
+    }
+
+    public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.stringConst = newValue;
     }
 
 
@@ -83,8 +83,8 @@ public class ASTPauseStmtNode extends ASTNode implements IActionStmt
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTPause;
-        case 2:  return this.stringConst;
-        case 3:  return this.intConst;
+        case 2:  return this.intConst;
+        case 3:  return this.stringConst;
         case 4:  return this.hiddenTEos;
         default: return null;
         }
@@ -96,8 +96,8 @@ public class ASTPauseStmtNode extends ASTNode implements IActionStmt
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTPause = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

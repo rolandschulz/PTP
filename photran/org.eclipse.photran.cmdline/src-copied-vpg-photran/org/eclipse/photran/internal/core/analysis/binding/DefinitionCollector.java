@@ -18,19 +18,26 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
+import org.eclipse.photran.internal.core.parser.ASTAssociationNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
-import org.eclipse.photran.internal.core.parser.ASTComponentDefStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDataComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTEntryStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEnumeratorDefStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEnumeratorNode;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTForallConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTIfThenStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceBodyNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
@@ -41,11 +48,18 @@ import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSelectTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeParamDeclNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeParamDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
+import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
@@ -80,8 +94,20 @@ class DefinitionCollector extends BindingCollector
         
         Definition d = addDefinition(node.getTypeName(), Definition.Classification.DERIVED_TYPE, Type.VOID);
         
-        if (node.getAccessSpec() != null)
-            d.setVisibility(node.getAccessSpec());
+//        if (node.getAccessSpec() != null)
+//            d.setVisibility(node.getAccessSpec());
+        // Change for Fortran 2003
+        if (node.getTypeAttrSpecList() != null)
+            for (ASTTypeAttrSpecNode attrSpec : node.getTypeAttrSpecList())
+                if (attrSpec.getAccessSpec() != null)
+                    d.setVisibility(attrSpec.getAccessSpec());
+        
+        // F03 -- Don't bind derived type parameters since we don't bind derived type components yet
+        // (so there is no scope for the derived type).  When we do, should also bind
+        // ASTTypeParamDefStmtNode 
+//        if (node.getTypeParamNameList() != null)
+//            for (ASTTypeParamNameNode typeParam : node.getTypeParamNameList())
+//                addDefinition(typeParam.getTypeParamName(), Definition.Classification.DERIVED_TYPE_PARAMETER);
     }
 
     // # R424
@@ -122,7 +148,7 @@ class DefinitionCollector extends BindingCollector
     // | <ComponentName> T_ASTERISK <CharLength>
     // | <ComponentName>
 
-    @Override public void visitASTComponentDefStmtNode(ASTComponentDefStmtNode node)
+    @Override public void visitASTDataComponentDefStmtNode(ASTDataComponentDefStmtNode node)
     {
         super.traverseChildren(node);
         
@@ -237,7 +263,7 @@ class DefinitionCollector extends BindingCollector
         for (int i = 0; i < groups.size(); i++)
         {
             Token name = groups.get(i).getNamelistGroupName();
-            Token object = groups.get(i).getVariableName();
+            //Token object = groups.get(i).getVariableName();
             if (name != null) addDefinition(name, Definition.Classification.NAMELIST);
         }
     }
@@ -537,7 +563,7 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        throw new Notification("ENTRY statements are not currently supported.");
+        // TODO Implement ENTRY statements
         
 //        // TO-DO: No syntax for function entries (with result parameter)
 //        // Then declare local result variable with entry name if no result exists
@@ -572,5 +598,109 @@ class DefinitionCollector extends BindingCollector
         super.traverseChildren(node);
         
         // Assume this is actually an assignment statement instead of a statement function
+    }
+
+    @Override public void visitASTExecutableProgramNode(ASTExecutableProgramNode node)
+    {
+        super.visitASTExecutableProgramNode(node);
+        markExternalSubprogramExports(node);
+    }
+    
+    // F03
+    @Override public void visitASTTypeParamDefStmtNode(ASTTypeParamDefStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        IASTListNode<ASTTypeParamDeclNode> list = node.getTypeParamDeclList();
+        for (int i = 0; i < list.size(); i++)
+            bind(list.get(i).getTypeParamName());
+    }
+
+    // F03
+    @Override public void visitASTEnumeratorDefStmtNode(ASTEnumeratorDefStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        for (ASTEnumeratorNode enumNode : node.getEnumeratorList())
+            addDefinition(enumNode.getNamedConstant().getNamedConstant(), Definition.Classification.ENUMERATOR, Type.INTEGER);
+    }
+
+    // F03  TODO: associate-construct-name
+    @Override public void visitASTAssociationNode(ASTAssociationNode node)
+    {
+        super.traverseChildren(node);
+        
+        addDefinition(node.getAssociateName(), Definition.Classification.VARIABLE_DECLARATION, Type.UNKNOWN); // TODO: Type
+    }
+    
+    // F03  TODO: select-construct-name
+    @Override public void visitASTSelectTypeStmtNode(ASTSelectTypeStmtNode node)
+    {
+        super.traverseChildren(node);
+        
+        if (node.getAssociateName() != null)
+            addDefinition(node.getAssociateName(), Definition.Classification.VARIABLE_DECLARATION, Type.UNKNOWN); // TODO: Type
+    }
+
+    private void markExternalSubprogramExports(ASTExecutableProgramNode node)
+    {
+        for (IProgramUnit pu : node.getProgramUnitList())
+        {
+            if (pu instanceof ASTSubroutineSubprogramNode)
+            {
+                ASTSubroutineSubprogramNode subroutine = (ASTSubroutineSubprogramNode)pu;
+                markSubprogramExport(subroutine.getSubroutineStmt().getSubroutineName().getSubroutineName());
+            }
+            else if (pu instanceof ASTFunctionSubprogramNode)
+            {
+                ASTFunctionSubprogramNode function = (ASTFunctionSubprogramNode)pu;
+                markSubprogramExport(function.getFunctionStmt().getFunctionName().getFunctionName());
+            }
+        }
+    }
+    
+    private void markSubprogramExport(Token subprogramNameToken)
+    {
+        try
+        {
+            markSubprogramExport(file, subprogramNameToken);
+        }
+        catch (Exception e) { throw new Error(e); }
+    }
+
+    @Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
+    {
+        super.visitASTInterfaceBlockNode(node);
+        if (node.getInterfaceStmt().getGenericName() == null
+            && node.getInterfaceStmt().getGenericSpec() == null)
+            markExternalSubprogramImports(node);
+    }
+
+    private void markExternalSubprogramImports(ASTInterfaceBlockNode node)
+    {
+        for (IInterfaceSpecification pu : node.getInterfaceBlockBody())
+        {
+            if (pu instanceof ASTInterfaceBodyNode)
+            {
+                ASTInterfaceBodyNode b = (ASTInterfaceBodyNode)pu;
+                
+                Token name;
+                if (b.getFunctionStmt() != null)
+                    name = b.getFunctionStmt().getFunctionName().getFunctionName();
+                else
+                    name = b.getSubroutineStmt().getSubroutineName().getSubroutineName();
+                
+                markSubprogramImport(name);
+            }
+        }
+    }
+    
+    private void markSubprogramImport(Token subprogramNameToken)
+    {
+        try
+        {
+            markSubprogramImport(file, subprogramNameToken);
+        }
+        catch (Exception e) { throw new Error(e); }
     }
 }

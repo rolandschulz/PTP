@@ -27,9 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTEndTypeStmtNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTEndTypeStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTEndtype; // in ASTEndTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEnd; // in ASTEndTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTType; // in ASTEndTypeStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEndtype; // in ASTEndTypeStmtNode
     ASTTypeNameNode typeName; // in ASTEndTypeStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndTypeStmtNode
 
@@ -71,9 +71,9 @@ public class ASTEndTypeStmtNode extends ASTNode
         switch (index)
         {
         case 0:  return this.label;
-        case 1:  return this.hiddenTEnd;
-        case 2:  return this.hiddenTType;
-        case 3:  return this.hiddenTEndtype;
+        case 1:  return this.hiddenTEndtype;
+        case 2:  return this.hiddenTEnd;
+        case 3:  return this.hiddenTType;
         case 4:  return this.typeName;
         case 5:  return this.hiddenTEos;
         default: return null;
@@ -85,9 +85,9 @@ public class ASTEndTypeStmtNode extends ASTNode
         switch (index)
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTEndtype = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hiddenTEndtype = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.typeName = (ASTTypeNameNode)value; return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

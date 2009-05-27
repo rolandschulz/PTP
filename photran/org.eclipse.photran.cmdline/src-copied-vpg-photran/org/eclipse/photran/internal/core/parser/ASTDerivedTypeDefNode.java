@@ -27,7 +27,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationConstruct
 {
     ASTDerivedTypeStmtNode derivedTypeStmt; // in ASTDerivedTypeDefNode
+    ASTTypeParamDefStmtNode typeParamDefStmt; // in ASTDerivedTypeDefNode
     IASTListNode<IDerivedTypeBodyConstruct> derivedTypeBody; // in ASTDerivedTypeDefNode
+    ASTTypeBoundProcedurePartNode typeBoundProcedurePart; // in ASTDerivedTypeDefNode
     ASTEndTypeStmtNode endTypeStmt; // in ASTDerivedTypeDefNode
 
     public ASTDerivedTypeStmtNode getDerivedTypeStmt()
@@ -41,6 +43,17 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     }
 
 
+    public ASTTypeParamDefStmtNode getTypeParamDefStmt()
+    {
+        return this.typeParamDefStmt;
+    }
+
+    public void setTypeParamDefStmt(ASTTypeParamDefStmtNode newValue)
+    {
+        this.typeParamDefStmt = newValue;
+    }
+
+
     public IASTListNode<IDerivedTypeBodyConstruct> getDerivedTypeBody()
     {
         return this.derivedTypeBody;
@@ -49,6 +62,17 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     public void setDerivedTypeBody(IASTListNode<IDerivedTypeBodyConstruct> newValue)
     {
         this.derivedTypeBody = newValue;
+    }
+
+
+    public ASTTypeBoundProcedurePartNode getTypeBoundProcedurePart()
+    {
+        return this.typeBoundProcedurePart;
+    }
+
+    public void setTypeBoundProcedurePart(ASTTypeBoundProcedurePartNode newValue)
+    {
+        this.typeBoundProcedurePart = newValue;
     }
 
 
@@ -72,7 +96,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
 
     @Override protected int getNumASTFields()
     {
-        return 3;
+        return 5;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -80,8 +104,10 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
         switch (index)
         {
         case 0:  return this.derivedTypeStmt;
-        case 1:  return this.derivedTypeBody;
-        case 2:  return this.endTypeStmt;
+        case 1:  return this.typeParamDefStmt;
+        case 2:  return this.derivedTypeBody;
+        case 3:  return this.typeBoundProcedurePart;
+        case 4:  return this.endTypeStmt;
         default: return null;
         }
     }
@@ -91,8 +117,10 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
         switch (index)
         {
         case 0:  this.derivedTypeStmt = (ASTDerivedTypeStmtNode)value; return;
-        case 1:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value; return;
-        case 2:  this.endTypeStmt = (ASTEndTypeStmtNode)value; return;
+        case 1:  this.typeParamDefStmt = (ASTTypeParamDefStmtNode)value; return;
+        case 2:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value; return;
+        case 3:  this.typeBoundProcedurePart = (ASTTypeBoundProcedurePartNode)value; return;
+        case 4:  this.endTypeStmt = (ASTEndTypeStmtNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
