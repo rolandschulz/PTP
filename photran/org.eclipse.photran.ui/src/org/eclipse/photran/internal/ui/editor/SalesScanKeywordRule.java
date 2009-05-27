@@ -340,8 +340,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             int pos = skipWhitespace(start);
             if (pos >= 0 && Character.isDigit(line.charAt(pos)))
             {
-                // Line starts with an integer label
+                // Line (possibly) starts with an integer label
                 pos = skipInteger(pos);
+                pos = Math.max(pos, 0);
                 pos = skipWhitespace(pos);
             }
             return pos;
