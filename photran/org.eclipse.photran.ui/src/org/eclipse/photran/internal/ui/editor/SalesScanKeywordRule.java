@@ -342,8 +342,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             {
                 // Line (possibly) starts with an integer label
                 pos = skipInteger(pos);
-                pos = Math.max(pos, 0);
-                pos = skipWhitespace(pos);
+                if (pos >= 0) pos = skipWhitespace(pos);
             }
             return pos;
         }
