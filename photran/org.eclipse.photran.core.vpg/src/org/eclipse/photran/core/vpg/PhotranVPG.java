@@ -202,17 +202,17 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	
 	public IFortranAST acquireTransientAST(IFile file)
 	{
-		return acquireTransientAST(getFilenameForIFile(file));
+	    return file == null ? null : acquireTransientAST(getFilenameForIFile(file));
 	}
 	
 	public IFortranAST acquirePermanentAST(IFile file)
 	{
-		return acquirePermanentAST(getFilenameForIFile(file));
+	    return file == null ? null : acquirePermanentAST(getFilenameForIFile(file));
 	}
 	
 	public void releaseAST(IFile file)
 	{
-		releaseAST(getFilenameForIFile(file));
+	    if (file != null) releaseAST(getFilenameForIFile(file));
 	}
 
 	public static String canonicalizeIdentifier(String moduleName)
