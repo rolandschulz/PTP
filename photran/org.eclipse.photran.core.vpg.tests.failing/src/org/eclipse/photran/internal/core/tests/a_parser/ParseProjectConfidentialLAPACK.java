@@ -21,6 +21,6 @@ public class ParseProjectConfidentialLAPACK
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("../../org.eclipse.photran-projects.confidential.lapack", false, false) {};
+        return new ParserTestSuite("../../org.eclipse.photran-projects.confidential.lapack", true, false) {};
     }
 }
