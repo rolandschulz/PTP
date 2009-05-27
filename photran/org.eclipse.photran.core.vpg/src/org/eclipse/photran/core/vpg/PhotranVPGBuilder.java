@@ -325,9 +325,9 @@ public class PhotranVPGBuilder extends PhotranVPG
     @Override
     protected IFortranAST parse(final String filename)
     {
-        if (isVirtualFile(filename)) return null;
+        if (filename == null || isVirtualFile(filename)) return null;
         
-        IFile file = getIFileForFilename(filename);
+        IFile file = getIFileForFilename(filename); if (file == null) return null;
         SourceForm sourceForm = determineSourceForm(filename);
         try
         {
