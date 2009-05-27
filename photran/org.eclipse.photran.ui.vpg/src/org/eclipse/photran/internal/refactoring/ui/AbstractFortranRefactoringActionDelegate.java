@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.refactoring.ui;
 import java.lang.reflect.Constructor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.photran.core.vpg.PhotranVPG;
@@ -27,9 +28,9 @@ import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
  */
 public class AbstractFortranRefactoringActionDelegate extends FortranEditorActionDelegate
 {
-    private Class refactoringClass, wizardClass;
+    private Class<?> refactoringClass, wizardClass;
     
-    public AbstractFortranRefactoringActionDelegate(Class refactoringClass, Class wizardClass)
+    public AbstractFortranRefactoringActionDelegate(Class<?> refactoringClass, Class<?> wizardClass)
     {
         this.refactoringClass = refactoringClass;
         this.wizardClass = wizardClass;
@@ -48,12 +49,21 @@ public class AbstractFortranRefactoringActionDelegate extends FortranEditorActio
     {
         try
         {
-            FortranRefactoring refactoring = getRefactoring();
-            RefactoringWizard wizard = getRefactoringWizard(wizardClass, refactoring);
-            
-            new RefactoringWizardOpenOperation(wizard).run(getFortranEditor().getShell(), refactoring.getName());
-            
-            getFortranEditor().forceOutlineViewUpdate();
+            if (getFortranEditor().getIFile() == null)
+            {
+                MessageDialog.openError(getFortranEditor().getShell(), "Error",
+                    "The file in the editor cannot be refactored.\n\nFortran files can only be refactored if they " +
+                    "are located inside a Fortran project in your workspace.");
+            }
+            else
+            {
+                FortranRefactoring refactoring = getRefactoring();
+                RefactoringWizard wizard = getRefactoringWizard(wizardClass, refactoring);
+                
+                new RefactoringWizardOpenOperation(wizard).run(getFortranEditor().getShell(), refactoring.getName());
+                
+                getFortranEditor().forceOutlineViewUpdate();
+            }
         }
         catch (InterruptedException e)
         {
@@ -76,7 +86,7 @@ public class AbstractFortranRefactoringActionDelegate extends FortranEditorActio
         try
         {
             AbstractFortranEditor editor = getFortranEditor();
-            Constructor ctor = refactoringClass.getConstructors()[0];
+            Constructor<?> ctor = refactoringClass.getConstructors()[0];
             return (FortranRefactoring)ctor.newInstance(new Object[] {
                 editor.getIFile(),
                 /*Boolean.valueOf(editor.isFixedForm()),*/
@@ -94,11 +104,11 @@ public class AbstractFortranRefactoringActionDelegate extends FortranEditorActio
      * @param fortranRefactoringClass
      * @return FortranRefactoring
      */
-    private RefactoringWizard getRefactoringWizard(Class wizardClass, FortranRefactoring refactoring)
+    private RefactoringWizard getRefactoringWizard(Class<?> wizardClass, FortranRefactoring refactoring)
     {
         try
         {
-            Constructor ctor = wizardClass.getConstructors()[0];
+            Constructor<?> ctor = wizardClass.getConstructors()[0];
             return (RefactoringWizard)ctor.newInstance(new Object[] { refactoring });
         }
         catch (Exception e)
