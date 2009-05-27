@@ -37,6 +37,7 @@
 ## DEALINGS IN THE SOFTWARE.
 ## 
 ## Changes:
+## 26.05.2009 Jeff Overbey: Bug fixes in Fortran 2003 support
 ##    01.2009 Jeff Overbey: Finished Fortran 2003 support 
 ##    08.2008 Jeff Overbey: Started Fortran 2003 support
 ## 19.04.2005 Dirk Rossow: Added T_Hcon Hollerith Constants
@@ -51,7 +52,14 @@
 #######################################################################################################################
 
 # R201
-(customsuperclass=ScopingNode):<ExecutableProgram> ::= <ProgramUnitList>
+(customsuperclass=ScopingNode):<ExecutableProgram> ::=
+    <ProgramUnitList>
+  | <EmptyProgram>
+
+# JO -- So empty files don't give a syntax error in the editor
+<EmptyProgram> ::=
+  | (empty)
+  | -:T_EOS
 
 (list):<ProgramUnitList> ::=
   |                   <ProgramUnit>
@@ -2396,7 +2404,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | (inline):<LblDef> -:T_INQUIRE -:T_LPAREN <InquireSpecList> -:T_RPAREN -:T_EOS
   | (inline):<LblDef> -:T_INQUIRE -:T_LPAREN -:T_IOLENGTHEQ ioLengthVar:<ScalarVariable> -:T_RPAREN <OutputItemList> -:T_EOS
 
-# R924
+# R924 - F03 R930
 (list):<InquireSpecList> ::=
   | <UnitIdentifier>
   | <InquireSpec>
@@ -2428,6 +2436,21 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | -:T_READWRITEEQ     readWriteVar:<ScalarVariable>
   | -:T_DELIMEQ             delimVar:<ScalarVariable>
   | -:T_PADEQ                 padVar:<ScalarVariable>
+  
+  | -:T_ASYNCHRONOUSEQ asyncExpr:<ScalarVariable> # F03
+  | -:T_DECIMALEQ    decimalExpr:<ScalarVariable> # F03
+  | -:T_ENCODINGEQ  encodingExpr:<ScalarVariable> # F03
+  | -:T_IDEQ               idVar:<ScalarVariable> # F03
+  | -:T_IOMSGEQ        iomsgExpr:<ScalarVariable> # F03
+  | -:T_PENDINGEQ     pendingVar:<ScalarVariable> # F03
+  | -:T_POSEQ             posVar:<ScalarVariable> # F03
+  | -:T_ROUNDEQ        roundExpr:<ScalarVariable> # F03
+  | -:T_SIGNEQ          signExpr:<ScalarVariable> # F03
+  | -:T_SIZEEQ           sizeVar:<ScalarVariable> # F03
+  | -:T_STREAMEQ       streamVar:<ScalarVariable> # F03
+  
+  
+  
 
 #######################################################################################################################
 # Section 10 Rules

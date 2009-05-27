@@ -167,6 +167,9 @@ public class FreeFormLexerPhase2 implements ILexer
         
         // Find the identifier naming the variable
         varDeclIdPosPair = getVarDeclIdPos();
+        
+//        if (((IToken)tokenStream.get(firstTokenPos)).getTerminal() == Terminal.T_INQUIRE)
+//            System.err.println("!");
 
         markAdditionalChanges();    // Must have idPos set
 
@@ -652,31 +655,42 @@ public class FreeFormLexerPhase2 implements ILexer
         }
         else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_TYPE)
         {
-            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            if (firstTokenPos+1 < tokenStream.size()
+                && ((IToken)tokenStream.elementAt(firstTokenPos+1)).getTerminal() == Terminal.T_EQUALS)
             {
-                Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
-                if (t == Terminal.T_EXTENDS
-                    || t == Terminal.T_ABSTRACT
-                    || t == Terminal.T_BIND
-                    || t == Terminal.T_KIND
-                    || t == Terminal.T_LEN
-                    || t == Terminal.T_IS)
+                retainAsKeyword[firstTokenPos] = false;
+            }
+            else
+            {
+                for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
                 {
-                    retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
-                }
-                else if (t == Terminal.T_COLON)
-                {
-                    break;
+                    Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
+                    if (t == Terminal.T_EXTENDS
+                        || t == Terminal.T_ABSTRACT
+                        || t == Terminal.T_BIND
+                        || t == Terminal.T_KIND
+                        || t == Terminal.T_LEN
+                        || t == Terminal.T_IS)
+                    {
+                        retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
+                    }
+                    else if (t == Terminal.T_COLON)
+                    {
+                        break;
+                    }
                 }
             }
         }
         else if (((IToken)tokenStream.elementAt(firstTokenPos)).getTerminal() == Terminal.T_INTEGER)
         {
-            for (int i = firstTokenPos+1; i < tokenStream.size(); i++)
+            for (int i = firstTokenPos+1; i < tokenStream.size()-2; i++)
             {
                 Terminal t = ((IToken)tokenStream.elementAt(i)).getTerminal();
-                if (t == Terminal.T_KIND
-                    || t == Terminal.T_LEN)
+                Terminal la1 = ((IToken)tokenStream.elementAt(i+1)).getTerminal();
+                Terminal la2 = ((IToken)tokenStream.elementAt(i+2)).getTerminal();
+                if ((t == Terminal.T_KIND || t == Terminal.T_LEN)
+                    && la1 == Terminal.T_COLON
+                    && la2 == Terminal.T_COLON)
                 {
                     retainAsKeyword[i] = (parenDepth[i] == 0 && i != idPos);
                 }

@@ -26,19 +26,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTModuleNatureNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTModuleNatureNode
     org.eclipse.photran.internal.core.lexer.Token isNonIntrinsic; // in ASTModuleNatureNode
-
-    public boolean isIntrinsic()
-    {
-        return this.isIntrinsic != null;
-    }
-
-    public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isIntrinsic = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTModuleNatureNode
 
     public boolean isNonIntrinsic()
     {
@@ -48,6 +37,17 @@ public class ASTModuleNatureNode extends ASTNode
     public void setIsNonIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNonIntrinsic = newValue;
+    }
+
+
+    public boolean isIntrinsic()
+    {
+        return this.isIntrinsic != null;
+    }
+
+    public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntrinsic = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTModuleNatureNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isIntrinsic;
-        case 1:  return this.isNonIntrinsic;
+        case 0:  return this.isNonIntrinsic;
+        case 1:  return this.isIntrinsic;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTModuleNatureNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isNonIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isNonIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
