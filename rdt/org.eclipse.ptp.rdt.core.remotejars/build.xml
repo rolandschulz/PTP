@@ -16,7 +16,7 @@
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
-	<property name="ptpVersion" value="2.2.0"/>
+	<property name="ptpVersion" value="3.0.0"/>
 	<property name="copyToDir" value="/home/www/tools/ptp/builds/${ptpVersion}/latest"/>
 	
 	<property name="serverBaseName" value="rdt-server"/>
@@ -34,7 +34,7 @@
 	<property name="icuBaseZip" value="com.ibm.icu.base-3.5M6.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.0.1.v20090109.jar"/>
 	
-	<property name="cdtCoreVersion" value="5.1.0.200903161435"/>
+	<property name="cdtCoreVersion" value="5.1.0.200905220803"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 
 	<property name="coreRuntimeVersion" value="3.5.0.v20090306"/>
