@@ -31,12 +31,12 @@ public class RenameBug278103 extends RenameTestSuite
     
     public RenameBug278103() throws Exception
     {
-//        dim.addReferences(filem, new LineCol[] { lc(3,27), lc(11,22) });
-//        dim.addReferences(filep, new LineCol[] { lc(14,24), lc(16,22) });
-//        dim.addReferences(files, new LineCol[] { lc(5,22), lc(9,14), lc(11,23) });
-//
-//        startTests("Renaming file exercising Bug 278103");
-//        addSuccessTests(dim, "something_else");
-//        endTests();
+        dim.addReferences(filem, new LineCol[] { lc(3,27), lc(11,22) });
+        dim.addReferences(filep, new LineCol[] { lc(14,24), lc(16,22) });
+        dim.addReferences(files, new LineCol[] { lc(5,22), lc(9,14), lc(11,23) });
+
+        startTests("Renaming file exercising Bug 278103");
+        addSuccessTests(dim, "something_else");
+        endTests();
     }
 }

@@ -97,14 +97,17 @@ public abstract class RenameTestCase extends RefactoringTestCase
     	PhotranVPG.getDatabase().clearDatabase();
     	
         final IFile thisFile = importFile(DIR, filename);
-        PhotranVPG.getInstance().acquireTransientAST(thisFile);
         for (String f : allFiles)
-        {
-            IFile anotherFile = importFile(DIR, f);
-            PhotranVPG.getInstance().acquireTransientAST(anotherFile);
-        }
-        
+            importFile(DIR, f);
+
+        // Originally, we called acquireTransientAST on each IFile
+        PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
         //project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); // Runs in separate thread... grrr...
+
+//        System.out.println(filename);
+//        for (String f : allFiles)
+//            System.out.println(f);
+//        PhotranVPG.getInstance().db.printOn(System.out);
         
         return new RenameRefactoring(thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
     }
