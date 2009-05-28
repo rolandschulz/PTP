@@ -68,6 +68,7 @@ import org.eclipse.photran.internal.core.parser.ASTPointerFieldNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
+import org.eclipse.photran.internal.core.parser.ASTSFVarNameNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
 import org.eclipse.photran.internal.core.parser.ASTSpecificBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
@@ -420,6 +421,13 @@ class ReferenceCollector extends BindingCollector
         if (node.getSFDummyArgNameList() != null)
             for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
                 bind(node.getSFDummyArgNameList().get(j).getName/*getVariableName*/());
+    }
+    
+    @Override public void visitASTSFVarNameNode(ASTSFVarNameNode node)
+    {
+        super.traverseChildren(node);
+        
+        bind(node.getName().getName());
     }
     
     // # R735 - JO - Macro substituted
