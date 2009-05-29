@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+
 
 /**
  * Refactoring to extract an expression into a local (temporary) variable.
@@ -19,7 +20,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefac
  * 
  * @author Jeff Overbey
  */
-public class ExtractLocalVariableRefactoring //extends FortranRefactoring
+public class ExtractLocalVariableRefactoring //extends SingleFileFortranRefactoring
 {
 //    ///////////////////////////////////////////////////////////////////////////
 //    // Fields

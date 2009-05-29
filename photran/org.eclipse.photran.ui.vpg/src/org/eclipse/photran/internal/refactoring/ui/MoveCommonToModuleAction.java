@@ -10,8 +10,13 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.refactoring.ui;
 
+import java.util.ArrayList;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.photran.internal.core.refactoring.MoveCommonToModuleRefactoring;
+import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -36,6 +41,14 @@ public class MoveCommonToModuleAction
     public MoveCommonToModuleAction()
     {
         super(MoveCommonToModuleRefactoring.class, FortranMoveCommonToModuleRefactoringWizard.class);
+    }
+    
+    @Override
+    protected AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files)
+    {
+        return new MoveCommonToModuleRefactoring(
+            getFortranEditor().getIFile(),
+            getFortranEditor().getSelection());
     }
     
     public static class FortranMoveCommonToModuleRefactoringWizard extends AbstractFortranRefactoringWizard

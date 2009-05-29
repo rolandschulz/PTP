@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.refactoring.ui;
 
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 
 /**
  * This is the base class for most (all?) of the wizard dialogs for Fortran refactorings.
@@ -22,7 +22,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefac
  */
 public abstract class AbstractFortranRefactoringWizard extends RefactoringWizard
 {
-    public AbstractFortranRefactoringWizard(FortranRefactoring r)
+    public AbstractFortranRefactoringWizard(AbstractFortranRefactoring r)
     {
         // CHECK_INITIAL_CONDITIONS_ON_OPEN causes the initial conditions to be checked
         // twice, which leads to duplicate and missing error messages

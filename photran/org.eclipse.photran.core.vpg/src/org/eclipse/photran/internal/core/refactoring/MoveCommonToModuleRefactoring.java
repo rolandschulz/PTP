@@ -39,15 +39,15 @@ import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 
 /**
  * Refactoring to move a COMMON block into a module.
  * 
  * @author Jeff Overbey
  */
-public class MoveCommonToModuleRefactoring extends FortranRefactoring
+public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
 {
     private static final String CRLF = System.getProperty("line.separator");
 
@@ -92,7 +92,7 @@ public class MoveCommonToModuleRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        ensureProjectHasRefactoringEnabled();
+        ensureProjectHasRefactoringEnabled(status);
         
         findEnclosingCommonBlock();
         determineEnclosingCommonBlockName();

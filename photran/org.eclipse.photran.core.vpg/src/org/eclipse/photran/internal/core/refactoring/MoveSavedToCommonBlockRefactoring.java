@@ -48,8 +48,9 @@ import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
 /**
@@ -58,7 +59,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * 
  * @author Stas Negara
  */
-public class MoveSavedToCommonBlockRefactoring extends FortranRefactoring
+public class MoveSavedToCommonBlockRefactoring extends SingleFileFortranRefactoring
 {
     /** The OS-dependent end-of-line sequence (\n or \r\n) */
     private static final String EOL = System.getProperty("line.separator");
@@ -102,7 +103,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        ensureProjectHasRefactoringEnabled();
+        ensureProjectHasRefactoringEnabled(status);
 
         Token token = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (token == null) fail(SELECT_SUBPROGRAM_WARNING);

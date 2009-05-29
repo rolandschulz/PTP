@@ -11,19 +11,18 @@
 package org.eclipse.photran.internal.core.refactoring;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.types.Type;
-import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
@@ -31,37 +30,36 @@ import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
 /**
  * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all implicitly-declared variables
  * into a scope and all nested scopes (where needed).
  * 
- * @author Jeff Overbey
+ * @author Jeff Overbey, Timofey Yuvashev
  */
-public class IntroImplicitNoneRefactoring extends FortranRefactoring
+public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
 {
-    private ScopingNode selectedScope = null;
+    private ArrayList<ScopingNode> selectedScopes = null;
 
-    public IntroImplicitNoneRefactoring(IFile file, ITextSelection selection)
+    public IntroImplicitNoneRefactoring(ArrayList<IFile> myFiles)
     {
-        super(file, selection);
+        super(myFiles);
     }
-
+    
     @Override
     public String getName()
     {
         return "Introduce Implicit None";
     }
 
-    public String getScopeDescription()
+    /*public String getScopeDescription()
     {
     	return selectedScope == null || selectedScope.getHeaderStmt() == null
     		? "the selected scope..."
     		: "\n" + SourcePrinter.getSourceCodeFromASTNode(selectedScope.getHeaderStmt());
-    }
+    }*/
     
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
@@ -70,16 +68,36 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        ensureProjectHasRefactoringEnabled();
+        ensureProjectHasRefactoringEnabled(status);
         
-        Token token = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
-        selectedScope = token == null ? null : token.getEnclosingScope();
+        //Get the root of the AST, so that we can later get all of the sub-programs contained in the file
+        if(astsOfSelectedFiles != null && astsOfSelectedFiles.size() > 0)
+        {
+            selectedScopes = new ArrayList<ScopingNode>();
+            for(IFortranAST ast : astsOfSelectedFiles)
+            {
+                selectedScopes.add(ast.getRoot());
+            }
+        }
         
-        if (selectedScope == null)
-        	fail("To Introduce Implicit None, first place the cursor inside a subprogram, module, or main program.");
-
-        if (selectedScope.isImplicitNone())
-        	fail("Implicit variables are already disallowed in the selected scope.");
+        if (selectedScopes == null)
+        {
+        	fail("To Introduce Implicit None, select one or more files in the Package Explorer that you want to refactor");
+        }
+        else
+        {
+            for(int i = 0; i < this.selectedScopes.size(); i++)
+            {
+                if(this.selectedScopes.get(i).isImplicitNone())
+                {
+                    this.selectedScopes.remove(i);
+                    selectedFiles.remove(i);
+                    astsOfSelectedFiles.remove(i);
+                    status.addWarning(selectedFiles.get(i).getName() + 
+                    " already has Implicit None defined. No action will be taken for that file");
+                }
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -99,13 +117,31 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
     @Override
     protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
     {
-        assert this.selectedScope != null;
-
-        for (ScopingNode scope : selectedScope.getAllContainedScopes())
+        if(this.selectedScopes != null)
         {
-            if (!scope.isImplicitNone()
-                    && !(scope instanceof ASTExecutableProgramNode)
-                    && !(scope instanceof ASTDerivedTypeDefNode))
+            for(int i=0; i<astsOfSelectedFiles.size() && i<selectedScopes.size(); i++)
+            {
+                introduceImplicitNoneInFile(progressMonitor, selectedScopes.get(i), 
+                                     astsOfSelectedFiles.get(i), selectedFiles.get(i));
+            }
+        }
+        vpg.releaseAllASTs();
+    }
+    
+    private void introduceImplicitNoneInFile(IProgressMonitor progressMonitor, 
+                                             ScopingNode scopeNode, 
+                                             IFortranAST ast, 
+                                             IFile file)
+    {
+        assert scopeNode != null;
+        //Get all scopes contained in the file
+        List<ScopingNode> nodeList = scopeNode.getAllContainedScopes();
+        
+        for (ScopingNode scope : nodeList)
+        {
+            if (!(scope instanceof ASTExecutableProgramNode)
+                &&  !(scope instanceof ASTDerivedTypeDefNode)
+                &&  !scope.isImplicitNone())
             {
                 ASTImplicitStmtNode implicitStmt = findExistingImplicitStatement(scope);
                 if (implicitStmt != null) implicitStmt.removeFromTree();
@@ -113,12 +149,11 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
                 IASTListNode<IBodyConstruct> newDeclarations = constructDeclarations(scope);
                 IASTListNode<IASTNode> body = (IASTListNode<IASTNode>)scope.getBody();
                 body.addAll(0, newDeclarations);
-                Reindenter.reindent(newDeclarations, astOfFileInEditor);
+                Reindenter.reindent(newDeclarations, ast);
             }
         }
-        		
-        this.addChangeFromModifiedAST(this.fileInEditor, progressMonitor);
-        vpg.releaseAllASTs();
+            
+        this.addChangeFromModifiedAST(file, progressMonitor);
     }
 
     private ASTImplicitStmtNode findExistingImplicitStatement(final ScopingNode scope)

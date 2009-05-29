@@ -23,6 +23,8 @@ public class IntroImplicitTestSuite extends TestSuite
         suite.addTest(getSuiteFor("bigexpression.f90"));
         suite.addTest(getSuiteFor("fortran.f90"));
         suite.addTest(getSuiteFor("crazyimplicits.f90"));
+        suite.addTest(getSuiteFor("crazyimplicits.f90", "fortran.f90"));
+        suite.addTest(getSuiteFor("crazyimplicits.f90", "fortran.f90", "bigexpression.f90"));
         return suite;
     }
     
@@ -30,6 +32,16 @@ public class IntroImplicitTestSuite extends TestSuite
     {
         TestSuite subSuite = new TestSuite("Introducing Implicit None in " + baseFilename);
         subSuite.addTest(new IntroImplicitTestCase(baseFilename, new LineCol(1, 9)));
+        return subSuite;
+    }
+    
+    private static TestSuite getSuiteFor(String... filenames)
+    {
+        TestSuite subSuite = new TestSuite("Introducing Implicit None in selected files");
+        for(String filename : filenames)
+        {
+            subSuite.addTest(new IntroImplicitTestCase(filename, new LineCol(1, 9)));
+        }
         return subSuite;
     }
 }

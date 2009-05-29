@@ -12,6 +12,7 @@ package org.eclipse.photran.refactoring.tests.introimplicitnone;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -66,8 +67,9 @@ public class IntroImplicitTestCase extends RefactoringTestCase
         final IFile thisFile = importFile(DIR, filename);
         
         //project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); // Runs in separate thread... grrr...
-        
-        return new IntroImplicitNoneRefactoring(thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
+        ArrayList<IFile> files = new ArrayList<IFile>();
+        files.add(thisFile);
+        return new IntroImplicitNoneRefactoring(files);//thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
     }
     
     protected String readTestFile(String filename) throws IOException, URISyntaxException

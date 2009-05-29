@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -18,9 +19,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 
 /**
  * Refactoring to extract a sequence of statements into a new subprogram,
@@ -30,7 +31,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefac
  * 
  * @author Jeff Overbey
  */
-public class ExtractProcedureRefactoring extends FortranRefactoring
+public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
 {
 	private List< ? extends IASTNode> stmtSeq = null;
 	private String name = null;
@@ -45,7 +46,7 @@ public class ExtractProcedureRefactoring extends FortranRefactoring
     {
         return "Extract Procedure";
     }
-
+    
     ///////////////////////////////////////////////////////////////////////////
     // User-Specified Parameters
     ///////////////////////////////////////////////////////////////////////////
@@ -64,7 +65,7 @@ public class ExtractProcedureRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        ensureProjectHasRefactoringEnabled();
+        ensureProjectHasRefactoringEnabled(status);
         
     	stmtSeq = this.findEnclosingStatementSequence(this.astOfFileInEditor, this.selectedRegionInEditor);
         

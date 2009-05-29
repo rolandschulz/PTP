@@ -27,14 +27,14 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 
 /**
  * Refactoring to rename identifiers in Fortran programs.
  * 
  * @author Jeff Overbey
  */
-public class RenameRefactoring extends FortranRefactoring
+public class RenameRefactoring extends SingleFileFortranRefactoring
 {
     private Definition definitionToRename = null;
     private ArrayList<PhotranTokenRef> allReferences = null;
@@ -76,7 +76,7 @@ public class RenameRefactoring extends FortranRefactoring
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        ensureProjectHasRefactoringEnabled();
+        ensureProjectHasRefactoringEnabled(status);
         
         oldName = findEnclosingToken().getText();
         definitionToRename = findDeclarationToRename();
@@ -91,7 +91,8 @@ public class RenameRefactoring extends FortranRefactoring
 	private Token findEnclosingToken() throws PreconditionFailure
 	{
 		Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
-        if (selectedToken == null || !isIdentifier(selectedToken)) fail("Please select an identifier to rename.");
+        if (selectedToken == null || !isIdentifier(selectedToken)) 
+            fail("Please select an identifier to rename.");
 		return selectedToken;
 	}
 

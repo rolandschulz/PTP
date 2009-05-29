@@ -10,8 +10,13 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.refactoring.ui;
 
+import java.util.ArrayList;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring;
+import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -32,6 +37,14 @@ public class MoveSavedToCommonBlockAction
     public MoveSavedToCommonBlockAction()
     {
         super(MoveSavedToCommonBlockRefactoring.class, FortranMoveSavedToCommonBlockRefactoringWizard.class);
+    }
+    
+    @Override
+    protected AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files)
+    {
+        return new MoveSavedToCommonBlockRefactoring(
+            getFortranEditor().getIFile(),
+            getFortranEditor().getSelection());
     }
     
     public static class FortranMoveSavedToCommonBlockRefactoringWizard extends AbstractFortranRefactoringWizard

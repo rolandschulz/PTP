@@ -574,6 +574,28 @@
       </viewerContribution>
    </extension>
    
+   <!-- 5. Add refactorings that do not require user input to the objects popup menu -->
+   <extension point="org.eclipse.ui.popupMenus">
+   <objectContribution
+   		adaptable="true"
+   		objectClass="org.eclipse.core.resources.IFile"
+   		nameFilter="*.f90"
+   		id="org.eclipse.photran.ui.FortranFileRefactoring">
+   		<menu
+         id="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu"
+         label="Refactoring"
+         path="additions">
+      	<separator name="group1"/>
+      	</menu>
+   		<action
+   			label="Introduce Implicit None(Fortran)"
+   			menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
+   			class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
+   			id="org.eclipse.photran.ui.FortranFileRefactoringAction">
+   		</action>
+   	</objectContribution>
+   	</extension>
+   
    <!--==========================================-->
    <!-- Experimental Editor with VPG Integration -->   
    <!--==========================================-->
@@ -624,7 +646,7 @@
             name="Fortran Declaration">
       </view>
    </extension>
-   
+    
    <!--=================================-->
    <!-- VPG Source Viewer Configuration -->   
    <!--=================================-->
