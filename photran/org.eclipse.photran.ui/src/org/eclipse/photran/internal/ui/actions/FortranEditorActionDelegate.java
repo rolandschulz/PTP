@@ -33,6 +33,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.progress.IProgressService;
 
 /**
@@ -66,6 +67,9 @@ public abstract class FortranEditorActionDelegate
 
     public void run(IAction action)
     {
+        if (this.window == null)
+            this.window = Workbench.getInstance().getActiveWorkbenchWindow();
+        
         if (this.window != null)
         {
             IEditorPart editor = this.window.getActivePage().getActiveEditor();
