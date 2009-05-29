@@ -736,11 +736,10 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        // F03 This is handled in visitASTDataRefNode
-        //if (node.getSubroutineName() != null)
-        //    bind(node.getSubroutineName());
+        if (node.getSubroutineName() != null)
+            bind(node.getSubroutineName());
 
-        IASTListNode<ASTSubroutineArgNode> list = node.getSubroutineArgList();
+        IASTListNode<ASTSubroutineArgNode> list = node.getArgList();
         if (list != null)
             for (int i = 0; i < list.size(); i++)
                 if (list.get(i) != null && list.get(i).getName() != null)

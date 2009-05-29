@@ -24,13 +24,14 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-public class ASTCallStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt
+public class ASTCallStmtNode extends ASTNode implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTCallStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTCall; // in ASTCallStmtNode
-    IASTListNode<ASTDataRefNode> dataRef; // in ASTCallStmtNode
+    org.eclipse.photran.internal.core.lexer.Token subroutineName; // in ASTCallStmtNode
+    IASTListNode<ASTDerivedTypeQualifiersNode> derivedTypeQualifiers; // in ASTCallStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCallStmtNode
-    IASTListNode<ASTSubroutineArgNode> subroutineArgList; // in ASTCallStmtNode
+    IASTListNode<ASTSubroutineArgNode> argList; // in ASTCallStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCallStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCallStmtNode
 
@@ -45,25 +46,36 @@ public class ASTCallStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     }
 
 
-    public IASTListNode<ASTDataRefNode> getDataRef()
+    public org.eclipse.photran.internal.core.lexer.Token getSubroutineName()
     {
-        return this.dataRef;
+        return this.subroutineName;
     }
 
-    public void setDataRef(IASTListNode<ASTDataRefNode> newValue)
+    public void setSubroutineName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.dataRef = newValue;
+        this.subroutineName = newValue;
     }
 
 
-    public IASTListNode<ASTSubroutineArgNode> getSubroutineArgList()
+    public IASTListNode<ASTDerivedTypeQualifiersNode> getDerivedTypeQualifiers()
     {
-        return this.subroutineArgList;
+        return this.derivedTypeQualifiers;
     }
 
-    public void setSubroutineArgList(IASTListNode<ASTSubroutineArgNode> newValue)
+    public void setDerivedTypeQualifiers(IASTListNode<ASTDerivedTypeQualifiersNode> newValue)
     {
-        this.subroutineArgList = newValue;
+        this.derivedTypeQualifiers = newValue;
+    }
+
+
+    public IASTListNode<ASTSubroutineArgNode> getArgList()
+    {
+        return this.argList;
+    }
+
+    public void setArgList(IASTListNode<ASTSubroutineArgNode> newValue)
+    {
+        this.argList = newValue;
     }
 
 
@@ -76,7 +88,7 @@ public class ASTCallStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
 
     @Override protected int getNumASTFields()
     {
-        return 7;
+        return 8;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -85,11 +97,12 @@ public class ASTCallStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTCall;
-        case 2:  return this.dataRef;
-        case 3:  return this.hiddenTLparen;
-        case 4:  return this.subroutineArgList;
-        case 5:  return this.hiddenTRparen;
-        case 6:  return this.hiddenTEos;
+        case 2:  return this.subroutineName;
+        case 3:  return this.derivedTypeQualifiers;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.argList;
+        case 6:  return this.hiddenTRparen;
+        case 7:  return this.hiddenTEos;
         default: return null;
         }
     }
@@ -100,11 +113,12 @@ public class ASTCallStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.hiddenTCall = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.dataRef = (IASTListNode<ASTDataRefNode>)value; return;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.subroutineArgList = (IASTListNode<ASTSubroutineArgNode>)value; return;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.subroutineName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.derivedTypeQualifiers = (IASTListNode<ASTDerivedTypeQualifiersNode>)value; return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.argList = (IASTListNode<ASTSubroutineArgNode>)value; return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

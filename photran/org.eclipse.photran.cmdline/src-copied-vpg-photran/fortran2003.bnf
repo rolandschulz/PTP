@@ -2745,13 +2745,28 @@ ASTAttrSpecNode:<ProcAttrSpec> ::=   # Merges with R503 <AttrSpec>
 #    REDUCE:    <SubroutineArg> ::= <Expr> .
 # by always reducing <Expr> to <SectionSubscript>, but unfortunately this means that
 # CALL sub(a, b=c) will not parse, so we have the (error) productions to handle this case.
-  | (inline):<LblDef> -:T_CALL <DataRef>                                           -:T_EOS
-  | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN                     -:T_RPAREN -:T_EOS
-  | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN <SubroutineArgList> -:T_RPAREN -:T_EOS
-  | (inline):<LblDef> -:T_CALL <DataRef>                                           (error) T_EOS
-  | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN                     -:T_RPAREN (error) T_EOS
-  | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN <SubroutineArgList> -:T_RPAREN (error) T_EOS
-  | (inline):<LblDef> -:T_CALL                                                     (error) T_EOS
+# | (inline):<LblDef> -:T_CALL <DataRef>                                           -:T_EOS
+# | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN                     -:T_RPAREN -:T_EOS
+# | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN <SubroutineArgList> -:T_RPAREN -:T_EOS
+# | (inline):<LblDef> -:T_CALL <DataRef>                                           (error) T_EOS
+# | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN                     -:T_RPAREN (error) T_EOS
+# | (inline):<LblDef> -:T_CALL <DataRef> -:T_LPAREN <SubroutineArgList> -:T_RPAREN (error) T_EOS
+# | (inline):<LblDef> -:T_CALL                                                     (error) T_EOS
+
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse>                                                                   -:T_EOS
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse> <DerivedTypeQualifiers>                                           -:T_EOS
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse>                         (inline):<ParenthesizedSubroutineArgList> -:T_EOS
+  | (inline):<LblDef> -:T_CALL (inline):<SubroutineNameUse> <DerivedTypeQualifiers> (inline):<ParenthesizedSubroutineArgList> -:T_EOS
+
+(list):<DerivedTypeQualifiers> ::=
+  |                                                                                                  -:T_PERCENT Component(inline):<Name>
+  |                         (inline):<ParenthesizedSubroutineArgList> -:T_PERCENT Component(inline):<Name>
+  | <DerivedTypeQualifiers>                                                                          -:T_PERCENT Component(inline):<Name>
+  | <DerivedTypeQualifiers> (inline):<ParenthesizedSubroutineArgList> -:T_PERCENT Component(inline):<Name>
+
+<ParenthesizedSubroutineArgList> ::=
+  | -:T_LPAREN                             -:T_RPAREN
+  | -:T_LPAREN argList:<SubroutineArgList> -:T_RPAREN
 
 (list):<SubroutineArgList> ::=
   | <SubroutineArg>
@@ -2942,8 +2957,7 @@ ASTAttrSpecNode:<ProcAttrSpec> ::=   # Merges with R503 <AttrSpec>
 
 <SubroutineName> ::= subroutineName:T_IDENT
 
-# JO Removed F03
-#<SubroutineNameUse> ::= subroutineName:T_IDENT
+<SubroutineNameUse> ::= subroutineName:T_IDENT
 
 <TypeName> ::= typeName:T_IDENT
 
