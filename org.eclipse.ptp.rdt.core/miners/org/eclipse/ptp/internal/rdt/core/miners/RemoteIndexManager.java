@@ -68,22 +68,16 @@ public class RemoteIndexManager {
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
 			Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
 			
-			Set<String> allScopes = ScopeManager.getInstance().getAllScopes();
-			
-			Iterator<String> iterator = allScopes.iterator();
-			
-			while(iterator.hasNext()) {
-				String currentScope = iterator.next();
-				
+			for(String currentScope : ScopeManager.getInstance().getAllScopes()) {
 				IIndexFragment fragment = getIndexerForScope(currentScope).getIndex().getWritableFragment();
-				
 				fragments.add(fragment);
 			}
 			
-			CIndex index = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
-			return index;
+			if(fragments.isEmpty())
+				System.out.println("Warning: index contains 0 fragments"); //$NON-NLS-1$
+			
+			return new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
 		}
-		
 		else {
 			StandaloneFastIndexer indexer = getIndexerForScope(scope);
 			return indexer.getIndex();
