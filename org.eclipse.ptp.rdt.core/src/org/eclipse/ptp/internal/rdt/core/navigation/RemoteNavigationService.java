@@ -33,6 +33,7 @@ public class RemoteNavigationService extends AbstractRemoteService implements IN
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
 		// go to the subsystem
 		ICIndexSubsystem subsystem = getSubSystem();
+		subsystem.checkProject(unit.getCProject().getProject(), monitor);
 		
 		if(unit instanceof TranslationUnit) {
 			IScannerInfo scannerInfo = null;

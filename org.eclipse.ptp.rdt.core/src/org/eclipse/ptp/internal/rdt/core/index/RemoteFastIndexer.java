@@ -29,26 +29,21 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 	
 	public static final String ID = "org.eclipse.ptp.rdt.core.RemoteFastIndexer"; //$NON-NLS-1$
 	
-	public IPDOMIndexerTask createTask(ITranslationUnit[] added,
-			ITranslationUnit[] changed, ITranslationUnit[] removed) {
-		
+	public IPDOMIndexerTask createTask(ITranslationUnit[] added, ITranslationUnit[] changed, ITranslationUnit[] removed) {
 		IServiceModelManager smm = ServiceModelManager.getInstance();
-		
 		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject().getProject());
-		
 		IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-		
 		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 		
 		if(serviceProvider instanceof IIndexServiceProvider)
 			return new RemoteIndexerTask(this, (IIndexServiceProvider) serviceProvider, added, changed, removed);
-		else
-			return null;
+		
+		return null;
 	}
 
+	
 	public String getID() {
 		return ID;
 	}
-	
 	
 }
