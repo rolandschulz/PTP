@@ -22,6 +22,7 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueNamed;
@@ -47,7 +48,9 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 
 		switch (marker) {
 		case 0:
-			value = AIFFactory.UNKNOWNVALUE;
+	        IAIFTypeAddress aType = pType.getAddressType();
+	        addrValue = AIFFactory.getAIFValue(null, aType, new byte[aType.sizeof()]);
+	        value = AIFFactory.UNKNOWNVALUE;
 			break;
 		case 1:
 			addrValue = AIFFactory.getAIFValue(null, pType.getAddressType(), buffer);
