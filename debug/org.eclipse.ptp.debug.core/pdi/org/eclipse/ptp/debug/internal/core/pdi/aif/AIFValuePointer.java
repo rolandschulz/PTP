@@ -34,8 +34,8 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
  * 
  */
 public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
-	IAIFValue value;
-	IAIFValue addrValue;
+	IAIFValue value = null;
+	IAIFValue addrValue = null;
 	
 	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, SimpleByteBuffer buffer) {
 		super(parent, type);
@@ -76,7 +76,11 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = addrValue.getValueString();
+			if (addrValue != null) {
+				result = addrValue.getValueString();
+			} else {
+				result = ""; //$NON-NLS-1$
+			}
 		}
 		return result;
 	}
