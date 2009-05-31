@@ -653,7 +653,7 @@ public class PDebugModel {
 	 */
 	public void shutdown() {
 		for (IPSession session : sessionMgr.getSessions()) {
-			shutdownnSession(session);
+			shutdownSession(session);
 		}
 		sessionMgr.shutdown();
 	}
@@ -661,7 +661,7 @@ public class PDebugModel {
 	/**
 	 * @param session
 	 */
-	public void shutdownnSession(IPSession session) {
+	public void shutdownSession(IPSession session) {
 		if (session != null) {
 			try {
 				deletePBreakpoint(session.getJob().getID());
@@ -678,7 +678,7 @@ public class PDebugModel {
 	 */
 	public void shutdownSession(IPJob job) {
 		if (job != null) {
-			shutdownnSession(getSession(job));
+			shutdownSession(getSession(job));
 		}
 	}
 }
