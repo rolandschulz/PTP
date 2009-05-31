@@ -30,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 public abstract class AIFValue implements IAIFValue {
 	protected IAIFType type = null;
 	protected String result = null;
-	protected int size;
+	protected int size = 0;
 	
 	public AIFValue(IAIFType type) {
 		this.type = type;

@@ -52,6 +52,7 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 		case 1:
 			addrValue = AIFFactory.getAIFValue(null, pType.getAddressType(), buffer);
 			value = AIFFactory.getAIFValue(getParent(), pType.getBaseType(), buffer);
+			size = addrValue.sizeof() + value.sizeof();
 			break;
 		case 2:
 			break;
@@ -61,7 +62,6 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		}
-		size = addrValue.sizeof() + value.sizeof();
 	}
 	/**
 	 * Get the children number of pointer.  Return 1 if the base type is primitive 
