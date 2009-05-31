@@ -85,6 +85,9 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 		return result;
 	}
 	public BigInteger pointerValue() throws AIFException {
+		if (addrValue == null) {
+			return BigInteger.ZERO;
+		}
 		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
 	}
 	public IAIFValue getValue() {
