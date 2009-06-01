@@ -23,7 +23,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.widgets.Shell;
@@ -79,15 +78,17 @@ public abstract class ParallelAction extends Action {
      * @see org.eclipse.jface.action.IAction#run()
      */
     public void run() {
+    	IElement[] elements = new IElement[0];
     	ISelection selection = getViewPart().getSelection();
     	if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
         	Object[] objs = ((IStructuredSelection)selection).toArray();
-        	IElement[] elements = new IElement[objs.length];
-        	System.arraycopy(objs, 0, elements, 0, objs.length);
-        	run(elements);
+        	if (objs.length > 0 && objs[0] instanceof IElement) {
+	        	elements = new IElement[objs.length];
+	        	System.arraycopy(objs, 0, elements, 0, objs.length);
+        	}
     	}
-    	else
-    		run(new IElement[0]);
+
+    	run(elements);
     }
     
 	/** Validation of given elements
