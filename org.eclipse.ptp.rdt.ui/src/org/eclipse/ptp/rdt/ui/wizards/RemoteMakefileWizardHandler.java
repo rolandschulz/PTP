@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.IWizard;
@@ -59,64 +60,70 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.managedbuilder.ui.wizards.STDWizardHandler#createProject(org.eclipse.core.resources.IProject, boolean, boolean)
+	 * @see org.eclipse.cdt.managedbuilder.ui.wizards.STDWizardHandler#createProject(org.eclipse.core.resources.IProject, boolean, boolean, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void createProject(IProject project, boolean defaults, boolean onFinish) throws CoreException {
-		ICProjectDescriptionManager mngr = CoreModel.getDefault().getProjectDescriptionManager();
-		ICProjectDescription des = mngr.createProjectDescription(project, false, !onFinish);
-		ManagedBuildInfo info = ManagedBuildManager.createBuildInfo(project);
-		ManagedProject mProj = new ManagedProject(des);
-		info.setManagedProject(mProj);
-
-		cfgs = CfgHolder.unique(fConfigPage.getCfgItems(defaults));
-		cfgs = CfgHolder.reorder(cfgs);
-			
-		for (int i=0; i<cfgs.length; i++) {
-			String s = (cfgs[i].getToolChain() == null) ? "0" : ((ToolChain)(cfgs[i].getToolChain())).getId();  //$NON-NLS-1$
-			Configuration cfg = new Configuration(mProj, (ToolChain)cfgs[i].getToolChain(), ManagedBuildManager.calculateChildId(s, null), cfgs[i].getName());
-			IBuilder bld = cfg.getEditableBuilder();
-			if (bld != null) {
-				if(bld.isInternalBuilder()){
-					IConfiguration prefCfg = ManagedBuildManager.getPreferenceConfiguration(false);
-					IBuilder prefBuilder = prefCfg.getBuilder();
-					cfg.changeBuilder(prefBuilder, ManagedBuildManager.calculateChildId(cfg.getId(), null), prefBuilder.getName());
-					bld = cfg.getEditableBuilder();
-					bld.setBuildPath(null);
+	public void createProject(IProject project, boolean defaults, boolean onFinish, IProgressMonitor monitor) throws CoreException {
+		try {
+			monitor.beginTask("", 100); //$NON-NLS-1$
+		
+			ICProjectDescriptionManager mngr = CoreModel.getDefault().getProjectDescriptionManager();
+			ICProjectDescription des = mngr.createProjectDescription(project, false, !onFinish);
+			ManagedBuildInfo info = ManagedBuildManager.createBuildInfo(project);
+			ManagedProject mProj = new ManagedProject(des);
+			info.setManagedProject(mProj);
+	
+			cfgs = CfgHolder.unique(fConfigPage.getCfgItems(defaults));
+			cfgs = CfgHolder.reorder(cfgs);
+				
+			for (int i=0; i<cfgs.length; i++) {
+				String s = (cfgs[i].getToolChain() == null) ? "0" : ((ToolChain)(cfgs[i].getToolChain())).getId();  //$NON-NLS-1$
+				Configuration cfg = new Configuration(mProj, (ToolChain)cfgs[i].getToolChain(), ManagedBuildManager.calculateChildId(s, null), cfgs[i].getName());
+				IBuilder bld = cfg.getEditableBuilder();
+				if (bld != null) {
+					if(bld.isInternalBuilder()){
+						IConfiguration prefCfg = ManagedBuildManager.getPreferenceConfiguration(false);
+						IBuilder prefBuilder = prefCfg.getBuilder();
+						cfg.changeBuilder(prefBuilder, ManagedBuildManager.calculateChildId(cfg.getId(), null), prefBuilder.getName());
+						bld = cfg.getEditableBuilder();
+						bld.setBuildPath(null);
+					}
+					bld.setManagedBuildOn(false);
+				} else {
+					System.out.println(UIMessages.getString("StdProjectTypeHandler.3")); //$NON-NLS-1$
 				}
-				bld.setManagedBuildOn(false);
-			} else {
-				System.out.println(UIMessages.getString("StdProjectTypeHandler.3")); //$NON-NLS-1$
+				cfg.setArtifactName(removeSpaces(project.getName()));
+				CConfigurationData data = cfg.getConfigurationData();
+				des.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, data);
 			}
-			cfg.setArtifactName(removeSpaces(project.getName()));
-			CConfigurationData data = cfg.getConfigurationData();
-			des.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, data);
+			mngr.setProjectDescription(project, des);
+			
+			// remove all builders from the project... I really wish there was a less hacky way to do this that wasn't so damn slow
+			IProjectDescription projectDescription = project.getDescription();
+			projectDescription.setBuildSpec(new ICommand[0]);
+			project.setDescription(projectDescription, IProject.FORCE, new NullProgressMonitor());
+			RemoteMakeNature.addToBuildSpec(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+			RemoteMakeNature.addNature(project, new NullProgressMonitor());
+			
+			// set the build directory by default to be that of the project... the usual workspace macro doesn't work as the workspace resides locally
+			// and the project resides remotely
+			
+			URI projectLocation = project.getLocationURI();
+			// assume that the path portion of the URI corresponds to the path on the remote machine
+			// this may not work if the remote machine does not use UNIX paths but we have no real way of knowing the path
+			// format, so we hope for the best...
+			IPath buildPath = Path.fromPortableString(projectLocation.getPath());
+			
+			IManagedBuildInfo mbsInfo = ManagedBuildManager.getBuildInfo(project);	
+			mbsInfo.getDefaultConfiguration().getBuildData().setBuilderCWD(buildPath);
+			mbsInfo.setDirty(true);
+			ManagedBuildManager.saveBuildInfo(project, true);
+			
+			doTemplatesPostProcess(project);
+			doCustom(project);
+		} finally {
+			monitor.done();
 		}
-		mngr.setProjectDescription(project, des);
-		
-		// remove all builders from the project... I really wish there was a less hacky way to do this that wasn't so damn slow
-		IProjectDescription projectDescription = project.getDescription();
-		projectDescription.setBuildSpec(new ICommand[0]);
-		project.setDescription(projectDescription, IProject.FORCE, new NullProgressMonitor());
-		RemoteMakeNature.addToBuildSpec(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-		RemoteMakeNature.addNature(project, new NullProgressMonitor());
-		
-		// set the build directory by default to be that of the project... the usual workspace macro doesn't work as the workspace resides locally
-		// and the project resides remotely
-		
-		URI projectLocation = project.getLocationURI();
-		// assume that the path portion of the URI corresponds to the path on the remote machine
-		// this may not work if the remote machine does not use UNIX paths but we have no real way of knowing the path
-		// format, so we hope for the best...
-		IPath buildPath = Path.fromPortableString(projectLocation.getPath());
-		
-		IManagedBuildInfo mbsInfo = ManagedBuildManager.getBuildInfo(project);	
-		mbsInfo.getDefaultConfiguration().getBuildData().setBuilderCWD(buildPath);
-		mbsInfo.setDirty(true);
-		ManagedBuildManager.saveBuildInfo(project, true);
-		
-		doTemplatesPostProcess(project);
-		doCustom(project);
 	}
 
 
