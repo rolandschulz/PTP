@@ -36,7 +36,10 @@ import org.eclipse.cdt.core.model.ICElementVisitor;
 import org.eclipse.cdt.core.model.ICModel;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.rdt.core.RDTLog;
@@ -110,20 +113,20 @@ public abstract class CElement implements ICElement, Serializable {
 
 	public IResource getResource() {
 
-//			// this code won't work on the remote side
-//			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-//			if (fLocation != null) {
-//				IFile[] files = root.findFilesForLocationURI(fLocation);
-//				if (files.length > 0) {
-//					return files[0];
-//				}
-//			}
-//			if (fPath != null) {
-//				IFile[] files = root.findFilesForLocation(fPath);
-//				if (files.length > 0) {
-//					return files[0];
-//				}
-//			}
+		// this code won't work on the remote side
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		if (fLocation != null) {
+			IFile[] files = root.findFilesForLocationURI(fLocation);
+			if (files.length > 0) {
+				return files[0];
+			}
+		}
+		if (fPath != null) {
+			IFile[] files = root.findFilesForLocation(fPath);
+			if (files.length > 0) {
+				return files[0];
+			}
+		}
 
 		return null;
 	}
