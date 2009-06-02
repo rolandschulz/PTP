@@ -520,21 +520,6 @@ DbgListSignals(session *s, bitset *set, char *name)
 }
 
 int
-DbgSignalInfo(session *s, bitset *set, char *arg)
-{
-	proxy_msg *	msg = new_proxy_msg(DBG_SIGNALINFO_CMD, 0);
-
-	proxy_msg_add_bitset(msg, set);
-	proxy_msg_add_string(msg, arg);
-
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
-	free_proxy_msg(msg);
-	
-	return 0;
-}
-
-int
 DbgCLIHandle(session *s, bitset *set, char *arg)
 {
 	proxy_msg *	msg = new_proxy_msg(DBG_CLIHANDLE_CMD, 0);
@@ -563,23 +548,9 @@ DbgQuit(session *s)
 }
 
 int
-DbgDataEvaluateExpression(session *s, bitset *set, char *arg)
+DbgEvaluatePartialExpression(session *s, bitset *set, char *name, char *key, int listChildren, int express)
 {
-	proxy_msg *	msg = new_proxy_msg(DBG_DATAEVALUATEEXPRESSION_CMD, 0);
-
-	proxy_msg_add_bitset(msg, set);
-	proxy_msg_add_string(msg, arg);
-
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
-	free_proxy_msg(msg);
-	
-	return 0;
-}
-int
-DbgGetPartialAIF(session *s, bitset *set, char *name, char *key, int listChildren, int express)
-{
-	proxy_msg *	msg = new_proxy_msg(DBG_GETPARTIALAIF_CMD, 0);
+	proxy_msg *	msg = new_proxy_msg(DBG_EVALUATEPARTIALEXPRESSION_CMD, 0);
 
 	proxy_msg_add_bitset(msg, set);
 	proxy_msg_add_string(msg, name);
@@ -593,10 +564,11 @@ DbgGetPartialAIF(session *s, bitset *set, char *name, char *key, int listChildre
 	
 	return 0;
 }
+
 int
-DbgVariableDelete(session *s, bitset *set, char *arg)
+DbgDeletePartialExpression(session *s, bitset *set, char *arg)
 {
-	proxy_msg *	msg = new_proxy_msg(DBG_VARIABLEDELETE_CMD, 0);
+	proxy_msg *	msg = new_proxy_msg(DBG_DELETEPARTIALEXPRESSION_CMD, 0);
 
 	proxy_msg_add_bitset(msg, set);
 	proxy_msg_add_string(msg, arg);

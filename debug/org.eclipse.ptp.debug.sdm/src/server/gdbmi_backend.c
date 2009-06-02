@@ -109,11 +109,9 @@ static int	GDBMIDataReadMemory(long, char*, char*, int, int, int, char*);
 static int	GDBMIDataWriteMemory(long, char*, char*, int, char*);
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBCLIListSignals(char*);
-static int	GDBCLISignalInfo(char*);
 static int	GDBCLIHandle(char*);
 static int	GDBMIQuit(void);
-static int	GDBMIDataEvaluateExpression(char*);
-static int	GDBGetPartialAIF(char *, char *, int, int);
+static int	GDBEvaluatePartialExpression(char *, char *, int, int);
 static int	GDBMIVarDelete(char*);
 
 static void SendCommandWait(MISession *, MICommand *);
@@ -155,10 +153,10 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIDataReadMemory,
 	GDBMIDataWriteMemory,
 	GDBCLIListSignals,
-	GDBCLISignalInfo,
+	NULL,
 	GDBCLIHandle,
-	GDBMIDataEvaluateExpression,
-	GDBGetPartialAIF,
+	NULL,
+	GDBEvaluatePartialExpression,
 	GDBMIVarDelete,
 	GDBMIQuit
 };
@@ -1905,6 +1903,7 @@ GDBCLIListSignals(char* name)
 	return DBGRES_OK;
 }
 
+#if 0
 static int
 GDBCLISignalInfo(char* arg)
 {
@@ -1923,6 +1922,7 @@ GDBCLISignalInfo(char* arg)
 	MICommandFree(cmd);
 	return DBGRES_OK;
 }
+#endif
 
 static int
 GDBCLIHandle(char *arg)
@@ -1943,6 +1943,7 @@ GDBCLIHandle(char *arg)
 	return DBGRES_OK;
 }
 
+#if 0
 static int
 GDBMIDataEvaluateExpression(char *arg)
 {
@@ -1969,6 +1970,7 @@ GDBMIDataEvaluateExpression(char *arg)
 
 	return DBGRES_OK;
 }
+#endif
 
 /*
 ** Evaluate the expression exp.
@@ -1986,6 +1988,7 @@ GDBMIEvaluateExpression(char *exp)
 	e = NewDbgEvent(DBGEV_DATA);
 	e->dbg_event_u.data_event.data = a;
 	e->dbg_event_u.data_event.type_desc = type;
+	e->dbg_event_u.data_event.name = strdup("");
 	SaveEvent(e);
 
 	return DBGRES_OK;
@@ -2651,8 +2654,8 @@ GetPartialPointerAIF(MIVar *var)
 	int id;
 
 	if (var->children != NULL) {
-		var->type[strlen(var->type) - 1] = '\0'; //remove pointer
-		while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
+		var->type[strlen(var->type) - 1] = '\0'; /* remove pointer */
+		while (var->type[strlen(var->type) - 1] == ' ') {/* remove whitespace */
 			var->type[strlen(var->type) - 1] = '\0';
 		}
 
@@ -2791,7 +2794,7 @@ GetMIVarDetails(char *name)
 }
 
 static int
-GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
+GDBEvaluatePartialExpression(char* expr, char* exprId, int listChildren, int express)
 {
 	MIVar *mivar;
 	AIF *a;
@@ -2800,8 +2803,10 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 
 	CHECK_SESSION();
 
-	//key is first perference if it exists
-	var_name = (key == NULL || strlen(key) == 0)?name:key;
+	/*
+	 * Start by using exprId if it exists
+	 */
+	var_name = (exprId == NULL || strlen(exprId) == 0) ? expr : exprId;
 
 	if (express) {
 		mivar = GetMIVarDetails(var_name);
@@ -2821,7 +2826,7 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 
 	if (mivar == NULL) {
 		//try again with original variable name
-		var_name = name;
+		var_name = expr;
 		if ((mivar = CreateMIVar(var_name)) == NULL) {
 			DbgSetError(DBGERR_UNKNOWN_VARIABLE, var_name);
 			return DBGRES_ERR;
@@ -2835,10 +2840,10 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GDBGetPartialAIF found key: %s, format: %s\n", mivar->name, AIF_FORMAT(a));
 
-	e = NewDbgEvent(DBGEV_PARTIAL_AIF);
-	e->dbg_event_u.partial_aif_event.data = a;
-	e->dbg_event_u.partial_aif_event.type_desc = strdup(mivar->type);
-	e->dbg_event_u.partial_aif_event.name = strdup(mivar->name);
+	e = NewDbgEvent(DBGEV_DATA);
+	e->dbg_event_u.data_event.data = a;
+	e->dbg_event_u.data_event.type_desc = strdup(mivar->type);
+	e->dbg_event_u.data_event.name = strdup(mivar->name);
 
 	MIVarFree(mivar);
 	SaveEvent(e);

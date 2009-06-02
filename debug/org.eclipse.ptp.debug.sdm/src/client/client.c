@@ -92,11 +92,11 @@ static proxy_cmd cmds[] = {
 	/* DBG_DATAREADMEMORY_CMD */			DbgClntDataReadMemory,
 	/* DBG_DATAWRITEMEMORY_CMD */			DbgClntDataWriteMemory,
 	/* DBG_LISTSIGNALS_CMD */				DbgClntListSignals,
-	/* DBG_SIGNALINFO_CMD */				DbgClntSignalInfo,
+	/* DBG_SIGNALINFO_CMD */				NULL,
 	/* DBG_CLIHANDLE_CMD */					DbgClntCLIHandle,
-	/* DBG_DATAEVALUATEEXPRESSION_CMD */	DbgClntDataEvaluateExpression,
-	/* DBG_GETPARTIALAIF_CMD */				DbgClntGetPartialAIF,
-	/* DBG_VARIABLEDELETE_CMD */			DbgClntVariableDelete
+	/* DBG_DATAEVALUATEEXPRESSION_CMD */	NULL,
+	/* DBG_EVALUATEPARTIALEXPRESSION_CMD */	DbgClntEvaluatePartialExpression,
+	/* DBG_DELETEPARTIALEXPRESSION_CMD */	DbgClntDeletePartialExpression
 };
 
 static proxy_commands	command_tab = {

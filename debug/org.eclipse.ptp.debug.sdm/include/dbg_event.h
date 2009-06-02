@@ -59,7 +59,7 @@
 #define DBGEV_SIGNALS		DBG_EV_OFFSET + 19
 
 #define DBGEV_DATA_EVA_EX	DBG_EV_OFFSET + 20 /* deprecated */
-#define DBGEV_PARTIAL_AIF	DBG_EV_OFFSET + 21
+#define DBGEV_PARTIAL_AIF	DBG_EV_OFFSET + 21 /* deprecated */
 
 
 struct dbg_suspend_event {
@@ -102,6 +102,7 @@ typedef struct dbg_bpset_event	dbg_bpset_event;
 
 struct dbg_data_event {
 	char *	type_desc;
+	char *	name;
 	AIF *	data;
 };
 typedef struct dbg_data_event	dbg_data_event;
@@ -117,13 +118,6 @@ struct dbg_thread_select_event {
 	int				thread_id;
 };
 typedef struct dbg_thread_select_event	dbg_thread_select_event;
-
-struct dbg_partial_aif_event {
-	AIF *	data;
-	char *	type_desc;
-	char *	name;
-};
-typedef struct dbg_partial_aif_event dbg_partial_aif_event;
 
 struct dbg_event {
 	int			event_id;
@@ -190,17 +184,6 @@ struct dbg_event {
 		 * DBGEV_THREAD_SELECT
 		 */
 		dbg_thread_select_event	thread_select_event;
-
-		/*
-		 * DBGEV_DATA_EVA_EX
-		 */
-		char * data_expression;
-
-		/*
-		 * DBGEV_PARTIAL_AIF
-		 */
-		dbg_partial_aif_event partial_aif_event;
-
 	} dbg_event_u;
 };
 typedef struct dbg_event dbg_event;
