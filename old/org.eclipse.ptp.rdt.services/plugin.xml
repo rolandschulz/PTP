@@ -19,5 +19,11 @@
             name="Test2">
       </service>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.ptp.rdt.services.Startup">
+      </startup>
+   </extension>
 
 </plugin>
