@@ -34,13 +34,13 @@ array: [R]T
 		
 boolean: b
 	- Represents a true/false value
-	- The data size is the same as the size of a native integer
-	- The data for a true value is > 0 
-	- The data for a false value is <= 0
+	- The data size is a single byte
+	- The data for a true value is non-zero 
+	- The data for a false value is 0
 
 character: c
 	- Represents a single character
-	- Uses 1 byte of data
+	- The data size is a single byte
 	- Characters are always unsigned
 
 C-style string: paN
