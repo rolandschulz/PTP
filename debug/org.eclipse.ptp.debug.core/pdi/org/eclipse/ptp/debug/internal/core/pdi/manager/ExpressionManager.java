@@ -40,9 +40,9 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITargetExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIDataEvaluateExpressionRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteVariableRequest;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIGetPartialAIFRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluateExpressionRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest;
 
 /**
  * @author Clement chu
@@ -110,10 +110,10 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 			target.setCurrentThread(frame.getThread(), false);
 			frame.getThread().setCurrentStackFrame(frame, false);
 
-			IPDIGetPartialAIFRequest request = session.getRequestFactory().getGetPartialAIFRequest(target.getTasks(), expr, null);
+			IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(target.getTasks(), expr, null);
 			session.getEventRequestManager().addEventRequest(request);
 			IAIF aif = request.getPartialAIF(target.getTasks());
-			String varid = request.getVarId(target.getTasks());
+			String varid = request.getId(target.getTasks());
 			
 			IPDIVariable v = session.getModelFactory().newLocalVariable(session, target.getTasks(), null, frame, expr, null, 0, 0, varid);
 			v.setAIF(aif);
@@ -144,7 +144,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#deleteVariable(org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
 	 */
 	public void deleteVariable(IPDIVariable variable) throws PDIException {
-		IPDIDeleteVariableRequest request = session.getRequestFactory().getDeleteVariableRequest(variable.getTasks(), variable.getVarId());
+		IPDIDeleteVariableRequest request = session.getRequestFactory().getDeletePartialExpressionRequest(variable.getTasks(), variable.getId());
 		session.getEventRequestManager().addEventRequest(request);
 		request.waitUntilCompleted(variable.getTasks());
 		
@@ -159,12 +159,12 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 				if (children[0] instanceof IPDIVariable) {
 					IPDIVariable child = (IPDIVariable)children[i];
 					eventList.add(session.getEventFactory().newDestroyedEvent(
-							session.getEventFactory().newVariableInfo(session, variable.getTasks(), child.getVarId(), child)));
+							session.getEventFactory().newVariableInfo(session, variable.getTasks(), child.getId(), child)));
 				}
 			}
 		}
 		eventList.add(session.getEventFactory().newDestroyedEvent(
-				session.getEventFactory().newVariableInfo(session, variable.getTasks(), variable.getVarId(), variable)));
+				session.getEventFactory().newVariableInfo(session, variable.getTasks(), variable.getId(), variable)));
 		session.getEventManager().fireEvents((IPDIEvent[]) eventList.toArray(new IPDIEvent[0]));
 	}
 	
@@ -194,7 +194,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @throws PDIException
 	 */
 	public IAIF getAIF(BitList qTasks, String expr) throws PDIException {
-		IPDIGetPartialAIFRequest request = session.getRequestFactory().getGetPartialAIFRequest(qTasks, expr, null);
+		IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(qTasks, expr, null);
 		session.getEventRequestManager().addEventRequest(request);
 		return request.getPartialAIF(qTasks);
 	}
@@ -216,7 +216,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#getExpressionValue(org.eclipse.ptp.core.util.BitList, java.lang.String)
 	 */
 	public IAIF getExpressionValue(BitList qTasks, String expr) throws PDIException {
-		IPDIDataEvaluateExpressionRequest request = session.getRequestFactory().getDataEvaluateExpressionRequest(qTasks, expr);
+		IPDIEvaluateExpressionRequest request = session.getRequestFactory().getEvaluateExpressionRequest(qTasks, expr);
 		session.getEventRequestManager().addEventRequest(request);
 		return request.getAIF(qTasks);
 	}
@@ -253,14 +253,14 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	
 	/**
 	 * @param qTasks
-	 * @param varid
+	 * @param varId
 	 * @return
 	 */
 	public IPDIVariable getVariable(BitList qTasks, String varid) {
 		List<IPDIVariable> varList = getVariableList(qTasks);
 		IPDIVariable[] vars = (IPDIVariable[])varList.toArray(new IPDIVariable[0]);
 		for (int i = 0; i < vars.length; i++) {
-			if (vars[i].getVarId().equals(varid)) {
+			if (vars[i].getId().equals(varid)) {
 				return vars[i];
 			}
 			IPDIVariable v = vars[i].getChild(varid);

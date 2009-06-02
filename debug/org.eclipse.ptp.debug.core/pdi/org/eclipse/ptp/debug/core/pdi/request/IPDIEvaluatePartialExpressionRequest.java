@@ -18,11 +18,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+
 /**
- * Represents to request an AIF
+ * Represents to request an expression evaluation that generates a partial AIF representation.
+ * 
  * @author clement
  *
  */
-public interface IPDIGetAIFRequest extends IPDIInternalEventRequest {
-
+public interface IPDIEvaluatePartialExpressionRequest extends IPDIInternalEventRequest {
+	/**
+	 * Retrieve the partial AIF object
+	 * 
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public IAIF getPartialAIF(BitList qTasks) throws PDIException;
+	
+	/**
+	 * Retrieve the ID assigned to this expression. This ID can be used to retrieve additional
+	 * data from the expression.
+	 * 
+	 * @param qTasks
+	 * @return
+	 * @throws PDIException
+	 */
+	public String getId(BitList qTasks) throws PDIException;
 }

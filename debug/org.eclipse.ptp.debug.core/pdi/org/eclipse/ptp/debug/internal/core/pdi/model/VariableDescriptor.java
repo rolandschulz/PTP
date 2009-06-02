@@ -26,7 +26,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIGetPartialAIFRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest;
 
 /**
  * @author clement
@@ -68,7 +68,7 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 	protected String qualifiedName = null;
 	protected String fFullName = null;
 	protected String fTypename = null;	
-	protected String varid = null;
+	protected String varId = null;
 	protected IAIF aif = null;
 	
 	public VariableDescriptor(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame stack, String n, String fn, int pos, int depth) {
@@ -193,10 +193,10 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 				target.setCurrentThread(fStackFrame.getThread(), false);				
 				((Thread)fStackFrame.getThread()).setCurrentStackFrame(fStackFrame, false);
 			
-				IPDIGetPartialAIFRequest request = session.getRequestFactory().getGetPartialAIFRequest(getTasks(), getQualifiedName(), varid);
+				IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(getTasks(), getQualifiedName(), varId);
 				session.getEventRequestManager().addEventRequest(request);
 				aif = request.getPartialAIF(getTasks());
-				varid = request.getVarId(getTasks());
+				varId = request.getId(getTasks());
 			} 
 			finally {
 				target.setCurrentThread(currentThread, false);
@@ -308,10 +308,10 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getVarId()
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getId()
 	 */
-	public String getVarId() {
-		return varid;
+	public String getId() {
+		return varId;
 	}
 	
 	/* (non-Javadoc)

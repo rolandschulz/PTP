@@ -36,7 +36,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeDerived;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IValueAggregate;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIGetPartialAIFRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest;
 
 /**
  * @author clement
@@ -50,14 +50,14 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	protected String language;
 	protected boolean isUpdated = true;
 			
-	public Variable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
+	public Variable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varId) {
 		super(session, tasks, thread, frame, name, fullName, pos, depth);
-		this.varid = varid;
+		this.varId = varId;
 	}
 	
-	public Variable(IPDISession session, IPDIVariableDescriptor varDesc, String varid) {
+	public Variable(IPDISession session, IPDIVariableDescriptor varDesc, String varId) {
 		super(session, varDesc);
-		this.varid = varid;
+		this.varId = varId;
 	}
 	
 	/* (non-Javadoc)
@@ -73,7 +73,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	public boolean equals(IPDIVariable var) {
 		if (var instanceof Variable) {
 			Variable variable = (Variable) var;
-			return variable.getVarId().equals(getVarId());
+			return variable.getId().equals(getId());
 		}
 		return super.equalDescriptors(var);
 	}
@@ -83,7 +83,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	 */
 	public IPDIVariable getChild(String varid) {
 		for (IPDIVariable variable : children) {
-			if (variable.getVarId().equals(varid)) {
+			if (variable.getId().equals(varid)) {
 				return (Variable)variable;
 			}
 			IPDIVariable grandChild = ((IPDIVariable)variable).getChild(varid);
@@ -107,16 +107,16 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 			target.setCurrentThread(fStackFrame.getThread(), false);				
 			((Thread)fStackFrame.getThread()).setCurrentStackFrame(fStackFrame, false);
 
-			IPDIGetPartialAIFRequest request = session.getRequestFactory().getGetPartialAIFRequest(getTasks(), getQualifiedName(), varid, true);
+			IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(getTasks(), getQualifiedName(), varId, true);
 			session.getEventRequestManager().addEventRequest(request);
 			IAIF aif = request.getPartialAIF(getTasks());
-			String ch_varid = request.getVarId(getTasks());
+			String ch_varid = request.getId(getTasks());
 	
 			IAIFType type = aif.getType();
 			IAIFValue value = aif.getValue();
 			fTypename = aif.getDescription();
-			if (varid == null) {
-				varid = ch_varid;
+			if (varId == null) {
+				varId = ch_varid;
 			}
 	
 			if (type instanceof ITypeDerived) {
@@ -129,7 +129,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 						int index = castingIndex + i;
 						String ch_fn = "(" + fn + ")[" + index + "]";
 						String ch_n = getName() + "[" + index + "]";
-						String ch_k = varid + "." + i;
+						String ch_k = varId + "." + i;
 						IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);					
 						v.setAIF(AIFFactory.newAIF(baseType, values[i]));
 						children[i] = v;
@@ -142,7 +142,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 						for (int i=0; i<children.length; i++) {
 							String ch_fn = "(" + fn + ")->" + aggrType.getField(i);
 							String ch_n = aggrType.getField(i); 
-							String ch_k = varid + "." + ch_n;
+							String ch_k = varId + "." + ch_n;
 							IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 							v.setAIF(AIFFactory.newAIF(aggrType.getType(i), ((IValueAggregate)value).getValue(i)));
 							children[i] = v;
@@ -152,7 +152,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 						children = new Variable[1];
 						String ch_fn = "*(" + fn + ")";
 						String ch_n = ch_varid;
-						String ch_k = varid + "." + ch_n;
+						String ch_k = varId + "." + ch_n;
 						IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 						v.setAIF(AIFFactory.newAIF(type, value));
 						children[0] = v;					
@@ -163,7 +163,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 				children = new Variable[1];
 				String ch_fn = "(" + fn + ")->" + ((IAIFTypeReference)type).getName();
 				String ch_n = ((IAIFTypeReference)type).getName();
-				String ch_k = varid + "." + ch_n;
+				String ch_k = varId + "." + ch_n;
 				IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 				v.setAIF(AIFFactory.newAIF(type, value));
 				children[0] = v;					
@@ -174,7 +174,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 				for (int i=0; i<children.length; i++) {
 					String ch_fn = "(" + fn + ")." + aggrType.getField(i);
 					String ch_n = aggrType.getField(i); 
-					String ch_k = varid + "." + ch_n;
+					String ch_k = varId + "." + ch_n;
 					IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 					v.setAIF(AIFFactory.newAIF(aggrType.getType(i), ((IValueAggregate)value).getValue(i)));
 					children[i] = v;
@@ -184,7 +184,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 				children = new Variable[1];
 				String ch_fn = fn;
 				String ch_n = ch_varid;
-				String ch_k = varid + "." + ch_n;
+				String ch_k = varId + "." + ch_n;
 				IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 				v.setAIF(AIFFactory.newAIF(type, value));
 				children[0] = v;
@@ -254,8 +254,8 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	 * @param fullName
 	 * @param pos
 	 * @param depth
-	 * @param varid
+	 * @param varId
 	 * @return
 	 */
-	protected abstract IPDIVariable createVariable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid);
+	protected abstract IPDIVariable createVariable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varId);
 }

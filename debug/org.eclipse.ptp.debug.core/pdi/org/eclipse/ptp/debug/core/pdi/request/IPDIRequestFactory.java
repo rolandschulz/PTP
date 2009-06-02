@@ -33,31 +33,10 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 public interface IPDIRequestFactory {
 	/**
 	 * @param tasks
-	 * @param expr
-	 * @return
-	 */
-	public IPDIGetAIFRequest getAIFRequest(BitList tasks, String expr);
-	
-	/**
-	 * @param tasks
 	 * @param command
 	 * @return
 	 */
 	public IPDICommandRequest getCommandRequest(BitList tasks, String command);
-	
-	/**
-	 * @param tasks
-	 * @param expr
-	 * @return
-	 */
-	public IPDIDataEvaluateExpressionRequest getDataEvaluateExpresionRequest(BitList tasks, String expr);
-	
-	/**
-	 * @param tasks
-	 * @param expr
-	 * @return
-	 */
-	public IPDIDataEvaluateExpressionRequest getDataEvaluateExpressionRequest(BitList tasks, String expr);
 	
 	/**
 	 * @param session
@@ -94,10 +73,10 @@ public interface IPDIRequestFactory {
 	
 	/**
 	 * @param tasks
-	 * @param varid
+	 * @param varId
 	 * @return
 	 */
-	public IPDIDeleteVariableRequest getDeleteVariableRequest(BitList tasks, String varid);
+	public IPDIDeleteVariableRequest getDeletePartialExpressionRequest(BitList tasks, String exprId);
 	
 	/**
 	 * @param tasks
@@ -115,6 +94,13 @@ public interface IPDIRequestFactory {
 	
 	/**
 	 * @param tasks
+	 * @param expr
+	 * @return
+	 */
+	public IPDIEvaluateExpressionRequest getEvaluateExpressionRequest(BitList tasks, String expr);
+	
+	/**
+	 * @param tasks
 	 * @return
 	 */
 	public IPDIGetInfoThreadsRequest getGetInfoThreadsRequest(BitList tasks);
@@ -122,19 +108,19 @@ public interface IPDIRequestFactory {
 	/**
 	 * @param tasks
 	 * @param expr
-	 * @param varid
+	 * @param exprId
 	 * @return
 	 */
-	public IPDIGetPartialAIFRequest getGetPartialAIFRequest(BitList tasks, String expr, String varid);
+	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId);
 	
 	/**
 	 * @param tasks
 	 * @param expr
-	 * @param varid
+	 * @param exprId
 	 * @param listChildren
 	 * @return
 	 */
-	public IPDIGetPartialAIFRequest getGetPartialAIFRequest(BitList tasks, String expr, String varid, boolean listChildren);
+	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId, boolean listChildren);
 
 	/**
 	 * @param tasks

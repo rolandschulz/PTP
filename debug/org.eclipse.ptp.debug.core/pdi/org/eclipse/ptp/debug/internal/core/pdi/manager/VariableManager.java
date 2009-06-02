@@ -81,7 +81,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 			try {
 				target.setCurrentThread(stack.getThread(), false);
 				stack.getThread().setCurrentStackFrame(stack, false);
-				argument = session.getModelFactory().newArgument(session, argDesc, argDesc.getVarId());
+				argument = session.getModelFactory().newArgument(session, argDesc, argDesc.getId());
 				List<IPDIVariable> variablesList = getVariablesList(argDesc.getTasks());
 				variablesList.add(argument);
 			} finally {
@@ -103,7 +103,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 			global = (IPDIGlobalVariable)variable;
 		}
 		if (global == null) {
-			global = session.getModelFactory().newGlobalVariable(session, varDesc, varDesc.getVarId());
+			global = session.getModelFactory().newGlobalVariable(session, varDesc, varDesc.getId());
 			List<IPDIVariable> variablesList = getVariablesList(varDesc.getTasks());
 			variablesList.add(global);
 		}
@@ -128,7 +128,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 			try {
 				target.setCurrentThread(stack.getThread(), false);
 				stack.getThread().setCurrentStackFrame(stack, false);
-				local = session.getModelFactory().newLocalVariable(session, varDesc, varDesc.getVarId());
+				local = session.getModelFactory().newLocalVariable(session, varDesc, varDesc.getId());
 				List<IPDIVariable> variablesList = getVariablesList(varDesc.getTasks());
 				variablesList.add(local);
 			} finally {
@@ -175,9 +175,9 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>();
 		IPDIVariable[] variables = getVariables(qTasks);
 		for (int i = 0; i < variables.length; ++i) {
-			removeVar(qTasks, variables[i].getVarId());
+			removeVar(qTasks, variables[i].getId());
 			eventList.add(session.getEventFactory().newDestroyedEvent(
-					session.getEventFactory().newVariableInfo(session, qTasks, variables[i].getVarId(), variables[i])));
+					session.getEventFactory().newVariableInfo(session, qTasks, variables[i].getId(), variables[i])));
 		}
 		session.getEventManager().fireEvents((IPDIEvent[]) eventList.toArray(new IPDIEvent[0]));
 	}
@@ -189,10 +189,10 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 		BitList qTasks = variable.getTasks();
 		List<IPDIVariable> varList = getVariablesList(qTasks);
 		if (varList.contains(variable)) {
-			removeVar(qTasks, variable.getVarId());
+			removeVar(qTasks, variable.getId());
 		}
 		IPDIEvent event = session.getEventFactory().newDestroyedEvent(
-				session.getEventFactory().newVariableInfo(session, qTasks, variable.getVarId(), variable));
+				session.getEventFactory().newVariableInfo(session, qTasks, variable.getId(), variable));
 		session.getEventManager().fireEvents(new IPDIEvent[] { event });
 	}
 	
@@ -312,13 +312,13 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	
 	/**
 	 * @param tasks
-	 * @param varid
+	 * @param varId
 	 * @return
 	 */
 	public IPDIVariable getVariable(BitList tasks, String varid) {
 		IPDIVariable[] vars = getVariables(tasks);
 		for (IPDIVariable var : vars) {
-			if (var.getVarId().equals(varid)) {
+			if (var.getId().equals(varid)) {
 				return var;
 			}
 			IPDIVariable v = var.getChild(varid);
@@ -393,11 +393,11 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	
 	/**
 	 * @param tasks
-	 * @param varid
+	 * @param varId
 	 * @throws PDIException
 	 */
 	public void removeVar(BitList tasks, String varid) throws PDIException {
-		session.getEventRequestManager().addEventRequest(session.getRequestFactory().getDeleteVariableRequest(tasks, varid));
+		session.getEventRequestManager().addEventRequest(session.getRequestFactory().getDeletePartialExpressionRequest(tasks, varid));
 	}
 	
 	/**
@@ -410,7 +410,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 		synchronized (varList) {
 			for (Iterator<IPDIVariable> iterator = varList.iterator(); iterator.hasNext();) {
 				IPDIVariable variable = (IPDIVariable)iterator.next();
-				if (variable.getVarId().equals(varId)) {
+				if (variable.getId().equals(varId)) {
 					iterator.remove();
 					return variable;
 				}
@@ -444,7 +444,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 			IPDIVariable variable = getVariable(qTasks, vars[i]);
 			if (variable != null) {
 				eventList.add(session.getEventFactory().newChangedEvent(
-						session.getEventFactory().newVariableInfo(session, qTasks, variable.getVarId(), variable)));
+						session.getEventFactory().newVariableInfo(session, qTasks, variable.getId(), variable)));
 			}
 		}
 		session.getEventManager().fireEvents((IPDIEvent[]) eventList.toArray(new IPDIEvent[0]));

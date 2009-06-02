@@ -19,26 +19,47 @@
 package org.eclipse.ptp.debug.core.pdi.request;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
+
 /**
- * Represents to request a partial AIF
  * @author clement
  *
  */
-public interface IPDIGetPartialAIFRequest extends IPDIInternalEventRequest {
-	/**
-	 * @param qTasks
-	 * @return
-	 * @throws PDIException
-	 */
-	public IAIF getPartialAIF(BitList qTasks) throws PDIException;
+public abstract class AbstractEvaluateExpressionRequest extends AbstractEventResultRequest implements IPDIEvaluateExpressionRequest {
+	private String expr;
 	
-	/**
-	 * @param qTasks
-	 * @return
-	 * @throws PDIException
+	public AbstractEvaluateExpressionRequest(BitList tasks, String expr) {
+		super(tasks);
+		this.expr = expr;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
-	public String getVarId(BitList qTasks) throws PDIException;
+	public void doExecute(IPDIDebugger debugger) throws PDIException {
+		debugger.evaluateExpression(tasks, expr);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIDataEvaluateExpressionRequest#getAIF(org.eclipse.ptp.core.util.BitList)
+	 */
+	public IAIF getAIF(BitList qTasks) throws PDIException {
+		waitUntilCompleted(qTasks);
+		Object obj = getResult(qTasks);
+		if (obj instanceof IAIF) {
+			return (IAIF)obj;
+		}
+		throw new PDIException(qTasks, "Variable "+ expr +": No value found");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
+	 */
+	public String getName() {
+		return "Data evaluate expression request";
+	}
+	
 }

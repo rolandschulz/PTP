@@ -16,22 +16,43 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.pdi.request;
+package org.eclipse.ptp.debug.internal.core.pdi.request;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteVariableRequest;
 
 /**
- * Represents to request a data evaluate expression
  * @author clement
  *
  */
-public interface IPDIDataEvaluateExpressionRequest extends IPDIInternalEventRequest {
-	/**
-	 * @param qTasks
-	 * @return
-	 * @throws PDIException
+public class DeletePartialExpressionRequest extends AbstractEventResultRequest implements IPDIDeleteVariableRequest {
+	private String varid;
+	
+	public DeletePartialExpressionRequest(BitList tasks, String varid) {
+		super(tasks);
+		this.varid = varid;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
-	public IAIF getAIF(BitList qTasks) throws PDIException;
+	public void doExecute(IPDIDebugger debugger) throws PDIException {
+		debugger.deletePartialExpression(tasks, varid);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
+	 */
+	public String getName() {
+		return "Delete partial expression request";
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 */
+	protected void storeResult(BitList rTasks, Object result) {
+	}
 }

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -28,24 +29,24 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  * @author clement
  *
  */
-public abstract class AbstractGetPartialAIFRequest extends AbstractEventResultRequest implements IPDIGetPartialAIFRequest {
+public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractEventResultRequest implements IPDIEvaluatePartialExpressionRequest {
 	private String expr;
-	private String varid;
+	private String exprId;
 	private boolean listChildren = false;
 	private boolean express = false;
 	
-	public AbstractGetPartialAIFRequest(BitList tasks, String expr, String varid) {
-		this(tasks, expr, varid, false, (varid != null));
+	public AbstractEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId) {
+		this(tasks, expr, exprId, false, (exprId != null));
 	}
 	
-	public AbstractGetPartialAIFRequest(BitList tasks, String expr, String varid, boolean listChildren) {
-		this(tasks, expr, varid, listChildren, false);
+	public AbstractEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId, boolean listChildren) {
+		this(tasks, expr, exprId, listChildren, false);
 	}
 	
-	public AbstractGetPartialAIFRequest(BitList tasks, String expr, String varid, boolean listChildren, boolean express) {
+	public AbstractEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId, boolean listChildren, boolean express) {
 		super(tasks);
 		this.expr = expr;
-		this.varid = varid;
+		this.exprId = exprId;
 		this.listChildren = listChildren;
 		this.express = express;
 	}
@@ -54,18 +55,18 @@ public abstract class AbstractGetPartialAIFRequest extends AbstractEventResultRe
 	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
-		debugger.retrievePartialAIF(tasks, expr, varid, listChildren, express);
+		debugger.evaluatePartialExpression(tasks, expr, exprId, listChildren, express);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Get partial aif request";
+		return "Partial expression evaluation";
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetPartialAIFRequest#getPartialAIF(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getPartialAIF(org.eclipse.ptp.core.util.BitList)
 	 */
 	public IAIF getPartialAIF(BitList qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
@@ -74,26 +75,26 @@ public abstract class AbstractGetPartialAIFRequest extends AbstractEventResultRe
 			Object[] returnValues = (Object[])obj;
 			return (IAIF)returnValues[1];
 		}
-		throw new PDIException(qTasks, "Variable " + expr + ": No aif found");
+		throw new PDIException(qTasks, NLS.bind("No result found for expression \"{0}\"", expr));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetPartialAIFRequest#getVarId(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getId(org.eclipse.ptp.core.util.BitList)
 	 */
-	public String getVarId(BitList qTasks) throws PDIException {
+	public String getId(BitList qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
 			Object[] returnValues = (Object[])obj;
 			return (String)returnValues[0];
 		}
-		throw new PDIException(qTasks, "Variable ID " + varid + ": No variable ID found");
+		throw new PDIException(qTasks, NLS.bind("Expression ID {0} not found", exprId));
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#toString()
 	 */
 	public String toString() {
-		return getName() + " for tasks " + BitList.showBitList(getTasks()) + ", exp: " + expr + ", var id: " + varid + ", is list children: " + listChildren + ", is express: " + express; 
+		return getName() + " for tasks " + BitList.showBitList(getTasks()) + ", exp: " + expr + ", id: " + exprId + ", is list children: " + listChildren + ", is express: " + express; 
 	}
 }

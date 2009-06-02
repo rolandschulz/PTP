@@ -27,47 +27,31 @@ import org.eclipse.ptp.core.util.BitList;
  */
 public interface IPDIVariableManagement {
 	/**
-	 * Requests IAIF value of given variable name
+	 * Requests to delete named partial expression
 	 * @param tasks target process
-	 * @param expr variable name
+	 * @param exprId ID of partial expression to delete
 	 * @throws PDIException on failure
 	 */
-	void retrieveAIF(BitList tasks, String expr) throws PDIException;
+	void deletePartialExpression(BitList tasks, String exprId) throws PDIException;
 
 	/**
-	 * Requests partial IAIF value of given variable name
+	 * Requests String value of given expression
 	 * @param tasks target process
-	 * @param expr variable name
-	 * @param key variable key
+	 * @param expr expression to evaluate
+	 * @throws PDIException on failure
+	 */
+	void evaluateExpression(BitList tasks, String expr) throws PDIException;
+		
+	/**
+	 * Requests partial IAIF value of given expression
+	 * @param tasks target process
+	 * @param expr expression to evaluate
+	 * @param exprId ID to refer to a pre-evaluated expression
 	 * @param listChildren is list a children?
 	 * @param express is expression?
 	 * @throws PDIException on failure
 	 */
-	void retrievePartialAIF(BitList tasks, String expr, String key, boolean listChildren, boolean express) throws PDIException;
-
-	/**
-	 * Requests String value of given variable name
-	 * @param tasks target process
-	 * @param expr variable name
-	 * @throws PDIException on failure
-	 */
-	void evaluateExpression(BitList tasks, String expr) throws PDIException;
-	
-	/**
-	 * Requests String value of given variable name 
-	 * @param tasks target process
-	 * @param expr variable name
-	 * @throws PDIException on failure
-	 */
-	void dataEvaluateExpression(BitList tasks, String expr) throws PDIException;
-	
-	/**
-	 * Requests IAIFType of given variable name
-	 * @param tasks target process
-	 * @param var variable name
-	 * @throws PDIException on failure
-	 */
-	void retrieveVariableType(BitList tasks, String var) throws PDIException;
+	void evaluatePartialExpression(BitList tasks, String expr, String exprId, boolean listChildren, boolean express) throws PDIException;
 	
 	/**
 	 * Request a list of argument for a range of level
@@ -79,24 +63,24 @@ public interface IPDIVariableManagement {
 	void listArguments(BitList tasks, int low, int high) throws PDIException;
 	
 	/**
-	 * Requests a list of local variables 
-	 * @param tasks target process
-	 * @throws PDIException on failure 
-	 */
-	void listLocalVariables(BitList tasks) throws PDIException;
-	
-	/**
 	 * Requests a list of global variables
 	 * @param tasks target process 
 	 * @throws PDIException on failure
 	 */
 	void listGlobalVariables(BitList tasks) throws PDIException;
+	
+	/**
+	 * Requests a list of local variables 
+	 * @param tasks target process
+	 * @throws PDIException on failure 
+	 */
+	void listLocalVariables(BitList tasks) throws PDIException;
 
 	/**
-	 * Requests to delete watching variable
+	 * Requests IAIFType of given variable name
 	 * @param tasks target process
-	 * @param var watching variable name
+	 * @param var variable name
 	 * @throws PDIException on failure
 	 */
-	void deleteVariable(BitList tasks, String var) throws PDIException;
+	void retrieveVariableType(BitList tasks, String var) throws PDIException;
 }
