@@ -25,14 +25,20 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
 
 public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugDataEvent {
 	private ProxyDebugAIF data;
+	private String name;
 	
-	public ProxyDebugDataEvent(int transID, String bits, ProxyDebugAIF data) {
+	public ProxyDebugDataEvent(int transID, String bits, ProxyDebugAIF data, String name) {
 		super(transID, EVENT_DBG_DATA, bits);
 		this.data = data;
+		this.name = name;
 	}
 	
 	public ProxyDebugAIF getData() {
 		return this.data;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public String toString() {
@@ -41,6 +47,8 @@ public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IPro
 			res += " " + this.data.toString(); //$NON-NLS-1$
 		else
 			res += " AIFNULL"; //$NON-NLS-1$
+		
+		res += ", name: " + name; //$NON-NLS-1$
 		return res;
 	}
 }

@@ -53,6 +53,9 @@ public interface IProxyDebugEvent extends IProxyExtendedEvent {
 	 * @deprecated
 	 */
 	public static final int EVENT_DBG_DATA_EVA_EX = DBG_EVENT_OFFSET + 20;
+	/**
+	 * @deprecated
+	 */
 	public static final int EVENT_DBG_PARTIAL_AIF = DBG_EVENT_OFFSET + 21;
 
 	public String getBitSet();
