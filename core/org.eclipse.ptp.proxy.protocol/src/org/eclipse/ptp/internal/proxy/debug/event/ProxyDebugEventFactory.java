@@ -67,15 +67,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			int errCode = Integer.parseInt(args[1]);
 			evt = new ProxyDebugErrorEvent(packet.getTransID(), bits, errCode, args[2]);
 			break;
-
-		/**
-		 * [1]: number of servers
-		 */			
-		case IProxyDebugEvent.EVENT_DBG_INIT:
-			int num_servers = Integer.parseInt(args[1]);
-			evt = new ProxyDebugInitEvent(packet.getTransID(), bits, num_servers);
-			break;
-			
+		
 		/**
 		 * [1]: event reason
 		 */
@@ -369,27 +361,11 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 		 * [1]: aif format
 		 * [2]: aif data
 		 * [3]: type description
+		 * [4]: name
 		 */
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugAIF data = new ProxyDebugAIF(args[1], args[2], args[3]);
-			evt = new ProxyDebugDataEvent(packet.getTransID(), bits, data);
-			break;
-
-		/**
-		 * [1]: data value 
-		 */
-		case IProxyDebugEvent.EVENT_DBG_DATA_EVA_EX:
-			evt = new ProxyDebugDataExpValueEvent(packet.getTransID(), bits, args[1]);
-			break;
-
-		/**
-		 * [1]: aif format
-		 * [2]: aif data
-		 * [3]: type description
-		 */
-		case IProxyDebugEvent.EVENT_DBG_PARTIAL_AIF:
-			ProxyDebugAIF partial_data = new ProxyDebugAIF(args[1], args[2], args[3]);
-			evt = new ProxyDebugPartialAIFEvent(packet.getTransID(), bits, partial_data, args[4]);
+			evt = new ProxyDebugDataEvent(packet.getTransID(), bits, data, args[4]);
 			break;
 		}
 		return evt;

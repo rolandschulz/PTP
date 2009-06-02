@@ -43,6 +43,6 @@ public interface IProxyDebugCommand extends IProxyCommand {
 	 * @deprecated
 	 */
 	public static final int DATAEVALUATEEXPRESSION = 29;
-	public static final int GETPARTIALAIF = 30;
-	public static final int VARIABLEDELETE = 31;
+	public static final int EVALUATEPARTIALEXPRESSION = 30;
+	public static final int DELETEPARTIALEXPRESSION = 31;
 }

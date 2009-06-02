@@ -23,4 +23,5 @@ import org.eclipse.ptp.proxy.debug.client.ProxyDebugAIF;
 
 public interface IProxyDebugDataEvent extends IProxyDebugEvent {
 	public ProxyDebugAIF getData();
+	public String getName();
 }

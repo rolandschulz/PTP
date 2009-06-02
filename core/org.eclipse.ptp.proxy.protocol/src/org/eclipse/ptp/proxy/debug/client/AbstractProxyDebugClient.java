@@ -33,7 +33,6 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugArgsEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataExpValueEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugErrorEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventFactory;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
@@ -42,7 +41,6 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugOKEvent;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugPartialAIFEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalExitEvent;
@@ -236,8 +234,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			fireProxyDebugBreakpointSetEvent((IProxyDebugBreakpointSetEvent) e);
 		} else if (e instanceof IProxyDebugDataEvent) {
 			fireProxyDebugDataEvent((IProxyDebugDataEvent) e);
-		} else if (e instanceof IProxyDebugDataExpValueEvent) {
-			fireProxyDebugDataExpValueEvent((IProxyDebugDataExpValueEvent) e);
 		} else if (e instanceof IProxyDebugExitEvent) {
 			fireProxyDebugExitEvent((IProxyDebugExitEvent) e);
 		} else if (e instanceof IProxyDebugErrorEvent) {
@@ -250,8 +246,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			fireProxyDebugMemoryInfoEvent((IProxyDebugMemoryInfoEvent) e);
 		} else if (e instanceof IProxyDebugOKEvent) {
 			fireProxyDebugOKEvent((IProxyDebugOKEvent) e);
-		} else if (e instanceof IProxyDebugPartialAIFEvent) {
-			fireProxyDebugPartialAIFEvent((IProxyDebugPartialAIFEvent) e);
 		} else if (e instanceof IProxyDebugSetThreadSelectEvent) {
 			fireProxyDebugSetThreadSelectEvent((IProxyDebugSetThreadSelectEvent) e);
 		} else if (e instanceof IProxyDebugSignalEvent) {
@@ -303,13 +297,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
-	protected void fireProxyDebugDataExpValueEvent(IProxyDebugDataExpValueEvent e) {
-		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
-		for (IProxyDebugEventListener listener : la) {
-			listener.handleProxyDebugDataExpValueEvent(e);
-		}
-	}
-
 	protected void fireProxyDebugExitEvent(IProxyDebugExitEvent e) {
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
@@ -349,12 +336,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
 			listener.handleProxyDebugOKEvent(e);
-		}
-	}
-	protected void fireProxyDebugPartialAIFEvent(IProxyDebugPartialAIFEvent e) {
-		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
-		for (IProxyDebugEventListener listener : la) {
-			listener.handleProxyDebugPartialAIFEvent(e);
 		}
 	}
 
