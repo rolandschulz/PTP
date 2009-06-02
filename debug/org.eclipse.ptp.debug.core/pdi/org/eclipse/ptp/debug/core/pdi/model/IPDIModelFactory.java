@@ -145,7 +145,7 @@ public interface IPDIModelFactory {
 	 * @param fullName
 	 * @param pos
 	 * @param depth
-	 * @param varid
+	 * @param varId
 	 */
 	public IPDILocalVariable newLocalVariable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid);
 	

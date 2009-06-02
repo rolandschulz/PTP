@@ -32,7 +32,7 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIGetAIFRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluateExpressionRequest;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
@@ -178,7 +178,7 @@ public final class PJobVariableManager {
 						if (monitor.isCanceled())
 							break;
 						
-						IPDIGetAIFRequest request = session.getPDISession().getRequestFactory().getAIFRequest(suspend_tasks, vars[i]);
+						IPDIEvaluateExpressionRequest request = session.getPDISession().getRequestFactory().getEvaluateExpressionRequest(suspend_tasks, vars[i]);
 						try {
 							session.getPDISession().getEventRequestManager().addEventRequest(request);
 							Map<BitList, Object> map = request.getResultMap(suspend_tasks);

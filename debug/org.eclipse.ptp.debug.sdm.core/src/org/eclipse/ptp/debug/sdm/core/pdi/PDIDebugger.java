@@ -114,17 +114,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#dataEvaluateExpression(org.eclipse.ptp.core.util.BitList, java.lang.String)
-	 */
-	public void dataEvaluateExpression(BitList tasks, String expr) throws PDIException {
-		try {
-			debugDataEvaluateExpression(tasks, expr);
-		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on evaluating data expression: " + e.getMessage()); //$NON-NLS-1$
-		}
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#deleteBreakpoint(org.eclipse.ptp.core.util.BitList, int)
 	 */
 	public void deleteBreakpoint(BitList tasks, int bpid) throws PDIException {
@@ -136,11 +125,11 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deleteVariable(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deletePartialExpression(org.eclipse.ptp.core.util.BitList, java.lang.String)
 	 */
-	public void deleteVariable(BitList tasks, String var) throws PDIException {
+	public void deletePartialExpression(BitList tasks, String var) throws PDIException {
 		try {
-			debugVariableDelete(tasks, var);
+			debugDeletePartialExpression(tasks, var);
 		} catch (IOException e) {
 			throw new PDIException(tasks, "Error on deleting variable: " + e.getMessage()); //$NON-NLS-1$
 		}
@@ -161,6 +150,49 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			debugEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
 			throw new PDIException(tasks, "Error on evaluating expression: " + e.getMessage()); //$NON-NLS-1$
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluatePartialExpression(org.eclipse.ptp.core.util.BitList, java.lang.String, java.lang.String, boolean, boolean)
+	 */
+	public void evaluatePartialExpression(BitList tasks, String expr, String exprId, boolean listChildren, boolean express)
+			throws PDIException {
+		try {
+			debugEvaluatePartialExpression(tasks, expr, exprId, listChildren, express);
+		} catch (IOException e) {
+			throw new PDIException(tasks, "Error on getting partial aif: " + e.getMessage()); //$NON-NLS-1$
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#getErrorAction(int)
+	 */
+	public int getErrorAction(int errorCode) {
+		switch (errorCode) {
+		case ISDMErrorCodes.DBGERR_NOBACKEND:
+		case ISDMErrorCodes.DBGERR_DEBUGGER:
+		case ISDMErrorCodes.DBGERR_NOFILEDIR:
+		case ISDMErrorCodes.DBGERR_CHDIR:
+			return IPDIErrorInfo.DBG_FATAL;
+			// case ISDMErrorCodes.DBGERR_INPROGRESS:
+		case ISDMErrorCodes.DBGERR_UNKNOWN_TYPE:
+		case ISDMErrorCodes.DBGERR_NOFILE:
+		case ISDMErrorCodes.DBGERR_NOBP:
+			return IPDIErrorInfo.DBG_NORMAL;
+		case ISDMErrorCodes.DBGERR_UNKNOWN_VARIABLE:
+			return IPDIErrorInfo.DBG_IGNORE;
+		default:
+			return IPDIErrorInfo.DBG_WARNING;
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
+	 */
+	public void handleEvent(IProxyExtendedEvent e) {
+		if (e instanceof IProxyDebugEvent) {
+			proxyNotifier.notify((IProxyDebugEvent) e);
 		}
 	}
 
@@ -231,62 +263,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			args.add("--port=" + port); //$NON-NLS-1$
 		} else {
 			throw new PDIException(null, "Error getting resource manager"); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * Get resource manager from a launch configuration
-	 * 
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	private IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws PDIException {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IResourceManager[] rms = universe.getResourceManagers();
-		String rmUniqueName;
-		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
-		} catch (CoreException e) {
-			throw new PDIException(null, e.getMessage());
-		}
-		for (IResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
-					rm.getUniqueName().equals(rmUniqueName)) {
-				return (IResourceManagerControl)rm;
-			}
-		}
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#getErrorAction(int)
-	 */
-	public int getErrorAction(int errorCode) {
-		switch (errorCode) {
-		case ISDMErrorCodes.DBGERR_NOBACKEND:
-		case ISDMErrorCodes.DBGERR_DEBUGGER:
-		case ISDMErrorCodes.DBGERR_NOFILEDIR:
-		case ISDMErrorCodes.DBGERR_CHDIR:
-			return IPDIErrorInfo.DBG_FATAL;
-			// case ISDMErrorCodes.DBGERR_INPROGRESS:
-		case ISDMErrorCodes.DBGERR_UNKNOWN_TYPE:
-		case ISDMErrorCodes.DBGERR_NOFILE:
-		case ISDMErrorCodes.DBGERR_NOBP:
-			return IPDIErrorInfo.DBG_NORMAL;
-		case ISDMErrorCodes.DBGERR_UNKNOWN_VARIABLE:
-			return IPDIErrorInfo.DBG_IGNORE;
-		default:
-			return IPDIErrorInfo.DBG_WARNING;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
-	 */
-	public void handleEvent(IProxyExtendedEvent e) {
-		if (e instanceof IProxyDebugEvent) {
-			proxyNotifier.notify((IProxyDebugEvent) e);
 		}
 	}
 
@@ -410,29 +386,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 */
 	public void resume(BitList tasks, IPDISignal signal) throws PDIException {
 		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDISignal) yet"); //$NON-NLS-1$
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrieveAIF(org.eclipse.ptp.core.util.BitList, java.lang.String)
-	 */
-	public void retrieveAIF(BitList tasks, String expr) throws PDIException {
-		try {
-			debugEvaluateExpression(tasks, expr);
-		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting aif: " + e.getMessage()); //$NON-NLS-1$
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrievePartialAIF(org.eclipse.ptp.core.util.BitList, java.lang.String, java.lang.String, boolean, boolean)
-	 */
-	public void retrievePartialAIF(BitList tasks, String expr, String key, boolean listChildren, boolean express)
-			throws PDIException {
-		try {
-			debugGetPartialAIF(tasks, expr, key, listChildren, express);
-		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting partial aif: " + e.getMessage()); //$NON-NLS-1$
-		}
 	}
 
 	/* (non-Javadoc)
@@ -752,6 +705,31 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		default:
 			return "x"; //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Get resource manager from a launch configuration
+	 * 
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	private IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws PDIException {
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager[] rms = universe.getResourceManagers();
+		String rmUniqueName;
+		try {
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+		} catch (CoreException e) {
+			throw new PDIException(null, e.getMessage());
+		}
+		for (IResourceManager rm : rms) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
+					rm.getUniqueName().equals(rmUniqueName)) {
+				return (IResourceManagerControl)rm;
+			}
+		}
+		return null;
 	}
 
 	/**

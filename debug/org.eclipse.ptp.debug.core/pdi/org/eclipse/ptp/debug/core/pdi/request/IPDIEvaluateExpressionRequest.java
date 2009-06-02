@@ -18,11 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+
 /**
- * Represents to request evaluting expression
+ * Represents a request to evaluate an expression
+ * 
  * @author clement
  *
  */
-public interface IPDIEvaluateExpressionRequest extends IPDIEventRequest {
-
+public interface IPDIEvaluateExpressionRequest extends IPDIInternalEventRequest {
+	/**
+	 * Get the AIF result of the request
+	 * 
+	 * @param qTasks tasks for which to obtain the result
+	 * @return an AIF object containing the expression type and value
+	 * @throws PDIException
+	 */
+	public IAIF getAIF(BitList qTasks) throws PDIException;
 }

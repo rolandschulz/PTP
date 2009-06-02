@@ -50,7 +50,6 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugArgsEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataExpValueEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugErrorEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugExitEvent;
@@ -58,7 +57,6 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugOKEvent;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugPartialAIFEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalExitEvent;
@@ -230,17 +228,9 @@ public class SDMEventManager extends AbstractEventManager {
 			eventList.add(session.getEventFactory().newErrorEvent(
 					session.getEventFactory().newErrorInfo(session, eTasks, actionType, "Internal Error", e.getErrorMessage())));
 		}
-		else if (event instanceof IProxyDebugDataExpValueEvent) {
-			
-		}
 		else if (event instanceof IProxyDebugInitEvent) {
-			
 		}
 		else if (event instanceof IProxyDebugMemoryInfoEvent) {
-			
-		}
-		else if (event instanceof IProxyDebugPartialAIFEvent) {
-			
 		}
 		else if (event instanceof IProxyDebugSignalExitEvent) {
 			IProxyDebugSignalExitEvent e = (IProxyDebugSignalExitEvent)event;

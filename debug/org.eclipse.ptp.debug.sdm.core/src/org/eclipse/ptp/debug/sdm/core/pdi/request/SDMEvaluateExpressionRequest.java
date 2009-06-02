@@ -12,12 +12,12 @@ package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.request.AbstractDataEvaluateExpressionRequest;
+import org.eclipse.ptp.debug.core.pdi.request.AbstractEvaluateExpressionRequest;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugAIF;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
 
-public class SDMDataEvaluateExpressionRequest extends AbstractDataEvaluateExpressionRequest {
-	public SDMDataEvaluateExpressionRequest(BitList tasks, String expr) {
+public class SDMEvaluateExpressionRequest extends AbstractEvaluateExpressionRequest {
+	public SDMEvaluateExpressionRequest(BitList tasks, String expr) {
 		super(tasks, expr);
 	}
 	

@@ -19,7 +19,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 import org.eclipse.ptp.debug.internal.core.pdi.request.CommandRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.request.DataWriteMemoryRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.request.DeleteBreakpointRequest;
-import org.eclipse.ptp.debug.internal.core.pdi.request.DeleteVariableRequest;
+import org.eclipse.ptp.debug.internal.core.pdi.request.DeletePartialExpressionRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.request.DisableBreakpointRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.request.EnableBreakpointRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.request.ResumeRequest;
@@ -69,11 +69,11 @@ public abstract class AbstractRequestFactory implements IPDIRequestFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getDeleteVariableRequest(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getDeletePartialExpressionRequest(org.eclipse.ptp.core.util.BitList, java.lang.String)
 	 */
-	public IPDIDeleteVariableRequest getDeleteVariableRequest(BitList tasks,
-			String varid) {
-		return new DeleteVariableRequest(tasks, varid);
+	public IPDIDeleteVariableRequest getDeletePartialExpressionRequest(BitList tasks,
+			String exprId) {
+		return new DeletePartialExpressionRequest(tasks, exprId);
 	}
 	
 	/* (non-Javadoc)

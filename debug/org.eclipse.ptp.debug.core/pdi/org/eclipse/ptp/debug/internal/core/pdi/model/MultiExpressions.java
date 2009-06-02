@@ -13,7 +13,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
-import org.eclipse.ptp.debug.core.pdi.request.IPDIDataEvaluateExpressionRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluateExpressionRequest;
 
 /**
  * @author clement
@@ -158,7 +158,7 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 	 */
 	public void updateExpressionsValue(BitList tasks, IProgressMonitor monitor) throws PDIException {
 		monitor.setTaskName("Updating expression ["+expr+"]...");
-		IPDIDataEvaluateExpressionRequest request = session.getRequestFactory().getDataEvaluateExpresionRequest(tasks, expr);
+		IPDIEvaluateExpressionRequest request = session.getRequestFactory().getEvaluateExpressionRequest(tasks, expr);
 		session.getEventRequestManager().addEventRequest(request);
 		Map<BitList, Object> results = request.getResultMap(tasks);
 		for (Iterator<BitList> i = results.keySet().iterator(); i.hasNext();) {

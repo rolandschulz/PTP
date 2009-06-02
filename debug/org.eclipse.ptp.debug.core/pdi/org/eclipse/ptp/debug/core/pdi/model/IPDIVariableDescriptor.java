@@ -36,8 +36,8 @@ public interface IPDIVariableDescriptor extends IPDISessionObject {
 	public boolean equalDescriptors(IPDIVariableDescriptor variable);
 	
 	/**
-	 * Returns AIF of this variable
-	 * @return AIF of this variable
+	 * Returns AIF representation of this variable
+	 * @return AIF representation of this variable
 	 * @throws PDIException on failure
 	 */
 	public IAIF getAIF() throws PDIException;
@@ -126,10 +126,10 @@ public interface IPDIVariableDescriptor extends IPDISessionObject {
 	public IPDIVariableDescriptor getVariableDescriptorAsType(String type) throws PDIException;
 
 	/**
-	 * Returns an unique id of this variable
-	 * @return an unique id of this variable
+	 * Returns a unique id for this variable. This id can be used for looking up the value of the variable.
+	 * @return a unique id for this variable
 	 */
-	public String getVarId();
+	public String getId();
 	
 	/**
 	 * Sets IAIF to this variable
