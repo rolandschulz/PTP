@@ -10,26 +10,80 @@ All bytes are represented in the data by two hex characters, representing upper
 nibble then lower nibble.  The characters and formats have changed over time.
 This is the currently operative list:
 
-b: boolean
-	- the data size is the same as the size of a native integer
-	- the data for a true value is -1 and 0 for a false value
+address: aN
+	- Represents an address value
+	- N is a single digit specifying the number of bytes of data
 
-c: character  
-	- uses 1 byte of data
-	- characters are always unsigned
+aggregate: {ID|N1=T1,...; N2=T2,...; N3=T3,...; N4=T4,...}
+	- Used for struct and class types
+	- ID is an optional name for the aggregate
+	- Nn is the name of the field
+	- Tn is a format string representing the type of the field
+	- The type specifier is divided into four sections separated by ";"
+	  - The first section is used to store public data (eg: N1)
+	  - The second section is used to store protected data (eg: N2)
+	  - The third section is used to store private data (eg: N3)
+	  - The fourth section is used to store hidden data (eg: N3)
+	  
+array: [R]T
+	- R is a range indicating low and high bounds. If R is empty then 
+	  this is a 0 element array.
+	- T is a format string representing the base type
+	- Multi-dimension arrays are represented as an array of base type array
+	- Itself uses 0 bytes of data, but the components may use data
+		
+boolean: b
+	- Represents a true/false value
+	- The data size is the same as the size of a native integer
+	- The data for a true value is > 0 
+	- The data for a false value is <= 0
 
-i: integer: i(s|u)N
+character: c
+	- Represents a single character
+	- Uses 1 byte of data
+	- Characters are always unsigned
+
+C-style string: paN
+	- aN is an address type
+	- The first N bytes of data are the address value
+	- The next 2 bytes of the data indicate the length (more significant 
+	  byte first) of the string in bytes.  These bytes follow immediately.
+	- There is no null included in the string
+	
+enumeration: <ID|S1=V1,S2=V2,...>is4
+	- ID is an optional name for the type
+	- Sn=Vn are name/value tuples where Sn is the name of the 
+	  enumerated value and Vn is the value of the enumeration. 
+	- The value of the enumeration is an integer whose type 
+	  is "is4" (signed integer with 4 bytes)
+	  
+floating: fN
+	- Represents a floating point value of arbitrary length
+	- N is a single digit specifying the number of bytes of data
+
+function: &A1,A2,.../T
+	- Represents a function that returns type T 
+	- A1, A2, ... are the types of each formal parameter
+	- Data consists of a null-terminated string containing 
+	  the name of the function
+	  
+integer: i(s|u)N
+	- Represents a signed or unsigned integer value of arbitrary length
 	- s means signed; u means unsigned
 	- N is a single digit specifying the number of bytes of data
 
-f: floating: fN
-	- N is a single digit specifying the number of bytes of data
-
-^: pointer: ^T
-	- T is a format string representing the target (possibly of > form)
-	- The first byte in the data is a marker, with value:
+named component: %N/T
+	- N is a number
+	- T is a format string representing the component
+	- Uses 0 bytes of data
+	
+pointer: ^aNT
+	- aN is an address type
+	- T is the type of the pointer target (possibly of > form)
+	- The first N bytes of data are the address value
+	- The byte N in the data is a marker, with value:
 		0 to indicate a null value
-		1 to indicate a normal value.  The target is found in the 
+		1 to indicate a normal value.  The target data is found in the 
 		  subsequent bytes
 		2 to indicate a normal value that will be referred to later.  
 		  The next byte gives a name to this value.  Subsequent 
@@ -38,70 +92,39 @@ f: floating: fN
 		  the name by which this value is known
 		4 to indicate an invalid pointer value
 
-%: named component: %name/T
-	- where T is a format string representing the component
-	- uses 0 bytes of data
+range: rL..UT
+	- Represents a range from L to U, inclusive
+	- L and U are integer types specified by T
 
->: reference to named component: >name/
-	- used in circular linked types to make representation finite
-	- uses 0 bytes of data
+reference to named component: >N/
+	- Used in circular linked types to make representation finite
+	- N is a number
+	- Uses 0 bytes of data
+	
+string: s
+	- Represents an arbitrary length character string
+	- The first 2 bytes of the data indicate the length (more significant 
+	  byte first) of the string in bytes.  These bytes follow immediately
 
-[: array: [R]T
-	- R is a range indicating low and high bounds
-	- T is a format string representing the base type (can be an array)
-	- itself uses 0 bytes of data, but the components may use data
-
-{: struct: {ID|N1=F1,N2=F2,...;;;}
-	- ID is the identifier for the struct, it is optional
-	- Nn is the name of the field
-	- Fn is a format string representing the field
-	- struct and class share the same format string since conceptually
-	  they are the same (except for the default member access specifiers)
-
-{: class: {ID|N1=F1,...; N2=F2,...; N3=F3,...; N4=F4,...}
-	- ID is the identifier for the class, it is optional
-	- Nn is the name of the field
-	- Fn is a format string representing the field
-	- The class format string is divided into four sections 
-	  (separated by a ;) :
-	  The first section is used to store public data (eg: N1)
-	  The second section is used to store protected data (eg: N2)
-	  The third section is used to store private data (eg: N3)
-	  The fourth section is used to store hidden data (eg: N3)
-
-(: union: (ID|N1=F1,N2=F2,...)
+union: (ID|N1=F1,N2=F2,...)
+	- Similar to a structure, but all fields start at the same address
 	- ID is the identifier for the union, it is optional
 	- Nn is the name of the field
 	- Fn is a format string representing the field
+	- The size of the union will be max(sizeof(F1),...sizeof(FN))
 
-<: enumeration: <ID|S1=V1,S2=V2,...>is4
-	- ID is the identifier for the enum, it is optional
-	- consists of name/val pairs Sn=Vn where Sn is the name of the 
-	  enumerated value and Vn is the value of the enumeration. Values 
-	  are integers whose type is is4 (signed integer with 4 bytes)
-
-r: range: rL..UT
-	- a range from L to U, where L and U are integer types specified by T
-
-&: function: &A1,A2,.../T
-	- a function that returns type T and that has arguments of type 
-	  A1, A2, ... Data consists of a null-terminated string containing 
-	  the name of the function
-
-s: string: s
-	- the first 2 bytes of the data indicate the length (more significant 
-	  byte first) of the string in bytes.  These bytes follow immediately
-
-v: void: vN
+void: vN
+	- Represents a void type
 	- N is the number of bytes of data
 
-z: ZPL region: zNT
-	- a ZPL region of rank N. Type T is the type of the data describing
+ZPL region: zNT
+	- Represents a ZPL region of rank N. 
+	- Type T is the type of the data describing
 	  the bounds of each rank and must be an integer type. The data 
 	  consists of pairs of integers describing the lower and upper
 	  bounds of each rank respectively
 
-?: invalid: ?n? 
+invalid: ?n? 
 	- n is an integer code (currently only 0)
 	- 0 bytes of data
 

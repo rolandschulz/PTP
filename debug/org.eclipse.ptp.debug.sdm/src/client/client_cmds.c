@@ -1096,7 +1096,7 @@ DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 	return res;
 }
 int
-DbgClntGetPartialAIF(int tid, int nargs, char **args)
+DbgClntEvaluatePartialExpression(int tid, int nargs, char **args)
 {
 	int			res;
 	int			len;
@@ -1110,7 +1110,7 @@ DbgClntGetPartialAIF(int tid, int nargs, char **args)
 		return DBGRES_ERR;
 	}
 
-	msg = new_proxy_msg(DBG_GETPARTIALAIF_CMD, tid);
+	msg = new_proxy_msg(DBG_EVALUATEPARTIALEXPRESSION_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
 	proxy_serialize_msg(msg, &buf, &len);
 
@@ -1122,7 +1122,7 @@ DbgClntGetPartialAIF(int tid, int nargs, char **args)
 	return res;
 }
 int
-DbgClntVariableDelete(int tid, int nargs, char **args)
+DbgClntDeletePartialExpression(int tid, int nargs, char **args)
 {
 	int			res;
 	int			len;
@@ -1136,7 +1136,7 @@ DbgClntVariableDelete(int tid, int nargs, char **args)
 		return DBGRES_ERR;
 	}
 
-	msg = new_proxy_msg(DBG_VARIABLEDELETE_CMD, tid);
+	msg = new_proxy_msg(DBG_DELETEPARTIALEXPRESSION_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
 	proxy_serialize_msg(msg, &buf, &len);
 

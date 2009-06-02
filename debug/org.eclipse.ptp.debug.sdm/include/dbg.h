@@ -119,11 +119,7 @@ int 	DbgSignalInfo(session *s, bitset *set, char*);
 /*
  * New functions
  */
-int 	DbgDataEvaluteExpression(session *s, bitset *set, char*);
-int 	DbgVariableCreate(session *s, bitset *set, char*);
-int 	DbgVariableDelete(session *s, bitset *set, char*);
-int 	DbgVariableUpdate(session *s, bitset *set, char*);
-int 	DbgGetPrtialAIF(session *s, bitset *set, char*, char *, int, int);
-int 	DbgGetAIFValue(session *s, bitset *set, char*);
+int 	DbgDeletePartialExpression(session *s, bitset *set, char*);
+int 	DbgEvaluatePartialExpression(session *s, bitset *set, char*, char *, int, int);
 
 #endif /* _DBG_H_ */

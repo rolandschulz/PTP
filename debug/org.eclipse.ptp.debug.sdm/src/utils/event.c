@@ -284,16 +284,7 @@ DbgSerializeEvent(dbg_event *e, char **result, int *len)
 	case DBGEV_DATA:
  		dbg_add_aif(p, e->dbg_event_u.data_event.data);
 		proxy_msg_add_string(p, e->dbg_event_u.data_event.type_desc);
-		break;
-
-	case DBGEV_DATA_EVA_EX:
- 		proxy_msg_add_string(p, e->dbg_event_u.data_expression);
-		break;
-
-	case DBGEV_PARTIAL_AIF:
- 		dbg_add_aif(p, e->dbg_event_u.partial_aif_event.data);
-		proxy_msg_add_string(p, e->dbg_event_u.partial_aif_event.type_desc);
-		proxy_msg_add_string(p, e->dbg_event_u.partial_aif_event.name);
+		proxy_msg_add_string(p, e->dbg_event_u.data_event.name);
 		break;
 
 	default:
@@ -743,16 +734,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 	case DBGEV_DATA:
 		dbg_str_to_aif(&args, &nargs, &e->dbg_event_u.data_event.data);
 		dbg_copy_str(&args, &nargs, &e->dbg_event_u.data_event.type_desc);
-		break;
-
-	case DBGEV_DATA_EVA_EX:
-		dbg_copy_str(&args, &nargs, &e->dbg_event_u.data_expression);
-		break;
-
-	case DBGEV_PARTIAL_AIF:
-		dbg_str_to_aif(&args, &nargs, &e->dbg_event_u.partial_aif_event.data);
-		dbg_copy_str(&args, &nargs, &e->dbg_event_u.partial_aif_event.type_desc);
-		dbg_copy_str(&args, &nargs, &e->dbg_event_u.partial_aif_event.name);
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.data_event.name);
 		break;
 
 	default:
@@ -835,6 +817,8 @@ FreeDbgEvent(dbg_event *e) {
 			AIFFree(e->dbg_event_u.data_event.data);
 		if (e->dbg_event_u.data_event.type_desc != NULL)
 			free(e->dbg_event_u.data_event.type_desc);
+		if (e->dbg_event_u.data_event.name != NULL)
+			free(e->dbg_event_u.data_event.name);
 		break;
 
 	case DBGEV_TYPE:
@@ -871,20 +855,6 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_BPSET:
 		if (e->dbg_event_u.bpset_event.bp != NULL)
 			FreeBreakpoint(e->dbg_event_u.bpset_event.bp);
-		break;
-
-	case DBGEV_DATA_EVA_EX:
-		if (e->dbg_event_u.data_expression != NULL)
-			free(e->dbg_event_u.data_expression);
-		break;
-
-	case DBGEV_PARTIAL_AIF:
-		if (e->dbg_event_u.partial_aif_event.data != NULL)
-			AIFFree(e->dbg_event_u.partial_aif_event.data);
-		if (e->dbg_event_u.partial_aif_event.type_desc != NULL)
-			free(e->dbg_event_u.partial_aif_event.type_desc);
-		if (e->dbg_event_u.partial_aif_event.name != NULL)
-			free(e->dbg_event_u.partial_aif_event.name);
 		break;
 	}
 

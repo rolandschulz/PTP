@@ -70,6 +70,8 @@ int 	DbgClntGetType(int, int, char **);
 int 	DbgClntListLocalVariables(int, int, char **);
 int 	DbgClntListArguments(int, int, char **);
 int 	DbgClntListGlobalVariables(int, int, char **);
+int 	DbgClntEvaluatePartialExpression(int, int, char **);
+int 	DbgClntDeletePartialExpression(int, int, char **);
 
 /**
  * Thread operations
@@ -112,9 +114,5 @@ int		DbgClntCLIHandle(int, int, char **);
  */
 int 	DbgClntListSignals(int, int, char **);
 int 	DbgClntSignalInfo(int, int, char **);
-
-int 	DbgClntDataEvaluateExpression(int, int, char **);
-int 	DbgClntGetPartialAIF(int, int, char **);
-int 	DbgClntVariableDelete(int, int, char **);
 
 #endif /* _DBG_CLIENT_H_ */
