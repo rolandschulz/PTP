@@ -125,9 +125,27 @@ public interface IServiceModelManager {
 	 * Removes all the configurations and services associated to the given project.
 	 * If the project has not been configured then this method does nothing.
 	 * 
+	 * This method should be called when a project is deleted.
+	 * 
 	 * @throws NullPointerException if project is null
 	 */
 	public void remove(IProject project);
+
+	
+	/**
+	 * Takes the service configuration for the first project and
+	 * uses the second project as the new key.
+	 * 
+	 * This method should be called when a project is renamed.
+	 * 
+	 * Caution. When a project is renamed using the IResource.move() method
+	 * the object that the method is called on still reflects the old project
+	 * location. You need to get a new IProject object that reflects the new
+	 * location to use as the key.
+	 * 
+	 * @throws NullPointerException if either argument is null
+	 */
+	public void remap(IProject projectToRemove, IProject projectToAdd);
 	
 	
 	/**

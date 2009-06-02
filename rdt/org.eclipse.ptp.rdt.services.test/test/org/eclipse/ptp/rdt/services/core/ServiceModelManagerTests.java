@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.services.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,6 +26,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -127,5 +127,42 @@ public class ServiceModelManagerTests {
 		assertEquals(1, services.size());
 		IService service = services.iterator().next();
 		assertServicesEquals(fService1, service, fConfig, config);
+	}
+	
+	@Test
+	public void testRename() throws Exception {
+		ServiceModelManager manager = ServiceModelManager.getInstance();
+		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
+		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
+		manager.putConfiguration(fProject, fConfig);
+		
+		if(!fProject.isOpen())
+			fProject.open(null);
+		
+		// resource change listener should automatically remap the configuration to the new project
+		fProject.move(new Path("newname"), true, null);
+		
+		// need to get an object that represents the new location of the project
+		fProject = ResourcesPlugin.getWorkspace().getRoot().getProject("newname");
+		
+		IServiceConfiguration conf = manager.getConfiguration(fProject, fConfig.getName());
+		assertNotNull(conf);
+		assertSame(fConfig, conf);
+	}
+	
+	@Test(expected=ProjectNotConfiguredException.class)
+	public void testDelete() throws Exception {
+		ServiceModelManager manager = ServiceModelManager.getInstance();
+		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
+		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
+		manager.putConfiguration(fProject, fConfig);
+		
+		if(!fProject.isOpen())
+			fProject.open(null);
+		
+		// resource change listener should automatically delete the configuration
+		fProject.delete(true, null);
+		
+		manager.getConfiguration(fProject, fConfig.getName());
 	}
 }
