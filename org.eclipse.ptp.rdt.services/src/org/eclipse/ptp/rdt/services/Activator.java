@@ -1,10 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rdt.services;
 
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rdt.services.core.ProjectDeletionListener;
+import org.eclipse.ptp.rdt.services.core.ProjectChangeListener;
 import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -36,21 +44,19 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		// If the plugin fails to activate because of an exception in the ServiceModelManager
-		// then we need to know what happened, so log it.
+		// If the plugin fails to activate because of an exception in the 
+		// ServiceModelManager then we need to know what happened, so log it.
 		try {
 			ServiceModelManager.getInstance().loadModelConfiguration();
 		} catch(Exception e) {
 			log(e);
 		}
-		
-		ProjectDeletionListener.startListening();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
-			ProjectDeletionListener.stopListening();
+			ProjectChangeListener.stopListening();
 		}
 		finally {
 			plugin = null;

@@ -105,9 +105,7 @@ public class ServiceModelManager implements IServiceModelManager {
 		 projectServices = new HashMap<IProject, Set<IService>>();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#putConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
-	 */
+
 	public void putConfiguration(IProject project, IServiceConfiguration conf) {
 		if(project == null || conf == null)
 			throw new NullPointerException();
@@ -143,23 +141,17 @@ public class ServiceModelManager implements IServiceModelManager {
 		return value;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
-	 */
+
 	public IServiceConfiguration getActiveConfiguration(IProject project) {
 		return getConf(activeConfigurations, project);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
-	 */
+
 	public IServiceConfiguration getConfiguration(IProject project, String name) {
 		return getConf(configurations, project).get(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
-	 */
+
 	public Set<IServiceConfiguration> getConfigurations(IProject project) {
 		return new HashSet<IServiceConfiguration>(getConf(configurations, project).values());
 	}
@@ -219,32 +211,24 @@ public class ServiceModelManager implements IServiceModelManager {
 		return config;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getServices()
-	 */
+
 	public Set<IService> getServices() {
 		loadServices();
 		return serviceSet;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
-	 */
+
 	public Set<IService> getServices(IProject project) {
 		return getConf(projectServices, project);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#getServices(java.lang.String)
-	 */
+
 	public Set<IService> getServices(String natureId) {
 		loadServices();
 		return natureServices.get(natureId);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
-	 */
+
 	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
 		Map<String, IServiceConfiguration> confs = getConf(configurations, project);
 		if(confs != null) {
@@ -261,9 +245,19 @@ public class ServiceModelManager implements IServiceModelManager {
 		projectServices.remove(project);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.services.core.IServiceConfiguration)
-	 */
+	
+	public void remap(IProject removedProject, IProject addedProject) {
+		if(removedProject == null || addedProject == null)
+			throw new NullPointerException();
+		
+		if(isConfigured(removedProject)) {
+			configurations.put(addedProject, configurations.remove(removedProject));
+			activeConfigurations.put(addedProject, activeConfigurations.remove(removedProject));
+			projectServices.put(addedProject, projectServices.remove(removedProject));
+		}
+	}
+	
+
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
 		Map<String, IServiceConfiguration> confs = getConf(configurations, project);
 		
@@ -504,6 +498,8 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}
 	}
+
+	
 
 	
 }
