@@ -92,6 +92,7 @@
 #define PROC_PID_ATTR				"processPID"
 #define PROC_INDEX_ATTR				"processIndex"
 #define PROC_STDOUT_ATTR			"processStdout"
+#define PROC_STDERR_ATTR			"processStderr"
 #define PROC_EXITCODE_ATTR			"processExitCode"
 #define PROC_SIGNALNAME_ATTR		"processSignalName"
 
