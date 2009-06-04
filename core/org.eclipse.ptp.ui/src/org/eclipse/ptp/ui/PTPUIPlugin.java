@@ -154,6 +154,15 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}	
 	
 	/**
+	 * Get the console manager instance
+	 * 
+	 * @return console manager
+	 */
+	public ConsoleManager getConsoleManager() {
+		return consoleManager;
+	}
+	
+	/**
 	 * Get the job manager instance
 	 * 
 	 * @return job manager
