@@ -39,6 +39,7 @@ import org.eclipse.ptp.ui.consoles.ConsoleManager;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
+import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.utils.DebugUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
@@ -141,12 +142,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 
 	//Resource bundle.
 	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
-	
 	private AbstractUIManager machineManager = null;	
-	
 	private AbstractUIManager jobManager = null;
-	
 	private ConsoleManager consoleManager = null;
+	private RMManager rmManager = null;
 	
 	public PTPUIPlugin() {
 		super();
@@ -181,6 +180,15 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 	
 	/**
+	 * Get the RM manager instance
+	 * 
+	 * @return RM manager
+	 */
+	public RMManager getRMManager() {
+		return rmManager;
+	}
+	
+	/**
 	 * Get the wizard page factory associated with a resource manager factory
 	 * 
 	 * @param factory resource manager factory
@@ -201,6 +209,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 		consoleManager = new ConsoleManager();
+		rmManager = new RMManager();
 	}
 	
 	/* (non-Javadoc)
@@ -211,9 +220,11 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		machineManager.shutdown();
 		jobManager.shutdown();
 		consoleManager.shutdown();
+		rmManager.shutdown();
 		machineManager = null;
 		jobManager = null;
 		consoleManager = null;
+		rmManager = null;
 		plugin = null;
 	}
 	
