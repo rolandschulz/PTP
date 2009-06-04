@@ -13,12 +13,14 @@ package org.eclipse.ptp.rdt.ui.wizards;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * 
@@ -91,6 +93,8 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 	 */
 	public void createControl(Composite parent) {
 		fCanvas = fModelWidget.createContents(parent);
+		Control control = fCanvas.getParent().getShell(); //get the shell or doesn't display help correctly
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(control,RDTHelpContextIds.SERVICE_MODEL_WIZARD);
 	}
 
 	/* (non-Javadoc)

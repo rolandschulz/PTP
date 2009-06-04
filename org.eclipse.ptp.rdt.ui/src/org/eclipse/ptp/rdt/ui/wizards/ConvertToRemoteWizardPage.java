@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
@@ -36,6 +37,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Converts existing CDT projects to RDT projects.
@@ -178,6 +181,8 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 				}							
 			}			
 		});
+		Shell shell = getContainer().getShell();
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,RDTHelpContextIds.CONVERTING_TO_REMOTE_PROJECT);
 	}
 	
 	private void configureServicesForRemoteProject(IProject project) throws InvocationTargetException,
