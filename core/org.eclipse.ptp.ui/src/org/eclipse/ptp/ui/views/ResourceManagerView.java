@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -13,6 +14,9 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -60,10 +64,14 @@ import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.EditResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
+import org.eclipse.ptp.ui.actions.SelectDefaultResourceManagerAction;
+import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -75,7 +83,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
 public class ResourceManagerView extends ViewPart {
-	
 	private final class MachineListener implements IMachineChildListener, IMachineListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedNodeEvent)
@@ -105,7 +112,7 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(e.getSource());
 		}
 	}
-
+	
 	private final class MMChildListener implements IModelManagerChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
@@ -143,7 +150,7 @@ public class ResourceManagerView extends ViewPart {
 				}});
 		}
 	}
-
+	
 	private final class QueueListener implements IQueueListener, IQueueChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
@@ -173,6 +180,39 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(e.getSource());
 		}
 
+	}
+
+	private class ResourceManagerLabelProvider extends WorkbenchLabelProvider {
+		
+		private Font selectedFont;
+		private Font unSelectedFont;
+		
+		public ResourceManagerLabelProvider(Font font) {
+			unSelectedFont = font;
+			FontData fd = font.getFontData()[0];
+			FontData selectedFontData = new FontData(fd.getName(), fd.getHeight(), SWT.BOLD);
+			selectedFont = (Font)new LocalResourceManager(JFaceResources.getResources()).get(FontDescriptor.createFrom(selectedFontData));
+		}
+
+		private IResourceManager getResourceManager(Object parentElement) {
+			IResourceManager rm = null;
+			if (parentElement instanceof IAdaptable) {
+				rm = (IResourceManager) ((IAdaptable) parentElement).getAdapter(IResourceManager.class);
+			}
+			return rm;
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
+		 */
+		@Override
+		public Font getFont(Object element) {
+			IResourceManager rm = getResourceManager(element);
+			if (rm != null && rm == PTPUIPlugin.getDefault().getRMManager().getSelected()) {
+				return selectedFont;
+			}
+			return unSelectedFont;
+		}
 	}
 	
 	private final class RMChildListener implements
@@ -310,7 +350,13 @@ public class ResourceManagerView extends ViewPart {
 		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangeEvent e) {
-			refreshViewer(e.getSource());
+			IResourceManager rm = e.getSource();
+			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
+			if (rm.getState() == ResourceManagerAttributes.State.STOPPED && 
+					rm == rmManager.getSelected()) {
+				rmManager.fireRMSelectedEvent(null);
+			}
+			refreshViewer(rm);
 		}
 
 		/* (non-Javadoc)
@@ -341,6 +387,7 @@ public class ResourceManagerView extends ViewPart {
 	private RemoveResourceManagersAction removeResourceManagerAction;
 	private AddResourceManagerAction addResourceManagerAction;
 	private EditResourceManagerAction editResourceManagerAction;
+	private SelectDefaultResourceManagerAction selectResourceManagerAction;
 
 	private final MMChildListener mmChildListener = new MMChildListener();
 	private final RMListener rmListener = new RMListener();
@@ -355,7 +402,7 @@ public class ResourceManagerView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI);
 		viewer.setContentProvider(new WorkbenchContentProvider());
-		viewer.setLabelProvider(new WorkbenchLabelProvider());
+		viewer.setLabelProvider(new ResourceManagerLabelProvider(viewer.getTree().getFont()));
 
 		viewer.setInput(PTPCorePlugin.getDefault().getUniverse());
 
@@ -426,15 +473,53 @@ public class ResourceManagerView extends ViewPart {
 		super.dispose();
 	}
 
+	public Font getFont() {
+		if (viewer == null) {
+			return null;
+		}
+		return viewer.getTree().getFont();
+	}
+
+	public void refreshViewer() {
+		ISafeRunnable safeRunnable = new SafeRunnable(){
+
+			public void run() throws Exception {
+				viewer.refresh();
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+
+	public void refreshViewer(final IPElement element) {
+		ISafeRunnable safeRunnable = new SafeRunnable(){
+
+			public void run() throws Exception {
+				viewer.refresh(element);
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
+	
+	public void updateViewer(final IPElement element) {
+		ISafeRunnable safeRunnable = new SafeRunnable(){
 
+			public void run() throws Exception {
+				viewer.update(element, null);
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+	
 	private void createContextMenu() {
 		final Shell shell = getSite().getShell();
 		addResourceManagerAction = new AddResourceManagerAction(shell);
 		removeResourceManagerAction = new RemoveResourceManagersAction(shell);
 		editResourceManagerAction = new EditResourceManagerAction(shell);
+		selectResourceManagerAction = new SelectDefaultResourceManagerAction(this);
 
 		MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuManager.setRemoveAllWhenShown(true);
@@ -456,12 +541,14 @@ public class ResourceManagerView extends ViewPart {
 		boolean inContextForRM = selection.size() > 0;
 		boolean inContextForEditRM = inContextForRM;
 		boolean inContextForRemoveRM = inContextForRM;
+		boolean inContextForSelectRM = inContextForRM;
 		for (int i = 0; i < selectedObjects.length; ++i) {
 			if (!(selectedObjects[i] instanceof IResourceManagerMenuContribution)) {
 				// Not all of the selected are RMs
 				inContextForRM = false;
 				inContextForEditRM = false;
 				inContextForRemoveRM = false;
+				inContextForSelectRM = false;
 				break;
 			}
 			else {
@@ -470,6 +557,8 @@ public class ResourceManagerView extends ViewPart {
 			    if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
 			    	inContextForEditRM = false;
 			        inContextForRemoveRM = false;
+			    } else {
+			        inContextForSelectRM = false;
 			    }
 			}
 		}
@@ -491,29 +580,16 @@ public class ResourceManagerView extends ViewPart {
 			editResourceManagerAction.setResourceManager(rmManager);
 		}
 		manager.add(new Separator());
+		manager.add(selectResourceManagerAction);
+		selectResourceManagerAction.setEnabled(inContextForSelectRM);
+		if (inContextForSelectRM) {
+			final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[0];
+			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+			selectResourceManagerAction.setResourceManager(rmManager);
+		}
+		manager.add(new Separator());
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS
-				+ "-end")); //$NON-NLS-1$
-	}
-
-	private void refreshViewer(final IPElement element) {
-		ISafeRunnable safeRunnable = new SafeRunnable(){
-
-			public void run() throws Exception {
-				viewer.refresh(element);
-			}
-		};
-		UIUtils.safeRunAsyncInUIThread(safeRunnable);
-	}
-
-	private void updateViewer(final IPElement element) {
-		ISafeRunnable safeRunnable = new SafeRunnable(){
-
-			public void run() throws Exception {
-				viewer.update(element, null);
-			}
-		};
-		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS + "-end")); //$NON-NLS-1$
 	}
 
 }

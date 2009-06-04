@@ -126,6 +126,7 @@ public class Messages extends NLS {
 	public static String RMConfigurationWizard_8;
 	public static String RMPreferencesPage_0;
 	public static String RMPreferencesPage_1;
+	public static String SelectDefaultResourceManagerAction_0;
 	public static String StartResourceManagersObjectActionDelegate_0;
 	public static String StartResourceManagersObjectActionDelegate_1;
 	public static String StopResourceManagersObjectActionDelegate_0;
