@@ -17,6 +17,11 @@ import java.util.List;
 import org.eclipse.cdt.ui.newui.CDTPrefUtil;
 import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.cdt.ui.wizards.EntryDescriptor;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Main page of the RDT wizard, which filters out local project types.
@@ -52,10 +57,15 @@ public class RDTMainWizardPage extends CDTMainWizardPage {
 			if(ed.getId().startsWith("org.eclipse.ptp.rdt")) {  // both the category and the template start with this //$NON-NLS-1$
 				filteredList.add(ed);
 			}
-			
 		}
 		
 		return filteredList;
+	}
+	
+	public void createControl(Composite parent){
+		super.createControl(parent);
+		Shell shell = getContainer().getShell(); //if not created on the shell, will not display properly
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, RDTHelpContextIds.CREATING_A_REMOTE_PROJECT);
 	}
 
 }

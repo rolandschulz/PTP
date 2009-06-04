@@ -8,7 +8,7 @@
             name="%rdtViewCategory.name">
       </category>
       <view
-            category="org.eclipse.cdt.ui.views"
+            category="org.eclipse.ptp.rdt.ui.views"
             class="org.eclipse.ptp.internal.rdt.ui.includebrowser.IBViewPart"
             icon="icons/view16/includeBrowser.gif"
             id="org.eclipse.ptp.rdt.ui.includeBrowser"
@@ -307,7 +307,7 @@
             weight="001">
       </tab>
       <tab
-            class="org.eclipse.cdt.ui.newui.SymbolTab"
+            class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteSymbolTab"
             icon="icons/obj16/define_obj.gif"
             name="Symbols"
             parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage">
