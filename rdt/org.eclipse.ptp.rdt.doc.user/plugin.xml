@@ -21,5 +21,12 @@
             file="toctasks.xml">
       </toc>
    </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="context_RDT.xml"
+            plugin="org.eclipse.ptp.rdt.ui">
+      </contexts>
+   </extension>
 
 </plugin>
