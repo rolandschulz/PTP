@@ -3,9 +3,12 @@ package org.eclipse.ptp.internal.rdt.ui.editor;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionGroup;
 
 
@@ -51,7 +54,15 @@ public class RemoteCEditor extends CEditor {
 				? new OpenViewActionGroup(this)  
 				: super.createOpenViewActionGroup();
 	}
-	
+	/**
+	 * This method overrides the CEditor createPartControl method in order to set the help for the Remote
+	 * C/C++ editor.
+	 */
+	public void createPartControl(Composite parent)
+	{
+		super.createPartControl(parent);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
+	}
 	
 	/**
 	 * Override so that the remote version of the
