@@ -687,7 +687,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				function = function.trim();
 				if (function.length() > 0) {
 					label.append(function);
-					label.append("() ");
+					if (!function.contains("(")) {
+						label.append("()");
+					}
+		            label.append(" ");
 					if (frame.getFile() != null) {
 						IPath path = new Path(frame.getFile());
 						if (!path.isEmpty()) {
