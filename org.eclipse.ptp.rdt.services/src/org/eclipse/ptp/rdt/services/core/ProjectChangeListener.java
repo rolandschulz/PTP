@@ -63,7 +63,6 @@ public class ProjectChangeListener {
 						renamedTo.put(project.getName(), project);
 					}
 					else if(delta.getKind() == REMOVED) { // delete
-						System.out.println("detected delete");
 						ServiceModelManager.getInstance().remove(project);
 					}
 				}
@@ -73,7 +72,6 @@ public class ProjectChangeListener {
 				IProject addedProject = addedInfo.getKey();
 				IProject removedProject = renamedTo.remove(addedInfo.getValue());
 				// does nothing if the project is not part of the service model
-				System.out.printf("Detected rename %s(%d) to %s(%d)\n", removedProject, removedProject.hashCode(), addedProject, addedProject.hashCode());
 				ServiceModelManager.getInstance().remap(removedProject, addedProject);
 			}
 		}
