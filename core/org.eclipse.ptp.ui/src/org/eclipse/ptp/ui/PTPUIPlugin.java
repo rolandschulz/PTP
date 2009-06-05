@@ -57,7 +57,7 @@ import org.osgi.framework.BundleContext;
  */
 public class PTPUIPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
-    public static final String RM_EXTENSION_POINT_ID = "rmConfigurationWizard"; //$NON-NLS-1$
+    public static final String RM_EXTENSION_POINT_ID = "rmConfigurationWizards"; //$NON-NLS-1$
     public static final String RMEXT_EXTENSION_POINT_ID = "rmConfigurationWizardExtensions"; //$NON-NLS-1$
     
 	//The shared instance.
