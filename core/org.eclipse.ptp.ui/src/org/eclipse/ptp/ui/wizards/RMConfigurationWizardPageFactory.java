@@ -31,8 +31,9 @@ import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 public abstract class RMConfigurationWizardPageFactory {
 
 	/**
+	 * Retrieves the RM specific configuration pages.
+	 * 
 	 * @param wizard 
-	 * @param config
 	 * @return The contributed ConfigurationWizardPages
 	 */
 	public abstract RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard);

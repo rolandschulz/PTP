@@ -19,7 +19,9 @@
 
 package org.eclipse.ptp.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -42,6 +44,7 @@ import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.utils.DebugUtil;
+import org.eclipse.ptp.ui.wizards.RMConfigurationExtensionWizardPageFactory;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -54,7 +57,8 @@ import org.osgi.framework.BundleContext;
  */
 public class PTPUIPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
-    public static final String EXTENSION_POINT_ID = "rmConfigurations"; //$NON-NLS-1$
+    public static final String RM_EXTENSION_POINT_ID = "rmConfigurationWizard"; //$NON-NLS-1$
+    public static final String RMEXT_EXTENSION_POINT_ID = "rmConfigurationWizardExtensions"; //$NON-NLS-1$
     
 	//The shared instance.
 	private static PTPUIPlugin plugin;
@@ -141,7 +145,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 
 	//Resource bundle.
-	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
+	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = 
+		new HashMap<String, RMConfigurationWizardPageFactory>();
+	private final HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extensionWizardPageFactories = 
+		new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
 	private AbstractUIManager machineManager = null;	
 	private AbstractUIManager jobManager = null;
 	private ConsoleManager consoleManager = null;
@@ -195,7 +202,21 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @return factory for creating wizard pages for this resource manager
 	 */
 	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
-		return (RMConfigurationWizardPageFactory) configurationWizardPageFactories.get(factory.getClass().getName());
+		return configurationWizardPageFactories.get(factory.getClass().getName());
+	}
+	
+	/**
+	 * Get the extension wizard page factories associated with a resource manager factory
+	 * 
+	 * @param factory resource manager factory
+	 * @return factories for creating extended wizard pages for this resource manager
+	 */
+	public RMConfigurationExtensionWizardPageFactory[] getRMConfigurationExtensionWizardPageFactories(IResourceManagerFactory factory) {
+		List<RMConfigurationExtensionWizardPageFactory> list = extensionWizardPageFactories.get(factory.getClass().getName());
+		if (list != null) {
+			return list.toArray(new RMConfigurationExtensionWizardPageFactory[list.size()]);
+		}
+		return new RMConfigurationExtensionWizardPageFactory[0];
 	}
 	
 	/* (non-Javadoc)
@@ -243,29 +264,63 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	/**
 	 * Locate and load wizard page factory extensions
 	 */
+	@SuppressWarnings("unchecked")
 	private void retrieveConfigurationWizardPageFactories() {
     	configurationWizardPageFactories.clear();
+    	extensionWizardPageFactories.clear();
+    	
+    	HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extFactories = 
+    		new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
     	
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
-		final IExtension[] extensions = extensionPoint.getExtensions();
+
+    	/*
+    	 * First find all extension factories
+    	 */
+    	IExtensionPoint extWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RMEXT_EXTENSION_POINT_ID);
+		final IExtension[] extWizardExtensions = extWizardPoint.getExtensions();
 		
-		for (int iext = 0; iext < extensions.length; ++iext) {
-			final IExtension ext = extensions[iext];
-			
+		for (IExtension ext : extWizardExtensions) {
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
 		
-			for (int i=0; i< elements.length; i++)
+			for (IConfigurationElement ce : elements)
 			{
-				IConfigurationElement ce = elements[i];
+				try {
+					RMConfigurationExtensionWizardPageFactory factory = (RMConfigurationExtensionWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
+					String id = ce.getAttribute("id"); //$NON-NLS-1$
+					ArrayList<RMConfigurationExtensionWizardPageFactory> list = extFactories.get(id);
+					if (id == null) {
+						list = new ArrayList<RMConfigurationExtensionWizardPageFactory>();
+						extFactories.put(id, list);
+					}
+					list.add(factory);
+				} catch (CoreException e) {
+					log(e);
+				}
+			}
+		}
+		
+		/*
+		 * Now find all wizard factories. Also keep a list of extension wizards for each wizard factory class.
+		 */
+    	IExtensionPoint confWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RM_EXTENSION_POINT_ID);
+		final IExtension[] confWizardExtensions = confWizardPoint.getExtensions();
+		
+		for (IExtension ext : confWizardExtensions) {
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+		
+			for (IConfigurationElement ce : elements)
+			{
 				try {
 					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					Class rmFactoryClass = factory.getRMFactoryClass();
 					configurationWizardPageFactories.put(rmFactoryClass.getName(), factory);
+					extensionWizardPageFactories.put(rmFactoryClass.getName(), extFactories.get(ce.getAttribute("id"))); //$NON-NLS-1$
 				} catch (CoreException e) {
 					log(e);
 				}
 			}
 		}
     }
+
 }

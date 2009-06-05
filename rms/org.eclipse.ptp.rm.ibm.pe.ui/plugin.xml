@@ -16,7 +16,7 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurations">
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.ibm.pe.ui.wizards.PEResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.ibmpe.ui.configurationWizard"/>

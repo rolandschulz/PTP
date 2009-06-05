@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-	<extension-point id="rmConfigurations" name="Resource Manager Configuration Wizard Pages" schema="schema/rmConfigurations.exsd"/>
+	<extension-point id="rmConfigurationWizards" name="Resource Manager Configuration Wizards" schema="schema/rmConfigurationWizards.exsd"/>
+ <extension-point id="rmConfigurationWizardExtensions" name="Resouce Manager Configuration Wizard Extensions" schema="schema/rmConfigurationWizardExtensions.exsd"/>
 	<extension
 		point="org.eclipse.ui.views">
 		<category

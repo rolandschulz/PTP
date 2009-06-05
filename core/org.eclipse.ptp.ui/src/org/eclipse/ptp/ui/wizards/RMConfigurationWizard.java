@@ -360,20 +360,25 @@ public class RMConfigurationWizard extends Wizard {
 		
 		if (cachedPages[index] == null) {
 			final PTPUIPlugin uiPlugin = PTPUIPlugin.getDefault();
+			final ArrayList<RMConfigurationWizardPage> pages = new ArrayList<RMConfigurationWizardPage>();
+
 			final RMConfigurationWizardPageFactory factory = uiPlugin.getRMConfigurationWizardPageFactory(resourceManagerFactory);
 			if (factory != null) {
-				cachedPages[index] = factory.getPages(this);
+				pages.addAll(Arrays.asList(factory.getPages(this)));
 			}
-
-			if (cachedPages[index] == null) {
-				cachedPages[index] = new RMConfigurationWizardPage[0];
+			final RMConfigurationExtensionWizardPageFactory[] extFactories = 
+				uiPlugin.getRMConfigurationExtensionWizardPageFactories(resourceManagerFactory);
+			for (RMConfigurationExtensionWizardPageFactory extFactory : extFactories) {
+				pages.addAll(Arrays.asList(extFactory.getPages(this)));
 			}
 			
 			// All wizard pages must be registered with
 			// a call to addPage(...)
-			for (int i = 0; i < cachedPages[index].length; ++i) {
-				addPage(cachedPages[index][i]);
+			for (RMConfigurationWizardPage page : pages) {
+				addPage(page);
 			}
+
+			cachedPages[index] = pages.toArray(new RMConfigurationWizardPage[0]);
 		}
 
 		// add the first and last pages to the selected factory's pages

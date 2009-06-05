@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurations">
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.mpi.mpich2.ui.wizards.MPICH2RMConfigurationWizardPageFactory"
             id="org.eclipse.ptp.rm.mpich2.ui.configurationWizard"/>

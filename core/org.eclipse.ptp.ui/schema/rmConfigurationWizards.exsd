@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ptp.ui">
+<schema targetNamespace="org.eclipse.ptp.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.ui" id="rmConfigurations" name="Resource Manager Configuration Wizard Pages"/>
+         <meta.schema plugin="org.eclipse.ptp.ui" id="rmConfigurationWizards" name="Resource Manager Configuration Wizards"/>
       </appInfo>
       <documentation>
          This extension point allows plug-ins to contribute a resource manager wizard that is used to configure a new resource manager.
@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="configurationWizard" minOccurs="1" maxOccurs="unbounded"/>
@@ -18,21 +23,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  a fully qualified identifier of the target extension point
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+                  an optional identifier of the extension instance
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+                  an optional name of the extension instance
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -44,17 +49,10 @@
 
    <element name="configurationWizard">
       <complexType>
-         <attribute name="name" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  a fully qualified name of the Java class extending &lt;samp&gt;org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory"/>
@@ -64,7 +62,7 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  a unique name that can be used to identify this wizard
                </documentation>
             </annotation>
          </attribute>
@@ -85,7 +83,14 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.ptp.ui.rmConfigurations&quot;&gt;
+    &lt;configurationWizard
+      class=&quot;org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMConfigurationWizardPageFactory&quot;
+      id=&quot;org.eclipse.ptp.rm.openmpi.ui.configurationWizard&quot;&gt;
+     &lt;/configurationWizard&gt;
+  &lt;/extension&gt;
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
@@ -94,26 +99,11 @@
          <meta.section type="apiInfo"/>
       </appInfo>
       <documentation>
-         [Enter API information here.]
+         The value of the class attribute must represent a class 
+that extends &lt;samp&gt;org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory&lt;/samp&gt;.
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
 </schema>
