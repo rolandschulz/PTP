@@ -64,6 +64,7 @@
 #include <hash.h>
 #include <limits.h>
 #include <dlfcn.h>
+#include <regex.h>
 #ifdef __linux__
 #include <getopt.h>
 #endif
@@ -128,6 +129,7 @@ typedef struct {
 
 typedef struct jobinfo {
     int proxy_jobid;		/* Job id assigned by proxy             */
+    int poe_taskid;         /* taskid for poe master process        */
     char *submit_jobid;		/* Jobid used when submitted by GUI     */
     pid_t poe_pid;		/* Process id for main poe process      */
     pid_t task0_pid;		/* Process id for app. task 0           */
@@ -143,19 +145,20 @@ typedef struct jobinfo {
     int sdm_debug_arg_count;    /* Number of debugger args              */
     int stdin_fd;		/* STDIN pipe/file descriptor           */
     int stdout_fd;		/* STDOUT pipe/file descriptor          */
-    int stderr_fd;		/* STDERR pipe/file descriptor          */
+    int stderr_fd;		/* STDERR pipe descriptor               */
+    FILE *stderr_file;      /* stderr file descriptor           */
     ioinfo stdout_info;		/* Stdout file buffer info              */
     ioinfo stderr_info;		/* Stderr file buffer info              */
     int numtasks;		/* Number of tasks in application       */
     taskinfo *tasks;		/* Tasks in this application            */
     pthread_t startup_thread;	/* Startup monitor thread for app       */
     time_t submit_time;		/* Time job was submitted               */
-    int label_io:1;		/* User set MP_LABELIO                  */
-    int split_io:1;		/* STDOUT is split by task              */
-    int stdin_redirect:1;	/* Stdin redirected to file             */
-    int stdout_redirect:1;	/* Stdout redirected to file            */
-    int stderr_redirect:1;	/* Stderr redirected to file            */
-    int discovered_job:1;	/* Job already running at PTP startup   */
+    char label_io;		/* User set MP_LABELIO                  */
+    char split_io;		/* STDOUT is split by task              */
+    char stdin_redirect;	/* Stdin redirected to file             */
+    char stdout_redirect;	/* Stdout redirected to file            */
+    char stderr_redirect;	/* Stderr redirected to file            */
+    char discovered_job;	/* Job already running at PTP startup   */
 } jobinfo;
 
 typedef struct NODE_REFCOUNT {
@@ -222,10 +225,13 @@ static char **create_debug_parmlist(char *debugger_name, int debug_args_count, c
 static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem,
 			       char *mp_rdma_count, char *debugger_id, int is_debugger);
 static void add_environment_variable(char *env_var);
-static int setup_stdio_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
-			  int *fd, int *redirect);
-static int setup_child_stdio(int run_trans_id, char *subid, int stdio_fd, int redirect,
+static int setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
+			  int *fd, char *redirect);
+static int setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
+			  int *fd, FILE **file_fd, char *redirect);
+static int setup_child_stdout(int run_trans_id, char *subid, int redirect,
 			     int *file_fd, int pipe_fd[]);
+static int setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[]);
 static int stdout_handler(int fd, void *job);
 static int stderr_handler(int fd, void *job);
 static void check_bufsize(ioinfo * file_info);
@@ -263,7 +269,7 @@ static void send_local_default_attrs(int trans_id);
 static void send_new_node_list(int trans_id, int machine_id, List * new_nodes);
 static void send_job_state_change_event(int trans_id, int jobid, char *state);
 static void send_process_state_change_event(int trans_id, jobinfo * job, char *state);
-static void send_process_state_output_event(int trans_id, int procid, char *output);
+static void send_process_state_output_event(int trans_id, int procid, char *dest, char *output);
 static int generate_id(void);
 static void enqueue_event(proxy_msg * event);
 static void print_message(int type, const char *format, ...);
@@ -327,6 +333,8 @@ static char *my_username;
 static int next_env_entry;
 static int env_array_size;
 static char **env_array;
+static regex_t msgid_regex;
+static regex_t errormsg_regex;
 
 #ifdef __linux__
 static struct option longopts[] = {
@@ -973,7 +981,7 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     pid_t pid;
     int mp_buffer_mem_set;
     int mp_rdma_count_set;
-    int redirect;
+    /*int redirect;*/
     int debug_sdm_mode;
     char mp_rdma_count_value[50];
     char mp_buffer_mem_value[50];
@@ -1328,20 +1336,20 @@ PE_submit_job(int trans_id, int nargs, char *args[])
      * Handle file descriptor setup for stdout first
      */
     status =
-	setup_stdio_fd(trans_id, jobid, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd), &redirect);
+	setup_stdout_fd(trans_id, jobid, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd), &(job->stdout_redirect));
     if (status == -1) {
 	TRACE_EXIT;
 	return PROXY_RES_OK;
     }
-    job->stdout_redirect = redirect;
     TRACE_DETAIL_V("stdout FD %d %d\n", stdout_pipe[0], stdout_pipe[1]);
     status =
-	setup_stdio_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd), &redirect);
+	setup_stderr_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd), &(job->stderr_file),
+			&(job->stderr_redirect));
+	RegisterFileHandler(job->stderr_fd, READ_FILE_HANDLER, stderr_handler, job);
     if (status == -1) {
 	TRACE_EXIT;
 	return PROXY_RES_OK;
     }
-    job->stderr_redirect = redirect;
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
     job->submit_jobid = jobid;
     job->label_io = label_io;
@@ -1363,6 +1371,7 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     job->stderr_info.cp = job->stderr_info.write_buf;
     job->stderr_info.write_func = send_stderr;
     job->discovered_job = 0;
+    job->numtasks = -1;
     envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value, pe_debugger_id, 0);
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
@@ -1393,15 +1402,14 @@ PE_submit_job(int trans_id, int nargs, char *args[])
 	 */
 	TRACE_DETAIL("+++ Setting up poe stdio file descriptors\n");
 	status =
-	    setup_child_stdio(trans_id, jobid, STDOUT_FILENO, job->stdout_redirect, &(job->stdout_fd),
+	    setup_child_stdout(trans_id, jobid, job->stdout_redirect, &(job->stdout_fd),
 			      stdout_pipe);
 	if (status == -1) {
 	    TRACE_EXIT;
 	    exit(1);
 	}
 	status =
-	    setup_child_stdio(trans_id, jobid, STDERR_FILENO, job->stderr_redirect, &(job->stderr_fd),
-			      stderr_pipe);
+	    setup_child_stderr(trans_id, jobid, stderr_pipe);
 	if (status == -1) {
 	    TRACE_EXIT;
 	    exit(1);
@@ -1712,6 +1720,8 @@ startup_monitor(void *job_ident)
 		}
 		while (!done) {
 		    char *cp;
+                    int num;
+
 		    linep = p;
 		    TRACE_DETAIL_V("Processing %s", linep);
 		    /*
@@ -1724,19 +1734,30 @@ startup_monitor(void *job_ident)
 		    tasknum = atoi(p);
 		    taskp = &tasks[tasknum];
 		    taskp->proxy_taskid = generate_id();
-#ifdef __linux__
 		    /*
-		     * skip ignored token
+		     * There are two possible attach.cfg file formats now. In the old
+                     * format, the first two tokens in the line are a task index and
+                     * host IP address.. In the new format, there is an additional
+                     * token between the task index and IP address, which we ignore.
+                     * We determine the format by checking the second token. If it is
+                     * numeric, this is the new fiel format and we advance to the next
+                     * token to get the host address. Otherwise we assume it is the
+                     * IP address and don't get another token.
 		     */
 		    p = strtok_r(NULL, " ", &tokenptr);
 		    if (p == NULL) {
 			break;
 		    }
-#endif
+                    num = strtol(p, &cp, 10);
+                    if (*cp == '\0') {
+                          /*
+                           * Token is numeric, advance 1 token
+                           */
+                        p = strtok_r(NULL, " ", &tokenptr);
+                    }
 		    /*
 		     * get node IP address
 		     */
-		    p = strtok_r(NULL, " ", &tokenptr);
 		    if (p == NULL) {
 			break;
 		    }
@@ -1931,12 +1952,12 @@ startup_monitor(void *job_ident)
     SetList(taskid_list);
     proxy_taskid = GetListElement(taskid_list);
     while (proxy_taskid != NULL) {
-        proxy_msg *msg;
+        proxy_msg *start_msg;
 
-        msg = proxy_process_change_event(start_events_transid, proxy_taskid, 1);
+        start_msg = proxy_process_change_event(start_events_transid, proxy_taskid, 1);
         free(proxy_taskid);
         proxy_add_string_attribute(msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
-        enqueue_event(msg);
+        enqueue_event(start_msg);
         proxy_taskid = GetListElement(taskid_list);
     }
     DestroyList(taskid_list, NULL);
@@ -2109,6 +2130,9 @@ zombie_reaper(void *arg)
 			update_node_refcounts(job->numtasks, job->tasks);
 		    }
 		    delete_task_list(job->numtasks, job->tasks);
+		}
+		if (job->stderr_file != NULL) {
+			fclose(job->stderr_file);
 		}
 		free(job->submit_jobid);
 		free(job->stdout_info.read_buf);
@@ -3171,8 +3195,8 @@ create_exec_parmlist(char *execname, char *targetname, int arg_count, char **arg
 {
       /*
        * Create parameter list for invoking application using PE. Copy
-       * the execname (/usr/bin/poe), the target executable, the 
-       * debug helper, if present, then the program arguments and a 
+       * the execname (/usr/bin/poe), the target executable, the
+       * debug helper, if present, then the program arguments and a
        * trailing null into the program arguments array and then
        * return that array.
        */
@@ -3345,11 +3369,11 @@ add_environment_variable(char *env_var)
 }
 
 /*
- * Set up the file descriptor for stdio output files
+ * Set up the file descriptor for stdout output files
  */
 int
-setup_stdio_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
-	       int *redirect)
+setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
+	       char *redirect)
 {
     int status;
 
@@ -3393,25 +3417,91 @@ setup_stdio_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *
 }
 
 /*
- * Set up a stdio file descriptor for child process so it is redirected to a file or pipe
+ * Set up the file descriptor for stderr output files
  */
 int
-setup_child_stdio(int run_trans_id, char *subid, int stdio_fd, int redirect, int *file_fd, int pipe_fd[])
+setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *stderr_path, char *stdio_name, int *fd,
+	       FILE **file_fd, char *redirect)
+{
+    int status;
+
+    TRACE_ENTRY;
+	status = pipe(pipe_fds);
+	if (status == -1) {
+	    snprintf(emsg_buffer, sizeof emsg_buffer,
+		     "Error creating %s pipe: %s", stdio_name, strerror(errno));
+	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
+	    TRACE_EXIT;
+	    return -1;
+	}
+	status = fcntl(pipe_fds[0], F_SETFL, O_NONBLOCK);
+	if (status == -1) {
+	    snprintf(emsg_buffer, sizeof emsg_buffer,
+		     "Error initializing %s pipe: %s", stdio_name, strerror(errno));
+	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
+	    TRACE_EXIT;
+	    return -1;
+	}
+	*fd = pipe_fds[0];
+	if (stderr_path == NULL) {
+		*redirect = 0;
+	}
+	else {
+		*file_fd = fopen(stderr_path, "w");
+		if (*file_fd == NULL) {
+			*redirect = 0;
+		}
+		else {
+		    *redirect = 1;
+		}
+	}
+    TRACE_EXIT;
+    return 0;
+}
+
+/*
+ * Set up a stdout file descriptor for child process so it is redirected to a file or pipe
+ */
+int
+setup_child_stdout(int run_trans_id, char *subid, int redirect, int *file_fd, int pipe_fd[])
 {
     int status;
 
     TRACE_ENTRY;
     if (redirect) {
-	status = dup2(*file_fd, stdio_fd);
+	status = dup2(*file_fd, STDOUT_FILENO);
     }
     else {
 	close(pipe_fd[0]);
-	status = dup2(pipe_fd[1], stdio_fd);
+	status = dup2(pipe_fd[1], STDOUT_FILENO);
     }
     if (status == -1) {
 	snprintf(emsg_buffer, sizeof emsg_buffer,
-		 "Error setting stdio file descriptor (%d) for application: %s",
-		 stdio_fd, strerror(errno));
+		 "Error setting stdout file descriptor for application: %s", strerror(errno));
+	emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+	post_submitjob_error(run_trans_id, subid, emsg_buffer);
+    }
+    TRACE_EXIT;
+    return status;
+}
+
+
+/*
+ * Set up a stderr file descriptor for child process so it is redirected to a pipe
+ */
+int
+setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[])
+{
+    int status;
+
+    TRACE_ENTRY;
+	close(pipe_fd[0]);
+	status = dup2(pipe_fd[1], STDERR_FILENO);
+    if (status == -1) {
+	snprintf(emsg_buffer, sizeof emsg_buffer,
+		 "Error setting stderr file descriptor for application: %s", strerror(errno));
 	emsg_buffer[sizeof emsg_buffer - 1] = '\0';
 	post_submitjob_error(run_trans_id, subid, emsg_buffer);
     }
@@ -5157,16 +5247,72 @@ send_stdout(jobinfo * job, char *buf)
         task = 0;
         outp = buf;
     }
-    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, outp);
+    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid,
+									PROC_STDOUT_ATTR, outp);
 }
 
 void
 send_stderr(jobinfo * job, char *buf)
 {
-    /*
-     * Send the data written to stderr file descriptors to the front end.
-     */
-    fprintf(stderr, "%s", buf);
+	int match;
+
+	    /*
+	     * If the message written to stderr has the format 'ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'
+	     * and job->numtasks is <= 0, then this is a terminating error message issued at PE
+	     * application startup. In this case, the attach.cfg file will not be generated since the
+	     * application is terminating. Therefore, we must generate a fake process to represent
+	     * the poe process and then write the stderr output using the fake process.
+	     * TODO: This does not deal with PE informational messages, since we do not want to
+	     * generate a fake process in that case because the application will execute.
+	     * One way to handle informational messages is to save them in a list and then dump them
+	     * to stderr as soon as the attach.cfg file has been processed.
+	     */
+	match = regexec(&errormsg_regex, buf, 0, NULL, 0);
+	if ((match == 0) && (job->numtasks <= 0)) {
+	    proxy_msg *msg;
+	    char jobid_str[30];
+	    int proxy_taskid;
+
+			/*
+			 * If job->numtasks is -1 this is first error, create phony process
+			 */
+	    if (job->numtasks == -1) {
+	        sprintf(jobid_str, "%d", job->proxy_jobid);
+	        msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
+	        job->poe_taskid = generate_id();
+	        sprintf(jobid_str, "%d", job->poe_taskid);
+		    proxy_add_process(msg, jobid_str, "poe", PROC_STATE_STARTING, 3);
+		    proxy_add_int_attribute(msg, PROC_NODEID_ATTR, 0);
+		    proxy_add_int_attribute(msg, PROC_INDEX_ATTR, 0);
+		    proxy_add_int_attribute(msg, PROC_PID_ATTR, job->poe_pid);
+	        enqueue_event(msg);
+	        job->numtasks = 0;
+	    }
+        send_process_state_output_event(start_events_transid, job->poe_taskid,
+									    PROC_STDERR_ATTR, buf);
+	}
+	else {
+	    /*
+	     * Redirect the stderr output to a file or send it to the front end as
+	     * requested by the redirect flag. stderr output where the text matches the AIX
+	     * error message id format [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] is always sent to
+	     * the front end.
+	     */
+	    if (job->stderr_redirect) {
+		    int match;
+
+		    fprintf(job->stderr_file, "%s", buf);
+		    match = regexec(&msgid_regex, buf, 0, NULL, 0);
+		    if (match == 0) {
+		        send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid,
+											    PROC_STDERR_ATTR, buf);
+		    }
+	    }
+	    else {
+            send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid,
+									        PROC_STDERR_ATTR, buf);
+	    }
+	}
 }
 
 /*************************************************************************/
@@ -5381,14 +5527,14 @@ send_process_state_change_event(int trans_id, jobinfo * job, char *state)
 }
 
 void
-send_process_state_output_event(int trans_id, int procid, char *output)
+send_process_state_output_event(int trans_id, int procid, char *dest, char *output)
 {
     proxy_msg *msg;
     char procid_str[12];
 
     sprintf(procid_str, "%d", procid);
     msg = proxy_process_change_event(trans_id, procid_str, 1);
-    proxy_msg_add_keyval_string(msg, PROC_STDOUT_ATTR, output);
+    proxy_msg_add_keyval_string(msg, dest, output);
     print_message(TRACE_DETAIL_MESSAGE, "Sent stdout: %s\n", output);
     enqueue_event(msg);
 }
@@ -5609,6 +5755,8 @@ main(int argc, char *argv[])
 	    exit(1);
 	}
     }
+    regcomp(&msgid_regex, ".* [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] .*", 0);
+    regcomp(&errormsg_regex, "^ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] .*", 0);
     ptp_signal_exit = 0;
     signal(SIGINT, ptp_signal_handler);
     signal(SIGHUP, SIG_IGN);
