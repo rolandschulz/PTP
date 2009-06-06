@@ -108,102 +108,110 @@
 #define TRACE_DETAIL(format) print_message(TRACE_DETAIL_MESSAGE, format)
 #define TRACE_DETAIL_V(format, ...) print_message(TRACE_DETAIL_MESSAGE, format, __VA_ARGS__)
 
-typedef struct jobinfo *jobinfoptr;	/* Forward reference to jobinfo         */
+typedef struct jobinfo *jobinfoptr; /* Forward reference to jobinfo         */
 
-typedef struct {
-    char *read_buf;		/* Read buffer for stdout/stderr        */
-    char *write_buf;		/* Write buffer for stdout/stderr       */
-    char *cp;			/* Current character in write buffer    */
-    int allocated;		/* Allocated size of write buffer       */
-    int remaining;		/* Bytes left in write buffer           */
-    void (*write_func) (jobinfoptr job, char *buf);	/* Function writing data */
+typedef struct
+{
+    char *read_buf; /* Read buffer for stdout/stderr        */
+    char *write_buf; /* Write buffer for stdout/stderr       */
+    char *cp; /* Current character in write buffer    */
+    int allocated; /* Allocated size of write buffer       */
+    int remaining; /* Bytes left in write buffer           */
+    void (*write_func)(jobinfoptr job, char *buf); /* Function writing data */
 } ioinfo;
 
-typedef struct {
-    int proxy_taskid;		/* Process id assigned by proxy         */
-    pid_t parent_pid;		/* PID for parent (poe) process         */
-    pid_t task_pid;		/* PID for this process                 */
-    char *ipaddr;		/* IP address of node where task is     */
-    char *hostname;		/* Hostname of node where task is       */
+typedef struct
+{
+    int proxy_taskid; /* Process id assigned by proxy         */
+    pid_t parent_pid; /* PID for parent (poe) process         */
+    pid_t task_pid; /* PID for this process                 */
+    char *ipaddr; /* IP address of node where task is     */
+    char *hostname; /* Hostname of node where task is       */
 } taskinfo;
 
-typedef struct jobinfo {
-    int proxy_jobid;		/* Job id assigned by proxy             */
-    int poe_taskid;         /* taskid for poe master process        */
-    char *submit_jobid;		/* Jobid used when submitted by GUI     */
-    pid_t poe_pid;		/* Process id for main poe process      */
-    pid_t task0_pid;		/* Process id for app. task 0           */
+typedef struct jobinfo
+{
+    int proxy_jobid; /* Job id assigned by proxy             */
+    int poe_taskid; /* taskid for poe master process        */
+    char *submit_jobid; /* Jobid used when submitted by GUI     */
+    pid_t poe_pid; /* Process id for main poe process      */
+    pid_t task0_pid; /* Process id for app. task 0           */
 #ifdef PE_DUAL_POE_DEBUG
-    jobinfoptr debugger_job;    /* reference to debugger job */
-    jobinfoptr debuggee_job;    /* reference to debuggee job */
+    jobinfoptr debugger_job; /* reference to debugger job */
+    jobinfoptr debuggee_job; /* reference to debuggee job */
 #endif
-    int debugging;		/* Job is being debugged 		*/
-    char *sdm_debugdir;         /* Directory path for SDM debugger      */
-    char *sdm_debugname;        /* Pathname to the top level debugger   */
-    char **sdm_debugargs;       /* Array of debugger args               */
-    char **sdm_envp;            /* Environment variables for SDM        */
-    int sdm_debug_arg_count;    /* Number of debugger args              */
-    int stdin_fd;		/* STDIN pipe/file descriptor           */
-    int stdout_fd;		/* STDOUT pipe/file descriptor          */
-    int stderr_fd;		/* STDERR pipe descriptor               */
-    FILE *stderr_file;      /* stderr file descriptor           */
-    ioinfo stdout_info;		/* Stdout file buffer info              */
-    ioinfo stderr_info;		/* Stderr file buffer info              */
-    int numtasks;		/* Number of tasks in application       */
-    taskinfo *tasks;		/* Tasks in this application            */
-    pthread_t startup_thread;	/* Startup monitor thread for app       */
-    time_t submit_time;		/* Time job was submitted               */
-    char label_io;		/* User set MP_LABELIO                  */
-    char split_io;		/* STDOUT is split by task              */
-    char stdin_redirect;	/* Stdin redirected to file             */
-    char stdout_redirect;	/* Stdout redirected to file            */
-    char stderr_redirect;	/* Stderr redirected to file            */
-    char discovered_job;	/* Job already running at PTP startup   */
+    int debugging; /* Job is being debugged 		*/
+    char *sdm_debugdir; /* Directory path for SDM debugger      */
+    char *sdm_debugname; /* Pathname to the top level debugger   */
+    char **sdm_debugargs; /* Array of debugger args               */
+    char **sdm_envp; /* Environment variables for SDM        */
+    int sdm_debug_arg_count; /* Number of debugger args              */
+    int stdin_fd; /* STDIN pipe/file descriptor           */
+    int stdout_fd; /* STDOUT pipe/file descriptor          */
+    int stderr_fd; /* STDERR pipe descriptor               */
+    FILE *stderr_file; /* stderr file descriptor           */
+    ioinfo stdout_info; /* Stdout file buffer info              */
+    ioinfo stderr_info; /* Stderr file buffer info              */
+    int numtasks; /* Number of tasks in application       */
+    taskinfo *tasks; /* Tasks in this application            */
+    pthread_t startup_thread; /* Startup monitor thread for app       */
+    time_t submit_time; /* Time job was submitted               */
+    char label_io; /* User set MP_LABELIO                  */
+    char split_io; /* STDOUT is split by task              */
+    char stdin_redirect; /* Stdin redirected to file             */
+    char stdout_redirect; /* Stdout redirected to file            */
+    char stderr_redirect; /* Stderr redirected to file            */
+    char discovered_job; /* Job already running at PTP startup   */
 } jobinfo;
 
-typedef struct NODE_REFCOUNT {
-    struct NODE_REFCOUNT *next;	/* -> Next node in hash chain           */
-    char *key;			/* Hash key for this structure          */
-    int proxy_nodeid;		/* Proxy assigned node id for node      */
-    int node_number;		/* This node's node number              */
-    int task_count;		/* Number of tasks running on node      */
+typedef struct NODE_REFCOUNT
+{
+    struct NODE_REFCOUNT *next; /* -> Next node in hash chain           */
+    char *key; /* Hash key for this structure          */
+    int proxy_nodeid; /* Proxy assigned node id for node      */
+    int node_number; /* This node's node number              */
+    int task_count; /* Number of tasks running on node      */
 } node_refcount;
 
-typedef struct {
-    char *id;			/* Attribute identifier                 */
-    int type;			/* Cases where attribute is allowed */
-    char *short_name;		/* Description used as label in GUI     */
-    char *long_name;		/* Text used for tooltip text in GUI    */
-    char *default_value;	/* Attribute's default value            */
+typedef struct
+{
+    char *id; /* Attribute identifier                 */
+    int type; /* Cases where attribute is allowed */
+    char *short_name; /* Description used as label in GUI     */
+    char *long_name; /* Text used for tooltip text in GUI    */
+    char *default_value; /* Attribute's default value            */
 } string_launch_attr;
 
-typedef struct {
-    char *id;			/* Attribute identifier                 */
-    int type;			/* Cases where attribute is allowed */
-    char *short_name;		/* Description used as label in GUI */
-    char *long_name;		/* Text used for tooltip text in GUI */
-    char *default_value;	/* Attribute's default value            */
-    char *enums;		/* Enumeration values ',' delimited     */
+typedef struct
+{
+    char *id; /* Attribute identifier                 */
+    int type; /* Cases where attribute is allowed */
+    char *short_name; /* Description used as label in GUI */
+    char *long_name; /* Text used for tooltip text in GUI */
+    char *default_value; /* Attribute's default value            */
+    char *enums; /* Enumeration values ',' delimited     */
 } enum_launch_attr;
 
-typedef struct {
-    char *id;			/* Attribute identifier                 */
-    int type;			/* Cases where attribute is allowed */
-    char *short_name;		/* Description used as label in GUI */
-    char *long_name;		/* Text used for tooltip text in GUI */
-    int default_value;		/* Attribute's default value            */
-    int llimit;			/* Attribute's lower limit              */
-    int ulimit;			/* Attribute's upper limit              */
+typedef struct
+{
+    char *id; /* Attribute identifier                 */
+    int type; /* Cases where attribute is allowed */
+    char *short_name; /* Description used as label in GUI */
+    char *long_name; /* Text used for tooltip text in GUI */
+    int default_value; /* Attribute's default value            */
+    int llimit; /* Attribute's lower limit              */
+    int ulimit; /* Attribute's upper limit              */
 } int_launch_attr;
 
-typedef struct {
-    char *id;			/* Attribute identifier                 */
-    int type;			/* Cases where attribute is allowed */
-    char *short_name;		/* Description used as label in GUI */
-    char *long_name;		/* Text used for tooltip text in GUI */
-    long long default_value;	/* Attribute's default value            */
-    long long llimit;		/* Attribute's lower limit              */
-    long long ulimit;		/* Attribute's upper limit              */
+typedef struct
+{
+    char *id; /* Attribute identifier                 */
+    int type; /* Cases where attribute is allowed */
+    char *short_name; /* Description used as label in GUI */
+    char *long_name; /* Text used for tooltip text in GUI */
+    long long default_value; /* Attribute's default value            */
+    long long llimit; /* Attribute's lower limit              */
+    long long ulimit; /* Attribute's upper limit              */
 } long_int_launch_attr;
 
 static RETSIGTYPE ptp_signal_handler(int sig);
@@ -220,17 +228,17 @@ static void job_enqueue(jobinfo *, pid_t);
 static void post_error(int trans_id, int type, char *msg);
 static void post_submitjob_error(int trans_id, char *subid, char *msg);
 static char **create_exec_parmlist(char *execname, char *targetname, int arg_count, char **args, char *helper);
-static char **create_child_sdm_parmlist(char *debugger_path, char *debugger_name, int debug_args_count, char **debug_args);
+static char **create_child_sdm_parmlist(char *debugger_path, char *debugger_name, int debug_args_count,
+        char **debug_args);
 static char **create_debug_parmlist(char *debugger_name, int debug_args_count, char **debug_args);
-static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem,
-			       char *mp_rdma_count, char *debugger_id, int is_debugger);
+static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
+        int is_debugger);
 static void add_environment_variable(char *env_var);
-static int setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
-			  int *fd, char *redirect);
-static int setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name,
-			  int *fd, FILE **file_fd, char *redirect);
-static int setup_child_stdout(int run_trans_id, char *subid, int redirect,
-			     int *file_fd, int pipe_fd[]);
+static int setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
+        char *redirect);
+static int setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
+        FILE **file_fd, char *redirect);
+static int setup_child_stdout(int run_trans_id, char *subid, int redirect, int *file_fd, int pipe_fd[]);
 static int setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[]);
 static int stdout_handler(int fd, void *job);
 static int stderr_handler(int fd, void *job);
@@ -253,14 +261,12 @@ static void send_ok_event(int trans_id);
 static void discover_jobs(void);
 static void add_discovered_job(char *pid);
 static void redirect_io(void);
-static proxy_msg *proxy_attr_def_enum_event(int trans_id, char *id, char *name,
-					    char *desc, int display, char *def, int count);
-static proxy_msg *proxy_attr_def_int_limits_event(int trans_id, char *id,
-						  char *name, char *desc, int display, int def,
-						  int llimit, int ulimit);
-static proxy_msg *proxy_attr_def_long_int_limits_event(int trans_id, char *id, char *name,
-						       char *desc, int display, long long def,
-						       long long llimit, long long ulimit);
+static proxy_msg *proxy_attr_def_enum_event(int trans_id, char *id, char *name, char *desc, int display, char *def,
+        int count);
+static proxy_msg *proxy_attr_def_int_limits_event(int trans_id, char *id, char *name, char *desc, int display, int def,
+        int llimit, int ulimit);
+static proxy_msg *proxy_attr_def_long_int_limits_event(int trans_id, char *id, char *name, char *desc, int display,
+        long long def, long long llimit, long long ulimit);
 static void send_string_attrs(int trans_id, int flags);
 static void send_int_attrs(int trans_id, int flags);
 static void send_long_int_attrs(int trans_id, int flags);
@@ -284,26 +290,26 @@ extern char **environ;
 static int events_enabled = 0;
 static int shutdown_requested;
 static int ptp_signal_exit;
-static List *jobs = NULL;		/* Jobs run by this proxy                   */
-static Hash *nodes;		/* Nodes currently in use                   */
-static int node_count = 0;		/* Number of active nodes                   */
-static int global_node_index = 0;	/* Sequentially assigned node number        */
-static RETSIGTYPE(*saved_signals[NSIG]) (int);
-static proxy_svr *pe_proxy = NULL;	/* Handle for proxy message link            */
-static int base_id;		/* Base id for proxy objects                */
-static int last_id = 1;		/* Last assigned object id                  */
-static int queue_id;		/* Object id for our queue                  */
-static int machine_id;		/* Object id for our machine                */
-static int start_events_transid;	/* start_events command id          */
-static int run_miniproxy = 0;	/* Run miniproxy at proxy shutdown */
-static char emsg_buffer[_POSIX_PATH_MAX + 50];	/* Buffer for building error msg */
-static int use_load_leveler = 0;	/* Use LL resource managment/tracking      */
-static char *user_libpath;	/* Alternate libdir for LoadLeveler      */
-static int multicluster_status;	/* LoadLeveler multicluster status          */
-static int min_node_sleep_seconds = 30;	/* Min. LL node status interval     */
-static int max_node_sleep_seconds = 300;	/* Max. LL node status interval    */
-static int job_sleep_seconds = 30;	/* LL job status interval        */
-static char ibmll_libpath_name[_POSIX_PATH_MAX];	/* LoadLeveler lib path */
+static List *jobs = NULL; /* Jobs run by this proxy                   */
+static Hash *nodes; /* Nodes currently in use                   */
+static int node_count = 0; /* Number of active nodes                   */
+static int global_node_index = 0; /* Sequentially assigned node number        */
+static RETSIGTYPE(*saved_signals[NSIG])(int);
+static proxy_svr *pe_proxy = NULL; /* Handle for proxy message link            */
+static int base_id; /* Base id for proxy objects                */
+static int last_id = 1; /* Last assigned object id                  */
+static int queue_id; /* Object id for our queue                  */
+static int machine_id; /* Object id for our machine                */
+static int start_events_transid; /* start_events command id          */
+static int run_miniproxy = 0; /* Run miniproxy at proxy shutdown */
+static char emsg_buffer[_POSIX_PATH_MAX + 50]; /* Buffer for building error msg */
+static int use_load_leveler = 0; /* Use LL resource managment/tracking      */
+static char *user_libpath; /* Alternate libdir for LoadLeveler      */
+static int multicluster_status; /* LoadLeveler multicluster status          */
+static int min_node_sleep_seconds = 30; /* Min. LL node status interval     */
+static int max_node_sleep_seconds = 300; /* Max. LL node status interval    */
+static int job_sleep_seconds = 30; /* LL job status interval        */
+static char ibmll_libpath_name[_POSIX_PATH_MAX]; /* LoadLeveler lib path */
 static char miniproxy_path[_POSIX_PATH_MAX];
 
 /*
@@ -317,8 +323,8 @@ static char miniproxy_path[_POSIX_PATH_MAX];
 static pthread_mutex_t job_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t node_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t print_message_lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_attr_t thread_attrs;	/* Thread creation attributes       */
-static pthread_t termination_thread;	/* Thread to monitor process exit   */
+static pthread_attr_t thread_attrs; /* Thread creation attributes       */
+static pthread_t termination_thread; /* Thread to monitor process exit   */
 static int state_trace = 0;
 static int state_trace_detail = 0;
 static int state_info = 0;
@@ -338,32 +344,30 @@ static regex_t errormsg_regex;
 
 #ifdef __linux__
 static struct option longopts[] = {
-    {"proxy", required_argument, NULL, 'P'},
-    {"port", required_argument, NULL, 'p'},
-    {"host", required_argument, NULL, 'h'},
-    {"useloadleveler", required_argument, NULL, 'L'},
-    {"trace", required_argument, NULL, 't'},
-    {"lib_override", required_argument, NULL, 'l'},
-    {"multicluster", required_argument, NULL, 'm'},
-    {"template_override", required_argument, NULL, 'o'},
-    {"template_write", required_argument, NULL, 'r'},
-    {"node_polling_min", required_argument, NULL, 'x'},
-    {"node_polling_max", required_argument, NULL, 'y'},
-    {"job_polling", required_argument, NULL, 'z'},
-    {"suspend_at_startup", no_argument, NULL, 'S'},
-    {"debug", required_argument, NULL, 'D'},
-    {"runMiniproxy", no_argument, NULL, 'M'},
-    {NULL, 0, NULL, 0}
+    {   "proxy", required_argument, NULL, 'P'},
+    {   "port", required_argument, NULL, 'p'},
+    {   "host", required_argument, NULL, 'h'},
+    {   "useloadleveler", required_argument, NULL, 'L'},
+    {   "trace", required_argument, NULL, 't'},
+    {   "lib_override", required_argument, NULL, 'l'},
+    {   "multicluster", required_argument, NULL, 'm'},
+    {   "template_override", required_argument, NULL, 'o'},
+    {   "template_write", required_argument, NULL, 'r'},
+    {   "node_polling_min", required_argument, NULL, 'x'},
+    {   "node_polling_max", required_argument, NULL, 'y'},
+    {   "job_polling", required_argument, NULL, 'z'},
+    {   "suspend_at_startup", no_argument, NULL, 'S'},
+    {   "debug", required_argument, NULL, 'D'},
+    {   "runMiniproxy", no_argument, NULL, 'M'},
+    {   NULL, 0, NULL, 0}
 };
-static char *libpath[] = { NULL, "/opt/ibmll/LoadL/full/lib/",
+static char *libpath[] = {NULL, "/opt/ibmll/LoadL/full/lib/",
     "/opt/ibmll/LoadL/so/lib/", (char *) -1
 };
 static char *libname = "libllapi.so";
 #else
-static char *libpath[] = {
-    NULL, "/usr/lpp/LoadL/full/lib", "/usr/lpp/LoadL/so/lib", "/opt/ibmll/LoadL/full/lib/",
-	"/opt/ibmll/LoadL/so/lib/", (char *) -1
-};
+static char *libpath[] = { NULL, "/usr/lpp/LoadL/full/lib", "/usr/lpp/LoadL/so/lib", "/opt/ibmll/LoadL/full/lib/",
+        "/opt/ibmll/LoadL/so/lib/", (char *) -1 };
 static char *libname = "libllapi.a";
 #endif
 
@@ -377,7 +381,7 @@ static char *libname = "libllapi.a";
 #define MY_STATE_IDLE 5
 #define MY_STATE_TERMINATED 6
 
-struct ClusterObject {		/* a LoadLeveler cluster (same as a ptp machine) */
+struct ClusterObject { /* a LoadLeveler cluster (same as a ptp machine) */
     int proxy_generated_cluster_id;
     char *cluster_name;
     Hash *node_hash;
@@ -390,28 +394,28 @@ struct ClusterObject {		/* a LoadLeveler cluster (same as a ptp machine) */
 };
 typedef struct ClusterObject ClusterObject;
 
-struct NodeObject {		/* a LoadLeveler or ptp node in a cluster (machine) */
+struct NodeObject { /* a LoadLeveler or ptp node in a cluster (machine) */
     int proxy_generated_node_id;
-    int node_found;		/* node found indicator */
+    int node_found; /* node found indicator */
     int node_state;
-    char *node_name;		/* use the name as the key to the node hash table in the cluster object */
+    char *node_name; /* use the name as the key to the node hash table in the cluster object */
 };
 typedef struct NodeObject NodeObject;
 
-struct JobObject {		/* a LoadLeveler or ptp job in a cluster */
+struct JobObject { /* a LoadLeveler or ptp job in a cluster */
     int proxy_generated_job_id;
     char *gui_assigned_job_id;
-    int job_found;		/* job found indicator */
-    int job_state;		/* 1=submitted, 2=in queue */
-    time_t job_submit_time;	/* time when submitted */
-    List *task_list;		/* processes running for this job */
+    int job_found; /* job found indicator */
+    int job_state; /* 1=submitted, 2=in queue */
+    time_t job_submit_time; /* time when submitted */
+    List *task_list; /* processes running for this job */
     LL_STEP_ID ll_step_id;
     char *cluster_name;
 };
 typedef struct JobObject JobObject;
-struct TaskObject {		/* a LoadLeveler or ptp task for job */
+struct TaskObject { /* a LoadLeveler or ptp task for job */
     int proxy_generated_task_id;
-    int task_found;		/* job found indicator */
+    int task_found; /* job found indicator */
     int ll_task_id;
     int task_state;
     char *node_name;
@@ -430,13 +434,13 @@ static struct {
     int (*ll_free_objs) (LL_element *);
     int (*ll_cluster) (int, LL_element **, LL_cluster_param *);
     int (*ll_submit_job) (char *job_cmd_file, char *monitor_program, char *monitor_arg,
-			  LL_job * job_info, int job_version);
+            LL_job * job_info, int job_version);
     int (*ll_terminate_job) (LL_terminate_job_info * ptr);
     void (*ll_free_job_info) (LL_job * job_info, int job_version);
     char *(*ll_error) (LL_element ** errObj, int print_to);
-} LL_SYMS;
+}LL_SYMS;
 
-static int state_shutdown_requested = 0;	/* shutdown not in progress */
+static int state_shutdown_requested = 0; /* shutdown not in progress */
 TaskObject *task_object = NULL;
 static pthread_t monitor_LoadLeveler_jobs_thread = 0;
 static pthread_attr_t monitor_LoadLeveler_jobs_thread_attr;
@@ -444,8 +448,8 @@ static pthread_t monitor_LoadLeveler_nodes_thread = 0;
 static pthread_attr_t monitor_LoadLeveler_nodes_thread_attr;
 static pthread_mutex_t master_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t access_LoadLeveler_lock = PTHREAD_MUTEX_INITIALIZER;
-static List *cluster_list = NULL;	/* list of clusters if multicluster (we'll set to single local if none) */
-static List *job_list = NULL;	/* job list for all clusters (since jobs can move) */
+static List *cluster_list = NULL; /* list of clusters if multicluster (we'll set to single local if none) */
+static List *job_list = NULL; /* job list for all clusters (since jobs can move) */
 static pthread_mutex_t job_notify_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t job_notify_condvar = PTHREAD_COND_INITIALIZER;
 static char ibmll_proxy_base_id_string[256];
@@ -461,23 +465,23 @@ static LL_element *my_ll_query(enum QueryType type);
 static int my_ll_free_objs(LL_element * query_elem);
 static LL_element *my_ll_next_obj(LL_element * query_elem);
 static LL_element *my_ll_get_objs(LL_element * query_elem, enum LL_Daemon daemon, char *ignore,
-				  int *value, int *rc);
+        int *value, int *rc);
 static int my_ll_set_request(LL_element * query_elem, enum QueryFlags qflags, char **ignore,
-			     enum DataFilter dfilter);
+        enum DataFilter dfilter);
 static int sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_object,
-			    NodeObject * node_object);
+        NodeObject * node_object);
 static int sendNodeChangeEvent(int gui_transmission_id, ClusterObject * cluster_object,
-			       NodeObject * node_object);
+        NodeObject * node_object);
 static int sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object,
-			   JobObject * job_object);
+        JobObject * job_object);
 static int sendJobChangeEvent(int gui_transmission_id, JobObject * job_object);
 static int sendJobRemoveEvent(int gui_transmission_id, JobObject * job_object);
 static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object,
-			    JobObject * job_object, TaskObject * task_object);
+        JobObject * job_object, TaskObject * task_object);
 static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object,
-			       TaskObject * task_object);
+        TaskObject * task_object);
 static int sendTaskRemoveEvent(int gui_transmission_id, JobObject * job_object,
-			       TaskObject * task_object);
+        TaskObject * task_object);
 static int sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_object);
 static int sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_object);
 static void add_job_to_list(List * job_list, JobObject * job_object);
@@ -487,7 +491,7 @@ static void delete_task_from_list(List * task_list, TaskObject * task_object);
 static JobObject *get_job_in_list(List * job_list, LL_STEP_ID ll_step_id);
 static NodeObject *get_node_in_hash(Hash * node_hash, char *node_name);
 static TaskObject *get_task_in_list(List * task_list, char *task_instance_machine_name,
-				    int ll_task_id);
+        int ll_task_id);
 static void refresh_cluster_list();
 #endif
 
@@ -497,303 +501,269 @@ static proxy_svr_helper_funcs helper_funcs = { NULL, NULL };
  * Proxy infrastructure expects commands in exactly this sequence.
  * Be careful when adding or deleting commands
  */
-static proxy_cmd cmds[] = {
-		PE_quit,
-		PE_start_daemon,
-		PE_define_model,
-		PE_start_events,
-		PE_halt_events,
-		PE_submit_job,
-		PE_terminate_job
-};
+static proxy_cmd cmds[] = { PE_quit, PE_start_daemon, PE_define_model, PE_start_events, PE_halt_events, PE_submit_job,
+        PE_terminate_job };
 static proxy_commands command_tab = { 0, sizeof cmds / sizeof(proxy_cmd), cmds };
 
-static char *mp_infolevel_labels[] = {"Error", "Warning", "Informational",
-    "Diagnostic", "Diagnostic level 4", "Diagnostic level 5",
-    "Diagnostic level 6"
-};
+static char *mp_infolevel_labels[] = { "Error", "Warning", "Informational", "Diagnostic", "Diagnostic level 4",
+        "Diagnostic level 5", "Diagnostic level 6" };
 
 /*
  * This table defines the launch attributes corresponding to PE environment
  * variables for the stand-alone PE case for Linux.
  */
 static string_launch_attr string_launch_attrs[] = {
-    /*
-     * Attributes needed in both basic and advanced mode
-     */
-    {"PE_STDIN_PATH", ATTR_ALWAYS_ALLOWED, "Stdin Path", "Specify path for stdin input file", ""},
-    {"PE_STDOUT_PATH", ATTR_ALWAYS_ALLOWED, "Stdout Path",
-     "Specify path for stdout output file", ""},
-    {"PE_STDERR_PATH", ATTR_ALWAYS_ALLOWED, "Stderr Path",
-      "Specify path for stderr output file", ""},
-    /*
-     * I/O Related attributes
-     */
-    {"MP_IONODEFILE", ATTR_ALWAYS_ALLOWED, "MPI I/O Node List",
-     "Specify file listing nodes performing parallel I/O (MP_IONODEFILE)",
-     ""},
-    /*
-     * Diagnostic related attributes
-     */
-    {"MP_PMDLOG_DIR", ATTR_ALWAYS_ALLOWED, "PMD Log Directory",
-     "Specify directory where PMD log is generated (MP_PMDLOG_DIR)", ""},
-    {"MP_PRIORITY_LOG_DIR", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Priority Log Directory",
-     "Specify directory containing co-scheduler log (MP_PRIORITY_LOG_DIR)", "/tmp"},
-    {"MP_PRIORITY_LOG_NAME", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Priority Log Name",
-     "Specify name of co-scheduler log (MP_PRIORITY_LOG_NAME)", "pmadjpri.log"},
-    /*
-     * Debug related attributes
-     */
-    {"MP_COREDIR", ATTR_ALWAYS_ALLOWED, "Corefile Directory",
-     "Specify directory for application's core files (MP_COREDIR)", ""},
-    {"MP_DEBUG_INITIAL_STOP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Initial Breakpoint",
-     "Initial breakpoint when debugging an application (MP_DEBUG_INITIAL_STOP)", ""},
-    {"MP_PROFDIR", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY, "GMON Directory",
-     "Directory containing GMON profiling data files (GMON_PROFDIR)", ""},
-    /*
-     * System resource related  attributes
-     */
-    {"MP_PRIORITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Dispatch Priority Class",
-     "Specify priority class or high/low priority values (MP_PRIORITY)", ""},
-    /*
-     * Node allocation related attributes
-     */
-    {"MP_CMDFILE", ATTR_ALWAYS_ALLOWED, "Command File",
-     "Specify script to load nodes in partition (MP_CMDFILE)", ""},
-    {"MP_HOSTFILE", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Host List File",
-     "Specify name of host list file for node allocation (MP_HOSTFILE)", ""},
-    {"MP_REMOTEDIR", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
-     "Specify name of script echoing current directory (MP_REMOTEDIR)", ""},
-    {"MP_LLFILE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Job Command File",
-     "Specify path of a LoadLeveler job command file used for node allocation (MP_LLFILE)", ""},
-    {"MP_RMPOOL", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Resource Pool",
-     "Name or number of resource pool to use for node allocation (MP_RMPOOL)", ""},
-    /*
-     * Performance related attributes
-     */
-    /*
-     * Miscellaneous attributes
-     */
-    {"MP_EUILIBPATH", ATTR_ALWAYS_ALLOWED, "Library Path",
-     "Specify path to message passing and communications libraries (MP_EUILIBPATH)", ""},
-    {"MP_CKPTFILE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Checkpoint File Name",
-     "Base name of the chcekpoint file (MP_CKPTFILE)", ""},
-    {"MP_CKPTDIR", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Checkpoint Directory",
-     "Directory where the checkpoint file will reside (MP_CHPTDIR)", ""},
+/*
+ * Attributes needed in both basic and advanced mode
+ */
+{ "PE_STDIN_PATH", ATTR_ALWAYS_ALLOWED, "Stdin Path", "Specify path for stdin input file", "" }, { "PE_STDOUT_PATH",
+        ATTR_ALWAYS_ALLOWED, "Stdout Path", "Specify path for stdout output file", "" }, { "PE_STDERR_PATH",
+        ATTR_ALWAYS_ALLOWED, "Stderr Path", "Specify path for stderr output file", "" },
+/*
+ * I/O Related attributes
+ */
+{ "MP_IONODEFILE", ATTR_ALWAYS_ALLOWED, "MPI I/O Node List",
+        "Specify file listing nodes performing parallel I/O (MP_IONODEFILE)", "" },
+/*
+ * Diagnostic related attributes
+ */
+{ "MP_PMDLOG_DIR", ATTR_ALWAYS_ALLOWED, "PMD Log Directory",
+        "Specify directory where PMD log is generated (MP_PMDLOG_DIR)", "" }, { "MP_PRIORITY_LOG_DIR", ATTR_FOR_AIX
+        | ATTR_FOR_ALL_PROXY, "Priority Log Directory",
+        "Specify directory containing co-scheduler log (MP_PRIORITY_LOG_DIR)", "/tmp" }, { "MP_PRIORITY_LOG_NAME",
+        ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Priority Log Name",
+        "Specify name of co-scheduler log (MP_PRIORITY_LOG_NAME)", "pmadjpri.log" },
+/*
+ * Debug related attributes
+ */
+{ "MP_COREDIR", ATTR_ALWAYS_ALLOWED, "Corefile Directory",
+        "Specify directory for application's core files (MP_COREDIR)", "" }, { "MP_DEBUG_INITIAL_STOP", ATTR_FOR_AIX
+        | ATTR_FOR_ALL_PROXY, "Initial Breakpoint",
+        "Initial breakpoint when debugging an application (MP_DEBUG_INITIAL_STOP)", "" }, { "MP_PROFDIR",
+        ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY, "GMON Directory",
+        "Directory containing GMON profiling data files (GMON_PROFDIR)", "" },
+/*
+ * System resource related  attributes
+ */
+{ "MP_PRIORITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Dispatch Priority Class",
+        "Specify priority class or high/low priority values (MP_PRIORITY)", "" },
+/*
+ * Node allocation related attributes
+ */
+{ "MP_CMDFILE", ATTR_ALWAYS_ALLOWED, "Command File", "Specify script to load nodes in partition (MP_CMDFILE)", "" }, {
+        "MP_HOSTFILE", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Host List File",
+        "Specify name of host list file for node allocation (MP_HOSTFILE)", "" }, { "MP_REMOTEDIR", ATTR_FOR_AIX
+        | ATTR_FOR_ALL_PROXY, "Specify name of script echoing current directory (MP_REMOTEDIR)", "" }, { "MP_LLFILE",
+        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Job Command File",
+        "Specify path of a LoadLeveler job command file used for node allocation (MP_LLFILE)", "" }, { "MP_RMPOOL",
+        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Resource Pool",
+        "Name or number of resource pool to use for node allocation (MP_RMPOOL)", "" },
+/*
+ * Performance related attributes
+ */
+/*
+ * Miscellaneous attributes
+ */
+{ "MP_EUILIBPATH", ATTR_ALWAYS_ALLOWED, "Library Path",
+        "Specify path to message passing and communications libraries (MP_EUILIBPATH)", "" },
+        { "MP_CKPTFILE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Checkpoint File Name",
+                "Base name of the chcekpoint file (MP_CKPTFILE)", "" }, { "MP_CKPTDIR", ATTR_FOR_AIX
+                | ATTR_FOR_ALL_PROXY, "Checkpoint Directory",
+                "Directory where the checkpoint file will reside (MP_CHPTDIR)", "" },
 
-    /*
-     * Alternate resource manager attributes
-     */
-    {"MP_RMLIB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_STANDALONE, "Resource Manager Library",
-     "Specify alternate resource manager library", ""}, /*
-     * Other attributes
-     */
-    {"PE_ENV_SCRIPT", ATTR_ALWAYS_ALLOWED, "Environment Setup Script",
-     "Specify if using basic or advanced mode", ""},
-    {"PE_ADVANCED_MODE", ATTR_ALWAYS_ALLOWED, "Advanced Mode",
-     "Specify name of PE environment variable setup script", "no"},
-    {"MP_SAVE_LLFILE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Save Job Command File",
-     "Specify path of generated LoadLeveler job command file (MP_SAVE_LLFILE)", ""},
-    {"MP_SAVEHOSTFILE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Save Hostlist File",
-     "Specify path of generated host list file (MP_SAVEHOSTFILE)", ""}
-};
+        /*
+         * Alternate resource manager attributes
+         */
+        { "MP_RMLIB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_STANDALONE, "Resource Manager Library",
+                "Specify alternate resource manager library", "" }, /*
+         * Other attributes
+         */
+        { "PE_ENV_SCRIPT", ATTR_ALWAYS_ALLOWED, "Environment Setup Script", "Specify if using basic or advanced mode",
+                "" }, { "PE_ADVANCED_MODE", ATTR_ALWAYS_ALLOWED, "Advanced Mode",
+                "Specify name of PE environment variable setup script", "no" }, { "MP_SAVE_LLFILE", ATTR_FOR_ALL_OS
+                | ATTR_FOR_PE_WITH_LL, "Save Job Command File",
+                "Specify path of generated LoadLeveler job command file (MP_SAVE_LLFILE)", "" }, { "MP_SAVEHOSTFILE",
+                ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Save Hostlist File",
+                "Specify path of generated host list file (MP_SAVEHOSTFILE)", "" } };
 
-static enum_launch_attr enum_attrs[] = {
-    /*
-     * I/O tab related attributes
-     */
-    {"MP_DEVTYPE", ATTR_ALWAYS_ALLOWED, "Device Type Class",
-     "Specify that Infiniband interconnect is to be used (MP_DEVTYPE)", "", "|ib"},
-    {"MP_LABELIO", ATTR_ALWAYS_ALLOWED, "Label I/O",
-     "Specify if application output is labeled by task id (MP_LABELIO)", "no", "yes|no"},
-    {"MP_IO_ERRLOG", ATTR_ALWAYS_ALLOWED, "Create I/O Error Log",
-     "Specify if I/O error logging is enabled (MP_IO_ERRLOG)", "no", "yes|no"},
-    {"PE_SPLIT_STDOUT", ATTR_ALWAYS_ALLOWED, "Split STDOUT by Task",
-     "Specify if stdio output is split by task", "no", "yes|no"},
-    {"MP_STDINMODE", ATTR_ALWAYS_ALLOWED, "STDIN Mode",
-     "Specify how application's stdin is managed (MP_STDINMODE)", "all", "all|none"},
-    {"MP_STDOUTMODE", ATTR_ALWAYS_ALLOWED, "STDOUT Mode",
-     "Specify how application's stdio output is handled (MP_STDOUTMODE)",
-     "unordered", "ordered|unordered"},
-    /*
-     * Diagnostic tab related attributes
-     */
-    {"MP_PMDLOG", ATTR_ALWAYS_ALLOWED, "Create PMD Log",
-     "Specify if PE diagnostic messages are logged", "no", "yes|no"},
-    {"MP_PRINTENV", ATTR_ALWAYS_ALLOWED, "Print Environment",
-     "Specify if PE environment variables are printed (MP_PRINTENV)", "no", "yes|no"},
-    {"MP_PRIORITY_LOG", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Log Co-scheduler Messages",
-     "Specify if messages are logged to co-scheduler log (MP_PRIORITY_LOG)", "yes", "yes|no"},
-    {"MP_INFOLEVEL", ATTR_ALWAYS_ALLOWED, "Message Level",
-     "Specify level of PE message reporting (MP_INFOLEVEL)", "Warning",
-     "Error|Warning|Informational|Diagnostic|Diagnostic level 4|Diagnostic level 5|Diagnostic level 6"},
-    {"MP_LAPI_TRACE_LEVEL", ATTR_ALWAYS_ALLOWED, "LAPI Trace Level",
-     "Specify level of LAPI trace (MP_LAPI_TRACE_LEVEL)", "0", "0|1|2|3|4|5"},
-    {"MP_STATISTICS", ATTR_ALWAYS_ALLOWED, "MPI Statistics",
-     "Obtain communication statistics for user space jobs (MP_STATISTICS)", "no", "yes|no|print"},
+static enum_launch_attr
+        enum_attrs[] = {
+                /*
+                 * I/O tab related attributes
+                 */
+                { "MP_DEVTYPE", ATTR_ALWAYS_ALLOWED, "Device Type Class",
+                        "Specify that Infiniband interconnect is to be used (MP_DEVTYPE)", "", "|ib" },
+                { "MP_LABELIO", ATTR_ALWAYS_ALLOWED, "Label I/O",
+                        "Specify if application output is labeled by task id (MP_LABELIO)", "no", "yes|no" },
+                { "MP_IO_ERRLOG", ATTR_ALWAYS_ALLOWED, "Create I/O Error Log",
+                        "Specify if I/O error logging is enabled (MP_IO_ERRLOG)", "no", "yes|no" },
+                { "PE_SPLIT_STDOUT", ATTR_ALWAYS_ALLOWED, "Split STDOUT by Task",
+                        "Specify if stdio output is split by task", "no", "yes|no" },
+                { "MP_STDINMODE", ATTR_ALWAYS_ALLOWED, "STDIN Mode",
+                        "Specify how application's stdin is managed (MP_STDINMODE)", "all", "all|none" },
+                { "MP_STDOUTMODE", ATTR_ALWAYS_ALLOWED, "STDOUT Mode",
+                        "Specify how application's stdio output is handled (MP_STDOUTMODE)", "unordered",
+                        "ordered|unordered" },
+                /*
+                 * Diagnostic tab related attributes
+                 */
+                { "MP_PMDLOG", ATTR_ALWAYS_ALLOWED, "Create PMD Log", "Specify if PE diagnostic messages are logged",
+                        "no", "yes|no" },
+                { "MP_PRINTENV", ATTR_ALWAYS_ALLOWED, "Print Environment",
+                        "Specify if PE environment variables are printed (MP_PRINTENV)", "no", "yes|no" },
+                { "MP_PRIORITY_LOG", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Log Co-scheduler Messages",
+                        "Specify if messages are logged to co-scheduler log (MP_PRIORITY_LOG)", "yes", "yes|no" },
+                { "MP_INFOLEVEL", ATTR_ALWAYS_ALLOWED, "Message Level",
+                        "Specify level of PE message reporting (MP_INFOLEVEL)", "Warning",
+                        "Error|Warning|Informational|Diagnostic|Diagnostic level 4|Diagnostic level 5|Diagnostic level 6" },
+                { "MP_LAPI_TRACE_LEVEL", ATTR_ALWAYS_ALLOWED, "LAPI Trace Level",
+                        "Specify level of LAPI trace (MP_LAPI_TRACE_LEVEL)", "0", "0|1|2|3|4|5" }, { "MP_STATISTICS",
+                        ATTR_ALWAYS_ALLOWED, "MPI Statistics",
+                        "Obtain communication statistics for user space jobs (MP_STATISTICS)", "no", "yes|no|print" },
 
-    /*
-     * Debug tab related attributes
-     */
-    {"MP_DEBUG_NOTIMEOUT", ATTR_ALWAYS_ALLOWED, "Suppress Timeout",
-     "Specify if debugger can attach without causing application timeout (MP_DEBUG_NOTIMEOUT)",
-     "no", "yes|no"},
-    {"MP_COREFILE_SIGTERM", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Corefile on SIGTERM",
-     "Specify if corefile generated on SIGTERM (MP_COREFILE_SIGTERM)", "no", "yes|no"},
-    {"MP_EUIDEVELOP", ATTR_ALWAYS_ALLOWED, "MPI Parameter Checking",
-     "Specify level of MPI parameter checking (MP_EUIDEVELOP)", "no", "yes|no|debug|minimum"},
-    {"MP_COREFILE_FORMAT", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
-     "Specify core file format or name of lightweight core file (MP_COREFILE_FORMAT)",
-     "standard", "standard|STDERR"},
-    /*
-     * System tab related attributes
-     */
-    {"MP_ADAPTER_USE", ATTR_ALWAYS_ALLOWED, "Exclusive Adapter Use",
-     "Specify how node's adapter should be used (MP_ADAPTER_USE)", "shared", "dedicated|shared"},
-    {"MP_CPU_USE", ATTR_ALWAYS_ALLOWED, "Exclusive CPU Use",
-     "Specify how node's CPU should be used (MP_CPU_USE)", "multiple", "multiple|unique"},
-    {"MP_EUIDEVICE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Adapter",
-     "Specify adapter to use for message passing (MP_EUIDEVICE)",
-     "", "en0|fi0|tr0|sn_all|sn_single|ml0"},
-    {"MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY, "Adapter",
-     "Specify adapter to use for message passing (MP_EUIDEVICE)", "", "ethx|sn_all|sn_single"},
-    {"MP_EUILIB", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Communications Subsystem",
-     "Communications susbsystem to be used (MP_EUILIB)", "ip", "ip|us"},
-    {"MP_INSTANCES", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Window or IP Instances",
-     "Number of user space windows or IP addresses to assign (MP_INSTANCES)", "", "|max"},
-    {"MP_RETRY", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
-     "Period in seconds between node allocation retries (MP_RETRY)", "0", "|wait"},
-    /*
-     * Node tab related attributes
-     */
-    {"MP_PGMMODEL", ATTR_ALWAYS_ALLOWED, "Programming Model",
-     "Specify programming model (MP_PGMMODEL)", "spmd", "spmd|mpmd"},
-    /*
-     * Performance tab related attributes
-     */
-    {"MP_CC_SCRATCH_BUF", ATTR_ALWAYS_ALLOWED, "Fastest Collectives",
-     "Specify if fastest collective algorithm is used (MP_CC_SCRATCH_BUF)", "yes", "yes|no"},
-    {"MP_CSS_INTERRUPT", ATTR_ALWAYS_ALLOWED, "Packets Generate Interrupts",
-     "Specify if arriving packets generate interrupts (MP_CSS_INTERRUPT)", "no", "yes|no"},
-    {"MP_PRIORITY_NTP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Coscheduler disables NTP",
-     "Specify if PE co-scheduler turns NTP off (MP_PRIORITY_NTP)", "no", "yes|no"},
-    {"MP_SHARED_MEMORY", ATTR_ALWAYS_ALLOWED, "Use Shared Memory",
-     "Specify is shared memory used for communication (MP_SHARED_MEMORY)", "yes", "yes|no"},
-    {"MP_SINGLE_THREAD", ATTR_ALWAYS_ALLOWED, "Single MPI Thread",
-     "Specify if application has single thread with MPI calls (MP_SINGLE_THREAD)",
-     "no", "yes|no"},
-    {"MP_WAIT_MODE", ATTR_ALWAYS_ALLOWED, "Wait Mode",
-     "Specify thread behavior when waiting for messages (MP_WAIT_MODE)",
-     "poll", "nopoll|poll|sleep|yield"},
-    {"MP_TASK_AFFINITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Task Affinity",
-     "Specify task affinity constraints (MP_TASK_AFFINITY)", "", "|SNI|-1"},
-    {"MP_NEWJOB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Maintain Partition",
-     "Maintain LoadLeveler parttition for multiple job steps (MP_NEWJOB)", "no", "yes|no"},
-    {"MP_USE_BULK_XFER", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Use Bulk Transfer",
-     "Exploit high performance switch data transfer (MP_USE_BULK_XFER)", "no", "yes|no"},
-    /*
-     * Miscellaneous tab related attributes
-     */
-    {"MP_HINTS_FILTERED", ATTR_ALWAYS_ALLOWED, "Hints Filtered",
-     "Specify if MPI info objects reject hints (MP_HINTS_FILTERED)", "yes", "yes|no"},
-    {"MP_CLOCK_SOURCE", ATTR_ALWAYS_ALLOWED, "Clock Source",
-     "Specify if high performance switch clock is time source (MP_CLOCK_SOURCE)", "", "|OS"},
-    {"MP_MSG_API", ATTR_ALWAYS_ALLOWED, "Message Passing API",
-     "Specify message passing API used by application (MP_MSG_API)",
-     "MPI", "MPI|LAPI|MPI_LAPI|MPI,LAPI"},
-    {"MP_TLP_REQUIRED", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Large Page Check",
-     "Specify if PE checks if application was compiled with large pages (MP_TLP_REQUIRED)",
-     "none", "none|warn|kill"},
-    {"MP_CKPTDIR_PER_TASK", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Checkpoint Directory Per Task",
-     "Specify if separate checkpoint directory per task (MP_CKPTDIR_PER_TASK)", "no"}
-};
+                /*
+                 * Debug tab related attributes
+                 */
+                { "MP_DEBUG_NOTIMEOUT", ATTR_ALWAYS_ALLOWED, "Suppress Timeout",
+                        "Specify if debugger can attach without causing application timeout (MP_DEBUG_NOTIMEOUT)",
+                        "no", "yes|no" }, { "MP_COREFILE_SIGTERM", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+                        "Corefile on SIGTERM", "Specify if corefile generated on SIGTERM (MP_COREFILE_SIGTERM)", "no",
+                        "yes|no" }, { "MP_EUIDEVELOP", ATTR_ALWAYS_ALLOWED, "MPI Parameter Checking",
+                        "Specify level of MPI parameter checking (MP_EUIDEVELOP)", "no", "yes|no|debug|minimum" }, {
+                        "MP_COREFILE_FORMAT", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+                        "Specify core file format or name of lightweight core file (MP_COREFILE_FORMAT)", "standard",
+                        "standard|STDERR" },
+                /*
+                 * System tab related attributes
+                 */
+                { "MP_ADAPTER_USE", ATTR_ALWAYS_ALLOWED, "Exclusive Adapter Use",
+                        "Specify how node's adapter should be used (MP_ADAPTER_USE)", "shared", "dedicated|shared" }, {
+                        "MP_CPU_USE", ATTR_ALWAYS_ALLOWED, "Exclusive CPU Use",
+                        "Specify how node's CPU should be used (MP_CPU_USE)", "multiple", "multiple|unique" }, {
+                        "MP_EUIDEVICE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Adapter",
+                        "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
+                        "en0|fi0|tr0|sn_all|sn_single|ml0" }, { "MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY,
+                        "Adapter", "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
+                        "ethx|sn_all|sn_single" },
+                { "MP_EUILIB", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Communications Subsystem",
+                        "Communications susbsystem to be used (MP_EUILIB)", "ip", "ip|us" }, { "MP_INSTANCES",
+                        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Window or IP Instances",
+                        "Number of user space windows or IP addresses to assign (MP_INSTANCES)", "", "|max" }, {
+                        "MP_RETRY", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
+                        "Period in seconds between node allocation retries (MP_RETRY)", "0", "|wait" },
+                /*
+                 * Node tab related attributes
+                 */
+                { "MP_PGMMODEL", ATTR_ALWAYS_ALLOWED, "Programming Model", "Specify programming model (MP_PGMMODEL)",
+                        "spmd", "spmd|mpmd" },
+                /*
+                 * Performance tab related attributes
+                 */
+                { "MP_CC_SCRATCH_BUF", ATTR_ALWAYS_ALLOWED, "Fastest Collectives",
+                        "Specify if fastest collective algorithm is used (MP_CC_SCRATCH_BUF)", "yes", "yes|no" }, {
+                        "MP_CSS_INTERRUPT", ATTR_ALWAYS_ALLOWED, "Packets Generate Interrupts",
+                        "Specify if arriving packets generate interrupts (MP_CSS_INTERRUPT)", "no", "yes|no" }, {
+                        "MP_PRIORITY_NTP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Coscheduler disables NTP",
+                        "Specify if PE co-scheduler turns NTP off (MP_PRIORITY_NTP)", "no", "yes|no" }, {
+                        "MP_SHARED_MEMORY", ATTR_ALWAYS_ALLOWED, "Use Shared Memory",
+                        "Specify is shared memory used for communication (MP_SHARED_MEMORY)", "yes", "yes|no" }, {
+                        "MP_SINGLE_THREAD", ATTR_ALWAYS_ALLOWED, "Single MPI Thread",
+                        "Specify if application has single thread with MPI calls (MP_SINGLE_THREAD)", "no", "yes|no" },
+                { "MP_WAIT_MODE", ATTR_ALWAYS_ALLOWED, "Wait Mode",
+                        "Specify thread behavior when waiting for messages (MP_WAIT_MODE)", "poll",
+                        "nopoll|poll|sleep|yield" }, { "MP_TASK_AFFINITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+                        "Task Affinity", "Specify task affinity constraints (MP_TASK_AFFINITY)", "", "|SNI|-1" }, {
+                        "MP_NEWJOB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Maintain Partition",
+                        "Maintain LoadLeveler parttition for multiple job steps (MP_NEWJOB)", "no", "yes|no" }, {
+                        "MP_USE_BULK_XFER", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Use Bulk Transfer",
+                        "Exploit high performance switch data transfer (MP_USE_BULK_XFER)", "no", "yes|no" },
+                /*
+                 * Miscellaneous tab related attributes
+                 */
+                { "MP_HINTS_FILTERED", ATTR_ALWAYS_ALLOWED, "Hints Filtered",
+                        "Specify if MPI info objects reject hints (MP_HINTS_FILTERED)", "yes", "yes|no" }, {
+                        "MP_CLOCK_SOURCE", ATTR_ALWAYS_ALLOWED, "Clock Source",
+                        "Specify if high performance switch clock is time source (MP_CLOCK_SOURCE)", "", "|OS" }, {
+                        "MP_MSG_API", ATTR_ALWAYS_ALLOWED, "Message Passing API",
+                        "Specify message passing API used by application (MP_MSG_API)", "MPI",
+                        "MPI|LAPI|MPI_LAPI|MPI,LAPI" }, { "MP_TLP_REQUIRED", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+                        "Large Page Check",
+                        "Specify if PE checks if application was compiled with large pages (MP_TLP_REQUIRED)", "none",
+                        "none|warn|kill" }, { "MP_CKPTDIR_PER_TASK", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
+                        "Checkpoint Directory Per Task",
+                        "Specify if separate checkpoint directory per task (MP_CKPTDIR_PER_TASK)", "no" } };
 
 int_launch_attr int_attrs[] = {
-    /*
-     * I/O tab related attributes
-     */
-    {"MP_IO_BUFFER_SIZE", ATTR_ALWAYS_ALLOWED, "MPI I/O Buffer Size",
-     "Specify default buffer size for MPI-IO (MPI_IO_BUFFER_SIZE)", 8192, 1, 0x8000000},
-	/*
-	 * Node tab related attributes
-	 */
-    {"MP_PROCS", ATTR_ALWAYS_ALLOWED,
-     "Number of Tasks", "Specify number of program tasks (MP_PROCS)", 1, 1, INT_MAX},
-    {"MP_NODES", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL,
-     "Number of Nodes", "Number of nodes to allocate (MP_NODES)", 1, 1, INT_MAX},
-    {"MP_TASKS_PER_NODE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Tasks per Node",
-     "Number of tasks to assign to a node (MP_TASKS_PER_NODE)", 1, 1, INT_MAX},
+/*
+ * I/O tab related attributes
+ */
+{ "MP_IO_BUFFER_SIZE", ATTR_ALWAYS_ALLOWED, "MPI I/O Buffer Size",
+        "Specify default buffer size for MPI-IO (MPI_IO_BUFFER_SIZE)", 8192, 1, 0x8000000 },
+/*
+ * Node tab related attributes
+ */
+{ "MP_PROCS", ATTR_ALWAYS_ALLOWED, "Number of Tasks", "Specify number of program tasks (MP_PROCS)", 1, 1, INT_MAX }, {
+        "MP_NODES", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Number of Nodes", "Number of nodes to allocate (MP_NODES)",
+        1, 1, INT_MAX }, { "MP_TASKS_PER_NODE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Tasks per Node",
+        "Number of tasks to assign to a node (MP_TASKS_PER_NODE)", 1, 1, INT_MAX },
 
-    {"MP_RETRY_COUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
-     "Number of times to retry node allocation (MP_RETRYCOUNT)", 1, 1, INT_MAX},
-    {"MP_RETRY_INT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
-    "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1, INT_MAX},
-	/*
-	 * Performance tab related attributes
-	 */
-    {"MP_ACK_THRESH", ATTR_ALWAYS_ALLOWED, "Acknowledgment Threshold",
-     "Specify packet acknowledgment threshhold (MP_ACK_THRESH)", 30, 1, 31},
-    {"MP_EAGER_LIMIT", ATTR_ALWAYS_ALLOWED, "Eager Limit",
-     "Specify rendezvous protocol message size threshold (MP_EAGER_LIMIT)",
-     0x10000, 1, INT_MAX},
-    {"MP_MSG_ENVELOPE_BUF", ATTR_ALWAYS_ALLOWED, "Envelope Buffer Size",
-     "Specify size of message envelope buffer (MP_MSG_ENVELOPE_BUF)",
-     0x800000, 1000001, INT_MAX},
-    {"MP_POLLING_INTERVAL", ATTR_ALWAYS_ALLOWED, "MPI Polling Interval",
-     "Specify PE polling interval (MP_POLLING_INTERVAL)", 400000, 1, INT_MAX},
-    {"PE_RDMA_COUNT", ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks",
-     "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX},
-    {"PE_RDMA_COUNT_2", ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks",
-     "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX},
-    {"MP_RETRANSMIT_INTERVAL", ATTR_ALWAYS_ALLOWED, "MPI Retransmit Interval",
-     "Specify interval to check if retransmit neeeded (MP_RETRANSMIT_INTERVAL)",
-     10000, 1000, INT_MAX},
-    {"MP_REXMIT_BUF_CNT", ATTR_ALWAYS_ALLOWED, "Retransmit Buffers",
-     "Specify number of retransmit buffers per task (MP_REXMIT_BUF_CNT)", 128, 1, INT_MAX},
-    {"MP_REXMIT_BUF_SIZE", ATTR_ALWAYS_ALLOWED, "Maximum LAPI Buffered Message",
-     "Specify maximum LAPI buffer size (MP_REXMIT_BUF_SIZE)", 65568, 1, INT_MAX},
-    {"MP_UDP_PACKET_SIZE", ATTR_ALWAYS_ALLOWED,
-     "UDP Packet Size", "Specify UDP packet size (MP_UDP_PACKET_SIZE)", 1, 1, INT_MAX},
-    {"PE_BUFFER_MEM", ATTR_ALWAYS_ALLOWED, "Buffer Memory",
-     "Specify size of preallocated early arrival buffer (MP_BUFFER_MEM)",
-     0x4000000, 0, INT_MAX},
-    {"MP_BULK_MIN_MSG_SIZE", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Minimum Bulk Message Size",
-     "Minimum message size to use bulk transfer path (MP_BULK_MIN_MSG_SIZE)",
-     153600, 0, INT_MAX},
-	/*
-	 * Miscellaneous tab related attributes
-	 */
-    {"MP_THREAD_STACKSIZE", ATTR_ALWAYS_ALLOWED, "Additional MPI Thread Stack Size",
-     "Specify additional stack size for MPI service thread (MP_THREAD_STACKSIZE)",
-     0, 0, INT_MAX},
-    {"MP_PULSE", ATTR_ALWAYS_ALLOWED, "Pulse Interval",
-     "Specify interval PE checks remote modes (MP_PULSE)", 600, 0, INT_MAX},
-    {"MP_TIMEOUT", ATTR_ALWAYS_ALLOWED, "Connection Timeout",
-     "Specify timeout limit for connecting to remote nodes (MP_TIMEOUT)", 150, 1, INT_MAX},
-	/*
-	 * Additional integer attributes used only for validation of attribute
-	 * field contents. These are used in cases where a single integer,
-	 * string or enumerated attribute is insufficient for validating
-	 * an attribute field, for instance where an allowable value is an
-	 * enumeration or integer value, or where a field contains
-	 * multiple sub-fields, such as mmm,nnn. For these attributes,
-	 * short name, long name and default value are irrelevant.
-	 */
-    {"MP_INSTANCES_INT", ATTR_ALWAYS_ALLOWED, "???", "???", 0, 0, INT_MAX},
-};
+{ "MP_RETRY_COUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
+        "Number of times to retry node allocation (MP_RETRYCOUNT)", 1, 1, INT_MAX }, { "MP_RETRY_INT", ATTR_FOR_ALL_OS
+        | ATTR_FOR_PE_WITH_LL, "Node Retry Interval", "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1,
+        INT_MAX },
+/*
+ * Performance tab related attributes
+ */
+{ "MP_ACK_THRESH", ATTR_ALWAYS_ALLOWED, "Acknowledgment Threshold",
+        "Specify packet acknowledgment threshhold (MP_ACK_THRESH)", 30, 1, 31 }, { "MP_EAGER_LIMIT",
+        ATTR_ALWAYS_ALLOWED, "Eager Limit", "Specify rendezvous protocol message size threshold (MP_EAGER_LIMIT)",
+        0x10000, 1, INT_MAX }, { "MP_MSG_ENVELOPE_BUF", ATTR_ALWAYS_ALLOWED, "Envelope Buffer Size",
+        "Specify size of message envelope buffer (MP_MSG_ENVELOPE_BUF)", 0x800000, 1000001, INT_MAX }, {
+        "MP_POLLING_INTERVAL", ATTR_ALWAYS_ALLOWED, "MPI Polling Interval",
+        "Specify PE polling interval (MP_POLLING_INTERVAL)", 400000, 1, INT_MAX }, { "PE_RDMA_COUNT",
+        ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks", "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX },
+        { "PE_RDMA_COUNT_2", ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks",
+                "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX }, { "MP_RETRANSMIT_INTERVAL",
+                ATTR_ALWAYS_ALLOWED, "MPI Retransmit Interval",
+                "Specify interval to check if retransmit neeeded (MP_RETRANSMIT_INTERVAL)", 10000, 1000, INT_MAX }, {
+                "MP_REXMIT_BUF_CNT", ATTR_ALWAYS_ALLOWED, "Retransmit Buffers",
+                "Specify number of retransmit buffers per task (MP_REXMIT_BUF_CNT)", 128, 1, INT_MAX }, {
+                "MP_REXMIT_BUF_SIZE", ATTR_ALWAYS_ALLOWED, "Maximum LAPI Buffered Message",
+                "Specify maximum LAPI buffer size (MP_REXMIT_BUF_SIZE)", 65568, 1, INT_MAX },
+        { "MP_UDP_PACKET_SIZE", ATTR_ALWAYS_ALLOWED, "UDP Packet Size", "Specify UDP packet size (MP_UDP_PACKET_SIZE)",
+                1, 1, INT_MAX }, { "PE_BUFFER_MEM", ATTR_ALWAYS_ALLOWED, "Buffer Memory",
+                "Specify size of preallocated early arrival buffer (MP_BUFFER_MEM)", 0x4000000, 0, INT_MAX }, {
+                "MP_BULK_MIN_MSG_SIZE", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Minimum Bulk Message Size",
+                "Minimum message size to use bulk transfer path (MP_BULK_MIN_MSG_SIZE)", 153600, 0, INT_MAX },
+        /*
+         * Miscellaneous tab related attributes
+         */
+        { "MP_THREAD_STACKSIZE", ATTR_ALWAYS_ALLOWED, "Additional MPI Thread Stack Size",
+                "Specify additional stack size for MPI service thread (MP_THREAD_STACKSIZE)", 0, 0, INT_MAX }, {
+                "MP_PULSE", ATTR_ALWAYS_ALLOWED, "Pulse Interval",
+                "Specify interval PE checks remote modes (MP_PULSE)", 600, 0, INT_MAX }, { "MP_TIMEOUT",
+                ATTR_ALWAYS_ALLOWED, "Connection Timeout",
+                "Specify timeout limit for connecting to remote nodes (MP_TIMEOUT)", 150, 1, INT_MAX },
+        /*
+         * Additional integer attributes used only for validation of attribute
+         * field contents. These are used in cases where a single integer,
+         * string or enumerated attribute is insufficient for validating
+         * an attribute field, for instance where an allowable value is an
+         * enumeration or integer value, or where a field contains
+         * multiple sub-fields, such as mmm,nnn. For these attributes,
+         * short name, long name and default value are irrelevant.
+         */
+        { "MP_INSTANCES_INT", ATTR_ALWAYS_ALLOWED, "???", "???", 0, 0, INT_MAX }, };
 
-long_int_launch_attr long_int_attrs[] = {
-    {"PE_BUFFER_MEM_MAX", ATTR_ALWAYS_ALLOWED, "???",
-     "Specify maximum size of early arrival buffer (MP_BUFFER_MEM)", 0, 0, 0x7fffffffffffffffLL}
-};
+long_int_launch_attr long_int_attrs[] = { { "PE_BUFFER_MEM_MAX", ATTR_ALWAYS_ALLOWED, "???",
+        "Specify maximum size of early arrival buffer (MP_BUFFER_MEM)", 0, 0, 0x7fffffffffffffffLL } };
 
 /*************************************************************************/
 
 /* Proxy command handlers                                                */
 
 /*************************************************************************/
-int
-PE_start_daemon(int trans_id, int nargs, char *args[])
+int PE_start_daemon(int trans_id, int nargs, char *args[])
 {
     /*
      * Proxy startup. Allocate a list to contain machine definitions, where
@@ -818,7 +788,7 @@ PE_start_daemon(int trans_id, int nargs, char *args[])
 #ifdef HAVE_LLAPI_H
     strcpy(ibmll_proxy_base_id_string, args[1]);
     if (use_load_leveler) {
-	load_load_leveler_library(trans_id);
+        load_load_leveler_library(trans_id);
     }
 #endif
     send_ok_event(trans_id);
@@ -826,8 +796,7 @@ PE_start_daemon(int trans_id, int nargs, char *args[])
     return PROXY_RES_OK;
 }
 
-int
-PE_define_model(int trans_id, int nargs, char *args[])
+int PE_define_model(int trans_id, int nargs, char *args[])
 {
     /*
      * Send the attribute definitions, launch attribute definitions,
@@ -844,10 +813,10 @@ PE_define_model(int trans_id, int nargs, char *args[])
     flags = flags | ATTR_FOR_AIX;
 #endif
     if (use_load_leveler) {
-	flags = flags | ATTR_FOR_PE_WITH_LL;
+        flags = flags | ATTR_FOR_PE_WITH_LL;
     }
     else {
-	flags = flags | ATTR_FOR_PE_STANDALONE;
+        flags = flags | ATTR_FOR_PE_STANDALONE;
     }
     print_message_args(nargs, args);
     send_string_attrs(trans_id, flags);
@@ -860,8 +829,7 @@ PE_define_model(int trans_id, int nargs, char *args[])
     return PROXY_RES_OK;
 }
 
-int
-PE_start_events(int trans_id, int nargs, char *args[])
+int PE_start_events(int trans_id, int nargs, char *args[])
 {
     /*
      * Send the complete machine state to the GUI. In PE standalone case,
@@ -878,41 +846,39 @@ PE_start_events(int trans_id, int nargs, char *args[])
     state_events_active = 1;
     if (use_load_leveler) {
 #ifdef HAVE_LLAPI_H
-	/*
-	 * If LoadLeveler is used, then PE jobs will use the machine and queue that the node where this
-	 * proxy is running is a member of, so machine_id and queue_id won't be generated here
-	 */
-	/* Create thread to monitor LoadLeveler clusters of machines (these are nodes in a machine in ptp lingo).  */
-	pthread_attr_init(&monitor_LoadLeveler_nodes_thread_attr);
-	pthread_attr_setdetachstate(&monitor_LoadLeveler_nodes_thread_attr,
-				    PTHREAD_CREATE_DETACHED);
-	pthread_create(&monitor_LoadLeveler_nodes_thread, &monitor_LoadLeveler_nodes_thread_attr,
-		       monitor_LoadLeveler_nodes, NULL);
+        /*
+         * If LoadLeveler is used, then PE jobs will use the machine and queue that the node where this
+         * proxy is running is a member of, so machine_id and queue_id won't be generated here
+         */
+        /* Create thread to monitor LoadLeveler clusters of machines (these are nodes in a machine in ptp lingo).  */
+        pthread_attr_init(&monitor_LoadLeveler_nodes_thread_attr);
+        pthread_attr_setdetachstate(&monitor_LoadLeveler_nodes_thread_attr,
+                PTHREAD_CREATE_DETACHED);
+        pthread_create(&monitor_LoadLeveler_nodes_thread, &monitor_LoadLeveler_nodes_thread_attr,
+                monitor_LoadLeveler_nodes, NULL);
 
-	/* Create thread to monitor LoadLeveler jobs in clusters.  */
-	pthread_attr_init(&monitor_LoadLeveler_jobs_thread_attr);
-	pthread_attr_setdetachstate(&monitor_LoadLeveler_jobs_thread_attr, PTHREAD_CREATE_DETACHED);
-	pthread_create(&monitor_LoadLeveler_jobs_thread, &monitor_LoadLeveler_jobs_thread_attr,
-		       monitor_LoadLeveler_jobs, NULL);
+        /* Create thread to monitor LoadLeveler jobs in clusters.  */
+        pthread_attr_init(&monitor_LoadLeveler_jobs_thread_attr);
+        pthread_attr_setdetachstate(&monitor_LoadLeveler_jobs_thread_attr, PTHREAD_CREATE_DETACHED);
+        pthread_create(&monitor_LoadLeveler_jobs_thread, &monitor_LoadLeveler_jobs_thread_attr,
+                monitor_LoadLeveler_jobs, NULL);
 #endif
     }
     else {
-	char id_str[12];
-	char base_id_str[12];
+        char id_str[12];
+        char base_id_str[12];
 
-	machine_id = generate_id();
-	queue_id = generate_id();
-	sprintf(base_id_str, "%d", base_id);
-	sprintf(id_str, "%d", machine_id);
-	enqueue_event(proxy_new_machine_event(trans_id, base_id_str, id_str,
-					      "default", MACHINE_STATE_UP));
-	sprintf(id_str, "%d", queue_id);
-	enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str,
-					    "default", QUEUE_STATE_NORMAL));
-	/*
-	 * Look for poe jobs already running on system
-	 */
-	discover_jobs();
+        machine_id = generate_id();
+        queue_id = generate_id();
+        sprintf(base_id_str, "%d", base_id);
+        sprintf(id_str, "%d", machine_id);
+        enqueue_event(proxy_new_machine_event(trans_id, base_id_str, id_str, "default", MACHINE_STATE_UP));
+        sprintf(id_str, "%d", queue_id);
+        enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str, "default", QUEUE_STATE_NORMAL));
+        /*
+         * Look for poe jobs already running on system
+         */
+        discover_jobs();
     }
     /*
      * Do not send an acknowledgment for the PE_start_events command here
@@ -927,8 +893,7 @@ PE_start_events(int trans_id, int nargs, char *args[])
     return PROXY_RES_OK;
 }
 
-int
-PE_submit_job(int trans_id, int nargs, char *args[])
+int PE_submit_job(int trans_id, int nargs, char *args[])
 {
     /*
      * Submit a Parallel Environmnent application for execution.
@@ -962,8 +927,8 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     char *mp_rdma_count_2;
     char **envp;
     jobinfo *job;
-    int  debug_dual_poe_mode = 0;
-    char pe_debugger_id[32] = { 0 };		// POE PID of parallel debugger.
+    int debug_dual_poe_mode = 0;
+    char pe_debugger_id[32] = { 0 }; // POE PID of parallel debugger.
     char *pmd_helper = 0;
 #ifdef PE_DUAL_POE_DEBUG
     jobinfo *debugger_job;
@@ -1020,311 +985,308 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     debug_args = (char **) malloc(debug_arg_limit * sizeof(char *));
     malloc_check(debug_args, __FUNCTION__, __LINE__);
     for (i = 0; args[i] != NULL; i++) {
-	/*
-	 * Check if this is a PE environment variable, for instance
-	 * MP_PROCS=2
-	 */
-	if (strncmp(args[i], "MP_", 3) == 0) {
-	    cp = strchr(args[i], '=');
-	    if (cp != NULL) {
-		/*
-		 * The MP_LABELIO and MP_HOSTFILE environment variables are
-		 * used by the proxy so process them here.
-		 */
-		*cp = '\0';
-		if (strcmp(args[i], "MP_LABELIO") == 0) {
-		    if (strcmp((cp + 1), "yes") == 0) {
-			label_io = 1;
-		    }
-		}
-		else if ((!use_load_leveler) && (strcmp(args[i], "MP_HOSTFILE")) == 0) {
-		    FILE *hostlist;
-		    /*
-		     * Process host file, building new machine
-		     * configuration if this is a unique hostfile.
-		     * If LoadLeveler is used, then don't process hostfile since node status
-		     * is handled by tracking Loadleveler's view of node status.
-		     */
-		    hostlist = fopen((cp + 1), "r");
-		    if (hostlist != NULL) {
-			update_nodes(trans_id, hostlist);
-			fclose(hostlist);
-		    }
-		}
-		/*
-		 * If MP_INFOLEVEL is > 1 char, then convert from label
-		 * name to real setting value. Note that the original
-		 * setting is overwritten, which is ok since the
-		 * new value is guaranteed to be shorter than the
-		 * original value.
-		 */
-		else if ((strcmp(args[i], "MP_INFOLEVEL") == 0) && (strlen(cp + 1) != 1)) {
-		    int n;
+        /*
+         * Check if this is a PE environment variable, for instance
+         * MP_PROCS=2
+         */
+        if (strncmp(args[i], "MP_", 3) == 0) {
+            cp = strchr(args[i], '=');
+            if (cp != NULL) {
+                /*
+                 * The MP_LABELIO and MP_HOSTFILE environment variables are
+                 * used by the proxy so process them here.
+                 */
+                *cp = '\0';
+                if (strcmp(args[i], "MP_LABELIO") == 0) {
+                    if (strcmp((cp + 1), "yes") == 0) {
+                        label_io = 1;
+                    }
+                }
+                else if ((!use_load_leveler) && (strcmp(args[i], "MP_HOSTFILE")) == 0) {
+                    FILE *hostlist;
+                    /*
+                     * Process host file, building new machine
+                     * configuration if this is a unique hostfile.
+                     * If LoadLeveler is used, then don't process hostfile since node status
+                     * is handled by tracking Loadleveler's view of node status.
+                     */
+                    hostlist = fopen((cp + 1), "r");
+                    if (hostlist != NULL) {
+                        update_nodes(trans_id, hostlist);
+                        fclose(hostlist);
+                    }
+                }
+                /*
+                 * If MP_INFOLEVEL is > 1 char, then convert from label
+                 * name to real setting value. Note that the original
+                 * setting is overwritten, which is ok since the
+                 * new value is guaranteed to be shorter than the
+                 * original value.
+                 */
+                else if ((strcmp(args[i], "MP_INFOLEVEL") == 0) && (strlen(cp + 1) != 1)) {
+                    int n;
 
-		    for (n = 0; n < sizeof mp_infolevel_labels / sizeof(char *); n++) {
-			if (strcmp(cp + 1, mp_infolevel_labels[n]) == 0) {
-			    break;
-			}
-		    }
-		    if (n < (sizeof mp_infolevel_labels / sizeof(char *))) {
-			sprintf(cp + 1, "%d", n);
-		    }
-		}
-		/*
-		 * Restore the '=' in the environment variable setting
-		 */
-		*cp = '=';
-	    }
-	}
-	/*
-	 * Check if this is a variable set by the PE front end and handle it
-	 * if so.
-	 */
-	else if (strncmp(args[i], "PE_", 3) == 0) {
-	    cp = strchr(args[i], '=');
-	    if (cp != NULL) {
-		*cp = '\0';
-		if (strcmp(args[i], "PE_STDIN_PATH") == 0) {
-		    stdin_path = cp + 1;
-		}
-		else if (strcmp(args[i], "PE_STDOUT_PATH") == 0) {
-		    stdout_path = cp + 1;
-		}
-		else if (strcmp(args[i], "PE_STDERR_PATH") == 0) {
-		    stderr_path = cp + 1;
-		}
-		else if ((strcmp(args[i], "PE_SPLIT_STDOUT") == 0)
-			 && (strcmp(cp + 1, "yes") == 0)) {
-		    split_io = 1;
-		}
-		/*
-		 * The PE environment variable MP_BUFFER_MEM gets
-		 * special handling since it is the only environment
-		 * variable which has up to 2 parameters, These parameters
-		 * are treated separately in the GUI to simplify
-		 * validation. The GUI sends the attributes PE_BUFFER_MEM
-		 * and PE_BUFFER_MEM_MAX representing these two values.
-		 * This code must re-assemble the parameters into a proper
-		 * MP_BUFFER_MEM setting and ensure that the environment
-		 * variable gets set. Since the values passed by the
-		 * GUI must not be passed directly to the application, the
-		 * front end identifies them with a PE_ prefix instead of
-		 * the usual MP_ prefix.
-		 * MP_RDMA_COUNT gets similar treatment, using GUI attributes
-		 * PE_RDMA_COUNT and PE_RDMA_COUNT_2
-		 */
-		else if (strcmp(args[i], "PE_BUFFER_MEM") == 0) {
-		    mp_buffer_mem = cp + 1;
-		    mp_buffer_mem_set = 1;
-		}
-		else if (strcmp(args[i], "PE_BUFFER_MEM_MAX") == 0) {
-		    mp_buffer_mem_max = cp + 1;
-		    mp_buffer_mem_set = 1;
-		}
-		else if (strcmp(args[i], "PE_RDMA_COUNT") == 0) {
-		    mp_rdma_count = cp + 1;
-		    mp_rdma_count_set = 1;
-		}
-		else if (strcmp(args[i], "PE_RDMA_COUNT_2") == 0) {
-		    mp_rdma_count_2 = cp + 1;
-		    mp_rdma_count_set = 1;
-		}
+                    for (n = 0; n < sizeof mp_infolevel_labels / sizeof(char *); n++) {
+                        if (strcmp(cp + 1, mp_infolevel_labels[n]) == 0) {
+                            break;
+                        }
+                    }
+                    if (n < (sizeof mp_infolevel_labels / sizeof(char *))) {
+                        sprintf(cp + 1, "%d", n);
+                    }
+                }
+                /*
+                 * Restore the '=' in the environment variable setting
+                 */
+                *cp = '=';
+            }
+        }
+        /*
+         * Check if this is a variable set by the PE front end and handle it
+         * if so.
+         */
+        else if (strncmp(args[i], "PE_", 3) == 0) {
+            cp = strchr(args[i], '=');
+            if (cp != NULL) {
+                *cp = '\0';
+                if (strcmp(args[i], "PE_STDIN_PATH") == 0) {
+                    stdin_path = cp + 1;
+                }
+                else if (strcmp(args[i], "PE_STDOUT_PATH") == 0) {
+                    stdout_path = cp + 1;
+                }
+                else if (strcmp(args[i], "PE_STDERR_PATH") == 0) {
+                    stderr_path = cp + 1;
+                }
+                else if ((strcmp(args[i], "PE_SPLIT_STDOUT") == 0) && (strcmp(cp + 1, "yes") == 0)) {
+                    split_io = 1;
+                }
+                /*
+                 * The PE environment variable MP_BUFFER_MEM gets
+                 * special handling since it is the only environment
+                 * variable which has up to 2 parameters, These parameters
+                 * are treated separately in the GUI to simplify
+                 * validation. The GUI sends the attributes PE_BUFFER_MEM
+                 * and PE_BUFFER_MEM_MAX representing these two values.
+                 * This code must re-assemble the parameters into a proper
+                 * MP_BUFFER_MEM setting and ensure that the environment
+                 * variable gets set. Since the values passed by the
+                 * GUI must not be passed directly to the application, the
+                 * front end identifies them with a PE_ prefix instead of
+                 * the usual MP_ prefix.
+                 * MP_RDMA_COUNT gets similar treatment, using GUI attributes
+                 * PE_RDMA_COUNT and PE_RDMA_COUNT_2
+                 */
+                else if (strcmp(args[i], "PE_BUFFER_MEM") == 0) {
+                    mp_buffer_mem = cp + 1;
+                    mp_buffer_mem_set = 1;
+                }
+                else if (strcmp(args[i], "PE_BUFFER_MEM_MAX") == 0) {
+                    mp_buffer_mem_max = cp + 1;
+                    mp_buffer_mem_set = 1;
+                }
+                else if (strcmp(args[i], "PE_RDMA_COUNT") == 0) {
+                    mp_rdma_count = cp + 1;
+                    mp_rdma_count_set = 1;
+                }
+                else if (strcmp(args[i], "PE_RDMA_COUNT_2") == 0) {
+                    mp_rdma_count_2 = cp + 1;
+                    mp_rdma_count_set = 1;
+                }
 #ifdef PE_DUAL_POE_DEBUG
-		else if (strcmp(args[i], "PE_DEBUG_MODE") == 0) {
-			if (strcasecmp(cp+1, "sdm") == 0)
-				debug_sdm_mode = 1;
-			else if (strcasecmp(cp+1, "dual") == 0) {
-				debug_dual_poe_mode++;
-				if (!pmd_helper)
-					pmd_helper = PMD_HELPER;
-			}
-		}
-		else if (strcmp(args[i], "PE_DEBUG_HELPER") == 0) {
-			pmd_helper = cp + 1;
-		}
+                else if (strcmp(args[i], "PE_DEBUG_MODE") == 0) {
+                    if (strcasecmp(cp + 1, "sdm") == 0)
+                        debug_sdm_mode = 1;
+                    else if (strcasecmp(cp + 1, "dual") == 0) {
+                        debug_dual_poe_mode++;
+                        if (!pmd_helper)
+                            pmd_helper = PMD_HELPER;
+                    }
+                }
+                else if (strcmp(args[i], "PE_DEBUG_HELPER") == 0) {
+                    pmd_helper = cp + 1;
+                }
 #endif
-	    }
-	}
-	else {
-	    /*
-	     * Look for general launch configuration variables and handle
-	     * appropriately
-	     */
-	    cp = strchr(args[i], '=');
-	    if (cp != NULL) {
-		*cp = '\0';
-		cp = cp + 1;
-		if (strcmp(args[i], JOB_SUB_ID_ATTR) == 0) {
-		    jobid = strdup(cp);
-		}
-		else if (strcmp(args[i], JOB_EXEC_NAME_ATTR) == 0) {
-		    execname = strdup(cp);
-		}
-		else if (strcmp(args[i], JOB_WORKING_DIR_ATTR) == 0) {
-			cwd = strdup(cp);
-		}
-		else if (strcmp(args[i], JOB_PROG_ARGS_ATTR) == 0) {
-		    argp[argp_count] = strdup(cp);
+            }
+        }
+        else {
+            /*
+             * Look for general launch configuration variables and handle
+             * appropriately
+             */
+            cp = strchr(args[i], '=');
+            if (cp != NULL) {
+                *cp = '\0';
+                cp = cp + 1;
+                if (strcmp(args[i], JOB_SUB_ID_ATTR) == 0) {
+                    jobid = strdup(cp);
+                }
+                else if (strcmp(args[i], JOB_EXEC_NAME_ATTR) == 0) {
+                    execname = strdup(cp);
+                }
+                else if (strcmp(args[i], JOB_WORKING_DIR_ATTR) == 0) {
+                    cwd = strdup(cp);
+                }
+                else if (strcmp(args[i], JOB_PROG_ARGS_ATTR) == 0) {
+                    argp[argp_count] = strdup(cp);
                     argp_count = argp_count + 1;
                     if (argp_count >= argp_limit) {
                         argp_limit = argp_limit + 10;
                         argp = (char **) realloc(argp, argp_limit * sizeof(char *));
                         malloc_check(argp, __FUNCTION__, __LINE__);
                     }
-		}
-		else if (strcmp(args[i], JOB_EXEC_PATH_ATTR) == 0) {
-		    execdir = strdup(cp);
-		}
-		else if (strcmp(args[i], JOB_ENV_ATTR) == 0) {
-		}
-		else if (strcmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR) == 0) {
-		    debugger_name = strdup(cp);
-		}
-		else if (strcmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR) == 0) {
-			debugger_path = strdup(cp);
-		}
-		else if (strcmp(args[i], JOB_DEBUG_ARGS_ATTR) == 0) {
-		    debug_args[debug_arg_count] = strdup(cp);
-		    debug_arg_count = debug_arg_count + 1;
+                }
+                else if (strcmp(args[i], JOB_EXEC_PATH_ATTR) == 0) {
+                    execdir = strdup(cp);
+                }
+                else if (strcmp(args[i], JOB_ENV_ATTR) == 0) {
+                }
+                else if (strcmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR) == 0) {
+                    debugger_name = strdup(cp);
+                }
+                else if (strcmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR) == 0) {
+                    debugger_path = strdup(cp);
+                }
+                else if (strcmp(args[i], JOB_DEBUG_ARGS_ATTR) == 0) {
+                    debug_args[debug_arg_count] = strdup(cp);
+                    debug_arg_count = debug_arg_count + 1;
                     if (debug_arg_count >= debug_arg_limit) {
                         debug_arg_limit = debug_arg_limit + 10;
                         debug_args = (char **) realloc(debug_args, debug_arg_limit * sizeof(char *));
                         malloc_check(debug_args, __FUNCTION__, __LINE__);
                     }
-		}
-		else if (strcmp(args[i], JOB_DEBUG_FLAG_ATTR) == 0) {
-		    debug_sdm_mode = 1;
-		}
-		else if (strcmp(args[i], "debugStopInMain") == 0) {
-		}
-		*(cp - 1) = '=';
-	    }
-	}
+                }
+                else if (strcmp(args[i], JOB_DEBUG_FLAG_ATTR) == 0) {
+                    debug_sdm_mode = 1;
+                }
+                else if (strcmp(args[i], "debugStopInMain") == 0) {
+                }
+                *(cp - 1) = '=';
+            }
+        }
     }
     if (jobid == NULL) {
-    	post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
+        post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
     }
     if (cwd != NULL) {
-    	status = chdir(cwd);
-	    if (status == -1) {
-		post_submitjob_error(trans_id, jobid,
-			   "Invalid working directory");
-		TRACE_EXIT;
-		return PROXY_RES_OK;
-	    }
+        status = chdir(cwd);
+        if (status == -1) {
+            post_submitjob_error(trans_id, jobid, "Invalid working directory");
+            TRACE_EXIT;
+            return PROXY_RES_OK;
+        }
     }
     if (mp_buffer_mem_set) {
-	snprintf(mp_buffer_mem_value, sizeof mp_buffer_mem_value,
-		 "MP_BUFFER_MEM=%s%s%s", mp_buffer_mem, (mp_buffer_mem_max[0]
-							 == '\0') ? "" : ",", mp_buffer_mem_max);
+        snprintf(mp_buffer_mem_value, sizeof mp_buffer_mem_value, "MP_BUFFER_MEM=%s%s%s", mp_buffer_mem,
+                (mp_buffer_mem_max[0] == '\0') ? "" : ",", mp_buffer_mem_max);
     }
     if (mp_rdma_count_set) {
-	snprintf(mp_rdma_count_value, sizeof mp_rdma_count_value,
-		 "MP_RDMA_COUNT=%s%s%s", mp_rdma_count, (mp_rdma_count_2[0]
-							 == '\0') ? "" : ",", mp_rdma_count_2);
+        snprintf(mp_rdma_count_value, sizeof mp_rdma_count_value, "MP_RDMA_COUNT=%s%s%s", mp_rdma_count,
+                (mp_rdma_count_2[0] == '\0') ? "" : ",", mp_rdma_count_2);
     }
     if (execdir == NULL) {
-    post_submitjob_error(trans_id, jobid, "No executable directory specified");
-	TRACE_EXIT;
-	return PROXY_RES_OK;
+        post_submitjob_error(trans_id, jobid, "No executable directory specified");
+        TRACE_EXIT;
+        return PROXY_RES_OK;
     }
     if (execname == NULL) {
-    post_submitjob_error(trans_id, jobid, "No executable specified");
-	TRACE_EXIT;
-	return PROXY_RES_OK;
+        post_submitjob_error(trans_id, jobid, "No executable specified");
+        TRACE_EXIT;
+        return PROXY_RES_OK;
     }
     job = (jobinfo *) malloc(sizeof(jobinfo));
     malloc_check(job, __FUNCTION__, __LINE__);
     memset(job, 0, sizeof(jobinfo));
 #ifdef PE_DUAL_POE_DEBUG
     /*DEBUG*/
-	if (debug_dual_poe_mode) {
-		char *debugger_full_path;
+    if (debug_dual_poe_mode) {
+        char *debugger_full_path;
 
-		debug_sdm_mode = 0;			// disable SDM debugger launch.
-		/*
-		 * If no path is specified, then try to locate execuable.
-		 */
-		if (debugger_path == NULL || debugger_name == NULL) {
-			post_submitjob_error(trans_id, jobid, "Debugger executuable not found");
-			return PROXY_RES_OK;
-		} else {
-			asprintf(&debugger_full_path, "%s/%s", debugger_path, debugger_name);
-		}
+        debug_sdm_mode = 0; // disable SDM debugger launch.
+        /*
+         * If no path is specified, then try to locate execuable.
+         */
+        if (debugger_path == NULL || debugger_name == NULL) {
+            post_submitjob_error(trans_id, jobid, "Debugger executuable not found");
+            return PROXY_RES_OK;
+        }
+        else {
+            asprintf(&debugger_full_path, "%s/%s", debugger_path, debugger_name);
+        }
 
-		if (access(debugger_full_path, X_OK) < 0) {
-			post_submitjob_error(trans_id, jobid, strerror(errno));
-			return PROXY_RES_OK;
-		}
+        if (access(debugger_full_path, X_OK) < 0) {
+            post_submitjob_error(trans_id, jobid, strerror(errno));
+            return PROXY_RES_OK;
+        }
 
-	    debugger_job = (jobinfo *) malloc(sizeof(jobinfo));
-	    malloc_check(debugger_job, __FUNCTION__, __LINE__);
-	    memset(debugger_job, 0, sizeof(jobinfo));
-	    debugger_job->debuggee_job = job;
-	    job->debugger_job = debugger_job;
+        debugger_job = (jobinfo *) malloc(sizeof(jobinfo));
+        malloc_check(debugger_job, __FUNCTION__, __LINE__);
+        memset(debugger_job, 0, sizeof(jobinfo));
+        debugger_job->debuggee_job = job;
+        job->debugger_job = debugger_job;
 
-	    TRACE_DETAIL("+++ Forking poe/debugger process\n");
-	    pid = fork();
-	    if (pid == 0) {
-	    	char **debugger_args;
-	    	char **debugger_envp;
-	    	int max_fd;
-	    	int a;
+        TRACE_DETAIL("+++ Forking poe/debugger process\n");
+        pid = fork();
+        if (pid == 0) {
+            char **debugger_args;
+            char **debugger_envp;
+            int max_fd;
+            int a;
 
-	    	debug_arg_count++;
-			debugger_args = (char **)malloc((debug_arg_count+3) * sizeof(char *));
-			debugger_args[0] = POE;
-			debugger_args[1] = debugger_full_path;
-			/* Use --jobid to inform node elements of debugger what their poe pid is.
-			 * This 'jobid' will be used to set up a message queue to accept connections
-			 * from the application process when it launches on the node.
-			 */
-			asprintf(&debugger_args[2], "--jobid=%d", getpid());
-			for (i = 0, a = 3; i < nargs; i++) {
-				if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
-					debugger_args[a] = strchr(args[i], '=') + 1;
-					a++;
-				}
-			}
-			debugger_args[a] = NULL;
+            debug_arg_count++;
+            debugger_args = (char **) malloc((debug_arg_count + 3) * sizeof(char *));
+            debugger_args[0] = POE;
+            debugger_args[1] = debugger_full_path;
+            /* Use --jobid to inform node elements of debugger what their poe pid is.
+             * This 'jobid' will be used to set up a message queue to accept connections
+             * from the application process when it launches on the node.
+             */
+            asprintf(&debugger_args[2], "--jobid=%d", getpid());
+            for (i = 0, a = 3; i < nargs; i++) {
+                if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
+                    debugger_args[a] = strchr(args[i], '=') + 1;
+                    a++;
+                }
+            }
+            debugger_args[a] = NULL;
 
-			snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
-			debugger_envp = create_env_array(args, 0, NULL, NULL, pe_debugger_id, 1);
+            snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
+            debugger_envp = create_env_array(args, 0, NULL, NULL, pe_debugger_id, 1);
 
-			max_fd = sysconf(_SC_OPEN_MAX);
-			for (i = STDERR_FILENO + 1; i < max_fd; i++) {
-			    close(i);
-			}
-			/*
-			 * Invoke the debugger as a target of 'poe'
-			 */
-			TRACE_DETAIL_V("+++ Ready to invoke debugger %s\n", debugger_full_path);
-			i = 0;
-			while (debugger_envp[i] != NULL) {
-			    TRACE_DETAIL_V("Target debugger_envp[%d]: %s\n", i, debugger_envp[i]);
-			    i++;
-			}
-			i = 0;
-			while (debugger_args[i] != NULL) {
-			    TRACE_DETAIL_V("Target debugger_args[%d]: %s\n", i, debugger_args[i]);
-			    i++;
-			}
-			status = execve(POE, debugger_args, debugger_envp);
-			print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", debugger_args[0], strerror(errno));
-			post_submitjob_error(trans_id, jobid, "Exec failed");
-			TRACE_EXIT;
-			exit(1);
-	    }
-	    else if (pid == -1) {
-		    post_submitjob_error(trans_id, jobid, "Debugger fork failed");
-		    return PROXY_RES_OK;
-		}
-	    /* Parent continues on... */
-		/* Augment the application's environment to include a debug marker based upon the poe pid of the debugger. */
-		snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", pid);
-		debugger_job->poe_pid = pid;
-		/* TODO: Do some more initialization of debugger_job here */
-	}
+            max_fd = sysconf(_SC_OPEN_MAX);
+            for (i = STDERR_FILENO + 1; i < max_fd; i++) {
+                close(i);
+            }
+            /*
+             * Invoke the debugger as a target of 'poe'
+             */
+            TRACE_DETAIL_V("+++ Ready to invoke debugger %s\n", debugger_full_path);
+            i = 0;
+            while (debugger_envp[i] != NULL) {
+                TRACE_DETAIL_V("Target debugger_envp[%d]: %s\n", i, debugger_envp[i]);
+                i++;
+            }
+            i = 0;
+            while (debugger_args[i] != NULL) {
+                TRACE_DETAIL_V("Target debugger_args[%d]: %s\n", i, debugger_args[i]);
+                i++;
+            }
+            status = execve(POE, debugger_args, debugger_envp);
+            print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", debugger_args[0], strerror(errno));
+            post_submitjob_error(trans_id, jobid, "Exec failed");
+            TRACE_EXIT;
+            exit(1);
+        }
+        else if (pid == -1) {
+            post_submitjob_error(trans_id, jobid, "Debugger fork failed");
+            return PROXY_RES_OK;
+        }
+        /* Parent continues on... */
+        /* Augment the application's environment to include a debug marker based upon the poe pid of the debugger. */
+        snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", pid);
+        debugger_job->poe_pid = pid;
+        /* TODO: Do some more initialization of debugger_job here */
+    }
 #endif
     TRACE_DETAIL("+++ Setting up stdio pipe descriptors\n");
     TRACE_DETAIL_V("+++ stdout path: %s\n", stdout_path == NULL ? "NULL" : stdout_path);
@@ -1335,20 +1297,19 @@ PE_submit_job(int trans_id, int nargs, char *args[])
      * a pipe.
      * Handle file descriptor setup for stdout first
      */
-    status =
-	setup_stdout_fd(trans_id, jobid, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd), &(job->stdout_redirect));
+    status = setup_stdout_fd(trans_id, jobid, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd),
+            &(job->stdout_redirect));
     if (status == -1) {
-	TRACE_EXIT;
-	return PROXY_RES_OK;
+        TRACE_EXIT;
+        return PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stdout FD %d %d\n", stdout_pipe[0], stdout_pipe[1]);
-    status =
-	setup_stderr_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd), &(job->stderr_file),
-			&(job->stderr_redirect));
-	RegisterFileHandler(job->stderr_fd, READ_FILE_HANDLER, stderr_handler, job);
+    status = setup_stderr_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd),
+            &(job->stderr_file), &(job->stderr_redirect));
+    RegisterFileHandler(job->stderr_fd, READ_FILE_HANDLER, stderr_handler, job);
     if (status == -1) {
-	TRACE_EXIT;
-	return PROXY_RES_OK;
+        TRACE_EXIT;
+        return PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
     job->submit_jobid = jobid;
@@ -1376,93 +1337,90 @@ PE_submit_job(int trans_id, int nargs, char *args[])
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
     if (pid == 0) {
-	char **argv;
-	char poe_target[_POSIX_PATH_MAX * 2 + 2];
-	int max_fd;
+        char **argv;
+        char poe_target[_POSIX_PATH_MAX * 2 + 2];
+        int max_fd;
 
-	snprintf(poe_target, sizeof poe_target, "%s/%s", execdir, execname);
-	poe_target[sizeof poe_target - 1] = '\0';
-	/*
-	 * Set up executable argument list and environment variables first
-	 * since there is a small timing window where a second run command
-	 * could be processed while this process is still setting up parameters
-	 * for the first run, resulting in modification of the first program's
-	 * parameters and environment variables.
-	 */
-	TRACE_DETAIL_V("+++ Creating poe exec() parameter list %s\n", pmd_helper ? "with pmdhelper" : "");
-	if (debug_sdm_mode) {
-	    argv = create_child_sdm_parmlist(debugger_path, debugger_name, debug_arg_count, debug_args);
-	}
-	else {
-	    argv = create_exec_parmlist(POE, poe_target, argp_count, argp, pmd_helper);
-	}
-	/*
-	 * Connect stdio to pipes or files owned by parent process (the
-	 * proxy)
-	 */
-	TRACE_DETAIL("+++ Setting up poe stdio file descriptors\n");
-	status =
-	    setup_child_stdout(trans_id, jobid, job->stdout_redirect, &(job->stdout_fd),
-			      stdout_pipe);
-	if (status == -1) {
-	    TRACE_EXIT;
-	    exit(1);
-	}
-	status =
-	    setup_child_stderr(trans_id, jobid, stderr_pipe);
-	if (status == -1) {
-	    TRACE_EXIT;
-	    exit(1);
-	}
-	/*
-	 * Close all open file descriptors above stderr.
-	 */
-	max_fd = sysconf(_SC_OPEN_MAX);
-	for (i = STDERR_FILENO + 1; i < max_fd; i++) {
-	    close(i);
-	}
-	/*
-	 * Invoke the application as a target of 'poe'
-	 */
-	TRACE_DETAIL_V("+++ Ready to invoke %s\n", poe_target);
-	i = 0;
-	while (envp[i] != NULL) {
-	    TRACE_DETAIL_V("Target env[%d]: %s\n", i, envp[i]);
-	    i = i + 1;
-	}
-	i = 0;
-	while (argv[i] != NULL) {
-	    TRACE_DETAIL_V("Target arg[%d]: %s\n", i, argv[i]);
-	    i = i + 1;
-	}
-	status = execve("/usr/bin/poe", argv, envp);
-	print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
-	post_submitjob_error(trans_id, jobid, "Exec failed");
-	TRACE_EXIT;
-	exit(1);
+        snprintf(poe_target, sizeof poe_target, "%s/%s", execdir, execname);
+        poe_target[sizeof poe_target - 1] = '\0';
+        /*
+         * Set up executable argument list and environment variables first
+         * since there is a small timing window where a second run command
+         * could be processed while this process is still setting up parameters
+         * for the first run, resulting in modification of the first program's
+         * parameters and environment variables.
+         */
+        TRACE_DETAIL_V("+++ Creating poe exec() parameter list %s\n", pmd_helper ? "with pmdhelper" : "");
+        if (debug_sdm_mode) {
+            argv = create_child_sdm_parmlist(debugger_path, debugger_name, debug_arg_count, debug_args);
+        }
+        else {
+            argv = create_exec_parmlist(POE, poe_target, argp_count, argp, pmd_helper);
+        }
+        /*
+         * Connect stdio to pipes or files owned by parent process (the
+         * proxy)
+         */
+        TRACE_DETAIL("+++ Setting up poe stdio file descriptors\n");
+        status = setup_child_stdout(trans_id, jobid, job->stdout_redirect, &(job->stdout_fd), stdout_pipe);
+        if (status == -1) {
+            TRACE_EXIT;
+            exit(1);
+        }
+        status = setup_child_stderr(trans_id, jobid, stderr_pipe);
+        if (status == -1) {
+            TRACE_EXIT;
+            exit(1);
+        }
+        /*
+         * Close all open file descriptors above stderr.
+         */
+        max_fd = sysconf(_SC_OPEN_MAX);
+        for (i = STDERR_FILENO + 1; i < max_fd; i++) {
+            close(i);
+        }
+        /*
+         * Invoke the application as a target of 'poe'
+         */
+        TRACE_DETAIL_V("+++ Ready to invoke %s\n", poe_target);
+        i = 0;
+        while (envp[i] != NULL) {
+            TRACE_DETAIL_V("Target env[%d]: %s\n", i, envp[i]);
+            i = i + 1;
+        }
+        i = 0;
+        while (argv[i] != NULL) {
+            TRACE_DETAIL_V("Target arg[%d]: %s\n", i, argv[i]);
+            i = i + 1;
+        }
+        status = execve("/usr/bin/poe", argv, envp);
+        print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
+        post_submitjob_error(trans_id, jobid, "Exec failed");
+        TRACE_EXIT;
+        exit(1);
     }
     else {
-	if (pid == -1) {
+        if (pid == -1) {
 #ifdef PE_DUAL_POE_DEBUG
             if (debug_dual_poe_mode) {
                 /* TODO: Take down debugger poe. */
             }
 #endif
-	    post_submitjob_error(trans_id, jobid, "Fork failed");
-	    return PROXY_RES_OK;
-	}
-	else {
+            post_submitjob_error(trans_id, jobid, "Fork failed");
+            return PROXY_RES_OK;
+        }
+        else {
 #ifdef PE_DUAL_POE_DEBUG
             if (debug_dual_poe_mode) {
                 job_enqueue(debugger_job, debugger_job->poe_pid);
             }
 #endif
-	    if (!job->stdout_redirect) {
-		close(stdout_pipe[1]);
-	    }
-	    if (!job->stderr_redirect) {
-		close(stderr_pipe[1]);
-	    }
+            if (!job->stdout_redirect) {
+                close(stdout_pipe[1]);
+            }
+            if (!job->stderr_redirect) {
+                close(stderr_pipe[1]);
+            }
             job->debugging = debug_sdm_mode;
             if (debug_sdm_mode) {
                 job->sdm_envp = envp;
@@ -1472,15 +1430,14 @@ PE_submit_job(int trans_id, int nargs, char *args[])
                 job->sdm_debug_arg_count = debug_arg_count;
             }
             job_enqueue(job, pid);
-	}
+        }
     }
     send_ok_event(trans_id);
     TRACE_EXIT;
     return PROXY_RES_OK;
 }
 
-int
-PE_halt_events(int trans_id, int nargs, char *args[])
+int PE_halt_events(int trans_id, int nargs, char *args[])
 {
     /*
      * Set flag indicating events are shut down, and send OK acks for
@@ -1497,8 +1454,7 @@ PE_halt_events(int trans_id, int nargs, char *args[])
     return PROXY_RES_OK;
 }
 
-int
-PE_terminate_job(int trans_id, int nargs, char *args[])
+int PE_terminate_job(int trans_id, int nargs, char *args[])
 {
     /*
      * Terminate the application. The initial kill is SIGTERM. If that
@@ -1515,33 +1471,33 @@ PE_terminate_job(int trans_id, int nargs, char *args[])
     pthread_mutex_lock(&job_lock);
     SetList(jobs);
     job = GetListElement(jobs);
-	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
-			job_ident = proxy_get_attribute_value_int(args[i]);
-		}
-	}
+    for (i = 0; i < nargs; i++) {
+        if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
+            job_ident = proxy_get_attribute_value_int(args[i]);
+        }
+    }
     while (job != NULL) {
-	if (job_ident == job->proxy_jobid) {
-	    break;
-	}
-	job = GetListElement(jobs);
+        if (job_ident == job->proxy_jobid) {
+            break;
+        }
+        job = GetListElement(jobs);
     }
     if (job != NULL) {
 #ifdef PE_DUAL_POE_DEBUG
-    	/* Is this a debugger job? */
-    	if (job->debuggee_job) {
-    		jobinfo *debuggee_job = job->debuggee_job;
-    		job->debuggee_job = NULL;
-    		kill (debuggee_job->poe_pid, SIGTERM);
-    		pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) debuggee_job->poe_pid);
-    	}
+        /* Is this a debugger job? */
+        if (job->debuggee_job) {
+            jobinfo *debuggee_job = job->debuggee_job;
+            job->debuggee_job = NULL;
+            kill(debuggee_job->poe_pid, SIGTERM);
+            pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) debuggee_job->poe_pid);
+        }
 #endif
-	kill(job->poe_pid, SIGTERM);
-	/*
-	 * Create a thread to kill the process with kill(9) if the
-	 * target process is still around after 1 minute.
-	 */
-	pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) job->poe_pid);
+        kill(job->poe_pid, SIGTERM);
+        /*
+         * Create a thread to kill the process with kill(9) if the
+         * target process is still around after 1 minute.
+         */
+        pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) job->poe_pid);
     }
     pthread_mutex_unlock(&job_lock);
     send_ok_event(trans_id);
@@ -1549,8 +1505,7 @@ PE_terminate_job(int trans_id, int nargs, char *args[])
     return PROXY_RES_OK;
 }
 
-int
-PE_quit(int trans_id, int nargs, char *args[])
+int PE_quit(int trans_id, int nargs, char *args[])
 {
     void *thread_status;
 
@@ -1558,15 +1513,15 @@ PE_quit(int trans_id, int nargs, char *args[])
     print_message_args(nargs, args);
 #ifdef HAVE_LLAPI_H
     if (use_load_leveler) {
-	dlclose(ibmll_libpath_handle);
-	state_shutdown_requested = 1;
+        dlclose(ibmll_libpath_handle);
+        state_shutdown_requested = 1;
     }
 #endif
     pthread_cancel(termination_thread);
     pthread_join(termination_thread, &thread_status);
     enqueue_event(proxy_shutdown_event(trans_id));
     if (run_miniproxy) {
-	redirect_io();
+        redirect_io();
     }
     shutdown_requested = 1;
     TRACE_EXIT;
@@ -1578,8 +1533,7 @@ PE_quit(int trans_id, int nargs, char *args[])
 /* Job support routines.                                                 */
 /*                                                                       */
 /*************************************************************************/
-void
-job_enqueue(jobinfo *job, pid_t pid)
+void job_enqueue(jobinfo *job, pid_t pid)
 {
     char jobname[40];
     char queue_id_str[12];
@@ -1601,15 +1555,14 @@ job_enqueue(jobinfo *job, pid_t pid)
     AddToList(jobs, job);
 #ifdef PE_DUAL_POE_DEBUG
     if (job->debuggee_job)
-    	return;		// Don't report debugger
+        return; // Don't report debugger
 #endif
     snprintf(jobname, sizeof jobname, "%s.%s", my_username, job->submit_jobid);
     jobname[sizeof jobname - 1] = '\0';
     sprintf(queue_id_str, "%d", queue_id);
     sprintf(jobid_str, "%d", job->proxy_jobid);
-    enqueue_event(proxy_new_job_event(start_events_transid,
-				      queue_id_str, jobid_str, jobname, JOB_STATE_INIT,
-				      job->submit_jobid));
+    enqueue_event(proxy_new_job_event(start_events_transid, queue_id_str, jobid_str, jobname, JOB_STATE_INIT,
+            job->submit_jobid));
 }
 
 /*************************************************************************/
@@ -1648,7 +1601,7 @@ startup_monitor(void *job_ident)
     TRACE_ENTRY;
     job = (jobinfo *) job_ident;
     if (job->discovered_job) {
-	new_nodes = NewList();
+        new_nodes = NewList();
     }
     taskid_list = NewList();
     snprintf(tasklist_path, sizeof tasklist_path, "/tmp/.ppe.%d.attach.cfg", job->poe_pid);
@@ -1660,82 +1613,82 @@ startup_monitor(void *job_ident)
      * within the last second before trying to read and parse it
      */
     for (;;) {
-	sleep(1);
-	status = stat(tasklist_path, &fileinfo);
-	if (status == 0) {
-	    if ((last_mtime >= job->submit_time) && (last_mtime == fileinfo.st_mtime)) {
-		break;
-	    }
-	    else {
-		last_mtime = fileinfo.st_mtime;
-	    }
-	}
+        sleep(1);
+        status = stat(tasklist_path, &fileinfo);
+        if (status == 0) {
+            if ((last_mtime >= job->submit_time) && (last_mtime == fileinfo.st_mtime)) {
+                break;
+            }
+            else {
+                last_mtime = fileinfo.st_mtime;
+            }
+        }
     }
     TRACE_DETAIL_V("+++ Have task config file %s\n", tasklist_path);
     done = 0;
     while (!done) {
-	char *lineptr;
-	char *tokenptr;
-	char *linep;
-	char *p;
-	int tasknum;
-	int numlines;
+        char *lineptr;
+        char *tokenptr;
+        char *linep;
+        char *p;
+        int tasknum;
+        int numlines;
 
-	stat(tasklist_path, &fileinfo);
-	cfgfile = fopen(tasklist_path, "r");
-	if (cfgfile != NULL) {
-	    cfginfo = (char *) malloc(fileinfo.st_size);
-	    malloc_check(cfginfo, __FUNCTION__, __LINE__);
-	    status = fread(cfginfo, fileinfo.st_size, 1, cfgfile);
-	    fclose(cfgfile);
-	    if (status != fileinfo.st_size) {
-		/*
-		 * First line contains version info which we don't care
-		 * about, and so it is ignored
-		 */
-		p = strtok_r(cfginfo, ";", &lineptr);
-		if (p == NULL) {
-		    break;
-		}
-		/*
-		 * Second line contains number of tasks in job
-		 */
-		p = strtok_r(NULL, ";", &lineptr);
-		if (p == NULL) {
-		    break;
-		}
-		linep = p;
-		p = strtok_r(linep, " ", &tokenptr);
-		numtasks = atoi(p);
-		numlines = 0;
-		TRACE_DETAIL_V("+++ Application has %d tasks\n", numtasks);
-		tasks = (taskinfo *) calloc(numtasks, sizeof(taskinfo));
-		malloc_check(tasks, __FUNCTION__, __LINE__);
-		/*
-		 * Now read one line per task and build task list
-		 */
-		p = strtok_r(NULL, ";", &lineptr);
-		if (p == NULL) {
-		    break;
-		}
-		while (!done) {
-		    char *cp;
+        stat(tasklist_path, &fileinfo);
+        cfgfile = fopen(tasklist_path, "r");
+        if (cfgfile != NULL) {
+            cfginfo = (char *) malloc(fileinfo.st_size);
+            malloc_check(cfginfo, __FUNCTION__, __LINE__);
+            status = fread(cfginfo, fileinfo.st_size, 1, cfgfile);
+            fclose(cfgfile);
+            if (status != fileinfo.st_size) {
+                /*
+                 * First line contains version info which we don't care
+                 * about, and so it is ignored
+                 */
+                p = strtok_r(cfginfo, ";", &lineptr);
+                if (p == NULL) {
+                    break;
+                }
+                /*
+                 * Second line contains number of tasks in job
+                 */
+                p = strtok_r(NULL, ";", &lineptr);
+                if (p == NULL) {
+                    break;
+                }
+                linep = p;
+                p = strtok_r(linep, " ", &tokenptr);
+                numtasks = atoi(p);
+                numlines = 0;
+                TRACE_DETAIL_V("+++ Application has %d tasks\n", numtasks);
+                tasks = (taskinfo *) calloc(numtasks, sizeof(taskinfo));
+                malloc_check(tasks, __FUNCTION__, __LINE__);
+                /*
+                 * Now read one line per task and build task list
+                 */
+                p = strtok_r(NULL, ";", &lineptr);
+                if (p == NULL) {
+                    break;
+                }
+                while (!done) {
+                    char *cp;
                     int num;
 
-		    linep = p;
-		    TRACE_DETAIL_V("Processing %s", linep);
-		    /*
-		     * get task index
-		     */
-		    p = strtok_r(linep, " ", &tokenptr);
-		    if (p == NULL) {
-			break;
-		    }
-		    tasknum = atoi(p);
-		    taskp = &tasks[tasknum];
-		    taskp->proxy_taskid = generate_id();
-		    /*
-		     * There are two possible attach.cfg file formats now. In the old
+                    linep = p;
+                    TRACE_DETAIL_V("Processing %s", linep);
+                    /*
+                     * get task index
+                     */
+                    p = strtok_r(linep, " ", &tokenptr);
+                    if (p == NULL) {
+                        break;
+                    }
+                    tasknum = atoi(p);
+                    taskp = &tasks[tasknum];
+                    taskp->proxy_taskid = generate_id();
+                    /*
+                     * There are two possible attach.cfg file formats now. In the old
                      * format, the first two tokens in the line are a task index and
                      * host IP address.. In the new format, there is an additional
                      * token between the task index and IP address, which we ignore.
@@ -1743,98 +1696,98 @@ startup_monitor(void *job_ident)
                      * numeric, this is the new fiel format and we advance to the next
                      * token to get the host address. Otherwise we assume it is the
                      * IP address and don't get another token.
-		     */
-		    p = strtok_r(NULL, " ", &tokenptr);
-		    if (p == NULL) {
-			break;
-		    }
+                     */
+                    p = strtok_r(NULL, " ", &tokenptr);
+                    if (p == NULL) {
+                        break;
+                    }
                     num = strtol(p, &cp, 10);
                     if (*cp == '\0') {
-                          /*
-                           * Token is numeric, advance 1 token
-                           */
+                        /*
+                         * Token is numeric, advance 1 token
+                         */
                         p = strtok_r(NULL, " ", &tokenptr);
                     }
-		    /*
-		     * get node IP address
-		     */
-		    if (p == NULL) {
-			break;
-		    }
-		    taskp->ipaddr = strdup(p);
-		    /*
-		     * get task hostname. hostname will be truncated to
-		     * short form if LoadLeveler is not being used. If Loadleveler
-		     * is used, it's node list uses full host name so truncation is
-		     * not allowed.
-		     */
-		    p = strtok_r(NULL, " ", &tokenptr);
-		    if (p == NULL) {
-			break;
-		    }
-		    if (!use_load_leveler) {
-			cp = strchr(p, '.');
-			if (cp != NULL) {
-			    *cp = '\0';
-			}
-		    }
-		    taskp->hostname = strdup(p);
-		    /*
-		     * get task pid
-		     */
-		    p = strtok_r(NULL, " ", &tokenptr);
-		    if (p == NULL) {
-			break;
-		    }
-		    taskp->task_pid = atoi(p);
-		    /*
-		     * get task parent pid
-		     */
-		    p = strtok_r(NULL, " ", &tokenptr);
-		    if (p == NULL) {
-			break;
-		    }
-		    taskp->parent_pid = atoi(p);
-		    numlines = numlines + 1;
-		    if (numlines >= numtasks) {
-			done = 1;
-			break;
-		    }
-		    /*
-		     * Read next line of task info
-		     */
-		    p = strtok_r(NULL, ";", &lineptr);
-		    if (p == NULL) {
-			break;
-		    }
-		}
-		/*
-		 * If numline == numtasks then the file was complete and
-		 * we are done with parsing the file. Otherwise clean up
-		 * the list and try again
-		 */
-		if (!done) {
-		    free(cfginfo);
-		    delete_task_list(tasknum + 1, tasks);
-		}
-	    }
-	    else {
-		/*
-		 * File was not completely read. Close the file then try
-		 * again.
-		 */
-		free(cfginfo);
-		fclose(cfgfile);
-		delete_task_list(tasknum + 1, tasks);
-		sleep(1);
-	    }
-	}
+                    /*
+                     * get node IP address
+                     */
+                    if (p == NULL) {
+                        break;
+                    }
+                    taskp->ipaddr = strdup(p);
+                    /*
+                     * get task hostname. hostname will be truncated to
+                     * short form if LoadLeveler is not being used. If Loadleveler
+                     * is used, it's node list uses full host name so truncation is
+                     * not allowed.
+                     */
+                    p = strtok_r(NULL, " ", &tokenptr);
+                    if (p == NULL) {
+                        break;
+                    }
+                    if (!use_load_leveler) {
+                        cp = strchr(p, '.');
+                        if (cp != NULL) {
+                            *cp = '\0';
+                        }
+                    }
+                    taskp->hostname = strdup(p);
+                    /*
+                     * get task pid
+                     */
+                    p = strtok_r(NULL, " ", &tokenptr);
+                    if (p == NULL) {
+                        break;
+                    }
+                    taskp->task_pid = atoi(p);
+                    /*
+                     * get task parent pid
+                     */
+                    p = strtok_r(NULL, " ", &tokenptr);
+                    if (p == NULL) {
+                        break;
+                    }
+                    taskp->parent_pid = atoi(p);
+                    numlines = numlines + 1;
+                    if (numlines >= numtasks) {
+                        done = 1;
+                        break;
+                    }
+                    /*
+                     * Read next line of task info
+                     */
+                    p = strtok_r(NULL, ";", &lineptr);
+                    if (p == NULL) {
+                        break;
+                    }
+                }
+                /*
+                 * If numline == numtasks then the file was complete and
+                 * we are done with parsing the file. Otherwise clean up
+                 * the list and try again
+                 */
+                if (!done) {
+                    free(cfginfo);
+                    delete_task_list(tasknum + 1, tasks);
+                }
+            }
+            else {
+                /*
+                 * File was not completely read. Close the file then try
+                 * again.
+                 */
+                free(cfginfo);
+                fclose(cfgfile);
+                delete_task_list(tasknum + 1, tasks);
+                sleep(1);
+            }
+        }
     }
     job->tasks = tasks;
     job->numtasks = numtasks;
 #ifdef PE_DUAL_POE_DEBUG
-    if (job->debuggee_job != NULL)        /* The debugger job doesn't report */
-    	goto out;
+    if (job->debuggee_job != NULL) /* The debugger job doesn't report */
+        goto out;
 #endif
     /*
      * For each task in the application, send a new process event to the
@@ -1844,111 +1797,111 @@ startup_monitor(void *job_ident)
     sprintf(jobid_str, "%d", ((jobinfo *) job_ident)->proxy_jobid);
     msg = proxy_new_process_event(start_events_transid, jobid_str, numtasks);
 #if 0
-	/*
-	 * Need to determine whether the proxy or the GUI writes the routing file.
-	 * If the GUI writes the routing file, that may become a problem as larger
-	 * numbers of tasks are run. If the GUI writes the routing file, the task list
-	 * is sent across the network connection twice, first from the proxy to the GUI
-	 * and then back from the GUI to the node where the proxy runs.
-	 *
-	 * For now, the GUI writes the routing file. This code may be clobbering the
-	 * routing file generated by the GUI so it is disabled.
-	 */
+    /*
+     * Need to determine whether the proxy or the GUI writes the routing file.
+     * If the GUI writes the routing file, that may become a problem as larger
+     * numbers of tasks are run. If the GUI writes the routing file, the task list
+     * is sent across the network connection twice, first from the proxy to the GUI
+     * and then back from the GUI to the node where the proxy runs.
+     *
+     * For now, the GUI writes the routing file. This code may be clobbering the
+     * routing file generated by the GUI so it is disabled.
+     */
     if (job->debugging) {
-	FILE *routing_file;
+        FILE *routing_file;
 
-	TRACE_DETAIL("\nCreating routing file\n");
-	routing_file = fopen("routing_file", "rw");
-	if (routing_file != NULL) {
-	    fprintf(routing_file, "%d\n", numtasks);
-	    TRACE_DETAIL("Writing routing data\n");
-	    for (i = 0; i < numtasks; i++) {
-		fprintf(routing_file, "%d %s 7777\n", i, taskp[i].hostname);
-	    }
-	    fclose(routing_file);
-	}
-	else {
-	    TRACE_DETAIL_V("\nError writing routing file: %s\n", strerror(errno));
-	}
+        TRACE_DETAIL("\nCreating routing file\n");
+        routing_file = fopen("routing_file", "rw");
+        if (routing_file != NULL) {
+            fprintf(routing_file, "%d\n", numtasks);
+            TRACE_DETAIL("Writing routing data\n");
+            for (i = 0; i < numtasks; i++) {
+                fprintf(routing_file, "%d %s 7777\n", i, taskp[i].hostname);
+            }
+            fclose(routing_file);
+        }
+        else {
+            TRACE_DETAIL_V("\nError writing routing file: %s\n", strerror(errno));
+        }
     }
 #endif
     if (job->discovered_job) {
-	/*
-	 * If this is a job running before the proxy started, then
-	 * there will be no hostfile. In this case, just add new
-	 * nodes for each unique nodename found in the attach.cfg file.
-	 */
-	for (i = 0; i < numtasks; i++) {
-	    if (find_node(taskp[i].hostname) == NULL) {
-		node_refcount *node;
+        /*
+         * If this is a job running before the proxy started, then
+         * there will be no hostfile. In this case, just add new
+         * nodes for each unique nodename found in the attach.cfg file.
+         */
+        for (i = 0; i < numtasks; i++) {
+            if (find_node(taskp[i].hostname) == NULL) {
+                node_refcount *node;
 
-		node = add_node(taskp[i].hostname);
-		AddToList(new_nodes, node);
-		node_count = node_count + 1;
-	    }
-	}
-	if (SizeOfList(new_nodes) > 0) {
-	    send_new_node_list(start_events_transid, machine_id, new_nodes);
-	}
-	DestroyList(new_nodes, NULL);
+                node = add_node(taskp[i].hostname);
+                AddToList(new_nodes, node);
+                node_count = node_count + 1;
+            }
+        }
+        if (SizeOfList(new_nodes) > 0) {
+            send_new_node_list(start_events_transid, machine_id, new_nodes);
+        }
+        DestroyList(new_nodes, NULL);
     }
     if (use_load_leveler) {
 #ifdef HAVE_LLAPI_H
-	NodeObject *node;
+        NodeObject *node;
 
-	for (i = 0; i < numtasks; i++) {
-	    if (i == 0) {
-		job->task0_pid = taskp->task_pid;
-	    }
-	    node = get_node_in_hash(my_cluster->node_hash, taskp[i].hostname);
-	    if (node == NULL) {
-		print_message(ERROR_MESSAGE, "Node %s not found in node list\n", taskp->hostname);
-	    }
-	    else {
-		sprintf(procid_str, "%d", taskp[i].proxy_taskid);
+        for (i = 0; i < numtasks; i++) {
+            if (i == 0) {
+                job->task0_pid = taskp->task_pid;
+            }
+            node = get_node_in_hash(my_cluster->node_hash, taskp[i].hostname);
+            if (node == NULL) {
+                print_message(ERROR_MESSAGE, "Node %s not found in node list\n", taskp->hostname);
+            }
+            else {
+                sprintf(procid_str, "%d", taskp[i].proxy_taskid);
                 AddToList(taskid_list, strdup(procid_str));
-		sprintf(procname, "task_%d", i);
-		proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
-		proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_generated_node_id);
+                sprintf(procname, "task_%d", i);
+                proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
+                proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_generated_node_id);
                 AddToList(taskid_list, &(node->proxy_generated_node_id));
-		proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
-		proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
-	    }
-	}
+                proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
+                proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
+            }
+        }
 #endif
     }
     else {
-	for (i = 0; i < numtasks; i++) {
-	    node_refcount *node;
+        for (i = 0; i < numtasks; i++) {
+            node_refcount *node;
 
-	    if (i == 0) {
-		job->task0_pid = taskp->task_pid;
-	    }
-	    /*
-	     * Increment the number of tasks running on the node and send the
-	     * new process event
-	     */
-	    node = find_node(taskp[i].hostname);
-	    if (node == NULL) {
-		print_message(ERROR_MESSAGE, "Node %s not found in node list\n", taskp->hostname);
-	    }
-	    else {
+            if (i == 0) {
+                job->task0_pid = taskp->task_pid;
+            }
+            /*
+             * Increment the number of tasks running on the node and send the
+             * new process event
+             */
+            node = find_node(taskp[i].hostname);
+            if (node == NULL) {
+                print_message(ERROR_MESSAGE, "Node %s not found in node list\n", taskp->hostname);
+            }
+            else {
 
-		node->task_count = node->task_count + 1;
-		sprintf(procid_str, "%d", taskp[i].proxy_taskid);
+                node->task_count = node->task_count + 1;
+                sprintf(procid_str, "%d", taskp[i].proxy_taskid);
                 AddToList(taskid_list, strdup(procid_str));
-		sprintf(procname, "task_%d", i);
-		proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
-		proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_nodeid);
-		proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
-		proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
-	    }
-	}
+                sprintf(procname, "task_%d", i);
+                proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
+                proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_nodeid);
+                proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
+                proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
+            }
+        }
     }
     enqueue_event(msg);
-      /*
-       * Notify front end that each task is started
-       */
+    /*
+     * Notify front end that each task is started
+     */
     SetList(taskid_list);
     proxy_taskid = GetListElement(taskid_list);
     while (proxy_taskid != NULL) {
@@ -1976,50 +1929,50 @@ startup_monitor(void *job_ident)
      * to stdio file descriptors, so don't register file handlers.
      */
     if (!job->stdout_redirect && !job->discovered_job) {
-	RegisterFileHandler(job->stdout_fd, READ_FILE_HANDLER, stdout_handler, job);
+        RegisterFileHandler(job->stdout_fd, READ_FILE_HANDLER, stdout_handler, job);
     }
     if (job->debugging) {
-	  /*
-	   * If this is a debug session then we need to start the top level SDM process
-	   * at this point. The child SDM processes have already been created by the
-	   * fork/exec of the poe process (which in the debug case is 'poe sdm ...') above.
-	   */
-	pid_t sdm_pid;
-	char *debugger;
-	int len;
-	char **argv;
+        /*
+         * If this is a debug session then we need to start the top level SDM process
+         * at this point. The child SDM processes have already been created by the
+         * fork/exec of the poe process (which in the debug case is 'poe sdm ...') above.
+         */
+        pid_t sdm_pid;
+        char *debugger;
+        int len;
+        char **argv;
 
-	sdm_pid = fork();
-	if (sdm_pid == 0) {
-	    TRACE_DETAIL("+++ Ready to invoke top level SDM\n");
-	    argv = create_debug_parmlist(job->sdm_debugname, job->sdm_debug_arg_count, job->sdm_debugargs);
-	    len = strlen(job->sdm_debugdir) + strlen(job->sdm_debugname) + 2;
-	    debugger = (char *) malloc(len);
-	    malloc_check(debugger, __FUNCTION__, __LINE__);
-	    strcpy(debugger, job->sdm_debugdir);
-	    strcat(debugger, "/");
-	    strcat(debugger, job->sdm_debugname);
-sleep(5);
-	    status = execve(debugger, argv, job->sdm_envp);
-	    print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
-	    TRACE_EXIT;
-	    exit(1);
-	}
-	else {
-	    if (sdm_pid == -1) {
-		return PROXY_RES_OK;
-	    }
-	    else {
-		/*
-		 * This is the parent leg of the fork for invoking the top level SDM.
-		 * No explicit processing required here. All we care about is
-		 * eventually catching the SDM exit status so we don't create a zonbie.
-		 */
-	    }
+        sdm_pid = fork();
+        if (sdm_pid == 0) {
+            TRACE_DETAIL("+++ Ready to invoke top level SDM\n");
+            argv = create_debug_parmlist(job->sdm_debugname, job->sdm_debug_arg_count, job->sdm_debugargs);
+            len = strlen(job->sdm_debugdir) + strlen(job->sdm_debugname) + 2;
+            debugger = (char *) malloc(len);
+            malloc_check(debugger, __FUNCTION__, __LINE__);
+            strcpy(debugger, job->sdm_debugdir);
+            strcat(debugger, "/");
+            strcat(debugger, job->sdm_debugname);
+            sleep(5);
+            status = execve(debugger, argv, job->sdm_envp);
+            print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
+            TRACE_EXIT;
+            exit(1);
+        }
+        else {
+            if (sdm_pid == -1) {
+                return PROXY_RES_OK;
+            }
+            else {
+                /*
+                 * This is the parent leg of the fork for invoking the top level SDM.
+                 * No explicit processing required here. All we care about is
+                 * eventually catching the SDM exit status so we don't create a zonbie.
+                 */
+            }
         }
     }
 #ifdef PE_DUAL_POE_DEBUG
-  out:
+    out:
 #endif
     /*
      * The startup thread exits at this point, so clear the reference in
@@ -2050,110 +2003,105 @@ zombie_reaper(void *arg)
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     for (;;) {
-	pthread_mutex_lock(&job_lock);
-	/*
-	 * Scan the job list looking for jobs running before the proxy
-	 * started. For each of those jobs, check if the poe process
-	 * still exists. If the process has disappeared, then mark the
-	 * job terminated.
-	 */
-	SetList(jobs);
-	job = GetListElement(jobs);
-	while (job != NULL) {
-	    if ((job->discovered_job) && (kill(job->poe_pid, 0) != 0)) {
-		TRACE_DETAIL_V("+++ poe process %d Exited with unknown status\n", job->poe_pid);
-		send_job_state_change_event(start_events_transid,
-					    job->proxy_jobid, JOB_STATE_TERMINATED);
-		send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED);
-		if (job->tasks != NULL) {
-		    if (!use_load_leveler) {
-			update_node_refcounts(job->numtasks, job->tasks);
-		    }
-		    delete_task_list(job->numtasks, job->tasks);
-		}
-		RemoveFromList(jobs, job);
-	    }
-	    job = GetListElement(jobs);
-	}
-	/*
-	 * wait for any poe task to terminate
-	 */
-	terminated_pmd = wait3(&status, WNOHANG, &rusage_info);
-	if (terminated_pmd > 0) {
+        pthread_mutex_lock(&job_lock);
+        /*
+         * Scan the job list looking for jobs running before the proxy
+         * started. For each of those jobs, check if the poe process
+         * still exists. If the process has disappeared, then mark the
+         * job terminated.
+         */
+        SetList(jobs);
+        job = GetListElement(jobs);
+        while (job != NULL) {
+            if ((job->discovered_job) && (kill(job->poe_pid, 0) != 0)) {
+                TRACE_DETAIL_V("+++ poe process %d Exited with unknown status\n", job->poe_pid);
+                send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_TERMINATED);
+                send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED);
+                if (job->tasks != NULL) {
+                    if (!use_load_leveler) {
+                        update_node_refcounts(job->numtasks, job->tasks);
+                    }
+                    delete_task_list(job->numtasks, job->tasks);
+                }
+                RemoveFromList(jobs, job);
+            }
+            job = GetListElement(jobs);
+        }
+        /*
+         * wait for any poe task to terminate
+         */
+        terminated_pmd = wait3(&status, WNOHANG, &rusage_info);
+        if (terminated_pmd > 0) {
 
-	    TRACE_DETAIL_V("+++ Pid %d exited\n", terminated_pmd);
-	    /*
-	     * Look for job with matching poe process pid. If found, then
-	     * post process status to front end and clean up resources
-	     * If no match to pid is found, it's probably a top level SDM debugger
-	     * process, and no additional processing is needed.
-	     */
-	    SetList(jobs);
-	    job = GetListElement(jobs);
-	    while (job != NULL) {
-		if (terminated_pmd == job->poe_pid) {
-		    break;
-		}
-		job = GetListElement(jobs);
-	    }
-	    if (job != NULL) {
-		/*
-		 * POE process status used to be reported to the GUI.
-		 * Apparently, now, only job status is posted.
-		 */
-		if (status <= 128) {
-		    TRACE_DETAIL_V("+++ %d Exited with status %08x\n", terminated_pmd, status);
-		    send_job_state_change_event(start_events_transid,
-						job->proxy_jobid, JOB_STATE_TERMINATED);
-		    send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED);
-		}
-		else {
-		    TRACE_DETAIL_V("+++ %d signalled with status %08x\n", terminated_pmd,
-				   status - 128);
-		    send_job_state_change_event(start_events_transid, job->proxy_jobid,
-						JOB_STATE_ERROR);
-		    send_process_state_change_event(start_events_transid, job,
-						    PROC_STATE_EXITED_SIGNALLED);
-		}
-		/*
-		 * Since the job is terminated, the stdio file descriptor
-		 * pipes should be unregistered from the main polling loop
-		 * and the file descriptors closed. However, if there
-		 * is still data in the buffers, this data would be lost.
-		 * So, leave the pipes registered. The polling loop
-		 * will eventually process the data left in the pipe. If the
-		 * last line of output does not end with a newline, that
-		 * line may be lost
-		 */
-		if (job->tasks != NULL) {
-		    if (!use_load_leveler) {
-			update_node_refcounts(job->numtasks, job->tasks);
-		    }
-		    delete_task_list(job->numtasks, job->tasks);
-		}
-		if (job->stderr_file != NULL) {
-			fclose(job->stderr_file);
-		}
-		free(job->submit_jobid);
-		free(job->stdout_info.read_buf);
-		free(job->stderr_info.read_buf);
-		free(job->stdout_info.write_buf);
-		free(job->stderr_info.write_buf);
-		RemoveFromList(jobs, job);
-		free(job);
-	    }
-	}
-	pthread_mutex_unlock(&job_lock);
-	/*
-	 * Poll for status once per second
-	 */
-	sleep(1);
+            TRACE_DETAIL_V("+++ Pid %d exited\n", terminated_pmd);
+            /*
+             * Look for job with matching poe process pid. If found, then
+             * post process status to front end and clean up resources
+             * If no match to pid is found, it's probably a top level SDM debugger
+             * process, and no additional processing is needed.
+             */
+            SetList(jobs);
+            job = GetListElement(jobs);
+            while (job != NULL) {
+                if (terminated_pmd == job->poe_pid) {
+                    break;
+                }
+                job = GetListElement(jobs);
+            }
+            if (job != NULL) {
+                /*
+                 * POE process status used to be reported to the GUI.
+                 * Apparently, now, only job status is posted.
+                 */
+                if (status <= 128) {
+                    TRACE_DETAIL_V("+++ %d Exited with status %08x\n", terminated_pmd, status);
+                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_TERMINATED);
+                    send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED);
+                }
+                else {
+                    TRACE_DETAIL_V("+++ %d signalled with status %08x\n", terminated_pmd,
+                            status - 128);
+                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_ERROR);
+                    send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED_SIGNALLED);
+                }
+                /*
+                 * Since the job is terminated, the stdio file descriptor
+                 * pipes should be unregistered from the main polling loop
+                 * and the file descriptors closed. However, if there
+                 * is still data in the buffers, this data would be lost.
+                 * So, leave the pipes registered. The polling loop
+                 * will eventually process the data left in the pipe. If the
+                 * last line of output does not end with a newline, that
+                 * line may be lost
+                 */
+                if (job->tasks != NULL) {
+                    if (!use_load_leveler) {
+                        update_node_refcounts(job->numtasks, job->tasks);
+                    }
+                    delete_task_list(job->numtasks, job->tasks);
+                }
+                if (job->stderr_file != NULL) {
+                    fclose(job->stderr_file);
+                }
+                free(job->submit_jobid);
+                free(job->stdout_info.read_buf);
+                free(job->stderr_info.read_buf);
+                free(job->stdout_info.write_buf);
+                free(job->stderr_info.write_buf);
+                RemoveFromList(jobs, job);
+                free(job);
+            }
+        }
+        pthread_mutex_unlock(&job_lock);
+        /*
+         * Poll for status once per second
+         */
+        sleep(1);
     }
     TRACE_EXIT;
 }
 
-void
-redirect_io(void)
+void redirect_io(void)
 {
     /*
      * STDIO for running applications needs to be redirected in order to
@@ -2189,94 +2137,92 @@ redirect_io(void)
     job = GetListElement(jobs);
     redirected_fds = 0;
     while (job != NULL) {
-	if (!job->stdin_redirect) {
-	    stdin_count = stdin_count + 1;
-	    redirected_fds = 1;
-	}
-	if (!job->stdout_redirect) {
-	    stdout_count = stdout_count + 1;
-	    redirected_fds = 1;
-	}
-	if (!job->stderr_redirect) {
-	    stderr_count = stderr_count + 1;
-	    redirected_fds = 1;
-	}
-	job = GetListElement(jobs);
+        if (!job->stdin_redirect) {
+            stdin_count = stdin_count + 1;
+            redirected_fds = 1;
+        }
+        if (!job->stdout_redirect) {
+            stdout_count = stdout_count + 1;
+            redirected_fds = 1;
+        }
+        if (!job->stderr_redirect) {
+            stderr_count = stderr_count + 1;
+            redirected_fds = 1;
+        }
+        job = GetListElement(jobs);
     }
     if (redirected_fds) {
-	/*
-	 * Allocate a string long enough to hold three pathnames, and lists of file
-	 * descriptors for stdin, stdout and stderr, each prefixed with a file
-	 * descriptor count. Then allocate work strings for each file descriptor list
-	 */
-	miniproxy_parmlist = (char *) malloc(PATH_MAX * 3 + stdin_count * 11 +
-					     stdout_count * 11 + stderr_count * 11 + 30);
-	if (miniproxy_parmlist == NULL) {
-	    exit(1);
-	}
-	stdin_fds = (char *) malloc(stdin_count * 11);
-	malloc_check(stdin_fds, __FUNCTION__, __LINE__);
-	stdout_fds = (char *) malloc(stdout_count * 11);
-	malloc_check(stdout_fds, __FUNCTION__, __LINE__);
-	stderr_fds = (char *) malloc(stderr_count * 11);
-	malloc_check(stderr_fds, __FUNCTION__, __LINE__);
-	/*
-	 * Initialize the file descriptor lists, then concatenate each
-	 * fd number for a non-redirected file to its list.
-	 */
-	stdin_fds[0] = '\0';
-	stdout_fds[0] = '\0';
-	stderr_fds[0] = '\0';
-	SetList(jobs);
-	job = GetListElement(jobs);
-	while (job != NULL) {
-	    if (!job->stdin_redirect) {
-		sprintf(num, "%d ", job->stdin_fd);
-		strcat(stdin_fds, num);
-	    }
-	    if (!job->stdout_redirect) {
-		sprintf(num, "%d ", job->stdout_fd);
-		strcat(stdout_fds, num);
-	    }
-	    if (!job->stderr_redirect) {
-		sprintf(num, "%d ", job->stderr_fd);
-		strcat(stderr_fds, num);
-	    }
-	    job = GetListElement(jobs);
-	}
-	/*
-	 * Build the miniproxy parameter list. All data is contained in a
-	 * string that is tokenized into individual parameters by miniproxy
-	 */
-	strcpy(miniproxy_parmlist, miniproxy_args[0]);
-	if (state_trace == 0) {
-	    strcat(miniproxy_parmlist, " n");
-	}
-	else {
-	    strcat(miniproxy_parmlist, " y");
-	}
-	strcat(miniproxy_parmlist, " /tmp/mp_stdout /tmp/mp_stderr ");
-	sprintf(num, "%d ", stdin_count);
-	strcat(miniproxy_parmlist, num);
-	strcat(miniproxy_parmlist, stdin_fds);
-	sprintf(num, "%d ", stdout_count);
-	strcat(miniproxy_parmlist, num);
-	strcat(miniproxy_parmlist, stdout_fds);
-	sprintf(num, "%d ", stderr_count);
-	strcat(miniproxy_parmlist, num);
-	strcat(miniproxy_parmlist, stderr_fds);
-	miniproxy_args[0] = miniproxy_path;
-	miniproxy_args[1] = miniproxy_parmlist;
-	miniproxy_args[2] = NULL;
-	print_message(TRACE_DETAIL_MESSAGE, "Invoking miniproxy with args %s\n",
-		      miniproxy_parmlist);
-	if (fork() == 0) {
-	    execve(miniproxy_args[0], miniproxy_args, miniproxy_env);
-	    print_message(ERROR_MESSAGE, "Failed to invke miniproxy %s: %s\n",
-			  miniproxy_args[0], strerror(errno));
-	    TRACE_EXIT;
-	    exit(1);
-	}
+        /*
+         * Allocate a string long enough to hold three pathnames, and lists of file
+         * descriptors for stdin, stdout and stderr, each prefixed with a file
+         * descriptor count. Then allocate work strings for each file descriptor list
+         */
+        miniproxy_parmlist = (char *) malloc(PATH_MAX * 3 + stdin_count * 11 + stdout_count * 11 + stderr_count * 11
+                + 30);
+        if (miniproxy_parmlist == NULL) {
+            exit(1);
+        }
+        stdin_fds = (char *) malloc(stdin_count * 11);
+        malloc_check(stdin_fds, __FUNCTION__, __LINE__);
+        stdout_fds = (char *) malloc(stdout_count * 11);
+        malloc_check(stdout_fds, __FUNCTION__, __LINE__);
+        stderr_fds = (char *) malloc(stderr_count * 11);
+        malloc_check(stderr_fds, __FUNCTION__, __LINE__);
+        /*
+         * Initialize the file descriptor lists, then concatenate each
+         * fd number for a non-redirected file to its list.
+         */
+        stdin_fds[0] = '\0';
+        stdout_fds[0] = '\0';
+        stderr_fds[0] = '\0';
+        SetList(jobs);
+        job = GetListElement(jobs);
+        while (job != NULL) {
+            if (!job->stdin_redirect) {
+                sprintf(num, "%d ", job->stdin_fd);
+                strcat(stdin_fds, num);
+            }
+            if (!job->stdout_redirect) {
+                sprintf(num, "%d ", job->stdout_fd);
+                strcat(stdout_fds, num);
+            }
+            if (!job->stderr_redirect) {
+                sprintf(num, "%d ", job->stderr_fd);
+                strcat(stderr_fds, num);
+            }
+            job = GetListElement(jobs);
+        }
+        /*
+         * Build the miniproxy parameter list. All data is contained in a
+         * string that is tokenized into individual parameters by miniproxy
+         */
+        strcpy(miniproxy_parmlist, miniproxy_args[0]);
+        if (state_trace == 0) {
+            strcat(miniproxy_parmlist, " n");
+        }
+        else {
+            strcat(miniproxy_parmlist, " y");
+        }
+        strcat(miniproxy_parmlist, " /tmp/mp_stdout /tmp/mp_stderr ");
+        sprintf(num, "%d ", stdin_count);
+        strcat(miniproxy_parmlist, num);
+        strcat(miniproxy_parmlist, stdin_fds);
+        sprintf(num, "%d ", stdout_count);
+        strcat(miniproxy_parmlist, num);
+        strcat(miniproxy_parmlist, stdout_fds);
+        sprintf(num, "%d ", stderr_count);
+        strcat(miniproxy_parmlist, num);
+        strcat(miniproxy_parmlist, stderr_fds);
+        miniproxy_args[0] = miniproxy_path;
+        miniproxy_args[1] = miniproxy_parmlist;
+        miniproxy_args[2] = NULL;
+        print_message(TRACE_DETAIL_MESSAGE, "Invoking miniproxy with args %s\n", miniproxy_parmlist);
+        if (fork() == 0) {
+            execve(miniproxy_args[0], miniproxy_args, miniproxy_env);
+            print_message(ERROR_MESSAGE, "Failed to invke miniproxy %s: %s\n", miniproxy_args[0], strerror(errno));
+            TRACE_EXIT;
+            exit(1);
+        }
     }
 }
 
@@ -2292,7 +2238,7 @@ monitor_LoadLeveler_nodes(void *job_ident)
     LL_element *query_elem = NULL;
     int node_count = 0;
     int sleep_seconds = 30;
-    int sleep_time_reset = 0;	/* if changes this pass */
+    int sleep_time_reset = 0; /* if changes this pass */
     LL_element *errObj = NULL;
 
     ListElement *cluster_list_element = NULL;
@@ -2301,238 +2247,238 @@ monitor_LoadLeveler_nodes(void *job_ident)
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
 
-  /*-----------------------------------------------------------------------*
-   * loop forever until we are told we are shutting down.                  *
-   *-----------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------*
+     * loop forever until we are told we are shutting down.                  *
+     *-----------------------------------------------------------------------*/
     while (state_shutdown_requested == 0) {
-	pthread_mutex_lock(&master_lock);
-	if (state_shutdown_requested == 1) {
-	    pthread_mutex_unlock(&master_lock);
-	    break;
-	}
-	query_elem = NULL;
-	node_name = NULL;
-	node_count = 0;
-	node = NULL;
-	LL_cluster_param cluster_parm;
-	char *remote_cluster[2];
-	Hash *node_hash = NULL;
-	HashEntry *hash_element = NULL;
-	List *node_list = NULL;
-	ListElement *node_list_element = NULL;
-	sleep_time_reset = 0;
+        pthread_mutex_lock(&master_lock);
+        if (state_shutdown_requested == 1) {
+            pthread_mutex_unlock(&master_lock);
+            break;
+        }
+        query_elem = NULL;
+        node_name = NULL;
+        node_count = 0;
+        node = NULL;
+        LL_cluster_param cluster_parm;
+        char *remote_cluster[2];
+        Hash *node_hash = NULL;
+        HashEntry *hash_element = NULL;
+        List *node_list = NULL;
+        ListElement *node_list_element = NULL;
+        sleep_time_reset = 0;
 
-	print_message(TRACE_MESSAGE, ">>> %s thread running. line=%d.\n", __FUNCTION__, __LINE__);
-	if (cluster_list == NULL) {
-	    refresh_cluster_list();
-	}
+        print_message(TRACE_MESSAGE, ">>> %s thread running. line=%d.\n", __FUNCTION__, __LINE__);
+        if (cluster_list == NULL) {
+            refresh_cluster_list();
+        }
 
-	if (cluster_list != NULL) {
+        if (cluster_list != NULL) {
 
-      /*-----------------------------------------------------------------------*
-       * loop on the cluster list we obtained earlier from LoadLeveler.        *
-       *-----------------------------------------------------------------------*/
-	    cluster_list_element = cluster_list->l_head;
-	    while (cluster_list_element != NULL) {
-		cluster_object = cluster_list_element->l_value;
-		cluster_list_element = cluster_list_element->l_next;
-		if (cluster_object->node_hash->count <= 0) {
-		    sleep_time_reset = 1;
-		}
+            /*-----------------------------------------------------------------------*
+             * loop on the cluster list we obtained earlier from LoadLeveler.        *
+             *-----------------------------------------------------------------------*/
+            cluster_list_element = cluster_list->l_head;
+            while (cluster_list_element != NULL) {
+                cluster_object = cluster_list_element->l_value;
+                cluster_list_element = cluster_list_element->l_next;
+                if (cluster_object->node_hash->count <= 0) {
+                    sleep_time_reset = 1;
+                }
 
-		if (multicluster_status == 1) {
+                if (multicluster_status == 1) {
 
-	 /*-----------------------------------------------------------------------*
-          * we are running multicluster - set cluster name into environment       *
-          * to influence where LoadLeveler searches for data (what cluster)       *
-          *-----------------------------------------------------------------------*/
-		    remote_cluster[0] = cluster_object->cluster_name;
-		    remote_cluster[1] = NULL;
-		    print_message(INFO_MESSAGE, "Setting access for LoadLeveler cluster=%s.\n",
-				  cluster_object->cluster_name);
-		    cluster_parm.action = CLUSTER_SET;
-		    cluster_parm.cluster_list = remote_cluster;
-		    rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
-		}
-		else {
+                    /*-----------------------------------------------------------------------*
+                     * we are running multicluster - set cluster name into environment       *
+                     * to influence where LoadLeveler searches for data (what cluster)       *
+                     *-----------------------------------------------------------------------*/
+                    remote_cluster[0] = cluster_object->cluster_name;
+                    remote_cluster[1] = NULL;
+                    print_message(INFO_MESSAGE, "Setting access for LoadLeveler cluster=%s.\n",
+                            cluster_object->cluster_name);
+                    cluster_parm.action = CLUSTER_SET;
+                    cluster_parm.cluster_list = remote_cluster;
+                    rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
+                }
+                else {
 
-	 /*-----------------------------------------------------------------------*
-          * not running multicluster                                              *
-          *-----------------------------------------------------------------------*/
-		    print_message(INFO_MESSAGE,
-				  "Setting access for LoadLeveler local cluster (single cluster).\n");
-		    cluster_parm.action = CLUSTER_UNSET;
-		    cluster_parm.cluster_list = NULL;
-		    rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
-		}
+                    /*-----------------------------------------------------------------------*
+                     * not running multicluster                                              *
+                     *-----------------------------------------------------------------------*/
+                    print_message(INFO_MESSAGE,
+                            "Setting access for LoadLeveler local cluster (single cluster).\n");
+                    cluster_parm.action = CLUSTER_UNSET;
+                    cluster_parm.cluster_list = NULL;
+                    rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
+                }
 
-	/*-----------------------------------------------------------------------*
-         * build a LoadLeveler query object (for nodes)                          *
+                /*-----------------------------------------------------------------------*
+                 * build a LoadLeveler query object (for nodes)                          *
+                 *-----------------------------------------------------------------------*/
+                query_elem = my_ll_query(MACHINES);
+                if (query_elem == NULL) {
+                    print_message(ERROR_MESSAGE,
+                            "Unable to obtain query element. LoadLeveler may not be active or is not responding.\n");
+                    continue;
+                }
+
+                /*-----------------------------------------------------------------------*
+                 * set the request type for LoadLeveler (we want nodes)                  *
+                 *-----------------------------------------------------------------------*/
+                print_message(INFO_MESSAGE,
+                        "Call LoadLeveler (ll_set_request) for nodes in cluster=%s.\n",
+                        cluster_object->cluster_name);
+                rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
+                if (rc != 0) {
+                    rc = my_ll_deallocate(query_elem);
+                    query_elem = NULL;
+                    continue;
+                }
+
+                /*-----------------------------------------------------------------------*
+                 * get nodes from LoadLeveler for current or local cluster.              *
+                 *-----------------------------------------------------------------------*/
+                print_message(INFO_MESSAGE,
+                        "Call LoadLeveler (ll_get_objs) for nodes in cluster=%s.\n",
+                        cluster_object->cluster_name);
+                node = my_ll_get_objs(query_elem, LL_CM, NULL, &node_count, &rc);
+                if (rc != 0) {
+                    rc = my_ll_deallocate(query_elem);
+                    query_elem = NULL;
+                    continue;
+                }
+
+                print_message(INFO_MESSAGE, "Number of LoadLeveler Nodes=%d in cluster=%s.\n",
+                        node_count, cluster_object->cluster_name);
+
+                /*-----------------------------------------------------------------------*
+                 * loop on the nodes returned by LoadLeveler                             *
+                 *-----------------------------------------------------------------------*/
+                i = 0;
+                while (node != NULL) {
+                    print_message(INFO_MESSAGE, "LoadLeveler Node %d:\n", i);
+                    rc = my_ll_get_data(node, LL_MachineName, &node_name);
+                    if (rc == 0) {
+                        print_message(INFO_MESSAGE, "Node name=%s\n", node_name);
+                        if ((node_object = get_node_in_hash(cluster_object->node_hash, node_name)) != NULL) {
+
+                            /*-----------------------------------------------------------------------*
+                             * node returned by LoadLeveler was found in our ptp node list.          *
+                             * flag it as found.                                                     *
+                             *-----------------------------------------------------------------------*/
+                            node_object->node_found = 1;
+                            if (node_object->node_state != MY_STATE_UP) {
+                                node_object->node_state = MY_STATE_UP;
+                                sleep_time_reset = 1;
+                                print_message(INFO_MESSAGE,
+                                        "Schedule event notification: node=%s changed for LoadLeveler Cluster=%s.\n",
+                                        node_name, cluster_object->cluster_name);
+                                sendNodeChangeEvent(start_events_transid, cluster_object,
+                                        node_object);
+                            }
+                        }
+                        else { /* new node (not yet in list) */
+
+                            /*-----------------------------------------------------------------------*
+                             * node returned by LoadLeveler was not found in our ptp node list       *
+                             * add it and generate an event to the gui. flag it as added.            *
+                             *-----------------------------------------------------------------------*/
+                            node_object = (NodeObject *) malloc(sizeof(NodeObject));
+                            malloc_check(node_object, __FUNCTION__, __LINE__);
+                            memset(node_object, '\0', sizeof(node_object));
+                            node_object->proxy_generated_node_id = generate_id();
+                            node_object->node_name = strdup(node_name);
+                            node_object->node_found = 2;
+                            node_object->node_state = MY_STATE_UP;
+                            sleep_time_reset = 1;
+                            add_node_to_hash(cluster_object->node_hash, (void *) node_object);
+                            sleep_time_reset = 1;
+                            print_message(INFO_MESSAGE,
+                                    "Schedule event notification: node=%s added for LoadLeveler Cluster=%s.\n",
+                                    node_name, cluster_object->cluster_name);
+                            sendNodeAddEvent(start_events_transid, cluster_object, node_object);
+                        }
+                    }
+
+                    i++;
+                    node = my_ll_next_obj(query_elem);
+                }
+
+                /*-----------------------------------------------------------------------*
+                 * loop on the ptp node list to see if any nodes were not returned       *
+                 * by LoadLeveler on this pass (maybe they went down).                   *
+                 * generate an event (changed/gone) to the gui.                          *
+                 *-----------------------------------------------------------------------*/
+                node_hash = cluster_object->node_hash;
+                if (node_hash != NULL) {
+                    HashSet(node_hash);
+                    hash_element = HashGet(node_hash);
+                    while (hash_element != NULL) {
+                        node_list = (List *) hash_element->h_data;
+                        hash_element = HashGet(node_hash);
+                        node_list_element = node_list->l_head;
+                        while (node_list_element != NULL) {
+                            node_object = node_list_element->l_value;
+                            node_list_element = node_list_element->l_next;
+                            if (node_object->node_found == 0) {
+                                if (node_object->node_state != MY_STATE_UNKNOWN) {
+                                    node_object->node_state = MY_STATE_UNKNOWN;
+                                    print_message(INFO_MESSAGE,
+                                            "Schedule event notification: node=%s changed for LoadLeveler Cluster=%s.\n",
+                                            node_name, cluster_object->cluster_name);
+                                    sendNodeChangeEvent(start_events_transid, cluster_object,
+                                            node_object);
+                                    sleep_time_reset = 1;
+                                }
+                            }
+                            else {
+                                node_object->node_found = 0;
+                            }
+                        }
+
+                    }
+                }
+                if (query_elem != NULL) {
+                    rc = my_ll_free_objs(query_elem);
+                    rc = my_ll_deallocate(query_elem);
+                    query_elem = NULL;
+                }
+
+            }
+        }
+        else {
+            sleep_time_reset = 1;
+        }
+
+        pthread_mutex_unlock(&master_lock);
+
+        /*-----------------------------------------------------------------------*
+         * adjust sleep interval based on changes this pass.                     *
          *-----------------------------------------------------------------------*/
-		query_elem = my_ll_query(MACHINES);
-		if (query_elem == NULL) {
-		    print_message(ERROR_MESSAGE,
-				  "Unable to obtain query element. LoadLeveler may not be active or is not responding.\n");
-		    continue;
-		}
+        if (sleep_time_reset == 1) {
+            sleep_seconds = min_node_sleep_seconds;
+        }
+        else {
+            sleep_seconds = sleep_seconds + min_node_sleep_seconds;
+            if (sleep_seconds > max_node_sleep_seconds) {
+                sleep_seconds = max_node_sleep_seconds;
+            }
+        }
 
-	/*-----------------------------------------------------------------------*
-         * set the request type for LoadLeveler (we want nodes)                  *
+        /*-----------------------------------------------------------------------*
+         * sleep and loop again on the LoadLeveler machines.                     *
          *-----------------------------------------------------------------------*/
-		print_message(INFO_MESSAGE,
-			      "Call LoadLeveler (ll_set_request) for nodes in cluster=%s.\n",
-			      cluster_object->cluster_name);
-		rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
-		if (rc != 0) {
-		    rc = my_ll_deallocate(query_elem);
-		    query_elem = NULL;
-		    continue;
-		}
-
-	/*-----------------------------------------------------------------------*
-         * get nodes from LoadLeveler for current or local cluster.              *
-         *-----------------------------------------------------------------------*/
-		print_message(INFO_MESSAGE,
-			      "Call LoadLeveler (ll_get_objs) for nodes in cluster=%s.\n",
-			      cluster_object->cluster_name);
-		node = my_ll_get_objs(query_elem, LL_CM, NULL, &node_count, &rc);
-		if (rc != 0) {
-		    rc = my_ll_deallocate(query_elem);
-		    query_elem = NULL;
-		    continue;
-		}
-
-		print_message(INFO_MESSAGE, "Number of LoadLeveler Nodes=%d in cluster=%s.\n",
-			      node_count, cluster_object->cluster_name);
-
-	/*-----------------------------------------------------------------------*
-         * loop on the nodes returned by LoadLeveler                             *
-         *-----------------------------------------------------------------------*/
-		i = 0;
-		while (node != NULL) {
-		    print_message(INFO_MESSAGE, "LoadLeveler Node %d:\n", i);
-		    rc = my_ll_get_data(node, LL_MachineName, &node_name);
-		    if (rc == 0) {
-			print_message(INFO_MESSAGE, "Node name=%s\n", node_name);
-			if ((node_object = get_node_in_hash(cluster_object->node_hash, node_name)) != NULL) {
-
-	      /*-----------------------------------------------------------------------*
-               * node returned by LoadLeveler was found in our ptp node list.          *
-               * flag it as found.                                                     *
-               *-----------------------------------------------------------------------*/
-			    node_object->node_found = 1;
-			    if (node_object->node_state != MY_STATE_UP) {
-				node_object->node_state = MY_STATE_UP;
-				sleep_time_reset = 1;
-				print_message(INFO_MESSAGE,
-					      "Schedule event notification: node=%s changed for LoadLeveler Cluster=%s.\n",
-					      node_name, cluster_object->cluster_name);
-				sendNodeChangeEvent(start_events_transid, cluster_object,
-						    node_object);
-			    }
-			}
-			else {	/* new node (not yet in list) */
-
-	      /*-----------------------------------------------------------------------*
-               * node returned by LoadLeveler was not found in our ptp node list       *
-               * add it and generate an event to the gui. flag it as added.            *
-               *-----------------------------------------------------------------------*/
-			    node_object = (NodeObject *) malloc(sizeof(NodeObject));
-			    malloc_check(node_object, __FUNCTION__, __LINE__);
-			    memset(node_object, '\0', sizeof(node_object));
-			    node_object->proxy_generated_node_id = generate_id();
-			    node_object->node_name = strdup(node_name);
-			    node_object->node_found = 2;
-			    node_object->node_state = MY_STATE_UP;
-			    sleep_time_reset = 1;
-			    add_node_to_hash(cluster_object->node_hash, (void *) node_object);
-			    sleep_time_reset = 1;
-			    print_message(INFO_MESSAGE,
-					  "Schedule event notification: node=%s added for LoadLeveler Cluster=%s.\n",
-					  node_name, cluster_object->cluster_name);
-			    sendNodeAddEvent(start_events_transid, cluster_object, node_object);
-			}
-		    }
-
-		    i++;
-		    node = my_ll_next_obj(query_elem);
-		}
-
-	/*-----------------------------------------------------------------------*
-         * loop on the ptp node list to see if any nodes were not returned       *
-         * by LoadLeveler on this pass (maybe they went down).                   *
-         * generate an event (changed/gone) to the gui.                          *
-         *-----------------------------------------------------------------------*/
-		node_hash = cluster_object->node_hash;
-		if (node_hash != NULL) {
-		    HashSet(node_hash);
-		    hash_element = HashGet(node_hash);
-		    while (hash_element != NULL) {
-			node_list = (List *) hash_element->h_data;
-			hash_element = HashGet(node_hash);
-			node_list_element = node_list->l_head;
-			while (node_list_element != NULL) {
-			    node_object = node_list_element->l_value;
-			    node_list_element = node_list_element->l_next;
-			    if (node_object->node_found == 0) {
-				if (node_object->node_state != MY_STATE_UNKNOWN) {
-				    node_object->node_state = MY_STATE_UNKNOWN;
-				    print_message(INFO_MESSAGE,
-						  "Schedule event notification: node=%s changed for LoadLeveler Cluster=%s.\n",
-						  node_name, cluster_object->cluster_name);
-				    sendNodeChangeEvent(start_events_transid, cluster_object,
-							node_object);
-				    sleep_time_reset = 1;
-				}
-			    }
-			    else {
-				node_object->node_found = 0;
-			    }
-			}
-
-		    }
-		}
-		if (query_elem != NULL) {
-		    rc = my_ll_free_objs(query_elem);
-		    rc = my_ll_deallocate(query_elem);
-		    query_elem = NULL;
-		}
-
-	    }
-	}
-	else {
-	    sleep_time_reset = 1;
-	}
-
-	pthread_mutex_unlock(&master_lock);
-
-    /*-----------------------------------------------------------------------*
-     * adjust sleep interval based on changes this pass.                     *
-     *-----------------------------------------------------------------------*/
-	if (sleep_time_reset == 1) {
-	    sleep_seconds = min_node_sleep_seconds;
-	}
-	else {
-	    sleep_seconds = sleep_seconds + min_node_sleep_seconds;
-	    if (sleep_seconds > max_node_sleep_seconds) {
-		sleep_seconds = max_node_sleep_seconds;
-	    }
-	}
-
-    /*-----------------------------------------------------------------------*
-     * sleep and loop again on the LoadLeveler machines.                     *
-     *-----------------------------------------------------------------------*/
-	if (state_shutdown_requested == 0) {
-	    int sleep_interval = 0;
-	    int mini_sleep_interval = (sleep_seconds + 4) / 5;
-	    print_message(INFO_MESSAGE, "%s Sleeping for (%d seconds) %d intervals of 5 seconds\n",
-			  __FUNCTION__, mini_sleep_interval * 5, mini_sleep_interval);
-	    for (sleep_interval = 0; sleep_interval < mini_sleep_interval; sleep_interval++) {
-		if (state_shutdown_requested == 0) {
-		    sleep(5);
-		}
-	    }
-	}
+        if (state_shutdown_requested == 0) {
+            int sleep_interval = 0;
+            int mini_sleep_interval = (sleep_seconds + 4) / 5;
+            print_message(INFO_MESSAGE, "%s Sleeping for (%d seconds) %d intervals of 5 seconds\n",
+                    __FUNCTION__, mini_sleep_interval * 5, mini_sleep_interval);
+            for (sleep_interval = 0; sleep_interval < mini_sleep_interval; sleep_interval++) {
+                if (state_shutdown_requested == 0) {
+                    sleep(5);
+                }
+            }
+        }
 
     }
 
@@ -2581,603 +2527,602 @@ monitor_LoadLeveler_jobs(void *job_ident)
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
 
-  /*-----------------------------------------------------------------------*
-   * loop forever until we are told we are shutting down.                  *
-   *-----------------------------------------------------------------------*/
-    while (state_shutdown_requested == 0) {
-	pthread_mutex_lock(&master_lock);
-	if (state_shutdown_requested == 1) {
-	    pthread_mutex_unlock(&master_lock);
-	    break;
-	}
-	query_elem = NULL;
-	job_name = NULL;
-	step_ID = NULL;
-	job_count = 0;
-	step_machine_count = 0;
-	job = NULL;
-	char *pChar = NULL;
-
-	print_message(TRACE_MESSAGE, ">>> %s thread running. line=%d.\n", __FUNCTION__, __LINE__);
-
-	if (cluster_list != NULL) {
-
-      /*-----------------------------------------------------------------------*
-       * loop on the cluster list we obtained earlier from LoadLeveler.        *
-       *-----------------------------------------------------------------------*/
-	    cluster_list_element = cluster_list->l_head;
-	    while (cluster_list_element != NULL) {
-		cluster_object = cluster_list_element->l_value;
-		cluster_list_element = cluster_list_element->l_next;
-
-		if (cluster_object != NULL) {
-		    if (cluster_object->node_hash != NULL) {
-			if (cluster_object->node_hash->count > 0) {
-
-			    if (multicluster_status == 1) {
-
-	 /*-----------------------------------------------------------------------*
-          * we are running multicluster - set cluster name into environment       *
-          * to influence where LoadLeveler searches for data (what cluster)       *
-          *-----------------------------------------------------------------------*/
-				remote_cluster[0] = cluster_object->cluster_name;
-				remote_cluster[1] = NULL;
-				print_message(INFO_MESSAGE,
-					      "Setting access for LoadLeveler cluster=%s.\n",
-					      cluster_object->cluster_name);
-				cluster_parm.action = CLUSTER_SET;
-				cluster_parm.cluster_list = remote_cluster;
-				rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
-			    }
-			    else {
-
-	 /*-----------------------------------------------------------------------*
-          * not running multicluster                                              *
-          *-----------------------------------------------------------------------*/
-				print_message(INFO_MESSAGE,
-					      "Setting access for LoadLeveler local cluster (single cluster).\n");
-				cluster_parm.action = CLUSTER_UNSET;
-				cluster_parm.cluster_list = NULL;
-				rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
-			    }
-
-	/*-----------------------------------------------------------------------*
-         * build a LoadLeveler query object (for jobs)                           *
-         *-----------------------------------------------------------------------*/
-			    query_elem = my_ll_query(JOBS);
-			    if (query_elem == NULL) {
-				print_message(ERROR_MESSAGE,
-					      "Unable to obtain query element. LoadLeveler may not be active or is not responding.\n");
-				continue;
-			    }
-
-	/*-----------------------------------------------------------------------*
-         * set the request type for LoadLeveler (we want nodes)                  *
-         *-----------------------------------------------------------------------*/
-			    print_message(INFO_MESSAGE,
-					  "Call LoadLeveler (ll_set_request) for jobs in cluster=%s.\n",
-					  cluster_object->cluster_name);
-			    rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
-			    if (rc != 0) {
-				rc = my_ll_deallocate(query_elem);
-				query_elem = NULL;
-				continue;
-			    }
-
-	/*-----------------------------------------------------------------------*
-         * get jobs from LoadLeveler for current or local cluster.               *
-         *-----------------------------------------------------------------------*/
-			    print_message(INFO_MESSAGE,
-					  "Call LoadLeveler (ll_get_objs) for jobs in cluster=%s.\n",
-					  cluster_object->cluster_name);
-			    job_count = 0;
-			    job = my_ll_get_objs(query_elem, LL_CM, NULL, &job_count, &rc);
-			    if (rc != 0) {
-				rc = my_ll_deallocate(query_elem);
-				query_elem = NULL;
-			    }
-
-			    print_message(INFO_MESSAGE,
-					  "Number of LoadLeveler Jobs=%d in cluster=%s.\n",
-					  job_count, cluster_object->cluster_name);
-
-	/*-----------------------------------------------------------------------*
-         * loop on the jobs returned by LoadLeveler                              *
-         *-----------------------------------------------------------------------*/
-			    i = 0;
-			    while (job != NULL) {
-				print_message(INFO_MESSAGE, "LoadLeveler Job %d:\n", i);
-				rc = my_ll_get_data(job, LL_JobSubmitHost, &job_submit_host);
-				rc = my_ll_get_data(job, LL_JobName, &job_name);
-				if (rc == 0) {	/* do something here with the job object */
-				    /*
-				     * For interactive PE jobs submitted thru LoadLeveler, there is no way to match
-				     * the invocation of the job thru PE and the appearance of the job in the Loadleveler
-				     * job queue since when the job is submitted, the only thing known is the pid of the poe
-				     * process, and the pid is not available in the responses to LoadLeveler queries. If the pid was
-				     * available, then we could match up based on reading the attach.cfg file generated by PE.
-				     * The alternative is to attempt to detect interactive PE jobs in the LoadLeveler job queue
-				     * and ignore them. The proxy threads created to monitor interactive PE status by watching for the
-				     * attach.cfg file and process termination will be responsible for creating the new job events
-				     * and associated events for the interactive PE job. This isn't 100% perfect, but with the available
-				     * information is probably the best that can be done.
-				     */
-				    int job_step_type;
-
-				    my_ll_get_data(job, LL_JobStepType, &job_step_type);
-				    if (job_step_type == INTERACTIVE_JOB) {
-					int job_is_remote;
-					char *submit_user_name;
-
-					my_ll_get_data(job, LL_JobIsRemote, &job_is_remote);
-					if (job_is_remote) {
-					    my_ll_get_data(job, LL_JobSubmittingUser,
-							   *submit_user_name);
-					}
-					else {
-					    LL_element *job_credentials;
-
-					    my_ll_get_data(job, LL_JobCredential, &job_credentials);
-					    my_ll_get_data(job_credentials, LL_CredentialUserName,
-							   &submit_user_name);
-					}
-					if (strcmp(my_username, submit_user_name) == 0) {
-					    print_message(INFO_MESSAGE,
-							  "Job %s is an interactive job for this user, and is ignored\n",
-							  job_name);
-					    free(submit_user_name);
-					    job = my_ll_next_obj(query_elem);
-					    continue;
-					}
-					else {
-					    free(submit_user_name);
-					}
-				    }
-				    print_message(INFO_MESSAGE, "Job name=%s\n", job_name);
-				    rc = my_ll_get_data(job, LL_JobGetFirstStep, &step);
-				    while (step != NULL) {
-					step_machine_count = 0;
-					rc = my_ll_get_data(step, LL_StepID, &step_ID);
-					if (rc != 0) {
-					    rc = my_ll_free_objs(query_elem);
-					    rc = my_ll_deallocate(query_elem);
-					    query_elem = NULL;
-					    continue;
-					}
-					else {
-
-	       /*-----------------------------------------------------------------------*
-                * break the job step name apart into a LoadLeveler LL_STEP_ID           *
-                *-----------------------------------------------------------------------*/
-					    ll_step_id.from_host = strdup(job_submit_host);
-					    pChar = step_ID + strlen(job_submit_host) + 1;
-					    pChar = strtok(pChar, ".");
-					    ll_step_id.cluster = atoi(pChar);
-					    pChar = strtok(NULL, ".");
-					    ll_step_id.proc = atoi(pChar);
-
-					    print_message(INFO_MESSAGE, "Job step ID=%s.%d.%d\n",
-							  ll_step_id.from_host, ll_step_id.cluster,
-							  ll_step_id.proc);
-					    if ((job_object = get_job_in_list(job_list, ll_step_id)) != NULL) {
-
-	      /*-----------------------------------------------------------------------*
-               * step returned by LoadLeveler was found in our ptp job list.           *
-               * flag it as found.                                                     *
-               *-----------------------------------------------------------------------*/
-						job_object->job_found = 1;
-						if (job_object->job_state == MY_STATE_UNKNOWN) {
-						    job_object->job_state = MY_STATE_IDLE;
-						    print_message(INFO_MESSAGE,
-								  "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
-								  job_object->ll_step_id.from_host,
-								  job_object->ll_step_id.cluster,
-								  job_object->ll_step_id.proc,
-								  job_object->cluster_name);
-						    sendJobChangeEvent(start_events_transid,
-								       job_object);
-						}
-						if (multicluster_status == 1) {
-						    if (strcmp(job_object->cluster_name, cluster_object->cluster_name) != 0) {
-							sendJobRemoveEvent(start_events_transid,
-									   job_object);
-							job_object->cluster_name = cluster_object->cluster_name;
-							sendJobAddEvent(start_events_transid,
-									cluster_object, job_object);
-						    }
-						}
-					    }
-					    else {
-
-	      /*-----------------------------------------------------------------------*
-               * job returned by LoadLeveler was not found in our ptp job list         *
-               * add it and generate an event to the gui. flag it as added.            *
-               *-----------------------------------------------------------------------*/
-						job_object =
-						    (JobObject *) malloc(sizeof(JobObject));
-						malloc_check(job_object, __FUNCTION__, __LINE__);
-						memset(job_object, '\0', sizeof(job_object));
-						job_object->proxy_generated_job_id = generate_id();
-						job_object->gui_assigned_job_id = "-1";
-						job_object->ll_step_id.from_host =
-						    strdup(ll_step_id.from_host);
-						job_object->ll_step_id.cluster = ll_step_id.cluster;
-						job_object->ll_step_id.proc = ll_step_id.proc;
-						job_object->job_found = 2;
-						job_object->job_state = MY_STATE_IDLE;
-						job_object->task_list = NewList();
-						job_object->cluster_name =
-						    strdup(cluster_object->cluster_name);
-						add_job_to_list(job_list, (void *) job_object);
-						print_message(INFO_MESSAGE,
-							      "Schedule event notification: Job=%s.%d.%d added for LoadLeveler Cluster=%s.\n",
-							      job_object->ll_step_id.from_host,
-							      job_object->ll_step_id.cluster,
-							      job_object->ll_step_id.proc,
-							      job_object->cluster_name);
-						sendJobAddEvent(start_events_transid,
-								cluster_object, job_object);
-					    }
-					    rc = my_ll_get_data(step, LL_StepNodeCount, &step_node_count);
-					    print_message(INFO_MESSAGE,
-							  "Step=%s.%d.%d. StepNodeCount=%d.\n",
-							  job_object->ll_step_id.from_host,
-							  job_object->ll_step_id.cluster,
-							  job_object->ll_step_id.proc,
-							  step_node_count);
-
-		/*-----------------------------------------------------------------------*
-                 * if this job from LoadLeveler has nodes (is running-like) then loop on *
-                 * the nodes to see task status for new or existing tasks.               *
-                 *-----------------------------------------------------------------------*/
-					    if (step_node_count > 0) {
-						rc = my_ll_get_data(step, LL_StepGetFirstNode, &node);	/* node */
-
-		  /*-----------------------------------------------------------------------*
-                   * loop on the nodes in the job returned by LoadLeveler                  *
-                   *-----------------------------------------------------------------------*/
-						while (node != NULL) {
-						    rc = my_ll_get_data(node, LL_NodeTaskCount, &node_task_count);
-						    print_message(INFO_MESSAGE,
-								  "NodeTaskCount=%d.\n",
-								  node_task_count);
-						    rc = my_ll_get_data(node, LL_NodeGetFirstTask, &task);
-
-		  /*-----------------------------------------------------------------------*
-                   * loop on the tasks in the job returned by LoadLeveler                  *
-                   *-----------------------------------------------------------------------*/
-						    while (task != NULL) {
-							rc = my_ll_get_data(task, LL_TaskTaskInstanceCount, &task_instance_count);
-							print_message(INFO_MESSAGE,
-								      "TaskInstanceCount=%d.\n",
-								      task_instance_count);
-							rc = my_ll_get_data(task, LL_TaskGetFirstTaskInstance, &task_instance);
-
-		      /*-----------------------------------------------------------------------*
-                       * loop on the task_instances in the job returned by LoadLeveler         *
-                       *-----------------------------------------------------------------------*/
-							while (task_instance != NULL) {
-							    rc = my_ll_get_data(task_instance, LL_TaskInstanceMachineName, &task_instance_machine_name);
-							    rc = my_ll_get_data(task_instance, LL_TaskInstanceMachineAddress, &task_instance_machine_address);
-							    rc = my_ll_get_data(task_instance, LL_TaskInstanceTaskID, &task_instance_task_ID);
-							    print_message(INFO_MESSAGE,
-									  "TaskInstanceMachineName=%s. TaskInstanceMachineAddress=%s. TaskInstanceTaskID=%d.\n",
-									  task_instance_machine_name,
-									  task_instance_machine_address,
-									  task_instance_task_ID);
-							    if ((task_object = get_task_in_list(job_object->task_list, task_instance_machine_name, task_instance_task_ID)) != NULL) {
-
-			 /*-----------------------------------------------------------------------*
-                         * task returned by LoadLeveler was found in our ptp job task list.      *
-                         * flag it as found.                                                     *
-                         *-----------------------------------------------------------------------*/
-								task_object->ll_task_id =
-								    task_instance_task_ID;
-								task_object->task_found = 1;
-								if (task_object->task_state !=
-								    MY_STATE_RUNNING) {
-								    task_object->task_state =
-									MY_STATE_RUNNING;
-								    print_message(INFO_MESSAGE,
-										  "Schedule event notification: Task_ID=%d running on node_name=%s added for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
-										  task_object->ll_task_id,
-										  task_object->node_name,
-										  job_object->ll_step_id.
-										  from_host,
-										  job_object->ll_step_id.
-										  cluster,
-										  job_object->ll_step_id.proc,
-										  job_object->cluster_name);
-								    sendTaskChangeEvent
-									(start_events_transid,
-									 job_object, task_object);
-								}
-								if (job_object->job_state !=
-								    MY_STATE_RUNNING) {
-								    job_object->job_state =
-									MY_STATE_RUNNING;
-								    print_message(INFO_MESSAGE,
-										  "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
-										  job_object->ll_step_id.
-										  from_host,
-										  job_object->ll_step_id.
-										  cluster,
-										  job_object->ll_step_id.proc,
-										  job_object->cluster_name);
-								    sendJobChangeEvent
-									(start_events_transid,
-									 job_object);
-								}
-							    }
-							    else {
-
-			   /*-----------------------------------------------------------------------*
-                            * task returned by LoadLeveler was not found in our ptp job task list   *
-                            * add it and generate an event to the gui. flag it as added.            *
-                            *-----------------------------------------------------------------------*/
-								task_object =
-								    (TaskObject *)
-								    malloc(sizeof(TaskObject));
-								malloc_check(task_object,
-									     __FUNCTION__,
-									     __LINE__);
-								memset(task_object, '\0', sizeof(task_object));
-								task_object->proxy_generated_task_id = generate_id();
-								task_object->ll_task_id =
-								    task_instance_task_ID;
-								task_object->node_name =
-								    strdup
-								    (task_instance_machine_name);
-								task_object->node_address =
-								    strdup
-								    (task_instance_machine_address);
-								task_object->task_found = 2;	/* flag it as added */
-								task_object->task_state =
-								    MY_STATE_RUNNING;
-								print_message(INFO_MESSAGE,
-									      "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
-									      job_object->ll_step_id.from_host,
-									      job_object->ll_step_id.cluster,
-									      job_object->ll_step_id.proc,
-									      job_object->cluster_name);
-								if (job_object->job_state !=
-								    MY_STATE_RUNNING) {
-								    job_object->job_state =
-									MY_STATE_RUNNING;
-								    print_message(INFO_MESSAGE,
-										  "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
-										  job_object->ll_step_id.
-										  from_host,
-										  job_object->ll_step_id.
-										  cluster,
-										  job_object->ll_step_id.proc,
-										  job_object->cluster_name);
-								    sendJobChangeEvent
-									(start_events_transid,
-									 job_object);
-								}
-								add_task_to_list(job_object->task_list, (void *) task_object);
-								print_message(INFO_MESSAGE,
-									      "Schedule event notification: Task_ID=%d running on node_name=%s added for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
-									      task_object->ll_task_id,
-									      task_object->node_name,
-									      job_object->ll_step_id.from_host,
-									      job_object->ll_step_id.cluster,
-									      job_object->ll_step_id.proc,
-									      job_object->cluster_name);
-								sendTaskAddEvent
-								    (start_events_transid,
-								     cluster_object, job_object,
-								     task_object);
-							    }
-							    rc = my_ll_get_data(task, LL_TaskGetNextTaskInstance, &task_instance);
-							}
-							rc = my_ll_get_data(node, LL_NodeGetNextTask, &task);
-						    }
-						    rc = my_ll_get_data(step, LL_StepGetNextNode, &node);
-						}
-					    }
-
-		/*-----------------------------------------------------------------------*
-                 * loop on the tasks in the job object - if any not found that were      *
-                 * present before then generate deleted task events.                     *
-                 *-----------------------------------------------------------------------*/
-					    task_list = (List *) job_object->task_list;
-					    task_list_element = task_list->l_head;
-					    while (task_list_element != NULL) {
-						task_object = task_list_element->l_value;
-						task_list_element = task_list_element->l_next;
-						if (task_object != 0) {
-						    if (task_object->task_found == 0) {
-							task_object->task_state =
-							    MY_STATE_TERMINATED;
-							task_object->task_found = 0;
-							print_message(INFO_MESSAGE,
-								      "Schedule event notification: Task_ID=%d running on node_name=%s deleted for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
-								      task_object->ll_task_id,
-								      task_object->node_name,
-								      job_object->ll_step_id.
-								      from_host,
-								      job_object->ll_step_id.
-								      cluster,
-								      job_object->ll_step_id.proc,
-								      job_object->cluster_name);
-							sendTaskRemoveEvent(start_events_transid,
-									    job_object,
-									    task_object);
-							delete_task_from_list(task_list, task_object);
-							if (SizeOfList(task_list) == 0) {
-							    if (job_object->job_state ==
-								MY_STATE_RUNNING) {
-								job_object->job_state = MY_STATE_TERMINATED;
-								print_message(INFO_MESSAGE,
-									      "Schedule event notification: Job=%s.%d.%d terminated for LoadLeveler Cluster=%s.\n",
-									      job_object->ll_step_id.from_host,
-									      job_object->ll_step_id.cluster,
-									      job_object->ll_step_id.proc,
-									      job_object->cluster_name);
-								sendJobChangeEvent
-								    (start_events_transid,
-								     job_object);
-							    }
-							    else {
-								job_object->job_state =
-								    MY_STATE_IDLE;
-								print_message(INFO_MESSAGE,
-									      "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
-									      job_object->ll_step_id.from_host,
-									      job_object->ll_step_id.cluster,
-									      job_object->ll_step_id.proc,
-									      job_object->cluster_name);
-								sendJobChangeEvent
-								    (start_events_transid,
-								     job_object);
-							    }
-							}
-						    }
-						    else {
-							task_object->task_found = 0;
-						    }
-						}
-					    }
-
-
-					    rc = my_ll_get_data(job, LL_JobGetNextStep, &step);
-					}
-				    }
-				}
-
-				i++;
-				job = my_ll_next_obj(query_elem);
-			    }
-			}
-		    }
-		}
-		if (query_elem != NULL) {
-		    rc = my_ll_free_objs(query_elem);
-		    rc = my_ll_deallocate(query_elem);
-		    query_elem = NULL;
-		}
-	    }
-
-	    if (query_elem != NULL) {
-		rc = my_ll_free_objs(query_elem);
-		rc = my_ll_deallocate(query_elem);
-		query_elem = NULL;
-	    }
-
-      /*-----------------------------------------------------------------------*
-       * get the time and see if job has been sitting in submitted state too   *
-       * long.                                                                 *
-       *-----------------------------------------------------------------------*/
-	    time(&my_clock);
-
-      /*-----------------------------------------------------------------------*
-       * loop on the ptp job list to see if any jobs were not returned         *
-       * by LoadLeveler on this pass (maybe they went down).                   *
-       * generate an event (changed/gone) to the gui.                          *
-       *-----------------------------------------------------------------------*/
-	    if (job_list != NULL) {
-		job_list_element = job_list->l_head;
-		while (job_list_element != NULL) {
-		    job_object = job_list_element->l_value;
-		    job_list_element = job_list_element->l_next;
-		    if ((job_object->job_found == 0) &&
-			((job_object->job_state != MY_STATE_UNKNOWN) ||
-			 ((my_clock - job_object->job_submit_time) > 300))) {
-			job_object->job_found = 0;
-
-	    /*-----------------------------------------------------------------------*
-             * loop on the tasks in the job object - send deleted event and mark     *
-             * all deleted.                                                          *
-             *-----------------------------------------------------------------------*/
-			task_list = (List *) job_object->task_list;
-			task_list_element = task_list->l_head;
-			while (task_list_element != NULL) {
-			    task_object = task_list_element->l_value;
-			    task_list_element = task_list_element->l_next;
-			    if (task_object != 0) {
-				print_message(INFO_MESSAGE,
-					      "Schedule event notification: Task_ID=%d deleted on node_name=%s deleted for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
-					      task_object->ll_task_id, task_object->node_name,
-					      job_object->ll_step_id.from_host,
-					      job_object->ll_step_id.cluster,
-					      job_object->ll_step_id.proc,
-					      job_object->cluster_name);
-				sendTaskRemoveEvent(start_events_transid, job_object, task_object);
-				delete_task_from_list(task_list, task_object);
-				if (SizeOfList(task_list) == 0) {
-				    job_object->job_state = MY_STATE_IDLE;
-				    print_message(INFO_MESSAGE,
-						  "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
-						  job_object->ll_step_id.from_host,
-						  job_object->ll_step_id.cluster,
-						  job_object->ll_step_id.proc,
-						  job_object->cluster_name);
-				    sendJobChangeEvent(start_events_transid, job_object);
-				}
-			    }
-			}
-
-			job_object->job_state = MY_STATE_TERMINATED;
-			print_message(INFO_MESSAGE,
-				      "Schedule event notification: Job=%s.%d.%d terminated for LoadLeveler Cluster=%s.\n",
-				      job_object->ll_step_id.from_host,
-				      job_object->ll_step_id.cluster, job_object->ll_step_id.proc,
-				      job_object->cluster_name);
-			sendJobChangeEvent(start_events_transid, job_object);
-			print_message(INFO_MESSAGE,
-				      "Schedule event notification: Job=%s.%d.%d deleted for LoadLeveler Cluster=%s.\n",
-				      job_object->ll_step_id.from_host,
-				      job_object->ll_step_id.cluster, job_object->ll_step_id.proc,
-				      job_object->cluster_name);
-			sendJobRemoveEvent(start_events_transid, job_object);
-		    }
-		    else {
-			job_object->job_found = 0;
-		    }
-		}
-	    }
-	}
-	pthread_mutex_unlock(&master_lock);
-
     /*-----------------------------------------------------------------------*
-     * sleep and loop again on the LoadLeveler machines.                     *
+     * loop forever until we are told we are shutting down.                  *
      *-----------------------------------------------------------------------*/
-	if (state_shutdown_requested == 0) {
-	    int sleep_interval = 0;
-	    int mini_sleep_interval = (job_sleep_seconds + 4) / 5;
-	    print_message(INFO_MESSAGE, "%s Sleeping for (%d seconds) %d intervals of 5 seconds\n",
-			  __FUNCTION__, mini_sleep_interval * 5, mini_sleep_interval);
-	    for (sleep_interval = 0; sleep_interval < mini_sleep_interval; sleep_interval++) {
-		if (state_shutdown_requested == 0) {
-		    struct timespec wakeup_time;
-		    int status;
+    while (state_shutdown_requested == 0) {
+        pthread_mutex_lock(&master_lock);
+        if (state_shutdown_requested == 1) {
+            pthread_mutex_unlock(&master_lock);
+            break;
+        }
+        query_elem = NULL;
+        job_name = NULL;
+        step_ID = NULL;
+        job_count = 0;
+        step_machine_count = 0;
+        job = NULL;
+        char *pChar = NULL;
 
-		    gettimeofday(&wakeup_time, NULL);
-		    wakeup_time.tv_sec = wakeup_time.tv_sec + 5;
-		    pthread_mutex_lock(&job_notify_lock);
-		    status =
-			pthread_cond_timedwait(&job_notify_condvar, &job_notify_lock, &wakeup_time);
-		    pthread_mutex_unlock(&job_notify_lock);
-		    if (status == 0) {
-			print_message(INFO_MESSAGE, "Main thread requests job query\n");
-			break;
-		    }
-		    else {
-			if (status != ETIMEDOUT) {
-			    print_message(INFO_MESSAGE,
-					  "Error in condition wait in job query thread: %s(%d)\n",
-					  strerror(status), status);
-			}
-			else {
-			    print_message(INFO_MESSAGE,
-					  "Job query thread woke up after 5 second wait\n");
-			}
-		    }
-		}
-	    }
-	}
+        print_message(TRACE_MESSAGE, ">>> %s thread running. line=%d.\n", __FUNCTION__, __LINE__);
+
+        if (cluster_list != NULL) {
+
+            /*-----------------------------------------------------------------------*
+             * loop on the cluster list we obtained earlier from LoadLeveler.        *
+             *-----------------------------------------------------------------------*/
+            cluster_list_element = cluster_list->l_head;
+            while (cluster_list_element != NULL) {
+                cluster_object = cluster_list_element->l_value;
+                cluster_list_element = cluster_list_element->l_next;
+
+                if (cluster_object != NULL) {
+                    if (cluster_object->node_hash != NULL) {
+                        if (cluster_object->node_hash->count > 0) {
+
+                            if (multicluster_status == 1) {
+
+                                /*-----------------------------------------------------------------------*
+                                 * we are running multicluster - set cluster name into environment       *
+                                 * to influence where LoadLeveler searches for data (what cluster)       *
+                                 *-----------------------------------------------------------------------*/
+                                remote_cluster[0] = cluster_object->cluster_name;
+                                remote_cluster[1] = NULL;
+                                print_message(INFO_MESSAGE,
+                                        "Setting access for LoadLeveler cluster=%s.\n",
+                                        cluster_object->cluster_name);
+                                cluster_parm.action = CLUSTER_SET;
+                                cluster_parm.cluster_list = remote_cluster;
+                                rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
+                            }
+                            else {
+
+                                /*-----------------------------------------------------------------------*
+                                 * not running multicluster                                              *
+                                 *-----------------------------------------------------------------------*/
+                                print_message(INFO_MESSAGE,
+                                        "Setting access for LoadLeveler local cluster (single cluster).\n");
+                                cluster_parm.action = CLUSTER_UNSET;
+                                cluster_parm.cluster_list = NULL;
+                                rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
+                            }
+
+                            /*-----------------------------------------------------------------------*
+                             * build a LoadLeveler query object (for jobs)                           *
+                             *-----------------------------------------------------------------------*/
+                            query_elem = my_ll_query(JOBS);
+                            if (query_elem == NULL) {
+                                print_message(ERROR_MESSAGE,
+                                        "Unable to obtain query element. LoadLeveler may not be active or is not responding.\n");
+                                continue;
+                            }
+
+                            /*-----------------------------------------------------------------------*
+                             * set the request type for LoadLeveler (we want nodes)                  *
+                             *-----------------------------------------------------------------------*/
+                            print_message(INFO_MESSAGE,
+                                    "Call LoadLeveler (ll_set_request) for jobs in cluster=%s.\n",
+                                    cluster_object->cluster_name);
+                            rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
+                            if (rc != 0) {
+                                rc = my_ll_deallocate(query_elem);
+                                query_elem = NULL;
+                                continue;
+                            }
+
+                            /*-----------------------------------------------------------------------*
+                             * get jobs from LoadLeveler for current or local cluster.               *
+                             *-----------------------------------------------------------------------*/
+                            print_message(INFO_MESSAGE,
+                                    "Call LoadLeveler (ll_get_objs) for jobs in cluster=%s.\n",
+                                    cluster_object->cluster_name);
+                            job_count = 0;
+                            job = my_ll_get_objs(query_elem, LL_CM, NULL, &job_count, &rc);
+                            if (rc != 0) {
+                                rc = my_ll_deallocate(query_elem);
+                                query_elem = NULL;
+                            }
+
+                            print_message(INFO_MESSAGE,
+                                    "Number of LoadLeveler Jobs=%d in cluster=%s.\n",
+                                    job_count, cluster_object->cluster_name);
+
+                            /*-----------------------------------------------------------------------*
+                             * loop on the jobs returned by LoadLeveler                              *
+                             *-----------------------------------------------------------------------*/
+                            i = 0;
+                            while (job != NULL) {
+                                print_message(INFO_MESSAGE, "LoadLeveler Job %d:\n", i);
+                                rc = my_ll_get_data(job, LL_JobSubmitHost, &job_submit_host);
+                                rc = my_ll_get_data(job, LL_JobName, &job_name);
+                                if (rc == 0) { /* do something here with the job object */
+                                    /*
+                                     * For interactive PE jobs submitted thru LoadLeveler, there is no way to match
+                                     * the invocation of the job thru PE and the appearance of the job in the Loadleveler
+                                     * job queue since when the job is submitted, the only thing known is the pid of the poe
+                                     * process, and the pid is not available in the responses to LoadLeveler queries. If the pid was
+                                     * available, then we could match up based on reading the attach.cfg file generated by PE.
+                                     * The alternative is to attempt to detect interactive PE jobs in the LoadLeveler job queue
+                                     * and ignore them. The proxy threads created to monitor interactive PE status by watching for the
+                                     * attach.cfg file and process termination will be responsible for creating the new job events
+                                     * and associated events for the interactive PE job. This isn't 100% perfect, but with the available
+                                     * information is probably the best that can be done.
+                                     */
+                                    int job_step_type;
+
+                                    my_ll_get_data(job, LL_JobStepType, &job_step_type);
+                                    if (job_step_type == INTERACTIVE_JOB) {
+                                        int job_is_remote;
+                                        char *submit_user_name;
+
+                                        my_ll_get_data(job, LL_JobIsRemote, &job_is_remote);
+                                        if (job_is_remote) {
+                                            my_ll_get_data(job, LL_JobSubmittingUser,
+                                                    *submit_user_name);
+                                        }
+                                        else {
+                                            LL_element *job_credentials;
+
+                                            my_ll_get_data(job, LL_JobCredential, &job_credentials);
+                                            my_ll_get_data(job_credentials, LL_CredentialUserName,
+                                                    &submit_user_name);
+                                        }
+                                        if (strcmp(my_username, submit_user_name) == 0) {
+                                            print_message(INFO_MESSAGE,
+                                                    "Job %s is an interactive job for this user, and is ignored\n",
+                                                    job_name);
+                                            free(submit_user_name);
+                                            job = my_ll_next_obj(query_elem);
+                                            continue;
+                                        }
+                                        else {
+                                            free(submit_user_name);
+                                        }
+                                    }
+                                    print_message(INFO_MESSAGE, "Job name=%s\n", job_name);
+                                    rc = my_ll_get_data(job, LL_JobGetFirstStep, &step);
+                                    while (step != NULL) {
+                                        step_machine_count = 0;
+                                        rc = my_ll_get_data(step, LL_StepID, &step_ID);
+                                        if (rc != 0) {
+                                            rc = my_ll_free_objs(query_elem);
+                                            rc = my_ll_deallocate(query_elem);
+                                            query_elem = NULL;
+                                            continue;
+                                        }
+                                        else {
+
+                                            /*-----------------------------------------------------------------------*
+                                             * break the job step name apart into a LoadLeveler LL_STEP_ID           *
+                                             *-----------------------------------------------------------------------*/
+                                            ll_step_id.from_host = strdup(job_submit_host);
+                                            pChar = step_ID + strlen(job_submit_host) + 1;
+                                            pChar = strtok(pChar, ".");
+                                            ll_step_id.cluster = atoi(pChar);
+                                            pChar = strtok(NULL, ".");
+                                            ll_step_id.proc = atoi(pChar);
+
+                                            print_message(INFO_MESSAGE, "Job step ID=%s.%d.%d\n",
+                                                    ll_step_id.from_host, ll_step_id.cluster,
+                                                    ll_step_id.proc);
+                                            if ((job_object = get_job_in_list(job_list, ll_step_id)) != NULL) {
+
+                                                /*-----------------------------------------------------------------------*
+                                                 * step returned by LoadLeveler was found in our ptp job list.           *
+                                                 * flag it as found.                                                     *
+                                                 *-----------------------------------------------------------------------*/
+                                                job_object->job_found = 1;
+                                                if (job_object->job_state == MY_STATE_UNKNOWN) {
+                                                    job_object->job_state = MY_STATE_IDLE;
+                                                    print_message(INFO_MESSAGE,
+                                                            "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
+                                                            job_object->ll_step_id.from_host,
+                                                            job_object->ll_step_id.cluster,
+                                                            job_object->ll_step_id.proc,
+                                                            job_object->cluster_name);
+                                                    sendJobChangeEvent(start_events_transid,
+                                                            job_object);
+                                                }
+                                                if (multicluster_status == 1) {
+                                                    if (strcmp(job_object->cluster_name, cluster_object->cluster_name) != 0) {
+                                                        sendJobRemoveEvent(start_events_transid,
+                                                                job_object);
+                                                        job_object->cluster_name = cluster_object->cluster_name;
+                                                        sendJobAddEvent(start_events_transid,
+                                                                cluster_object, job_object);
+                                                    }
+                                                }
+                                            }
+                                            else {
+
+                                                /*-----------------------------------------------------------------------*
+                                                 * job returned by LoadLeveler was not found in our ptp job list         *
+                                                 * add it and generate an event to the gui. flag it as added.            *
+                                                 *-----------------------------------------------------------------------*/
+                                                job_object =
+                                                (JobObject *) malloc(sizeof(JobObject));
+                                                malloc_check(job_object, __FUNCTION__, __LINE__);
+                                                memset(job_object, '\0', sizeof(job_object));
+                                                job_object->proxy_generated_job_id = generate_id();
+                                                job_object->gui_assigned_job_id = "-1";
+                                                job_object->ll_step_id.from_host =
+                                                strdup(ll_step_id.from_host);
+                                                job_object->ll_step_id.cluster = ll_step_id.cluster;
+                                                job_object->ll_step_id.proc = ll_step_id.proc;
+                                                job_object->job_found = 2;
+                                                job_object->job_state = MY_STATE_IDLE;
+                                                job_object->task_list = NewList();
+                                                job_object->cluster_name =
+                                                strdup(cluster_object->cluster_name);
+                                                add_job_to_list(job_list, (void *) job_object);
+                                                print_message(INFO_MESSAGE,
+                                                        "Schedule event notification: Job=%s.%d.%d added for LoadLeveler Cluster=%s.\n",
+                                                        job_object->ll_step_id.from_host,
+                                                        job_object->ll_step_id.cluster,
+                                                        job_object->ll_step_id.proc,
+                                                        job_object->cluster_name);
+                                                sendJobAddEvent(start_events_transid,
+                                                        cluster_object, job_object);
+                                            }
+                                            rc = my_ll_get_data(step, LL_StepNodeCount, &step_node_count);
+                                            print_message(INFO_MESSAGE,
+                                                    "Step=%s.%d.%d. StepNodeCount=%d.\n",
+                                                    job_object->ll_step_id.from_host,
+                                                    job_object->ll_step_id.cluster,
+                                                    job_object->ll_step_id.proc,
+                                                    step_node_count);
+
+                                            /*-----------------------------------------------------------------------*
+                                             * if this job from LoadLeveler has nodes (is running-like) then loop on *
+                                             * the nodes to see task status for new or existing tasks.               *
+                                             *-----------------------------------------------------------------------*/
+                                            if (step_node_count > 0) {
+                                                rc = my_ll_get_data(step, LL_StepGetFirstNode, &node); /* node */
+
+                                                /*-----------------------------------------------------------------------*
+                                                 * loop on the nodes in the job returned by LoadLeveler                  *
+                                                 *-----------------------------------------------------------------------*/
+                                                while (node != NULL) {
+                                                    rc = my_ll_get_data(node, LL_NodeTaskCount, &node_task_count);
+                                                    print_message(INFO_MESSAGE,
+                                                            "NodeTaskCount=%d.\n",
+                                                            node_task_count);
+                                                    rc = my_ll_get_data(node, LL_NodeGetFirstTask, &task);
+
+                                                    /*-----------------------------------------------------------------------*
+                                                     * loop on the tasks in the job returned by LoadLeveler                  *
+                                                     *-----------------------------------------------------------------------*/
+                                                    while (task != NULL) {
+                                                        rc = my_ll_get_data(task, LL_TaskTaskInstanceCount, &task_instance_count);
+                                                        print_message(INFO_MESSAGE,
+                                                                "TaskInstanceCount=%d.\n",
+                                                                task_instance_count);
+                                                        rc = my_ll_get_data(task, LL_TaskGetFirstTaskInstance, &task_instance);
+
+                                                        /*-----------------------------------------------------------------------*
+                                                         * loop on the task_instances in the job returned by LoadLeveler         *
+                                                         *-----------------------------------------------------------------------*/
+                                                        while (task_instance != NULL) {
+                                                            rc = my_ll_get_data(task_instance, LL_TaskInstanceMachineName, &task_instance_machine_name);
+                                                            rc = my_ll_get_data(task_instance, LL_TaskInstanceMachineAddress, &task_instance_machine_address);
+                                                            rc = my_ll_get_data(task_instance, LL_TaskInstanceTaskID, &task_instance_task_ID);
+                                                            print_message(INFO_MESSAGE,
+                                                                    "TaskInstanceMachineName=%s. TaskInstanceMachineAddress=%s. TaskInstanceTaskID=%d.\n",
+                                                                    task_instance_machine_name,
+                                                                    task_instance_machine_address,
+                                                                    task_instance_task_ID);
+                                                            if ((task_object = get_task_in_list(job_object->task_list, task_instance_machine_name, task_instance_task_ID)) != NULL) {
+
+                                                                /*-----------------------------------------------------------------------*
+                                                                 * task returned by LoadLeveler was found in our ptp job task list.      *
+                                                                 * flag it as found.                                                     *
+                                                                 *-----------------------------------------------------------------------*/
+                                                                task_object->ll_task_id =
+                                                                task_instance_task_ID;
+                                                                task_object->task_found = 1;
+                                                                if (task_object->task_state !=
+                                                                        MY_STATE_RUNNING) {
+                                                                    task_object->task_state =
+                                                                    MY_STATE_RUNNING;
+                                                                    print_message(INFO_MESSAGE,
+                                                                            "Schedule event notification: Task_ID=%d running on node_name=%s added for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
+                                                                            task_object->ll_task_id,
+                                                                            task_object->node_name,
+                                                                            job_object->ll_step_id.
+                                                                            from_host,
+                                                                            job_object->ll_step_id.
+                                                                            cluster,
+                                                                            job_object->ll_step_id.proc,
+                                                                            job_object->cluster_name);
+                                                                    sendTaskChangeEvent
+                                                                    (start_events_transid,
+                                                                            job_object, task_object);
+                                                                }
+                                                                if (job_object->job_state !=
+                                                                        MY_STATE_RUNNING) {
+                                                                    job_object->job_state =
+                                                                    MY_STATE_RUNNING;
+                                                                    print_message(INFO_MESSAGE,
+                                                                            "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
+                                                                            job_object->ll_step_id.
+                                                                            from_host,
+                                                                            job_object->ll_step_id.
+                                                                            cluster,
+                                                                            job_object->ll_step_id.proc,
+                                                                            job_object->cluster_name);
+                                                                    sendJobChangeEvent
+                                                                    (start_events_transid,
+                                                                            job_object);
+                                                                }
+                                                            }
+                                                            else {
+
+                                                                /*-----------------------------------------------------------------------*
+                                                                 * task returned by LoadLeveler was not found in our ptp job task list   *
+                                                                 * add it and generate an event to the gui. flag it as added.            *
+                                                                 *-----------------------------------------------------------------------*/
+                                                                task_object =
+                                                                (TaskObject *)
+                                                                malloc(sizeof(TaskObject));
+                                                                malloc_check(task_object,
+                                                                        __FUNCTION__,
+                                                                        __LINE__);
+                                                                memset(task_object, '\0', sizeof(task_object));
+                                                                task_object->proxy_generated_task_id = generate_id();
+                                                                task_object->ll_task_id =
+                                                                task_instance_task_ID;
+                                                                task_object->node_name =
+                                                                strdup
+                                                                (task_instance_machine_name);
+                                                                task_object->node_address =
+                                                                strdup
+                                                                (task_instance_machine_address);
+                                                                task_object->task_found = 2; /* flag it as added */
+                                                                task_object->task_state =
+                                                                MY_STATE_RUNNING;
+                                                                print_message(INFO_MESSAGE,
+                                                                        "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
+                                                                        job_object->ll_step_id.from_host,
+                                                                        job_object->ll_step_id.cluster,
+                                                                        job_object->ll_step_id.proc,
+                                                                        job_object->cluster_name);
+                                                                if (job_object->job_state !=
+                                                                        MY_STATE_RUNNING) {
+                                                                    job_object->job_state =
+                                                                    MY_STATE_RUNNING;
+                                                                    print_message(INFO_MESSAGE,
+                                                                            "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
+                                                                            job_object->ll_step_id.
+                                                                            from_host,
+                                                                            job_object->ll_step_id.
+                                                                            cluster,
+                                                                            job_object->ll_step_id.proc,
+                                                                            job_object->cluster_name);
+                                                                    sendJobChangeEvent
+                                                                    (start_events_transid,
+                                                                            job_object);
+                                                                }
+                                                                add_task_to_list(job_object->task_list, (void *) task_object);
+                                                                print_message(INFO_MESSAGE,
+                                                                        "Schedule event notification: Task_ID=%d running on node_name=%s added for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
+                                                                        task_object->ll_task_id,
+                                                                        task_object->node_name,
+                                                                        job_object->ll_step_id.from_host,
+                                                                        job_object->ll_step_id.cluster,
+                                                                        job_object->ll_step_id.proc,
+                                                                        job_object->cluster_name);
+                                                                sendTaskAddEvent
+                                                                (start_events_transid,
+                                                                        cluster_object, job_object,
+                                                                        task_object);
+                                                            }
+                                                            rc = my_ll_get_data(task, LL_TaskGetNextTaskInstance, &task_instance);
+                                                        }
+                                                        rc = my_ll_get_data(node, LL_NodeGetNextTask, &task);
+                                                    }
+                                                    rc = my_ll_get_data(step, LL_StepGetNextNode, &node);
+                                                }
+                                            }
+
+                                            /*-----------------------------------------------------------------------*
+                                             * loop on the tasks in the job object - if any not found that were      *
+                                             * present before then generate deleted task events.                     *
+                                             *-----------------------------------------------------------------------*/
+                                            task_list = (List *) job_object->task_list;
+                                            task_list_element = task_list->l_head;
+                                            while (task_list_element != NULL) {
+                                                task_object = task_list_element->l_value;
+                                                task_list_element = task_list_element->l_next;
+                                                if (task_object != 0) {
+                                                    if (task_object->task_found == 0) {
+                                                        task_object->task_state =
+                                                        MY_STATE_TERMINATED;
+                                                        task_object->task_found = 0;
+                                                        print_message(INFO_MESSAGE,
+                                                                "Schedule event notification: Task_ID=%d running on node_name=%s deleted for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
+                                                                task_object->ll_task_id,
+                                                                task_object->node_name,
+                                                                job_object->ll_step_id.
+                                                                from_host,
+                                                                job_object->ll_step_id.
+                                                                cluster,
+                                                                job_object->ll_step_id.proc,
+                                                                job_object->cluster_name);
+                                                        sendTaskRemoveEvent(start_events_transid,
+                                                                job_object,
+                                                                task_object);
+                                                        delete_task_from_list(task_list, task_object);
+                                                        if (SizeOfList(task_list) == 0) {
+                                                            if (job_object->job_state ==
+                                                                    MY_STATE_RUNNING) {
+                                                                job_object->job_state = MY_STATE_TERMINATED;
+                                                                print_message(INFO_MESSAGE,
+                                                                        "Schedule event notification: Job=%s.%d.%d terminated for LoadLeveler Cluster=%s.\n",
+                                                                        job_object->ll_step_id.from_host,
+                                                                        job_object->ll_step_id.cluster,
+                                                                        job_object->ll_step_id.proc,
+                                                                        job_object->cluster_name);
+                                                                sendJobChangeEvent
+                                                                (start_events_transid,
+                                                                        job_object);
+                                                            }
+                                                            else {
+                                                                job_object->job_state =
+                                                                MY_STATE_IDLE;
+                                                                print_message(INFO_MESSAGE,
+                                                                        "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
+                                                                        job_object->ll_step_id.from_host,
+                                                                        job_object->ll_step_id.cluster,
+                                                                        job_object->ll_step_id.proc,
+                                                                        job_object->cluster_name);
+                                                                sendJobChangeEvent
+                                                                (start_events_transid,
+                                                                        job_object);
+                                                            }
+                                                        }
+                                                    }
+                                                    else {
+                                                        task_object->task_found = 0;
+                                                    }
+                                                }
+                                            }
+
+                                            rc = my_ll_get_data(job, LL_JobGetNextStep, &step);
+                                        }
+                                    }
+                                }
+
+                                i++;
+                                job = my_ll_next_obj(query_elem);
+                            }
+                        }
+                    }
+                }
+                if (query_elem != NULL) {
+                    rc = my_ll_free_objs(query_elem);
+                    rc = my_ll_deallocate(query_elem);
+                    query_elem = NULL;
+                }
+            }
+
+            if (query_elem != NULL) {
+                rc = my_ll_free_objs(query_elem);
+                rc = my_ll_deallocate(query_elem);
+                query_elem = NULL;
+            }
+
+            /*-----------------------------------------------------------------------*
+             * get the time and see if job has been sitting in submitted state too   *
+             * long.                                                                 *
+             *-----------------------------------------------------------------------*/
+            time(&my_clock);
+
+            /*-----------------------------------------------------------------------*
+             * loop on the ptp job list to see if any jobs were not returned         *
+             * by LoadLeveler on this pass (maybe they went down).                   *
+             * generate an event (changed/gone) to the gui.                          *
+             *-----------------------------------------------------------------------*/
+            if (job_list != NULL) {
+                job_list_element = job_list->l_head;
+                while (job_list_element != NULL) {
+                    job_object = job_list_element->l_value;
+                    job_list_element = job_list_element->l_next;
+                    if ((job_object->job_found == 0) &&
+                            ((job_object->job_state != MY_STATE_UNKNOWN) ||
+                                    ((my_clock - job_object->job_submit_time) > 300))) {
+                        job_object->job_found = 0;
+
+                        /*-----------------------------------------------------------------------*
+                         * loop on the tasks in the job object - send deleted event and mark     *
+                         * all deleted.                                                          *
+                         *-----------------------------------------------------------------------*/
+                        task_list = (List *) job_object->task_list;
+                        task_list_element = task_list->l_head;
+                        while (task_list_element != NULL) {
+                            task_object = task_list_element->l_value;
+                            task_list_element = task_list_element->l_next;
+                            if (task_object != 0) {
+                                print_message(INFO_MESSAGE,
+                                        "Schedule event notification: Task_ID=%d deleted on node_name=%s deleted for LoadLeveler Job=%s.%d.%d for LoadLeveler Cluster=%s.\n",
+                                        task_object->ll_task_id, task_object->node_name,
+                                        job_object->ll_step_id.from_host,
+                                        job_object->ll_step_id.cluster,
+                                        job_object->ll_step_id.proc,
+                                        job_object->cluster_name);
+                                sendTaskRemoveEvent(start_events_transid, job_object, task_object);
+                                delete_task_from_list(task_list, task_object);
+                                if (SizeOfList(task_list) == 0) {
+                                    job_object->job_state = MY_STATE_IDLE;
+                                    print_message(INFO_MESSAGE,
+                                            "Schedule event notification: Job=%s.%d.%d changed for LoadLeveler Cluster=%s.\n",
+                                            job_object->ll_step_id.from_host,
+                                            job_object->ll_step_id.cluster,
+                                            job_object->ll_step_id.proc,
+                                            job_object->cluster_name);
+                                    sendJobChangeEvent(start_events_transid, job_object);
+                                }
+                            }
+                        }
+
+                        job_object->job_state = MY_STATE_TERMINATED;
+                        print_message(INFO_MESSAGE,
+                                "Schedule event notification: Job=%s.%d.%d terminated for LoadLeveler Cluster=%s.\n",
+                                job_object->ll_step_id.from_host,
+                                job_object->ll_step_id.cluster, job_object->ll_step_id.proc,
+                                job_object->cluster_name);
+                        sendJobChangeEvent(start_events_transid, job_object);
+                        print_message(INFO_MESSAGE,
+                                "Schedule event notification: Job=%s.%d.%d deleted for LoadLeveler Cluster=%s.\n",
+                                job_object->ll_step_id.from_host,
+                                job_object->ll_step_id.cluster, job_object->ll_step_id.proc,
+                                job_object->cluster_name);
+                        sendJobRemoveEvent(start_events_transid, job_object);
+                    }
+                    else {
+                        job_object->job_found = 0;
+                    }
+                }
+            }
+        }
+        pthread_mutex_unlock(&master_lock);
+
+        /*-----------------------------------------------------------------------*
+         * sleep and loop again on the LoadLeveler machines.                     *
+         *-----------------------------------------------------------------------*/
+        if (state_shutdown_requested == 0) {
+            int sleep_interval = 0;
+            int mini_sleep_interval = (job_sleep_seconds + 4) / 5;
+            print_message(INFO_MESSAGE, "%s Sleeping for (%d seconds) %d intervals of 5 seconds\n",
+                    __FUNCTION__, mini_sleep_interval * 5, mini_sleep_interval);
+            for (sleep_interval = 0; sleep_interval < mini_sleep_interval; sleep_interval++) {
+                if (state_shutdown_requested == 0) {
+                    struct timespec wakeup_time;
+                    int status;
+
+                    gettimeofday(&wakeup_time, NULL);
+                    wakeup_time.tv_sec = wakeup_time.tv_sec + 5;
+                    pthread_mutex_lock(&job_notify_lock);
+                    status =
+                    pthread_cond_timedwait(&job_notify_condvar, &job_notify_lock, &wakeup_time);
+                    pthread_mutex_unlock(&job_notify_lock);
+                    if (status == 0) {
+                        print_message(INFO_MESSAGE, "Main thread requests job query\n");
+                        break;
+                    }
+                    else {
+                        if (status != ETIMEDOUT) {
+                            print_message(INFO_MESSAGE,
+                                    "Error in condition wait in job query thread: %s(%d)\n",
+                                    strerror(status), status);
+                        }
+                        else {
+                            print_message(INFO_MESSAGE,
+                                    "Job query thread woke up after 5 second wait\n");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
@@ -3193,13 +3138,13 @@ monitor_LoadLeveler_jobs(void *job_ident)
 char **
 create_exec_parmlist(char *execname, char *targetname, int arg_count, char **args, char *helper)
 {
-      /*
-       * Create parameter list for invoking application using PE. Copy
-       * the execname (/usr/bin/poe), the target executable, the
-       * debug helper, if present, then the program arguments and a
-       * trailing null into the program arguments array and then
-       * return that array.
-       */
+    /*
+     * Create parameter list for invoking application using PE. Copy
+     * the execname (/usr/bin/poe), the target executable, the
+     * debug helper, if present, then the program arguments and a
+     * trailing null into the program arguments array and then
+     * return that array.
+     */
     char **argv;
     int i;
     int arg_idx;
@@ -3208,7 +3153,7 @@ create_exec_parmlist(char *execname, char *targetname, int arg_count, char **arg
     TRACE_ENTRY;
     num_args = 3 + arg_count;
     if (helper) {
-    	num_args++;
+        num_args++;
     }
     argv = malloc(num_args * sizeof(char *));
     malloc_check(argv, __FUNCTION__, __LINE__);
@@ -3216,13 +3161,13 @@ create_exec_parmlist(char *execname, char *targetname, int arg_count, char **arg
     argv[i++] = execname;
 #ifdef PE_DUAL_POE_DEBUG
     if (helper) {
-	argv[i++] = helper;
+        argv[i++] = helper;
     }
 #endif
     argv[i++] = targetname;
     arg_idx = 0;
     while (arg_idx < arg_count) {
-	argv[i++] = args[arg_idx++];
+        argv[i++] = args[arg_idx++];
     }
     argv[i++] = NULL;
     TRACE_EXIT;
@@ -3242,7 +3187,7 @@ create_debug_parmlist(char *debugname, int debug_args_count, char **debug_args)
     argv[n++] = debugname;
     argv[n++] = "--master";
     for (i = 0; i < debug_args_count; i++) {
-	argv[n++] = debug_args[i];
+        argv[n++] = debug_args[i];
     }
     argv[n++] = NULL;
     return argv;
@@ -3267,14 +3212,15 @@ create_child_sdm_parmlist(char *debugdir, char *debugname, int debug_args_count,
     argv[n++] = "poe";
     argv[n++] = debugger;
     for (i = 0; i < debug_args_count; i++) {
-	argv[n++] = debug_args[i];
+        argv[n++] = debug_args[i];
     }
     argv[n++] = NULL;
     return argv;
 }
 
 char **
-create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id, int is_debugger)
+create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
+        int is_debugger)
 {
     /*
      * Set up the environment variable array for the target application.
@@ -3297,57 +3243,57 @@ create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_
     next_env_entry = 0;
     env_array = (char **) malloc(sizeof(char *) * env_array_size);
     for (i = 0; args[i] != NULL; i++) {
-	if (strncmp(args[i], "MP_", 3) == 0) {
+        if (strncmp(args[i], "MP_", 3) == 0) {
 #ifdef PE_DUAL_POE_DEBUG
-		if (is_debugger && strncmp(args[i], "MP_PROCS=", 9) == 0) {
-			int nprocs = atoi(args[i] + 9) + 1;
-			char procs_str[128];
+            if (is_debugger && strncmp(args[i], "MP_PROCS=", 9) == 0) {
+                int nprocs = atoi(args[i] + 9) + 1;
+                char procs_str[128];
 
-			snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
-			add_environment_variable(strdup(procs_str));
-			has_mp_procs = 1;
-		}
-		else if (is_debugger && strncmp(args[i], "MP_MSG_API=", 11) == 0) {
-			/* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
-		}
-		else {
-			add_environment_variable(strdup(args[i]));
-		}
+                snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
+                add_environment_variable(strdup(procs_str));
+                has_mp_procs = 1;
+            }
+            else if (is_debugger && strncmp(args[i], "MP_MSG_API=", 11) == 0) {
+                /* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
+            }
+            else {
+                add_environment_variable(strdup(args[i]));
+            }
 #else
-		add_environment_variable(strdup(args[i]));
+            add_environment_variable(strdup(args[i]));
 #endif
-	}
-	else {
-	    if (strncmp(args[i], "env=", 4) == 0) {
-	    	add_environment_variable(strdup(args[i]) + 4);
-	    }
-	}
+        }
+        else {
+            if (strncmp(args[i], "env=", 4) == 0) {
+                add_environment_variable(strdup(args[i]) + 4);
+            }
+        }
     }
 #ifdef PE_DUAL_POE_DEBUG
     if (is_debugger && !has_mp_procs)
-    	add_environment_variable("MP_PROCS=2");
+        add_environment_variable("MP_PROCS=2");
 #endif
 
     if (split_io == 1) {
-	add_environment_variable("MP_LABELIO=yes");
+        add_environment_variable("MP_LABELIO=yes");
     }
     if (mp_buffer_mem && mp_buffer_mem[0] != '\0') {
-	add_environment_variable(mp_buffer_mem);
+        add_environment_variable(mp_buffer_mem);
     }
     if (mp_rdma_count && mp_rdma_count[0] != '\0') {
-	add_environment_variable(mp_rdma_count);
+        add_environment_variable(mp_rdma_count);
     }
 #ifdef PE_DUAL_POE_DEBUG
     if (debugger_id && debugger_id[0] != '\0') {
-    	add_environment_variable(debugger_id);
+        add_environment_variable(debugger_id);
     }
 #endif
     if (use_load_leveler) {
-	add_environment_variable("MP_RESD=yes");
-	print_message(TRACE_DETAIL_MESSAGE, "PE Job uses LoadLeveler resource management\n");
+        add_environment_variable("MP_RESD=yes");
+        print_message(TRACE_DETAIL_MESSAGE, "PE Job uses LoadLeveler resource management\n");
     }
     else {
-	add_environment_variable("MP_RESD=no");
+        add_environment_variable("MP_RESD=no");
     }
     add_environment_variable(NULL);
     TRACE_EXIT;
@@ -3357,13 +3303,12 @@ create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_
 /*
  * Add the specified environment variable to the poe process environment variable set
  */
-void
-add_environment_variable(char *env_var)
+void add_environment_variable(char *env_var)
 {
     if (next_env_entry >= env_array_size) {
-	env_array_size = env_array_size + 10;
-	env_array = (char **) realloc(env_array, sizeof(char *) * env_array_size);
-	malloc_check(env_array, __FUNCTION__, __LINE__);
+        env_array_size = env_array_size + 10;
+        env_array = (char **) realloc(env_array, sizeof(char *) * env_array_size);
+        malloc_check(env_array, __FUNCTION__, __LINE__);
     }
     env_array[next_env_entry++] = env_var;
 }
@@ -3371,46 +3316,43 @@ add_environment_variable(char *env_var)
 /*
  * Set up the file descriptor for stdout output files
  */
-int
-setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
-	       char *redirect)
+int setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
+        char *redirect)
 {
     int status;
 
     TRACE_ENTRY;
     if (path == NULL) {
-	status = pipe(pipe_fds);
-	if (status == -1) {
-	    snprintf(emsg_buffer, sizeof emsg_buffer,
-		     "Error creating %s pipe: %s", stdio_name, strerror(errno));
-	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
-	    TRACE_EXIT;
-	    return -1;
-	}
-	status = fcntl(pipe_fds[0], F_SETFL, O_NONBLOCK);
-	if (status == -1) {
-	    snprintf(emsg_buffer, sizeof emsg_buffer,
-		     "Error initializing %s pipe: %s", stdio_name, strerror(errno));
-	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
-	    TRACE_EXIT;
-	    return -1;
-	}
-	*fd = pipe_fds[0];
-	*redirect = 0;
+        status = pipe(pipe_fds);
+        if (status == -1) {
+            snprintf(emsg_buffer, sizeof emsg_buffer, "Error creating %s pipe: %s", stdio_name, strerror(errno));
+            emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+            post_submitjob_error(run_trans_id, subid, emsg_buffer);
+            TRACE_EXIT;
+            return -1;
+        }
+        status = fcntl(pipe_fds[0], F_SETFL, O_NONBLOCK);
+        if (status == -1) {
+            snprintf(emsg_buffer, sizeof emsg_buffer, "Error initializing %s pipe: %s", stdio_name, strerror(errno));
+            emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+            post_submitjob_error(run_trans_id, subid, emsg_buffer);
+            TRACE_EXIT;
+            return -1;
+        }
+        *fd = pipe_fds[0];
+        *redirect = 0;
     }
     else {
-	*fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0644);
-	if (*fd == -1) {
-	    snprintf(emsg_buffer, sizeof emsg_buffer,
-		     "Error redirecting %s to %s: %s", stdio_name, path, strerror(errno));
-	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
-	    TRACE_EXIT;
-	    return -1;
-	}
-	*redirect = 1;
+        *fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0644);
+        if (*fd == -1) {
+            snprintf(emsg_buffer, sizeof emsg_buffer, "Error redirecting %s to %s: %s", stdio_name, path, strerror(
+                    errno));
+            emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+            post_submitjob_error(run_trans_id, subid, emsg_buffer);
+            TRACE_EXIT;
+            return -1;
+        }
+        *redirect = 1;
     }
     TRACE_EXIT;
     return 0;
@@ -3419,44 +3361,41 @@ setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char 
 /*
  * Set up the file descriptor for stderr output files
  */
-int
-setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *stderr_path, char *stdio_name, int *fd,
-	       FILE **file_fd, char *redirect)
+int setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *stderr_path, char *stdio_name, int *fd,
+        FILE **file_fd, char *redirect)
 {
     int status;
 
     TRACE_ENTRY;
-	status = pipe(pipe_fds);
-	if (status == -1) {
-	    snprintf(emsg_buffer, sizeof emsg_buffer,
-		     "Error creating %s pipe: %s", stdio_name, strerror(errno));
-	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
-	    TRACE_EXIT;
-	    return -1;
-	}
-	status = fcntl(pipe_fds[0], F_SETFL, O_NONBLOCK);
-	if (status == -1) {
-	    snprintf(emsg_buffer, sizeof emsg_buffer,
-		     "Error initializing %s pipe: %s", stdio_name, strerror(errno));
-	    emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	    post_submitjob_error(run_trans_id, subid, emsg_buffer);
-	    TRACE_EXIT;
-	    return -1;
-	}
-	*fd = pipe_fds[0];
-	if (stderr_path == NULL) {
-		*redirect = 0;
-	}
-	else {
-		*file_fd = fopen(stderr_path, "w");
-		if (*file_fd == NULL) {
-			*redirect = 0;
-		}
-		else {
-		    *redirect = 1;
-		}
-	}
+    status = pipe(pipe_fds);
+    if (status == -1) {
+        snprintf(emsg_buffer, sizeof emsg_buffer, "Error creating %s pipe: %s", stdio_name, strerror(errno));
+        emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+        post_submitjob_error(run_trans_id, subid, emsg_buffer);
+        TRACE_EXIT;
+        return -1;
+    }
+    status = fcntl(pipe_fds[0], F_SETFL, O_NONBLOCK);
+    if (status == -1) {
+        snprintf(emsg_buffer, sizeof emsg_buffer, "Error initializing %s pipe: %s", stdio_name, strerror(errno));
+        emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+        post_submitjob_error(run_trans_id, subid, emsg_buffer);
+        TRACE_EXIT;
+        return -1;
+    }
+    *fd = pipe_fds[0];
+    if (stderr_path == NULL) {
+        *redirect = 0;
+    }
+    else {
+        *file_fd = fopen(stderr_path, "w");
+        if (*file_fd == NULL) {
+            *redirect = 0;
+        }
+        else {
+            *redirect = 1;
+        }
+    }
     TRACE_EXIT;
     return 0;
 }
@@ -3464,53 +3403,49 @@ setup_stderr_fd(int run_trans_id, char *subid, int pipe_fds[], char *stderr_path
 /*
  * Set up a stdout file descriptor for child process so it is redirected to a file or pipe
  */
-int
-setup_child_stdout(int run_trans_id, char *subid, int redirect, int *file_fd, int pipe_fd[])
+int setup_child_stdout(int run_trans_id, char *subid, int redirect, int *file_fd, int pipe_fd[])
 {
     int status;
 
     TRACE_ENTRY;
     if (redirect) {
-	status = dup2(*file_fd, STDOUT_FILENO);
+        status = dup2(*file_fd, STDOUT_FILENO);
     }
     else {
-	close(pipe_fd[0]);
-	status = dup2(pipe_fd[1], STDOUT_FILENO);
+        close(pipe_fd[0]);
+        status = dup2(pipe_fd[1], STDOUT_FILENO);
     }
     if (status == -1) {
-	snprintf(emsg_buffer, sizeof emsg_buffer,
-		 "Error setting stdout file descriptor for application: %s", strerror(errno));
-	emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	post_submitjob_error(run_trans_id, subid, emsg_buffer);
+        snprintf(emsg_buffer, sizeof emsg_buffer, "Error setting stdout file descriptor for application: %s", strerror(
+                errno));
+        emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+        post_submitjob_error(run_trans_id, subid, emsg_buffer);
     }
     TRACE_EXIT;
     return status;
 }
-
 
 /*
  * Set up a stderr file descriptor for child process so it is redirected to a pipe
  */
-int
-setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[])
+int setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[])
 {
     int status;
 
     TRACE_ENTRY;
-	close(pipe_fd[0]);
-	status = dup2(pipe_fd[1], STDERR_FILENO);
+    close(pipe_fd[0]);
+    status = dup2(pipe_fd[1], STDERR_FILENO);
     if (status == -1) {
-	snprintf(emsg_buffer, sizeof emsg_buffer,
-		 "Error setting stderr file descriptor for application: %s", strerror(errno));
-	emsg_buffer[sizeof emsg_buffer - 1] = '\0';
-	post_submitjob_error(run_trans_id, subid, emsg_buffer);
+        snprintf(emsg_buffer, sizeof emsg_buffer, "Error setting stderr file descriptor for application: %s", strerror(
+                errno));
+        emsg_buffer[sizeof emsg_buffer - 1] = '\0';
+        post_submitjob_error(run_trans_id, subid, emsg_buffer);
     }
     TRACE_EXIT;
     return status;
 }
 
-void
-update_nodes(int trans_id, FILE * hostlist)
+void update_nodes(int trans_id, FILE * hostlist)
 {
     /*
      * Create a node list, containing unique nodes, from the hostlist file.
@@ -3533,23 +3468,23 @@ update_nodes(int trans_id, FILE * hostlist)
     res = fgets(hostname, sizeof(hostname), hostlist);
     new_nodes = NewList();
     while (res != NULL) {
-	char *cp;
+        char *cp;
 
-	/*
-	 * Truncate node name to short form name
-	 */
-	cp = strpbrk(hostname, ".\n\r");
-	if (cp != NULL) {
-	    *cp = '\0';
-	}
-	if (find_node(hostname) == NULL) {
-	    node_refcount *node;
+        /*
+         * Truncate node name to short form name
+         */
+        cp = strpbrk(hostname, ".\n\r");
+        if (cp != NULL) {
+            *cp = '\0';
+        }
+        if (find_node(hostname) == NULL) {
+            node_refcount *node;
 
-	    node = add_node(hostname);
-	    AddToList(new_nodes, node);
-	    node_count = node_count + 1;
-	}
-	res = fgets(hostname, sizeof(hostname), hostlist);
+            node = add_node(hostname);
+            AddToList(new_nodes, node);
+            node_count = node_count + 1;
+        }
+        res = fgets(hostname, sizeof(hostname), hostlist);
     }
     send_new_node_list(start_events_transid, machine_id, new_nodes);
     DestroyList(new_nodes, NULL);
@@ -3574,31 +3509,31 @@ find_node(char *key)
     hash = HashCompute(key, strlen(key));
     node_list = HashSearch(nodes, hash);
     if (node_list == NULL) {
-	TRACE_EXIT;
-	return NULL;
+        TRACE_EXIT;
+        return NULL;
     }
     else {
-	node_refcount *node;
+        node_refcount *node;
 
-	/*
-	 * Optimally, this code would obtain a lock on the hash node rather
-	 * than locking all accesses to nodes, but currently the hash entry
-	 * only contains a pointer to the list. If this becomes a problem
-	 * then the hash object could be replaced with a structure
-	 * containing the node lock and the list pointer.
-	 */
-	pthread_mutex_lock(&node_lock);
-	SetList(node_list);
-	node = GetListElement(node_list);
-	while (node != NULL) {
-	    if (strcmp(key, node->key) == 0) {
-		break;
-	    }
-	    node = GetListElement(node_list);
-	}
-	pthread_mutex_unlock(&node_lock);
-	TRACE_EXIT;
-	return node;
+        /*
+         * Optimally, this code would obtain a lock on the hash node rather
+         * than locking all accesses to nodes, but currently the hash entry
+         * only contains a pointer to the list. If this becomes a problem
+         * then the hash object could be replaced with a structure
+         * containing the node lock and the list pointer.
+         */
+        pthread_mutex_lock(&node_lock);
+        SetList(node_list);
+        node = GetListElement(node_list);
+        while (node != NULL) {
+            if (strcmp(key, node->key) == 0) {
+                break;
+            }
+            node = GetListElement(node_list);
+        }
+        pthread_mutex_unlock(&node_lock);
+        TRACE_EXIT;
+        return node;
     }
 }
 
@@ -3635,19 +3570,18 @@ add_node(char *key)
     hash = HashCompute(key, strlen(key));
     node_list = HashSearch(nodes, hash);
     if (node_list == NULL) {
-	node_list = NewList();
-	AddToList(node_list, node);
-	HashInsert(nodes, hash, node_list);
+        node_list = NewList();
+        AddToList(node_list, node);
+        HashInsert(nodes, hash, node_list);
     }
     else {
-	AddToList(node_list, node);
+        AddToList(node_list, node);
     }
     TRACE_EXIT;
     return node;
 }
 
-void
-update_node_refcounts(int numtasks, taskinfo * tasks)
+void update_node_refcounts(int numtasks, taskinfo * tasks)
 {
     /*
      * Update node reference counts (number of tasks running on node),
@@ -3660,29 +3594,25 @@ update_node_refcounts(int numtasks, taskinfo * tasks)
 
     TRACE_ENTRY;
     for (i = 0; i < numtasks; i++) {
-	noderef = find_node(tasks[i].hostname);
-	if (noderef == NULL) {
-	    print_message(TRACE_DETAIL_MESSAGE,
-			  "Failed to find expected node %s\n", tasks[i].hostname);
-	}
-	else {
-	    noderef->task_count = noderef->task_count - 1;
-	    if (noderef->task_count <= 0) {
-		print_message(TRACE_DETAIL_MESSAGE,
-			      "No tasks left on %s, deleting\n", tasks[i].hostname);
-		delete_noderef(tasks[i].hostname);
-	    }
-	    else {
-		print_message(TRACE_DETAIL_MESSAGE,
-			      "Refcount for %s is %d\n", tasks[i].hostname, noderef->task_count);
-	    }
-	}
+        noderef = find_node(tasks[i].hostname);
+        if (noderef == NULL) {
+            print_message(TRACE_DETAIL_MESSAGE, "Failed to find expected node %s\n", tasks[i].hostname);
+        }
+        else {
+            noderef->task_count = noderef->task_count - 1;
+            if (noderef->task_count <= 0) {
+                print_message(TRACE_DETAIL_MESSAGE, "No tasks left on %s, deleting\n", tasks[i].hostname);
+                delete_noderef(tasks[i].hostname);
+            }
+            else {
+                print_message(TRACE_DETAIL_MESSAGE, "Refcount for %s is %d\n", tasks[i].hostname, noderef->task_count);
+            }
+        }
     }
     TRACE_EXIT;
 }
 
-void
-delete_noderef(char *hostname)
+void delete_noderef(char *hostname)
 {
     /*
      * delete node from the node list and notify the front end
@@ -3695,50 +3625,48 @@ delete_noderef(char *hostname)
     hash = HashCompute(hostname, strlen(hostname));
     node_list = HashSearch(nodes, hash);
     if (node_list == NULL) {
-	TRACE_EXIT;
-	return;
+        TRACE_EXIT;
+        return;
     }
     pthread_mutex_lock(&node_lock);
     SetList(node_list);
     node = GetListElement(node_list);
     while (node != NULL) {
-	if (strcmp(node->key, hostname) == 0) {
-	    char node_number[11];
+        if (strcmp(node->key, hostname) == 0) {
+            char node_number[11];
 
-	    free(node->key);
-	    RemoveFromList(node_list, node);
-	    sprintf(node_number, "%d", node->proxy_nodeid);
-	    print_message(TRACE_DETAIL_MESSAGE, "Sending delete event for node %s\n", node_number);
-	    enqueue_event(proxy_remove_node_event(start_events_transid, node_number));
-	    free(node);
-	    break;
-	}
-	node = GetListElement(node_list);
+            free(node->key);
+            RemoveFromList(node_list, node);
+            sprintf(node_number, "%d", node->proxy_nodeid);
+            print_message(TRACE_DETAIL_MESSAGE, "Sending delete event for node %s\n", node_number);
+            enqueue_event(proxy_remove_node_event(start_events_transid, node_number));
+            free(node);
+            break;
+        }
+        node = GetListElement(node_list);
     }
     pthread_mutex_unlock(&node_lock);
     TRACE_EXIT;
 }
 
-void
-delete_task_list(int numtasks, taskinfo * tasks)
+void delete_task_list(int numtasks, taskinfo * tasks)
 {
     int i;
 
     TRACE_ENTRY;
     for (i = 0; i < numtasks; i++) {
-	if (tasks[i].hostname != NULL) {
-	    free(tasks[i].hostname);
-	}
-	if (tasks[i].ipaddr != NULL) {
-	    free(tasks[i].ipaddr);
-	}
+        if (tasks[i].hostname != NULL) {
+            free(tasks[i].hostname);
+        }
+        if (tasks[i].ipaddr != NULL) {
+            free(tasks[i].ipaddr);
+        }
     }
     free(tasks);
     TRACE_EXIT;
 }
 
-void
-hash_cleanup(void *hash_list)
+void hash_cleanup(void *hash_list)
 {
     TRACE_ENTRY;
     DestroyList(hash_list, NULL);
@@ -3755,14 +3683,11 @@ kill_process(void *pid)
     return NULL;
 }
 
-void
-malloc_check(void *p, const char *function, int line)
+void malloc_check(void *p, const char *function, int line)
 {
     if (p == NULL) {
-	print_message(FATAL_MESSAGE,
-		      "Memory allocation error in resource manager in %s (line %d)\n",
-		      function, line);
-	exit(1);
+        print_message(FATAL_MESSAGE, "Memory allocation error in resource manager in %s (line %d)\n", function, line);
+        exit(1);
     }
 
 }
@@ -3775,7 +3700,7 @@ load_load_leveler_library(int trans_id)
     int dlopen_mode;
     int my_errno;
 
-    memset(&LL_SYMS, '\0', sizeof(LL_SYMS));	/* zero the LoadLeveler dlsym symbol table */
+    memset(&LL_SYMS, '\0', sizeof(LL_SYMS)); /* zero the LoadLeveler dlsym symbol table */
     dlopen_mode = 0;
     print_message(INFO_MESSAGE, "dlopen LoadLeveler shared library %s.\n", ibmll_libpath_name);
 #ifdef _AIX
@@ -3786,16 +3711,16 @@ load_load_leveler_library(int trans_id)
     ibmll_libpath_handle = dlopen(ibmll_libpath_name, dlopen_mode);
     my_errno = errno;
     if (ibmll_libpath_handle == NULL) {
-	print_message(ERROR_MESSAGE, "dlopen of %s failed with errno=%d.\n", ibmll_libpath_name,
-		      my_errno);
+        print_message(ERROR_MESSAGE, "dlopen of %s failed with errno=%d.\n", ibmll_libpath_name,
+                my_errno);
 #if 0
-	sendErrorEvent(trans_id, RTEV_ERROR_LL_INIT,
-		       "dlopen failed for LoadLeveler shared library");
+        sendErrorEvent(trans_id, RTEV_ERROR_LL_INIT,
+                "dlopen failed for LoadLeveler shared library");
 #endif
-	return PROXY_RES_ERR;
+        return PROXY_RES_ERR;
     }
     else {
-	print_message(INFO_MESSAGE, "dlopen %s successful.\n", ibmll_libpath_name);
+        print_message(INFO_MESSAGE, "dlopen %s successful.\n", ibmll_libpath_name);
     }
 
     print_message(INFO_MESSAGE, "Locating LoadLeveler functions via dlsym.\n");
@@ -3807,29 +3732,29 @@ load_load_leveler_library(int trans_id)
     *(void **) (&LL_SYMS.ll_deallocate) = dlsym(ibmll_libpath_handle, "ll_deallocate");
     *(void **) (&LL_SYMS.ll_next_obj) = dlsym(ibmll_libpath_handle, "ll_next_obj");
     *(void **) (&LL_SYMS.ll_cluster)
-	= dlsym(ibmll_libpath_handle, "ll_cluster");
+    = dlsym(ibmll_libpath_handle, "ll_cluster");
     *(void **) (&LL_SYMS.ll_submit_job) = dlsym(ibmll_libpath_handle, "llsubmit");
     *(void **) (&LL_SYMS.ll_terminate_job) = dlsym(ibmll_libpath_handle, "ll_terminate_job");
     *(void **) (&LL_SYMS.ll_free_job_info) = dlsym(ibmll_libpath_handle, "llfree_job_info");
     *(void **) (&LL_SYMS.ll_error) = dlsym(ibmll_libpath_handle, "ll_error");
     if ((LL_SYMS.ll_query == NULL) || (LL_SYMS.ll_set_request == NULL)
-	|| (LL_SYMS.ll_get_objs == NULL) || (LL_SYMS.ll_get_data == NULL)
-	|| (LL_SYMS.ll_free_objs == NULL)
-	|| (LL_SYMS.ll_deallocate == NULL) || (LL_SYMS.ll_cluster == NULL)
-	|| (LL_SYMS.ll_next_obj == NULL) || (LL_SYMS.ll_free_job_info
-					     == NULL) || (LL_SYMS.ll_terminate_job == NULL)
-	|| (LL_SYMS.ll_error == NULL) || (LL_SYMS.ll_submit_job == NULL)) {
-	print_message(ERROR_MESSAGE,
-		      "One or more LoadLeveler symbols could not be located in %s.\n",
-		      ibmll_libpath_name);
+            || (LL_SYMS.ll_get_objs == NULL) || (LL_SYMS.ll_get_data == NULL)
+            || (LL_SYMS.ll_free_objs == NULL)
+            || (LL_SYMS.ll_deallocate == NULL) || (LL_SYMS.ll_cluster == NULL)
+            || (LL_SYMS.ll_next_obj == NULL) || (LL_SYMS.ll_free_job_info
+                    == NULL) || (LL_SYMS.ll_terminate_job == NULL)
+            || (LL_SYMS.ll_error == NULL) || (LL_SYMS.ll_submit_job == NULL)) {
+        print_message(ERROR_MESSAGE,
+                "One or more LoadLeveler symbols could not be located in %s.\n",
+                ibmll_libpath_name);
 #if 0
-	sendErrorEvent(trans_id, RTEV_ERROR_LL_INIT, "LoadLeveler symbols not located");
+        sendErrorEvent(trans_id, RTEV_ERROR_LL_INIT, "LoadLeveler symbols not located");
 #endif
-	return PROXY_RES_ERR;
+        return PROXY_RES_ERR;
     }
     else {
-	print_message(INFO_MESSAGE,
-		      "Successfully located all of the required LoadLeveler functions via dlsym.\n");
+        print_message(INFO_MESSAGE,
+                "Successfully located all of the required LoadLeveler functions via dlsym.\n");
     }
     return PROXY_RES_OK;
 }
@@ -3842,12 +3767,12 @@ my_ll_get_data(LL_element * request, enum LLAPI_Specification spec, void *result
 {
     int rc = 0;
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. LLAPI_Specification=%d.\n", __FUNCTION__,
-		  __LINE__, spec);
+            __LINE__, spec);
     pthread_mutex_lock(&access_LoadLeveler_lock);
     rc = (*LL_SYMS.ll_get_data) (request, spec, result);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (rc != 0) {
-	print_message(INFO_MESSAGE, "LoadLeveler ll_get_data rc=%d.\n", rc);
+        print_message(INFO_MESSAGE, "LoadLeveler ll_get_data rc=%d.\n", rc);
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. rc=%d.\n", __FUNCTION__, __LINE__, rc);
     return rc;
@@ -3861,17 +3786,16 @@ my_ll_cluster(int version, LL_element ** errObj, LL_cluster_param * cp)
 {
     int rc = 0;
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. version=%d.\n", __FUNCTION__, __LINE__,
-		  version);
+            version);
     pthread_mutex_lock(&access_LoadLeveler_lock);
-    rc = (*LL_SYMS.ll_cluster) (version, errObj, cp);	/* set the cluster name */
+    rc = (*LL_SYMS.ll_cluster) (version, errObj, cp); /* set the cluster name */
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (rc != 0) {
-	print_message(INFO_MESSAGE, "LoadLeveler ll_cluster rc=%d.\n", rc);
+        print_message(INFO_MESSAGE, "LoadLeveler ll_cluster rc=%d.\n", rc);
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. rc=%d.\n", __FUNCTION__, __LINE__, rc);
     return rc;
 }
-
 
 /*************************************************************************
  * Call LoadLeveler to deallocate the query element                      *
@@ -3885,7 +3809,7 @@ my_ll_deallocate(LL_element * query_elem)
     rc = (*LL_SYMS.ll_deallocate) (query_elem);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (rc != 0) {
-	print_message(ERROR_MESSAGE, "LoadLeveler ll_deallocate rc=%d.\n", rc);
+        print_message(ERROR_MESSAGE, "LoadLeveler ll_deallocate rc=%d.\n", rc);
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. rc=%d.\n", __FUNCTION__, __LINE__, rc);
     return rc;
@@ -3899,13 +3823,13 @@ my_ll_query(enum QueryType type)
 {
     LL_element *query_elem = NULL;
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. QueryType=%d.\n", __FUNCTION__, __LINE__,
-		  type);
+            type);
     pthread_mutex_lock(&access_LoadLeveler_lock);
     query_elem = (*LL_SYMS.ll_query) (type);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (query_elem == NULL) {
-	print_message(INFO_MESSAGE,
-		      "LoadLeveler ll_query element=NULL. End of list was probably reached.\n");
+        print_message(INFO_MESSAGE,
+                "LoadLeveler ll_query element=NULL. End of list was probably reached.\n");
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return query_elem;
@@ -3923,7 +3847,7 @@ my_ll_free_objs(LL_element * query_elem)
     rc = (*LL_SYMS.ll_free_objs) (query_elem);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (rc != 0) {
-	print_message(ERROR_MESSAGE, "LoadLeveler ll_free_objs rc=%d.\n", rc);
+        print_message(ERROR_MESSAGE, "LoadLeveler ll_free_objs rc=%d.\n", rc);
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. rc=%d.\n", __FUNCTION__, __LINE__, rc);
     return rc;
@@ -3941,8 +3865,8 @@ my_ll_next_obj(LL_element * query_elem)
     next_elem = (*LL_SYMS.ll_next_obj) (query_elem);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (next_elem == NULL) {
-	print_message(INFO_MESSAGE,
-		      "LoadLeveler ll_next_obj element=NULL. End of list was probably reached.\n");
+        print_message(INFO_MESSAGE,
+                "LoadLeveler ll_next_obj element=NULL. End of list was probably reached.\n");
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return next_elem;
@@ -3954,19 +3878,19 @@ my_ll_next_obj(LL_element * query_elem)
 LL_element *
 my_ll_get_objs(LL_element * query_elem, enum LL_Daemon daemon, char *ignore, int *value, int *rc)
 {
-    *rc = 0;			/* preset rc to 0 */
+    *rc = 0; /* preset rc to 0 */
     LL_element *ret_object = NULL;
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. LL_Daemon=%d.\n", __FUNCTION__, __LINE__,
-		  daemon);
+            daemon);
     pthread_mutex_lock(&access_LoadLeveler_lock);
     ret_object = LL_SYMS.ll_get_objs(query_elem, daemon, ignore, value, rc);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (ret_object == NULL) {
-	print_message(INFO_MESSAGE,
-		      "LoadLeveler ll_get_objs element=NULL. End of list was probably reached.\n");
+        print_message(INFO_MESSAGE,
+                "LoadLeveler ll_get_objs element=NULL. End of list was probably reached.\n");
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. rc=%d.\n", __FUNCTION__, __LINE__,
-		  *rc);
+            *rc);
     return ret_object;
 }
 
@@ -3975,16 +3899,16 @@ my_ll_get_objs(LL_element * query_elem, enum LL_Daemon daemon, char *ignore, int
  *************************************************************************/
 int
 my_ll_set_request(LL_element * query_elem, enum QueryFlags qflags, char **ignore,
-		  enum DataFilter dfilter)
+        enum DataFilter dfilter)
 {
     int rc = 0;
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. QueryFlags=%d.\n", __FUNCTION__,
-		  __LINE__, qflags);
+            __LINE__, qflags);
     pthread_mutex_lock(&access_LoadLeveler_lock);
     rc = LL_SYMS.ll_set_request(query_elem, qflags, ignore, dfilter);
     pthread_mutex_unlock(&access_LoadLeveler_lock);
     if (rc != 0) {
-	print_message(ERROR_MESSAGE, "LoadLeveler ll_set_request rc=%i.\n", rc);
+        print_message(ERROR_MESSAGE, "LoadLeveler ll_set_request rc=%i.\n", rc);
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. rc=%d.\n", __FUNCTION__, __LINE__, rc);
     return rc;
@@ -4002,23 +3926,23 @@ sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_object, NodeOb
     char *node_state_to_report = NODE_STATE_UNKNOWN;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. node=%s. state=%d.\n",
-		  __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name,
-		  node_object->node_state);
+            __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name,
+            node_object->node_state);
     memset(proxy_generated_cluster_id_string, '\0', sizeof(proxy_generated_cluster_id_string));
     memset(proxy_generated_node_id_string, '\0', sizeof(proxy_generated_node_id_string));
     sprintf(proxy_generated_cluster_id_string, "%d", cluster_object->proxy_generated_cluster_id);
     sprintf(proxy_generated_node_id_string, "%d", node_object->proxy_generated_node_id);
 
     switch (node_object->node_state) {
-	case MY_STATE_UP:
-	    node_state_to_report = NODE_STATE_UP;
-	    break;
-	case MY_STATE_DOWN:
-	    node_state_to_report = NODE_STATE_DOWN;
-	    break;
-	default:
-	    node_state_to_report = NODE_STATE_UNKNOWN;
-	    break;
+        case MY_STATE_UP:
+        node_state_to_report = NODE_STATE_UP;
+        break;
+        case MY_STATE_DOWN:
+        node_state_to_report = NODE_STATE_DOWN;
+        break;
+        default:
+        node_state_to_report = NODE_STATE_UNKNOWN;
+        break;
     }
 
     msg = proxy_new_node_event(gui_transmission_id, proxy_generated_cluster_id_string, 1);
@@ -4033,28 +3957,28 @@ sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_object, NodeOb
  *************************************************************************/
 static int
 sendNodeChangeEvent(int gui_transmission_id, ClusterObject * cluster_object,
-		    NodeObject * node_object)
+        NodeObject * node_object)
 {
     proxy_msg *msg;
     char proxy_generated_node_id_string[256];
     char *node_state_to_report = NODE_STATE_UNKNOWN;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. node=%s. state=%d.\n",
-		  __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name,
-		  node_object->node_state);
+            __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name,
+            node_object->node_state);
     memset(proxy_generated_node_id_string, '\0', sizeof(proxy_generated_node_id_string));
     sprintf(proxy_generated_node_id_string, "%d", node_object->proxy_generated_node_id);
 
     switch (node_object->node_state) {
-	case MY_STATE_UP:
-	    node_state_to_report = NODE_STATE_UP;
-	    break;
-	case MY_STATE_DOWN:
-	    node_state_to_report = NODE_STATE_DOWN;
-	    break;
-	default:
-	    node_state_to_report = NODE_STATE_UNKNOWN;
-	    break;
+        case MY_STATE_UP:
+        node_state_to_report = NODE_STATE_UP;
+        break;
+        case MY_STATE_DOWN:
+        node_state_to_report = NODE_STATE_DOWN;
+        break;
+        default:
+        node_state_to_report = NODE_STATE_UNKNOWN;
+        break;
     }
 
     msg = proxy_node_change_event(gui_transmission_id, proxy_generated_node_id_string, 1);
@@ -4077,8 +4001,8 @@ sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObje
     char *job_state_to_report = JOB_STATE_INIT;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
-		  __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
-		  job_object->ll_step_id.proc, job_object->job_state);
+            __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
+            job_object->ll_step_id.proc, job_object->job_state);
     memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));
     memset(proxy_generated_queue_id_string, '\0', sizeof(proxy_generated_queue_id_string));
     memset(job_name_string, '\0', sizeof(job_name_string));
@@ -4086,29 +4010,29 @@ sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObje
     sprintf(proxy_generated_queue_id_string, "%d", cluster_object->proxy_generated_queue_id);
 
     switch (job_object->job_state) {
-	case MY_STATE_IDLE:
-	    job_state_to_report = JOB_STATE_INIT;
-	    break;
-	case MY_STATE_RUNNING:
-	    job_state_to_report = JOB_STATE_RUNNING;
-	    break;
-	case MY_STATE_STOPPED:
-	    job_state_to_report = JOB_STATE_INIT;
-	    break;
-	case MY_STATE_TERMINATED:
-	    job_state_to_report = JOB_STATE_TERMINATED;
-	    break;
-	default:
-	    job_state_to_report = JOB_STATE_INIT;
-	    break;
+        case MY_STATE_IDLE:
+        job_state_to_report = JOB_STATE_INIT;
+        break;
+        case MY_STATE_RUNNING:
+        job_state_to_report = JOB_STATE_RUNNING;
+        break;
+        case MY_STATE_STOPPED:
+        job_state_to_report = JOB_STATE_INIT;
+        break;
+        case MY_STATE_TERMINATED:
+        job_state_to_report = JOB_STATE_TERMINATED;
+        break;
+        default:
+        job_state_to_report = JOB_STATE_INIT;
+        break;
     }
 
     sprintf(job_name_string, "%s.%d.%d", job_object->ll_step_id.from_host,
-	    job_object->ll_step_id.cluster, job_object->ll_step_id.proc);
+            job_object->ll_step_id.cluster, job_object->ll_step_id.proc);
     msg =
-	proxy_new_job_event(gui_transmission_id, proxy_generated_queue_id_string,
-			    proxy_generated_job_id_string, job_name_string, job_state_to_report,
-			    job_object->gui_assigned_job_id);
+    proxy_new_job_event(gui_transmission_id, proxy_generated_queue_id_string,
+            proxy_generated_job_id_string, job_name_string, job_state_to_report,
+            job_object->gui_assigned_job_id);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
@@ -4126,28 +4050,28 @@ sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
     char *job_state_to_report = JOB_STATE_INIT;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
-		  __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
-		  job_object->ll_step_id.proc, job_object->job_state);
+            __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
+            job_object->ll_step_id.proc, job_object->job_state);
     memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));
     memset(job_state_string, '\0', sizeof(job_state_string));
     sprintf(proxy_generated_job_id_string, "%d", job_object->proxy_generated_job_id);
 
     switch (job_object->job_state) {
-	case MY_STATE_IDLE:
-	    job_state_to_report = JOB_STATE_INIT;
-	    break;
-	case MY_STATE_RUNNING:
-	    job_state_to_report = JOB_STATE_RUNNING;
-	    break;
-	case MY_STATE_STOPPED:
-	    job_state_to_report = JOB_STATE_INIT;
-	    break;
-	case MY_STATE_TERMINATED:
-	    job_state_to_report = JOB_STATE_TERMINATED;
-	    break;
-	default:
-	    job_state_to_report = JOB_STATE_INIT;
-	    break;
+        case MY_STATE_IDLE:
+        job_state_to_report = JOB_STATE_INIT;
+        break;
+        case MY_STATE_RUNNING:
+        job_state_to_report = JOB_STATE_RUNNING;
+        break;
+        case MY_STATE_STOPPED:
+        job_state_to_report = JOB_STATE_INIT;
+        break;
+        case MY_STATE_TERMINATED:
+        job_state_to_report = JOB_STATE_TERMINATED;
+        break;
+        default:
+        job_state_to_report = JOB_STATE_INIT;
+        break;
     }
 
     msg = proxy_job_change_event(gui_transmission_id, proxy_generated_job_id_string, 1);
@@ -4168,8 +4092,8 @@ sendJobRemoveEvent(int gui_transmission_id, JobObject * job_object)
     char proxy_generated_job_id_string[256];
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
-		  __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
-		  job_object->ll_step_id.proc, job_object->job_state);
+            __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
+            job_object->ll_step_id.proc, job_object->job_state);
     memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));
     sprintf(proxy_generated_job_id_string, "%d", job_object->proxy_generated_job_id);
 
@@ -4184,7 +4108,7 @@ sendJobRemoveEvent(int gui_transmission_id, JobObject * job_object)
  *************************************************************************/
 static int
 sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObject * job_object,
-		 TaskObject * task_object)
+        TaskObject * task_object)
 {
     proxy_msg *msg;
     char proxy_generated_job_id_string[256];
@@ -4194,9 +4118,9 @@ sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObj
     NodeObject *node_object = NULL;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. node=%s. task=%d.\n",
-		  __FUNCTION__, __LINE__, job_object->ll_step_id.from_host,
-		  job_object->ll_step_id.cluster, job_object->ll_step_id.proc,
-		  task_object->node_name, task_object->ll_task_id);
+            __FUNCTION__, __LINE__, job_object->ll_step_id.from_host,
+            job_object->ll_step_id.cluster, job_object->ll_step_id.proc,
+            task_object->node_name, task_object->ll_task_id);
     memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));
     memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string));
     memset(ll_task_id_string, '\0', sizeof(ll_task_id_string));
@@ -4206,23 +4130,22 @@ sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObj
     msg = proxy_new_process_event(gui_transmission_id, proxy_generated_job_id_string, 1);
 
     switch (task_object->task_state) {
-	case MY_STATE_IDLE:
-	    task_state_to_report = PROC_STATE_STARTING;
-	    break;
-	case MY_STATE_RUNNING:
-	    task_state_to_report = PROC_STATE_RUNNING;
-	    break;
-	case MY_STATE_STOPPED:
-	    task_state_to_report = PROC_STATE_STOPPED;
-	    break;
-	case MY_STATE_TERMINATED:
-	    task_state_to_report = PROC_STATE_EXITED;
-	    break;
-	default:
-	    task_state_to_report = PROC_STATE_STARTING;
-	    break;
+        case MY_STATE_IDLE:
+        task_state_to_report = PROC_STATE_STARTING;
+        break;
+        case MY_STATE_RUNNING:
+        task_state_to_report = PROC_STATE_RUNNING;
+        break;
+        case MY_STATE_STOPPED:
+        task_state_to_report = PROC_STATE_STOPPED;
+        break;
+        case MY_STATE_TERMINATED:
+        task_state_to_report = PROC_STATE_EXITED;
+        break;
+        default:
+        task_state_to_report = PROC_STATE_STARTING;
+        break;
     }
-
 
     proxy_add_process(msg, proxy_generated_task_id_string, ll_task_id_string, task_state_to_report, 2);
 
@@ -4251,21 +4174,21 @@ sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
     msg = proxy_process_change_event(gui_transmission_id, proxy_generated_task_id_string, 1);
 
     switch (task_object->task_state) {
-	case MY_STATE_IDLE:
-	    task_state_to_report = PROC_STATE_STARTING;
-	    break;
-	case MY_STATE_RUNNING:
-	    task_state_to_report = PROC_STATE_RUNNING;
-	    break;
-	case MY_STATE_STOPPED:
-	    task_state_to_report = PROC_STATE_STOPPED;
-	    break;
-	case MY_STATE_TERMINATED:
-	    task_state_to_report = PROC_STATE_EXITED;
-	    break;
-	default:
-	    task_state_to_report = PROC_STATE_STARTING;
-	    break;
+        case MY_STATE_IDLE:
+        task_state_to_report = PROC_STATE_STARTING;
+        break;
+        case MY_STATE_RUNNING:
+        task_state_to_report = PROC_STATE_RUNNING;
+        break;
+        case MY_STATE_STOPPED:
+        task_state_to_report = PROC_STATE_STOPPED;
+        break;
+        case MY_STATE_TERMINATED:
+        task_state_to_report = PROC_STATE_EXITED;
+        break;
+        default:
+        task_state_to_report = PROC_STATE_STARTING;
+        break;
     }
 
     proxy_add_string_attribute(msg, PROC_STATE_ATTR, task_state_to_report);
@@ -4304,7 +4227,7 @@ sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
     char *machine_state_to_report = MACHINE_STATE_UNKNOWN;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. state=%d.\n", __FUNCTION__,
-		  __LINE__, cluster_object->cluster_name, cluster_object->cluster_state);
+            __LINE__, cluster_object->cluster_name, cluster_object->cluster_state);
     memset(proxy_generated_cluster_id_string, '\0', sizeof(proxy_generated_cluster_id_string));
     sprintf(proxy_generated_cluster_id_string, "%d", cluster_object->proxy_generated_cluster_id);
 
@@ -4312,20 +4235,20 @@ sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
     my_cluster = cluster_object;
     machine_id = cluster_object->proxy_generated_cluster_id;
     switch (cluster_object->cluster_state) {
-	case MY_STATE_UP:
-	    machine_state_to_report = MACHINE_STATE_UP;
-	    break;
-	case MY_STATE_DOWN:
-	    machine_state_to_report = MACHINE_STATE_DOWN;
-	    break;
-	default:
-	    machine_state_to_report = MACHINE_STATE_UNKNOWN;
-	    break;
+        case MY_STATE_UP:
+        machine_state_to_report = MACHINE_STATE_UP;
+        break;
+        case MY_STATE_DOWN:
+        machine_state_to_report = MACHINE_STATE_DOWN;
+        break;
+        default:
+        machine_state_to_report = MACHINE_STATE_UNKNOWN;
+        break;
     }
     msg =
-	proxy_new_machine_event(gui_transmission_id, ibmll_proxy_base_id_string,
-				proxy_generated_cluster_id_string, cluster_object->cluster_name,
-				machine_state_to_report);
+    proxy_new_machine_event(gui_transmission_id, ibmll_proxy_base_id_string,
+            proxy_generated_cluster_id_string, cluster_object->cluster_name,
+            machine_state_to_report);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
@@ -4342,25 +4265,25 @@ sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
     char *queue_state_to_report = QUEUE_STATE_STOPPED;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. queue=%s. state=%d.\n", __FUNCTION__,
-		  __LINE__, cluster_object->cluster_name, cluster_object->queue_state);
+            __LINE__, cluster_object->cluster_name, cluster_object->queue_state);
     memset(proxy_generated_queue_id_string, '\0', sizeof(proxy_generated_queue_id_string));
     sprintf(proxy_generated_queue_id_string, "%d", cluster_object->proxy_generated_queue_id);
 
     // TODO - Need to ensure that queue_id gets set to the queue belonging to the cluster where the proxy node resides
     queue_id = cluster_object->proxy_generated_queue_id;
     switch (cluster_object->cluster_state) {
-	case MY_STATE_UP:
-	    queue_state_to_report = QUEUE_STATE_NORMAL;
-	    break;
-	default:
-	    queue_state_to_report = QUEUE_STATE_STOPPED;
-	    break;
+        case MY_STATE_UP:
+        queue_state_to_report = QUEUE_STATE_NORMAL;
+        break;
+        default:
+        queue_state_to_report = QUEUE_STATE_STOPPED;
+        break;
     }
 
     msg =
-	proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string,
-			      proxy_generated_queue_id_string, cluster_object->cluster_name,
-			      queue_state_to_report);
+    proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string,
+            proxy_generated_queue_id_string, cluster_object->cluster_name,
+            queue_state_to_report);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
@@ -4373,7 +4296,7 @@ void
 add_job_to_list(List * job_list, JobObject * job_object)
 {
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job_object=x\'%08x\'.\n", __FUNCTION__,
-		  __LINE__, job_object);
+            __LINE__, job_object);
     AddToList(job_list, job_object);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
 }
@@ -4385,7 +4308,7 @@ void
 add_task_to_list(List * task_list, TaskObject * task_object)
 {
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. task_object=x\'%08x\'.\n", __FUNCTION__,
-		  __LINE__, task_object);
+            __LINE__, task_object);
     AddToList(task_list, task_object);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
 }
@@ -4400,20 +4323,19 @@ add_node_to_hash(Hash * node_hash, NodeObject * node_object)
     List *node_list;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. object=x\'%08x\'.\n", __FUNCTION__,
-		  __LINE__, node_object);
+            __LINE__, node_object);
     hash_key = HashCompute(node_object->node_name, strlen(node_object->node_name));
     node_list = HashSearch(node_hash, hash_key);
     if (node_list == NULL) {
-	node_list = NewList();
-	AddToList(node_list, node_object);
-	HashInsert(node_hash, hash_key, node_list);
+        node_list = NewList();
+        AddToList(node_list, node_object);
+        HashInsert(node_hash, hash_key, node_list);
     }
     else {
-	AddToList(node_list, node_object);
+        AddToList(node_list, node_object);
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
 }
-
 
 /*************************************************************************
  * delete task from my list                                              *
@@ -4423,12 +4345,12 @@ delete_task_from_list(List * task_list, TaskObject * task_object)
 {
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
     if (task_object->node_name != NULL) {
-	free(task_object->node_name);
-	task_object->node_name = NULL;
+        free(task_object->node_name);
+        task_object->node_name = NULL;
     }
     if (task_object->node_address != NULL) {
-	free(task_object->node_address);
-	task_object->node_address = NULL;
+        free(task_object->node_address);
+        task_object->node_address = NULL;
     }
     RemoveFromList(task_list, task_object);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
@@ -4444,22 +4366,22 @@ get_job_in_list(List * job_list, LL_STEP_ID ll_step_id)
     JobObject *job_object = NULL;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. name=%s.%d.%d.\n", __FUNCTION__,
-		  __LINE__, ll_step_id.from_host, ll_step_id.cluster, ll_step_id.proc);
+            __LINE__, ll_step_id.from_host, ll_step_id.cluster, ll_step_id.proc);
     job_list_element = job_list->l_head;
     while (job_list_element != NULL) {
-	job_object = job_list_element->l_value;
-	job_list_element = job_list_element->l_next;
-	if ((strcmp(ll_step_id.from_host, job_object->ll_step_id.from_host) == 0)
-	    && (ll_step_id.cluster == job_object->ll_step_id.cluster)
-	    && (ll_step_id.proc == job_object->ll_step_id.proc)) {
-	    print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. job_object=x\'%08x\'.\n",
-			  __FUNCTION__, __LINE__, job_object);
-	    return job_object;
-	}
+        job_object = job_list_element->l_value;
+        job_list_element = job_list_element->l_next;
+        if ((strcmp(ll_step_id.from_host, job_object->ll_step_id.from_host) == 0)
+                && (ll_step_id.cluster == job_object->ll_step_id.cluster)
+                && (ll_step_id.proc == job_object->ll_step_id.proc)) {
+            print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. job_object=x\'%08x\'.\n",
+                    __FUNCTION__, __LINE__, job_object);
+            return job_object;
+        }
     }
     job_object = NULL;
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. job_object=x\'%08x\'.\n", __FUNCTION__,
-		  __LINE__, job_object);
+            __LINE__, job_object);
     return job_object;
 }
 
@@ -4475,24 +4397,24 @@ get_node_in_hash(Hash * node_hash, char *node_name)
     NodeObject *node_object = NULL;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. name=%s.\n", __FUNCTION__, __LINE__,
-		  node_name);
+            node_name);
     hash_key = HashCompute(node_name, strlen(node_name));
     node_list = HashSearch(node_hash, hash_key);
     if (node_list != NULL) {
-	node_list_element = node_list->l_head;
-	while (node_list_element != NULL) {
-	    node_object = node_list_element->l_value;
-	    node_list_element = node_list_element->l_next;
-	    if (strcmp(node_name, node_object->node_name) == 0) {
-		print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. node_object=x\'%08x\'.\n",
-			      __FUNCTION__, __LINE__, node_object);
-		return node_object;
-	    }
-	}
+        node_list_element = node_list->l_head;
+        while (node_list_element != NULL) {
+            node_object = node_list_element->l_value;
+            node_list_element = node_list_element->l_next;
+            if (strcmp(node_name, node_object->node_name) == 0) {
+                print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. node_object=x\'%08x\'.\n",
+                        __FUNCTION__, __LINE__, node_object);
+                return node_object;
+            }
+        }
     }
     node_object = NULL;
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. node_object=x\'%08x\'.\n",
-		  __FUNCTION__, __LINE__, node_object);
+            __FUNCTION__, __LINE__, node_object);
     return node_object;
 }
 
@@ -4506,21 +4428,21 @@ get_task_in_list(List * task_list, char *task_instance_machine_name, int ll_task
     ListElement *task_list_element = NULL;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. id=%d.\n", __FUNCTION__, __LINE__,
-		  ll_task_id);
+            ll_task_id);
     task_list_element = task_list->l_head;
     while (task_list_element != NULL) {
-	task_object = task_list_element->l_value;
-	task_list_element = task_list_element->l_next;
-	if ((ll_task_id == task_object->ll_task_id)
-	    && (strcmp(task_object->node_name, task_instance_machine_name) == 0)) {
-	    print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. task_object=x\'%08x\'.\n",
-			  __FUNCTION__, __LINE__, task_object);
-	    return task_object;
-	}
+        task_object = task_list_element->l_value;
+        task_list_element = task_list_element->l_next;
+        if ((ll_task_id == task_object->ll_task_id)
+                && (strcmp(task_object->node_name, task_instance_machine_name) == 0)) {
+            print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. task_object=x\'%08x\'.\n",
+                    __FUNCTION__, __LINE__, task_object);
+            return task_object;
+        }
     }
     task_object = NULL;
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d. task_object=x\'%08x\'.\n",
-		  __FUNCTION__, __LINE__, task_object);
+            __FUNCTION__, __LINE__, task_object);
     return task_object;
 }
 
@@ -4542,55 +4464,55 @@ get_multicluster_status()
 
     if ((state_shutdown_requested == 0) && (state_events_active == 1)) {
 
-	if (multicluster_status == -1) {
+        if (multicluster_status == -1) {
 
-	    query_elem = NULL;
-	    query_elem = my_ll_query(CLUSTERS);
+            query_elem = NULL;
+            query_elem = my_ll_query(CLUSTERS);
 
-	    if (query_elem == NULL) {
-		print_message(ERROR_MESSAGE,
-			      "Unable to obtain query element. LoadLeveler may not be active.\n");
-		return -1;
-	    }
+            if (query_elem == NULL) {
+                print_message(ERROR_MESSAGE,
+                        "Unable to obtain query element. LoadLeveler may not be active.\n");
+                return -1;
+            }
 
-	    /* Get information relating to LoadLeveler clusters.
-	     * QUERY_ALL: we are querying for local cluster data
-	     * NULL: no filter needed
-	     * ALL_DATA: we want all the information available about the cluster */
+            /* Get information relating to LoadLeveler clusters.
+             * QUERY_ALL: we are querying for local cluster data
+             * NULL: no filter needed
+             * ALL_DATA: we want all the information available about the cluster */
 
-	    print_message(INFO_MESSAGE, "Call LoadLeveler (ll_set_request) for cluster.\n");
-	    rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
+            print_message(INFO_MESSAGE, "Call LoadLeveler (ll_set_request) for cluster.\n");
+            rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
 
-	    print_message(INFO_MESSAGE, "Call LoadLeveler (ll_get_objs) for cluster.\n");
-	    cluster = my_ll_get_objs(query_elem, LL_CM, NULL, &cluster_count, &rc);
-	    if (rc < 0) {
-		rc = my_ll_deallocate(query_elem);
-		return -1;
-	    }
+            print_message(INFO_MESSAGE, "Call LoadLeveler (ll_get_objs) for cluster.\n");
+            cluster = my_ll_get_objs(query_elem, LL_CM, NULL, &cluster_count, &rc);
+            if (rc < 0) {
+                rc = my_ll_deallocate(query_elem);
+                return -1;
+            }
 
-	    print_message(INFO_MESSAGE, "Number of LoadLeveler Clusters=%d.\n", cluster_count);
-	    i = 0;
-	    if (cluster != NULL) {
-		print_message(INFO_MESSAGE, "Cluster %d:\n", i);
-		rc = my_ll_get_data(cluster, LL_ClusterMusterEnvironment, &multicluster_status);
-		if (rc != 0) {
-		    print_message(ERROR_MESSAGE,
-				  "Error rc=%d trying to determine if LoadLeveler is running local or multicluster configuration. Defaulting to local cluster only (no multicluster).\n",
-				  rc);
-		    multicluster_status = 0;
-		}
-		else {
-		    print_message(INFO_MESSAGE, "Multicluster returned is = %d.\n",
-				  multicluster_status);
-		}
+            print_message(INFO_MESSAGE, "Number of LoadLeveler Clusters=%d.\n", cluster_count);
+            i = 0;
+            if (cluster != NULL) {
+                print_message(INFO_MESSAGE, "Cluster %d:\n", i);
+                rc = my_ll_get_data(cluster, LL_ClusterMusterEnvironment, &multicluster_status);
+                if (rc != 0) {
+                    print_message(ERROR_MESSAGE,
+                            "Error rc=%d trying to determine if LoadLeveler is running local or multicluster configuration. Defaulting to local cluster only (no multicluster).\n",
+                            rc);
+                    multicluster_status = 0;
+                }
+                else {
+                    print_message(INFO_MESSAGE, "Multicluster returned is = %d.\n",
+                            multicluster_status);
+                }
 
-	    }
+            }
 
-	    /* First we need to release the individual objects that were */
-	    /* obtained by the query */
-	    rc = my_ll_free_objs(query_elem);
-	    rc = my_ll_deallocate(query_elem);
-	}
+            /* First we need to release the individual objects that were */
+            /* obtained by the query */
+            rc = my_ll_free_objs(query_elem);
+            rc = my_ll_deallocate(query_elem);
+        }
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return multicluster_status;
@@ -4616,141 +4538,141 @@ refresh_cluster_list()
 
     if ((state_shutdown_requested == 0) && (state_events_active == 1)) {
 
-	if (multicluster_status == -1) {
-	    multicluster_status = get_multicluster_status();
-	}
+        if (multicluster_status == -1) {
+            multicluster_status = get_multicluster_status();
+        }
 
-	switch (multicluster_status) {
+        switch (multicluster_status) {
 
-      /*-----------------------------------------------------------------------*
-       * no contact with loadleveler yet                                       *
-       *-----------------------------------------------------------------------*/
-	    case -1:
-		break;
+            /*-----------------------------------------------------------------------*
+             * no contact with loadleveler yet                                       *
+             *-----------------------------------------------------------------------*/
+            case -1:
+            break;
 
-      /*-----------------------------------------------------------------------*
-       * single cluster and multi cluster                                      *
-       *-----------------------------------------------------------------------*/
-	    case 0:
-		if (cluster_list == NULL) {
-		    cluster_list = NewList();
-		    job_list = NewList();
-		}
-		/* end if no list obtained yet */
-		print_message(INFO_MESSAGE,
-			      "Number of LoadLeveler Clusters=0 (not running multicluster).\n");
-		i = 0;
-		cluster_object = (ClusterObject *) malloc(sizeof(ClusterObject));
-		malloc_check(cluster_object, __FUNCTION__, __LINE__);
-		memset(cluster_object, '\0', sizeof(cluster_object));
-		cluster_object->proxy_generated_cluster_id = generate_id();
-		cluster_object->proxy_generated_queue_id = generate_id();
-		cluster_object->cluster_state = MY_STATE_UP;
-		cluster_object->queue_state = MY_STATE_UP;
-		cluster_object->cluster_name = strdup("Local (not multicluster)");
-		cluster_object->cluster_is_local = 1;
-		cluster_object->node_hash = HashCreate(1024);
-		print_message(INFO_MESSAGE, "Cluster name=%s\n", cluster_name);
-		AddToList(cluster_list, (void *) cluster_object);
-		print_message(INFO_MESSAGE,
-			      "Send event notification: PTP Machine added for LoadLeveler Cluster=%s.\n",
-			      cluster_name);
-		sendMachineAddEvent(start_events_transid, cluster_object);
-		print_message(INFO_MESSAGE,
-			      "Send event notification: PTP Queue added for LoadLeveler Cluster=%s.\n",
-			      cluster_name);
-		sendQueueAddEvent(start_events_transid, cluster_object);
-		break;
+            /*-----------------------------------------------------------------------*
+             * single cluster and multi cluster                                      *
+             *-----------------------------------------------------------------------*/
+            case 0:
+            if (cluster_list == NULL) {
+                cluster_list = NewList();
+                job_list = NewList();
+            }
+            /* end if no list obtained yet */
+            print_message(INFO_MESSAGE,
+                    "Number of LoadLeveler Clusters=0 (not running multicluster).\n");
+            i = 0;
+            cluster_object = (ClusterObject *) malloc(sizeof(ClusterObject));
+            malloc_check(cluster_object, __FUNCTION__, __LINE__);
+            memset(cluster_object, '\0', sizeof(cluster_object));
+            cluster_object->proxy_generated_cluster_id = generate_id();
+            cluster_object->proxy_generated_queue_id = generate_id();
+            cluster_object->cluster_state = MY_STATE_UP;
+            cluster_object->queue_state = MY_STATE_UP;
+            cluster_object->cluster_name = strdup("Local (not multicluster)");
+            cluster_object->cluster_is_local = 1;
+            cluster_object->node_hash = HashCreate(1024);
+            print_message(INFO_MESSAGE, "Cluster name=%s\n", cluster_name);
+            AddToList(cluster_list, (void *) cluster_object);
+            print_message(INFO_MESSAGE,
+                    "Send event notification: PTP Machine added for LoadLeveler Cluster=%s.\n",
+                    cluster_name);
+            sendMachineAddEvent(start_events_transid, cluster_object);
+            print_message(INFO_MESSAGE,
+                    "Send event notification: PTP Queue added for LoadLeveler Cluster=%s.\n",
+                    cluster_name);
+            sendQueueAddEvent(start_events_transid, cluster_object);
+            break;
 
-      /*-----------------------------------------------------------------------*
-       * multicluster                                                          *
-       *-----------------------------------------------------------------------*/
-	    case 1:
-		if (cluster_list == NULL) {
-		    cluster_list = NewList();
-		    job_list = NewList();
-		}
-		/* end if no list obtained yet */
-		query_elem = NULL;
+            /*-----------------------------------------------------------------------*
+             * multicluster                                                          *
+             *-----------------------------------------------------------------------*/
+            case 1:
+            if (cluster_list == NULL) {
+                cluster_list = NewList();
+                job_list = NewList();
+            }
+            /* end if no list obtained yet */
+            query_elem = NULL;
 
-		query_elem = my_ll_query(MCLUSTERS);
+            query_elem = my_ll_query(MCLUSTERS);
 
-		if (query_elem == NULL) {
-		    print_message(ERROR_MESSAGE,
-				  "Unable to obtain query element. LoadLeveler may not be active.\n");
-		    multicluster_status = -1;
-		    return;
-		}
+            if (query_elem == NULL) {
+                print_message(ERROR_MESSAGE,
+                        "Unable to obtain query element. LoadLeveler may not be active.\n");
+                multicluster_status = -1;
+                return;
+            }
 
-		print_message(INFO_MESSAGE, "Call LoadLeveler (ll_set_request) for clusters.\n");
-		rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
+            print_message(INFO_MESSAGE, "Call LoadLeveler (ll_set_request) for clusters.\n");
+            rc = my_ll_set_request(query_elem, QUERY_ALL, NULL, ALL_DATA);
 
-		if (rc != 0) {
-		    rc = my_ll_deallocate(query_elem);
-		    query_elem = NULL;
-		    multicluster_status = -1;
-		    return;
-		}
+            if (rc != 0) {
+                rc = my_ll_deallocate(query_elem);
+                query_elem = NULL;
+                multicluster_status = -1;
+                return;
+            }
 
-		print_message(INFO_MESSAGE, "Call LoadLeveler (ll_get_objs) for clusters.\n");
-		cluster = my_ll_get_objs(query_elem, LL_SCHEDD, NULL, &cluster_count, &rc);
-		if (rc != 0) {
-		    rc = my_ll_deallocate(query_elem);
-		    query_elem = NULL;
-		    multicluster_status = -1;
-		    return;
-		}
+            print_message(INFO_MESSAGE, "Call LoadLeveler (ll_get_objs) for clusters.\n");
+            cluster = my_ll_get_objs(query_elem, LL_SCHEDD, NULL, &cluster_count, &rc);
+            if (rc != 0) {
+                rc = my_ll_deallocate(query_elem);
+                query_elem = NULL;
+                multicluster_status = -1;
+                return;
+            }
 
-		print_message(INFO_MESSAGE, "Number of LoadLeveler Clusters=%d.\n", cluster_count);
-		i = 0;
-		while ((cluster != NULL) && (query_elem != NULL)) {
-		    print_message(INFO_MESSAGE, "Cluster %d:\n", i);
-		    rc = my_ll_get_data(cluster, LL_MClusterName, &cluster_name);
-		    if (rc != 0) {
-			rc = my_ll_free_objs(query_elem);
-			rc = my_ll_deallocate(query_elem);
-			query_elem = NULL;
-			multicluster_status = -1;
-			return;
-		    }
-		    else {
-			cluster_object = (ClusterObject *) malloc(sizeof(ClusterObject));
-			malloc_check(cluster_object, __FUNCTION__, __LINE__);
-			memset(cluster_object, '\0', sizeof(cluster_object));
-			cluster_object->proxy_generated_cluster_id = generate_id();
-			cluster_object->proxy_generated_queue_id = generate_id();
-			cluster_object->cluster_state = MY_STATE_UP;
-			cluster_object->queue_state = MY_STATE_UP;
-			rc = my_ll_get_data(cluster, LL_MClusterLocal, &cluster_local);
-			cluster_object->cluster_name = strdup(cluster_name);
-			if (cluster_local == 1) {
-			    cluster_object->cluster_is_local = 1;
-			}
-			cluster_object->node_hash = HashCreate(1024);
-			print_message(INFO_MESSAGE, "Cluster name=%s\n", cluster_name);
-			AddToList(cluster_list, (void *) cluster_object);
-			print_message(INFO_MESSAGE,
-				      "Send event notification: PTP Machine added for LoadLeveler Cluster=%s.\n",
-				      cluster_name);
-			sendMachineAddEvent(start_events_transid, cluster_object);
-			print_message(INFO_MESSAGE,
-				      "Send event notification: PTP Queue added for LoadLeveler Cluster=%s.\n",
-				      cluster_name);
-			sendQueueAddEvent(start_events_transid, cluster_object);
-		    }
+            print_message(INFO_MESSAGE, "Number of LoadLeveler Clusters=%d.\n", cluster_count);
+            i = 0;
+            while ((cluster != NULL) && (query_elem != NULL)) {
+                print_message(INFO_MESSAGE, "Cluster %d:\n", i);
+                rc = my_ll_get_data(cluster, LL_MClusterName, &cluster_name);
+                if (rc != 0) {
+                    rc = my_ll_free_objs(query_elem);
+                    rc = my_ll_deallocate(query_elem);
+                    query_elem = NULL;
+                    multicluster_status = -1;
+                    return;
+                }
+                else {
+                    cluster_object = (ClusterObject *) malloc(sizeof(ClusterObject));
+                    malloc_check(cluster_object, __FUNCTION__, __LINE__);
+                    memset(cluster_object, '\0', sizeof(cluster_object));
+                    cluster_object->proxy_generated_cluster_id = generate_id();
+                    cluster_object->proxy_generated_queue_id = generate_id();
+                    cluster_object->cluster_state = MY_STATE_UP;
+                    cluster_object->queue_state = MY_STATE_UP;
+                    rc = my_ll_get_data(cluster, LL_MClusterLocal, &cluster_local);
+                    cluster_object->cluster_name = strdup(cluster_name);
+                    if (cluster_local == 1) {
+                        cluster_object->cluster_is_local = 1;
+                    }
+                    cluster_object->node_hash = HashCreate(1024);
+                    print_message(INFO_MESSAGE, "Cluster name=%s\n", cluster_name);
+                    AddToList(cluster_list, (void *) cluster_object);
+                    print_message(INFO_MESSAGE,
+                            "Send event notification: PTP Machine added for LoadLeveler Cluster=%s.\n",
+                            cluster_name);
+                    sendMachineAddEvent(start_events_transid, cluster_object);
+                    print_message(INFO_MESSAGE,
+                            "Send event notification: PTP Queue added for LoadLeveler Cluster=%s.\n",
+                            cluster_name);
+                    sendQueueAddEvent(start_events_transid, cluster_object);
+                }
 
-		    i++;
-		    cluster = my_ll_next_obj(query_elem);
-		}
+                i++;
+                cluster = my_ll_next_obj(query_elem);
+            }
 
-		if (query_elem != NULL) {
-		    rc = my_ll_free_objs(query_elem);
-		    rc = my_ll_deallocate(query_elem);
-		}
-		query_elem = NULL;
-		break;
+            if (query_elem != NULL) {
+                rc = my_ll_free_objs(query_elem);
+                rc = my_ll_deallocate(query_elem);
+            }
+            query_elem = NULL;
+            break;
 
-	}
+        }
 
     }
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
@@ -4759,30 +4681,26 @@ refresh_cluster_list()
 
 #endif
 
-void
-send_string_attrs(int trans_id, int flags)
+void send_string_attrs(int trans_id, int flags)
 {
 
-/*
- * Send string attributes, including default values, to front end
- */
+    /*
+     * Send string attributes, including default values, to front end
+     */
     TRACE_ENTRY;
     int i;
 
     for (i = 0; i < (sizeof string_launch_attrs / sizeof(string_launch_attr)); i++) {
-	if ((string_launch_attrs[i].type & flags) == flags) {
-	    enqueue_event(proxy_attr_def_string_event(trans_id,
-						      string_launch_attrs[i].id,
-						      string_launch_attrs[i].short_name,
-						      string_launch_attrs[i].long_name, 0,
-						      string_launch_attrs[i].default_value));
-	}
+        if ((string_launch_attrs[i].type & flags) == flags) {
+            enqueue_event(proxy_attr_def_string_event(trans_id, string_launch_attrs[i].id,
+                    string_launch_attrs[i].short_name, string_launch_attrs[i].long_name, 0,
+                    string_launch_attrs[i].default_value));
+        }
     }
     TRACE_EXIT;
 }
 
-void
-send_int_attrs(int trans_id, int flags)
+void send_int_attrs(int trans_id, int flags)
 {
     /*
      * Send integer attributes, including default value, lower and upper
@@ -4792,20 +4710,15 @@ send_int_attrs(int trans_id, int flags)
 
     TRACE_ENTRY;
     for (i = 0; i < (sizeof int_attrs / sizeof(int_launch_attr)); i++) {
-	if ((int_attrs[i].type & flags) == flags) {
-	    enqueue_event(proxy_attr_def_int_limits_event(trans_id,
-							  int_attrs[i].id, int_attrs[i].short_name,
-							  int_attrs[i].long_name, 0,
-							  int_attrs[i].default_value,
-							  int_attrs[i].llimit,
-							  int_attrs[i].ulimit));
-	}
+        if ((int_attrs[i].type & flags) == flags) {
+            enqueue_event(proxy_attr_def_int_limits_event(trans_id, int_attrs[i].id, int_attrs[i].short_name,
+                    int_attrs[i].long_name, 0, int_attrs[i].default_value, int_attrs[i].llimit, int_attrs[i].ulimit));
+        }
     }
     TRACE_EXIT;
 }
 
-void
-send_long_int_attrs(int trans_id, int flags)
+void send_long_int_attrs(int trans_id, int flags)
 {
     /*
      * Send long (64 bit) intgeger attributes, including default value and
@@ -4815,21 +4728,16 @@ send_long_int_attrs(int trans_id, int flags)
 
     TRACE_ENTRY;
     for (i = 0; i < (sizeof long_int_attrs / sizeof(long_int_launch_attr)); i++) {
-	if ((long_int_attrs[i].type & flags) == flags) {
-	    enqueue_event(proxy_attr_def_long_int_limits_event(trans_id,
-							       long_int_attrs[i].id,
-							       long_int_attrs[i].short_name,
-							       long_int_attrs[i].long_name, 0,
-							       long_int_attrs[i].default_value,
-							       long_int_attrs[i].llimit,
-							       long_int_attrs[i].ulimit));
-	}
+        if ((long_int_attrs[i].type & flags) == flags) {
+            enqueue_event(proxy_attr_def_long_int_limits_event(trans_id, long_int_attrs[i].id,
+                    long_int_attrs[i].short_name, long_int_attrs[i].long_name, 0, long_int_attrs[i].default_value,
+                    long_int_attrs[i].llimit, long_int_attrs[i].ulimit));
+        }
     }
     TRACE_EXIT;
 }
 
-void
-send_enum_attrs(int trans_id, int flags)
+void send_enum_attrs(int trans_id, int flags)
 {
     /*
      * Send enumerated attributes, including default and allowable values, to
@@ -4839,62 +4747,60 @@ send_enum_attrs(int trans_id, int flags)
 
     TRACE_ENTRY;
     for (i = 0; i < (sizeof enum_attrs / sizeof(enum_launch_attr)); i++) {
-	char *cp;
-	char *end_cp;
-	char *cp_save;
-	int n;
+        char *cp;
+        char *end_cp;
+        char *cp_save;
+        int n;
 
-	proxy_msg *msg;
+        proxy_msg *msg;
 
-	if ((enum_attrs[i].type & flags) == flags) {
-	    /*
-	     * Count the number of enumerations in the enum list. Enumerations are
-	     * delimited by '|' so number of enumerations is number of '|' + 1
-	     */
-	    cp = enum_attrs[i].enums;
-	    n = 1;
-	    while (*cp != '\0') {
-		if ((*cp) == '|') {
-		    n = n + 1;
-		}
-		cp = cp + 1;
-	    }
-	    /*
-	     * Create the enumeration attribute definition header
-	     */
-	    msg = proxy_attr_def_enum_event(trans_id, enum_attrs[i].id,
-					    enum_attrs[i].short_name, enum_attrs[i].long_name, 0,
-					    enum_attrs[i].default_value, n);
-	    /*
-	     * Append enumerations to message. Since enumerations string is
-	     * a string literal that is illegal to modify, create a working copy
-	     */
-	    cp = strdup(enum_attrs[i].enums);
-	    cp_save = cp;
-	    for (;;) {
-		end_cp = strchr(cp, '|');
-		if (end_cp == NULL) {
-		    proxy_msg_add_string(msg, cp);
-		    break;
-		}
-		else {
-		    *end_cp = '\0';
-		    proxy_msg_add_string(msg, cp);
-		    cp = end_cp + 1;
-		}
-	    }
-	    free(cp_save);
-	    /*
-	     * Send the attribute definition
-	     */
-	    enqueue_event(msg);
-	}
+        if ((enum_attrs[i].type & flags) == flags) {
+            /*
+             * Count the number of enumerations in the enum list. Enumerations are
+             * delimited by '|' so number of enumerations is number of '|' + 1
+             */
+            cp = enum_attrs[i].enums;
+            n = 1;
+            while (*cp != '\0') {
+                if ((*cp) == '|') {
+                    n = n + 1;
+                }
+                cp = cp + 1;
+            }
+            /*
+             * Create the enumeration attribute definition header
+             */
+            msg = proxy_attr_def_enum_event(trans_id, enum_attrs[i].id, enum_attrs[i].short_name,
+                    enum_attrs[i].long_name, 0, enum_attrs[i].default_value, n);
+            /*
+             * Append enumerations to message. Since enumerations string is
+             * a string literal that is illegal to modify, create a working copy
+             */
+            cp = strdup(enum_attrs[i].enums);
+            cp_save = cp;
+            for (;;) {
+                end_cp = strchr(cp, '|');
+                if (end_cp == NULL) {
+                    proxy_msg_add_string(msg, cp);
+                    break;
+                }
+                else {
+                    *end_cp = '\0';
+                    proxy_msg_add_string(msg, cp);
+                    cp = end_cp + 1;
+                }
+            }
+            free(cp_save);
+            /*
+             * Send the attribute definition
+             */
+            enqueue_event(msg);
+        }
     }
     TRACE_EXIT;
 }
 
-void
-send_local_default_attrs(int trans_id)
+void send_local_default_attrs(int trans_id)
 {
     /*
      * Send values of any PE environment variables (MP_*) to front end. These
@@ -4909,28 +4815,28 @@ send_local_default_attrs(int trans_id)
     TRACE_ENTRY;
     env = environ;
     while (*env != NULL) {
-	/*
-	 * Check if the environment variable is a PE environment variable.
-	 */
-	if (memcmp(*env, "MP_", 3) == 0) {
-	    /*
-	     * Make a duplicate of the environment then split into name/value
-	     * at '=', change the first two characters of the name to 'EN' and
-	     * send it to the front end as a string attribute. These attributes
-	     * do not have attribute name or description since they do not
-	     * display in the GUI.
-	     */
-	    cp = strdup(*env);
-	    value = strchr(cp, '=');
-	    if (value != NULL) {
-		*value = '\0';
-		value = value + 1;
-		memcpy(cp, "EN", 2);
-		enqueue_event(proxy_attr_def_string_event(trans_id, cp, "", "", 0, value));
-	    }
-	    free(cp);
-	}
-	env = env + 1;
+        /*
+         * Check if the environment variable is a PE environment variable.
+         */
+        if (memcmp(*env, "MP_", 3) == 0) {
+            /*
+             * Make a duplicate of the environment then split into name/value
+             * at '=', change the first two characters of the name to 'EN' and
+             * send it to the front end as a string attribute. These attributes
+             * do not have attribute name or description since they do not
+             * display in the GUI.
+             */
+            cp = strdup(*env);
+            value = strchr(cp, '=');
+            if (value != NULL) {
+                *value = '\0';
+                value = value + 1;
+                memcpy(cp, "EN", 2);
+                enqueue_event(proxy_attr_def_string_event(trans_id, cp, "", "", 0, value));
+            }
+            free(cp);
+        }
+        env = env + 1;
     }
     TRACE_EXIT;
 }
@@ -4958,13 +4864,13 @@ discover_jobs()
     my_uid = getuid();
     procdir = opendir("/proc");
     if (procdir == NULL) {
-	TRACE_EXIT;
-	return;
+        TRACE_EXIT;
+        return;
     }
     status = chdir("/proc");
     if (status != 0) {
-	TRACE_EXIT;
-	return;
+        TRACE_EXIT;
+        return;
     }
     proc_entry = readdir(procdir);
     /*
@@ -4976,40 +4882,40 @@ discover_jobs()
      * anticipate errors attempting to open or read files in /proc.
      */
     while (proc_entry != NULL) {
-	status = stat(proc_entry->d_name, &stat_info);
-	if (status == 0) {
-	    if ((stat_info.st_uid == my_uid) && (S_ISDIR(stat_info.st_mode))) {
-		FILE *cmdline_file;
+        status = stat(proc_entry->d_name, &stat_info);
+        if (status == 0) {
+            if ((stat_info.st_uid == my_uid) && (S_ISDIR(stat_info.st_mode))) {
+                FILE *cmdline_file;
 
-		snprintf(cmd_path, sizeof cmd_path, "/proc/%s/cmdline", proc_entry->d_name);
-		cmdline_file = fopen(cmd_path, "r");
-		if (cmdline_file != NULL) {
-		    char cmdline[PATH_MAX];
-		    char *cp;
+                snprintf(cmd_path, sizeof cmd_path, "/proc/%s/cmdline", proc_entry->d_name);
+                cmdline_file = fopen(cmd_path, "r");
+                if (cmdline_file != NULL) {
+                    char cmdline[PATH_MAX];
+                    char *cp;
 
-		    cp = fgets(cmdline, sizeof cmdline, cmdline_file);
-		    if (cp != NULL) {
-			int len;
+                    cp = fgets(cmdline, sizeof cmdline, cmdline_file);
+                    if (cp != NULL) {
+                        int len;
 
-			/*
-			 * The command line is an array of '\0' terminated
-			 * tokens representing arg[0] thru arg[n]. Look
-			 * at the last 3 characters of arg[0] to see if
-			 * it is a poe process.
-			 */
-			len = strlen(cmdline);
-			if (len >= 3) {
-			    cp = cp + len - 3;
-			}
-			if (strcmp(cp, "poe") == 0) {
-			    add_discovered_job(proc_entry->d_name);
-			}
-		    }
-		    fclose(cmdline_file);
-		}
-	    }
-	}
-	proc_entry = readdir(procdir);
+                        /*
+                         * The command line is an array of '\0' terminated
+                         * tokens representing arg[0] thru arg[n]. Look
+                         * at the last 3 characters of arg[0] to see if
+                         * it is a poe process.
+                         */
+                        len = strlen(cmdline);
+                        if (len >= 3) {
+                            cp = cp + len - 3;
+                        }
+                        if (strcmp(cp, "poe") == 0) {
+                            add_discovered_job(proc_entry->d_name);
+                        }
+                    }
+                    fclose(cmdline_file);
+                }
+            }
+        }
+        proc_entry = readdir(procdir);
     }
     closedir(procdir);
     TRACE_EXIT;
@@ -5042,53 +4948,52 @@ discover_jobs()
     TRACE_ENTRY;
     start_pid = 0;
     num_procs = getprocs(NULL, sizeof(struct procsinfo), NULL,
-			 sizeof(struct fdsinfo), &start_pid, INT_MAX);
+            sizeof(struct fdsinfo), &start_pid, INT_MAX);
     if (num_procs > 0) {
-	procinfo = (struct procsinfo *) malloc(num_procs * sizeof(struct procsinfo));
-	malloc_check(procinfo, __FUNCTION__, __LINE__);
-	/*
-	 * Now get the actual process table.
-	 * start_pid must be reset in order for getprocs to get process
-	 * table information.
-	 */
-	start_pid = 0;
-	num_procs = getprocs(procinfo, sizeof(struct procsinfo), NULL,
-			     sizeof(struct fdsinfo), &start_pid, num_procs);
-	if (num_procs >= 0) {
-	    int i;
+        procinfo = (struct procsinfo *) malloc(num_procs * sizeof(struct procsinfo));
+        malloc_check(procinfo, __FUNCTION__, __LINE__);
+        /*
+         * Now get the actual process table.
+         * start_pid must be reset in order for getprocs to get process
+         * table information.
+         */
+        start_pid = 0;
+        num_procs = getprocs(procinfo, sizeof(struct procsinfo), NULL,
+                sizeof(struct fdsinfo), &start_pid, num_procs);
+        if (num_procs >= 0) {
+            int i;
 
-	    uid = getuid();
-	    /*
-	     * Notify the front end for each poe process owned by the user
-	     */
-	    for (i = 0; i < num_procs; i++) {
-		if (procinfo[i].pi_uid == uid) {
-		    char *cp;
+            uid = getuid();
+            /*
+             * Notify the front end for each poe process owned by the user
+             */
+            for (i = 0; i < num_procs; i++) {
+                if (procinfo[i].pi_uid == uid) {
+                    char *cp;
 
-		    cp = strrchr(procinfo[i].pi_comm, '/');
-		    if (cp == NULL) {
-			cp = procinfo[i].pi_comm;
-		    }
-		    else {
-			cp = cp + 1;
-		    }
-		    if (strcmp(cp, "poe") == 0) {
-			char poe_pid[20];
+                    cp = strrchr(procinfo[i].pi_comm, '/');
+                    if (cp == NULL) {
+                        cp = procinfo[i].pi_comm;
+                    }
+                    else {
+                        cp = cp + 1;
+                    }
+                    if (strcmp(cp, "poe") == 0) {
+                        char poe_pid[20];
 
-			snprintf(poe_pid, sizeof poe_pid, "%d", procinfo[i].pi_pid);
-			add_discovered_job(poe_pid);
-		    }
-		}
-	    }
-	}
-	free(procinfo);
+                        snprintf(poe_pid, sizeof poe_pid, "%d", procinfo[i].pi_pid);
+                        add_discovered_job(poe_pid);
+                    }
+                }
+            }
+        }
+        free(procinfo);
     }
     TRACE_EXIT;
 }
 #endif
 
-void
-add_discovered_job(char *pid)
+void add_discovered_job(char *pid)
 {
     /*
      * Create a new job object for the discovered job, add it to the job
@@ -5114,8 +5019,8 @@ add_discovered_job(char *pid)
     snprintf(jobname, sizeof jobname, "%s.run_%s", userinfo->pw_name, pid);
     jobname[sizeof jobname - 1] = '\0';
     AddToList(jobs, job);
-    enqueue_event(proxy_new_job_event(start_events_transid, queueid_str,
-				      jobid_str, jobname, JOB_STATE_INIT, job->submit_jobid));
+    enqueue_event(proxy_new_job_event(start_events_transid, queueid_str, jobid_str, jobname, JOB_STATE_INIT,
+            job->submit_jobid));
     /*
      * Start a thread to watch for the attach.cfg file for this job
      * as if it was invoked by the front end.
@@ -5129,20 +5034,17 @@ add_discovered_job(char *pid)
 /* STDOUT/STDERR handling                                                */
 
 /*************************************************************************/
-int
-stdout_handler(int fd, void *job)
+int stdout_handler(int fd, void *job)
 {
     return write_output(fd, (jobinfo *) job, &((jobinfo *) job)->stdout_info);
 }
 
-int
-stderr_handler(int fd, void *job)
+int stderr_handler(int fd, void *job)
 {
     return write_output(fd, (jobinfo *) job, &((jobinfo *) job)->stderr_info);
 }
 
-int
-write_output(int fd, jobinfo * job, ioinfo * file_info)
+int write_output(int fd, jobinfo * job, ioinfo * file_info)
 {
     /*
      * Read available data from the file descriptor and send it to
@@ -5162,55 +5064,53 @@ write_output(int fd, jobinfo * job, ioinfo * file_info)
 
     byte_count = read(fd, file_info->read_buf, READ_BUFFER_SIZE - 1);
     while (byte_count > 0) {
-	file_info->read_buf[byte_count] = '\0';
-	cp = file_info->read_buf;
-	while (*cp != '\0') {
-	    check_bufsize(file_info);
-	    *file_info->cp = *cp;
-	    if (*cp == '\n') {
-		check_bufsize(file_info);
-		file_info->cp = file_info->cp + 1;
-		*file_info->cp = '\0';
-		file_info->write_func(job, file_info->write_buf);
-		file_info->cp = file_info->write_buf;
-		file_info->remaining = file_info->allocated;
-	    }
-	    else {
-		file_info->cp = file_info->cp + 1;
-		file_info->remaining = file_info->remaining - 1;
-	    }
-	    cp = cp + 1;
-	}
-	byte_count = read(fd, file_info->read_buf, READ_BUFFER_SIZE - 1);
+        file_info->read_buf[byte_count] = '\0';
+        cp = file_info->read_buf;
+        while (*cp != '\0') {
+            check_bufsize(file_info);
+            *file_info->cp = *cp;
+            if (*cp == '\n') {
+                check_bufsize(file_info);
+                file_info->cp = file_info->cp + 1;
+                *file_info->cp = '\0';
+                file_info->write_func(job, file_info->write_buf);
+                file_info->cp = file_info->write_buf;
+                file_info->remaining = file_info->allocated;
+            }
+            else {
+                file_info->cp = file_info->cp + 1;
+                file_info->remaining = file_info->remaining - 1;
+            }
+            cp = cp + 1;
+        }
+        byte_count = read(fd, file_info->read_buf, READ_BUFFER_SIZE - 1);
     }
     if (byte_count == -1) {
-	if ((errno == EINTR) || (errno == EAGAIN)) {
-	    return 0;
-	}
-	else {
-	    return -1;
-	}
+        if ((errno == EINTR) || (errno == EAGAIN)) {
+            return 0;
+        }
+        else {
+            return -1;
+        }
     }
     else {
-	print_message(TRACE_DETAIL_MESSAGE, "EOF for fd %d. Unregistering handler\n", fd);
-	UnregisterFileHandler(fd);
-	close(fd);
-	return 0;
+        print_message(TRACE_DETAIL_MESSAGE, "EOF for fd %d. Unregistering handler\n", fd);
+        UnregisterFileHandler(fd);
+        close(fd);
+        return 0;
     }
 }
 
-void
-check_bufsize(ioinfo * file_info)
+void check_bufsize(ioinfo * file_info)
 {
     if (file_info->remaining == 0) {
-	file_info->allocated = file_info->allocated * 2;
-	file_info->write_buf = (char *) realloc(file_info->write_buf, file_info->allocated);
-	malloc_check(file_info->write_buf, __FILE__, __LINE__);
+        file_info->allocated = file_info->allocated * 2;
+        file_info->write_buf = (char *) realloc(file_info->write_buf, file_info->allocated);
+        malloc_check(file_info->write_buf, __FILE__, __LINE__);
     }
 }
 
-void
-send_stdout(jobinfo * job, char *buf)
+void send_stdout(jobinfo * job, char *buf)
 {
     /*
      * Send the data written to stdio file descriptors to the front end.
@@ -5228,91 +5128,86 @@ send_stdout(jobinfo * job, char *buf)
     if (job->split_io) {
         cp = strchr(buf, ':');
         if (cp != NULL) {
-	        *cp = '\0';
-	        task = atoi(buf);
-	        *cp = ':';
-	    if (job->label_io) {
-	        outp = buf;
-	    }
-	    else {
-	        outp = cp + 1;
-	    }
+            *cp = '\0';
+            task = atoi(buf);
+            *cp = ':';
+            if (job->label_io) {
+                outp = buf;
+            }
+            else {
+                outp = cp + 1;
+            }
         }
         else {
-	    task = 0;
-	    outp = buf;
+            task = 0;
+            outp = buf;
         }
     }
     else {
         task = 0;
         outp = buf;
     }
-    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid,
-									PROC_STDOUT_ATTR, outp);
+    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, PROC_STDOUT_ATTR, outp);
 }
 
-void
-send_stderr(jobinfo * job, char *buf)
+void send_stderr(jobinfo * job, char *buf)
 {
-	int match;
+    int match;
 
-	    /*
-	     * If the message written to stderr has the format 'ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'
-	     * and job->numtasks is <= 0, then this is a terminating error message issued at PE
-	     * application startup. In this case, the attach.cfg file will not be generated since the
-	     * application is terminating. Therefore, we must generate a fake process to represent
-	     * the poe process and then write the stderr output using the fake process.
-	     * TODO: This does not deal with PE informational messages, since we do not want to
-	     * generate a fake process in that case because the application will execute.
-	     * One way to handle informational messages is to save them in a list and then dump them
-	     * to stderr as soon as the attach.cfg file has been processed.
-	     */
-	match = regexec(&errormsg_regex, buf, 0, NULL, 0);
-	if ((match == 0) && (job->numtasks <= 0)) {
-	    proxy_msg *msg;
-	    char jobid_str[30];
-	    int proxy_taskid;
+    /*
+     * If the message written to stderr has the format 'ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'
+     * and job->numtasks is <= 0, then this is a terminating error message issued at PE
+     * application startup. In this case, the attach.cfg file will not be generated since the
+     * application is terminating. Therefore, we must generate a fake process to represent
+     * the poe process and then write the stderr output using the fake process.
+     * TODO: This does not deal with PE informational messages, since we do not want to
+     * generate a fake process in that case because the application will execute.
+     * One way to handle informational messages is to save them in a list and then dump them
+     * to stderr as soon as the attach.cfg file has been processed.
+     */
+    match = regexec(&errormsg_regex, buf, 0, NULL, 0);
+    if ((match == 0) && (job->numtasks <= 0)) {
+        proxy_msg *msg;
+        char jobid_str[30];
+        int proxy_taskid;
 
-			/*
-			 * If job->numtasks is -1 this is first error, create phony process
-			 */
-	    if (job->numtasks == -1) {
-	        sprintf(jobid_str, "%d", job->proxy_jobid);
-	        msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
-	        job->poe_taskid = generate_id();
-	        sprintf(jobid_str, "%d", job->poe_taskid);
-		    proxy_add_process(msg, jobid_str, "poe", PROC_STATE_STARTING, 3);
-		    proxy_add_int_attribute(msg, PROC_NODEID_ATTR, 0);
-		    proxy_add_int_attribute(msg, PROC_INDEX_ATTR, 0);
-		    proxy_add_int_attribute(msg, PROC_PID_ATTR, job->poe_pid);
-	        enqueue_event(msg);
-	        job->numtasks = 0;
-	    }
-        send_process_state_output_event(start_events_transid, job->poe_taskid,
-									    PROC_STDERR_ATTR, buf);
-	}
-	else {
-	    /*
-	     * Redirect the stderr output to a file or send it to the front end as
-	     * requested by the redirect flag. stderr output where the text matches the AIX
-	     * error message id format [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] is always sent to
-	     * the front end.
-	     */
-	    if (job->stderr_redirect) {
-		    int match;
+        /*
+         * If job->numtasks is -1 this is first error, create phony process
+         */
+        if (job->numtasks == -1) {
+            sprintf(jobid_str, "%d", job->proxy_jobid);
+            msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
+            job->poe_taskid = generate_id();
+            sprintf(jobid_str, "%d", job->poe_taskid);
+            proxy_add_process(msg, jobid_str, "poe", PROC_STATE_STARTING, 3);
+            proxy_add_int_attribute(msg, PROC_NODEID_ATTR, 0);
+            proxy_add_int_attribute(msg, PROC_INDEX_ATTR, 0);
+            proxy_add_int_attribute(msg, PROC_PID_ATTR, job->poe_pid);
+            enqueue_event(msg);
+            job->numtasks = 0;
+        }
+        send_process_state_output_event(start_events_transid, job->poe_taskid, PROC_STDERR_ATTR, buf);
+    }
+    else {
+        /*
+         * Redirect the stderr output to a file or send it to the front end as
+         * requested by the redirect flag. stderr output where the text matches the AIX
+         * error message id format [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] is always sent to
+         * the front end.
+         */
+        if (job->stderr_redirect) {
+            int match;
 
-		    fprintf(job->stderr_file, "%s", buf);
-		    match = regexec(&msgid_regex, buf, 0, NULL, 0);
-		    if (match == 0) {
-		        send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid,
-											    PROC_STDERR_ATTR, buf);
-		    }
-	    }
-	    else {
-            send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid,
-									        PROC_STDERR_ATTR, buf);
-	    }
-	}
+            fprintf(job->stderr_file, "%s", buf);
+            match = regexec(&msgid_regex, buf, 0, NULL, 0);
+            if (match == 0) {
+                send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PROC_STDERR_ATTR, buf);
+            }
+        }
+        else {
+            send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PROC_STDERR_ATTR, buf);
+        }
+    }
 }
 
 /*************************************************************************/
@@ -5321,8 +5216,7 @@ send_stderr(jobinfo * job, char *buf)
 
 /*************************************************************************/
 
-void
-send_ok_event(int trans_id)
+void send_ok_event(int trans_id)
 {
     proxy_msg *msg;
 
@@ -5330,8 +5224,7 @@ send_ok_event(int trans_id)
     enqueue_event(msg);
 }
 
-void
-post_error(int trans_id, int type, char *msgtext)
+void post_error(int trans_id, int type, char *msgtext)
 {
     /*
      * Send an error message to the front end
@@ -5345,8 +5238,7 @@ post_error(int trans_id, int type, char *msgtext)
     return;
 }
 
-void
-post_submitjob_error(int trans_id, char *subid, char *msgtext)
+void post_submitjob_error(int trans_id, char *subid, char *msgtext)
 {
     /*
      * Send an error message to the front end
@@ -5366,9 +5258,8 @@ post_submitjob_error(int trans_id, char *subid, char *msgtext)
  */
 
 proxy_msg *
-proxy_attr_def_int_limits_event(int trans_id, char *id,
-				char *name, char *desc, int display, int def, int llimit,
-				int ulimit)
+proxy_attr_def_int_limits_event(int trans_id, char *id, char *name, char *desc, int display, int def, int llimit,
+        int ulimit)
 {
     proxy_msg *msg;
 
@@ -5387,9 +5278,8 @@ proxy_attr_def_int_limits_event(int trans_id, char *id,
 }
 
 proxy_msg *
-proxy_attr_def_long_int_limits_event(int trans_id, char *id,
-				     char *name, char *desc, int display, long long def,
-				     long long llimit, long long ulimit)
+proxy_attr_def_long_int_limits_event(int trans_id, char *id, char *name, char *desc, int display, long long def,
+        long long llimit, long long ulimit)
 {
     proxy_msg *msg;
     char num_str[22];
@@ -5412,8 +5302,7 @@ proxy_attr_def_long_int_limits_event(int trans_id, char *id,
 }
 
 proxy_msg *
-proxy_attr_def_enum_event(int trans_id, char *id,
-			  char *name, char *desc, int display, char *def, int count)
+proxy_attr_def_enum_event(int trans_id, char *id, char *name, char *desc, int display, char *def, int count)
 {
     proxy_msg *msg;
 
@@ -5429,8 +5318,7 @@ proxy_attr_def_enum_event(int trans_id, char *id,
     return msg;
 }
 
-void
-send_new_node_list(int trans_id, int machine_id, List * new_nodes)
+void send_new_node_list(int trans_id, int machine_id, List * new_nodes)
 {
     proxy_msg *msg;
     node_refcount *noderef;
@@ -5442,16 +5330,15 @@ send_new_node_list(int trans_id, int machine_id, List * new_nodes)
     msg = proxy_new_node_event(trans_id, id_string, SizeOfList(new_nodes));
     noderef = GetListElement(new_nodes);
     while (noderef != NULL) {
-	sprintf(id_string, "%d", noderef->proxy_nodeid);
-	proxy_add_node(msg, id_string, noderef->key, NODE_STATE_UP, 0);
-	noderef = GetListElement(new_nodes);
+        sprintf(id_string, "%d", noderef->proxy_nodeid);
+        proxy_add_node(msg, id_string, noderef->key, NODE_STATE_UP, 0);
+        noderef = GetListElement(new_nodes);
     }
     pthread_mutex_unlock(&node_lock);
     enqueue_event(msg);
 }
 
-void
-send_job_state_change_event(int trans_id, int proxy_jobid, char *state)
+void send_job_state_change_event(int trans_id, int proxy_jobid, char *state)
 {
     proxy_msg *msg;
     char jobid_str[12];
@@ -5462,8 +5349,7 @@ send_job_state_change_event(int trans_id, int proxy_jobid, char *state)
     enqueue_event(msg);
 }
 
-void
-send_process_state_change_event(int trans_id, jobinfo * job, char *state)
+void send_process_state_change_event(int trans_id, jobinfo * job, char *state)
 {
     /*
      * Send state change event for all processes associated with the job
@@ -5488,46 +5374,45 @@ send_process_state_change_event(int trans_id, jobinfo * job, char *state)
 
     tasks = job->tasks;
     if (tasks == NULL) {
-	return;
+        return;
     }
     task_index = -1;
     info = tasks;
     i = 0;
     while (i < job->numtasks) {
-	task_index = info->proxy_taskid;
-	start_task = task_index;
-	next_task = task_index;
-	/*
-	 * Loop as long as the process object ids are consecutive and
-	 * not end of list.
-	 */
-	while (task_index == next_task) {
-	    i = i + 1;
-	    info = &tasks[i];
-	    next_task = next_task + 1;
-	    if (i >= job->numtasks) {
-		break;
-	    }
-	    task_index = info->proxy_taskid;
-	}
-	if (task_index != -1) {
-	    /*
-	     * Generate a process state change event for a consecutive
-	     * range of process id objects. next_task will have a value
-	     * 1 more than the last consecutive object id.
-	     */
-	    snprintf(range, sizeof range, "%d-%d", start_task, next_task - 1);
-	    range[sizeof range - 1] = '\0';
-	    msg = proxy_process_change_event(trans_id, range, 1);
-	    proxy_msg_add_keyval_string(msg, PROC_STATE_ATTR, state);
-	    enqueue_event(msg);
-	    task_index = -1;
-	}
+        task_index = info->proxy_taskid;
+        start_task = task_index;
+        next_task = task_index;
+        /*
+         * Loop as long as the process object ids are consecutive and
+         * not end of list.
+         */
+        while (task_index == next_task) {
+            i = i + 1;
+            info = &tasks[i];
+            next_task = next_task + 1;
+            if (i >= job->numtasks) {
+                break;
+            }
+            task_index = info->proxy_taskid;
+        }
+        if (task_index != -1) {
+            /*
+             * Generate a process state change event for a consecutive
+             * range of process id objects. next_task will have a value
+             * 1 more than the last consecutive object id.
+             */
+            snprintf(range, sizeof range, "%d-%d", start_task, next_task - 1);
+            range[sizeof range - 1] = '\0';
+            msg = proxy_process_change_event(trans_id, range, 1);
+            proxy_msg_add_keyval_string(msg, PROC_STATE_ATTR, state);
+            enqueue_event(msg);
+            task_index = -1;
+        }
     }
 }
 
-void
-send_process_state_output_event(int trans_id, int procid, char *dest, char *output)
+void send_process_state_output_event(int trans_id, int procid, char *dest, char *output)
 {
     proxy_msg *msg;
     char procid_str[12];
@@ -5539,32 +5424,29 @@ send_process_state_output_event(int trans_id, int procid, char *dest, char *outp
     enqueue_event(msg);
 }
 
-int
-generate_id()
+int generate_id()
 {
     return base_id + last_id++;
 }
 
-void
-enqueue_event(proxy_msg * msg)
+void enqueue_event(proxy_msg * msg)
 {
     proxy_svr_queue_msg(pe_proxy, msg);
 }
 
-static void
-print_usage(char *progname)
+static void print_usage(char *progname)
 {
-	print_message(FATAL_MESSAGE,
-		  "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] [--template_override=file] [--template_write=y|n] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
-		   progname);
+    print_message(
+            FATAL_MESSAGE,
+            "%s [--proxy=proxy] [--host=host_name] [--port=port] [--useloadleveler=y/n] [--trace=level] [--lib_override=directory] [--multicluster=d|n|y] [--template_override=file] [--template_write=y|n] --node_polling_min=value --node_polling_max=value --job_polling=value\n",
+            progname);
 }
 /*************************************************************************/
 
 /* Proxy startup and command loop                                        */
 
 /*************************************************************************/
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     char *host = "localhost";
     char *proxy_str = DEFAULT_PROXY;
@@ -5577,83 +5459,83 @@ main(int argc, char *argv[])
     strcpy(miniproxy_path, argv[0]);
     cp = strrchr(miniproxy_path, '/');
     if (cp != NULL) {
-	strcpy(cp + 1, "ptp_ibmpe_miniproxy");
+        strcpy(cp + 1, "ptp_ibmpe_miniproxy");
     }
     else {
-	strcpy(miniproxy_path, "./ptp_ibmpe_miniproxy");
+        strcpy(miniproxy_path, "./ptp_ibmpe_miniproxy");
     }
 #ifdef __linux__
     while ((ch = getopt_long(argc, argv, "D:P:p:h:t:l:m:o:r:x:y:z:LSM", longopts, NULL)) != -1) {
-	switch (ch) {
-	    case 'P':
-		proxy_str = optarg;
-		break;
-	    case 'p':
-		port = atoi(optarg);
-		break;
-	    case 'h':
-		host = optarg;
-		break;
-	    case 'L':
-		use_load_leveler = 1;
-		break;
-	    case 't':
-		if (strcmp(optarg, "Function") == 0) {
-		    state_trace = 1;
-		    state_trace_detail = 0;
-		}
-		else if (strcmp(optarg, "Detail") == 0) {
-		    state_trace = 1;
-		    state_trace_detail = 1;
-		    state_info = 1;
-		}
-		else if (strcmp(optarg, "None") == 0) {
-		    state_trace = 0;
-		    state_trace_detail = 0;
-		}
-		else {
-		    print_message(FATAL_MESSAGE, "Incorrect trace level '%s'\n", optarg);
-		    return 1;
-		}
-		break;
-	    case 'D':
-		break;
-	    case 'l':
-		user_libpath = strdup(optarg);	/* user has specified override full path to LoadLeveler shared library */
-		break;
-	    case 'm':
-		if (strncmp(optarg, "y", 1) == 0) {	/* y - multicluster forced on */
-		    multicluster_status = 1;	/* force multicluster */
-		}
-		else if (strncmp(optarg, "n", 1) == 0) {	/* n - multicluster forced off */
-		    multicluster_status = 0;	/* force local */
-		}
-		else {		/* d - default to LoadLeveler determine multicluster state */
-		    multicluster_status = -1;	/* allow LoadLeveler to determine mode */
-		}
-		break;
-	    case 'x':		/* min node polling */
-		min_node_sleep_seconds = atoi(optarg);
-		break;
-	    case 'y':		/* max node polling */
-		max_node_sleep_seconds = atoi(optarg);
-		break;
-	    case 'z':		/* job polling */
-		job_sleep_seconds = atoi(optarg);
-		break;
-	    case 'S':
-		debug = 1;
-		while (debug) {
-		    sleep(1);
-		}
-		break;
-	    case 'M':
-		run_miniproxy = 1;
-		break;
-	    default:
-                print_usage(argv[0]);
-		exit(1);
-	}
+        switch (ch) {
+            case 'P':
+            proxy_str = optarg;
+            break;
+            case 'p':
+            port = atoi(optarg);
+            break;
+            case 'h':
+            host = optarg;
+            break;
+            case 'L':
+            use_load_leveler = 1;
+            break;
+            case 't':
+            if (strcmp(optarg, "Function") == 0) {
+                state_trace = 1;
+                state_trace_detail = 0;
+            }
+            else if (strcmp(optarg, "Detail") == 0) {
+                state_trace = 1;
+                state_trace_detail = 1;
+                state_info = 1;
+            }
+            else if (strcmp(optarg, "None") == 0) {
+                state_trace = 0;
+                state_trace_detail = 0;
+            }
+            else {
+                print_message(FATAL_MESSAGE, "Incorrect trace level '%s'\n", optarg);
+                return 1;
+            }
+            break;
+            case 'D':
+            break;
+            case 'l':
+            user_libpath = strdup(optarg); /* user has specified override full path to LoadLeveler shared library */
+            break;
+            case 'm':
+            if (strncmp(optarg, "y", 1) == 0) { /* y - multicluster forced on */
+                multicluster_status = 1; /* force multicluster */
+            }
+            else if (strncmp(optarg, "n", 1) == 0) { /* n - multicluster forced off */
+                multicluster_status = 0; /* force local */
+            }
+            else { /* d - default to LoadLeveler determine multicluster state */
+                multicluster_status = -1; /* allow LoadLeveler to determine mode */
+            }
+            break;
+            case 'x': /* min node polling */
+            min_node_sleep_seconds = atoi(optarg);
+            break;
+            case 'y': /* max node polling */
+            max_node_sleep_seconds = atoi(optarg);
+            break;
+            case 'z': /* job polling */
+            job_sleep_seconds = atoi(optarg);
+            break;
+            case 'S':
+            debug = 1;
+            while (debug) {
+                sleep(1);
+            }
+            break;
+            case 'M':
+            run_miniproxy = 1;
+            break;
+            default:
+            print_usage(argv[0]);
+            exit(1);
+        }
     }
 #else
     /*
@@ -5665,95 +5547,95 @@ main(int argc, char *argv[])
      */
     int n = 1;
     while (n < argc) {
-	cp = strchr(argv[n], '=');
-	if (cp == NULL) {
-	    if (strcmp(argv[n], "--suspend_at_startup") == 0) {
-		debug = 1;
-		while (debug) {
-		    sleep(1);
-		}
-	    }
-	    else if (strcmp(argv[n], "--runMiniproxy") == 0) {
-		run_miniproxy = 1;
-	    }
-	    else if (strcmp(argv[n], "--useloadleveler") == 0) {
-		use_load_leveler = 1;
-	    }
-	    else {
-		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
-    		print_usage(argv[0]);
-		exit(1);
-	    }
-	}
-	else {
-	    *cp = '\0';
-	    if (strcmp(argv[n], "--proxy") == 0) {
-		proxy_str = cp + 1;
-	    }
-	    else if (strcmp(argv[n], "--port") == 0) {
-		port = atoi(cp + 1);
-	    }
-	    else if (strcmp(argv[n], "--host") == 0) {
-		host = cp + 1;
-	    }
-	    else if (strcmp(argv[n], "--trace") == 0) {
-		if (strcmp(cp + 1, "Function") == 0) {
-		    state_trace = 1;
-		    state_trace_detail = 0;
-		}
-		else if (strcmp(cp + 1, "Detail") == 0) {
-		    state_trace = 1;
-		    state_trace_detail = 1;
-		    state_info = 1;
-		}
-		else if (strcmp(cp + 1, "None") == 0) {
-		    state_trace = 0;
-		    state_trace_detail = 0;
-		}
-		else {
-		    print_message(FATAL_MESSAGE, "Incorrect trace level '%s'\n", argv[n + 1]);
-		    return 1;
-		}
-	    }
-	    else if (strcmp(argv[n], "--lib-override") == 0) {
-		user_libpath = strdup(cp + 1);
-	    }
-	    else if (strcmp(argv[n], "--multicluster") == 0) {
-		if (strncmp(cp + 1, "y", 1) == 0) {
-		    multicluster_status = 1;
-		}
-		else if (strncmp(cp + 1, "n", 1) == 0) {
-		    multicluster_status = 0;
-		}
-		else {
-		    multicluster_status = -1;
-		}
-	    }
-	    else if (strcmp(argv[n], "--node_polling_min") == 0) {
-		min_node_sleep_seconds = atoi(cp + 1);
-	    }
-	    else if (strcmp(argv[n], "--node_polling_max") == 0) {
-		max_node_sleep_seconds = atoi(cp + 1);
-	    }
-	    else if (strcmp(argv[n], "--job_polling") == 0) {
-		job_sleep_seconds = atoi(cp + 1);
-	    }
-	    else if (strcmp(argv[n], "--debug") == 0) {
-		/* Do nothing */
-	    }
-	    else {
-		print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
-		print_usage(argv[0]);
-		exit(1);
-	    }
-	}
-	n = n + 1;
+        cp = strchr(argv[n], '=');
+        if (cp == NULL) {
+            if (strcmp(argv[n], "--suspend_at_startup") == 0) {
+                debug = 1;
+                while (debug) {
+                    sleep(1);
+                }
+            }
+            else if (strcmp(argv[n], "--runMiniproxy") == 0) {
+                run_miniproxy = 1;
+            }
+            else if (strcmp(argv[n], "--useloadleveler") == 0) {
+                use_load_leveler = 1;
+            }
+            else {
+                print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
+                print_usage(argv[0]);
+                exit(1);
+            }
+        }
+        else {
+            *cp = '\0';
+            if (strcmp(argv[n], "--proxy") == 0) {
+                proxy_str = cp + 1;
+            }
+            else if (strcmp(argv[n], "--port") == 0) {
+                port = atoi(cp + 1);
+            }
+            else if (strcmp(argv[n], "--host") == 0) {
+                host = cp + 1;
+            }
+            else if (strcmp(argv[n], "--trace") == 0) {
+                if (strcmp(cp + 1, "Function") == 0) {
+                    state_trace = 1;
+                    state_trace_detail = 0;
+                }
+                else if (strcmp(cp + 1, "Detail") == 0) {
+                    state_trace = 1;
+                    state_trace_detail = 1;
+                    state_info = 1;
+                }
+                else if (strcmp(cp + 1, "None") == 0) {
+                    state_trace = 0;
+                    state_trace_detail = 0;
+                }
+                else {
+                    print_message(FATAL_MESSAGE, "Incorrect trace level '%s'\n", argv[n + 1]);
+                    return 1;
+                }
+            }
+            else if (strcmp(argv[n], "--lib-override") == 0) {
+                user_libpath = strdup(cp + 1);
+            }
+            else if (strcmp(argv[n], "--multicluster") == 0) {
+                if (strncmp(cp + 1, "y", 1) == 0) {
+                    multicluster_status = 1;
+                }
+                else if (strncmp(cp + 1, "n", 1) == 0) {
+                    multicluster_status = 0;
+                }
+                else {
+                    multicluster_status = -1;
+                }
+            }
+            else if (strcmp(argv[n], "--node_polling_min") == 0) {
+                min_node_sleep_seconds = atoi(cp + 1);
+            }
+            else if (strcmp(argv[n], "--node_polling_max") == 0) {
+                max_node_sleep_seconds = atoi(cp + 1);
+            }
+            else if (strcmp(argv[n], "--job_polling") == 0) {
+                job_sleep_seconds = atoi(cp + 1);
+            }
+            else if (strcmp(argv[n], "--debug") == 0) {
+                /* Do nothing */
+            }
+            else {
+                print_message(FATAL_MESSAGE, "Invalid argument %s (%d)\n", argv[n], n);
+                print_usage(argv[0]);
+                exit(1);
+            }
+        }
+        n = n + 1;
     }
 #endif
     if (use_load_leveler) {
-	if (find_load_leveler_library() != 0) {
-	    exit(1);
-	}
+        if (find_load_leveler_library() != 0) {
+            exit(1);
+        }
     }
     regcomp(&msgid_regex, ".* [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] .*", 0);
     regcomp(&errormsg_regex, "^ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] .*", 0);
@@ -5770,8 +5652,7 @@ main(int argc, char *argv[])
     exit(rc);
 }
 
-int
-find_load_leveler_library()
+int find_load_leveler_library()
 {
 
     /*-----------------------------------------------------------------------*
@@ -5787,71 +5668,67 @@ find_load_leveler_library()
     int status;
     struct stat statinfo;
 
-    if (user_libpath != NULL) {	/* if user specified lib */
-	if (strlen(user_libpath) > 0) {	/* if not a null string */
-	    libpath[0] = user_libpath;	/* pick up user specified libpath
-					 * as only one to check */
-	    libpath[1] = (char *) -1;	/* new end of list */
-	}
+    if (user_libpath != NULL) { /* if user specified lib */
+        if (strlen(user_libpath) > 0) { /* if not a null string */
+            libpath[0] = user_libpath; /* pick up user specified libpath
+             * as only one to check */
+            libpath[1] = (char *) -1; /* new end of list */
+        }
     }
 
-    lib_found = 0;		/* preset to not found */
+    lib_found = 0; /* preset to not found */
     i = 0;
     print_message(INFO_MESSAGE, "Searching for LoadLeveler shared library.\n");
-    while ((libpath[i] != (char *) -1) && (lib_found == 0)) {	/* if not end of list and not yet found */
-	if (libpath[i] != NULL) {	/* if valid entry */
-	    strcpy(ibmll_libpath_name, libpath[i]);
-	    strcat(ibmll_libpath_name, "/");
-	    strcat(ibmll_libpath_name, libname);
-	    /* see if this is a valid LoadLeveler shared library */
-	    print_message(INFO_MESSAGE, "Trying: %s\n", ibmll_libpath_name);
-	    status = stat(ibmll_libpath_name, &statinfo);
-	    if (status == 0) {
+    while ((libpath[i] != (char *) -1) && (lib_found == 0)) { /* if not end of list and not yet found */
+        if (libpath[i] != NULL) { /* if valid entry */
+            strcpy(ibmll_libpath_name, libpath[i]);
+            strcat(ibmll_libpath_name, "/");
+            strcat(ibmll_libpath_name, libname);
+            /* see if this is a valid LoadLeveler shared library */
+            print_message(INFO_MESSAGE, "Trying: %s\n", ibmll_libpath_name);
+            status = stat(ibmll_libpath_name, &statinfo);
+            if (status == 0) {
 #ifdef _AIX
-		strcat(ibmll_libpath_name, "(shr.o)");
+                strcat(ibmll_libpath_name, "(shr.o)");
 #endif
-		print_message(INFO_MESSAGE,
-			      "Successful search: Found LoadLeveler shared library %s\n",
-			      ibmll_libpath_name);
-		lib_found = 1;	/* we found it */
-		break;
-	    }
-	    else {
-		print_message(ERROR_MESSAGE,
-			      "Search failure: \"stat\" of LoadLeveler shared library %s returned errno=%d.\n",
-			      ibmll_libpath_name, errno);
-	    }
-	}
-	i++;
+                print_message(INFO_MESSAGE, "Successful search: Found LoadLeveler shared library %s\n",
+                        ibmll_libpath_name);
+                lib_found = 1; /* we found it */
+                break;
+            }
+            else {
+                print_message(ERROR_MESSAGE,
+                        "Search failure: \"stat\" of LoadLeveler shared library %s returned errno=%d.\n",
+                        ibmll_libpath_name, errno);
+            }
+        }
+        i++;
     }
 
     if (lib_found == 0) {
-	print_message(FATAL_MESSAGE, "No LoadLeveler shared library found - quitting...\n");
-	return -1;
+        print_message(FATAL_MESSAGE, "No LoadLeveler shared library found - quitting...\n");
+        return -1;
     }
     return 0;
 }
 
-int
-shutdown_proxy(void)
+int shutdown_proxy(void)
 {
     return 0;
 }
 
-RETSIGTYPE
-ptp_signal_handler(int sig)
+RETSIGTYPE ptp_signal_handler(int sig)
 {
     ptp_signal_exit = sig;
     if (sig >= 0 && sig < NSIG) {
-	RETSIGTYPE(*saved_signal) (int) = saved_signals[sig];
-	if (saved_signal != SIG_ERR && saved_signal != SIG_IGN && saved_signal != SIG_DFL) {
-	    saved_signal(sig);
-	}
+        RETSIGTYPE(*saved_signal)(int) = saved_signals[sig];
+        if (saved_signal != SIG_ERR && saved_signal != SIG_IGN && saved_signal != SIG_DFL) {
+            saved_signal(sig);
+        }
     }
 }
 
-int
-server(char *name, char *host, int port)
+int server(char *name, char *host, int port)
 {
     /*
      * Initialize the proxy, connect to front end, then run the main loop
@@ -5863,64 +5740,62 @@ server(char *name, char *host, int port)
     struct timeval timeout = { 0, 20000 };
 
     jobs = NewList();
-    if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &pe_proxy)
-	!= PROXY_RES_OK)
-	return 0;
+    if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &pe_proxy) != PROXY_RES_OK)
+        return 0;
 
     rc = proxy_svr_connect(pe_proxy, host, port);
     if (rc != PROXY_RES_OK) {
-	print_message(INFO_MESSAGE, "proxy_connect fails with %d status.\n", rc);
-	return 0;
+        print_message(INFO_MESSAGE, "proxy_connect fails with %d status.\n", rc);
+        return 0;
     }
     print_message(INFO_MESSAGE, "Running IBMPE proxy to host %s via port %d\n", host, port);
 
     while (ptp_signal_exit == 0 && !shutdown_requested) {
-	if ((proxy_svr_progress(pe_proxy) != PROXY_RES_OK)) {
-	    print_message(TRACE_DETAIL_MESSAGE, "Loop ending\n");
-	    break;
-	}
+        if ((proxy_svr_progress(pe_proxy) != PROXY_RES_OK)) {
+            print_message(TRACE_DETAIL_MESSAGE, "Loop ending\n");
+            break;
+        }
     }
 
     if (ptp_signal_exit != 0) {
-	switch (ptp_signal_exit) {
-	    case SIGINT:
-		msg1 = "INT";
-		msg2 = "Interrupt";
-		break;
-	    case SIGHUP:
-		msg1 = "HUP";
-		msg2 = "Hangup";
-		break;
-	    case SIGILL:
-		msg1 = "ILL";
-		msg2 = "Illegal Instruction";
-		break;
-	    case SIGSEGV:
-		msg1 = "SEGV";
-		msg2 = "Segmentation Violation";
-		break;
-	    case SIGTERM:
-		msg1 = "TERM";
-		msg2 = "Termination";
-		break;
-	    case SIGQUIT:
-		msg1 = "QUIT";
-		msg2 = "Quit";
-		break;
-	    case SIGABRT:
-		msg1 = "ABRT";
-		msg2 = "Process Aborted";
-		break;
-	    default:
-		msg1 = "***UNKNOWN SIGNAL***";
-		msg2 = "ERROR - UNKNOWN SIGNAL";
-		break;
-	}
-	print_message(FATAL_MESSAGE,
-		      "ptp_pe_proxy received signal %s (%s) and is exiting.", msg1, msg2);
-	shutdown_proxy();
-	/* our return code = the signal that fired */
-	rc = ptp_signal_exit;
+        switch (ptp_signal_exit) {
+        case SIGINT:
+            msg1 = "INT";
+            msg2 = "Interrupt";
+            break;
+        case SIGHUP:
+            msg1 = "HUP";
+            msg2 = "Hangup";
+            break;
+        case SIGILL:
+            msg1 = "ILL";
+            msg2 = "Illegal Instruction";
+            break;
+        case SIGSEGV:
+            msg1 = "SEGV";
+            msg2 = "Segmentation Violation";
+            break;
+        case SIGTERM:
+            msg1 = "TERM";
+            msg2 = "Termination";
+            break;
+        case SIGQUIT:
+            msg1 = "QUIT";
+            msg2 = "Quit";
+            break;
+        case SIGABRT:
+            msg1 = "ABRT";
+            msg2 = "Process Aborted";
+            break;
+        default:
+            msg1 = "***UNKNOWN SIGNAL***";
+            msg2 = "ERROR - UNKNOWN SIGNAL";
+            break;
+        }
+        print_message(FATAL_MESSAGE, "ptp_pe_proxy received signal %s (%s) and is exiting.", msg1, msg2);
+        shutdown_proxy();
+        /* our return code = the signal that fired */
+        rc = ptp_signal_exit;
     }
     DestroyList(jobs, NULL);
     proxy_svr_finish(pe_proxy);
@@ -5934,8 +5809,7 @@ server(char *name, char *host, int port)
  * Info, Trace, Arg and Warning messages go to stdout.                   *
  * Error and Fatal messages go to stderr.                                *
  *************************************************************************/
-void
-print_message(int type, const char *format, ...)
+void print_message(int type, const char *format, ...)
 {
     va_list ap;
     char timebuf[20];
@@ -5944,122 +5818,121 @@ print_message(int type, const char *format, ...)
     int thread_id = 0;
 
     pthread_mutex_lock(&print_message_lock);
-    pthread_t tid = pthread_self();	/* what thread am I ? */
-    for (thread_id = 0; thread_id < (sizeof(thread_map_table)
-				     / sizeof(pthread_t)); thread_id++) {
-	if (tid == thread_map_table[thread_id]) {
-	    break;
-	}
+    pthread_t tid = pthread_self(); /* what thread am I ? */
+    for (thread_id = 0; thread_id < (sizeof(thread_map_table) / sizeof(pthread_t)); thread_id++) {
+        if (tid == thread_map_table[thread_id]) {
+            break;
+        }
     }
-    time(&my_clock);		/* what time is it ? */
+    time(&my_clock); /* what time is it ? */
     localtime_r(&my_clock, &a_tm);
     strftime(&timebuf[0], 15, "%m/%d %02H:%02M:%02S", &a_tm);
 
     va_start(ap, format);
     switch (type) {
-	case INFO_MESSAGE:
-	    if (state_info == 1) {	/* if info messages allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stdout, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stdout, "T(%d) ", thread_id);
-		}
-		fprintf(stdout, "Info: ");
-		vfprintf(stdout, format, ap);
-		fflush(stdout);
-	    }
-	    break;
-	case TRACE_MESSAGE:
-	    if (state_trace == 1) {	/* if trace messages allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stdout, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stdout, "T(%d) ", thread_id);
-		}
-		fprintf(stdout, "Trace: ");
-		vfprintf(stdout, format, ap);
-		fflush(stdout);
-	    }
-	    break;
-	case TRACE_DETAIL_MESSAGE:
-	    if (state_trace_detail == 1) {	/* if trace messages allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stdout, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stdout, "T(%d) ", thread_id);
-		}
-		fprintf(stdout, "Trace: ");
-		vfprintf(stdout, format, ap);
-		fflush(stdout);
-	    }
-	    break;
-	case WARNING_MESSAGE:
-	    if (state_warning == 1) {	/* if warning messages allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stdout, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stdout, "T(%d) ", thread_id);
-		}
-		fprintf(stdout, "Warning: ");
-		vfprintf(stdout, format, ap);
-		fflush(stdout);
-	    }
-	    break;
-	case ERROR_MESSAGE:
-	    if (state_error == 1) {	/* if error messages allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stderr, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stderr, "T(%d) ", thread_id);
-		}
-		fprintf(stderr, "Error: ");
-		vfprintf(stderr, format, ap);
-		fflush(stderr);
-	    }
-	    break;
-	case FATAL_MESSAGE:	/* fatal messages are never suppressed */
-	    if (state_error == 1) {	/* if error messages allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stderr, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stderr, "T(%d) ", thread_id);
-		}
-		fprintf(stderr, "Fatal: ");
-		vfprintf(stderr, format, ap);
-		fflush(stderr);
-	    }
-	    break;
-	case ARGS_MESSAGE:
-	    if (state_args == 1) {	/* if formatted arg messages are allowed */
-		if (state_message_timedate != 0) {
-		    fprintf(stdout, "%s ", timebuf);
-		}
-		if (state_message_threadid != 0) {
-		    fprintf(stdout, "T(%d) ", thread_id);
-		}
-		fprintf(stdout, "Args: ");
-		vfprintf(stdout, format, ap);
-		fprintf(stdout, "\n");
-		fflush(stdout);
-	    }
-	    break;
-	default:		/* unknown message type - allow it */
-	    if (state_message_timedate != 0) {
-		fprintf(stdout, "%s ", timebuf);
-	    }
-	    if (state_message_threadid != 0) {
-		fprintf(stdout, "T(%d) ", thread_id);
-	    }
-	    fprintf(stdout, ": ");
-	    vfprintf(stdout, format, ap);
-	    fflush(stdout);
-	    break;
+    case INFO_MESSAGE:
+        if (state_info == 1) { /* if info messages allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stdout, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stdout, "T(%d) ", thread_id);
+            }
+            fprintf(stdout, "Info: ");
+            vfprintf(stdout, format, ap);
+            fflush(stdout);
+        }
+        break;
+    case TRACE_MESSAGE:
+        if (state_trace == 1) { /* if trace messages allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stdout, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stdout, "T(%d) ", thread_id);
+            }
+            fprintf(stdout, "Trace: ");
+            vfprintf(stdout, format, ap);
+            fflush(stdout);
+        }
+        break;
+    case TRACE_DETAIL_MESSAGE:
+        if (state_trace_detail == 1) { /* if trace messages allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stdout, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stdout, "T(%d) ", thread_id);
+            }
+            fprintf(stdout, "Trace: ");
+            vfprintf(stdout, format, ap);
+            fflush(stdout);
+        }
+        break;
+    case WARNING_MESSAGE:
+        if (state_warning == 1) { /* if warning messages allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stdout, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stdout, "T(%d) ", thread_id);
+            }
+            fprintf(stdout, "Warning: ");
+            vfprintf(stdout, format, ap);
+            fflush(stdout);
+        }
+        break;
+    case ERROR_MESSAGE:
+        if (state_error == 1) { /* if error messages allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stderr, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stderr, "T(%d) ", thread_id);
+            }
+            fprintf(stderr, "Error: ");
+            vfprintf(stderr, format, ap);
+            fflush(stderr);
+        }
+        break;
+    case FATAL_MESSAGE: /* fatal messages are never suppressed */
+        if (state_error == 1) { /* if error messages allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stderr, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stderr, "T(%d) ", thread_id);
+            }
+            fprintf(stderr, "Fatal: ");
+            vfprintf(stderr, format, ap);
+            fflush(stderr);
+        }
+        break;
+    case ARGS_MESSAGE:
+        if (state_args == 1) { /* if formatted arg messages are allowed */
+            if (state_message_timedate != 0) {
+                fprintf(stdout, "%s ", timebuf);
+            }
+            if (state_message_threadid != 0) {
+                fprintf(stdout, "T(%d) ", thread_id);
+            }
+            fprintf(stdout, "Args: ");
+            vfprintf(stdout, format, ap);
+            fprintf(stdout, "\n");
+            fflush(stdout);
+        }
+        break;
+    default: /* unknown message type - allow it */
+        if (state_message_timedate != 0) {
+            fprintf(stdout, "%s ", timebuf);
+        }
+        if (state_message_threadid != 0) {
+            fprintf(stdout, "T(%d) ", thread_id);
+        }
+        fprintf(stdout, ": ");
+        vfprintf(stdout, format, ap);
+        fflush(stdout);
+        break;
     }
 
     va_end(ap);
@@ -6067,19 +5940,18 @@ print_message(int type, const char *format, ...)
     pthread_mutex_unlock(&print_message_lock);
 }
 
-void
-print_message_args(int argc, char *optional_args[])
+void print_message_args(int argc, char *optional_args[])
 {
     int i;
     if (optional_args != NULL) {
         if (argc < 0) {
-        	argc = 0;
-        	while (optional_args[argc] != NULL)
-        		++argc;
+            argc = 0;
+            while (optional_args[argc] != NULL)
+                ++argc;
         }
-	for (i = 0; i < argc; i++) {
-	    print_message(TRACE_MESSAGE, " '%s'\n", optional_args[i]);
-	}
+        for (i = 0; i < argc; i++) {
+            print_message(TRACE_MESSAGE, " '%s'\n", optional_args[i]);
+        }
     }
 }
 
