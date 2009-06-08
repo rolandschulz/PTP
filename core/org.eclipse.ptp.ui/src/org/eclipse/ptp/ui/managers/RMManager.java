@@ -94,8 +94,6 @@ public class RMManager {
 	
 	/**
 	 * Persist selected RM
-	 * 
-	 * TODO: implement
 	 */
 	private void saveSelectedRM() {
 		RMSelectionPersistence store = new RMSelectionPersistence();
@@ -104,8 +102,6 @@ public class RMManager {
 	
 	/**
 	 * Restore persisted state
-	 * 
-	 * TODO: implement
 	 */
 	private void restoreSelectedRM() {
 		if ((!loaded) && (selectedRM == null)) {
