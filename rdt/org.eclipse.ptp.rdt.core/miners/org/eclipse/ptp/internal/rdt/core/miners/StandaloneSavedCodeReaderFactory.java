@@ -10,19 +10,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.miners;
 
+import java.io.IOException;
+
 import org.eclipse.cdt.core.dom.CDOM;
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
+import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
-import org.eclipse.cdt.core.parser.CodeReaderCache;
 import org.eclipse.cdt.core.parser.ICodeReaderCache;
+import org.eclipse.cdt.internal.core.dom.AbstractCodeReaderFactory;
 import org.eclipse.cdt.internal.core.dom.parser.EmptyCodeReaderCache;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * @author crecoskie
  *
  */
-public class StandaloneSavedCodeReaderFactory implements ICodeReaderFactory {
+@SuppressWarnings("deprecation")
+public class StandaloneSavedCodeReaderFactory extends AbstractCodeReaderFactory implements ICodeReaderFactory {
 
 	private ICodeReaderCache cache = null;
 	
@@ -35,21 +40,18 @@ public class StandaloneSavedCodeReaderFactory implements ICodeReaderFactory {
     
     private StandaloneSavedCodeReaderFactory()
     {
-		int size= CodeReaderCache.DEFAULT_CACHE_SIZE_IN_MB;
+    	super(null);
+		//int size= CodeReaderCache.DEFAULT_CACHE_SIZE_IN_MB;
 		
 		// TODO:  put in a real cache!
 		cache = new EmptyCodeReaderCache();
     }
-    /* (non-Javadoc)
-     * @see org.eclipse.cdt.core.dom.ICodeReaderFactory#getUniqueIdentifier()
-     */
-    public int getUniqueIdentifier() {
-        return CDOM.PARSE_SAVED_RESOURCES;
+
+	public int getUniqueIdentifier() {
+        return 0; // this is a dumb method
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.cdt.core.dom.ICodeReaderFactory#createCodeReaderForTranslationUnit(java.lang.String)
-     */
+
     public CodeReader createCodeReaderForTranslationUnit(String path) {
 		return cache.get(path);
     }
@@ -58,17 +60,19 @@ public class StandaloneSavedCodeReaderFactory implements ICodeReaderFactory {
 		return new CodeReader(tu.getResource().getLocation().toOSString(), tu.getContents());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.cdt.core.dom.ICodeReaderFactory#createCodeReaderForInclusion(java.lang.String)
-     */
+
     public CodeReader createCodeReaderForInclusion(String path) {
 		return cache.get(path);
     }
 	
-	/* (non-Javadoc)
-     * @see org.eclipse.cdt.core.dom.ICodeReaderFactory#createCodeReaderForInclusion(java.lang.String)
-     */
+
 	public ICodeReaderCache getCodeReaderCache() {
 		return cache;
+	}
+	
+	@Override
+	public CodeReader createCodeReaderForInclusion(IIndexFileLocation ifl,
+			String astPath) throws CoreException, IOException {
+		return cache.get(astPath, ifl);
 	}
 }

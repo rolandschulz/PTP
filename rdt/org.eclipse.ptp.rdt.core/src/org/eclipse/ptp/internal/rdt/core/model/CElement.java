@@ -111,9 +111,10 @@ public abstract class CElement implements ICElement, Serializable {
 		return fPath;
 	}
 
+	/**
+	 * Caution: this code won't work on the remote side.
+	 */
 	public IResource getResource() {
-
-		// this code won't work on the remote side
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		if (fLocation != null) {
 			IFile[] files = root.findFilesForLocationURI(fLocation);
