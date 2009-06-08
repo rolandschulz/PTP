@@ -150,9 +150,6 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	 * Version: 1.102
 	 */
 	private AbstractCodeReaderFactory getCodeReaderFactory(int style, IIndex index, int linkageID) {
-		//final ICProject cprj= getCProject();
-		//final ProjectIndexerInputAdapter pathResolver = new ProjectIndexerInputAdapter(cprj);
-		//final ProjectIndexerIncludeResolutionHeuristics heuristics = new ProjectIndexerIncludeResolutionHeuristics(cprj.getProject(), pathResolver);
 		ASTFilePathResolver pathResolver = new RemoteIndexerInputAdapter();
 		ProjectIndexerIncludeResolutionHeuristics heuristics = null;
 		
@@ -160,7 +157,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		if ((style & AST_SKIP_NONINDEXED_HEADERS) != 0) {
 			codeReaderFactory= NullCodeReaderFactory.getInstance();
 		} else {
-			codeReaderFactory= SavedCodeReaderFactory.createInstance(heuristics);
+			codeReaderFactory= StandaloneSavedCodeReaderFactory.getInstance();
 		}
 		
 		if (index != null && (style & AST_SKIP_INDEXED_HEADERS) != 0) {
@@ -182,7 +179,11 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 				fLanguageOfContext= null;
 				for (int element : CTX_LINKAGES) {
 					IIndexFile context= null;
-					final IIndexFileLocation ifl = IndexLocationFactory.getIFL(this);
+					
+					// On the remote side there all external files
+					//final IIndexFileLocation ifl = IndexLocationFactory.getIFL(this);
+					final IIndexFileLocation ifl = IndexLocationFactory.getExternalIFL(getLocationURI().getPath());
+					
 					if (ifl != null) {
 						IIndexFile indexFile= index.getFile(element, ifl);
 						if (indexFile != null) {
@@ -211,8 +212,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return this;
 	}
 
-	private IIndexFile getParsedInContext(IIndexFile indexFile)
-			throws CoreException {
+	private IIndexFile getParsedInContext(IIndexFile indexFile) throws CoreException {
 		IIndexInclude include= indexFile.getParsedInContext();
 		if (include != null) {
 			return include.getIncludedBy();
@@ -261,19 +261,6 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			}
 		}
 		return null;
-
-//		if (fLanguage != null && fScannerInfo != null && fLocation != null) {
-//			IParserLogService log = new DefaultLogService();
-//			ICodeReaderFactory fileCreator = StandaloneSavedCodeReaderFactory.getInstance();
-//			String filePath = fLocation.getPath();
-//			
-//			int options = getParserOptions(filePath);
-//			
-//			CodeReader reader = getCodeReader();
-//			return fLanguage.getASTTranslationUnit(reader, fScannerInfo, fileCreator, index, options, log);
-//		}
-//		return null;
-		
 	}
 	
 	/**
@@ -298,17 +285,36 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		}
 	}
 
+	
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.core/model
+	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
+	 * Version: 1.102
+	 */
 	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
 		checkState();
-		if (fLanguage != null && fScannerInfo != null && fLocation != null) {
+		
+		ITranslationUnit configureWith= getSourceContextTU(index, style);
+		
+		IScannerInfo scanInfo = configureWith.getScannerInfo( (style & ITranslationUnit.AST_SKIP_IF_NO_BUILD_INFO) == 0);
+		if (scanInfo == null) {
+			return null;
+		}
+		
+		CodeReader reader;
+		reader = getCodeReader();
+		
+		ILanguage language= configureWith.getLanguage();
+		fLanguageOfContext= language;
+		if (language != null) {
+			AbstractCodeReaderFactory crf= getCodeReaderFactory(style, index, language.getLinkageID());
 			IParserLogService log = new DefaultLogService();
-			ICodeReaderFactory fileCreator = StandaloneSavedCodeReaderFactory.getInstance();
-			CodeReader reader = getCodeReader();
-			return fLanguage.getCompletionNode(reader, fScannerInfo, fileCreator, index, log, offset);
+			return language.getCompletionNode(reader, scanInfo, crf, index, log, offset);
 		}
 		return null;
 	}
-
+	
+	
 	public String getContentTypeId() {
 		// TODO Auto-generated method stub
 		return null;
