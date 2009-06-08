@@ -182,7 +182,7 @@ public class BindingAdapter {
 			return null;
 		}
 		else if (scope instanceof ICPPNamespaceScope) {
-			element= new Namespace(parentElement, new String(scopeName.toCharArray()));
+			element= new Namespace(parentElement, new String(scopeName.getSimpleID()));
 		} else {
 			element = parentElement;
 		}
