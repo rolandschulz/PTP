@@ -17,6 +17,7 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.internal.ui.RMSelectionPersistence;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 
 public class RMManager {
@@ -97,6 +98,8 @@ public class RMManager {
 	 * TODO: implement
 	 */
 	private void saveSelectedRM() {
+		RMSelectionPersistence store = new RMSelectionPersistence();
+		store.saveDefaultRM(selectedRM);
 	}
 	
 	/**
@@ -105,7 +108,12 @@ public class RMManager {
 	 * TODO: implement
 	 */
 	private void restoreSelectedRM() {
-		if (!loaded) {
+		if ((!loaded) && (selectedRM == null)) {
+			RMSelectionPersistence store = new RMSelectionPersistence();
+			selectedRM = store.getDefaultRM();
+			if (selectedRM != null) {
+				fireRMSelectedEvent(selectedRM);
+			}
 			loaded = true;
 		}
 	}
