@@ -12,7 +12,7 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurations">
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.slurm.ui.wizards.SLURMResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.slurm.ui.configurationWizard"/>

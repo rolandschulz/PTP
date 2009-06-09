@@ -24,14 +24,14 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
 import org.eclipse.ptp.rm.slurm.ui.Activator;
-import org.eclipse.ptp.rm.slurm.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -42,8 +42,8 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	
 	//jobNumProces
 	private Text numProcsText;
-	private String numProcsString = "1";
-	private static final String NUMBER_OF_PROCESSES_LABEL = "Number of Processes(-n): ";
+	private String numProcsString = "1"; //$NON-NLS-1$
+	private static final String NUMBER_OF_PROCESSES_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_0;
 	//jobNumNodes
 	/*
 	private Text NumNodesText;
@@ -52,33 +52,33 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	*/
 	//jobTimeLimit
 	private Text TimeLimitText;
-	private String timeLimitString = "2";
-	private static final String JOB_TIME_LIMIT_LABEL = "Time Limit(-t):";
+	private String timeLimitString = "2"; //$NON-NLS-1$
+	private static final String JOB_TIME_LIMIT_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_1;
 	//jobPartition
-	private String partationRequestedString = "3";
-	private static final String JOB_PARTATION_LABEL = "Partation Requested(-p):";
+	private String partationRequestedString = "3"; //$NON-NLS-1$
+	private static final String JOB_PARTATION_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_2;
 	//jobType
-	private String jobTypeComboString = "mpi";
-	private static final String JOB_TYPE_LABEL = "Job Type(--jobtype):";
+	private String jobTypeComboString = "mpi"; //$NON-NLS-1$
+	private static final String JOB_TYPE_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_3;
 	//jobIoLabel
-	private String jobIoString = "true";
-	private static final String JOB_IO_LABEL = "Job Io Label(-l):";
+	private String jobIoString = Messages.SLURMRMLaunchConfigurationDynamicTab_4;
+	private static final String JOB_IO_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_5;
 	//jobVerbose
-	private String jobVerboseModString = "true";
-	private static final String JOB_VERBOSE_MODE_LABEL = "Job Verbose Mode(-v):";
+	private String jobVerboseModString = Messages.SLURMRMLaunchConfigurationDynamicTab_6;
+	private static final String JOB_VERBOSE_MODE_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_7;
 	//jobNodeList
-	private String jobNodeListString = "node0,node1";
-	private static final String JOB_NODE_LIST_LABEL ="Job Nodelist(-w):";
+	private String jobNodeListString = "node0,node1"; //$NON-NLS-1$
+	private static final String JOB_NODE_LIST_LABEL =Messages.SLURMRMLaunchConfigurationDynamicTab_8;
 	
-	private static final String ATTR_PREFIX = Activator.PLUGIN_ID + ".launchAttributes";
-	private static final String ATTR_NUMPROCS = ATTR_PREFIX + ".numProcs";	
-	private static final String ATTR_NUMNODES = ATTR_PREFIX + ".numNodes";
-	private static final String ATTR_TIMELIMIT = ATTR_PREFIX + ".timeLimit";
-	private static final String ATTR_JOBPARTATION = ATTR_PREFIX + ".jobpartation";
-	private static final String ATTR_JOBTYPE = ATTR_PREFIX + ".jobtype";
-	private static final String ATTR_JOBIO = ATTR_PREFIX + ".jobio";
-	private static final String ATTR_JOBVERBOSEMODE = ATTR_PREFIX + ".jobverbosemode";	
-	private static final RMLaunchValidation success = new RMLaunchValidation(true, "");
+	private static final String ATTR_PREFIX = Activator.PLUGIN_ID + ".launchAttributes"; //$NON-NLS-1$
+	private static final String ATTR_NUMPROCS = ATTR_PREFIX + ".numProcs";	 //$NON-NLS-1$
+	private static final String ATTR_NUMNODES = ATTR_PREFIX + ".numNodes"; //$NON-NLS-1$
+	private static final String ATTR_TIMELIMIT = ATTR_PREFIX + ".timeLimit"; //$NON-NLS-1$
+	private static final String ATTR_JOBPARTATION = ATTR_PREFIX + ".jobpartation"; //$NON-NLS-1$
+	private static final String ATTR_JOBTYPE = ATTR_PREFIX + ".jobtype"; //$NON-NLS-1$
+	private static final String ATTR_JOBIO = ATTR_PREFIX + ".jobio"; //$NON-NLS-1$
+	private static final String ATTR_JOBVERBOSEMODE = ATTR_PREFIX + ".jobverbosemode";	 //$NON-NLS-1$
+	private static final RMLaunchValidation success = new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	
 	private Composite control;
 
@@ -145,7 +145,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 		}		
 		*/
 				
-		return new RMLaunchValidation(true, "");
+		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -178,7 +178,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 		
 		numProcsText = new Text(comp, SWT.BORDER | SWT.WRAP);
 		numProcsText.setTextLimit(10);
-		numProcsText.setToolTipText("Please input the integer number(>=1) of processes!");
+		numProcsText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_9);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false, numColumns-1, 1);
 		gd.minimumWidth = numProcsText.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 		numProcsText.setLayoutData(gd);
@@ -219,7 +219,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 
 		TimeLimitText = new Text(comp, SWT.BORDER | SWT.WRAP);
 		TimeLimitText.setTextLimit(10);
-		TimeLimitText.setToolTipText("Please input the limit(>=1) of running time(minutes)!");
+		TimeLimitText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_10);
 		final GridData gd_timeLimitText = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		TimeLimitText.setLayoutData(gd_timeLimitText);
 		//TimeLimitText   value
@@ -333,7 +333,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 				numProcsText.setText(numProcsAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL +
-						e.getMessage() + " : " + e1.getMessage());
+						e.getMessage() + " : " + e1.getMessage()); //$NON-NLS-1$
 			}
 			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
@@ -363,7 +363,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 				TimeLimitText.setText(jobTimeLimitAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL +
-						e.getMessage() + " : " + e1.getMessage());
+						e.getMessage() + " : " + e1.getMessage()); //$NON-NLS-1$
 			}
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
@@ -427,7 +427,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 			@SuppressWarnings("unused")
 			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, numProcsString);
 			if (iattr.getValue() < 1) {
-				return new RMLaunchValidation(false, Messages.getString("SLURMConfigurationWizardPage.numProcsInvalid")); //$NON-NLS-1$
+				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numProcsInvalid);
 			}
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
@@ -449,7 +449,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 			@SuppressWarnings("unused")
 			IntegerAttribute iattr = new IntegerAttribute(jobTimeLimitAttrDef, timeLimitString);
 			if (iattr.getValue() < 1) {
-				return new RMLaunchValidation(false, Messages.getString("SLURMConfigurationWizardPage.timeLimitInvalid")); //$NON-NLS-1$
+				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_timeLimitInvalid);
 			}
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
@@ -486,7 +486,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 			return new RMLaunchValidation(false, JOB_IO_LABEL + e.getMessage());
 		}
 		*/
-		return new RMLaunchValidation(true, "");
+		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
 
@@ -546,7 +546,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 		*/
 		//System.out.println(ATTR_NUMNODES);
 		
-		return new RMLaunchValidation(true, "");
+		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -608,10 +608,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 		return JobAttributes.getNumberOfProcessesAttributeDefinition();
 	}
 	private IntegerAttributeDefinition getJobNumNodesAttrDef(IResourceManager rm, IPQueue queue) {
-		return JobAttributes.getJobNumberOfNodesAttributeDefinition();
+		return SLURMJobAttributes.getNumberOfNodesAttributeDefinition();
 	}
 	private IntegerAttributeDefinition getJobTimeLimitAttrDef(IResourceManager rm, IPQueue queue) {
-		return JobAttributes.getJobTimelimitAttributeDefinition();
+		return SLURMJobAttributes.getTimeLimitAttributeDefinition();
 	}
 	/*
 	private IntegerAttributeDefinition getJobPartationAttrDef(IResourceManager rm, IPQueue queue) {
