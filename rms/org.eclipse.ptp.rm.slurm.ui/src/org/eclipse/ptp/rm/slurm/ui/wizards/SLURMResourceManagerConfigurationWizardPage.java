@@ -13,15 +13,15 @@
 package org.eclipse.ptp.rm.slurm.ui.wizards;
 
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
-import org.eclipse.ptp.rm.slurm.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
 public final class SLURMResourceManagerConfigurationWizardPage extends
 	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 	
 	public SLURMResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, Messages.getString("SLURMResourceManagerConfigurationWizardPage.name")); //$NON-NLS-1$
-		setTitle(Messages.getString("SLURMResourceManagerConfigurationWizardPage.title")); //$NON-NLS-1$
-		setDescription(Messages.getString("SLURMResourceManagerConfigurationWizardPage.description")); //$NON-NLS-1$
+		super(wizard, Messages.SLURMResourceManagerConfigurationWizardPage_name);
+		setTitle(Messages.SLURMResourceManagerConfigurationWizardPage_title);
+		setDescription(Messages.SLURMResourceManagerConfigurationWizardPage_description);
 	}
 }

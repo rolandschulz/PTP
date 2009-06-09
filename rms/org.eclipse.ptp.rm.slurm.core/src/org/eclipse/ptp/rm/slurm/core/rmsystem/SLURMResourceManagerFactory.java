@@ -16,17 +16,13 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
 public class SLURMResourceManagerFactory extends AbstractResourceManagerFactory {
-
-	public SLURMResourceManagerFactory() {
-		super("SLURM");
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)

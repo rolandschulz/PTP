@@ -73,9 +73,9 @@ final public class SLURMResourceManagerConfiguration extends
 	@Override
 	public Object clone() {
 		CommonConfig commonConf = new CommonConfig(getName(),
-				getDescription(), getUniqueName());
+				getDescription(), getUniqueName(),
+				getRemoteServicesId(), getConnectionName());
 		RemoteConfig remoteConf = new RemoteConfig(commonConf,
-				getRemoteServicesId(), getConnectionName(),
 				getProxyServerPath(), getLocalAddress(),
 				getInvocationOptionsStr(), getOptions());
 		return new SLURMResourceManagerConfiguration(

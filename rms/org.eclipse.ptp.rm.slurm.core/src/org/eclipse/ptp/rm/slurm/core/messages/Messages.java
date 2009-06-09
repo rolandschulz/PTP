@@ -10,24 +10,23 @@
  * Contributors:
  * 			Peichang Shi <pcmutates@163.com>/<pcshi@nudt.edu.cn>
  *******************************************************************************/
-package org.eclipse.ptp.rm.slurm.ui.internal.ui;
+package org.eclipse.ptp.rm.slurm.core.messages;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import org.eclipse.osgi.util.NLS;
 
-public class Messages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.slurm.ui.internal.ui.Messages"; //$NON-NLS-1$
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.slurm.core.messages.messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+	public static String SLURMJobAttributes_0;
+	public static String SLURMJobAttributes_1;
+	
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
 	private Messages() {
-	}
-
-	public static String getString(String key) {
-		try {
-			return RESOURCE_BUNDLE.getString(key);
-		} catch (MissingResourceException e) {
-			return '!' + key + '!';
-		}
+		// Prevent instances.
 	}
 }
+

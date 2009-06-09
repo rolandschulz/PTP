@@ -25,16 +25,18 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.ui.Activator;
-import org.eclipse.ptp.rm.slurm.ui.internal.ui.Messages;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
+import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -94,9 +96,9 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	private WidgetListener listener = new WidgetListener();
 	
 	public SLURMConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, Messages.getString("SLURMConfigurationWizardPage.name")); //$NON-NLS-1$
-		setTitle(Messages.getString("SLURMConfigurationWizardPage.title")); //$NON-NLS-1$
-		setDescription(Messages.getString("SLURMConfigurationWizardPage.description")); //$NON-NLS-1$
+		super(wizard, Messages.SLURMConfigurationWizardPage_name);
+		setTitle(Messages.SLURMConfigurationWizardPage_title);
+		setDescription(Messages.SLURMConfigurationWizardPage_description);
 		setPageComplete(true);
 		isValid = true;
 	}
@@ -162,7 +164,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		/*
 		 * Default
 		 */
-		defaultButton = createCheckButton(contents, Messages.getString("SLURMConfigurationWizardPage.defaultButton")); //$NON-NLS-1$
+		defaultButton = createCheckButton(contents, Messages.SLURMConfigurationWizardPage_defaultButton);
 		defaultButton.addSelectionListener(listener);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
@@ -172,7 +174,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		 * SLURMD path
 		 */
 		Label label = new Label(contents, SWT.NONE);
-		label.setText(Messages.getString("SLURMConfigurationWizardPage.path"));
+		label.setText(Messages.SLURMConfigurationWizardPage_path);
 
 		pathText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -181,14 +183,14 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		pathText.setLayoutData(gd);
 		pathText.addModifyListener(listener);
 		
-		browseButton = SWTUtil.createPushButton(contents, Messages.getString("SLURMConfigurationWizardPage.browseButton"), null); //$NON-NLS-1$
+		browseButton = SWTUtil.createPushButton(contents, Messages.SLURMConfigurationWizardPage_browseButton, null);
 		browseButton.addSelectionListener(listener);
 		
 		/*
 		 * SLURMD args
 		 */
 		label = new Label(contents, SWT.NONE);
-		label.setText(Messages.getString("SLURMConfigurationWizardPage.arguments")); //$NON-NLS-1$
+		label.setText(Messages.SLURMConfigurationWizardPage_arguments);
 		
 		argsText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -375,8 +377,8 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 						try {
 							connection.open(monitor);
 						} catch (RemoteConnectionException e) {
-							ErrorDialog.openError(getShell(), Messages.getString("SLURMConfigurationWizardPage.connection_error"),  //$NON-NLS-1$ 
-									Messages.getString("SLURMConfigurationWizardPage.connection_error_msg"),  //$NON-NLS-1$
+							ErrorDialog.openError(getShell(), Messages.SLURMConfigurationWizardPage_connection_error,
+									Messages.SLURMConfigurationWizardPage_connection_error_msg,
 									new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 						}
 					}
@@ -385,19 +387,20 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 				try {
 					new ProgressMonitorDialog(getShell()).run(true, true, op);
 				} catch (InvocationTargetException e) {
-					ErrorDialog.openError(getShell(), Messages.getString("SLURMConfigurationWizardPage.connection_error"),  //$NON-NLS-1$ 
-							Messages.getString("SLURMConfigurationWizardPage.connection_error_msg"),  //$NON-NLS-1$
+					ErrorDialog.openError(getShell(), Messages.SLURMConfigurationWizardPage_connection_error,
+							Messages.SLURMConfigurationWizardPage_connection_error_msg,
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				} catch (InterruptedException e) {
-					ErrorDialog.openError(getShell(), Messages.getString("SLURMConfigurationWizardPage.connection_error"),  //$NON-NLS-1$
-							Messages.getString("SLURMConfigurationWizardPage.connection_error_msg"),  //$NON-NLS-1$
+					ErrorDialog.openError(getShell(), Messages.SLURMConfigurationWizardPage_connection_error,
+							Messages.SLURMConfigurationWizardPage_connection_error_msg,
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
 				}
 			}
-			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
+			IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 			
-			String initialPath = "//"; // Start at root since SLURMD is probably installed in the system somewhere
-			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("SLURMConfigurationWizardPage.select"), initialPath); //$NON-NLS-1$
+			String initialPath = "//"; // Start at root since SLURMD is probably installed in the system somewhere //$NON-NLS-1$
+			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.SLURMConfigurationWizardPage_select, initialPath);
 			if (selectedPath != null) {
 				pathText.setText(selectedPath.toString());
 			}
@@ -416,7 +419,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		if (pathText != null) {
 			String name = getFieldContent(pathText.getText());
 			if (name == null) {
-				setErrorMessage(Messages.getString("SLURMConfigurationWizardPage.invalid")); //$NON-NLS-1$
+				setErrorMessage(Messages.SLURMConfigurationWizardPage_invalid); 
 				return false;
 			}
 		}
