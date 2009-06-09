@@ -1,0 +1,89 @@
+dnl
+dnl
+
+AC_PREREQ([2.50])
+
+AC_INIT([org.eclipse.ptp.slurm], [2.1])
+AC_CONFIG_SRCDIR([src/ptp_slurm_proxy.c])
+
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+
+AC_CANONICAL_BUILD
+
+dnl
+dnl Eclipse adds version number to end of package when deploying via update site
+dnl
+
+UTILS="../../core/org.eclipse.ptp.utils"
+if test ! -d $UTILS; then
+	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	if test ! -d $UTILS; then
+		AC_MSG_ERROR([utils directory not found])
+	fi
+fi
+
+PROXY="../../core/org.eclipse.ptp.proxy"
+if test ! -d $PROXY; then
+	PROXY="`echo ${PROXY}_${PACKAGE_VERSION}.*`"
+	if test ! -d $PROXY; then
+		AC_MSG_ERROR([proxy directory not found])
+	fi
+fi
+
+dnl SLURM
+
+AC_ARG_WITH([slurm], AS_HELP_STRING([--with-slurm],
+	[Specify the top dir of installed SLURM rms.@<:@REQUIRED@:>@]),[],[with_slurm=no])
+
+SLURMDIR=
+AS_IF([test "x$with_slurm" != xno],[AC_SUBST([SLURMDIR],[$with_slurm])],
+       AC_MSG_ERROR([The top installation directory of SLURM rms must be specified via "--with-slurm=DIR".]))
+
+
+dnl
+dnl Check for programs.
+dnl
+
+AC_PROG_CC
+AM_PROG_CC_C_O
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include -I$SLURMDIR/include"
+LIBS="$LIBS -L$UTILS -L$PROXY -L$SLURMDIR/lib"
+CPPFLAGS="$CPPFLAGS -I$SLURMDIR/include"
+
+dnl
+dnl Check for libraries.
+dnl
+
+AC_CHECK_LIB([utils], [bitset_new])
+AC_CHECK_LIB([proxysvr], [proxy_svr_init])
+AC_CHECK_LIB([slurm],[slurm_ping],[],
+			[AC_MSG_ERROR([libslurm.so/.a not found. Make sure --with-slurm specify correct dir.])])
+
+dnl
+dnl Check for header files.
+dnl
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS([slurm/slurm.h slurm/slurm_errno.h],[],
+				[AC_MSG_ERROR([slurm.h or slurm_errno.h not found])])
+
+dnl
+dnl Check for types
+dnl
+AC_TYPE_SIGNAL
+
+AC_PATH_PROG(SRUN, [srun], no)
+if test "$ac_cv_path_SRUN" != no; then
+	AC_DEFINE([HAVE_SRUN],[1],[Enable SLURM rms support.])
+else
+	AC_MSG_ERROR([srun command not found. Make sure SLURM rms installed.])
+fi
+
+
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
