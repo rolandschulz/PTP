@@ -109,12 +109,12 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.preferences,org.eclipse.ptp.remotetools.preferences,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.utils,org.eclipse.ptp.remotetools.utils,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.core,org.eclipse.ptp.rm.core,ptp_2_1"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll-feature,org.eclipse.ptp.rm.ibm.ll-feature,ptp_2_1"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.ibm.ll-feature,org.eclipse.ptp.rm.ibm.ll-feature,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.core,org.eclipse.ptp.rm.ibm.ll.core,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.help,org.eclipse.ptp.rm.ibm.ll.help,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.proxy,org.eclipse.ptp.rm.ibm.ll.proxy,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.ui,org.eclipse.ptp.rm.ibm.ll.ui,ptp_2_1"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe-feature,org.eclipse.ptp.rm.ibm.pe-feature,ptp_2_1"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.ibm.pe-feature,org.eclipse.ptp.rm.ibm.pe-feature,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe.core,org.eclipse.ptp.rm.ibm.pe.core,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe.help,org.eclipse.ptp.rm.ibm.pe.help,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe.proxy,org.eclipse.ptp.rm.ibm.pe.proxy,ptp_2_1"/>
@@ -123,8 +123,8 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.mpich2.ui,org.eclipse.ptp.rm.mpi.mpich2.ui,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.core,org.eclipse.ptp.rm.mpi.openmpi.core,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.ui,org.eclipse.ptp.rm.mpi.openmpi.ui,ptp_2_1"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpich2-feature,org.eclipse.ptp.rm.mpich2-feature,ptp_2_1"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.openmpi-feature,org.eclipse.ptp.rm.openmpi-feature,ptp_2_1"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.mpich2-feature,org.eclipse.ptp.rm.mpich2-feature,ptp_2_1"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.openmpi-feature,org.eclipse.ptp.rm.openmpi-feature,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.rm.remote,org.eclipse.ptp.rm.remote,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ui,org.eclipse.ptp.rm.ui,ptp_2_1"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature,org.eclipse.ptp.sdm-feature,ptp_2_1"/>
