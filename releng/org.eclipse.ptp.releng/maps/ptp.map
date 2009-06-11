@@ -28,9 +28,6 @@ feature@org.eclipse.ptp.perf.tau.fortran=@ptpTag@,:pserver:anonymous@dev.eclipse
 ! RDT features
 feature@org.eclipse.ptp.rdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt-feature
 
-! Cell features
-feature@org.eclipse.ptp.cell=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell-feature
-
 ! PTP Plugins
 plugin@org.eclipse.ptp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp
 plugin@org.eclipse.ptp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.core
@@ -92,7 +89,7 @@ plugin@org.eclipse.ptp.pldt.openmp.ui.pv=@ptpTag@,:pserver:anonymous@dev.eclipse
 plugin@org.eclipse.ptp.pldt.upc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.upc
 plugin@org.eclipse.ptp.pldt.wizards=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards
 
-! PTF Plugins
+! ETF Plugins
 plugin@org.eclipse.ptp.perf=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf
 plugin@org.eclipse.ptp.perf.tau=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau
 plugin@org.eclipse.ptp.perf.tau.jars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.jars
@@ -107,41 +104,6 @@ plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvs
 plugin@org.eclipse.ptp.rdt.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui
 plugin@org.eclipse.ptp.rdt.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.services
 plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user
-
-! Cell Plugins
-plugin@org.eclipse.ptp.cell=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell
-plugin@org.eclipse.ptp.cell.alf.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.alf.ui
-plugin@org.eclipse.ptp.cell.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.core
-plugin@org.eclipse.ptp.cell.debug.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.debug.core
-plugin@org.eclipse.ptp.cell.debug.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.debug.ui
-plugin@org.eclipse.ptp.cell.debug.be.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.debug.be.core
-plugin@org.eclipse.ptp.cell.debug.be.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.debug.be.ui
-plugin@org.eclipse.ptp.cell.environment.cellsimulator=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.environment.cellsimulator
-plugin@org.eclipse.ptp.cell.environment.launcher.cellbe=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.environment.launcher.cellbe
-plugin@org.eclipse.ptp.cell.environment.launcher.pdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.environment.launcher.pdt
-plugin@org.eclipse.ptp.cell.environment.remotesimulator=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.environment.remotesimulator
-plugin@org.eclipse.ptp.cell.environment.ui.deploy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.environment.ui.deploy
-plugin@org.eclipse.ptp.cell.examples.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.examples.ui
-plugin@org.eclipse.ptp.cell.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.help
-plugin@org.eclipse.ptp.cell.make.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.make.core
-plugin@org.eclipse.ptp.cell.managedbuilder.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.managedbuilder.core
-plugin@org.eclipse.ptp.cell.managedbuilder.gnu.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.managedbuilder.gnu.core
-plugin@org.eclipse.ptp.cell.managedbuilder.gnu.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.managedbuilder.gnu.ui
-plugin@org.eclipse.ptp.cell.managedbuilder.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.managedbuilder.ui
-plugin@org.eclipse.ptp.cell.managedbuilder.xl.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.managedbuilder.xl.core
-plugin@org.eclipse.ptp.cell.managedbuilder.xl.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.managedbuilder.xl.ui
-plugin@org.eclipse.ptp.cell.pdt.xml=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.pdt.xml
-plugin@org.eclipse.ptp.cell.preferences=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.preferences
-plugin@org.eclipse.ptp.cell.simulator=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.simulator
-plugin@org.eclipse.ptp.cell.simulator.architecture.dualcell=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.simulator.architecture.dualcell
-plugin@org.eclipse.ptp.cell.simulator.architecture.dualsoma=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.simulator.architecture.dualsoma
-plugin@org.eclipse.ptp.cell.simulator.architecture.singlecell=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.simulator.architecture.singlecell
-plugin@org.eclipse.ptp.cell.simulator.architecture.singlesoma=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.simulator.architecture.singlesoma
-plugin@org.eclipse.ptp.cell.simulator.profile.default=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.simulator.profile.default
-plugin@org.eclipse.ptp.cell.sputiming=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.sputiming
-plugin@org.eclipse.ptp.cell.sputiming.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.sputiming.ui
-plugin@org.eclipse.ptp.cell.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.ui
-plugin@org.eclipse.ptp.cell.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell.utils
 
 ! Fragments
 fragment@org.eclipse.ptp.aix.ppc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.aix.ppc
