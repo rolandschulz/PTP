@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -29,15 +30,15 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public class ResumeAction extends DebugAction {
-	public static final String name = "Resume";
+	public static final String name = Messages.ResumeAction_0;
 
 	/** Constructor
 	 * @param view
 	 */
 	public ResumeAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_NORMAL));
-	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_DISABLE));
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_GROUP_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_GROUP_DISABLE));
 	}
 
 	/* (non-Javadoc)

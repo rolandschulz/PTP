@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -30,15 +31,15 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public class SuspendAction extends DebugAction {
-	public static final String name = "Suspend";
+	public static final String name = Messages.SuspendAction_0;
 
 	/** Constructor
 	 * @param view
 	 */
 	public SuspendAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_SUSPEND_NORMAL));
-	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_SUSPEND_DISABLE));
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_SUSPEND_GROUP_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_SUSPEND_GROUP_DISABLE));
 	}
 
 	/* (non-Javadoc)

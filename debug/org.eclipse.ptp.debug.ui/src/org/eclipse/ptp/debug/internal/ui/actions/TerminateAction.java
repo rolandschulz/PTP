@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -30,15 +31,15 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public class TerminateAction extends DebugAction {
-	public static final String name = "Terminate";
+	public static final String name = Messages.TerminateAction_0;
 
 	/** Constructor
 	 * @param view
 	 */
 	public TerminateAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_TERMINATEALL_NORMAL));
-	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_TERMINATEALL_DISABLE));
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_TERMINATE_GROUP_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_TERMINATE_GROUP_DISABLE));
 	}
 	
 	/* (non-Javadoc)
