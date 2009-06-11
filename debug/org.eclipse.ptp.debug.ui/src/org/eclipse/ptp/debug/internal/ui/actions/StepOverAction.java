@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -30,15 +31,15 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public class StepOverAction extends StepAction {
-	public static final String name = "Step Over";
+	public static final String name = Messages.StepOverAction_0;
 
 	/** Constructor
 	 * @param view
 	 */
 	public StepOverAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPOVER_NORMAL));
-	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPOVER_DISABLE));
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPOVER_GROUP_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPOVER_GROUP_DISABLE));
 	}
 
 	/* (non-Javadoc)
