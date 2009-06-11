@@ -54,9 +54,6 @@
 	<feature url="features/org.eclipse.ptp.perf.tau_@buildVersion@.jar" id="org.eclipse.ptp.perf.tau" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.cell_@buildVersion@.jar" id="org.eclipse.ptp.cell" version="@buildVersion@">
-		<category name="Parallel Tools Platform 3.0"/>
-	</feature>
 	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
 		<category name="Remote Development Tools"/>
 	</feature>
