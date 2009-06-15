@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -460,7 +462,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     private IMarker createMarkerFrom(VPGErrorOrWarning<Token, PhotranTokenRef> entry) throws CoreException
     {
         IMarker marker = createMarkerOnResource(entry);
-        setMarkerAttributes(marker, entry);
+        if (marker != null) setMarkerAttributes(marker, entry);
         return marker;
     }
 
@@ -468,8 +470,8 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         PhotranTokenRef tr = entry.getTokenRef();
         IFile file = tr == null ? null : tr.getFile();
-        IMarker marker = file == null ? null : file.createMarker(determineMarkerType(entry));
-        return marker;
+        IResource res = file == null ? ResourcesPlugin.getWorkspace().getRoot() : file;
+        return res.createMarker(determineMarkerType(entry));
     }
 
     private String determineMarkerType(VPGErrorOrWarning<Token, PhotranTokenRef> entry)
@@ -484,10 +486,17 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     private void setMarkerAttributes(IMarker marker, VPGErrorOrWarning<Token, PhotranTokenRef> entry) throws CoreException
     {
         Map attribs = new HashMap(5);
-        attribs.put(IMarker.CHAR_START, entry.getTokenRef().getOffset());
-        attribs.put(IMarker.CHAR_END, entry.getTokenRef().getEndOffset());
+        
+        PhotranTokenRef tr = entry.getTokenRef();
+        if (tr != null)
+        {
+            attribs.put(IMarker.CHAR_START, tr.getOffset());
+            attribs.put(IMarker.CHAR_END, tr.getEndOffset());
+        }
+        
         attribs.put(IMarker.MESSAGE, entry.getMessage());
         attribs.put(IMarker.USER_EDITABLE, false);
+        
         marker.setAttributes(attribs);
     }
     
