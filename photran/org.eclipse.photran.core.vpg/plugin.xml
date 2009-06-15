@@ -14,4 +14,24 @@
             id="defaultModelBilder"
             name="Default Photran Model Builder" />
    </extension>
+   
+   <!-- Markers for displaying the VPG error/warning log -->
+   <extension point="org.eclipse.core.resources.markers"
+       name="VPG Log Marker"
+       id="org.eclipse.photran.core.vpg.errorOrWarningMarker">
+       <super type="org.eclipse.core.resources.textmarker"/>
+       <attribute name="resource"/>
+       <attribute name="message"/>
+       <persistent value="false"/>
+   </extension>
+   <extension point="org.eclipse.core.resources.markers"
+       name="VPG Warning Marker"
+       id="org.eclipse.photran.core.vpg.warningMarker">
+       <super type="org.eclipse.photran.core.vpg.errorOrWarningMarker"/>
+   </extension>
+   <extension point="org.eclipse.core.resources.markers"
+       name="VPG Error Marker"
+       id="org.eclipse.photran.core.vpg.errorMarker">
+       <super type="org.eclipse.photran.core.vpg.errorOrWarningMarker"/>
+   </extension>
 </plugin>

@@ -1,10 +1,18 @@
 package org.eclipse.photran.core.vpg;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.types.Type;
@@ -19,6 +27,7 @@ import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
+import bz.over.vpg.VPGErrorOrWarning;
 import bz.over.vpg.eclipse.EclipseVPG;
 
 /**
@@ -425,4 +434,161 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         Object result = db.getAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE);
         return result == null || !(result instanceof Integer) ? 0 : ((Integer)result).intValue();
     }
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // VPG Error/Warning Log View/Listener Support
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    public List<IMarker> getErrorLogMarkers()
+    {
+        List<VPGErrorOrWarning<Token, PhotranTokenRef>> errorLog = getErrorLog();
+        List<IMarker> result = new ArrayList<IMarker>(errorLog.size());
+        for (VPGErrorOrWarning<Token, PhotranTokenRef> entry : errorLog)
+        {
+            try
+            {
+                result.add(createMarkerFrom(entry));
+            }
+            catch (CoreException e)
+            {
+                // Ignore
+            }
+        }
+        return result;
+    }
+
+    private IMarker createMarkerFrom(VPGErrorOrWarning<Token, PhotranTokenRef> entry) throws CoreException
+    {
+        IMarker marker = createMarkerOnResource(entry);
+        setMarkerAttributes(marker, entry);
+        return marker;
+    }
+
+    private IMarker createMarkerOnResource(VPGErrorOrWarning<Token, PhotranTokenRef> entry) throws CoreException
+    {
+        PhotranTokenRef tr = entry.getTokenRef();
+        IFile file = tr == null ? null : tr.getFile();
+        IMarker marker = file == null ? null : file.createMarker(determineMarkerType(entry));
+        return marker;
+    }
+
+    private String determineMarkerType(VPGErrorOrWarning<Token, PhotranTokenRef> entry)
+    {
+        if (entry.isWarning())
+            return "org.eclipse.photran.core.vpg.warningMarker";
+        else // (entry.isError())
+            return "org.eclipse.photran.core.vpg.errorMarker";
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setMarkerAttributes(IMarker marker, VPGErrorOrWarning<Token, PhotranTokenRef> entry) throws CoreException
+    {
+        Map attribs = new HashMap(5);
+        attribs.put(IMarker.CHAR_START, entry.getTokenRef().getOffset());
+        attribs.put(IMarker.CHAR_END, entry.getTokenRef().getEndOffset());
+        attribs.put(IMarker.MESSAGE, entry.getMessage());
+        attribs.put(IMarker.USER_EDITABLE, false);
+        marker.setAttributes(attribs);
+    }
+    
+    /**
+     * An object which acts as an Observer [GoF] on the VPG error/warning log.
+     * 
+     * @author Jeff Overbey
+     */
+    public static interface ILogListener
+    {
+        /**
+         * Callback method invoked when the VPG error/warning log changes.
+         * <p>
+         * All of the entries in <code>errorWarningLog</code> will have
+         * org.eclipse.photran.core.vpg.errorOrWarningMarker as their supertype.
+         * 
+         * @param errorWarningLog the (revised) list of VPG errors and warnings
+         */
+        void onLogChange(List<IMarker> errorWarningLog);
+    }
+    
+    private Set<ILogListener> listeners = new HashSet<ILogListener>();
+    
+    /** Adds the given object as a Observer [GoF] of the VPG error/warning log */
+    public void addLogListener(ILogListener listener)
+    {
+        listeners.add(listener);
+        listener.onLogChange(getErrorLogMarkers());
+    }
+    
+    /** Removes the given object as a Observer [GoF] of the VPG error/warning log */
+    public void removeLogListener(ILogListener listener)
+    {
+        listeners.remove(listener);
+    }
+    
+    private void notifyListeners()
+    {
+        List<IMarker> markers = getErrorLogMarkers();
+        for (ILogListener listener : listeners)
+            listener.onLogChange(markers);
+    }
+
+    @Override public IStatus ensureVPGIsUpToDate(IProgressMonitor monitor)
+    {
+        IStatus result = super.ensureVPGIsUpToDate(monitor);
+        notifyListeners();
+        return result;
+    }
+    
+    @Override public void clearLog()
+    {
+        super.clearLog();
+        notifyListeners();
+    }
+
+    @Override public void clearLogEntriesFor(String filename)
+    {
+        super.clearLogEntriesFor(filename);
+        notifyListeners();
+    }
+
+    @Override public void logWarning(String message)
+    {
+        super.logWarning(message);
+        notifyListeners();
+    }
+    
+    @Override public void logWarning(String message, String filename)
+    {
+        super.logWarning(message, filename);
+        notifyListeners();
+    }
+    
+    @Override public void logWarning(String message, PhotranTokenRef tokenRef)
+    {
+        super.logWarning(message, tokenRef);
+        notifyListeners();
+    }
+
+    @Override public void logError(Throwable e)
+    {
+        super.logError(e);
+        notifyListeners();
+    }
+
+    @Override public void logError(String message)
+    {
+        super.logError(message);
+        notifyListeners();
+    }
+
+    @Override public void logError(String message, String filename)
+    {
+        super.logError(message, filename);
+        notifyListeners();
+    }
+    
+    @Override public void logError(String message, PhotranTokenRef tokenRef)
+    {
+        super.logError(message, tokenRef);
+        notifyListeners();
+   }
 }
