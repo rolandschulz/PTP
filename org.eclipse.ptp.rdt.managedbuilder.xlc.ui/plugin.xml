@@ -11,7 +11,7 @@
             id="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.builder1"
             isAbstract="false"
             isVariableCaseSensitive="false"
-            name="Remote GNU Make"
+            name="%builder.name"
             superClass="cdt.managedbuild.target.gnu.builder">
       </builder>
       <projectType
@@ -190,7 +190,7 @@
    </extension>
    <extension
          id="RemoteXLCPerProjectProfile"
-         name="Remote XL C/C++ Per Project Profile"
+         name="%extension.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
             class="org.eclipse.ptp.rdt.core.remotemake.ProjectDescriptionCollector"
