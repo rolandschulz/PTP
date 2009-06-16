@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,9 @@
 
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.rdt.ui.wizards.ConfigureRemoteServices;
@@ -19,7 +21,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PropertyPage;
 
@@ -49,7 +50,11 @@ public class ServiceModelPropertyPage extends PropertyPage {
 	@Override
 	protected Control createContents(Composite parent) {
 		Control table = fModelWidget.createContents(parent);
-		fModelWidget.updateServicesTable((IProject) getElement());
+
+		if (getElement() instanceof IProject)
+			fModelWidget.updateServicesTable((IProject) getElement());
+		else if (getElement() instanceof ICProject )
+			fModelWidget.updateServicesTable(((ICProject) getElement()).getProject());
 		
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.SERVICE_MODEL_PROPERTY_PAGE);
 		
@@ -61,8 +66,12 @@ public class ServiceModelPropertyPage extends PropertyPage {
 	 */
 	@Override
 	public boolean performOk() {
+		IProject project = null;
 		// called when OK or Apply is pressed
-		IProject project = (IProject) getElement();
+		if (getElement() instanceof IProject)
+			project = (IProject) getElement();
+		else 
+			project = ((ICProject) getElement()).getProject();
 		ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap(), new NullProgressMonitor());
 		return true;
 	}
