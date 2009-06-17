@@ -28,22 +28,22 @@ import org.eclipse.cdt.managedbuilder.core.IManagedOutputNameProvider;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.makegen.IManagedDependencyGenerator;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.cdtinterface.core.FortranLanguage;
 
-// import org.eclipse.photran.internal.core.f95parser.FortranProcessor;
-// import org.eclipse.photran.internal.core.f95parser.ILexer;
-// import org.eclipse.photran.internal.core.f95parser.Terminal;
-// import org.eclipse.photran.internal.core.f95parser.Token;
-
-
 /**
  *  This class implements the Dependency Manager and Output Name Provider interfaces
+ *  @author Unknown
+ *  @author Timofey Yuvashev 2009
  */
 public class DefaultFortranDependencyCalculator implements IManagedDependencyGenerator,
 														   IManagedOutputNameProvider
@@ -184,8 +184,20 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 	 * Given a set of the module names used by a source file, and a set of resources to search, determine
 	 * if any of the source files implements the module names.
 	 */
-	private IResource[] FindModulesInResources(IProject project, Collection contentTypes, IResource resource, IResource[] resourcesToSearch, 
-							String topBuildDir, String[] usedNames) {
+	private IResource[] FindModulesInResources(IProject project, 
+											   Collection contentTypes, 
+											   IResource resource, 
+											   IResource[] resourcesToSearch, 
+											   String topBuildDir, 
+											   String[] usedNames) 
+	{
+		IResource[] res = null;
+		try {
+			res = project.members();
+		} catch (CoreException e1) {
+			throw new Error("No files found in the given project");
+		}
+		
 		ArrayList modRes = new ArrayList();
 		for (int ir = 0; ir < resourcesToSearch.length; ir++) {
 			if (resourcesToSearch[ir].equals(resource)) continue;
@@ -202,7 +214,7 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 								//  to generate .mod files in the directory from which the compiler is run.  For MBS, this
 								//  is the top-level build directory.  
 								//  TODO: Support the /module:path option and use that in determining the path of the module file 
-								IPath modName = Path.fromOSString(topBuildDir + Path.SEPARATOR + modules[im] + "." + MODULE_EXTENSION);
+								IPath modName = getModulePath(topBuildDir, modules[im], res, project);
 								modRes.add(project.getFile(modName));
 								foundDependency = true;
 								break;
@@ -225,6 +237,129 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 		}		
 		return (IResource[]) modRes.toArray(new IResource[modRes.size()]);
 	}
+	
+	/*
+	 * Finds the relative path to the file whose name matches of the given module. If no such file
+	 * is found, the "Debug" folder is erased and an error is thrown.
+	 * 
+	 * @topBuildDir - name of directory (possibly relative path) in which make/object files will be created
+	 * @moduleName  - name of the module that we are comparing files against
+	 * @project		- project we are currently compiling. Used to remove the Debug directory in case of failure
+	 */
+	private IPath getModulePath(String topBuildDir, String moduleName, IResource[] resources, IProject project)
+	{
+		String fileNameContainingModule;
+		fileNameContainingModule = getFileNameContainingModule(moduleName, resources, topBuildDir);
+		
+		//If we can't find any files with that module, remove Debug folder
+		if(fileNameContainingModule == null || fileNameContainingModule == "")
+		{
+			removeDir(new File(project.getLocation().toString() + Path.SEPARATOR + topBuildDir));
+			try 
+			{
+				project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			} 
+			catch (CoreException e) 
+			{
+				throw new Error("Could not update the project");
+			}
+			throw new Error("Could not find a file to match the module name: "+ moduleName);
+		}
+		
+		IPath p = Path.fromOSString("./"+topBuildDir + Path.SEPARATOR + fileNameContainingModule + "." + MODULE_EXTENSION);
+		return p;
+	}
+	
+	/*
+	 * This method operates under that assumption that 
+	 * 1. There will be no 2 files that are named the same, even if they are in separate folder
+	 * 2. There is only 1 module per file
+	 * 3. There are no files that differ in their names only by upper or lower case letters (i.e. file1.f90 and fILe1.f90)
+	 * 
+	 * This method finds the relative path to the filename that matches the name of the given module. It 
+	 * searches the list of given @resources to compare the names of contained files. It returns a string which
+	 * is the relative path to the file supposedly containing the given module, with that file's extension chopped off.
+	 * 
+	 * @moduleName - name of the module that we are comparing files against
+	 * @resources  - list of resources that we look through (could be files and folders)
+	 */
+	private String getFileNameContainingModule(String moduleName, IResource[] resources, String buildDirName)
+	{
+		ArrayList possibleMatchingFiles = new ArrayList();
+		if(resources == null || resources.length < 1 || 
+		   moduleName == null || moduleName == "")
+		{
+			return null;
+		}
+		
+		for(int i = 0; i < resources.length; i++)
+		{
+			if(resources[i] instanceof IFile)
+			{
+				IFile f = (IFile)resources[i];
+				
+				//Gets rid of the file extension
+				String fileName = f.getName().replaceFirst("\\..+", "");
+				
+				//If a file name matches a module name exactly -- return the relative path to that file
+				if(fileName == moduleName)
+					return f.getProjectRelativePath().toString().replaceFirst("\\..+", "");
+				
+				//Otherwise, check if the two names have different cases
+				else if(fileName.equalsIgnoreCase(moduleName))
+				{
+					//And if they do, keep it
+					possibleMatchingFiles.add(f.getProjectRelativePath().toString().replaceFirst("\\..+", "")); 
+				}
+			}
+			//If its a folder, recurse
+			else if(resources[i] instanceof IContainer)
+			{
+				IContainer folder = (IContainer)resources[i];
+				IResource[] subResource = null;
+				
+				//Skip build folder, because it contains files with the same
+				// names as the one we are looking for (created .o files)
+				if(folder.getName().equalsIgnoreCase(buildDirName))
+					continue;
+					
+				try 
+				{
+					subResource = folder.members();
+				} 
+				catch (CoreException e) 
+				{
+					throw new Error("Could not open a container to explore its files");
+				}
+				
+				String name = getFileNameContainingModule(moduleName, subResource, buildDirName);
+				if(name != null)
+					return name;
+			}			
+		}
+		if(possibleMatchingFiles.size() == 1)
+			return (String) possibleMatchingFiles.get(0);
+		
+		return null;
+			
+	}
+	
+	private void removeDir(File f)
+	{	
+		if(f != null && f.exists())
+		{
+			File[] files = f.listFiles();
+			for(int i = 0; i < files.length; i++)
+			{
+				if(files[i].isDirectory())
+					removeDir(files[i]);
+				else
+					files[i].delete();
+			}
+		}
+		f.delete();
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.managedbuilder.makegen.IManagedBuilderDependencyCalculator#findDependencies(org.eclipse.core.resources.IResource)
