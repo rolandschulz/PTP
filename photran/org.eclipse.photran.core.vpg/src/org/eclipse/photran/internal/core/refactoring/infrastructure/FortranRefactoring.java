@@ -56,7 +56,7 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.text.edits.ReplaceEdit;
 
 import bz.over.vpg.TokenRef;
-import bz.over.vpg.VPGErrorOrWarning;
+import bz.over.vpg.VPGLog;
 
 /**
  * Superclass for all refactorings in Photran.
@@ -158,7 +158,7 @@ public abstract class FortranRefactoring extends Refactoring
 
     private void logVPGErrors(RefactoringStatus status)
     {
-		for (VPGErrorOrWarning<Token, PhotranTokenRef> entry : vpg.getErrorLog())
+		for (VPGLog<Token, PhotranTokenRef>.Entry entry : vpg.log.getEntries())
 		{
 			if (entry.isWarning())
 				status.addWarning(entry.getMessage(), createContext(entry.getTokenRef()));

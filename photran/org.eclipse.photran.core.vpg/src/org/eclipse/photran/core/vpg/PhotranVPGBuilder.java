@@ -227,7 +227,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (Exception e)
         {
-            logError(e);
+            log.logError(e);
         }
     }
 
@@ -279,7 +279,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (Exception e)
         {
-            logError(e);
+            log.logError(e);
         }
     }
 
@@ -356,7 +356,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bs));
         sb.append(bs);
-        super.logError(sb.toString());
+        log.logError(sb.toString());
     }
 
     @Override

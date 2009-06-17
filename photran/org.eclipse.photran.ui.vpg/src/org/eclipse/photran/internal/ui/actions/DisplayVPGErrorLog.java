@@ -32,7 +32,7 @@ public class DisplayVPGErrorLog extends FortranEditorActionDelegate
 
             File temp = createTempFile();
             final PrintStream ps = createPrintStream(temp);
-            PhotranVPG.getInstance().printErrorLogOn(ps);
+            PhotranVPG.getInstance().log.printOn(ps);
             ps.close();
 
             openHtmlViewerOn("VPG Error/Warning Log", temp);

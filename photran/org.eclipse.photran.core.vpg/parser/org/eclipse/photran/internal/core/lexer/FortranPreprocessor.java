@@ -212,12 +212,12 @@ public final class FortranPreprocessor extends InputStream
         }
         catch (FileNotFoundException e)
         {
-        	PhotranVPG.getInstance().logError("Unable to locate INCLUDE file \""
+        	PhotranVPG.getInstance().log.logError("Unable to locate INCLUDE file \""
                                               + fileToInclude + "\""
                                               //+ " (working directory: "
                                               //+ new File(".").getCanonicalPath()
                                               //+ ")"
-                                              , fileToInclude);
+                                              );
             return null;
         }
     }

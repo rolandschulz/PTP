@@ -16,14 +16,14 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import bz.over.vpg.db.caching.CachingDB;
 import bz.over.vpg.db.cdt.CDTDB;
 
-public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB>
+public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>
 {
     public PhotranVPGDB()
     {
         super(new PhotranCDTDB(), 500, 10000);
     }
     
-    static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef>
+    static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGLog>
     {
         public PhotranCDTDB()
         {

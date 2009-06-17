@@ -10,18 +10,12 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring.PreconditionFailure;
 
 /**
  * This is a base class for all Photran refactorings that apply to a single file 
