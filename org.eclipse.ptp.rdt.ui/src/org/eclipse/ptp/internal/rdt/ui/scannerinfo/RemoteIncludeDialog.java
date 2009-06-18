@@ -65,10 +65,14 @@ public class RemoteIncludeDialog extends Dialog {
 	private boolean isAllConfigurations = false;
 	
 	
+	private final boolean isEdit;
 	
-	public RemoteIncludeDialog(Shell parent, String title) {
+	
+	public RemoteIncludeDialog(Shell parent, String title, boolean isEdit) {
+		
 		super(parent);
 		setText(title);
+		this.isEdit = isEdit;
 	}
 	
 	
@@ -104,7 +108,7 @@ public class RemoteIncludeDialog extends Dialog {
 		c.setLayout(rl);
 		
 		Label l1 = new Label(c, SWT.NONE);
-		l1.setText("Directory:");  //$NON-NLS-1$
+		l1.setText(Messages.RemoteIncludeDialog_directory);
 
 		// composite to hold text area and browse button
 		Composite c1 = new Composite(c, SWT.NONE);
@@ -116,16 +120,21 @@ public class RemoteIncludeDialog extends Dialog {
 			text.setText(pathText);
 
 		b_browse = new Button(c1, SWT.PUSH);
-		b_browse.setText("Browse..."); //$NON-NLS-1$
+		b_browse.setText(Messages.RemoteIncludeDialog_browse);
 		b_browse.addSelectionListener(listener);
 
 		// composite to hold checkboxes
 		Composite c2 = new Composite(c, SWT.NONE);
 		c2.setLayout(new RowLayout(SWT.VERTICAL));
 		b_add2confs = new Button(c2, SWT.CHECK);
-		b_add2confs.setText("Add to all configurations"); //$NON-NLS-1$
+		b_add2confs.setText(Messages.RemoteIncludeDialog_configurations);
 		b_add2langs = new Button(c2, SWT.CHECK);
-		b_add2langs.setText("Add to all languages"); //$NON-NLS-1$
+		b_add2langs.setText(Messages.RemoteIncludeDialog_languages);
+		
+		if(isEdit) {
+			b_add2confs.setVisible(false);
+			b_add2langs.setVisible(false);
+		}
 		
 		// composite to hold OK and Cancel buttons
 		Composite c3 = new Composite(c, SWT.NONE);
@@ -138,14 +147,14 @@ public class RemoteIncludeDialog extends Dialog {
 		ph.setText(""); //$NON-NLS-1$
 		
 		b_ok = new Button(c3, SWT.PUSH);
-		b_ok.setText("Ok"); //$NON-NLS-1$
+		b_ok.setText(Messages.RemoteIncludeDialog_ok); 
 		b_ok.addSelectionListener(listener);
 		gd = new GridData();
 		gd.widthHint = 80;
 		b_ok.setLayoutData(gd);
 		
 		b_cancel = new Button(c3, SWT.PUSH);
-		b_cancel.setText("Cancel"); //$NON-NLS-1$
+		b_cancel.setText(Messages.RemoteIncludeDialog_cancel); 
 		b_cancel.addSelectionListener(listener);
 		b_cancel.setLayoutData(new RowData(300, SWT.DEFAULT));
 		gd = new GridData();
@@ -177,7 +186,7 @@ public class RemoteIncludeDialog extends Dialog {
 				shell.dispose();
 			} 
 			else if(pressed.equals(b_browse)) {
-				SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, "Select Remote Directory"); //$NON-NLS-1$
+				SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, Messages.RemoteIncludeDialog_select); 
 				folderDialog.open();
 				Object remoteObject = folderDialog.getSelectedObject();
 				if(remoteObject instanceof IRemoteFile) {
