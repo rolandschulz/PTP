@@ -24,32 +24,54 @@ import org.eclipse.ui.IMemento;
  */
 public interface IServiceProvider extends IServiceProviderDescriptor {
 	/**
-	 * Test if this service provider has been configured.
-	 * 
-	 * @return true if provider has been configured
-	 */
-	public boolean isConfigured();
-
-	/**
-	 * Saves the state of this provider in the given
-	 * <code>IMemento</code>.
-	 * 
-	 * @param memento for saving the provider's state.
-	 */
-	public void saveState(IMemento memento);
-
-	/**
-	 * Restores the state of this provider from the
-	 * given <code>IMemento</code>.
-	 * 
-	 * @param memento for restoring the provider's state.
-	 */
-	public void restoreState(IMemento memento);
-	
-	/**
 	 * Returns provider specific information for the current configuration.
 	 * 
 	 * @return information on current configuration for this provider
 	 */
 	public String getConfigurationString();
+
+	/**
+	 * Returns the string value of the given key.
+	 * 
+	 * @param key the key
+	 * @return the value or null if no value was found
+	 */
+	public String getString(String key);
+
+	/**
+	 * Test if this service provider has been configured.
+	 * 
+	 * @return true if provider has been configured
+	 */
+	public boolean isConfigured();
+	
+	/**
+	 * Sets the value of the given key to the given string
+	 * 
+	 * @param key the key
+	 * @param value the value
+	 */
+	public void putString(String key, String value);
+	
+	/**
+	 * Restores the state of this provider from the
+	 * given <code>IMemento</code>.
+	 * 
+	 * NOTE: This should only be implemented if a provider 
+	 * wishes to override the default behavior.
+
+	 * @param memento for restoring the provider's state.
+	 */
+	public void restoreState(IMemento memento);
+	
+	/**
+	 * Saves the state of this provider in the given
+	 * <code>IMemento</code>. 
+	 * 
+	 * NOTE: This should only be implemented if a provider  
+	 * wishes to override the default behavior.
+	 * 
+	 * @param memento for saving the provider's state.
+	 */
+	public void saveState(IMemento memento);
 }
