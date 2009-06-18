@@ -40,7 +40,7 @@ public class ServiceProviderConfigurationWizard extends Wizard {
 	 */
 	public ServiceProviderConfigurationWizard(IServiceConfiguration serviceConfiguration, IServiceProvider provider, IWizardPage page) {
 		setForcePreviousAndNextButtons(true);
-		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderConfigurationUI(provider);
+		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderContributor(provider);
 		if (config != null) {
 			setWizardPages(config.getWizardPages(this, provider));
 		}

@@ -76,14 +76,14 @@ public class ServiceModelUIManager {
 	 * @return class implementing IServiceProviderContributor
 	 */
 	public IServiceProviderContributor getServiceProviderContributor(IServiceProviderDescriptor desc) {
-		IServiceProviderContributor config = null;
+		IServiceProviderContributor contrib = null;
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
 					if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
 						try {
-							config = (IServiceProviderContributor) element.createExecutableExtension(ATTR_CLASS);
+							contrib = (IServiceProviderContributor) element.createExecutableExtension(ATTR_CLASS);
 						} catch (Exception e) {
 							return null;
 						}
@@ -91,6 +91,6 @@ public class ServiceModelUIManager {
 				}
 			}
 		}
-		return config;
+		return contrib;
 	}
 }

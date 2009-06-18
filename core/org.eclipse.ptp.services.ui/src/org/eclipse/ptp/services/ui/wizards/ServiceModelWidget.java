@@ -540,7 +540,7 @@ public class ServiceModelWidget {
 	 * @param enabled
 	 */
 	protected void updateConfigureButton(IServiceProviderDescriptor descriptor) {
-		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderConfigurationUI(descriptor);
+		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderContributor(descriptor);
 		fConfigureButton.setEnabled(config != null);
 	}
 }
