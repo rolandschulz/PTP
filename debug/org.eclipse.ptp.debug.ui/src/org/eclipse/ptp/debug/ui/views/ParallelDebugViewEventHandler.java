@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -69,13 +71,16 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 					if (refresh) {
 						IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 						if (elementHandler != null) {
-							IElement[] regElementArray = new IElement[c_regTask_array.length];
+							ArrayList<IElement> regElementArray = new ArrayList<IElement>();
 							for (int j=0; j<c_regTask_array.length; j++) {
 								IPProcess proc = job.getProcessByIndex(c_regTask_array[j]);
 								((UIDebugManager) getPView().getUIManager()).addConsoleWindow(job, proc);
-								regElementArray[j] = elementHandler.getSetRoot().getElementByID(proc.getID());
+								IElement element = elementHandler.getSetRoot().getElementByID(proc.getID());
+								if (element != null) {
+									regElementArray.add(element);
+								}
 							}
-							elementHandler.addToRegister(regElementArray);
+							elementHandler.addToRegister(regElementArray.toArray(new IElement[regElementArray.size()]));
 						}
 						refresh();
 					}
