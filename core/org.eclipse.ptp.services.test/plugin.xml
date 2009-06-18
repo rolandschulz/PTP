@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.services.core.services">
+      <service
+            id="TestService1"
+            name="Test Service 1">
+      </service>
+      <service
+            id="TestService2"
+            name="Test Service 2">
+      </service>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.services.test.TestServiceProvider"
+            id="TestProvider1"
+            name="Test Provider 1"
+            priority="100"
+            serviceId="TestService1">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.services.test.TestServiceProvider2"
+            id="TestProvider2"
+            name="Test Provider 2"
+            priority="1"
+            serviceId="TestService1">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.services.test.TestServiceProvider3"
+            id="TestProvider3"
+            name="Test Provider 3"
+            priority="1"
+            serviceId="TestService2">
+      </provider>
+   </extension>
+
+
+      <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="org.eclipse.ptp.services.ui.menus.servicesMenu"
+               label="Services"
+               mnemonic="M">
+            <command
+                  commandId="org.eclipse.ptp.services.ui.commands.launchWizard"
+                  id="org.eclipse.ptp.services.ui.menus.launchWizard"
+                  mnemonic="S">
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.services.test.commands.printServiceModel"
+                  id="org.eclipse.ptp.services.test.menus.printServiceModel"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.ptp.services.ui.commands.category"
+            name="Services Category">
+      </category>
+      <command
+            categoryId="org.eclipse.ptp.services.ui.commands.category"
+            id="org.eclipse.ptp.services.ui.commands.launchWizard"
+            name="Launch Wizard...">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.services.ui.commands.category"
+            id="org.eclipse.ptp.services.test.commands.printServiceModel"
+            name="Print Service Model">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ptp.services.ui.handlers.LaunchWizardHandler"
+            commandId="org.eclipse.ptp.services.ui.commands.launchWizard">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.services.test.handlers.PrintServiceModelHandler"
+            commandId="org.eclipse.ptp.services.test.commands.printServiceModel">
+      </handler>
+   </extension>
+   
+</plugin>
