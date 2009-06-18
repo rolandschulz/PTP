@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
+import java.util.HashMap;
+
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
- * A service provider that does nothing.
+ * An abstract base class for service provider implementations.
  * 
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is no guarantee that this API will work or
@@ -26,13 +28,14 @@ import org.eclipse.ui.IMemento;
  */
 public abstract class ServiceProvider implements IServiceProvider, IServiceProviderDescriptor {
 	
-	private IServiceProviderDescriptor descriptor = null;
+	private IServiceProviderDescriptor fDescriptor = null;
+	private final HashMap<String, String> fAttributes = new HashMap<String, String>();
 	
 	public ServiceProvider() {
 	}
 	
 	public ServiceProvider(IServiceProviderDescriptor descriptor) {
-		this.descriptor = descriptor;
+		fDescriptor = descriptor;
 	}
 
 	/* (non-Javadoc)
@@ -46,58 +49,77 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getId()
 	 */
 	public String getId() {
-		if (descriptor == null) {
+		if (fDescriptor == null) {
 			return null;
 		}
-		return descriptor.getId();
+		return fDescriptor.getId();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getName()
 	 */
 	public String getName() {
-		if (descriptor == null) {
+		if (fDescriptor == null) {
 			return null;
 		}
-		return descriptor.getName();
+		return fDescriptor.getName();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getPriority()
 	 */
 	public String getPriority() {
-		if (descriptor == null) {
+		if (fDescriptor == null) {
 			return null;
 		}
-		return descriptor.getPriority();
+		return fDescriptor.getPriority();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getServiceId()
 	 */
 	public String getServiceId() {
-		if (descriptor == null) {
+		if (fDescriptor == null) {
 			return null;
 		}
-		return descriptor.getServiceId();
+		return fDescriptor.getServiceId();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#getString(java.lang.String)
+	 */
+	public String getString(String key) {
+		return fAttributes.get(key);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#putString(java.lang.String, java.lang.String)
+	 */
+	public void putString(String key, String value) {
+		fAttributes.put(key, value);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#restoreState(org.eclipse.ui.IMemento)
 	 */
 	public void restoreState(IMemento memento) {
-		// does not restore anything
+		fAttributes.clear();
+		for (String key : memento.getAttributeKeys()) {
+			fAttributes.put(key, memento.getString(key));
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#saveState(org.eclipse.ui.IMemento)
 	 */
 	public void saveState(IMemento memento) {
-		// does not save anything
+		for (String key : fAttributes.keySet()) {
+			memento.putString(key, fAttributes.get(key));
+		}
 	}
 
 	public void setDescriptor(IServiceProviderDescriptor descriptor) {
-		this.descriptor = descriptor;
+		this.fDescriptor = descriptor;
 	}
 
 }
