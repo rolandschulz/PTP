@@ -50,6 +50,7 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 		super(pageName);
 		fWizard = wizard;
 		fService = service;
+		setPageComplete(false);
 	}
 
 	/* (non-Javadoc)
@@ -81,18 +82,13 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
 			public void widgetSelected(SelectionEvent e) {
-				int index = providerCombo.getSelectionIndex();
-				IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(fProviderComboList.get(index));
-				IServiceConfiguration config = getConfigurationWizard().getServiceConfiguration();
-				fChildWizard = null; // need to set fChildWizard to null so we get the next service configuration page
-				IWizardPage page = getNextPage();
-				fChildWizard = new ServiceProviderConfigurationWizard(config, provider, page);
+				handleComboSelection(providerCombo);
 			}
         });
 
         createComboContents(providerCombo);
 	}
-
+	
 	/**
      * The <code>WizardSelectionPage</code> implementation of 
      * this <code>IWizardPage</code> method returns the first page 
@@ -125,6 +121,19 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 		
 		return sortedProviders;
 	}
+
+	/**
+	 * @param combo
+	 */
+	private void handleComboSelection(Combo combo) {
+		int index = combo.getSelectionIndex();
+		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(fProviderComboList.get(index));
+		IServiceConfiguration config = getConfigurationWizard().getServiceConfiguration();
+		fChildWizard = null; // need to set fChildWizard to null so we get the next service configuration page
+		IWizardPage page = getNextPage();
+		fChildWizard = new ServiceProviderConfigurationWizard(config, provider, page);
+		setPageComplete(true);
+	}
 	
 	/**
 	 * @param combo
@@ -136,6 +145,8 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 			combo.add(descriptor.getName());
 			fProviderComboList.add(index++, descriptor);
 		}
+		combo.select(0);
+		handleComboSelection(combo);
 	}
 	
 	/**
