@@ -113,7 +113,6 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     // Change
     ///////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
     {
@@ -128,6 +127,7 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
         vpg.releaseAllASTs();
     }
     
+    @SuppressWarnings("unchecked")
     private void introduceImplicitNoneInFile(IProgressMonitor progressMonitor, 
                                              ScopingNode scopeNode, 
                                              IFortranAST ast, 

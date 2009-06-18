@@ -429,6 +429,12 @@
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RenameRefactoringCommand">
       </command>
+      <command
+            name="Replace Obsolete Operators"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
+      </command>
+            
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
    <extension
@@ -515,6 +521,13 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+          <action
+               label="Replace Obsolete Operators (Fortran)"
+               definitionId="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>               
+               
       </actionSet>
    </extension>
    <!--extension
@@ -562,6 +575,11 @@
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
          <action 
+               label="Replace Obsolete &amp;Operators" 
+               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>      
+         <action 
                label="&amp;Introduce Implicit None" 
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
@@ -571,6 +589,7 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+               
       </viewerContribution>
    </extension>
    
@@ -579,20 +598,44 @@
    <objectContribution
    		adaptable="true"
    		objectClass="org.eclipse.core.resources.IFile"
-   		nameFilter="*.f90"
+   		nameFilter="*"
    		id="org.eclipse.photran.ui.FortranFileRefactoring">
+          <!--enablement>
+            <or>
+                <instanceof value="org.eclipse.core.resources.IFile" />
+                <instanceof value="org.eclipse.core.resources.IFolder" />
+                <and>
+                   <instanceof value="org.eclipse.core.resources.IProject" />
+                   <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.cdt.core.cnature"/>
+                </and>
+            </or>
+          </enablement-->
+   		<visibility>
+   		    <!--objectState
+   		        name="contentTypeId" 
+                value="org.eclipse.photran.core.fortranSource"/-->
+           <objectState
+                name="contentTypeId" 
+                value="org.eclipse.photran.core.freeFormFortranSource"/>
+   		</visibility>
    		<menu
          id="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu"
          label="Refactoring"
          path="additions">
-      	<separator name="group1"/>
+      	    <separator name="group1"/>
       	</menu>
-   		<action
-   			label="Introduce Implicit None(Fortran)"
-   			menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
-   			class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
-   			id="org.eclipse.photran.ui.FortranFileRefactoringAction">
-   		</action>
+        <action
+            label="Replace Obsolete Operators (Fortran)"
+            menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
+            class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
+            id="org.eclipse.photran.ui.RepObsOpersFileRefactoringAction">
+        </action>
+        <action
+            label="Introduce Implicit None (Fortran)"
+            menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
+            class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
+            id="org.eclipse.photran.ui.IntroImplicitNoneFileRefactoringAction">
+        </action>
    	</objectContribution>
    	</extension>
    
