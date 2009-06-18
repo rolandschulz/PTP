@@ -75,7 +75,7 @@ public class ServiceModelUIManager {
 	 * @param desc service provider descriptor
 	 * @return class implementing IServiceProviderContributor
 	 */
-	public IServiceProviderContributor getServiceProviderConfigurationUI(IServiceProviderDescriptor desc) {
+	public IServiceProviderContributor getServiceProviderContributor(IServiceProviderDescriptor desc) {
 		IServiceProviderContributor config = null;
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
