@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.types.ArraySpec;
 import org.eclipse.photran.internal.core.analysis.types.DerivedType;
 import org.eclipse.photran.internal.core.analysis.types.FunctionType;
@@ -110,7 +111,7 @@ public class Definition implements Serializable, Comparable<Definition>
     protected Classification classification;
     protected PhotranTokenRef tokenRef;
     protected String declaredName, canonicalizedName;
-    protected Visibility visibility;
+    //protected Visibility visibility;
     protected Type type;
     protected ArraySpec arraySpec;
     
@@ -122,13 +123,13 @@ public class Definition implements Serializable, Comparable<Definition>
     protected Definition() {}
     
     /** Creates a definition and binds it to the given token */
-    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, Visibility visibility, Type type)
+    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, /*Visibility visibility,*/ Type type)
     {
         this.classification = classification;
     	this.tokenRef = tokenRef;
     	this.declaredName = declaredName;
     	this.canonicalizedName = canonicalize(declaredName);
-        this.visibility = visibility; //Visibility.INHERIT_FROM_SCOPE;
+        //this.visibility = visibility; //Visibility.INHERIT_FROM_SCOPE;
         this.type = type;
         this.arraySpec = null;
     }
@@ -318,12 +319,12 @@ public class Definition implements Serializable, Comparable<Definition>
     // | @:<AttrSpecSeq> T_COMMA <AttrSpec>
     
     /** Sets the attributes according to an AttrSpecSeq node */
-    void setAttributes(IASTListNode<ASTAttrSpecSeqNode> listNode)
+    void setAttributes(IASTListNode<ASTAttrSpecSeqNode> listNode, ScopingNode setInScope)
     {
         if (listNode == null) return;
         
         for (int i = 0; i < listNode.size(); i++)
-            setAttribute(listNode.get(i).getAttrSpec());
+            setAttribute(listNode.get(i).getAttrSpec(), setInScope);
     }
 
     // # R503
@@ -340,7 +341,7 @@ public class Definition implements Serializable, Comparable<Definition>
     // | T_SAVE
     // | T_TARGET
 
-    private void setAttribute(ASTAttrSpecNode attrSpec)
+    private void setAttribute(ASTAttrSpecNode attrSpec, ScopingNode setInScope)
     {
         ASTArraySpecNode arraySpec = attrSpec.getArraySpec();
         ASTAccessSpecNode accessSpec = attrSpec.getAccessSpec();
@@ -348,7 +349,7 @@ public class Definition implements Serializable, Comparable<Definition>
         if (arraySpec != null)
             setArraySpec(arraySpec);
         else if (accessSpec != null)
-            setVisibility(accessSpec);
+            setVisibility(accessSpec, setInScope);
         else if (attrSpec.isParameter())
             setParameter();
 
@@ -360,12 +361,17 @@ public class Definition implements Serializable, Comparable<Definition>
     //     T_PUBLIC
     //   | T_PRIVATE
 
-    void setVisibility(ASTAccessSpecNode accessSpec)
+    void setVisibility(ASTAccessSpecNode accessSpec, ScopingNode setInScope)
     {
-        if (accessSpec.isPublic())
-            this.visibility = Visibility.PUBLIC;
-        else if (accessSpec.isPrivate())
-            this.visibility = Visibility.PRIVATE;
+//        if (accessSpec.isPublic())
+//            this.visibility = Visibility.PUBLIC;
+//        else if (accessSpec.isPrivate())
+//            this.visibility = Visibility.PRIVATE;
+        
+        ((PhotranVPGBuilder)PhotranVPG.getInstance()).markDefinitionVisibilityInScope(
+            tokenRef,
+            setInScope,
+            accessSpec.isPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC);
     }
     
     void setParameter()
@@ -379,12 +385,12 @@ public class Definition implements Serializable, Comparable<Definition>
         return parameter;
     }
     
-    boolean isPublic()
-    {
-        // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
-        return this.visibility.equals(Visibility.PUBLIC);
-            //|| this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
-    }
+//    boolean isPublic()
+//    {
+//        // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
+//        return this.visibility.equals(Visibility.PUBLIC);
+//            //|| this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
+//    }
 
     void markAsTypeBoundProcedure(boolean renamed)
     {
@@ -562,7 +568,7 @@ public class Definition implements Serializable, Comparable<Definition>
             && this.subprogramArgument == o.subprogramArgument
             && equals(this.tokenRef, o.tokenRef)
             && equals(this.type, o.type)
-            && equals(this.visibility, o.visibility);
+            ; // && equals(this.visibility, o.visibility);
     }
     
     private boolean equals(Object a, Object b)
@@ -584,7 +590,7 @@ public class Definition implements Serializable, Comparable<Definition>
             + (this.subprogramArgument ? 1 : 0)
             + hashCode(this.tokenRef)
             + 0 //hashCode(this.type)
-            + hashCode(this.visibility);
+            ; // + hashCode(this.visibility);
     }
 
     private int hashCode(Object o)

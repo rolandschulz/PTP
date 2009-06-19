@@ -13,7 +13,6 @@ package org.eclipse.photran.internal.core.analysis.binding;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
-import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
@@ -94,13 +93,15 @@ class DefinitionCollector extends BindingCollector
         
         Definition d = addDefinition(node.getTypeName(), Definition.Classification.DERIVED_TYPE, Type.VOID);
         
+        ScopingNode enclosingScope = node.findNearestAncestor(ScopingNode.class);
+        
 //        if (node.getAccessSpec() != null)
 //            d.setVisibility(node.getAccessSpec());
         // Change for Fortran 2003
         if (node.getTypeAttrSpecList() != null)
             for (ASTTypeAttrSpecNode attrSpec : node.getTypeAttrSpecList())
                 if (attrSpec.getAccessSpec() != null)
-                    d.setVisibility(attrSpec.getAccessSpec());
+                    d.setVisibility(attrSpec.getAccessSpec(), enclosingScope);
         
         // F03 -- Don't bind derived type parameters since we don't bind derived type components yet
         // (so there is no scope for the derived type).  When we do, should also bind
@@ -174,6 +175,8 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
+        ScopingNode enclosingScope = node.findNearestAncestor(ScopingNode.class);
+        
         IASTListNode<ASTEntityDeclNode> decls = node.getEntityDeclList();
         for (int i = 0; i < decls.size(); i++)
         {
@@ -183,7 +186,7 @@ class DefinitionCollector extends BindingCollector
             Definition def = addDefinition(objectNameIdent,
                                            Definition.Classification.VARIABLE_DECLARATION,
                                            Type.parse(node.getTypeSpec()));
-            def.setAttributes(node.getAttrSpecSeq());
+            def.setAttributes(node.getAttrSpecSeq(), enclosingScope);
             def.setArraySpec(getArraySpec(entityDecl)); // (p.119) This overrides the DIMENSION attribute
             setDefinition(objectNameIdent, def);
         }

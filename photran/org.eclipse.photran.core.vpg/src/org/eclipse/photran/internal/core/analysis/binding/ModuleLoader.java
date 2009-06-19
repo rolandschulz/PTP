@@ -38,10 +38,11 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
  * 
  * @author Jeff Overbey
  */
-public class ModuleLoader extends BindingCollector
+public class ModuleLoader extends VisibilityCollector
 {
-    // Visit USE statements first to make sure all definitions are imported;
-    // the annotate the "module:whatever" virtual file in the VPG with
+    // Visit USE statements and Access-Spec statements first to make sure
+    // all definitions are imported;
+    // then annotate the "module:whatever" virtual file in the VPG with
     // the full module symbol table
     @Override
     public void visitASTModuleNode(ASTModuleNode node)

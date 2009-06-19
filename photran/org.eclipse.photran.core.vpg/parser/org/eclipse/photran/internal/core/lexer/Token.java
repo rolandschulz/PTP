@@ -437,9 +437,14 @@ public class Token implements IToken, IASTNode
 
     public List<PhotranTokenRef> manuallyResolveBinding()
     {
-    	return getEnclosingScope().manuallyResolve(this);
+        return getEnclosingScope().manuallyResolve(this);
     }
-	
+    
+    public List<PhotranTokenRef> manuallyResolveBindingNoImplicits()
+    {
+        return getEnclosingScope().manuallyResolveNoImplicits(this);
+    }
+    
 	public ScopingNode findScopeDeclaringOrImporting(Definition definition)
 	{
 		return getEnclosingScope().findScopeDeclaringOrImporting(definition.getTokenRef().findToken());

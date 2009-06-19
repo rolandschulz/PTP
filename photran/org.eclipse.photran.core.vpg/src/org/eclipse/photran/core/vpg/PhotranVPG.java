@@ -13,6 +13,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -44,12 +46,14 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
 	public static final int BINDING_EDGE_TYPE = 2;
     public static final int RENAMED_BINDING_EDGE_TYPE = 3;
+    public static final int DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE = 4;
     private static final String[] edgeTypeDescriptions =
 	{
 	    "Definition-scope relationship",
 	    "Definition-scope relationship due to module import",
 	    "Binding",
 	    "Renamed binding",
+	    "Definition is private in scope",
 	};
 	
 	public static final int SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE = 0;
@@ -397,6 +401,17 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	public Type getTypeFor(PhotranTokenRef tokenRef)
 	{
 		return (Type)db.getAnnotation(tokenRef, TYPE_ANNOTATION_TYPE);
+	}
+	
+	public Visibility getVisibilityFor(Definition def, ScopingNode visibilityInScope)
+	{
+	    PhotranTokenRef targetScope = visibilityInScope.getRepresentativeToken();
+	    
+	    for (PhotranTokenRef privateScope : db.getOutgoingEdgeTargets(def.getTokenRef(), DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE))
+	        if (privateScope.equals(targetScope))
+	            return Visibility.PRIVATE;
+	    
+	    return Visibility.PUBLIC;
 	}
     
     public PhotranTokenRef getModuleTokenRef(String moduleName)

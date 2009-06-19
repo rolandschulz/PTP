@@ -460,10 +460,32 @@ public abstract class ScopingNode extends ASTNode
 
     private void manuallyResolve(Token identifier, BindingResolutionCallback result)
     {
-    	if (!manuallyResolveInLocalScope(identifier, result))
-    		if (!manuallyResolveInParentScopes(identifier, result))
-    			if (!manuallyResolveIntrinsic(identifier, result))
-    				attemptToDeclareImplicit(identifier, result);
+        if (!manuallyResolveInLocalScope(identifier, result))
+            if (!manuallyResolveInParentScopes(identifier, result))
+                if (!manuallyResolveIntrinsic(identifier, result))
+                    attemptToDeclareImplicit(identifier, result);
+    }
+
+    public List<PhotranTokenRef> manuallyResolveNoImplicits(Token identifier)
+    {
+        final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
+        
+        manuallyResolveNoImplicits(identifier, new BindingResolutionCallback()
+        {
+            public void foundDefinition(PhotranTokenRef definition, ScopingNode scope)
+            {
+                bindings.add(definition);
+            }
+        });
+        
+        return bindings;
+    }
+
+    private void manuallyResolveNoImplicits(Token identifier, BindingResolutionCallback result)
+    {
+        if (!manuallyResolveInLocalScope(identifier, result))
+            if (!manuallyResolveInParentScopes(identifier, result))
+                manuallyResolveIntrinsic(identifier, result);
     }
     
 	private boolean manuallyResolveInLocalScope(Token identifier, BindingResolutionCallback bindings)
@@ -514,10 +536,11 @@ public abstract class ScopingNode extends ASTNode
     	
     	PhotranTokenRef tokenRef = identifier.getTokenRef();
 		Type type = implicitSpec.getType(name.charAt(0));
-		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, Visibility.PUBLIC, type);
+		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, /*Visibility.PUBLIC,*/ type);
 		
     	vpg.setDefinitionFor(tokenRef, def);
     	vpg.markScope(tokenRef, this);
+    	vpg.markDefinitionVisibilityInScope(tokenRef, this, Visibility.PUBLIC);
     	bindings.foundDefinition(tokenRef, getGlobalScope());
 	}
 
@@ -537,10 +560,11 @@ public abstract class ScopingNode extends ASTNode
 
 	public List<Definition> getAllPublicDefinitions()
 	{
+        PhotranVPG vpg = PhotranVPG.getInstance();
 		List<Definition> result = new LinkedList<Definition>();
 		
     	for (Definition def : getAllDefinitions())
-    		if (def != null && def.isPublic())
+    		if (def != null && vpg.getVisibilityFor(def, this).equals(Visibility.PUBLIC))
     			result.add(def);
     	
     	return result;

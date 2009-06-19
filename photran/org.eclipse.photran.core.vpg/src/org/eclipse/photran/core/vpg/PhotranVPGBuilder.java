@@ -29,6 +29,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
@@ -83,6 +84,17 @@ public class PhotranVPGBuilder extends PhotranVPG
 	{
 	    db.setAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE, definition);
 	}
+    
+    public void markDefinitionVisibilityInScope(PhotranTokenRef definitionTokenRef, ScopingNode scope, Visibility visibility)
+    {
+        //System.err.println("Marking " + definitionTokenRef.findToken().getText() + " " + visibility + " in " + scope.getRepresentativeToken().findTokenOrReturnNull());
+        
+        VPGEdge<IFortranAST, Token, PhotranTokenRef> privateEdge = new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, definitionTokenRef, scope.getRepresentativeToken(), DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE);
+        if (visibility.equals(Visibility.PRIVATE))
+            db.ensure(privateEdge);
+        else
+            db.delete(privateEdge);
+    }
 	
 	public void markScope(PhotranTokenRef identifier, ScopingNode scope)
 	{
