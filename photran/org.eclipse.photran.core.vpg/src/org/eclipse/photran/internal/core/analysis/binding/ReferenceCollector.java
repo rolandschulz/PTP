@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.parser.ASTArrayElementNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignedGotoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTCPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
@@ -96,6 +97,13 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  */
 class ReferenceCollector extends BindingCollector
 {
+    @Override public void visitASTCPrimaryNode(ASTCPrimaryNode node)
+    {
+        super.traverseChildren(node);
+        if (node.getName() != null)
+            bind(node.getName().getName());
+    }
+
     @Override public void visitASTUFPrimaryNode(ASTUFPrimaryNode node)
     {
         super.traverseChildren(node);
