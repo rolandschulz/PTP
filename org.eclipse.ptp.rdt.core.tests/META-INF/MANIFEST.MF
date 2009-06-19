@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.ptp.rdt.core.tests;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Export-Package: org.eclipse.ptp.internal.rdt.core,
  org.eclipse.ptp.internal.rdt.core.callhierarchy,
  org.eclipse.ptp.internal.rdt.core.model,
