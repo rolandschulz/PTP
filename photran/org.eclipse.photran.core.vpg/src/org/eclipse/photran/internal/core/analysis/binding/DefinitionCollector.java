@@ -455,8 +455,10 @@ class DefinitionCollector extends BindingCollector
         
         IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
         for (int i = 0; i < list.size(); i++)
+        {
             addDefinition(list.get(i).getExternalName(), Definition.Classification.EXTERNAL, Type.UNKNOWN);
-        // TODO: addExternalDefinition
+            markSubprogramImport(list.get(i).getExternalName());
+        }
     }
 
     // # R1209
@@ -676,10 +678,10 @@ class DefinitionCollector extends BindingCollector
         super.visitASTInterfaceBlockNode(node);
         if (node.getInterfaceStmt().getGenericName() == null
             && node.getInterfaceStmt().getGenericSpec() == null)
-            markExternalSubprogramImports(node);
+            markMatchingDeclarationsInInterfacesForExtSubprog(node);
     }
 
-    private void markExternalSubprogramImports(ASTInterfaceBlockNode node)
+    private void markMatchingDeclarationsInInterfacesForExtSubprog(ASTInterfaceBlockNode node)
     {
         for (IInterfaceSpecification pu : node.getInterfaceBlockBody())
         {

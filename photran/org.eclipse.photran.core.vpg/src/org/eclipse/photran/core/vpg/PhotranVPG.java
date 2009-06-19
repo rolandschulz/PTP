@@ -18,6 +18,8 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
+import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
@@ -25,6 +27,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 import bz.over.vpg.VPGLog;
@@ -369,7 +372,63 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
                 result.add(def);
         }
     }
+    
+    public ArrayList<Definition> findAllDeclarationsInExternalStmts(String name)
+    {
+        ArrayList<Definition> result = new ArrayList<Definition>();
+        for (IFile file : findFilesThatImportSubprogram(name))
+            result.addAll(findExternalStmts(name, file));
+        return result;
+    }
 
+    private ArrayList<Definition> findExternalStmts(String name, IFile file)
+    {
+        ArrayList<Definition> result = new ArrayList<Definition>();
+        
+        IFortranAST ast = acquireTransientAST(file);
+        if (ast != null)
+            ast.accept(new ExternalStmtVisitor(result, PhotranVPG.canonicalizeIdentifier(name)));
+        
+        return result;
+    }
+    
+    private final class ExternalStmtVisitor extends GenericASTVisitor
+    {
+        private final ArrayList<Definition> result;
+        private final String canonicalizedName;
+        
+        public ExternalStmtVisitor(ArrayList<Definition> result, String canonicalizedName)
+        {
+            this.result = result;
+            this.canonicalizedName = canonicalizedName;
+        }
+
+        // # R1208
+        // <ExternalStmt> ::=
+        // <LblDef> T_EXTERNAL <ExternalNameList> T_EOS
+        // | <LblDef> T_EXTERNAL T_COLON T_COLON <ExternalNameList> T_EOS
+        //
+        // <ExternalNameList> ::=
+        // <ExternalName>
+        // | @:<ExternalNameList> T_COMMA <ExternalName>
+
+        @Override public void visitASTExternalStmtNode(ASTExternalStmtNode node)
+        {
+            super.traverseChildren(node);
+            
+            IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
+            for (int i = 0; i < list.size(); i++)
+                add(PhotranVPG.this.attemptToMatch(canonicalizedName, list.get(i).getExternalName()));
+        }
+
+        private void add(PhotranTokenRef tr)
+        {
+            Definition def = tr == null ? null : getDefinitionFor(tr);
+            if (def != null) // && def.getClassification().equals(Classification.EXTERNAL))
+                result.add(def);
+        }
+    }
+    
     public List<IFile> findFilesThatExportSubprogram(String subprogramName)
     {
         return getOutgoingDependenciesFrom("subprogram:" + canonicalizeIdentifier(subprogramName));

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,9 +37,9 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 public class RenameRefactoring extends SingleFileFortranRefactoring
 {
     private Definition definitionToRename = null;
-    private ArrayList<PhotranTokenRef> allReferences = null;
+    private Collection<PhotranTokenRef> allReferences = null;
     private String oldName = null, newName = null;
-    private boolean shouldBindInterfacesToDefinitions = true;
+    private boolean shouldBindInterfacesAndExternals = true;
 
     public RenameRefactoring(IFile file, ITextSelection selection)
     {
@@ -70,9 +70,9 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         this.newName = newName;
     }
     
-    public void setShouldBindInterfaces(boolean value)
+    public void setShouldBindInterfacesAndExternals(boolean value)
     {
-        this.shouldBindInterfacesToDefinitions = value;
+        this.shouldBindInterfacesAndExternals = value;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -121,6 +121,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         
         if (!definitionToRename.isLocalVariable()
                && !definitionToRename.isSubprogram()
+               && !definitionToRename.isExternal()
                && !definitionToRename.isDerivedType()
                && !definitionToRename.isModuleEntityBeforeRename()
                && !definitionToRename.isRenamedModuleEntity()
@@ -158,7 +159,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         
         if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
 
-        allReferences = definitionToRename.findAllReferences(shouldBindInterfacesToDefinitions);
+        allReferences = definitionToRename.findAllReferences(shouldBindInterfacesAndExternals);
         checkIfReferencesCanBeRenamed();
 
         checkForConflictingDefinitionOrShadowing(status);

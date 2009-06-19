@@ -22,7 +22,7 @@ import bz.over.vpg.TokenRef;
  * 
  * @author Jeff Overbey
  */
-public class PhotranTokenRef extends TokenRef<Token> implements Serializable
+public class PhotranTokenRef extends TokenRef<Token> implements Serializable, Comparable<PhotranTokenRef>
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -68,4 +68,13 @@ public class PhotranTokenRef extends TokenRef<Token> implements Serializable
 	{
 		return findToken().getText();
 	}
+
+    public int compareTo(PhotranTokenRef that)
+    {
+        // Compare lexicographically as an ordered triple (filename, offset, length)
+        int result = this.getFilename().compareTo(that.getFilename());
+        if (result == 0) result = Integer.valueOf(this.getOffset()).compareTo(that.getOffset());
+        if (result == 0) result = Integer.valueOf(this.getLength()).compareTo(that.getLength());
+        return result;
+    }
 }

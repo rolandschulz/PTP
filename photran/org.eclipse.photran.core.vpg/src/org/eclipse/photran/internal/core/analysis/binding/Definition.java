@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -33,9 +34,12 @@ import org.eclipse.photran.internal.core.parser.ASTAccessSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
-import org.eclipse.photran.internal.core.parser.ASTBodyPlusInternalsNode;
+import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
+import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -156,8 +160,14 @@ public class Definition implements Serializable, Comparable<Definition>
     
     private boolean isInternal()
     {
-        for (IASTNode parent = tokenRef.findToken().getParent(); parent != null; parent = parent.getParent())
-            if (parent instanceof ASTBodyPlusInternalsNode || parent instanceof ASTModuleNode)
+        IASTNode startFrom = tokenRef.findToken();
+        if (this.isSubprogram()) startFrom = startFrom.findNearestAncestor(ScopingNode.class); // Look upward from this function/subroutine
+        
+        for (IASTNode parent = startFrom.getParent(); parent != null; parent = parent.getParent())
+            if (parent instanceof ASTModuleNode
+                || parent instanceof ASTSubroutineSubprogramNode
+                || parent instanceof ASTFunctionSubprogramNode
+                || parent instanceof ASTMainProgramNode)
                 return true;
         
         return false;
@@ -190,6 +200,11 @@ public class Definition implements Serializable, Comparable<Definition>
     {
         return classification == Classification.SUBROUTINE
             || classification == Classification.FUNCTION;
+    }
+
+    public boolean isExternal()
+    {
+        return classification == Classification.EXTERNAL;
     }
     
     public boolean isRenamedModuleEntity()
@@ -424,42 +439,84 @@ public class Definition implements Serializable, Comparable<Definition>
     }
     
     /** @return all workspace references to this definition, not including renamed references */
-    public ArrayList<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesToSubprogramDefinitions)
+    public Collection<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesAndExternals)
     {
-		ArrayList<PhotranTokenRef> result = new ArrayList<PhotranTokenRef>();
-		
-		addBindings(result);
-		
-		if (this.isSubprogram() && shouldBindInterfacesToSubprogramDefinitions)
-		{
-		    if (this.isInInterfaceBlock())
-                addExternalSubprogramDefinitions(result);
-            else if (this.isExternallyVisibleSubprogramDefinition())
-		        addInterfaceDecls(result);
-		}
-		
-		// if (...)
-		//     addExternalStmts(result);
-		
-		return result;
+		if ((this.isSubprogram() || this.isExternal()) && shouldBindInterfacesAndExternals)
+		    return findAllReferencesToSubprogramAggressively();
+		else
+		    return findAllImmediateReferences();
+    }
+    
+    private ArrayList<PhotranTokenRef> findAllImmediateReferences()
+    {
+        ArrayList<PhotranTokenRef> result = new ArrayList<PhotranTokenRef>();
+        addImmediateBindings(result);
+        return result;
     }
 
-    private void addBindings(ArrayList<PhotranTokenRef> result)
+    private Collection<PhotranTokenRef> findAllReferencesToSubprogramAggressively()
     {
+        assert this.isSubprogram();
+        
+        Collection<Definition> subprogramDefinitions;
+        if (this.isInInterfaceBlock())
+            subprogramDefinitions = this.resolveInterfaceBinding();
+        else if (this.isInExternalStmt())
+            subprogramDefinitions = this.resolveExternalBinding();
+        else if (this.isExternallyVisibleSubprogramDefinition())
+            subprogramDefinitions = this.findAllSimilarlyNamedExternalSubprograms();
+        else // probably an internal subprogram
+            return findAllImmediateReferences();
+        
+        Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
+        for (Definition subprogram : subprogramDefinitions)
+            result.addAll(subprogram.findAllReferencesToSubprogIncludingInterfacesAndExternalStmts());
+        result.remove(this.getTokenRef()); // By contract, the set of references does not include this
+        return result;
+    }
+
+    private Set<PhotranTokenRef> findAllReferencesToSubprogIncludingInterfacesAndExternalStmts()
+    {
+        assert this.isExternallyVisibleSubprogramDefinition();
+        
+        Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
+        addExternalSubprogramDefinitions(result);
+        addInterfaceDecls(result);
+        addExternalStmts(result);
+        return result;
+    }
+    
+//    private void removeDuplicates(ArrayList<PhotranTokenRef> result)
+//    {
+//        Set<PhotranTokenRef> alreadyAdded = new TreeSet<PhotranTokenRef>(result.size());
+//        int i = 0;
+//        while (i < result.size())
+//        {
+//            if (alreadyAdded.contains(result.get(i)))
+//                result.remove(i);
+//            else
+//                alreadyAdded.add(result.get(i++));
+//        }
+//    }
+
+    private void addImmediateBindings(Collection<PhotranTokenRef> result)
+    {
+        result.add(this.getTokenRef());
+        
         for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
 			result.add((PhotranTokenRef)r);
     }
 
-    private void addExternalSubprogramDefinitions(ArrayList<PhotranTokenRef> result)
+    private void addExternalSubprogramDefinitions(Collection<PhotranTokenRef> result)
     {
-        for (Definition externalSubprogDef : this.resolveInterfaceBinding())
+        for (Definition externalSubprogDef : this.findAllSimilarlyNamedExternalSubprograms())
         {
             result.add(externalSubprogDef.getTokenRef());
             result.addAll(externalSubprogDef.findAllReferences(false));
         }
     }
 
-    private void addInterfaceDecls(ArrayList<PhotranTokenRef> result)
+    private void addInterfaceDecls(Collection<PhotranTokenRef> result)
     {
         for (Definition interfaceDef : this.findMatchingDeclarationsInInterfaces())
         {
@@ -468,11 +525,13 @@ public class Definition implements Serializable, Comparable<Definition>
         }
     }
 
-    private void addExternalStmts(ArrayList<PhotranTokenRef> result)
+    private void addExternalStmts(Collection<PhotranTokenRef> result)
     {
-        // FIXME
-//        for (Definition interfaceDef : this.findMatchingDeclarationsInInterfaces())
-//            result.add(interfaceDef.getTokenRef());
+        for (Definition externalDef : this.findMatchingDeclarationsInExternalStmts())
+        {
+            result.add(externalDef.getTokenRef());
+            result.addAll(externalDef.findAllReferences(false));
+        }
     }
     
     /** @return true iff this is an entity defined inside an INTERFACE block */
@@ -493,6 +552,8 @@ public class Definition implements Serializable, Comparable<Definition>
 //        ASTInterfaceStmtNode stmt = tokenRef.findToken().findNearestAncestor(ASTInterfaceBlockNode.class).getInterfaceStmt();
 //        return stmt.getGenericName() == null && stmt.getGenericSpec() == null;
 //    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
@@ -560,6 +621,60 @@ public class Definition implements Serializable, Comparable<Definition>
     }
     
     /**
+     * @return if this is an external subprogram, a list of all other external subprograms with the same name
+     * (i.e., subprograms that might also be referenced by a similar INTERFACE block or EXTERNAL statement)
+     */
+    public Collection<Definition> findAllSimilarlyNamedExternalSubprograms()
+    {
+        return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(this.canonicalizedName);
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return if this is a subprogram declared in an EXTERNAL statement, a list of all possible matching subprogram
+     * Definitions; otherwise, <code>null</code>
+     * 
+     * @see #findMatchingDeclarationsInExternalStmts()
+     */
+    public Collection<Definition> resolveExternalBinding()
+    {
+        if (!isInExternalStmt()) return Collections.emptySet();
+
+        Token token = getTokenRef().findToken();
+        ScopingNode scopeOfThisDef = token.getEnclosingScope();
+        ScopingNode parentScope = scopeOfThisDef.getEnclosingScope();
+        
+        HashSet<Definition> result = collectExternalResolutions(token, scopeOfThisDef);
+        if (resolvesToSubprogramArgument(result)) return Collections.emptyList();
+        if (needToResolveInParentScope(result)) result = collectResolutions(token, parentScope);
+        result.addAll(collectMatchingExternalSubprograms(token));
+        return result;
+    }
+
+    /** @return true iff this is an entity defined inside an EXTERNAL statement */
+    public boolean isInExternalStmt()
+    {
+        Token tok = getTokenRef().findTokenOrReturnNull();
+        return tok != null && tok.findNearestAncestor(ASTExternalStmtNode.class) != null;
+    }
+    
+    private HashSet<Definition> collectExternalResolutions(Token token, ScopingNode scope)
+    {
+        HashSet<Definition> result = new HashSet<Definition>();
+        for (PhotranTokenRef d : scope.manuallyResolve(new FakeToken(token, token.getText())))
+        {
+            Definition def = PhotranVPG.getInstance().getDefinitionFor(d);
+            if (def != null)
+                if ((def.isSubprogram() && !def.isInInterfaceBlock()) || def.isSubprogramArgument())
+                    result.add(def);
+        }
+        return result;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
      * @return if this is an external subprogram, a list of all possible matching declarations in INTERFACE blocks;
      * otherwise, <code>null</code>
      * 
@@ -570,7 +685,7 @@ public class Definition implements Serializable, Comparable<Definition>
         if /*(isModuleSubprogram())
             return findMatchesForModuleSubprogram();
         else if*/ (isExternallyVisibleSubprogramDefinition())
-            return findMatchesForExternalSubprogram();
+            return PhotranVPG.getInstance().findAllDeclarationsInInterfacesForExternalSubprogram(canonicalizedName);
         else
             return Collections.emptySet();
     }
@@ -585,10 +700,16 @@ public class Definition implements Serializable, Comparable<Definition>
 //        // TODO Auto-generated method stub
 //        return null;
 //    }
-
-    private ArrayList<Definition> findMatchesForExternalSubprogram()
+    
+    /**
+     * @return if this is an external subprogram, a list of all possible matching declarations in EXTERNAL statements;
+     * otherwise, <code>null</code>
+     * 
+     * @see #resolveExternalBinding()
+     */
+    public Collection<Definition> findMatchingDeclarationsInExternalStmts()
     {
-        return PhotranVPG.getInstance().findAllDeclarationsInInterfacesForExternalSubprogram(canonicalizedName);
+        return PhotranVPG.getInstance().findAllDeclarationsInExternalStmts(canonicalizedName);
     }
 
     @Override public String toString()

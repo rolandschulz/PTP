@@ -44,8 +44,7 @@ public class RenameExtSub1 extends RenameTestSuite
         ext2.addReferences(file2, new LineCol[] { lc(1,27), lc(6,3), lc(7,14) });
         
         ext3.addReferences(file1, new LineCol[] { lc(13,22), lc(14,18), lc(19,12), lc(23,10), lc(25,14) });
-        // TODO: We don't handle EXTERNAL statements yet
-        // !!!!!!!!!!!!! ext3.addReferences(file2, new LineCol[] { lc(3,12), lc(5,7) });
+        ext3.addReferences(file2, new LineCol[] { lc(3,12), lc(5,7) });
 
         startTests("Renaming file exercising Bug 278320");
         addSuccessTests(ext1, "something_else");

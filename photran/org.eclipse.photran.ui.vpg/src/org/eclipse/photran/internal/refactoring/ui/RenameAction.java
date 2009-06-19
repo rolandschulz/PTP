@@ -68,7 +68,7 @@ public class RenameAction
             addPage(new UserInputWizardPage(renameRefactoring.getName())
             {
                 protected Text newNameField;
-                protected Button shouldBindInterfaces;
+                protected Button shouldBindInterfacesAndExternals;
         
                 public void createControl(Composite parent)
                 {
@@ -98,10 +98,10 @@ public class RenameAction
                     
                     new Label(group, SWT.NONE).setText("");
                     
-                    shouldBindInterfaces = new Button(group, SWT.CHECK);
-                    shouldBindInterfaces.setText("Map interface declarations to subprogram definitions");
-                    shouldBindInterfaces.setSelection(true);
-                    shouldBindInterfaces.addSelectionListener(new SelectionListener()
+                    shouldBindInterfacesAndExternals = new Button(group, SWT.CHECK);
+                    shouldBindInterfacesAndExternals.setText("Match external subprograms with interfaces and external declarations");
+                    shouldBindInterfacesAndExternals.setSelection(true);
+                    shouldBindInterfacesAndExternals.addSelectionListener(new SelectionListener()
                     {
                         public void widgetDefaultSelected(SelectionEvent e)
                         {
@@ -110,8 +110,8 @@ public class RenameAction
 
                         public void widgetSelected(SelectionEvent e)
                         {
-                            boolean isChecked = shouldBindInterfaces.getSelection();
-                            renameRefactoring.setShouldBindInterfaces(isChecked);
+                            boolean isChecked = shouldBindInterfacesAndExternals.getSelection();
+                            renameRefactoring.setShouldBindInterfacesAndExternals(isChecked);
                         }
                         
                     });
