@@ -68,6 +68,7 @@ import org.eclipse.photran.internal.core.parser.ASTOutputImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerFieldNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
+import org.eclipse.photran.internal.core.parser.ASTSFDataRefNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
 import org.eclipse.photran.internal.core.parser.ASTSFVarNameNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
@@ -97,6 +98,13 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  */
 class ReferenceCollector extends BindingCollector
 {
+    @Override public void visitASTSFDataRefNode(ASTSFDataRefNode node)
+    {
+        super.traverseChildren(node);
+        if (node.getName() != null)
+            bind(node.getName());
+    }
+
     @Override public void visitASTCPrimaryNode(ASTCPrimaryNode node)
     {
         super.traverseChildren(node);
