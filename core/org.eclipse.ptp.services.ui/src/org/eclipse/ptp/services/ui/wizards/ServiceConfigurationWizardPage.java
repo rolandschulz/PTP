@@ -13,7 +13,6 @@ package org.eclipse.ptp.services.ui.wizards;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -107,12 +106,11 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 	 * @param service service containing providers
 	 * @return sorted providers
 	 */
-	private Set<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
+	private SortedSet<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
 		SortedSet<IServiceProviderDescriptor> sortedProviders = 
 			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
 				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
-					int res = o1.getPriority().compareTo(o2.getPriority());
-					return res;
+					return o1.getPriority().compareTo(o2.getPriority());
 				}
 			});
 		for (IServiceProviderDescriptor p : service.getProviders()) {
@@ -129,9 +127,12 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 		int index = combo.getSelectionIndex();
 		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(fProviderComboList.get(index));
 		IServiceConfiguration config = getConfigurationWizard().getServiceConfiguration();
+		config.setServiceProvider(getService(), provider);
 		fChildWizard = null; // need to set fChildWizard to null so we get the next service configuration page
-		IWizardPage page = getNextPage();
-		fChildWizard = new ServiceProviderConfigurationWizard(config, provider, page);
+		if (!provider.isConfigured()) {
+			IWizardPage page = getNextPage();
+			fChildWizard = new ServiceProviderConfigurationWizard(config, provider, page);
+		}
 		setPageComplete(true);
 	}
 	

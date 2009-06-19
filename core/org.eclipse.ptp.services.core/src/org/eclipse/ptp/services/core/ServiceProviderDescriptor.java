@@ -22,44 +22,48 @@ package org.eclipse.ptp.services.core;
  * @author greg
  */
 public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
-	private String id;
-	private String name;
-	private String serviceId;
-	private String priority;
+	private String fId;
+	private String fName;
+	private String fServiceId;
+	private Integer fPriority;
 	
 	public ServiceProviderDescriptor(String id, String name, String serviceId, String priority) {
-		this.id = id;
-		this.name = name;
-		this.serviceId = serviceId;
-		this.priority = priority;
+		fId = id;
+		fName = name;
+		fServiceId = serviceId;
+		try {
+			fPriority = Integer.parseInt(priority);
+		} catch (NumberFormatException e) {
+			fPriority = Integer.MAX_VALUE;
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getId()
 	 */
 	public String getId() {
-		return id;
+		return fId;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getName()
 	 */
 	public String getName() {
-		return name;
+		return fName;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getPriority()
 	 */
-	public String getPriority() {
-		return priority;
+	public Integer getPriority() {
+		return fPriority;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getServiceId()
 	 */
 	public String getServiceId() {
-		return serviceId;
+		return fServiceId;
 	}
 	
 	@Override
@@ -67,15 +71,15 @@ public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
 		if (!(o instanceof IServiceProviderDescriptor)) {
 			return false;
 		}
-		return id.equals(((IServiceProviderDescriptor) o).getId()); 
+		return fId.equals(((IServiceProviderDescriptor) o).getId()); 
 	}
 	
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return fId.hashCode();
 	}
 	
 	public String toString() {
-		return "ServiceProviderDescriptor(" + id + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "ServiceProviderDescriptor(" + fId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

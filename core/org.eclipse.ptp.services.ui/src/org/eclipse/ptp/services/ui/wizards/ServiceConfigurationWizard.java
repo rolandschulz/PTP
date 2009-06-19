@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.ui.wizards;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -116,7 +116,7 @@ public class ServiceConfigurationWizard extends Wizard {
 	}
 
 	private WizardPage[] getWizardPagesFromServiceConfiguration(IServiceConfiguration serviceConfiguration) {
-		Set<WizardPage> wizardPages = new HashSet<WizardPage>();
+		List<WizardPage> wizardPages = new ArrayList<WizardPage>();
 		for (IService service : getServicesByPriority(serviceConfiguration)) {
 			IServiceContributor contrib = ServiceModelUIManager.getInstance().getServiceContributor(service);
 			if (contrib != null) {
@@ -142,12 +142,11 @@ public class ServiceConfigurationWizard extends Wizard {
 	 * @param service service containing providers
 	 * @return sorted providers
 	 */
-	private Set<IService> getServicesByPriority(IServiceConfiguration serviceConfiguration) {
+	private SortedSet<IService> getServicesByPriority(IServiceConfiguration serviceConfiguration) {
 		SortedSet<IService> sortedServices = 
 			new TreeSet<IService>(new Comparator<IService>() {
 				public int compare(IService o1, IService o2) {
-					int res = o1.getPriority().compareTo(o2.getPriority());
-					return res;
+					return o1.getPriority().compareTo(o2.getPriority());
 				}
 			});
 		for (IService s : serviceConfiguration.getServices()) {
