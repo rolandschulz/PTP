@@ -67,7 +67,6 @@ public class ServiceModelWidget {
 	
 	public class AddListener implements Listener {
 		public void handleEvent(Event event) {
-			// TODO: should be shown in priority order
 			Set<IService> displaySet = new HashSet<IService>();
 			Set<IService> configServices = getServiceConfiguration().getServices();
 			for (IService service : ServiceModelManager.getInstance().getServices()) {
@@ -80,7 +79,7 @@ public class ServiceModelWidget {
 			if (dialog.open() == Dialog.OK) {
 				IService[] selectedServices = dialog.getSelectedServices();
 				for (IService service : selectedServices) {
-					Set<IServiceProviderDescriptor> providers = getProvidersByPriority(service);
+					SortedSet<IServiceProviderDescriptor> providers = getProvidersByPriority(service);
 					if (providers.size() > 0) {
 						IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(providers.iterator().next());
 						addTableRow(service, provider);
@@ -410,12 +409,11 @@ public class ServiceModelWidget {
 	 * @param service service containing providers
 	 * @return sorted providers
 	 */
-	private Set<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
+	private SortedSet<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
 		SortedSet<IServiceProviderDescriptor> sortedProviders = 
 			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
 				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
-					int res = o1.getPriority().compareTo(o2.getPriority());
-					return res;
+					return o2.getPriority().compareTo(o1.getPriority());
 				}
 			});
 		for (IServiceProviderDescriptor p : service.getProviders()) {

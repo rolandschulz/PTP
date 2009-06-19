@@ -68,7 +68,7 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getPriority()
 	 */
-	public String getPriority() {
+	public Integer getPriority() {
 		if (fDescriptor == null) {
 			return null;
 		}
@@ -118,6 +118,11 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		}
 	}
 
+	/**
+	 * Set the descriptor for this provider.
+	 * 
+	 * @param descriptor descriptor to set
+	 */
 	public void setDescriptor(IServiceProviderDescriptor descriptor) {
 		this.fDescriptor = descriptor;
 	}

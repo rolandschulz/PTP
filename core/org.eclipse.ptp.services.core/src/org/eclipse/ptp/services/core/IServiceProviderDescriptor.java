@@ -41,11 +41,10 @@ public interface IServiceProviderDescriptor {
 	public String getServiceId();
 	
 	/**
-	 * Get the display priority for the the provider. Can be used by
-	 * UI elements to set the order that providers are displayed.
+	 * Get the priority for the the provider. 
 	 * Lower values have higher priority.
 	 * 
-	 * @return display priority
+	 * @return priority
 	 */
-	public String getPriority();
+	public Integer getPriority();
 }

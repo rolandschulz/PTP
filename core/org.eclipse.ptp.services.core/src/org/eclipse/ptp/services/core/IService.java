@@ -55,11 +55,11 @@ public interface IService {
 	public Set<String> getNatures();
 	
 	/**
-	 * Get the priority of this service.
+	 * Get the priority of this service. Lower values have higher priority.
 	 * 
 	 * @return a string representing the service priority
 	 */
-	public String getPriority();
+	public Integer getPriority();
 	
 	/**
 	 * Gets a specific provider of this service.

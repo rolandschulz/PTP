@@ -23,32 +23,36 @@ import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
  *
  */
 public class Service implements IService {
-	private String serviceId;
-	private String serviceName;
-	private String servicePriority;
-	private Set<String> serviceNatures;
-	private Set<IServiceProviderDescriptor> serviceProviderDescriptors = new HashSet<IServiceProviderDescriptor>();
-	private Map<String, IServiceProviderDescriptor> idToServiceProviderDescriptorMap = new HashMap<String, IServiceProviderDescriptor>();
+	private String fServiceId;
+	private String fServiceName;
+	private Integer fServicePriority;
+	private Set<String> fServiceNatures;
+	private Set<IServiceProviderDescriptor> fServiceProviderDescriptors = new HashSet<IServiceProviderDescriptor>();
+	private Map<String, IServiceProviderDescriptor> fIdToServiceProviderDescriptorMap = new HashMap<String, IServiceProviderDescriptor>();
 	
 	public Service(String id, String name, String priority, Set<String>natures) {
-		this.serviceId = id;
-		this.serviceName = name;
-		this.servicePriority = priority;
-		this.serviceNatures = natures;
+		fServiceId = id;
+		fServiceName = name;
+		try {
+			fServicePriority = Integer.parseInt(priority);
+		} catch (NumberFormatException e) {
+			fServicePriority = Integer.MAX_VALUE;
+		}
+		fServiceNatures = natures;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#addServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public void addServiceProvider(IServiceProviderDescriptor provider) {
-		serviceProviderDescriptors.add(provider);
-		idToServiceProviderDescriptorMap.put(provider.getId(), provider);
+		fServiceProviderDescriptors.add(provider);
+		fIdToServiceProviderDescriptorMap.put(provider.getId(), provider);
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof IService) {
-			return ((IService) o).getId().equals(serviceId);
+			return ((IService) o).getId().equals(fServiceId);
 		}
 		return false;
 	}
@@ -57,58 +61,58 @@ public class Service implements IService {
 	 * @see org.eclipse.ptp.services.core.IService#getId()
 	 */
 	public String getId() {
-		return serviceId;
+		return fServiceId;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getName()
 	 */
 	public String getName() {
-		return serviceName;
+		return fServiceName;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getNatures()
 	 */
 	public Set<String> getNatures() {
-		return serviceNatures;
+		return fServiceNatures;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getPriority()
 	 */
-	public String getPriority() {
-		return servicePriority;
+	public Integer getPriority() {
+		return fServicePriority;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getProvider(java.lang.String)
 	 */
 	public IServiceProviderDescriptor getProviderDescriptor(String id) {
-		return idToServiceProviderDescriptorMap.get(id);
+		return fIdToServiceProviderDescriptorMap.get(id);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getProviders()
 	 */
 	public Set<IServiceProviderDescriptor> getProviders() {
-		return serviceProviderDescriptors;
+		return fServiceProviderDescriptors;
 	}
 	
 	@Override
 	public int hashCode() {
-		return serviceId.hashCode();
+		return fServiceId.hashCode();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#removeServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public void removeServiceProvider(IServiceProviderDescriptor provider) {
-		serviceProviderDescriptors.remove(provider);
-		idToServiceProviderDescriptorMap.remove(provider.getId());
+		fServiceProviderDescriptors.remove(provider);
+		fIdToServiceProviderDescriptorMap.remove(provider.getId());
 	}
 	
 	public String toString() {
-		return "Service(" + serviceId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "Service(" + fServiceId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
