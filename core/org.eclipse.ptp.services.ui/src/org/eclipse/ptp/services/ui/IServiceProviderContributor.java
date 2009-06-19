@@ -12,7 +12,6 @@ package org.eclipse.ptp.services.ui;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.ui.wizards.ServiceProviderConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -43,5 +42,5 @@ public interface IServiceProviderContributor {
 	 * @param provider the provider being configured
 	 * @return wizard pages for the provider
 	 */
-	public WizardPage[] getWizardPages(ServiceProviderConfigurationWizard wizard, IServiceProvider provider);
+	public WizardPage[] getWizardPages(IServiceProvider provider);
 }

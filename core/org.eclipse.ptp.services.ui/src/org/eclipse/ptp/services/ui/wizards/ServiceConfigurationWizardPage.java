@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Label;
 
 public class ServiceConfigurationWizardPage extends WizardPage {
 
-	private final ServiceConfigurationWizard fWizard;
 	private final IService fService;
 	private IWizard fChildWizard = null;
 
@@ -45,9 +44,8 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 	 * @param fWizard
 	 * @param pageName
 	 */
-	public ServiceConfigurationWizardPage(ServiceConfigurationWizard wizard, IService service, String pageName) {
+	public ServiceConfigurationWizardPage(IService service, String pageName) {
 		super(pageName);
-		fWizard = wizard;
 		fService = service;
 		setPageComplete(false);
 	}
@@ -64,7 +62,7 @@ public class ServiceConfigurationWizardPage extends WizardPage {
         setControl(container);
         
         Label providerLabel = new Label(container, SWT.LEFT);
-        providerLabel.setText("Select a provider");
+        providerLabel.setText("Select a Provider:");
         
         final Combo providerCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
         providerCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -126,7 +124,7 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 	private void handleComboSelection(Combo combo) {
 		int index = combo.getSelectionIndex();
 		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(fProviderComboList.get(index));
-		IServiceConfiguration config = getConfigurationWizard().getServiceConfiguration();
+		IServiceConfiguration config = ((ServiceConfigurationWizard)getWizard()).getServiceConfiguration();
 		config.setServiceProvider(getService(), provider);
 		fChildWizard = null; // need to set fChildWizard to null so we get the next service configuration page
 		if (!provider.isConfigured()) {
@@ -140,21 +138,21 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 	 * @param combo
 	 */
 	protected void createComboContents(Combo combo) {
+		IServiceConfiguration config = ((ServiceConfigurationWizard)getWizard()).getServiceConfiguration();
+		IServiceProvider provider = config.getServiceProvider(getService());
 		int index = 0;
+		int selection = 0;
 		combo.removeAll();
 		for (IServiceProviderDescriptor descriptor : getProvidersByPriority(getService())) {
 			combo.add(descriptor.getName());
-			fProviderComboList.add(index++, descriptor);
+			fProviderComboList.add(index, descriptor);
+			if (descriptor.getId().equals(provider.getId())) {
+				selection = index;
+			}
+			index++;
 		}
-		combo.select(0);
+		combo.select(selection);
 		handleComboSelection(combo);
-	}
-	
-	/**
-	 * @return
-	 */
-	protected ServiceConfigurationWizard getConfigurationWizard() {
-		return fWizard;
 	}
 	
     /**

@@ -28,9 +28,10 @@ import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 
 public class ServiceProviderConfigurationWizard extends Wizard {
 
+	private final IWizardPage fFinalPage;
+	
 	/**
-	 * Create wizard with pages from a single service provider. Don't add intro and
-	 * services pages.
+	 * Create wizard with pages from a single service provider.
 	 * 
 	 * NOTE: The service provider MUST provide a configuration that supports the wizard.
 	 * 
@@ -42,13 +43,23 @@ public class ServiceProviderConfigurationWizard extends Wizard {
 		setForcePreviousAndNextButtons(true);
 		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderContributor(provider);
 		if (config != null) {
-			setWizardPages(config.getWizardPages(this, provider));
+			setWizardPages(config.getWizardPages(provider));
 		}
-		if (page != null) {
-			addPage(page);
-		}
+		fFinalPage = page;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#getNextPage(org.eclipse.jface.wizard.IWizardPage)
+	 */
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		IWizardPage nextPage = super.getNextPage(page);
+		if (nextPage == null) {
+			return fFinalPage;
+		}
+		return nextPage;
+	}
+
 	public boolean performFinish() {
 		return true;
 	}

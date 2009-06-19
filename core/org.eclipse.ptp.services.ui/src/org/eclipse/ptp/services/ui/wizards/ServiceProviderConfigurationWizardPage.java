@@ -16,26 +16,16 @@ import org.eclipse.swt.widgets.Composite;
 
 public abstract class ServiceProviderConfigurationWizardPage extends WizardPage {
 
-	private final ServiceProviderConfigurationWizard fWizard;
-	
 	/**
 	 * @param wizard
 	 * @param pageName
 	 */
-	public ServiceProviderConfigurationWizardPage(ServiceProviderConfigurationWizard wizard, String pageName) {
+	public ServiceProviderConfigurationWizardPage(String pageName) {
 		super(pageName);
-		fWizard = wizard;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public abstract void createControl(Composite parent);
-
-	/**
-	 * @return
-	 */
-	protected ServiceProviderConfigurationWizard getConfigurationWizard() {
-		return fWizard;
-	}
 }
