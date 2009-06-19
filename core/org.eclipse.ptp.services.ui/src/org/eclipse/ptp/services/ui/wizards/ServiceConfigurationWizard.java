@@ -114,13 +114,13 @@ public class ServiceConfigurationWizard extends Wizard {
 	public boolean performFinish() {
 		return true;
 	}
-
+	
 	private WizardPage[] getWizardPagesFromServiceConfiguration(IServiceConfiguration serviceConfiguration) {
 		List<WizardPage> wizardPages = new ArrayList<WizardPage>();
 		for (IService service : getServicesByPriority(serviceConfiguration)) {
 			IServiceContributor contrib = ServiceModelUIManager.getInstance().getServiceContributor(service);
 			if (contrib != null) {
-				WizardPage[] pages = contrib.getWizardPages(this, service);
+				WizardPage[] pages = contrib.getWizardPages(service);
 				for (WizardPage page : pages) {
 					wizardPages.add(page);
 				}
