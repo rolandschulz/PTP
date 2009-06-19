@@ -39,6 +39,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     private Definition definitionToRename = null;
     private ArrayList<PhotranTokenRef> allReferences = null;
     private String oldName = null, newName = null;
+    private boolean shouldBindInterfacesToDefinitions = true;
 
     public RenameRefactoring(IFile file, ITextSelection selection)
     {
@@ -68,6 +69,11 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         
         this.newName = newName;
     }
+    
+    public void setShouldBindInterfaces(boolean value)
+    {
+        this.shouldBindInterfacesToDefinitions = value;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
@@ -82,10 +88,6 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         definitionToRename = findDeclarationToRename();
         
         checkIfDefinitionCanBeRenamed();
-        
-        allReferences = definitionToRename.findAllReferences();
-        
-		checkIfReferencesCanBeRenamed();
     }
 
 	private Token findEnclosingToken() throws PreconditionFailure
@@ -140,22 +142,6 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
                fail(oldName + " cannot be renamed: It is declared in an INCLUDE file.");
 	}
 
-	private void checkIfReferencesCanBeRenamed() throws PreconditionFailure
-	{
-		for (PhotranTokenRef ref : allReferences)
-        {
-            Token reference = ref.findToken();
-            
-			if (reference.resolveBinding().size() > 1)
-            	fail(oldName + " cannot be renamed: " + describeToken(reference) + " is an ambiguous reference "
-            	     + " (it refers to " + oldName + " but may refer to another entity as well).");
-            
-			if (isPreprocessed(reference))
-                fail(oldName + " cannot be renamed: It would require modifying an INCLUDE file "
-                     + " (" + describeToken(reference) + ").");
-        }
-	}
-
     ///////////////////////////////////////////////////////////////////////////
     // Final Preconditions
     ///////////////////////////////////////////////////////////////////////////
@@ -171,7 +157,10 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         // OK if capitalization is different
         
         if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
-        
+
+        allReferences = definitionToRename.findAllReferences(shouldBindInterfacesToDefinitions);
+        checkIfReferencesCanBeRenamed();
+
         checkForConflictingDefinitionOrShadowing(status);
         
         for (PhotranTokenRef ref : findReferencesToShadowedDefinitions())
@@ -179,6 +168,22 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         
         for (PhotranTokenRef ref : allReferences)
             checkIfReferenceBindingWillChange(status, ref, true);
+    }
+
+    private void checkIfReferencesCanBeRenamed() throws PreconditionFailure
+    {
+        for (PhotranTokenRef ref : allReferences)
+        {
+            Token reference = ref.findToken();
+            
+            if (reference.resolveBinding().size() > 1)
+                fail(oldName + " cannot be renamed: " + describeToken(reference) + " is an ambiguous reference "
+                     + " (it refers to " + oldName + " but may refer to another entity as well).");
+            
+            if (isPreprocessed(reference))
+                fail(oldName + " cannot be renamed: It would require modifying an INCLUDE file "
+                     + " (" + describeToken(reference) + ").");
+        }
     }
 
     /** Check whether the new definition will either conflict with or shadow an existing definition */
@@ -215,7 +220,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
 
 		List<PhotranTokenRef> referencesToShadowedDefinitions = new LinkedList<PhotranTokenRef>();
 		for (PhotranTokenRef def : shadowedDefinitions)
-			referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences());
+			referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences(false));
 		return referencesToShadowedDefinitions;
 	}
 

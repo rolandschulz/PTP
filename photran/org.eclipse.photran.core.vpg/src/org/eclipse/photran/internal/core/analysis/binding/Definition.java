@@ -424,14 +424,55 @@ public class Definition implements Serializable, Comparable<Definition>
     }
     
     /** @return all workspace references to this definition, not including renamed references */
-    public ArrayList<PhotranTokenRef> findAllReferences()
+    public ArrayList<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesToSubprogramDefinitions)
     {
 		ArrayList<PhotranTokenRef> result = new ArrayList<PhotranTokenRef>();
 		
-		for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
-			result.add((PhotranTokenRef)r);
+		addBindings(result);
+		
+		if (this.isSubprogram() && shouldBindInterfacesToSubprogramDefinitions)
+		{
+		    if (this.isInInterfaceBlock())
+                addExternalSubprogramDefinitions(result);
+            else if (this.isExternallyVisibleSubprogramDefinition())
+		        addInterfaceDecls(result);
+		}
+		
+		// if (...)
+		//     addExternalStmts(result);
 		
 		return result;
+    }
+
+    private void addBindings(ArrayList<PhotranTokenRef> result)
+    {
+        for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
+			result.add((PhotranTokenRef)r);
+    }
+
+    private void addExternalSubprogramDefinitions(ArrayList<PhotranTokenRef> result)
+    {
+        for (Definition externalSubprogDef : this.resolveInterfaceBinding())
+        {
+            result.add(externalSubprogDef.getTokenRef());
+            result.addAll(externalSubprogDef.findAllReferences(false));
+        }
+    }
+
+    private void addInterfaceDecls(ArrayList<PhotranTokenRef> result)
+    {
+        for (Definition interfaceDef : this.findMatchingDeclarationsInInterfaces())
+        {
+            result.add(interfaceDef.getTokenRef());
+            result.addAll(interfaceDef.findAllReferences(false));
+        }
+    }
+
+    private void addExternalStmts(ArrayList<PhotranTokenRef> result)
+    {
+        // FIXME
+//        for (Definition interfaceDef : this.findMatchingDeclarationsInInterfaces())
+//            result.add(interfaceDef.getTokenRef());
     }
     
     /** @return true iff this is an entity defined inside an INTERFACE block */
@@ -453,8 +494,12 @@ public class Definition implements Serializable, Comparable<Definition>
 //        return stmt.getGenericName() == null && stmt.getGenericSpec() == null;
 //    }
 
-    /** @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
-     * Definitions; otherwise, <code>null</code> */
+    /**
+     * @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
+     * Definitions; otherwise, <code>null</code>
+     * 
+     * @see #findMatchingDeclarationsInInterfaces()
+     */
     public Collection<Definition> resolveInterfaceBinding()
     {
         if (!isInInterfaceBlock()) return Collections.emptySet();
@@ -514,8 +559,12 @@ public class Definition implements Serializable, Comparable<Definition>
         return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(token.getText());
     }
     
-    /** @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
-     * Definitions; otherwise, <code>null</code> */
+    /**
+     * @return if this is an external subprogram, a list of all possible matching declarations in INTERFACE blocks;
+     * otherwise, <code>null</code>
+     * 
+     * @see #resolveInterfaceBinding()
+     */
     public Collection<Definition> findMatchingDeclarationsInInterfaces()
     {
         if /*(isModuleSubprogram())

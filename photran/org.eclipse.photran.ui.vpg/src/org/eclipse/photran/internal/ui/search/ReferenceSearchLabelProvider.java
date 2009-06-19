@@ -21,10 +21,11 @@ import org.eclipse.swt.graphics.Image;
  * @author Doug Schaefer
  *
  */
+@SuppressWarnings("restriction")
 public class ReferenceSearchLabelProvider extends LabelProvider {
 
 	private final AbstractTextSearchViewPage fPage;
-	private final CUILabelProvider fCElementLabelProvider;
+    private final CUILabelProvider fCElementLabelProvider;
 	
 	public ReferenceSearchLabelProvider(AbstractTextSearchViewPage page) {
 		fCElementLabelProvider= new CUILabelProvider(0, CElementImageProvider.SMALL_ICONS);

@@ -14,14 +14,16 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
-import org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring;
 import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -66,6 +68,7 @@ public class RenameAction
             addPage(new UserInputWizardPage(renameRefactoring.getName())
             {
                 protected Text newNameField;
+                protected Button shouldBindInterfaces;
         
                 public void createControl(Composite parent)
                 {
@@ -90,9 +93,28 @@ public class RenameAction
                             renameRefactoring.setNewNameForIdentifier(newNameField.getText());
                         }
                     });
-                    
                     // Call once for sure, just in case the user doesn't modify the text
                     renameRefactoring.setNewNameForIdentifier(newNameField.getText());
+                    
+                    new Label(group, SWT.NONE).setText("");
+                    
+                    shouldBindInterfaces = new Button(group, SWT.CHECK);
+                    shouldBindInterfaces.setText("Map interface declarations to subprogram definitions");
+                    shouldBindInterfaces.setSelection(true);
+                    shouldBindInterfaces.addSelectionListener(new SelectionListener()
+                    {
+                        public void widgetDefaultSelected(SelectionEvent e)
+                        {
+                            widgetSelected(e);
+                        }
+
+                        public void widgetSelected(SelectionEvent e)
+                        {
+                            boolean isChecked = shouldBindInterfaces.getSelection();
+                            renameRefactoring.setShouldBindInterfaces(isChecked);
+                        }
+                        
+                    });
                     
                     newNameField.setFocus();
                 }

@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.search;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -81,7 +79,7 @@ public class ReferenceSearch implements ISearchQuery
         {
             filterAndAddSearchResult(getDef().getTokenRef());
             
-            for (PhotranTokenRef ref : getDef().findAllReferences())
+            for (PhotranTokenRef ref : getDef().findAllReferences(true))
                 filterAndAddSearchResult(ref);
         }
         catch (Exception e)

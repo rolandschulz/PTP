@@ -28,6 +28,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author Doug Schaefer
  *
  */
+@SuppressWarnings("restriction")
 public class ReferenceSearchViewPage extends AbstractTextSearchViewPage {
 
 	private IReferencesSearchContentProvider contentProvider;
@@ -66,7 +67,7 @@ public class ReferenceSearchViewPage extends AbstractTextSearchViewPage {
 		viewer.setLabelProvider(new ReferenceSearchListLabelProvider(this));
 	}
 
-	@Override
+    @Override
 	protected void showMatch(Match match, int currentOffset, int currentLength, boolean activate) throws PartInitException  {
 		try {
 			IFile element= (IFile)match.getElement();
@@ -77,7 +78,7 @@ public class ReferenceSearchViewPage extends AbstractTextSearchViewPage {
 				textEditor.selectAndReveal(currentOffset, currentLength);
 			}
 		} catch (CoreException e) {
-			CUIPlugin.getDefault().log(e);
+			CUIPlugin.log(e);
 		}
 	}
 }

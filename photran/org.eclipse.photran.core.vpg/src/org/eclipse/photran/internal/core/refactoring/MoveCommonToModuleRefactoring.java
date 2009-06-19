@@ -211,7 +211,7 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
         if (typeDecl != null)
             result.add(typeDecl);
 
-        for (PhotranTokenRef tokRef : def.findAllReferences())
+        for (PhotranTokenRef tokRef : def.findAllReferences(false))
         {
             ISpecificationStmt enclosingSpecStmt = tokRef.findToken().findNearestAncestor(ISpecificationStmt.class);
             if (enclosingSpecStmt != null && !(enclosingSpecStmt instanceof ASTCommonStmtNode))

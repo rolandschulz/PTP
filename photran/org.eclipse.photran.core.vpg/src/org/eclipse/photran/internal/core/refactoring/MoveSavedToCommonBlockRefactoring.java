@@ -28,6 +28,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
 import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
+import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
@@ -47,8 +48,6 @@ import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
@@ -396,7 +395,7 @@ public class MoveSavedToCommonBlockRefactoring extends SingleFileFortranRefactor
 
     private void processSpecifications(String newVariableName, Definition variableDefinition, StringBuffer result, HashSet<String> usedSpecs)
                                        throws PreconditionFailure{ 
-        for (PhotranTokenRef tokenReference : variableDefinition.findAllReferences()){
+        for (PhotranTokenRef tokenReference : variableDefinition.findAllReferences(false)){
             //Rename all occurences of the variable to the generated unique name
             tokenReference.findToken().setText(newVariableName);
 
