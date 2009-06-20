@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 
 /**
- * Implements the Clear VPG Database action in the Refactor/(Debugging) menu
+ * Implements the Clear and Rebuild VPG Database action in the Refactor/(Debugging) menu
  * 
  * @author Jeff Overbey
  */
@@ -29,6 +29,7 @@ public class ClearVPGDatabase extends FortranEditorActionDelegate
         	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
             PhotranVPG.getDatabase().clearDatabase();
+            PhotranVPG.getInstance().ensureVPGIsUpToDate(progressMonitor);
         }
         catch (Exception e)
         {

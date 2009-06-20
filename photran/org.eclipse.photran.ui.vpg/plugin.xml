@@ -367,7 +367,7 @@
          <action
                class="org.eclipse.photran.internal.ui.actions.ClearVPGDatabase"
                id="org.eclipse.photran.ui.ClearVPGDatabaseAction"
-               label="Clear VPG Database"
+               label="Clear and Rebuild VPG Database"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgdb"/>
          <action
                class="org.eclipse.photran.internal.ui.actions.RefreshVPGDatabase"
