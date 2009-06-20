@@ -206,6 +206,11 @@ public class Definition implements Serializable, Comparable<Definition>
     {
         return classification == Classification.EXTERNAL;
     }
+
+    public boolean isInterface()
+    {
+        return classification == Classification.INTERFACE;
+    }
     
     public boolean isRenamedModuleEntity()
     {
@@ -439,7 +444,7 @@ public class Definition implements Serializable, Comparable<Definition>
     }
     
     /** @return all workspace references to this definition, not including renamed references */
-    public Collection<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesAndExternals)
+    public Set<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesAndExternals)
     {
 		if ((this.isSubprogram() || this.isExternal()) && shouldBindInterfacesAndExternals)
 		    return findAllReferencesToSubprogramAggressively();
@@ -447,14 +452,15 @@ public class Definition implements Serializable, Comparable<Definition>
 		    return findAllImmediateReferences();
     }
     
-    private ArrayList<PhotranTokenRef> findAllImmediateReferences()
+    private Set<PhotranTokenRef> findAllImmediateReferences()
     {
-        ArrayList<PhotranTokenRef> result = new ArrayList<PhotranTokenRef>();
+        Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
         addImmediateBindings(result);
+        result.remove(this.getTokenRef()); // By contract, the set of references does not include this
         return result;
     }
 
-    private Collection<PhotranTokenRef> findAllReferencesToSubprogramAggressively()
+    private Set<PhotranTokenRef> findAllReferencesToSubprogramAggressively()
     {
         assert this.isSubprogram();
         
@@ -676,7 +682,7 @@ public class Definition implements Serializable, Comparable<Definition>
     
     /**
      * @return if this is an external subprogram, a list of all possible matching declarations in INTERFACE blocks;
-     * otherwise, <code>null</code>
+     * otherwise, the empty set
      * 
      * @see #resolveInterfaceBinding()
      */

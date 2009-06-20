@@ -676,8 +676,8 @@ class DefinitionCollector extends BindingCollector
     @Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
     {
         super.visitASTInterfaceBlockNode(node);
-        if (node.getInterfaceStmt().getGenericName() == null
-            && node.getInterfaceStmt().getGenericSpec() == null)
+//        if (node.getInterfaceStmt().getGenericName() == null
+//            && node.getInterfaceStmt().getGenericSpec() == null)
             markMatchingDeclarationsInInterfacesForExtSubprog(node);
     }
 

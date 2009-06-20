@@ -122,6 +122,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         if (!definitionToRename.isLocalVariable()
                && !definitionToRename.isSubprogram()
                && !definitionToRename.isExternal()
+               && !definitionToRename.isInterface()
                && !definitionToRename.isDerivedType()
                && !definitionToRename.isModuleEntityBeforeRename()
                && !definitionToRename.isRenamedModuleEntity()
@@ -131,8 +132,8 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
                && !definitionToRename.isBlockData())
         {
                fail("The " + definitionToRename.describeClassification() + " " + oldName + " cannot be renamed.  "
-                    + "Only local variables, subprograms, derived types, main programs, namelists, common blocks, "
-            		+ "and block data subprograms can be renamed.  Derived type components and subprogram "
+                    + "Only local variables, subprograms and interfaces, derived types, main programs, namelists, "
+            		+ "common blocks, and block data subprograms can be renamed.  Derived type components and subprogram "
             		+ "arguments cannot be renamed.");
         }
         
