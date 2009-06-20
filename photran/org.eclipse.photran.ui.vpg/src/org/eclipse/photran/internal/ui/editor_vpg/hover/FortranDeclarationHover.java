@@ -87,11 +87,18 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
         String str = "";
         if (activeTokenList != null && activeDefinitionMap != null)
         {
-            TextSelection ts = new TextSelection(textViewer.getDocument(),
-                hoverRegion.getOffset(),
-                hoverRegion.getLength());
-            Definition def = activeDefinitionMap.lookup(ts, activeTokenList);
-            if (def != null) str = def.describe();
+            try
+            {
+                TextSelection ts = new TextSelection(textViewer.getDocument(),
+                    hoverRegion.getOffset(),
+                    hoverRegion.getLength());
+                Definition def = activeDefinitionMap.lookup(ts, activeTokenList);
+                if (def != null) str = def.describe();
+            }
+            catch (Throwable t)
+            {
+                // Ignore
+            }
         }
 
         return str;

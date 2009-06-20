@@ -170,6 +170,8 @@ public class Intrinsics
      */
     private static class Intrinsic extends Definition
     {
+        private static final long serialVersionUID = 1L;
+
         public Intrinsic(String declaredName, PhotranTokenRef tokenRef)
         {
         	super(declaredName, tokenRef, Definition.Classification.INTRINSIC, /*Visibility.PUBLIC,*/ Type.UNKNOWN);

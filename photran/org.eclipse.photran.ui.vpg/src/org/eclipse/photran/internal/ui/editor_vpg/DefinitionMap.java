@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
@@ -37,6 +38,8 @@ public abstract class DefinitionMap<T>
 
     public DefinitionMap(ASTExecutableProgramNode ast)
     {
+        if (PhotranVPGBuilder.isEmpty(ast)) return;
+        
         ast.accept(new GenericASTVisitor()
         {
             @Override public void visitASTNode(IASTNode node)

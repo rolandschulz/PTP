@@ -356,10 +356,15 @@ public class PhotranVPGBuilder extends PhotranVPG
             db.deleteAllOutgoingDependenciesFor(filename);
         }
         
-        if (ast == null) return;
+        if (ast == null || isEmpty(ast.getRoot())) return;
 
         long start = System.currentTimeMillis();
         Binder.bind(ast, getIFileForFilename(filename));
         debug("  - Elapsed time in Binder#bind: " + (System.currentTimeMillis()-start) + " ms", filename);
+    }
+
+    public static boolean isEmpty(ASTExecutableProgramNode ast)
+    {
+        return ast.findFirstToken() == null;
     }
 }
