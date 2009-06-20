@@ -11,11 +11,12 @@
 package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
@@ -26,38 +27,21 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefactoring
 {
     protected ArrayList<IFile> selectedFiles = null;
-    protected ArrayList<IFortranAST> astsOfSelectedFiles = null;
     
     public MultipleFileFortranRefactoring(ArrayList<IFile> files)
     {
         assert files != null && files.size() > 0;
         
         this.vpg= PhotranVPG.getInstance();
-        
         this.selectedFiles = files;
     }
     
     @Override
     protected RefactoringStatus getAbstractSyntaxTree(RefactoringStatus status)
     {
-        if(selectedFiles != null)
-        {
-            this.astsOfSelectedFiles = new ArrayList<IFortranAST>();
-            for(IFile f : this.selectedFiles)
-            {
-                IFortranAST tempAST = this.vpg.acquirePermanentAST(f);
-                logVPGErrors(status);
-                if (tempAST == null)
-                {
-                    status.addFatalError("One of the selected files (" + f.getName() +") cannot be parsed.");
-                    return status;
-                }
-                this.astsOfSelectedFiles.add(tempAST); 
-            }
-        }
         return status;
     }
-    
+
     @Override
     protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
     {
@@ -82,4 +66,21 @@ public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefa
         //Remove files that didn't have Refactoring enabled in their projects
         this.selectedFiles.removeAll(filesToBeRemoved);
     }
+    
+    protected void removeFixedFormFilesFrom(Collection<IFile> files, RefactoringStatus status)
+    {
+        Set<IFile> filesToRemove = new HashSet<IFile>();
+        
+        for (IFile file : files)
+        {
+            if (!filesToRemove.contains(file) && PhotranVPG.hasFixedFormContentType(file))
+            {
+                status.addError("The fixed form file " + file.getName() + " will not be refactored.");
+                filesToRemove.add(file);
+            }
+        }
+        
+        files.removeAll(filesToRemove);
+    }
+
 }

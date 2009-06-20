@@ -135,6 +135,8 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 	@Override
     public final RefactoringStatus checkFinalConditions(IProgressMonitor pm)
     {
+        allChanges = new CompositeChange(getName());
+        
 		RefactoringStatus status = new RefactoringStatus();
 		pm.beginTask("Checking final preconditions; please wait...", IProgressMonitor.UNKNOWN);
         try
@@ -157,7 +159,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     	assert pm != null;
     	
         pm.beginTask("Constructing workspace transformation; please wait...", IProgressMonitor.UNKNOWN);
-        allChanges = new CompositeChange(getName());
+        // allChanges constructed above in #checkFinalConditions
         doCreateChange(pm);
         pm.done();
         return allChanges;

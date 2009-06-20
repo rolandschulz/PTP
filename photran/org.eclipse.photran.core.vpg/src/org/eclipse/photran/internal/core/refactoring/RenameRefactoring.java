@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Token;
@@ -161,6 +162,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
 
         allReferences = definitionToRename.findAllReferences(shouldBindInterfacesAndExternals);
+        removeFixedFormReferences(status);
         checkIfReferencesCanBeRenamed();
 
         checkForConflictingDefinitionOrShadowing(status);
@@ -170,6 +172,39 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         
         for (PhotranTokenRef ref : allReferences)
             checkIfReferenceBindingWillChange(status, ref, true);
+    }
+
+    private void removeFixedFormReferences(RefactoringStatus status)
+    {
+        HashSet<IFile> fixedFormFiles = new HashSet<IFile>();
+        HashSet<IFile> freeFormFiles = new HashSet<IFile>();
+        HashSet<PhotranTokenRef> referencesToRemove = new HashSet<PhotranTokenRef>();
+        
+        for (PhotranTokenRef reference : allReferences)
+        {
+            IFile file = reference.getFile();
+            
+            if (fixedFormFiles.contains(file))
+            {
+                referencesToRemove.add(reference);
+            }
+            else if (freeFormFiles.contains(file))
+            {
+                continue;
+            }
+            else if (PhotranVPG.hasFixedFormContentType(file))
+            {
+                fixedFormFiles.add(file);
+                status.addError("The fixed form file " + file.getName() + " will not be refactored.");
+                referencesToRemove.add(reference);
+            }
+            else
+            {
+                freeFormFiles.add(file);
+            }
+        }
+        
+        allReferences.removeAll(referencesToRemove);
     }
 
     private void checkIfReferencesCanBeRenamed() throws PreconditionFailure

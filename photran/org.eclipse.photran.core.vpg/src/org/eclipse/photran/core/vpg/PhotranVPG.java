@@ -11,6 +11,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
@@ -568,5 +570,39 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         attribs.put(IMarker.USER_EDITABLE, false);
         
         marker.setAttributes(attribs);
+    }
+    
+    public static boolean hasFixedFormContentType(IFile file)
+    {
+        return hasFixedFormContentType(getFilenameForIFile(file));
+    }
+    
+    public static boolean hasFreeormContentType(IFile file)
+    {
+        return hasFreeFormContentType(getFilenameForIFile(file));
+    }
+    
+    protected static boolean hasFixedFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".f");
+        else
+            return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
+    }
+    
+    protected static boolean hasFreeFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".f90");
+        else
+            return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
+    }
+    
+    protected static final String getContentType(String filename)
+    {
+        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
+        return contentType == null ? null : contentType.getId();
+        
+        // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
     }
 }

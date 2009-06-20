@@ -179,30 +179,6 @@ public class PhotranVPGBuilder extends PhotranVPG
         String filename = file.getName();
         return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
     }
-    
-    private static boolean hasFixedFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f");
-        else
-            return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
-    }
-    
-    private static boolean hasFreeFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f90");
-        else
-            return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
-    }
-    
-    private static final String getContentType(String filename)
-    {
-        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
-        return contentType == null ? null : contentType.getId();
-        
-        // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
-    }
 
     @Override
     protected boolean shouldProcessProject(IProject project)

@@ -41,8 +41,6 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
  */
 public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
 {
-    private ArrayList<ScopingNode> selectedScopes = null;
-
     public IntroImplicitNoneRefactoring(ArrayList<IFile> myFiles)
     {
         super(myFiles);
@@ -69,62 +67,26 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        
-        //Get the root of the AST, so that we can later get all of the sub-programs contained in the file
-        if(astsOfSelectedFiles != null && astsOfSelectedFiles.size() > 0)
-        {
-            selectedScopes = new ArrayList<ScopingNode>();
-            for(IFortranAST ast : astsOfSelectedFiles)
-            {
-                selectedScopes.add(ast.getRoot());
-            }
-        }
-        
-        if (selectedScopes == null)
-        {
-        	fail("To Introduce Implicit None, select one or more files in the Package Explorer that you want to refactor");
-        }
-        else
-        {
-            for(int i = 0; i < this.selectedScopes.size(); i++)
-            {
-                if(this.selectedScopes.get(i).isImplicitNone())
-                {
-                    this.selectedScopes.remove(i);
-                    selectedFiles.remove(i);
-                    astsOfSelectedFiles.remove(i);
-                    status.addWarning(selectedFiles.get(i).getName() + 
-                    " already has Implicit None defined. No action will be taken for that file");
-                }
-            }
-        }
+        removeFixedFormFilesFrom(this.selectedFiles, status);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Final Preconditions
+    // Final Preconditions & Change Creation
     ///////////////////////////////////////////////////////////////////////////
     
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Change
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
-    {
-        if(this.selectedScopes != null)
+        logVPGErrors(status);
+        
+        for(IFile f : this.selectedFiles)
         {
-            for(int i=0; i<astsOfSelectedFiles.size() && i<selectedScopes.size(); i++)
-            {
-                introduceImplicitNoneInFile(progressMonitor, selectedScopes.get(i), 
-                                     astsOfSelectedFiles.get(i), selectedFiles.get(i));
-            }
+            IFortranAST tempAST = this.vpg.acquirePermanentAST(f);
+            if (tempAST == null)
+                status.addError("One of the selected files (" + f.getName() +") cannot be parsed.");
+            introduceImplicitNoneInFile(pm, tempAST.getRoot(), tempAST, f);
+            vpg.releaseAST(f);
         }
-        vpg.releaseAllASTs();
     }
     
     @SuppressWarnings("unchecked")
@@ -220,4 +182,10 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
 		String typeString = type == null ? "type(unknown)" : type.toString(); // TODO
 		return typeString + " :: " + def.getCanonicalizedName() + EOL;
 	}
+
+    @Override
+    protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
+    {
+        // Change creation done in #doCheckFinalConditions
+    }
 }
