@@ -42,6 +42,7 @@ import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
@@ -865,9 +866,9 @@ public class Definition implements Serializable, Comparable<Definition>
                     if (first != null) commentsBefore = first.getWhiteBefore();
                     if (last != null) commentsAfter = last.getWhiteAfter();
                     
-//                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-//                    headerStmt.printOn(new PrintStream(out), null);
-//                    return out.toString();
+                    Token after = findFirstTokenAfter(last, localScope);
+                    if (after != null && !startsWithBlankLine(after.getWhiteBefore()))
+                        commentsAfter += after.getWhiteBefore();
                 }
             }
         }
@@ -875,6 +876,35 @@ public class Definition implements Serializable, Comparable<Definition>
         return commentsBefore + describe(name) + "\n" + commentsAfter;
     }
     
+    private boolean startsWithBlankLine(String string)
+    {
+        while (string.startsWith(" ") || string.startsWith("\t"))
+            string = string.substring(2);
+        
+        return string.startsWith("\r") || string.startsWith("\n");
+    }
+
+    private Token findFirstTokenAfter(final Token target, ScopingNode localScope)
+    {
+        class TokenFinder extends GenericASTVisitor
+        {
+            private Token lastToken = null;
+            private Token result = null;
+            
+            @Override public void visitToken(Token thisToken)
+            {
+                if (lastToken == target)
+                    result = thisToken;
+                
+                lastToken = thisToken;
+            }
+        }
+        
+        TokenFinder t = new TokenFinder();
+        localScope.accept(t);
+        return t.result;
+    }
+
     private IASTNode findEnclosingSpecificationStmt(Token tok)
     {
         for (IASTNode candidate = tok.getParent(); candidate != null; candidate = candidate.getParent())
