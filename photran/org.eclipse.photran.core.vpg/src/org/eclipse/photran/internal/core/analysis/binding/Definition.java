@@ -446,8 +446,49 @@ public class Definition implements Serializable, Comparable<Definition>
     /** @return all workspace references to this definition, not including renamed references */
     public Set<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesAndExternals)
     {
+        if (this.isImpliedFunctionResultVar() && findEnclosingFunctionDefinition() != null)
+            return findAllReferencesToEnclosingSubprogramInstead(shouldBindInterfacesAndExternals);
+        else
+            return internalFindAllReferences(shouldBindInterfacesAndExternals);
+    }
+
+    private Set<PhotranTokenRef> findAllReferencesToEnclosingSubprogramInstead(boolean aggressive)
+    {
+        Definition fnDef = findEnclosingFunctionDefinition();
+        Set<PhotranTokenRef> result = fnDef.internalFindAllReferences(aggressive);
+        result.add(fnDef.getTokenRef());
+        result.remove(this.getTokenRef());
+        return result;
+    }
+
+    private boolean isImpliedFunctionResultVar()
+    {
+        if (!this.isLocalVariable()) return false;
+        
+        ASTFunctionSubprogramNode fn = findEnclosingFunction();
+        if (fn != null && !fn.getFunctionStmt().hasResultClause())
+        {
+            Definition fnDef = findEnclosingFunctionDefinition();
+            return this.getCanonicalizedName().equals(fnDef.getCanonicalizedName());
+        }
+        return false;
+    }
+
+    private ASTFunctionSubprogramNode findEnclosingFunction()
+    {
+        return this.getTokenRef().findToken().findNearestAncestor(ASTFunctionSubprogramNode.class);
+    }
+
+    private Definition findEnclosingFunctionDefinition()
+    {
+        ASTFunctionSubprogramNode fn = findEnclosingFunction();
+        return fn == null ? null : PhotranVPG.getInstance().getDefinitionFor(fn.getRepresentativeToken());
+    }
+
+    private Set<PhotranTokenRef> internalFindAllReferences(boolean shouldBindInterfacesAndExternals)
+    {
 		if ((this.isSubprogram() || this.isExternal()) && shouldBindInterfacesAndExternals)
-		    return findAllReferencesToSubprogramAggressively();
+		    return internalFindAllReferencesToSubprogramAggressively();
 		else
 		    return findAllImmediateReferences();
     }
@@ -456,11 +497,48 @@ public class Definition implements Serializable, Comparable<Definition>
     {
         Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
         addImmediateBindings(result);
+        if (this.isFunction())
+            matchFunctionAndImpliedResultVariable(result);
         result.remove(this.getTokenRef()); // By contract, the set of references does not include this
         return result;
     }
 
-    private Set<PhotranTokenRef> findAllReferencesToSubprogramAggressively()
+    private void matchFunctionAndImpliedResultVariable(Collection<PhotranTokenRef> result)
+    {
+        try
+        {
+            ASTFunctionSubprogramNode fn = findEnclosingFunction();
+            if (fn.getFunctionStmt().hasResultClause()) return;
+            
+            for (Definition def : fn.getAllDefinitions())
+            {
+                if (def.getCanonicalizedName().equals(this.getCanonicalizedName()))
+                {
+                    result.add(def.getTokenRef());
+                    result.addAll(def.internalFindAllReferences(false));
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            // Ignore
+        }
+    }
+
+    private boolean isFunction()
+    {
+        return this.getClassification().equals(Classification.FUNCTION);
+    }
+
+    private void addImmediateBindings(Collection<PhotranTokenRef> result)
+    {
+        result.add(this.getTokenRef());
+        
+        for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
+            result.add((PhotranTokenRef)r);
+    }
+
+    private Set<PhotranTokenRef> internalFindAllReferencesToSubprogramAggressively()
     {
         assert this.isSubprogram();
         
@@ -476,12 +554,12 @@ public class Definition implements Serializable, Comparable<Definition>
         
         Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
         for (Definition subprogram : subprogramDefinitions)
-            result.addAll(subprogram.findAllReferencesToSubprogIncludingInterfacesAndExternalStmts());
+            result.addAll(subprogram.internalFindAllReferencesToSubprogIncludingInterfacesAndExternalStmts());
         result.remove(this.getTokenRef()); // By contract, the set of references does not include this
         return result;
     }
 
-    private Set<PhotranTokenRef> findAllReferencesToSubprogIncludingInterfacesAndExternalStmts()
+    private Set<PhotranTokenRef> internalFindAllReferencesToSubprogIncludingInterfacesAndExternalStmts()
     {
         assert this.isExternallyVisibleSubprogramDefinition();
         
@@ -491,34 +569,13 @@ public class Definition implements Serializable, Comparable<Definition>
         addExternalStmts(result);
         return result;
     }
-    
-//    private void removeDuplicates(ArrayList<PhotranTokenRef> result)
-//    {
-//        Set<PhotranTokenRef> alreadyAdded = new TreeSet<PhotranTokenRef>(result.size());
-//        int i = 0;
-//        while (i < result.size())
-//        {
-//            if (alreadyAdded.contains(result.get(i)))
-//                result.remove(i);
-//            else
-//                alreadyAdded.add(result.get(i++));
-//        }
-//    }
-
-    private void addImmediateBindings(Collection<PhotranTokenRef> result)
-    {
-        result.add(this.getTokenRef());
-        
-        for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
-			result.add((PhotranTokenRef)r);
-    }
 
     private void addExternalSubprogramDefinitions(Collection<PhotranTokenRef> result)
     {
         for (Definition externalSubprogDef : this.findAllSimilarlyNamedExternalSubprograms())
         {
             result.add(externalSubprogDef.getTokenRef());
-            result.addAll(externalSubprogDef.findAllReferences(false));
+            result.addAll(externalSubprogDef.internalFindAllReferences(false));
         }
     }
 
@@ -527,7 +584,7 @@ public class Definition implements Serializable, Comparable<Definition>
         for (Definition interfaceDef : this.findMatchingDeclarationsInInterfaces())
         {
             result.add(interfaceDef.getTokenRef());
-            result.addAll(interfaceDef.findAllReferences(false));
+            result.addAll(interfaceDef.internalFindAllReferences(false));
         }
     }
 
@@ -536,7 +593,7 @@ public class Definition implements Serializable, Comparable<Definition>
         for (Definition externalDef : this.findMatchingDeclarationsInExternalStmts())
         {
             result.add(externalDef.getTokenRef());
-            result.addAll(externalDef.findAllReferences(false));
+            result.addAll(externalDef.internalFindAllReferences(false));
         }
     }
     
