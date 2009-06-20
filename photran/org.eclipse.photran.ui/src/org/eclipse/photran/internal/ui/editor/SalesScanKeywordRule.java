@@ -489,7 +489,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else if (keyword.equalsIgnoreCase("bind"))
                 return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos));
             else if (keyword.equalsIgnoreCase("procedure"))
-                return match("procedure", firstTokenPos);
+                return match("procedure", firstTokenPos) || match("module", firstTokenPos);
             else if (keyword.equalsIgnoreCase("pointer"))
                 return openContextComma;
             else if (keyword.equalsIgnoreCase("operator")
