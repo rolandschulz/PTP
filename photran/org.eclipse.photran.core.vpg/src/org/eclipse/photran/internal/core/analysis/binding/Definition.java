@@ -879,7 +879,7 @@ public class Definition implements Serializable, Comparable<Definition>
     private boolean startsWithBlankLine(String string)
     {
         while (string.startsWith(" ") || string.startsWith("\t"))
-            string = string.substring(2);
+            string = string.substring(1);
         
         return string.startsWith("\r") || string.startsWith("\n");
     }
