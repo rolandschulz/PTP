@@ -36,17 +36,18 @@ import org.eclipse.photran.internal.core.lexer.Terminal;
 /**
  * This is a minimal Fortran model builder (which populates the model
  * you see in the Outline view) based only on lexical analysis.
- * The preferred model builder (based on the parser) is in the Core VPG
- * plug-in.
+ * The preferred model builder (based on the parser) is in the
+ * cdtinterface.vpg plug-in.
  * <p>
  * Editors can force the model builder to use fixed or free format for a given file by calling
- * <code>forceFormat</code>.  Otherwise, the format is determined by content type (i.e., by the
+ * {@link #setIsFixedForm(boolean)}.  Otherwise, the format is determined by content type (i.e., by the
  * filename extension and the user's workspace preferences).
  * <p>
  * All CDT extension languages are expected to supply a model builder.
- * @see IContributedModelBuilder
  * 
  * @author Jeff Overbey
+ * 
+ * @see IContributedModelBuilder
  */
 public class SimpleFortranModelBuilder implements IFortranModelBuilder
 {
@@ -83,6 +84,7 @@ public class SimpleFortranModelBuilder implements IFortranModelBuilder
                   isFixedForm ? (ILexer)new FixedFormLexerPhase2(in, filename, SimpleTokenFactory.getInstance())
                               : (ILexer)new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename, SimpleTokenFactory.getInstance(), false));
 
+              createSourceFormNode();
               buildModel(lexer);
 
                 
@@ -108,6 +110,16 @@ public class SimpleFortranModelBuilder implements IFortranModelBuilder
     public void setIsStructureKnown(boolean isStructureKnown)
     {
         translationUnit.setIsStructureKnown(isStructureKnown);
+    }
+
+    private FortranElement createSourceFormNode() throws CModelException
+    {
+        String sourceForm = isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>";
+        FortranElement element = new FortranElement.UnknownNode(translationUnit, sourceForm);
+        translationUnit.addChild(element);
+        this.newElements.put(element, element.getElementInfo());
+        return element;
+
     }
 
     private FortranElement createParseFailureNode(Parent parent, String errorMessage)
