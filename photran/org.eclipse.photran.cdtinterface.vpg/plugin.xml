@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- VPG-based model builder -->
+   <extension
+         point="org.eclipse.photran.cdtinterface.modelbuilder">
+      <modelbuilder
+            class="org.eclipse.photran.internal.core.model.FortranModelBuilder"
+            id="defaultModelBilder"
+            name="Default Photran Model Builder" />
+   </extension>
+
+</plugin>
