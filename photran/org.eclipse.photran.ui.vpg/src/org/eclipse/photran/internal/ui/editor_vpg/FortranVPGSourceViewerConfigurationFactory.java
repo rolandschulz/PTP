@@ -1,5 +1,6 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
+import org.eclipse.cdt.internal.ui.text.CCompositeReconcilingStrategy;
 import org.eclipse.cdt.internal.ui.text.CReconciler;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.ITextHover;
@@ -10,7 +11,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor.IFortranSourceViewerConfigurationFactory;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor.FortranModelReconcilingSourceViewerConfiguration;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor.FortranSourceViewerConfiguration;
 import org.eclipse.photran.internal.ui.editor_vpg.contentassist.FortranCompletionProcessor;
 import org.eclipse.photran.internal.ui.editor_vpg.hover.FortranDeclarationHover;
 
@@ -19,30 +20,25 @@ public class FortranVPGSourceViewerConfigurationFactory implements IFortranSourc
 {
     public SourceViewerConfiguration create(final AbstractFortranEditor editor)
     {
-        return new FortranModelReconcilingSourceViewerConfiguration(editor)
+        return new FortranSourceViewerConfiguration(editor)
         {
             private final FortranCompletionProcessor fortranCompletionProcessor =
                 new FortranCompletionProcessor();
             
-            @Override public IReconciler getReconciler(ISourceViewer sourceViewer)
+            @Override protected CCompositeReconcilingStrategy createReconcilingStrategy(ISourceViewer sourceViewer)
             {
-                MonoReconciler r = new CReconciler(editor,
-                        new FortranVPGReconcilingStrategy(sourceViewer, editor, getConfiguredDocumentPartitioning(sourceViewer)));
-                r.setIsIncrementalReconciler(false);
-                r.setProgressMonitor(new NullProgressMonitor());
-                r.setDelay(500);
-                return r;
+                return new FortranVPGReconcilingStrategy(sourceViewer, editor, getConfiguredDocumentPartitioning(sourceViewer));
             }
 
             @Override public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
             {
-                IContentAssistant result = fortranCompletionProcessor.setup(editor);
+                IContentAssistant result = fortranCompletionProcessor.setup((AbstractFortranEditor)editor);
                 return result == null ? super.getContentAssistant(sourceViewer) : result;
             }
 
             @Override public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
             {
-                return new FortranDeclarationHover(sourceViewer, editor);
+                return new FortranDeclarationHover(sourceViewer, (AbstractFortranEditor)editor);
             }
         };
     }

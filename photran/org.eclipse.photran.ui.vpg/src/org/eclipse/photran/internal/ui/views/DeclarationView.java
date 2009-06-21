@@ -101,7 +101,7 @@ public class DeclarationView extends ViewPart
     private SourceViewer createFortranSourceViewer(Composite parent)
     {
         final SourceViewer viewer = new SourceViewer(parent, null, SWT.V_SCROLL); //TextViewer(parent, SWT.NONE);
-        viewer.configure(new AbstractFortranEditor.FortranSourceViewerConfiguration()
+        viewer.configure(new AbstractFortranEditor.FortranSourceViewerConfiguration(null)
         {
             @Override protected ITokenScanner getTokenScanner()
             {

@@ -13,6 +13,7 @@ Export-Package: org.eclipse.photran.cdtinterface,
  org.eclipse.photran.cdtinterface.launch,
  org.eclipse.photran.cdtinterface.natures,
  org.eclipse.photran.cdtinterface.ui,
+ org.eclipse.photran.cdtinterface.ui.editor,
  org.eclipse.photran.internal.core.model
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -29,5 +30,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.launch,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
- org.eclipse.jface.text;bundle-version="3.4.0"
+ org.eclipse.jface.text;bundle-version="3.4.0",
+ org.eclipse.ui.editors;bundle-version="3.4.0",
+ org.eclipse.ui.views;bundle-version="3.3.1"
 Eclipse-LazyStart: true

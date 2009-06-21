@@ -176,7 +176,7 @@ public class SourceViewerInformationControl implements IInformationControl, IInf
         }
 
         fViewer = new SourceViewer(composite, null, textStyle);
-        fViewer.configure(new AbstractFortranEditor.FortranSourceViewerConfiguration()
+        fViewer.configure(new AbstractFortranEditor.FortranSourceViewerConfiguration(null)
         {
             @Override protected ITokenScanner getTokenScanner()
             {

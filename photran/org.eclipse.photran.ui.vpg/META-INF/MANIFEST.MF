@@ -17,10 +17,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ltk.core.refactoring,
  org.eclipse.ltk.ui.refactoring,
  org.eclipse.photran.core,
- org.eclipse.cdt.core,
  org.eclipse.search,
- org.eclipse.cdt.ui,
- org.eclipse.photran.cdtinterface
+ org.eclipse.photran.cdtinterface,
+ org.eclipse.cdt.core;bundle-version="5.0.2",
+ org.eclipse.cdt.ui;bundle-version="5.0.2"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.photran.internal.refactoring.ui,
  org.eclipse.photran.internal.ui.actions,

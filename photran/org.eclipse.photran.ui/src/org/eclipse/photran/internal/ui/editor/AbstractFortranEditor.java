@@ -10,40 +10,20 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
-import org.eclipse.cdt.core.model.CModelException;
-import org.eclipse.cdt.core.model.ICElement;
-import org.eclipse.cdt.core.model.ISourceRange;
-import org.eclipse.cdt.core.model.ISourceReference;
-import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
-import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
-import org.eclipse.cdt.internal.ui.editor.CEditor;
-import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
-import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
-import org.eclipse.cdt.internal.ui.text.CCompositeReconcilingStrategy;
-import org.eclipse.cdt.internal.ui.text.CReconciler;
-import org.eclipse.cdt.internal.ui.text.CReconcilingStrategy;
-import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.ui.IWorkingCopyManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
-import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -54,9 +34,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.photran.cdtinterface.ui.editor.CDTBasedSourceViewerConfiguration;
+import org.eclipse.photran.cdtinterface.ui.editor.CDTBasedTextEditor;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.graphics.Color;
@@ -68,30 +47,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPartService;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.editors.text.TextEditor;
-import org.eclipse.ui.part.IShowInSource;
-import org.eclipse.ui.part.IShowInTargetList;
-import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
-import org.eclipse.ui.texteditor.ContentAssistAction;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditorActionConstants;
-import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
-import org.eclipse.ui.texteditor.TextOperationAction;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
-import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 /**
  * Base class for the fixed and free-form Fortran editors
  * 
  * @author Jeff Overbey
  */
-public abstract class AbstractFortranEditor extends TextEditor implements ISelectionChangedListener
+public abstract class AbstractFortranEditor extends CDTBasedTextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
@@ -121,7 +89,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     
     protected IPreferenceStore fCombinedPreferenceStore;
     protected Composite fMainComposite;
-    protected CContentOutlinePage fOutlinePage;
     protected FortranHorizontalRuler fHRuler;
     protected Color verticalLineColor;
     
@@ -134,9 +101,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         super();
         setSourceViewerConfiguration(createSourceViewerConfiguration());
         setRangeIndicator(new DefaultRangeIndicator());
-        // We must use the CUIPlugin's document provider in order for the
-        // working copy manager in setOutlinePageInput (below) to function correctly.
-        setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
+        useCDTDocumentProvider();
         
         // This has to be set to be notified of changes to preferences
         // Without this, the editor will not auto-update
@@ -147,9 +112,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         // This enables any global changes to editor e.g. font type and size to take effect
         WorkbenchChainedTextFontFieldEditor.startPropagate(store, JFaceResources.TEXT_FONT);
 
-        // JO: This gives you a "Toggle Breakpoint" action (and others)
-        // when you right-click the Fortran editor's ruler
-        setRulerContextMenuId("#CEditorRulerContext"); //$NON-NLS-1$
+        useCDTRulerContextMenuID();
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,28 +146,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
 
         createHorizontalRuler(fMainComposite);
         createLightGrayLines();
-    }
-
-    protected void createActions()
-    {
-        super.createActions();
-
-        // See CEditor#createActions
-        
-        IAction action = new TextOperationAction(CEditorMessages.getResourceBundle(), "Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
-        action.setActionDefinitionId(ICEditorActionDefinitionIds.FORMAT);
-        setAction("Format", action); //$NON-NLS-1$
-        markAsStateDependentAction("Format", true); //$NON-NLS-1$
-
-        action = new ContentAssistAction(CEditorMessages.getResourceBundle(), "ContentAssistProposal.", this); //$NON-NLS-1$
-        action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
-        setAction("ContentAssistProposal", action); //$NON-NLS-1$
-        markAsStateDependentAction("ContentAssistProposal", true); //$NON-NLS-1$
-
-        action= new TextOperationAction(CEditorMessages.getResourceBundle(), "ContentAssistContextInformation.", this, ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION); //$NON-NLS-1$
-        action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_CONTEXT_INFORMATION);
-        setAction("ContentAssistContextInformation", action); //$NON-NLS-1$
-        markAsStateDependentAction("ContentAssistContextInformation", true); //$NON-NLS-1$
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,11 +250,11 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         }
 
         // Otherwise, default to CDT's reconciler
-        return new FortranModelReconcilingSourceViewerConfiguration(this);
+        return new FortranSourceViewerConfiguration(this);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Syntax Highlighting
+    // Syntax Highlighting and Outline View Support (Partitioning and Reconciling)
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     protected void configurePartitionScanner(IDocument document)
@@ -326,9 +267,14 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
 
     protected abstract ITokenScanner getTokenScanner();
 
-    public static abstract class FortranSourceViewerConfiguration extends SourceViewerConfiguration
+    public static class FortranSourceViewerConfiguration extends CDTBasedSourceViewerConfiguration
     {
         protected PresentationReconciler reconciler;
+        
+        public FortranSourceViewerConfiguration(AbstractFortranEditor editor)
+        {
+            super(editor);
+        }
         
         /**
          * Returns a list of the possible partitions' content types.
@@ -358,251 +304,11 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
    
             return reconciler;
         }
-        
-        protected abstract ITokenScanner getTokenScanner();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Outline View Support
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static class FortranModelReconcilingSourceViewerConfiguration extends FortranSourceViewerConfiguration
-    {
-        protected AbstractFortranEditor editor;
-        
-        public FortranModelReconcilingSourceViewerConfiguration(AbstractFortranEditor editor)
-        {
-            this.editor = editor;
-        }
-
-        /*
-         * The CReconciler is used to ensure that an ElementChangedEvent is fired.
-         * Without this, the Outline view says "Pending..." but never populates.
-         * 
-         * From Anton Leherbaurer (cdt-dev, 8/16/07):
-         *     The outline view waits for the initial reconciler to run and it requires
-         *     an ElementChangedEvent when it is done to populate the view.
-         *     See CContentOutlinerProvider$ElementChangedListener#elementChanged().
-         *     The event should usually be issued from the
-         *     ReconcileWorkingCopyOperation.
-         */
-        public IReconciler getReconciler(ISourceViewer sourceViewer)
-        {
-            //MonoReconciler r = new CReconciler(editor, new CReconcilingStrategy(editor));
-            MonoReconciler r = new CReconciler(editor,
-            	new CCompositeReconcilingStrategy(sourceViewer, editor, getConfiguredDocumentPartitioning(sourceViewer)));
-            r.setIsIncrementalReconciler(false);
-            r.setProgressMonitor(new NullProgressMonitor());
-            r.setDelay(500);
-            return r;
-        }
 
         protected ITokenScanner getTokenScanner()
         {
-            return editor.getTokenScanner();
+            return ((AbstractFortranEditor)editor).getTokenScanner();
         }
-    }
-
-	/**
-	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-	 */
-	public Object getAdapter(Class required) {
-		if (IContentOutlinePage.class.equals(required)) {
-			return getOutlinePage();
-		}
-		if (required == IShowInTargetList.class) {
-			return new IShowInTargetList() {
-				public String[] getShowInTargetIds() {
-					return new String[] { CUIPlugin.CVIEW_ID, IPageLayout.ID_OUTLINE, IPageLayout.ID_RES_NAV };
-				}
-
-			};
-		}
-		if (required == IShowInSource.class) {
-			ICElement ce= null;
-			try {
-				ce= SelectionConverter.getElementAtOffset(this);
-			} catch (CModelException ex) {
-				ce= null;
-			}
-			if (ce != null) { 
-				final ISelection selection= new StructuredSelection(ce);
-				return new IShowInSource() {
-					public ShowInContext getShowInContext() {
-						return new ShowInContext(getEditorInput(), selection);
-					}
-				};
-			}
-		}
-		return super.getAdapter(required);
-	}
-
-	/**
-	 * Gets the outline page of the c-editor.
-     * @return Outline page.
-	 */
-	public CContentOutlinePage getOutlinePage() {
-		if (fOutlinePage == null) {
-			fOutlinePage = new CContentOutlinePage(new CEditor());
-			fOutlinePage.addSelectionChangedListener(this);
-		}
-		setOutlinePageInput(fOutlinePage, getEditorInput());
-		return fOutlinePage;
-	}
-
-	/**
-     * Sets an input for the outline page.
-	 * @param page Page to set the input.
-	 * @param input Input to set.
-	 */
-	public static void setOutlinePageInput(CContentOutlinePage page, IEditorInput input) {
-		if (page != null) {
-			IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
-			IWorkingCopy workingCopy = manager.getWorkingCopy(input);
-			if (workingCopy != null)
-			    page.setInput(workingCopy);
-		}
-	}
-
-//    /**
-//     * Gets the outline page of the c-editor.
-//     * 
-//     * @return Outline page.
-//     */
-//    public CContentOutlinePage getOutlinePage() {
-//        if (fOutlinePage == null) {
-//            // CContentOutlinePage currently does nothing with its editor
-//            // parameter,
-//            // so we can pass in null rather than trying to convince it to use
-//            // our
-//            // editor (e.g., by subclassing CEditor).
-//            fOutlinePage = new CContentOutlinePage(null);
-//            fOutlinePage.addSelectionChangedListener(this);
-//        }
-//        setOutlinePageInput(fOutlinePage, getEditorInput());
-//        return fOutlinePage;
-//    }
-//
-//    /**
-//     * Sets an input for the outline page.
-//     * 
-//     * @param page
-//     *            Page to set the input.
-//     * @param input
-//     *            Input to set.
-//     */
-//    public static void setOutlinePageInput(CContentOutlinePage page,
-//            IEditorInput input) {
-//        if (page != null) {
-//            IWorkingCopyManager manager = CUIPlugin.getDefault()
-//                    .getWorkingCopyManager();
-//            page.setInput(manager.getWorkingCopy(input));
-//        }
-//    }
-    
-    // ISelectionChangedListener Implementation ///////////////////////////////////////////////////
-    // (for updating editor when Outline clicked)
-    
-    /**
-     * React to changed selection in the outline view.
-     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-     */
-    public void selectionChanged(SelectionChangedEvent event) {
-        ISelection sel = event.getSelection();
-        if (sel instanceof IStructuredSelection) {
-            IStructuredSelection selection = (IStructuredSelection) sel;
-            Object obj = selection.getFirstElement();
-            if (obj instanceof ISourceReference) {
-                try {
-                    ISourceRange range = ((ISourceReference) obj).getSourceRange();
-                    if (range != null) {
-                        setSelection(range, !isActivePart());
-                    }
-                } catch (CModelException e) {
-                    // Selection change not applied.
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the current editor selection to the source range. Optionally
-     * sets the current editor position.
-     *
-     * @param element the source range to be shown in the editor, can be null.
-     * @param moveCursor if true the editor is scrolled to show the range.
-     */
-    public void setSelection(ISourceRange element, boolean moveCursor) {
-
-        if (element == null) {
-            return;
-        }
-
-        try {
-            IRegion alternateRegion = null;
-            int start = element.getStartPos();
-            int length = element.getLength();
-
-            // Sanity check sometimes the parser may throw wrong numbers.
-            if (start < 0 || length < 0) {
-                start = 0;
-                length = 0;
-            }
-
-            // 0 length and start and non-zero start line says we know
-            // the line for some reason, but not the offset.
-            if (length == 0 && start == 0 && element.getStartLine() > 0) {
-                // We have the information in term of lines, we can work it out.
-                // Binary elements return the first executable statement so we have to substract -1
-                start = getDocumentProvider().getDocument(getEditorInput()).getLineOffset(element.getStartLine() - 1);
-                if (element.getEndLine() > 0) {
-                    length = getDocumentProvider().getDocument(getEditorInput()).getLineOffset(element.getEndLine()) - start;
-                } else {
-                    length = start;
-                }
-                // create an alternate region for the keyword highlight.
-                alternateRegion = getDocumentProvider().getDocument(getEditorInput()).getLineInformation(element.getStartLine() - 1);
-                if (start == length || length < 0) {
-                    if (alternateRegion != null) {
-                        start = alternateRegion.getOffset();
-                        length = alternateRegion.getLength();
-                    }
-                }
-            }
-            setHighlightRange(start, length, moveCursor);
-
-            if (moveCursor) {
-                start = element.getIdStartPos();
-                length = element.getIdLength();
-                if (start == 0 && length == 0 && alternateRegion != null) {
-                    start = alternateRegion.getOffset();
-                    length = alternateRegion.getLength();
-                }
-                if (start > -1 && getSourceViewer() != null) {
-                    getSourceViewer().revealRange(start, length);
-                    getSourceViewer().setSelectedRange(start, length);
-                }
-                updateStatusField(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
-            }
-            return;
-        } catch (IllegalArgumentException x) {
-            // No information to the user
-        } catch (BadLocationException e) {
-            // No information to the user
-        }
-
-        if (moveCursor)
-            resetHighlightRange();
-    }
-
-    /**
-     * Checks is the editor active part. 
-     * @return <code>true</code> if editor is the active part of the workbench.
-     */
-    private boolean isActivePart() {
-        IWorkbenchWindow window = getSite().getWorkbenchWindow();
-        IPartService service = window.getPartService();
-        return (this == service.getActivePart());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

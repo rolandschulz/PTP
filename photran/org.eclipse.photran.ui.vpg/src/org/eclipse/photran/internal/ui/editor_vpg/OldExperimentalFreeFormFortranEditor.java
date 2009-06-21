@@ -33,7 +33,7 @@ public class OldExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
         return new VPGFortranSourceViewerConfiguration(this);
     }
     
-    protected class VPGFortranSourceViewerConfiguration extends FortranModelReconcilingSourceViewerConfiguration
+    protected class VPGFortranSourceViewerConfiguration extends FortranSourceViewerConfiguration
     {
         public VPGFortranSourceViewerConfiguration(AbstractFortranEditor editor)
         {
