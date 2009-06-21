@@ -35,9 +35,14 @@
     id="org.eclipse.photran.codetemplates.fixedsourcefile"
     description="Default template for newly created fixed-form Fortran source files"
     context="org.eclipse.photran.core.fixedFormFortranSource.contenttype_context"
-    enabled="true">c ${file_base}
+    enabled="true">c
+c     ${file_name}
+c
+c     Created by ${user} (${date})
+c
+      program ${file_base}
           implicit none
-      end
+      end program ${file_base}
 </template>
 
 <template
@@ -45,9 +50,14 @@
     id="org.eclipse.photran.codetemplates.freesourcefile"
     description="Default template for newly created free-form Fortran source files"
     context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
-    enabled="true">! ${file_base}
+    enabled="true">!
+!     ${file_name}
+!
+!     Created by ${user} (${date})
+!
+program ${file_base}
     implicit none
-end
+end program ${file_base}
 </template>
 
 <template
