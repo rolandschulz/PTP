@@ -35,12 +35,7 @@
     id="org.eclipse.photran.codetemplates.fixedsourcefile"
     description="Default template for newly created fixed-form Fortran source files"
     context="org.eclipse.photran.core.fixedFormFortranSource.contenttype_context"
-    enabled="true">c
-c     ${file_name}
-c
-c     Created by ${user} (${date})
-c
-      program ${file_base}
+    enabled="true">      program ${file_base}
           implicit none
       end program ${file_base}
 </template>
@@ -50,12 +45,7 @@ c
     id="org.eclipse.photran.codetemplates.freesourcefile"
     description="Default template for newly created free-form Fortran source files"
     context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
-    enabled="true">!
-!     ${file_name}
-!
-!     Created by ${user} (${date})
-!
-program ${file_base}
+    enabled="true">program ${file_base}
     implicit none
 end program ${file_base}
 </template>
@@ -65,8 +55,7 @@ end program ${file_base}
     id="org.eclipse.photran.codetemplates.freemodulesourcefile"
     description="Fortran 90 module (free format)"
     context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
-    enabled="true">! ${file_name} - Implementation of the ${file_base} module
-module ${file_base}
+    enabled="true">module ${file_base}
     implicit none
 end module ${file_base}
 </template>
@@ -76,8 +65,7 @@ end module ${file_base}
     id="org.eclipse.photran.codetemplates.freeclasssourcefile"
     description="Fortran 2003 class (free format)"
     context="org.eclipse.photran.core.freeFormFortranSource.contenttype_context"
-    enabled="true">! ${file_name} - Implementation of the ${file_base} class and ${file_base}_module module
-module ${file_base}_module
+    enabled="true">module ${file_base}_module
     implicit none
     private
 
