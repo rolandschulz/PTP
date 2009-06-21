@@ -76,6 +76,7 @@ AbstractToolRMConfiguration implements Cloneable {
 	public static final String VERSION_AUTO = "auto"; //$NON-NLS-1$
 	public static final String VERSION_12 = "1.2"; //$NON-NLS-1$
 	public static final String VERSION_13 = "1.3"; //$NON-NLS-1$
+	public static final String VERSION_14 = "1.4"; //$NON-NLS-1$
 
 	public static OpenMPIResourceManagerConfiguration load(
 			OpenMPIResourceManagerFactory factory, IMemento memento) {
@@ -246,6 +247,7 @@ AbstractToolRMConfiguration implements Cloneable {
 
 	private boolean validateVersion() {
 		return getDetectedVersion().equals(VERSION_12)
-			|| getDetectedVersion().equals(VERSION_13);
+			|| getDetectedVersion().equals(VERSION_13)
+			|| getDetectedVersion().equals(VERSION_14);
 	}
 }

@@ -39,7 +39,6 @@ RMConfigurationWizardPageFactory {
 		};
 	}
 
-	//	@Override
 	@Override
 	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
 		List<RMConfigurationWizardPage> list = new ArrayList<RMConfigurationWizardPage>();
@@ -48,7 +47,6 @@ RMConfigurationWizardPageFactory {
 		return list.toArray(new RMConfigurationWizardPage[list.size()]);
 	}
 
-	//	@Override
 	@Override
 	public Class<? extends IResourceManagerFactory> getRMFactoryClass() {
 		return OpenMPIResourceManagerFactory.class;

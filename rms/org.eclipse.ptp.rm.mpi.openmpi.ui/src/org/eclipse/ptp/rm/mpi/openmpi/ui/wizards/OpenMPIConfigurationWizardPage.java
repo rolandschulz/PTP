@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI12PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI13PreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPI14PreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIAutoPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
@@ -42,12 +43,14 @@ AbstractToolRMConfigurationWizardPage {
 	String versionIds[] = new String[] { 
 			OpenMPIResourceManagerConfiguration.VERSION_AUTO, 
 			OpenMPIResourceManagerConfiguration.VERSION_12, 
-			OpenMPIResourceManagerConfiguration.VERSION_13 
+			OpenMPIResourceManagerConfiguration.VERSION_13,
+			OpenMPIResourceManagerConfiguration.VERSION_14
 			};
 	String versionsNames[] = new String[] { 
 			Messages.OpenMPIConfigurationWizardPage_VersionCombo_Auto, 
 			Messages.OpenMPIConfigurationWizardPage_VersionCombo_Version12, 
-			Messages.OpenMPIConfigurationWizardPage_VersionCombo_Version13
+			Messages.OpenMPIConfigurationWizardPage_VersionCombo_Version13,
+			Messages.OpenMPIConfigurationWizardPage_VersionCombo_Version14
 			};
 
 	protected Combo versionCombo;
@@ -218,7 +221,13 @@ AbstractToolRMConfigurationWizardPage {
 			launchCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_DISCOVER_CMD);
-			remoteInstallPath = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI12PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
+			remoteInstallPath = preferences.getString(OpenMPI13PreferenceManager.PREFIX + OpenMPI13PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
+		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
+			Preferences preferences = OpenMPI14PreferenceManager.getPreferences();
+			launchCmd = preferences.getString(OpenMPI14PreferenceManager.PREFIX + OpenMPI14PreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = preferences.getString(OpenMPI14PreferenceManager.PREFIX + OpenMPI14PreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = preferences.getString(OpenMPI14PreferenceManager.PREFIX + OpenMPI14PreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = preferences.getString(OpenMPI14PreferenceManager.PREFIX + OpenMPI14PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else {
 			assert false;
 		}

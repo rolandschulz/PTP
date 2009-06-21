@@ -65,6 +65,7 @@ public class Messages extends NLS {
 	public static String OpenMPIConfigurationWizardPage_VersionCombo_Auto;
 	public static String OpenMPIConfigurationWizardPage_VersionCombo_Version12;
 	public static String OpenMPIConfigurationWizardPage_VersionCombo_Version13;
+	public static String OpenMPIConfigurationWizardPage_VersionCombo_Version14;
 	public static String OpenMPIConfigurationWizardPage_Version_Auto;
 	public static String OpenMPIRMConfigurationWizardPage_Description;
 	public static String OpenMPIRMConfigurationWizardPage_Title;

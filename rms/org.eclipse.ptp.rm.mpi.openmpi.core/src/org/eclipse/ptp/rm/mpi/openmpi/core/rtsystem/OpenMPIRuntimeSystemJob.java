@@ -219,7 +219,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								// Empty
 							}
 						});
-					} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
+					} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
+								|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
 						InputStream is;
 						if (configuration.getServiceVersion() > 0) {
 							is = new OpenMPI131InputStream(parserInputStream);
@@ -295,9 +296,10 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
 		final OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 		/*
-		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] since the streams are wrapped in the appropriate XML tags.
+		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] and 1.4 since the streams are wrapped in the appropriate XML tags.
 		 */
-		if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13) && configuration.getServiceVersion() > 0) {
+		if ((configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13) && configuration.getServiceVersion() > 0)
+			|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
 			builder.redirectErrorStream(true);
 		}
 	}
@@ -355,8 +357,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * for stdout and stderr.
 		 */
 		final IPProcess procZero;
-		if (!configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
-				|| configuration.getServiceVersion() < 1) {
+		if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)
+				|| (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12) 
+						&& configuration.getServiceVersion() < 1)) {
 			procZero = ipJob.getProcessByIndex(0);
 		} else {
 			procZero = null;
@@ -468,7 +471,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			} else {
 				getStdoutObserver().addListener(getParserListener());
 			}
-		} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
+		} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
+					|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
 			getStdoutObserver().addListener(getParserListener());
 		} else {
 			assert false;
