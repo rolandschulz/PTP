@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceConfiguration;
@@ -85,7 +86,7 @@ public class ServiceModelManagerTests {
 	
 	@Test
 	public void testMultipleServices() throws Exception {
-		ServiceModelManager manager = ServiceModelManager.getInstance();
+		IServiceModelManager manager = ServiceModelManager.getInstance();
 		
 		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
 		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
@@ -119,7 +120,7 @@ public class ServiceModelManagerTests {
 
 	@Test
 	public void testOneProvider() throws Exception {
-		ServiceModelManager manager = ServiceModelManager.getInstance();
+		IServiceModelManager manager = ServiceModelManager.getInstance();
 		
 		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
 		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$

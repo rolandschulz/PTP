@@ -16,16 +16,6 @@ import org.eclipse.core.resources.IProject;
 
 public interface IServiceModelManager {
 	/**
-	 * Associate the service configuration with a project
-	 * 
-	 * @param project the project
-	 * @param conf the configuration
-	 * 
-	 * @throws NullPointerException if project or conf is null
-	 */
-	public void putConfiguration(IProject project, IServiceConfiguration conf);
-	
-	/**
 	 * Get the configuration that is currently active for the project. Each project has
 	 * exactly one active configuration, which describes the mapping from services to
 	 * service providers. By default, the first configuration created for a project will 
@@ -62,13 +52,30 @@ public interface IServiceModelManager {
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
 	
+	/**
+	 * Get the project associated with a configuration
+	 * 
+	 * @param configuration the configuration
+	 * @return the project associated with the configuration, or null if there is no project
+	 */
+	public IProject getProject(IServiceConfiguration configuration);
+	
 	
 	/**
-	 * Returns true if the given project has a configuration.
+	 * Retrieves the service corresponding to a given id.
 	 * 
+	 * @param id The unique id of the service to retrieve.
+	 * @return IService or null
 	 */
-	public boolean isConfigured(IProject project);
+	public IService getService(String id);
 	
+	/**
+	 * Return the service provider corresponding to the descriptor.
+	 * 
+	 * @param desc extension description
+	 * @return service provider
+	 */
+	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc);
 	
 	/**
 	 * Get all the services that have been registered with the system.
@@ -97,13 +104,38 @@ public interface IServiceModelManager {
 	public Set<IService> getServices(String natureID);
 	
 	/**
-	 * Retrieves the service corresponding to a given id.
+	 * Get all configurations available in the workspace.
 	 * 
-	 * @param id The unique id of the service to retrieve.
-	 * @return IService or null
+	 * @return all configurations that could be found, or an empty set
 	 */
-	public IService getService(String id);
+	public Set<IServiceConfiguration> getWorkspaceConfigurations();
 	
+	/**
+	 * Returns true if the given project has a configuration.
+	 * 
+	 */
+	public boolean isConfigured(IProject project);
+	
+	
+	/**
+	 * Associate the service configuration with a project
+	 * 
+	 * @param project the project
+	 * @param conf the configuration
+	 * 
+	 * @throws NullPointerException if project or conf is null
+	 */
+	public void putConfiguration(IProject project, IServiceConfiguration conf);
+	
+	
+	/**
+	 * Removes all the configurations and services associated to the given project.
+	 * If the project has not been configured then this method does nothing.
+	 * 
+	 * @throws NullPointerException if project is null
+	 */
+	public void remove(IProject project);
+
 	/**
 	 * TODO What happens if you try to remove the active configuration?
 	 * TODO What happens if there are no configurations left after removing the given configuration?
@@ -119,17 +151,7 @@ public interface IServiceModelManager {
 	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public void removeConfiguration(IProject project, IServiceConfiguration conf);
-	
-	
-	/**
-	 * Removes all the configurations and services associated to the given project.
-	 * If the project has not been configured then this method does nothing.
-	 * 
-	 * @throws NullPointerException if project is null
-	 */
-	public void remove(IProject project);
-	
-	
+
 	/**
 	 * Set the active configuration for a project. By default, the first configuration created
 	 * for a project will be the active configuration for that project.
