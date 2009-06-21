@@ -11,6 +11,7 @@
 package org.eclipse.ptp.services.core;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * An interface for arbitrary services.  Services can be implemented by one or more
@@ -75,6 +76,14 @@ public interface IService {
 	 * @return set of providers for this service
 	 */
 	public Set<IServiceProviderDescriptor> getProviders();
+	
+	/**
+	 * Return the set of providers sorted by priority
+	 * 
+	 * @param service service containing providers
+	 * @return sorted providers
+	 */
+	public SortedSet<IServiceProviderDescriptor> getProvidersByPriority();
 	
 	/**
 	 * Remove service provider from list of providers for this service.

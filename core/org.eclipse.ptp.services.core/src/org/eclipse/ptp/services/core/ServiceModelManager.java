@@ -44,7 +44,7 @@ import org.eclipse.ui.XMLMemento;
  * A singleton class which is the entry point to a service model which represents:
  * - the set of contributed services
  * - the set of providers which provide those services
- * - the service configurations for each project which specify which services are
+ * - the service fProjectConfigurations for each project which specify which services are
  * 		mapped to which providers.
  *
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
@@ -74,14 +74,15 @@ public class ServiceModelManager implements IServiceModelManager {
 	/** Default location to save service model configuration */
 	private final IPath defaultSaveFile; 
 	
-	private Map<IProject, Map<String, IServiceConfiguration>> configurations;
-	private Map<IProject, IServiceConfiguration> activeConfigurations;
-	private Map<IProject, Set<IService>> projectServices;
+	private Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations;
+	private Map<IProject, IServiceConfiguration> fActiveConfigurations;
+	private Map<IProject, Set<IService>> fProjectServices;
+	private Map<IServiceConfiguration, IProject> fConfigurationToProject;
 
-	private Map<String, IService> services = null;
-	private Map<String, IServiceProviderDescriptor> serviceProviders = null;
-	private Set<IService> serviceSet = null;
-	private Map<String, Set<IService>> natureServices = null;
+	private Map<String, IService> fServices = null;
+	private Map<String, IServiceProvider> fServiceProviders = null;
+	private Set<IService> fServiceSet = null;
+	private Map<String, Set<IService>> fNatureServices = null;
 	
 	
 	private static ServiceModelManager fInstance;
@@ -92,46 +93,6 @@ public class ServiceModelManager implements IServiceModelManager {
 		return fInstance;
 	}
 	
-	private ServiceModelManager() {
-		defaultSaveFile = Activator.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
-		initialize();
-	}
-	
-	private void initialize() {
-		 activeConfigurations = new HashMap<IProject, IServiceConfiguration>();
-		 configurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
-		 projectServices = new HashMap<IProject, Set<IService>>();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#putConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void putConfiguration(IProject project, IServiceConfiguration conf) {
-		if(project == null || conf == null)
-			throw new NullPointerException();
-		
-		Map<String, IServiceConfiguration> confs = configurations.get(project);
-		if(confs == null) {
-			confs = new HashMap<String, IServiceConfiguration>();
-			configurations.put(project, confs);
-			activeConfigurations.put(project, conf);
-		}
-		
-		confs.put(conf.getName(), conf);
-		
-		Set<IService> services = projectServices.get(project);
-		if(services == null) {
-			services = new HashSet<IService>();
-			projectServices.put(project, services);
-		}
-		for(IServiceConfiguration config : confs.values()) {
-			for(IService service : config.getServices()) {
-				services.add(service);
-			}
-		}
-	}
-
-	
 	private static <T> T getConf(Map<IProject, T> map, IProject project) {
 		if(project == null)
 			throw new NullPointerException();
@@ -140,226 +101,6 @@ public class ServiceModelManager implements IServiceModelManager {
 			throw new ProjectNotConfiguredException();
 		return value;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
-	 */
-	public IServiceConfiguration getActiveConfiguration(IProject project) {
-		return getConf(activeConfigurations, project);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
-	 */
-	public IServiceConfiguration getConfiguration(IProject project, String name) {
-		return getConf(configurations, project).get(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
-	 */
-	public Set<IServiceConfiguration> getConfigurations(IProject project) {
-		return new HashSet<IServiceConfiguration>(getConf(configurations, project).values());
-	}
-	
-	
-	public boolean isConfigured(IProject project) {
-		return configurations.containsKey(project);
-	}
-	
-	/**
-	 * @param desc
-	 * @return
-	 */
-	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
-		if (extensionPoint != null) {
-			for (IExtension extension : extensionPoint.getExtensions()) {
-				for (IConfigurationElement element : extension.getConfigurationElements()) {
-					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
-						if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
-							try {
-								IServiceProvider provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
-								if (provider instanceof ServiceProvider) {
-									((ServiceProvider)provider).setDescriptor(desc);
-									return provider;
-								}
-							} catch (Exception e) {
-								Activator.getDefault().log(e);
-								return null;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices()
-	 */
-	public Set<IService> getServices() {
-		loadServices();
-		return serviceSet;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
-	 */
-	public Set<IService> getServices(IProject project) {
-		return getConf(projectServices, project);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
-	 */
-	public Set<IService> getServices(String natureId) {
-		loadServices();
-		return natureServices.get(natureId);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
-		Map<String, IServiceConfiguration> confs = getConf(configurations, project);
-		if(confs != null) {
-			confs.remove(conf.getName());
-		}
-	}
-	
-	
-	public void remove(IProject project) {
-		if(project == null)
-			throw new NullPointerException();
-		configurations.remove(project);
-		activeConfigurations.remove(project);
-		projectServices.remove(project);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
-		Map<String, IServiceConfiguration> confs = getConf(configurations, project);
-		
-		if(!confs.containsKey(configuration.getName()))
-			throw new IllegalArgumentException();
-		
-		activeConfigurations.put(project, configuration);
-	}
-
-	/**
-	 * Locate and initialize service extensions.
-	 */
-	private void loadServices() {
-		if (services != null) {
-			return;
-		}
-		services = new HashMap<String, IService>();
-		serviceProviders = new HashMap<String, IServiceProviderDescriptor>();
-		serviceSet = new HashSet<IService>();
-		natureServices = new HashMap<String, Set<IService>>();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, SERVICE_EXTENSION_ID);
-		if (extensionPoint != null) {
-			for (IExtension extension : extensionPoint.getExtensions()) {
-				for (IConfigurationElement element : extension.getConfigurationElements()) {
-					if (element.getName().equals(SERVICE_ELEMENT_NAME)) {
-						String id = element.getAttribute(ATTR_ID);
-						String name = element.getAttribute(ATTR_NAME);
-						String priority = element.getAttribute(ATTR_PRIORITY);
-						IConfigurationElement[] natureConf = element.getChildren(NATURE_ELEMENT_NAME);
-						Set<String> natures = new HashSet<String>();
-						if (natureConf != null) {
-							for (IConfigurationElement nature : natureConf) {
-								String natureId = nature.getAttribute(ATTR_ID);
-								if (workspace.getNatureDescriptor(natureId) != null) {
-									natures.add(natureId);
-								}
-							}
-						}
-						IService service = new Service(id, name, priority, natures);
-						serviceSet.add(service);
-						services.put(id, service);
-						for (String nature : natures) {
-							Set<IService> svcs = natureServices.get(nature);
-							if (svcs == null) {
-								svcs = new HashSet<IService>();
-								natureServices.put(nature, svcs);
-							}
-							svcs.add(service);
-						}
-					}
-				}
-			}
-		}
-        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, PROVIDER_EXTENSION_ID);
-		if (extensionPoint != null) {
-			for (IExtension extension : extensionPoint.getExtensions()) {
-				for (IConfigurationElement element : extension.getConfigurationElements()) {
-					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
-						String id = element.getAttribute(ATTR_ID);
-						String name = element.getAttribute(ATTR_NAME);
-						String priority = element.getAttribute(ATTR_PRIORITY);
-						String serviceId = element.getAttribute(ATTR_SERVICE_ID);
-						IServiceProviderDescriptor desc = new ServiceProviderDescriptor(id, name, serviceId, priority);
-						IService service = services.get(serviceId);
-						if (service != null) {
-							serviceProviders.put(id, desc);
-							service.addServiceProvider(desc);
-						} else {
-							Activator.getDefault().logErrorMessage(
-									NLS.bind(Messages.Services_invalidServiceId, serviceId));
-						}
-					}
-				}
-			}
-		}	
-	}
-
-	public IService getService(String id) {
-		loadServices();
-		return services.get(id);
-	}
-	
-	/**
-	 * Saves the service model configuration to the given <code>file</code>.
-	 * Will not save data for projects that do not exist.
-	 * 
-	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
-	 * @param file
-	 * @throws IOException 
-	 * @throws NullPointerException if file is null
-	 */
-	public void saveModelConfiguration(Writer writer) throws IOException {
-		if(writer == null)
-			throw new NullPointerException();
-		saveModelConfiguration(configurations, writer);
-	}
-	
-	/**
-	 * Saves the model configuration into the plugin's metadata area using
-	 * the default file name.
-	 * Will not save data for projects that do not exist.
-	 * 
-	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.services.core<code> plugin.
-	 * @throws IOException
-	 */
-	public void saveModelConfiguration() throws IOException {
-		File file = defaultSaveFile.toFile();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		try {
-			saveModelConfiguration(writer);
-		} finally {
-			writer.close();
-		}
-	}
-	
 	
 	private static void saveModelConfiguration(Map<IProject, Map<String, IServiceConfiguration>> model, Writer writer) throws IOException {
 		XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
@@ -401,7 +142,129 @@ public class ServiceModelManager implements IServiceModelManager {
 			
 		rootMemento.save(writer);
 	}
+
+	private ServiceModelManager() {
+		defaultSaveFile = Activator.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+		initialize();
+	}
+
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
+	 */
+	public IServiceConfiguration getActiveConfiguration(IProject project) {
+		return getConf(fActiveConfigurations, project);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
+	 */
+	public IServiceConfiguration getConfiguration(IProject project, String name) {
+		return getConf(fProjectConfigurations, project).get(name);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
+	 */
+	public Set<IServiceConfiguration> getConfigurations(IProject project) {
+		return new HashSet<IServiceConfiguration>(getConf(fProjectConfigurations, project).values());
+	}
+	
+	public IProject getProject(IServiceConfiguration configuration) {
+		return fConfigurationToProject.get(configuration);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getService(java.lang.String)
+	 */
+	public IService getService(String id) {
+		loadServices();
+		return fServices.get(id);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
+	 */
+	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
+		IServiceProvider provider = fServiceProviders.get(desc.getId());
+		if (provider != null) {
+			return provider;
+		}
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+						if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
+							try {
+								provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
+								if (provider instanceof ServiceProvider) {
+									((ServiceProvider)provider).setDescriptor(desc);
+									fServiceProviders.put(desc.getId(), provider);
+									return provider;
+								}
+							} catch (Exception e) {
+								Activator.getDefault().log(e);
+								return null;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices()
+	 */
+	public Set<IService> getServices() {
+		loadServices();
+		return fServiceSet;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
+	 */
+	public Set<IService> getServices(IProject project) {
+		return getConf(fProjectServices, project);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
+	 */
+	public Set<IService> getServices(String natureId) {
+		loadServices();
+		return fNatureServices.get(natureId);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getWorkspaceConfigurations()
+	 */
+	public Set<IServiceConfiguration> getWorkspaceConfigurations() {
+		Set<IServiceConfiguration> configs = new HashSet<IServiceConfiguration>();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		for (IProject project : workspace.getRoot().getProjects()) {
+			if (project.isOpen()) {
+				try {
+					for (IServiceConfiguration config : getConfigurations(project)) {
+						configs.add(config);
+					}
+				} catch (ProjectNotConfiguredException e) {
+					// No configurations to include
+				}
+			}
+		}
+		return configs;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#isConfigured(org.eclipse.core.resources.IProject)
+	 */
+	public boolean isConfigured(IProject project) {
+		return fProjectConfigurations.containsKey(project);
+	}
 	
 	/**
 	 * Replaces the current service model configuration with what is
@@ -424,7 +287,6 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}
 	}
-	
 	
 	/**
 	 * Replaces the current service model configuration with what is
@@ -466,23 +328,204 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		} 
 	}
-
 	
 	/**
 	 * Prints the current service model to the console, for debugging purposes.
 	 */
 	public void printServiceModel() {
 		System.out.println("Service Model: "); //$NON-NLS-1$
-		if(configurations.isEmpty())
+		if(fProjectConfigurations.isEmpty())
 			System.out.println("  Service Model is empty"); //$NON-NLS-1$
 		
-		for(Entry<IProject, Map<String, IServiceConfiguration>> entry : configurations.entrySet()) {
+		for(Entry<IProject, Map<String, IServiceConfiguration>> entry : fProjectConfigurations.entrySet()) {
 			IProject project = entry.getKey();
 			System.out.println("  Project: " + project.getName()); //$NON-NLS-1$
 			for(IServiceConfiguration conf : entry.getValue().values()) {
 				System.out.println("      " + conf); //$NON-NLS-1$
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#putConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void putConfiguration(IProject project, IServiceConfiguration conf) {
+		if(project == null || conf == null)
+			throw new NullPointerException();
+		
+		Map<String, IServiceConfiguration> confs = fProjectConfigurations.get(project);
+		if(confs == null) {
+			confs = new HashMap<String, IServiceConfiguration>();
+			fProjectConfigurations.put(project, confs);
+			fActiveConfigurations.put(project, conf);
+		}
+		
+		confs.put(conf.getName(), conf);
+		
+		Set<IService> services = fProjectServices.get(project);
+		if(services == null) {
+			services = new HashSet<IService>();
+			fProjectServices.put(project, services);
+		}
+		for(IServiceConfiguration config : confs.values()) {
+			for(IService service : config.getServices()) {
+				services.add(service);
+			}
+		}
+		
+		fConfigurationToProject.put(conf, project);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.core.resources.IProject)
+	 */
+	public void remove(IProject project) {
+		if(project == null) {
+			throw new NullPointerException();
+		}
+		for (IServiceConfiguration conf : getConfigurations(project)) {
+			fConfigurationToProject.remove(conf);
+		}
+		fProjectConfigurations.remove(project);
+		fActiveConfigurations.remove(project);
+		fProjectServices.remove(project);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
+		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
+		if(confs != null) {
+			confs.remove(conf.getName());
+			fConfigurationToProject.remove(conf);
+		}
+	}
+	
+	/**
+	 * Saves the model configuration into the plugin's metadata area using
+	 * the default file name.
+	 * Will not save data for projects that do not exist.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
+	 * @throws IOException
+	 */
+	public void saveModelConfiguration() throws IOException {
+		File file = defaultSaveFile.toFile();
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		try {
+			saveModelConfiguration(writer);
+		} finally {
+			writer.close();
+		}
+	}
+	
+	
+	/**
+	 * Saves the service model configuration to the given <code>file</code>.
+	 * Will not save data for projects that do not exist.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * @param file
+	 * @throws IOException 
+	 * @throws NullPointerException if file is null
+	 */
+	public void saveModelConfiguration(Writer writer) throws IOException {
+		if(writer == null)
+			throw new NullPointerException();
+		saveModelConfiguration(fProjectConfigurations, writer);
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
+		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
+		
+		if(!confs.containsKey(configuration.getName()))
+			throw new IllegalArgumentException();
+		
+		fActiveConfigurations.put(project, configuration);
+	}
+	
+	
+	private void initialize() {
+		 fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
+		 fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
+		 fProjectServices = new HashMap<IProject, Set<IService>>();
+		 fConfigurationToProject = new HashMap<IServiceConfiguration, IProject>();
+		 fServiceProviders = new HashMap<String, IServiceProvider>();
+	}
+
+	
+	/**
+	 * Locate and initialize service extensions.
+	 */
+	private void loadServices() {
+		if (fServices != null) {
+			return;
+		}
+		fServices = new HashMap<String, IService>();
+		fServiceSet = new HashSet<IService>();
+		fNatureServices = new HashMap<String, Set<IService>>();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, SERVICE_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					if (element.getName().equals(SERVICE_ELEMENT_NAME)) {
+						String id = element.getAttribute(ATTR_ID);
+						String name = element.getAttribute(ATTR_NAME);
+						String priority = element.getAttribute(ATTR_PRIORITY);
+						IConfigurationElement[] natureConf = element.getChildren(NATURE_ELEMENT_NAME);
+						Set<String> natures = new HashSet<String>();
+						if (natureConf != null) {
+							for (IConfigurationElement nature : natureConf) {
+								String natureId = nature.getAttribute(ATTR_ID);
+								if (workspace.getNatureDescriptor(natureId) != null) {
+									natures.add(natureId);
+								}
+							}
+						}
+						IService service = new Service(id, name, priority, natures);
+						fServiceSet.add(service);
+						fServices.put(id, service);
+						for (String nature : natures) {
+							Set<IService> svcs = fNatureServices.get(nature);
+							if (svcs == null) {
+								svcs = new HashSet<IService>();
+								fNatureServices.put(nature, svcs);
+							}
+							svcs.add(service);
+						}
+					}
+				}
+			}
+		}
+        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, PROVIDER_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+						String id = element.getAttribute(ATTR_ID);
+						String name = element.getAttribute(ATTR_NAME);
+						String priority = element.getAttribute(ATTR_PRIORITY);
+						String serviceId = element.getAttribute(ATTR_SERVICE_ID);
+						IServiceProviderDescriptor desc = new ServiceProviderDescriptor(id, name, serviceId, priority);
+						IService service = fServices.get(serviceId);
+						if (service != null) {
+							service.addServiceProvider(desc);
+						} else {
+							Activator.getDefault().logErrorMessage(
+									NLS.bind(Messages.Services_invalidServiceId, serviceId));
+						}
+					}
+				}
+			}
+		}	
 	}
 
 	

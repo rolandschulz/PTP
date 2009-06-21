@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.internal.core;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
@@ -70,7 +73,7 @@ public class Service implements IService {
 	public String getName() {
 		return fServiceName;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getNatures()
 	 */
@@ -84,7 +87,7 @@ public class Service implements IService {
 	public Integer getPriority() {
 		return fServicePriority;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IService#getProvider(java.lang.String)
 	 */
@@ -97,6 +100,23 @@ public class Service implements IService {
 	 */
 	public Set<IServiceProviderDescriptor> getProviders() {
 		return fServiceProviderDescriptors;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IService#getProvidersByPriority()
+	 */
+	public SortedSet<IServiceProviderDescriptor> getProvidersByPriority() {
+		SortedSet<IServiceProviderDescriptor> sortedProviders = 
+			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
+				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
+					return o2.getPriority().compareTo(o1.getPriority());
+				}
+			});
+		for (IServiceProviderDescriptor p : getProviders()) {
+			sortedProviders.add(p);
+		}
+		
+		return sortedProviders;
 	}
 	
 	@Override
