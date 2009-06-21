@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
+import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -18,6 +19,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.IPaintPositionManager;
+import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.MarginPainter;
@@ -36,11 +39,19 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.photran.cdtinterface.ui.editor.CDTBasedSourceViewerConfiguration;
 import org.eclipse.photran.cdtinterface.ui.editor.CDTBasedTextEditor;
+import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.ui.FortranUIPlugin;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -48,10 +59,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 
 /**
@@ -91,6 +102,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     protected Composite fMainComposite;
     protected FortranHorizontalRuler fHRuler;
     protected Color verticalLineColor;
+    protected boolean contentTypeMismatch;
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constructor
@@ -113,6 +125,8 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         WorkbenchChainedTextFontFieldEditor.startPropagate(store, JFaceResources.TEXT_FONT);
 
         useCDTRulerContextMenuID();
+        
+        contentTypeMismatch = false;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,10 +136,30 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     protected void doSetInput(IEditorInput input) throws CoreException
     {
         super.doSetInput(input);
+        
         IDocument document = this.getDocumentProvider().getDocument(input);
         if (document == null) return;
         
         configurePartitionScanner(document);
+        
+        if (input instanceof FileEditorInput)
+            checkForContentTypeMismatch((FileEditorInput)input);
+    }
+
+    private void checkForContentTypeMismatch(FileEditorInput input)
+    {
+        contentTypeMismatch = false;
+        
+        IFile file = input.getFile();
+        if (file == null || file.getProject() == null || file.getName() == null) return;
+        
+        String contentType = CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
+        if (contentType == null) return;
+        
+        boolean expectedSourceForm = this.isFixedForm();
+        boolean actualSourceForm = contentType.equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE);
+        if (actualSourceForm != expectedSourceForm)
+            contentTypeMismatch = true;
     }
 
     public void createPartControl(Composite parent)
@@ -146,6 +180,76 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
 
         createHorizontalRuler(fMainComposite);
         createLightGrayLines();
+        
+        addWatermark(parent);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Watermark Indicating Source Form Mismatch
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void addWatermark(Composite parent)
+    {
+        ISourceViewer sourceViewer = getSourceViewer();
+        if (sourceViewer instanceof ITextViewerExtension2)
+        {
+            ITextViewerExtension2 painter = (ITextViewerExtension2)sourceViewer;
+            painter.addPainter(new WatermarkPainter());
+        }
+    }
+    
+    public final class WatermarkPainter implements IPainter
+    {
+        private boolean active = false;
+        private StyledText widget = null;
+        private PaintListener listener = null;
+
+        public void paint(int reason)
+        {
+            if (!active)
+            {
+                active = true;
+                widget = AbstractFortranEditor.this.getSourceViewer().getTextWidget();
+                final Font font = new Font(null, new FontData("Arial", 14, SWT.NORMAL));
+                final Color lightGray = new Color(null, new RGB(192, 192, 192));
+                listener = new PaintListener()
+                {
+                    public void paintControl(PaintEvent e)
+                    {
+                        if (widget == null || contentTypeMismatch == false) return;
+                        
+//                        String msg = "WARNING: This file is open in a "
+//                                   + (isFixedForm() ? "fixed-form" : "free-form")
+//                                   + " editor,\nbut the platform content type "
+//                                   + "indicates that it is a "
+//                                   + (isFixedForm() ? "free-form" : "fixed-form")
+//                                   + " file.";
+                        String msg = "WARNING: Content type mismatch     ";
+                        Rectangle area = widget.getClientArea();
+                        e.gc.setFont(font);
+                        e.gc.setForeground(lightGray);
+                        int x = Math.max(0, area.x + area.width - e.gc.textExtent(msg).x); //area.x + area.width/2;
+                        int y = area.y;
+                        e.gc.drawString(msg, x, y, true);
+                    }
+                };
+                widget.addPaintListener(listener);
+            }
+        }
+        
+        public void dispose()
+        {
+            if (listener != null)
+            {
+                widget.removePaintListener(listener);
+                listener = null;
+            }
+            
+            widget = null;
+        }
+
+        public void deactivate(boolean redraw) {}
+        public void setPositionManager(IPaintPositionManager manager) {}
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

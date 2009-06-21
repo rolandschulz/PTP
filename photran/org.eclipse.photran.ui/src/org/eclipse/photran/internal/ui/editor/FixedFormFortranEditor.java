@@ -64,6 +64,6 @@ public class FixedFormFortranEditor extends AbstractFortranEditor
 
     public boolean isFixedForm()
     {
-        return false;
+        return true;
     }
 }
