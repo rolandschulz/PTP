@@ -13,6 +13,7 @@ plugin@org.eclipse.photran.managedbuilder.ui=@photranTag@,:pserver:anonymous@dev
 plugin@org.eclipse.photran.cdtinterface=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface
 plugin@org.eclipse.photran.ui=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.ui
 plugin@org.eclipse.photran.managedbuilder.gnu.ui=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.gnu.ui
+plugin@org.eclipse.photran.cdtinterface.vpg=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface.vpg
 plugin@org.eclipse.photran.core.vpg=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.core.vpg
 plugin@org.eclipse.photran.ui.vpg=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.ui.vpg
 plugin@org.eclipse.photran.managedbuilder.intel.ui=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.intel.ui

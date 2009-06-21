@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Photran VPG Failing Unit Tests
 Bundle-SymbolicName: org.eclipse.photran.core.vpg.tests.failing
 Bundle-Version: 1.0.0
-Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.photran.core.vpg.tests,
  org.junit,
  org.eclipse.photran.core,

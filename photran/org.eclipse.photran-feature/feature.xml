@@ -91,6 +91,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.photran.cdtinterface.vpg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.photran.ui.vpg"
          download-size="0"
          install-size="0"

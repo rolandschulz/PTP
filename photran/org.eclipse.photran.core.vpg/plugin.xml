@@ -6,15 +6,6 @@
      <startup class="org.eclipse.photran.core.vpg.PhotranVPGStartup" />
   </extension>
 
-   <!-- VPG-based model builder -->
-   <extension
-         point="org.eclipse.photran.cdtinterface.modelbuilder">
-      <modelbuilder
-            class="org.eclipse.photran.internal.core.model.FortranModelBuilder"
-            id="defaultModelBilder"
-            name="Default Photran Model Builder" />
-   </extension>
-   
    <!-- Markers for displaying the VPG error/warning log -->
    <extension point="org.eclipse.core.resources.markers"
        name="VPG Log Marker"

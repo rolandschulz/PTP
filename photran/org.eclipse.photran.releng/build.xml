@@ -103,6 +103,9 @@
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface"/>
 		</antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface.vpg"/>
+        </antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core"/>
 		</antcall>

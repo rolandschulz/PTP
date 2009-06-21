@@ -11,6 +11,7 @@ Export-Package: org.eclipse.photran.cdtinterface,
  org.eclipse.photran.cdtinterface.core,
  org.eclipse.photran.cdtinterface.dom,
  org.eclipse.photran.cdtinterface.launch,
+ org.eclipse.photran.cdtinterface.natures,
  org.eclipse.photran.cdtinterface.ui,
  org.eclipse.photran.internal.core.model
 Require-Bundle: org.eclipse.ui,

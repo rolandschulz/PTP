@@ -16,13 +16,12 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCProjectNature;
-import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.photran.cdtinterface.natures.ProjectNatures;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
@@ -186,7 +185,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         try
         {
             if (!project.isAccessible()) return false;
-            if (!project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) return false;
+            if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID)) return false;
             return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
         }
         catch (CoreException e)
