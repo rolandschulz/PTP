@@ -18,7 +18,12 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceStatus;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.cdtinterface.natures.ProjectNatures;
@@ -344,11 +349,34 @@ public class PhotranVPGBuilder extends PhotranVPG
                 logError("Error parsing " + filename, e);
             return null;
         }
+        catch (CoreException e)
+        {
+            IFile errorFile = getFileFromStatus(e.getStatus());
+            if (errorFile != null)
+                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    new PhotranTokenRef(errorFile, 0, 0));
+            else
+                logError("Error parsing " + filename, e);
+            return null;
+        }
         catch (Exception e)
         {
             logError("Error parsing " + filename, e);
             return null;
         }
+    }
+
+    private IFile getFileFromStatus(IStatus status)
+    {
+        if (!(status instanceof IResourceStatus)) return null;
+        
+        IPath path = ((IResourceStatus)status).getPath();
+        if (path == null) return null;
+        
+        IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+        if (res == null || !(res instanceof IFile)) return null;
+        
+        return (IFile)res;
     }
 
     private void logError(String message, Exception e)
