@@ -23,8 +23,10 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
@@ -571,9 +573,11 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		List<String> command = new ArrayList<String>();
 		if (! effectiveConfiguration.hasLaunchCmd()) {
 			// Fall back to calling the executable.
+			StringAttribute execName = getAttrMgr().getAttribute(JobAttributes.getExecutableNameAttributeDefinition());
 			StringAttribute execPath = getAttrMgr().getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
+			IPath path = new Path(execPath.getValue()).append(execName.getValue());
 			ArrayAttribute<String> arguments = getAttrMgr().getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition());
-			command.add(execPath.getValue());
+			command.add(path.toOSString());
 			command.addAll(arguments.getValue());
 		} else {
 			// Use the tool to launch executable
@@ -601,9 +605,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		List<String> command = new ArrayList<String>();
 		if (! effectiveConfiguration.hasDebugCmd()) {
 			// Fall back to calling the executable.
+			StringAttribute execName = getAttrMgr().getAttribute(JobAttributes.getExecutableNameAttributeDefinition());
 			StringAttribute execPath = getAttrMgr().getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
+			IPath path = new Path(execPath.getValue());
+			path.append(execName.getValue());
 			ArrayAttribute<String> arguments = getAttrMgr().getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition());
-			command.add(execPath.getValue());
+			command.add(path.toOSString());
 			command.addAll(arguments.getValue());
 		} else {
 			// Use the tool to launch executable
