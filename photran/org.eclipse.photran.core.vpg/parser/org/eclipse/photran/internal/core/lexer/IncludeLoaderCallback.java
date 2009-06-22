@@ -20,6 +20,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.photran.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**
@@ -97,5 +99,17 @@ public class IncludeLoaderCallback
         Visitor visitor = new Visitor();
         try { ((IContainer)folder).accept(visitor); } catch (CoreException e) { throw new Error(e); }
         return visitor.result;
+    }
+
+    /**
+     * Called to log an error message when an INCLUDE file cannot be found.
+     * 
+     * @param message the error message to display to the user
+     * @param topLevelFile the file in which the INCLUDE line occurred
+     * @param offset the offset in topLevelFile at which the INCLUDE line was found
+     */
+    public void logError(String message, IFile topLevelFile, int offset)
+    {
+        // By default, ignore errors
     }
 }

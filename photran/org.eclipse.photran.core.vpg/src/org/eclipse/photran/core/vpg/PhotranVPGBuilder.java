@@ -252,6 +252,12 @@ public class PhotranVPGBuilder extends PhotranVPG
                     
                     return super.getIncludedFileAsStream(fileToInclude);
                 }
+
+                @Override
+                public void logError(String message, IFile topLevelFile, int offset)
+                {
+                    PhotranVPG.getInstance().log.logError(message, new PhotranTokenRef(topLevelFile, offset, 0));
+                }
             });
         }
         return sourceForm;

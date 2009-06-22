@@ -209,7 +209,7 @@ public final class FortranPreprocessor extends InputStream
         }
     }
 
-    private InputStream findIncludedFile(String fileToInclude) throws IOException
+    protected InputStream findIncludedFile(String fileToInclude) throws IOException
     {
         try
         {
@@ -217,13 +217,13 @@ public final class FortranPreprocessor extends InputStream
         }
         catch (FileNotFoundException e)
         {
-        	PhotranVPG.getInstance().log.logError(
-        	    "Unable to locate INCLUDE file \""
+            callback.logError(
+                "Unable to locate INCLUDE file \""
         	    + fileToInclude + "\""
         	    //+ " (working directory: "
                 //+ new File(".").getCanonicalPath()
                 //+ ")"
-                , new PhotranTokenRef(topLevelFile, offset, 0));
+                , topLevelFile, offset);
             return null;
         }
     }
