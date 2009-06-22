@@ -463,20 +463,4 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     {
         return getSourceViewerConfiguration().getReconciler(getSourceViewer());
     }
-
-    public void forceOutlineViewUpdate()
-    {
-        //  //     ///     ////   //  //    ///
-        //  //   //  //   //      // //    /////
-        //////   //////   //      ////      ///
-        //  //   //  //   //      // //
-        //  //   //  //    ////   //  //    //
-      
-        IDocument doc = getIDocument();
-        if (doc == null) return;
-        doc.set(" " + doc.get());
-        doSave(null);
-        doc.set(doc.get().substring(1));
-        doSave(null);
-    }
 }
