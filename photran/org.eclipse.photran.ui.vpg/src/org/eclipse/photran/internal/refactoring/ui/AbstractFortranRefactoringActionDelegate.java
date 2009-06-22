@@ -23,10 +23,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
-import org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction.FortranIntroImplicitNoneRefactoringWizard;
-import org.eclipse.photran.internal.refactoring.ui.RenameAction.FortranRenameRefactoringWizard;
 import org.eclipse.photran.internal.ui.actions.FortranEditorActionDelegate;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.swt.widgets.Shell;
@@ -102,12 +99,19 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         RefactoringWizard wizard = getRefactoringWizard(wizardClass, refact);
         try
         {
-            AbstractFortranEditor abstEditor = (AbstractFortranEditor)Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-            Shell shell = abstEditor == null ? null : abstEditor.getShell();
+            //AbstractFortranEditor abstEditor = (AbstractFortranEditor)Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+            //Shell shell = abstEditor == null ? null : abstEditor.getShell();
+            
+            Shell shell = Workbench.getInstance().getActiveWorkbenchWindow().getShell();
+            if (shell == null) return;
+            
             String name = refact.getName();
             RefactoringWizardOpenOperation wiz = new RefactoringWizardOpenOperation(wizard);
             wiz.run(shell, name);
-            getFortranEditor().forceOutlineViewUpdate();
+            
+            AbstractFortranEditor activeFortranEditor = getFortranEditor();
+            if (activeFortranEditor != null)
+                activeFortranEditor.forceOutlineViewUpdate();
         }
         catch (InterruptedException e) 
         {
