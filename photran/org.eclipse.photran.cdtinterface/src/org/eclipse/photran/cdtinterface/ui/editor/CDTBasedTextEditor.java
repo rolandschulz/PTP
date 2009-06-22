@@ -15,6 +15,7 @@
 package org.eclipse.photran.cdtinterface.ui.editor;
 
 import org.eclipse.cdt.core.model.CModelException;
+import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
@@ -25,6 +26,7 @@ import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
@@ -307,5 +309,21 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
         IWorkbenchWindow window = getSite().getWorkbenchWindow();
         IPartService service = window.getPartService();
         return (this == service.getActivePart());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Utility Methods for Subclasses
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void forceOutlineViewUpdate()
+    {
+        try
+        {
+            CoreModel.getDefault().getCModel().makeConsistent(new NullProgressMonitor());
+        }
+        catch (CModelException e)
+        {
+            // Ignore
+        }
     }
 }
