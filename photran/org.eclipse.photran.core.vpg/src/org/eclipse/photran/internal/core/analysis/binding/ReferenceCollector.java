@@ -971,12 +971,15 @@ class ReferenceCollector extends BindingCollector
         
         for (ASTWaitSpecNode waitSpec : node.getWaitSpecList())
         {
-            String keyword = waitSpec.getKeyword().getText().toLowerCase();
-            if (keyword != null && (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat")))
+            if (waitSpec.getKeyword() != null)
             {
-                Token variable = waitSpec.getExpr().findFirstToken();
-                if (variable != null && variable.getTerminal() == Terminal.T_IDENT)
-                    bind(variable);
+                String keyword = waitSpec.getKeyword().getText().toLowerCase();
+                if (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat"))
+                {
+                    Token variable = waitSpec.getExpr().findFirstToken();
+                    if (variable != null && variable.getTerminal() == Terminal.T_IDENT)
+                        bind(variable);
+                }
             }
         }
     }
