@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIAutoPreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
@@ -112,11 +112,11 @@ AbstractToolRMConfiguration implements Cloneable {
 		/*
 		 * By default, assume openmpi auto configuration.
 		 */
-		Preferences prefs = OpenMPIAutoPreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_LAUNCH_CMD));
-		setDebugCmd(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_DEBUG_CMD));
-		setDiscoverCmd(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_DISCOVER_CMD));
-		setRemoteInstallPath(prefs.getString(OpenMPIAutoPreferenceManager.PREFIX + OpenMPIAutoPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+		Preferences prefs = OpenMPIPreferenceManager.getPreferences();
+		setLaunchCmd(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DEBUG_CMD));
+		setDiscoverCmd(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD));
+		setRemoteInstallPath(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		setVersionId(VERSION_AUTO);
 		setUseInstallDefaults(true);
 		setUseToolDefaults(true);
@@ -229,7 +229,7 @@ AbstractToolRMConfiguration implements Cloneable {
 				return false;
 			}
 			if (!getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
-					return getVersionId().equals(getDetectedVersion());
+				return getVersionId().equals(getDetectedVersion());
 			}
 			return true;
 		}
