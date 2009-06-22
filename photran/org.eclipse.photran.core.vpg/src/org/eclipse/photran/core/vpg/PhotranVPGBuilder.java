@@ -337,7 +337,7 @@ public class PhotranVPGBuilder extends PhotranVPG
                 log.logError("Error parsing " + filename + ": " + e.getMessage(),
                     new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
             else
-                logError("Error parsing " + filename, e);
+                logError(file, "Error parsing " + filename, e);
             return null;
         }
         catch (LexerException e)
@@ -346,22 +346,22 @@ public class PhotranVPGBuilder extends PhotranVPG
                 log.logError("Error parsing " + filename + ": " + e.getMessage(),
                     new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
             else
-                logError("Error parsing " + filename, e);
+                logError(file, "Error parsing " + filename, e);
             return null;
         }
-        catch (CoreException e)
+//        catch (CoreException e)
+//        {
+//            IFile errorFile = getFileFromStatus(e.getStatus());
+//            if (errorFile != null)
+//                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+//                    new PhotranTokenRef(errorFile, 0, 0));
+//            else
+//                logError(file, "Error parsing " + filename, e);
+//            return null;
+//        }
+        catch (Throwable e)
         {
-            IFile errorFile = getFileFromStatus(e.getStatus());
-            if (errorFile != null)
-                log.logError("Error parsing " + filename + ": " + e.getMessage(),
-                    new PhotranTokenRef(errorFile, 0, 0));
-            else
-                logError("Error parsing " + filename, e);
-            return null;
-        }
-        catch (Exception e)
-        {
-            logError("Error parsing " + filename, e);
+            logError(file, "Error parsing " + filename, e);
             return null;
         }
     }
@@ -379,7 +379,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         return (IFile)res;
     }
 
-    private void logError(String message, Exception e)
+    private void logError(IFile file, String message, Throwable e)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(message);
@@ -391,7 +391,11 @@ public class PhotranVPGBuilder extends PhotranVPG
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bs));
         sb.append(bs);
-        log.logError(sb.toString());
+        
+        if (file != null)
+            log.logError(sb.toString(), new PhotranTokenRef(file, 0, 0));
+        else
+            log.logError(sb.toString());
     }
 
     @Override
