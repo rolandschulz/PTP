@@ -36,7 +36,7 @@ import org.eclipse.core.resources.IFile;
  
 %public
 %class FreeFormLexerPhase1
-%throws Exception
+%throws LexerException
 %char
 %line
 %column
@@ -111,9 +111,10 @@ import org.eclipse.core.resources.IFile;
     private String filename = "<stdin>";
     protected TokenFactory tokenFactory;
     
-    public FreeFormLexerPhase1(java.io.InputStream in, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    public FreeFormLexerPhase1(java.io.InputStream in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
         this(new LineAppendingInputStream(in));
+        this.lastTokenFile = file;
         this.filename = filename;
         this.tokenFactory = tokenFactory;
         this.accumulateWhitetext = accumulateWhitetext;
@@ -520,8 +521,8 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 [^\n\r&']+                                      { stringBuffer.append( yytext() ); }
 {LineContinuation}                              { stringBuffer.append( yytext() ); }
 "&"                                             { stringBuffer.append( yytext() ); }
-[\n\r]                                          { throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation"); }
-<<EOF>>                                         { throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated"); }
+[\n\r]                                          { throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation"); }
+<<EOF>>                                         { throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated"); }
 }
 
 <DBLQUOTED> {
@@ -533,10 +534,10 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 [^\n\r&\"]+                                     { stringBuffer.append( yytext() ); }
 {LineContinuation}                              { stringBuffer.append( yytext() ); }
 "&"                                             { stringBuffer.append( yytext() ); }
-[\n\r]                                          { throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation"); }
-<<EOF>>                                         { throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated"); }
+[\n\r]                                          { throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation"); }
+<<EOF>>                                         { throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated"); }
 }
 
 /* Error */
-/*.                                             { throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): Unexpected character " + yytext()); }*/
+/*.                                             { throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): Unexpected character " + yytext()); }*/
 .                                               { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_UNEXPECTED_CHARACTER); }

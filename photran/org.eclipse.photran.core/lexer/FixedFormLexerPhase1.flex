@@ -41,7 +41,7 @@ import org.eclipse.core.resources.IFile;
 %%
  
 %class FixedFormLexerPhase1
-%throws Exception
+%throws LexerException
 %char
 %line
 %column
@@ -121,9 +121,10 @@ import org.eclipse.core.resources.IFile;
         
     private String filename = "<stdin>";
     
-    public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
     {
         this(in, _prepass, tokenFactory);
+        this.lastTokenFile = file;
         this.filename = filename;
     }
         
@@ -253,7 +254,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                   stringBuffer.append(text);                                                              
                                                   hollerithLength=Integer.parseInt(text.substring(0,text.length()-1));
                                                   if (hollerithLength==0)
-                                                      throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0"); 
+                                                      throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0"); 
                                                   yybegin(HOLLERITH); 
                                                 }
 {Rcon1}                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
@@ -522,8 +523,8 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                   wantEos = true;
                                                   return token(Terminal.T_SCON); }
 [^\n\r']+                                       { stringBuffer.append( yytext() ); }
-[\n\r]                                          { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): String literal spans multiple lines without continuation"); }
-<<EOF>>                                         { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated"); }
+[\n\r]                                          { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): String literal spans multiple lines without continuation"); }
+<<EOF>>                                         { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated"); }
 }
 
 <DBLQUOTED> {
@@ -533,8 +534,8 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                   wantEos = true;
                                                   return token(Terminal.T_SCON); }
 [^\n\r\"]+                                      { stringBuffer.append( yytext() ); }
-[\n\r]                                          { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): String literal spans multiple lines without continuation"); }
-<<EOF>>                                         { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated"); }
+[\n\r]                                          { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): String literal spans multiple lines without continuation"); }
+<<EOF>>                                         { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated"); }
 }
 
 <HOLLERITH> {
@@ -546,11 +547,11 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                             return token(Terminal.T_HCON);
                                                      }
                                                 }
-[\n\r]                                          { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Hollerith literal spans multiple lines without continuation"); }
-<<EOF>>                                         { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before hollerith literal terminated"); }
+[\n\r]                                          { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Hollerith literal spans multiple lines without continuation"); }
+<<EOF>>                                         { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before hollerith literal terminated"); }
 }
 
 
 /* Error */
-/*.                                             { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Unexpected character " + yytext()); }*/
+/*.                                             { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Unexpected character " + yytext()); }*/
 .                                               { wantEos = true; unsetSOL();          return token(Terminal.T_UNEXPECTED_CHARACTER); }

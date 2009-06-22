@@ -19,11 +19,11 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.cdt.core.model.CModelException;
-import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.IContributedModelBuilder;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.FixedFormLexerPhase2;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase2;
@@ -79,10 +79,11 @@ public class SimpleFortranModelBuilder implements IFortranModelBuilder
         {
 //            FortranElement note = new FortranElement.UnknownNode(translationUnit, isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>");
 //            this.addF90Element(note);
-            
+
+              IFile file = translationUnit.getFile();
               ILexer lexer =
-                  isFixedForm ? (ILexer)new FixedFormLexerPhase2(in, filename, SimpleTokenFactory.getInstance())
-                              : (ILexer)new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename, SimpleTokenFactory.getInstance(), false));
+                  isFixedForm ? (ILexer)new FixedFormLexerPhase2(in, file, filename, SimpleTokenFactory.getInstance())
+                              : (ILexer)new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, file, filename, SimpleTokenFactory.getInstance(), false));
 
               createSourceFormNode();
               buildModel(lexer);

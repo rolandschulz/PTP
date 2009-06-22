@@ -1,5 +1,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.IOException;
+
 import org.eclipse.core.resources.IFile;
 
 /**
@@ -9,7 +11,7 @@ import org.eclipse.core.resources.IFile;
  */
 public interface ILexer
 {
-    IToken yylex() throws Exception;
+    IToken yylex() throws IOException, LexerException;
 
     TokenFactory getTokenFactory();
     

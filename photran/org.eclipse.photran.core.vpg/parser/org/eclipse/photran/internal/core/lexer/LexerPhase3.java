@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.IOException;
+
 import org.eclipse.core.resources.IFile;
 
 /**
@@ -75,7 +77,7 @@ class LexerPhase3 implements IAccumulatingLexer
         return phase2Lexer.getLastTokenStreamOffset();
     }
 
-    public Token yylex() throws Exception
+    public Token yylex() throws IOException, LexerException
     {
         Token token = (Token)phase2Lexer.yylex();
         tokenList.add(token);

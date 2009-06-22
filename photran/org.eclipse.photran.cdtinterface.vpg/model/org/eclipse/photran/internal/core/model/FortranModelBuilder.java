@@ -67,6 +67,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
             IFile file = translationUnit.getFile();
             lexer = LexerFactory.createLexer(
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
+                file,
                 file == null ? "" : file.getName(),
                 isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM,
                 false);

@@ -21,8 +21,12 @@ java -Xmx512M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-wo
 	-prec "<TypeBoundProcedurePart> < T_ICON" \
 	-shift T_IDENT "<CommonBlock>" \
 	-imports "import org.eclipse.photran.internal.core.lexer.*; \
-                  import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;" \
-	-onError "throw new Exception(\"Syntax error: Unexpected \" + lookahead.getTerminal().toString() + \" (\" + (lookahead.getFile()==null ? \"\" : lookahead.getFile().getName() + \", \") + \"line \" + lookahead.getLine() + \", column \" + lookahead.getCol() + \")\");" \
+                  import org.eclipse.photran.internal.core.analysis.binding.ScopingNode; \
+                  import org.eclipse.photran.internal.core.SyntaxException; \
+                  import java.io.IOException;" \
+	-description "An LALR(1) parser for Fortran 2003" \
+	-throws "IOException, LexerException, SyntaxException" \
+	-onError "throw new SyntaxException(lookahead);" \
 	-lexerClass IAccumulatingLexer \
 	-parserClass Parser \
 	-tokenType "org.eclipse.photran.internal.core.lexer.Token" \

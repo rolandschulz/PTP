@@ -39,7 +39,7 @@ public class TypeCheckerTestCase extends TestCase
         // a parseable program, then extract the expression from the program's AST
         
         String program = "a = " + expression + "\nend";
-        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new ByteArrayInputStream(program.getBytes()), "<literal text>", SourceForm.UNPREPROCESSED_FREE_FORM, false));
+        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new ByteArrayInputStream(program.getBytes()), null, "<literal text>", SourceForm.UNPREPROCESSED_FREE_FORM, false));
         assertNotNull(ast);
         ASTMainProgramNode mainProg = (ASTMainProgramNode)ast.getProgramUnitList().get(0);
         ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)mainProg.getBody().get(0);

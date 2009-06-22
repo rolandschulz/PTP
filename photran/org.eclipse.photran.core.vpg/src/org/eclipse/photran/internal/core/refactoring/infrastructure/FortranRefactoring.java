@@ -272,7 +272,7 @@ public abstract class FortranRefactoring extends Refactoring
         try
         {
             IAccumulatingLexer lexer = LexerFactory.createLexer(
-                new ByteArrayInputStream(string.getBytes()), "(none)",
+                new ByteArrayInputStream(string.getBytes()), null, "(none)",
                 SourceForm.UNPREPROCESSED_FREE_FORM, true);
             if (parser == null) parser = new Parser();
             

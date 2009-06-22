@@ -13,6 +13,8 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * Phase 1 lexer that handles Fortran INCLUDE directives.
  * 
@@ -23,20 +25,20 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
     private FortranPreprocessor preprocessor;
     private String lastDirective;
 
-    public PreprocessingFreeFormLexerPhase1(InputStream in, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
+    public PreprocessingFreeFormLexerPhase1(InputStream in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
-        this(new FortranPreprocessor(new LineAppendingInputStream(in), filename, callback), filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
+        this(new FortranPreprocessor(new LineAppendingInputStream(in), filename, callback), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }
     
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
-    private PreprocessingFreeFormLexerPhase1(FortranPreprocessor preprocessor, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    private PreprocessingFreeFormLexerPhase1(FortranPreprocessor preprocessor, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
-        super(preprocessor, filename, tokenFactory, accumulateWhitetext);
+        super(preprocessor, file, filename, tokenFactory, accumulateWhitetext);
         this.preprocessor = preprocessor;
         this.lastDirective = null;
     }
 
-    public Token yylex() throws IOException, Exception
+    public Token yylex() throws IOException, LexerException
     {
         Token token = (Token)super.yylex();
         

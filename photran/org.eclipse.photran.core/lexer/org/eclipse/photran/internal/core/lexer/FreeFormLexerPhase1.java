@@ -2150,9 +2150,10 @@ public class FreeFormLexerPhase1 implements ILexer {
     private String filename = "<stdin>";
     protected TokenFactory tokenFactory;
     
-    public FreeFormLexerPhase1(java.io.InputStream in, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    public FreeFormLexerPhase1(java.io.InputStream in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
         this(new LineAppendingInputStream(in));
+        this.lastTokenFile = file;
         this.filename = filename;
         this.tokenFactory = tokenFactory;
         this.accumulateWhitetext = accumulateWhitetext;
@@ -2449,7 +2450,7 @@ public class FreeFormLexerPhase1 implements ILexer {
    * @return      the next token
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
-  public IToken yylex() throws java.io.IOException, Exception {
+  public IToken yylex() throws java.io.IOException, LexerException {
     int zzInput;
     int zzAction;
 
@@ -3234,7 +3235,7 @@ public class FreeFormLexerPhase1 implements ILexer {
           }
         case 393: break;
         case 24: 
-          { throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation");
+          { throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation");
           }
         case 394: break;
         case 123: 
@@ -3540,11 +3541,11 @@ public class FreeFormLexerPhase1 implements ILexer {
             }
             case 1031: break;
             case DBLQUOTED: {
-              throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated");
+              throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated");
             }
             case 1032: break;
             case QUOTED: {
-              throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated");
+              throw new LexerException(this, "Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated");
             }
             case 1033: break;
             case YYINITIAL: {

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.cdtinterface.natures.ProjectNatures;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
@@ -31,6 +32,7 @@ import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
@@ -323,6 +325,24 @@ public class PhotranVPGBuilder extends PhotranVPG
             ASTExecutableProgramNode ast = parser.parse(lexer);
             debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
             return new FortranAST(file, ast, lexer.getTokenList());
+        }
+        catch (SyntaxException e)
+        {
+            if (e.getFile() != null)
+                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
+            else
+                logError("Error parsing " + filename, e);
+            return null;
+        }
+        catch (LexerException e)
+        {
+            if (e.getFile() != null)
+                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
+            else
+                logError("Error parsing " + filename, e);
+            return null;
         }
         catch (Exception e)
         {
