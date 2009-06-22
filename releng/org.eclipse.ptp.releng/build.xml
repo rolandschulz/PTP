@@ -112,6 +112,8 @@
 		<symlink link="${copyToDir}/latest" resource="${copyToDir}/${buildType}.${buildId}" overwrite="true"/>
 		<symlink action="delete" link="${copyToDir}/ptp-master-${branchVersion}-latest.zip" failonerror="false"/>
 		<symlink link="${copyToDir}/ptp-master-${branchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${masterFile}" overwrite="true"/>
+		<symlink action="delete" link="${copyToDir}/rdt-server-unix-1.0-latest.tar" failonerror="false"/>
+		<symlink link="${copyToDir}/rdt-server-unix-1.0-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-1.0.tar" overwrite="true"/>
 	</target>
 	
 	<target name="tagone">
