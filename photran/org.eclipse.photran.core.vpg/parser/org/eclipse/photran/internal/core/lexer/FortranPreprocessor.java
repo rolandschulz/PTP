@@ -19,6 +19,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 
 /**
@@ -63,6 +65,8 @@ public final class FortranPreprocessor extends InputStream
     
     private IncludeLoaderCallback callback;
     
+    private IFile topLevelFile;
+    
     private StreamStack streamStack;
     
     private int offset = 0, line = 1;
@@ -76,8 +80,9 @@ public final class FortranPreprocessor extends InputStream
     private ArrayList<Integer> fileStartLines;
     private ArrayList<Integer> fileStartLineAdjustments;
     
-    public FortranPreprocessor(InputStream readFrom, String filename, IncludeLoaderCallback callback) throws IOException
+    public FortranPreprocessor(InputStream readFrom, IFile file, String filename, IncludeLoaderCallback callback) throws IOException
     {
+        this.topLevelFile = file;
         this.callback = callback;
         
         streamStack = new StreamStack();
@@ -212,12 +217,13 @@ public final class FortranPreprocessor extends InputStream
         }
         catch (FileNotFoundException e)
         {
-        	PhotranVPG.getInstance().log.logError("Unable to locate INCLUDE file \""
-                                              + fileToInclude + "\""
-                                              //+ " (working directory: "
-                                              //+ new File(".").getCanonicalPath()
-                                              //+ ")"
-                                              );
+        	PhotranVPG.getInstance().log.logError(
+        	    "Unable to locate INCLUDE file \""
+        	    + fileToInclude + "\""
+        	    //+ " (working directory: "
+                //+ new File(".").getCanonicalPath()
+                //+ ")"
+                , new PhotranTokenRef(topLevelFile, offset, 0));
             return null;
         }
     }
@@ -256,5 +262,10 @@ public final class FortranPreprocessor extends InputStream
     {
         // Similar to above 
         return line - desiredLine;
+    }
+    
+    public IFile getTopLevelFile()
+    {
+        return topLevelFile;
     }
 }

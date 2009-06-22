@@ -27,7 +27,7 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
 
     public PreprocessingFreeFormLexerPhase1(InputStream in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
-        this(new FortranPreprocessor(new LineAppendingInputStream(in), filename, callback), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
+        this(new FortranPreprocessor(new LineAppendingInputStream(in), file, filename, callback), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }
     
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
