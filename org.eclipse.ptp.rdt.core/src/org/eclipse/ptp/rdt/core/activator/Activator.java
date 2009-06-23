@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.core.activator;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ptp.internal.rdt.core.remotemake.PathEntryValidationListener;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -43,14 +44,14 @@ public class Activator extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		// startup code here
+		PathEntryValidationListener.startListening();
 	}
 	
 	
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
-			// shutdown code here
+			PathEntryValidationListener.stopListening();
 		}
 		finally {
 			super.stop(context);

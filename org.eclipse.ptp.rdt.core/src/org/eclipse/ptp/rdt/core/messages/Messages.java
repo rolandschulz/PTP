@@ -18,7 +18,8 @@ public class Messages extends NLS {
 	
 	public static String 
 		RemoteCIndexServiceProvider_0,
-		RemoteRunSiProvider_taskName;
+		RemoteRunSiProvider_taskName,
+		PathEntryValidationListener_jobName;
 	
 	
 	static {
