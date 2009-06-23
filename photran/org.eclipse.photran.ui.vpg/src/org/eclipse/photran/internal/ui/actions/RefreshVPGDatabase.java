@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 
 /**
- * Implements the Clear VPG Database action in the Refactor/(Debugging) menu
+ * Implements the Refresh VPG Database action in the Refactor/(Debugging) menu
  * 
  * @author Jeff Overbey
  */
