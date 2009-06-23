@@ -2211,6 +2211,21 @@ get_complex_type(char *type)
 	}
 }
 
+/*
+ * Find the base type of the pointer type.
+ * Assumes type string is '<something>*'
+ * Removes whitespace before the '*'
+ * Modifies the string argument.
+ */
+void
+find_pointer_base_type(char *type) {
+	int pos = strlen(type) - 2;
+	while (pos >= 0 && type[pos] == ' ') {
+		pos--;
+	}
+	type[pos] = '\0';
+}
+
 static AIF*
 GetPrimitiveAIF(int id, char *res)
 {
@@ -2460,10 +2475,7 @@ GetPointerAIF(MIVar *var, int named)
 	AIF *a;
 	int id;
 
-	var->type[strlen(var->type) - 1] = '\0'; //remove pointer
-	while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
-		var->type[strlen(var->type) - 1] = '\0';
-	}
+	find_pointer_base_type(var->type);
 
 	id = get_complex_type(var->type);
 	switch (id) {
@@ -2654,10 +2666,7 @@ GetPartialPointerAIF(MIVar *var)
 	int id;
 
 	if (var->children != NULL) {
-		var->type[strlen(var->type) - 1] = '\0'; /* remove pointer */
-		while (var->type[strlen(var->type) - 1] == ' ') {/* remove whitespace */
-			var->type[strlen(var->type) - 1] = '\0';
-		}
+		find_pointer_base_type(var->type);
 
 		id = get_complex_type(var->type);
 		switch (id) {
@@ -2802,6 +2811,9 @@ GDBEvaluatePartialExpression(char* expr, char* exprId, int listChildren, int exp
 	char* var_name;
 
 	CHECK_SESSION();
+
+	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GDBGetPartialAIF expr: %s, exprId: %s, listChild: %d, exp: %d\n",
+			expr, (exprId != NULL) ? exprId : "null", listChildren, express);
 
 	/*
 	 * Start by using exprId if it exists
