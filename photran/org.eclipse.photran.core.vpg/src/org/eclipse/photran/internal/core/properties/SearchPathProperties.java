@@ -14,12 +14,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 /**
  * Provides access to the module paths and include paths for a project.
@@ -35,6 +37,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
  * @see org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage
  * @author Jeff Overbey
  * Modified by Jungyoon Lee, Kun Koh, Nam Kim, David Weiner
+ * Modified by Timofey Yuvashev
  */
 public class SearchPathProperties
 {
@@ -45,6 +48,27 @@ public class SearchPathProperties
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
     
+    
+    protected static ProjectScope pScope = null;
+    public static ScopedPreferenceStore scopedStore = null;
+    
+    protected static void initProjScope(IProject proj)
+    {
+        pScope = new ProjectScope(proj);
+        scopedStore = new ScopedPreferenceStore(pScope, "scoped_pref_store");
+        
+        
+        String includeName = SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME;
+        String moduleName = SearchPathProperties.MODULE_PATHS_PROPERTY_NAME;
+        String defaultDir = proj.getFullPath().toOSString() + File.pathSeparator;
+        
+        //Set the default include and module paths to the root of the project
+        scopedStore.setDefault(includeName, 
+                               defaultDir);
+        scopedStore.setDefault(moduleName, 
+                               defaultDir);
+    }
+    
     /** @return the value of the given property for the project containing the given file */
     public static String getProperty(IFile file, String propertyName)
     {
@@ -53,45 +77,48 @@ public class SearchPathProperties
         else
             return getProperty(file.getProject(), propertyName);
     }
-
+    
+    public static void setProject(IProject project)
+    {
+        if(pScope == null || scopedStore == null)
+            initProjScope(project);
+        
+        //HACK: A way to check that we are looking at the correct project scope.
+        IPath currPath = pScope.getLocation();
+        IPath projPath = project.getLocation();
+        
+        //If the path to the current project is different then the one passed in --
+        // we need to re-set the project
+        if(!currPath.equals(projPath.append(EclipsePreferences.DEFAULT_PREFERENCES_DIRNAME)))
+            initProjScope(project);
+    }
+    
     /** @return the value of the given property for the given project */
     public static String getProperty(IProject project, String propertyName)
     {
-        try
-        {
-            String result = project.getPersistentProperty(new QualifiedName("", propertyName)); // Could cast to IResource instead
-            if (result == null) result = getPropertyDefault(project, propertyName);
-            
-            if (propertyName.equals(ENABLE_DECL_VIEW_PROPERTY_NAME)
-                    || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
-                return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true") ? "true" : "";
-            else
-                return result == null ? "" : result;
-        }
-        catch (CoreException e)
-        {
-            return "";
-        }
+        setProject(project);
+        String result = scopedStore.getString(propertyName);
+
+        if (propertyName.equals(ENABLE_DECL_VIEW_PROPERTY_NAME)
+                || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
+            return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true") ? "true" : "";
+        else
+            return result == null ? "" : result;   
     }
     
     /** @return the default value of the given property for the given project (i.e., its value if it has not been
      * explicitly set by the user) */
     public static String getPropertyDefault(IProject project, String propertyName)
     {
-        return project.getFullPath().toOSString() + File.pathSeparator;
+        setProject(project);
+        return scopedStore.getDefaultString(propertyName);
     }
 
     /** Sets the given property to the given value in the given project */
     public static void setProperty(IProject project, String propertyName, String value)
     {
-        try
-        {
-            project.setPersistentProperty(new QualifiedName("", propertyName), value);
-        }
-        catch (CoreException e)
-        {
-            ;
-        }
+        setProject(project);
+        scopedStore.setValue(propertyName, value);
     }
 
     
@@ -118,12 +145,13 @@ public class SearchPathProperties
     public static String[] parseString(String stringList)
     {
         StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
-        ArrayList v = new ArrayList();
+        ArrayList<String> v = new ArrayList<String>();
         while (st.hasMoreTokens())
             v.add(st.nextToken());
         return (String[]) v.toArray(new String[v.size()]);
     }
 
+    
     public static IPreferenceStore getPropertyStore(final IProject project, final String propertyName)
     {
         return new CustomPropertyStore()
