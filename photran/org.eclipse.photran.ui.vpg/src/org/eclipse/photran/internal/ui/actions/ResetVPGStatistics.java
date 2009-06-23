@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.analysis.binding.Binder;
 
 /**
  * Implements the Reset VPG Statistics action in the Refactor/(Debugging) menu
@@ -28,6 +29,7 @@ public class ResetVPGStatistics extends FortranEditorActionDelegate
         {
         	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
             PhotranVPG.getDatabase().resetStatistics();
+            Binder.resetStatistics();
         }
         catch (Exception e)
         {

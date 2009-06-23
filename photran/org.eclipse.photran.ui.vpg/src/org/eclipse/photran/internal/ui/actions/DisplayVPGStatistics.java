@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.analysis.binding.Binder;
 
 /**
  * Implements the Display VPG Database action in the Refactor/(Debugging) menu
@@ -32,7 +33,11 @@ public class DisplayVPGStatistics extends FortranEditorActionDelegate
 
             File temp = createTempFile();
             final PrintStream ps = createPrintStream(temp);
+            
+            Binder.printStatisticsOn(ps);
+            ps.println();
             PhotranVPG.getDatabase().printStatisticsOn(ps);
+            
             ps.close();
 
             openHtmlViewerOn("VPG Statistics", temp);
