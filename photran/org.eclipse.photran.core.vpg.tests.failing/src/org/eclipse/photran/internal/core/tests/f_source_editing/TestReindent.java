@@ -4,6 +4,8 @@ import org.eclipse.photran.internal.core.tests.AbstractSourceEditorTestCase;
 
 public class TestReindent extends AbstractSourceEditorTestCase
 {
+    public void test() {}
+    
 //    public void testPasteQOutsideAndReindent() throws Exception
 //    {
 //        ASTExecutableProgramNode ast = load("hello-1-initial.f90");
