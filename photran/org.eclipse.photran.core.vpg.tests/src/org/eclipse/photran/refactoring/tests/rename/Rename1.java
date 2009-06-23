@@ -133,9 +133,9 @@ public class Rename1 extends RenameTestSuite
     public void addFailConflictInReference() throws Exception
     {
         startTests("Check: Conflicts outside local scope");
-        addSuccessTests(main, "int");
+        addPreconditionTests(main, "int"); // FIXME: Bug -- should be addPreconditionTests
         addPreconditionTests(main, "ext");
-        addSuccessTests(intInMain, "Main");
+        addPreconditionTests(intInMain, "Main");
         addPreconditionTests(intInMain, "ext");
         addPreconditionTests(subInMain, "int");
         addPreconditionTests(subInMain, "ext");
@@ -143,7 +143,7 @@ public class Rename1 extends RenameTestSuite
         addPreconditionTests(ext, "sub"); // will change interpretation of ext call in Main
         addPreconditionTests(ext, "Main");
         addSuccessTests(intContained, "sub");
-        //addSuccessTests(intContained, "Main"); // TODO: This is a special case; won't worry about it
+        addSuccessTests(intContained, "Main");
         endTests();
     }
 }

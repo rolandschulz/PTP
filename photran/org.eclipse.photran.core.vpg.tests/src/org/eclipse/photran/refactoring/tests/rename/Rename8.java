@@ -39,9 +39,9 @@ public class Rename8 extends RenameTestSuite
           // * x cannot be renamed to x
           
           /* vvv can be renamed to >>>     f      g_paramOfF q      h      x_paramOfG x_paramOfH g_function   
-          /* f          */ new boolean[] { false, false,     true,  true,  true,      true,      false },
+          /* f          */ new boolean[] { false, false,     false, true,  true,      true,      false },
           /* g_paramOfF */ new boolean[] { false, false,     false, false, false,     false,     false },
-          /* q          */ new boolean[] { true,  false,     false, true,  true,      true,      false },
+          /* q          */ new boolean[] { false, false,     false, true,  true,      true,      false },
           /* h          */ new boolean[] { false, false,     false, false, false,     false,     false },
           /* x_paramOfG */ new boolean[] { false, false,     false, false, false,     false,     false },
           /* x_paramOfH */ new boolean[] { false, false,     false, false, false,     false,     false },

@@ -82,6 +82,17 @@ public abstract class BindingCollector extends ASTVisitor
     		throw new Error(e);
     	}
     }
+    
+//    Definition addDefinitionAndDuplicateInLocalScope(Token name, Classification classification, Type type)
+//    {
+//        Definition result = addDefinition(name, classification, type);
+//        // addDefinition called vpg.markScope for the enclosing scope
+//        
+//        ScopingNode localScope = name.findNearestAncestor(ScopingNode.class);
+//        vpg.markScope(name.getTokenRef(), localScope);
+//        
+//        return result;
+//    }
 
     Definition addDefinition(Token token, Definition.Classification classification)
     {

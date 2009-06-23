@@ -174,6 +174,11 @@ public class Definition implements Serializable, Comparable<Definition>
         return false;
     }
     
+    public boolean isInternalSubprogramDefinition()
+    {
+        return isInternal() && isSubprogram();
+    }
+    
     public boolean isExternallyVisibleSubprogramDefinition()
     {
         return !isInternal() && isSubprogram();
@@ -201,6 +206,11 @@ public class Definition implements Serializable, Comparable<Definition>
     {
         return classification == Classification.SUBROUTINE
             || classification == Classification.FUNCTION;
+    }
+
+    public boolean isModule()
+    {
+        return classification == Classification.MODULE;
     }
 
     public boolean isExternal()

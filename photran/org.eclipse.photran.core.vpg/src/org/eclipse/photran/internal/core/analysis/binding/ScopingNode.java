@@ -11,9 +11,11 @@
 package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -24,6 +26,7 @@ import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
+import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataNameNode;
@@ -62,8 +65,6 @@ import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-
-import bz.over.vpg.TokenRef;
 
 /**
  * An AST node representing a scope.
@@ -206,8 +207,6 @@ public abstract class ScopingNode extends ASTNode
     	// Find root of AST (i.e., topmost ASTExecutableProgramNode)
     	while (result.getParent() != null) result = result.getParent();
     	
-    	if (!(result instanceof ASTExecutableProgramNode))
-    	    System.err.println("!");
     	return (ScopingNode)result;
     }
 
@@ -412,22 +411,78 @@ public abstract class ScopingNode extends ASTNode
 		}
 	}
 	
-	public List<ScopingNode> findImportingScopes()
+	public Iterable<ScopingNode> findImportingScopes()
 	{
-		PhotranVPG vpg = PhotranVPG.getInstance();
-		
-		Set<PhotranTokenRef> result = new HashSet<PhotranTokenRef>();
-		for (Definition def : getAllDefinitions())
-		    if (def != null) // TODO: Why are we getting null here?
-		        for (TokenRef<Token> t : vpg.db.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
-		            result.add((PhotranTokenRef)t);
-	    	
-	    List<ScopingNode> scopes = new LinkedList<ScopingNode>();
-	    for (PhotranTokenRef tokenRef : result)
-	    	scopes.add(tokenRef.findToken().getEnclosingScope());
-	    return scopes;
-	}
+//		PhotranVPG vpg = PhotranVPG.getInstance();
+//		
+//		Set<PhotranTokenRef> result = new HashSet<PhotranTokenRef>();
+//		for (Definition def : getAllDefinitions())
+//		    if (def != null) // TODO: Why are we getting null here?
+//		        for (TokenRef<Token> t : vpg.db.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
+//		            result.add((PhotranTokenRef)t);
+//	    	
+//	    List<ScopingNode> scopes = new LinkedList<ScopingNode>();
+//	    for (PhotranTokenRef tokenRef : result)
+//	    	scopes.add(tokenRef.findToken().getEnclosingScope());
+//	    return scopes;
 
+		// Find all references to things defined in this scope (presumably a module),
+		// and sort them by file and offset
+        Set<PhotranTokenRef> allReferences = new TreeSet<PhotranTokenRef>();
+        for (Definition def : getAllDefinitions())
+            if (def != null)
+                allReferences.addAll(def.findAllReferences(false));
+
+        // Now go through each file, parse it, and collect the containing scope's representative token
+        final Set<PhotranTokenRef> scopes = new HashSet<PhotranTokenRef>();
+        for (PhotranTokenRef ref : allReferences)
+            scopes.add(ref.findToken().findNearestAncestor(ScopingNode.class).getRepresentativeToken());
+        
+        // And return an iterable that will parse files and change the representative tokens back into ScopingNodes
+        return new Iterable<ScopingNode>()
+        {
+            public Iterator<ScopingNode> iterator()
+            {
+                return new TokenRefToScopeIterator(scopes);
+            }
+        };
+	}
+	
+	private static class TokenRefToScopeIterator implements Iterator<ScopingNode>
+	{
+        private Iterator<PhotranTokenRef> it;
+        
+        public TokenRefToScopeIterator(Set<PhotranTokenRef> scopes)
+        {
+            this.it = scopes.iterator();
+        }
+
+        public boolean hasNext()
+        {
+            return it.hasNext();
+        }
+
+        public ScopingNode next()
+        {
+            return findScopingNodeForRepresentativeToken(it.next());
+        }
+
+        public void remove()
+        {
+            throw new UnsupportedOperationException();
+        }
+	}
+	
+	public static ScopingNode findScopingNodeForRepresentativeToken(PhotranTokenRef tr)
+	{
+	    PhotranVPG vpg = PhotranVPG.getInstance();
+	    
+	    if (tr.getOffset() < 0)
+	        return vpg.acquireTransientAST(tr.getFilename()).getRoot();
+	    else
+	        return vpg.findToken(tr).findNearestAncestor(ScopingNode.class);
+	}
+    
     public List<PhotranTokenRef> manuallyResolve(Token identifier)
     {
     	final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
@@ -638,5 +693,30 @@ public abstract class ScopingNode extends ASTNode
         LastTokenVisitor lastTokenVisitor = new LastTokenVisitor();
         node.accept(lastTokenVisitor);
         return lastTokenVisitor.getLastToken();
+    }
+
+    public boolean isNamed(String targetName)
+    {
+        String name = getName();
+        if (name == null) return false;
+        
+        String actualName = PhotranVPG.canonicalizeIdentifier(name);
+        String expectedName = PhotranVPG.canonicalizeIdentifier(targetName);
+        return actualName.equals(expectedName);
+    }
+
+    public String getName()
+    {
+        Token nameToken = getNameToken();
+        return nameToken == null ? null : nameToken.getText();
+    }
+    
+    public Token getNameToken()
+    {
+        Token repToken = getRepresentativeToken().findTokenOrReturnNull();
+        if (repToken == null || repToken.getTerminal() != Terminal.T_IDENT)
+            return null;
+        else
+            return repToken;
     }
 }

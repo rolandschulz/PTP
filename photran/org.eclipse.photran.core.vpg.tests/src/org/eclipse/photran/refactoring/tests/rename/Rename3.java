@@ -52,21 +52,21 @@ public class Rename3 extends RenameTestSuite
         // * The rename refactoring requires that the new name not be identical to the old name, hence "false" along the diagonal
         
         /* vvv can be renamed to >>>    myProgram, aRenamed3, bRenamed3, contained, external, moduleA, aSub1of3, aSub2of3, aSub3of3, moduleB, bSub1of3, bSub2of3, bSub3of3, moduleC, cSub
-        /* myProgram */ new boolean[] { false,     true,      true,      true,      false,    true,    true,     true,     true,     true,    true,     true,     true,     true,    true  },
-        /* aRenamed3 */ new boolean[] { true,      false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
-        /* bRenamed3 */ new boolean[] { true,      false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
-        /* contained */ new boolean[] { true,      false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
+        /* myProgram */ new boolean[] { false,     false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
+        /* aRenamed3 */ new boolean[] { false,     false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
+        /* bRenamed3 */ new boolean[] { false,     false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
+        /* contained */ new boolean[] { false,     false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
         /* external  */ new boolean[] { false,     false,     false,     false,     false,    true,    false,    false,    true,     true,    true,     false,    true,     true,    true  },
         /* moduleA   */ new boolean[] { false,     false,     false,     false,     false,    false,   false,    false,    false,    false,   false,    false,    false,    false,   false },
-        /* aSub1of3  */ new boolean[] { true,      false,     false,     false,     false,    true,    false,    false,    false,    true,    true,     false,    true,     true,    true  },
-        /* aSub2of3  */ new boolean[] { true,      false,     false,     false,     false,    true,    false,    false,    false,    true,    true,     false,    true,     true,    true  },
-        /* aSub3of3  */ new boolean[] { true,      true,      true,      true,      true,     true,    false,    false,    false,    true,    true,     true,     true,     true,    true  },
+        /* aSub1of3  */ new boolean[] { false,     false,     false,     false,     false,    false,   false,    false,    false,    true,    true,     false,    true,     true,    true  },
+        /* aSub2of3  */ new boolean[] { false,     false,     false,     false,     false,    false,   false,    false,    false,    true,    true,     false,    true,     true,    true  },
+        /* aSub3of3  */ new boolean[] { true,      true,      true,      true,      true,     false,   false,    false,    false,    true,    true,     true,     true,     true,    true  },
         /* moduleB   */ new boolean[] { false,     false,     false,     false,     false,    false,   false,    false,    false,    false,   false,    false,    false,    false,   false },
-        /* bSub1of3  */ new boolean[] { true,      true,      true,      true,      true,     true,    true,     true,     true,     true,    false,    false,    false,    true,    false },
-        /* bSub2of3  */ new boolean[] { true,      false,     false,     false,     false,    true,    false,    false,    true,     true,    false,    false,    false,    true,    false,},
-        /* bSub3of3  */ new boolean[] { true,      true,      true,      true,      true,     true,    true,     true,     true,     true,    false,    false,    false,    true,    false },
+        /* bSub1of3  */ new boolean[] { true,      true,      true,      true,      true,     true,    true,     true,     true,     false,   false,    false,    false,    true,    false },
+        /* bSub2of3  */ new boolean[] { false,     false,     false,     false,     false,    true,    false,    false,    true,     false,   false,    false,    false,    true,    false,},
+        /* bSub3of3  */ new boolean[] { true,      true,      true,      true,      true,     true,    true,     true,     true,     false,   false,    false,    false,    true,    false },
         /* moduleC   */ new boolean[] { false,     false,     false,     false,     false,    false,   false,    false,    false,    false,   false,    false,    false,    false,   false },
-        /* cSub      */ new boolean[] { true,      true,      true,      true,      true,     true,    true,     true,     true,     false,   false,    false,    false,    true,    false },
+        /* cSub      */ new boolean[] { true,      true,      true,      true,      true,     true,    true,     true,     true,     false,   false,    false,    false,    false,   false },
     };
     
     ///////////////////////////////////////////////////////////////////////////

@@ -90,7 +90,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	{
 		if (instance == null)
 	    {
-            if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
+            if (/*inTestingMode() ||*/ FortranPreferences.ENABLE_VPG_LOGGING.getValue())
             {
     		    instance = new PhotranVPGBuilder()
         		{
