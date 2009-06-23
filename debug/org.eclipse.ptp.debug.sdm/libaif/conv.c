@@ -38,7 +38,7 @@
 union ieee
 {
 	char		c;
-	int		i;
+	int			i;
 	AIFLONGEST	li;
 	float		f;
 	double		d;
@@ -107,6 +107,8 @@ AIFNormalise(char *dst, int dstlen, char *src, int srclen)
 int
 _pointer_to_aif(char **rd, const AIF *addr, const AIF *val)
 {
+	char * d;
+
 	if ( rd == NULL )
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
@@ -118,11 +120,12 @@ _pointer_to_aif(char **rd, const AIF *addr, const AIF *val)
 	if( *rd == NULL ) {
 		*rd = (char *)_aif_alloc(AIF_LEN(addr) + AIF_LEN(val) + 1);
 	}
-
-	**rd = (char) AIF_PTR_NORMAL; /* indicates normal pointer value */
 	
-	memcpy((*rd)+1, AIF_DATA(addr), AIF_LEN(addr));
-	memcpy((*rd)+1+AIF_LEN(addr), AIF_DATA(val), AIF_LEN(val));
+	d = *rd;
+	*d++ = (char) AIF_PTR_NORMAL; /* indicates normal pointer value */
+	memcpy(d, AIF_DATA(addr), AIF_LEN(addr));
+	d += AIF_LEN(addr);
+	memcpy(d, AIF_DATA(val), AIF_LEN(val));
 
 	return 0;
 }
@@ -430,6 +433,7 @@ ByteToHex(char *out_string, char *in_string, int in_size)
 		*out_string++ = hexchars[ ch & 0xf]; /* [c%16]; */
 	}
 }
+
 /* Get default address format with size
  * 
  */
@@ -439,16 +443,14 @@ GetDefaultAddress(int size)
 	int i;
 	const char *pattern = "00";
 	char *addr = (char *)malloc(size*2 + 1);
-	//char addr[size*2];
-	//addr[0] = '\0';
 
 	for (i=0; i<size; i++) {
 		memcpy(&addr[i*2], pattern, 2);
-		//strcat(addr, pattern);
 	}
 	addr[size*2] = '\0';
 	return strdup(addr);
 }
+
 /* Converts hexadecimal display to binary. String length is used
  * and only hexadecimal pairs are handled.
  */
@@ -494,8 +496,10 @@ HexToByte(char *out_string, char *in_string, int in_size)
 	}
 }
 /*
- * Convert an address (defined as a pointer to a null terminated array
- * of characters) to AIF format.
+ * Convert a null terminated array of hexadecimal characters to
+ * an AIF address of length len.
+ *
+ * NOTE: there must be at least len*2 characters in the array
  */
 AIF *
 AddressToAIF(char *addr, int len)
@@ -510,16 +514,9 @@ AddressToAIF(char *addr, int len)
 	a = NewAIF(0, len);
 	AIF_FORMAT(a) = strdup(AIF_ADDRESS_TYPE(len));
 
-	//memcpy(AIF_DATA(a), &addr, in_size);
 	buf = _aif_alloc(len);
 	HexToByte(buf, addr, len);
-/*
-	char *hex;
-	hex = _aif_alloc(len);
-	ByteToHex(hex, buf, len);
-	printf("---- Address hex: %s, %i\n", hex, len);
-	free(hex);
-*/
+
 	memcpy(AIF_DATA(a), buf, len);
 	free(buf);
 	return a;
@@ -530,19 +527,25 @@ AddressToAIF(char *addr, int len)
 AIF *
 BoolToAIF(int b)
 {
-	AIF  * a;
-	int    size;
-
-	size = sizeof(int);
+	AIF  *	a;
+	int		size = 1;
+	int		val;
 
 	a = NewAIF(0, size);
 
-	AIF_FORMAT(a) = strdup(AIF_BOOLEAN_TYPE());
+	AIF_FORMAT(a) = strdup(AIF_BOOLEAN_TYPE(size));
 
-	if ( b )
-		memset(AIF_DATA(a), 0xff, size);
-	else
-		memset(AIF_DATA(a), 0, size);
+	if (b == 0) {
+		val = AIF_BOOLEAN_FALSE;
+	} else {
+		val = AIF_BOOLEAN_TRUE;
+	}
+
+	if ( _longest_to_aif(&AIF_DATA(a), size, (AIFLONGEST)val) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
 
 	return a;
 }
@@ -1329,7 +1332,7 @@ _aif_to_char(char *data, char *val)
 int
 _aif_to_longest(char *data, int len, AIFLONGEST *val)
 {
-	int			s;
+	int				s;
 	AIFLONGEST		i = 0;
 
 	if ( data == NULL || val == (AIFLONGEST *)NULL )
@@ -1426,7 +1429,7 @@ _aif_to_doublest(char *data, int len, AIFDOUBLEST *val)
 
 	ResetAIFError();
 
-        AIFNormalise(f.bytes, len, data, len);
+    AIFNormalise(f.bytes, len, data, len);
 
 	if ( len == sizeof(float) )
 		*val = (AIFDOUBLEST)f.f;
@@ -1858,24 +1861,19 @@ _str_get(void)
 int
 _aif_bool_to_str(int depth, char **fds, char **data)
 {
-	int		bytes = sizeof(int);
-	int		i;
-	char		buf[BUFSIZ];
+	int			bytes = FDSTypeSize(*fds);
 	AIFLONGEST	lli;
+	char		buf[BUFSIZ];
 
 	(*fds)++;
 
 	if ( _aif_to_longest(*data, bytes, &lli) < 0 )
 		return -1;
 
-	i = (int)lli;
-
-	if ( i == -1 )
-		snprintf(buf, BUFSIZ-1, "true");
-	else if ( i == 0 )
+	if ( lli == 0 )
 		snprintf(buf, BUFSIZ-1, "false");
 	else
-		snprintf(buf, BUFSIZ-1, "%d", i);
+		snprintf(buf, BUFSIZ-1, "true");
 
 	_str_cat(buf);
 	*data += bytes;
@@ -1933,11 +1931,11 @@ _aif_char_to_str(int depth, char **fds, char **data)
 int
 _aif_int_to_str(int depth, char **fds, char **data)
 {
-	int		bytes = FDSTypeSize(*fds);
-	int		isSigned = FDSIsSigned(*fds);
-	int		i;
+	int			bytes = FDSTypeSize(*fds);
+	int			isSigned = FDSIsSigned(*fds);
+	int			i;
 	AIFLONGEST	lli;
-	char	buf[BUFSIZ];
+	char		buf[BUFSIZ];
 
 	*fds += 2;
 	*fds = _fds_skipnum(*fds);
@@ -2077,10 +2075,9 @@ _aif_pointer_to_str(int depth, char **fds, char **data)
 	int 	index;
 	char 	buf[BUFSIZ];
 
-	(*fds)++; /* past "^" */
 	_str_cat("^");
 
-	switch ( (int)**data )
+	switch ( _get_pointer_type(*data) )
 	{
 	case AIF_PTR_NIL: /* nil value */
 		if ( depth == 1 )
@@ -2088,14 +2085,11 @@ _aif_pointer_to_str(int depth, char **fds, char **data)
 		else if ( depth > 1 )
 			depth--;
 
-		(*data)++;
 		_str_cat("null");
-		_fds_advance(fds);
+		_fds_skip_data(fds, data);
 		break;
 
 	case AIF_PTR_NORMAL: /* normal value */
-		(*data)++;
-
 		if ( depth == -1 )
 		{
 			_str_cat("<normal>");
@@ -2107,13 +2101,13 @@ _aif_pointer_to_str(int depth, char **fds, char **data)
 		else if ( depth > 1 )
 			depth--;
 		
+		_find_target(fds, data, 0);
 		_aif_to_str(depth, fds, data);
 		break;
 
 	case AIF_PTR_NAME: /* normal value, but remember it */
-		(*data)++;
-		_ptrname_to_int(*data, &index);
-		*data += 4;
+		index = _get_pointer_name(*data);
+		_find_target(fds, data, 0);
 		_aif_values_seen[index] = *data;
 		snprintf(buf, BUFSIZ-1, "<%d:>", index);
 		_str_cat(buf);
@@ -2137,7 +2131,7 @@ _aif_pointer_to_str(int depth, char **fds, char **data)
 			char * target;
 
 			depth = -1;
-			target = _find_target(data, 0);
+			_find_target(fds, data, 0);
 			_aif_to_str(depth, fds, &target);
 		}
 		else if ( depth > 1 )
@@ -2145,25 +2139,22 @@ _aif_pointer_to_str(int depth, char **fds, char **data)
 			char * target;
 
 			depth--;
-			target = _find_target(data, 0);
+			_find_target(fds, data, 0);
 			_aif_to_str(depth, fds, &target);
 		}
 		else
 		{
-			(*data)++;
-			_ptrname_to_int(*data, &index);
-			*data += 4;
+			index = _get_pointer_name(*data);
 			snprintf(buf, BUFSIZ-1, "<=%d>", index);
 			_str_cat(buf);
-			_fds_advance(fds);
+			_fds_skip_data(fds, data);
 		}
 
 		break;
 
 	case AIF_PTR_INVALID: /* pointer is invalid */
-		(*data)++;
 		_str_cat("<invalid>");
-		_fds_advance(fds);
+		_fds_skip_data(fds, data);
 		break;
 	}
 
@@ -2838,26 +2829,31 @@ AIFToStr(char **str, int depth, AIF *a)
 	return 0;
 }
 
-/* Convert a pointer name into an int (4 bytes) */
+/*
+ * Convert a pointer name into an int (4 bytes). Advances data to
+ * the end of the name.
+ */
 void
-_ptrname_to_int(char *name, int *number)
+_ptrname_to_int(char **data, int *number)
 {
-	int	s;
+	int		s;
 	int 	i = 0;
 
 	for ( s = 0 ; s < 4 ; s++ )
-		i = i * 0x100 + (name[s] & 0xff);
+		i = i * 0x100 + (*(*data)++ & 0xff);
 
 	*number = i;
 }
 
-/* Convert an int (4 bytes) into a string for the pointer name */
+/*
+ * Convert an int (4 bytes) into a string for the pointer name
+ */
 void
-_int_to_ptrname(int number, char *name)
+_int_to_ptrname(int number, char *data)
 {
 	union ieee	f;
 	f.i = number;
 
-	_aif_normalise(name, 4, f.bytes, 4);
+	_aif_normalise(data, 4, f.bytes, 4);
 }
 

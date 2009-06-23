@@ -61,7 +61,7 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_ENUM_START, '%', 's', FDS_ID, FDS_ENUM_END, FDS_INTEGER, '%', 'c', '4', '\0' },
 
-	{ FDS_BOOLEAN, '\0' },
+	{ FDS_BOOLEAN, '%', 'd', '\0' },
 	
 	{ FDS_ADDRESS, '%', 'd', '\0' },
 
@@ -274,36 +274,36 @@ _fds_base_type(char *type)
 	if ( type == NULL || *type == '\0' )
 		return NULL;
 
-	switch ( *type )
+	switch ( *type++ )
 	{
 	case FDS_FUNCTION: /* function */
-		p = _fds_skipto(++type, _fds_function_arg_end);
+		p = _fds_skipto(type, _fds_function_arg_end);
 		p++;
 		break;
 
 	case FDS_POINTER: /* pointer */
-		p = ++type;
+		_fds_advance(&type); /* skip address */
+		p = type;
 		break;
 		
 	case FDS_ARRAY_START: /* array */
-		p = _fds_skipto(++type, _fds_array_end);
+		p = _fds_skipto(type, _fds_array_end);
 		p++;
 		break;
 
 	case FDS_ENUM_START: /* enum */
-		p = _fds_skipto(++type, _fds_enum_end);
+		p = _fds_skipto(type, _fds_enum_end);
 		p++;
 		break;
 
 	case FDS_RANGE: /* range */
-		p = type + 1;   /* skip FDS_RANGE */
 		p = _fds_skipnum(p); /* skip MinValue */
 		p += 2;         /* skip '..' */
 		p = _fds_skipnum(p); /* skip MaxValue */
 		break;
 
 	case FDS_REGION: /* region */
-		p = type + 2;	/* skip FDS_REGION Rank */
+		p = type + 1;	/* skip FDS_REGION Rank */
 		break;
 
 	default:
@@ -366,8 +366,9 @@ FDSTypeSize(char *type)
 
 	switch ( *type )
 	{
+	case FDS_ADDRESS:
 	case FDS_BOOLEAN: /* boolean */
-		return sizeof(int);		
+		return _fds_getnum(type + 1);
 
 	case FDS_CHARACTER: /* character */
 		return 1;
@@ -467,7 +468,6 @@ FDSTypeSize(char *type)
 
 	case FDS_CHAR_POINTER:
 	case FDS_STRING:
-	case FDS_ADDRESS:
 	default:
 		return -1;
 	}
@@ -563,13 +563,13 @@ TypeToFDS(int type, ...)
 		break;
 
 	case AIF_ADDRESS:
+	case AIF_BOOLEAN:
 		v1 = va_arg(args, int);
 		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1);
 		break;
 
 	case AIF_STRING:
 	case AIF_CHARACTER:
-	case AIF_BOOLEAN:
 		strcpy(_fds_buf, _fds_type_str[type]);
 		break;
 
@@ -666,6 +666,8 @@ FDSTypeCompare(char *f1, char *f2)
 	case AIF_FLOATING:
 	case AIF_VOID:
 	case AIF_REGION:
+	case AIF_ADDRESS:
+	case AIF_BOOLEAN:
 		res = FDSTypeSize(f1) == FDSTypeSize(f2);
 		break;
 
@@ -674,7 +676,7 @@ FDSTypeCompare(char *f1, char *f2)
 		res = FDSTypeCompare(FDSBaseType(f1), FDSBaseType(f2));
 		break;
 
-        case AIF_REFERENCE:
+	case AIF_REFERENCE:
 		res = FDSType(f2) == FDSType(f1);
 		break;
 
@@ -2195,9 +2197,9 @@ _fds_advance(char **fds)
 {
 	switch ( FDSType((*fds)++) )
 	{
+	case AIF_ADDRESS:
 	case AIF_BOOLEAN:
-	case AIF_CHARACTER:
-		/* already skipped all we should */
+		*fds = _fds_skipnum(*fds);
 		break;
 
 	case AIF_ENUM:
@@ -2264,7 +2266,12 @@ _fds_advance(char **fds)
 		break;
 
 	case AIF_POINTER:
+		_fds_advance(fds); /* past the address */
 		_fds_advance(fds); /* past the pointed-to type */
+		break;
+
+	case AIF_CHAR_POINTER:
+		_fds_advance(fds); /* past the address */
 		break;
 
 	case AIF_REFERENCE:
@@ -2272,6 +2279,7 @@ _fds_advance(char **fds)
 		(*fds)++; /* past closing '/' */
 		break;
 
+	case AIF_CHARACTER:
 	case AIF_STRING:
 		break; /* already skipped all we should */
 
@@ -2315,8 +2323,10 @@ _fds_count_bytes(char **fds)
 		break;
 
 	case FDS_BOOLEAN:
-		(*fds)++; /* past b */
-		bytes = sizeof(int);
+	case FDS_ADDRESS:
+		(*fds)++; /* past b or a */
+		bytes = _fds_getnum(*fds);
+		*fds = _fds_skipnum(*fds); /* past size indicator */
 		break;
 
 	case FDS_VOID:
@@ -2369,6 +2379,100 @@ _fds_lookup(char **fmt)
 	return _aif_types_seen[index+MAX_TYPES_SEEN/2];
 }
 
+/*
+ * Find the target data for a pointer.
+ *
+ * @param fds format descriptor for pointer (need to calculate address size). At the
+ * 		  end of the call, fds will be advanced to the beginning of the target type
+ * @param data points to the data part of an AIF. At the end of the call, data
+ *        will be advanced to the beggining of the target data
+ * @param index a unique index for saving/retrieving values in order
+ *        to simultaneously maintain targets for multiple AIFs.
+ * @return a pointer to the data region where the target data actually
+ *         starts, or 0 if null or invalid pointer
+ *
+ * Format of the data is:
+ * 	<type>[<name>][<address>[<target>]]
+ *
+ * Where:
+ *
+ * <type> is a single byte:
+ * 		0: null pointer, no data
+ *  	1: ordinary pointer, data contains <address> and <target>
+ *  	2: named pointer, data contains <name>, <address> and <target>
+ *  	3: pointer reference, data contains <name>
+ *  	4: invalid pointer, data contains <address>
+ *  <name> is an unsigned 4 byte integer
+ *  <address> is the address of the pointer
+ *	<target> is the target data
+ */
+
+char *
+_find_target(char **fds, char **data, int index)
+{
+	int		name;
+	char	code = **data;
+	char *	res;
+
+	(*fds)++;	/* past the ^ */
+	(*data)++;	/* past the code */
+
+	switch ( code )
+	{
+	case AIF_PTR_NIL:
+		_fds_advance(fds); /* skip address type */
+		return (char *)0;
+
+	case AIF_PTR_INVALID: /* invalid pointer value */
+		_fds_skip_data(fds, data); /* skip address */
+		return (char *)0;
+
+	case AIF_PTR_NORMAL: /* normal pointer value */
+		_fds_skip_data(fds, data); /* skip address */
+		res = *data;
+		return res;
+
+	case AIF_PTR_NAME: /* named value */
+		_ptrname_to_int(data, &name);
+		_fds_skip_data(fds, data); /* skip address type */
+		_aif_values_seen[name+index*MAX_VALUES_SEEN/2] = *data;
+		return *data;
+
+	case AIF_PTR_REFERENCE: /* reference to named value */
+		_ptrname_to_int(data, &name);
+		_fds_advance(fds); /* skip address type */
+		return _aif_values_seen[name+index*MAX_VALUES_SEEN/2];
+	}
+
+	return 0; /* should never fall through */
+}
+
+/*
+ * Get the pointer type.
+ */
+int
+_get_pointer_type(char *data)
+{
+	return (int)(*data);
+}
+
+/*
+ * Get the pointer name.
+ */
+int
+_get_pointer_name(char *data)
+{
+	int name = 0;
+	int type = _get_pointer_type(data);
+
+	if (type == AIF_PTR_NAME || type == AIF_PTR_REFERENCE) {
+		data++; /* skip code */
+		_ptrname_to_int(&data, &name);
+	}
+
+	return name;
+}
+
 /* 
  * Skip over one full data unit, specified by the fds,
  * At return, fds should be at its end, and data is advanced.
@@ -2379,8 +2483,6 @@ _fds_skip_data(char **fds, char **data)
 {
 	int		i;
 	int		bytes;
-	int		reg;
-	char *		target;
 	AIFIndex *	ix;
 	char *		fmt;
 
@@ -2394,30 +2496,10 @@ _fds_skip_data(char **fds, char **data)
 		return;
 
 	case AIF_POINTER:
-		reg = (**data < (char) AIF_PTR_REFERENCE); /* data not a reference */
-
-		(*fds)++; /* past ^ */
-
-		if ( **data == AIF_PTR_REFERENCE)
-		{
-			(*data)+=5;
+		if (_find_target(fds, data, 0) == 0)
 			_fds_advance(fds);
-			return;
-		}
-		
-		if ( (target = _find_target(data, 0)) == 0 )
-		{
-			/*
-			** null pointer.  skip over the target fds
-			*/
-			_fds_advance(fds);
-			return;
-		}
-
-		_fds_skip_data(fds, &target);
-
-		if ( reg )
-			*data = target; /* otherwise _find_target advanced for us */
+		else
+			_fds_skip_data(fds, data);
 		return;
 
 	case AIF_VOID:
@@ -2425,6 +2507,7 @@ _fds_skip_data(char **fds, char **data)
 	case AIF_INTEGER:
 	case AIF_BOOLEAN:
 	case AIF_FLOATING:
+	case AIF_ADDRESS:
 	case AIF_ENUM:
 		(*data) += _fds_count_bytes(fds);
 		return;
@@ -2464,6 +2547,14 @@ _fds_skip_data(char **fds, char **data)
 		}
 
 		(*fds)++; /* past close brace */
+		return;
+
+	case AIF_CHAR_POINTER:
+		(*fds)++; /* past p */
+		_fds_skip_data(fds, data); /* past address */
+		bytes = (*(*data)++ & 0xff) << 8;
+		bytes += *(*data)++ & 0xff;
+		*data += bytes;
 		return;
 
 	case AIF_STRING:

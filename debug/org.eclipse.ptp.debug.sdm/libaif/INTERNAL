@@ -32,9 +32,9 @@ array: [R]T
 	- Multi-dimension arrays are represented as an array of base type array
 	- Itself uses 0 bytes of data, but the components may use data
 		
-boolean: b
+boolean: bN
 	- Represents a true/false value
-	- The data size is a single byte
+	- N is a single digit specifying the number of bytes of data
 	- The data for a true value is non-zero 
 	- The data for a false value is 0
 
@@ -80,17 +80,22 @@ named component: %N/T
 pointer: ^aNT
 	- aN is an address type
 	- T is the type of the pointer target (possibly of > form)
-	- The first N bytes of data are the address value
-	- The byte N in the data is a marker, with value:
-		0 to indicate a null value
-		1 to indicate a normal value.  The target data is found in the 
-		  subsequent bytes
+	- The first byte in the data is a type, with value:
+		0 to indicate a null pointer
+		1 to indicate a normal value
 		2 to indicate a normal value that will be referred to later.  
-		  The next byte gives a name to this value.  Subsequent 
-		  bytes represent the value of the target
-		3 to indicate that the value is circular.  The next byte gives 
-		  the name by which this value is known
+		3 to indicate that the value is a circular reference
 		4 to indicate an invalid pointer value
+	- A null pointer (type 0) has no data.
+	- Data for a normal pointer (type 1) comprises N bytes of the
+	  address value, followed by the target.
+	- Data for a named pointer (type 2) comprises a name, N bytes of the
+	  address value, then the target data.
+	- Data for a reference pointer (type 3) comprises a name followed by
+	  N bytes of the address value.
+	- Data for an invalid pointer (type 4) comprises N bytes of
+	  the address value.
+	- Names are 4 byte unsigned integers
 
 range: rL..UT
 	- Represents a range from L to U, inclusive
