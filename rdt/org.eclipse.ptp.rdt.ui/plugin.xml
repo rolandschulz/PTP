@@ -408,6 +408,10 @@
                menubarPath="org.eclipse.search.menu/dialogGroup"
                id="org.eclipse.ptp.rdt.ui.OpenRemoteCSearchPage">
          </action>
+         <menu
+               label="%searchMenu.label"
+               id="org.eclipse.search.menu">
+         </menu>
       </actionSet>
    </extension>
    <extension
