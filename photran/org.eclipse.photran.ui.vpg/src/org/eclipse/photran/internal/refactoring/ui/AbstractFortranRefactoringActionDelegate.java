@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -26,7 +27,11 @@ import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.photran.internal.ui.actions.FortranEditorActionDelegate;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.internal.ObjectPluginAction;
 import org.eclipse.ui.internal.Workbench;
 
@@ -45,6 +50,78 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         this.wizardClass = wizardClass;
     }
     
+    private static boolean hasFile(ArrayList<IFile> files, IPath fullPath)
+    {
+        for(IFile f : files)
+        {
+            IPath fileFullPath = f.getFullPath();
+            if(fileFullPath.equals(fullPath))
+                return true;
+        }
+        return false;
+    }
+    
+    private boolean saveFile(AbstractFortranEditor editor)
+    {
+        ArrayList<IFile> filesToCheck = new ArrayList();
+        filesToCheck.add(editor.getIFile());
+        IEditorPart[] dirtyEditors = {editor};
+        return saveModifiedFiles(filesToCheck, dirtyEditors);
+    }
+    
+    private boolean saveSelectedFiles(IStructuredSelection structSel)
+    {
+        ArrayList<IFile> filesToCheck = populateFilesFromSelection(structSel);
+        IEditorPart[] dirtyEditors = Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getDirtyEditors();
+        return saveModifiedFiles(filesToCheck, dirtyEditors);
+    }
+    
+    //This function returns user selection (OK or Cancel) as a boolean.
+    // If it is passed in "false", user is not prompted, and "true" is returned by default
+    private boolean promptUser(boolean shouldPrompt)
+    {
+        boolean userSelection = true;
+        
+        if(shouldPrompt)
+        {
+            userSelection = MessageDialog.openConfirm(null, 
+                "Files need to be saved", 
+                "In order to refactor the selected file(s) they will be saved. " +
+                "Do you want to proceed?");
+        }
+        
+        return userSelection;            
+    }
+    
+    private boolean saveModifiedFiles(ArrayList<IFile> filesToCheck, IEditorPart[] dirtyEditors)
+    {
+        boolean promptUser = true;
+        for(int i = 0; i < dirtyEditors.length; i++)
+        {
+            IEditorInput editorInput = dirtyEditors[i].getEditorInput();
+            if(editorInput instanceof IFileEditorInput)
+            {
+                IFileEditorInput fileEditorInput = (IFileEditorInput)editorInput;
+                IPath fullPath = fileEditorInput.getFile().getFullPath();
+                if(hasFile(filesToCheck, fullPath) && dirtyEditors[i].isDirty())
+                {
+                    if(promptUser(promptUser))
+                    {
+                        //If user agreed to save files, proceed
+                        saveFileInEditorIfDirty(dirtyEditors[i]);
+                    }
+                    //Otherwise, return false
+                    else
+                        return false;
+                    
+                    //Make sure the user is not prompted for every file
+                    promptUser = false;                    
+                }
+            }
+        }
+        return true;
+    }
+    
     /**
      * Checks if there are multiple selected files or if a file is selected from 
      * PackageExplorer window. If that is the case, runs a separate routine for 
@@ -55,6 +132,10 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
      */
     @Override public void run(IAction action)
     {
+        //If there are unsaved files, and the user chooses not to save them, don't run 
+        // the refacotring
+        boolean shouldRun = true;
+        
         if(action instanceof ObjectPluginAction)
         {
             ISelection select = ((ObjectPluginAction)action).getSelection();
@@ -62,24 +143,45 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
             {
                 IStructuredSelection structSel = (IStructuredSelection)select;
                 if(structSel.size() > 0)
-                    runForSelectedFiles(structSel);
-                else
-                    super.run(action);
+                {
+                    shouldRun = saveSelectedFiles(structSel);
+                    if(shouldRun)
+                        runForSelectedFiles(structSel);
+                }
             }
         }
         else
-            super.run(action);        
+        {
+            //HACK: For some reason the editor is not set at certain times
+            AbstractFortranEditor editor = 
+                (AbstractFortranEditor)Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+
+            shouldRun = saveFile(editor);
+            if(shouldRun)
+                super.run(action);   
+        }
+    }
+    
+    //TODO: Possibly prompt the user if he/she wants to save the files that
+    // we are trying to refactor? Or should we save them by default?
+    private void saveFileInEditorIfDirty(IEditorPart editor)
+    {
+        if(editor.isDirty())
+            editor.doSave(null);
     }
        
     private ArrayList<IFile> populateFilesFromSelection(IStructuredSelection structSel)
     {
         ArrayList<IFile> myFiles = new ArrayList<IFile>();
-        Iterator iter = structSel.iterator();
+        Iterator<?> iter = structSel.iterator();
         for(;iter.hasNext();)
         {
             Object obj = iter.next();
             if(obj instanceof IFile)
-                myFiles.add((IFile)obj);
+            {
+                IFile file = (IFile)obj;
+                myFiles.add(file);
+            }
         }
         return myFiles;
     }
