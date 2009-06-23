@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.parser.ASTOperatorNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
@@ -53,15 +54,16 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-    }
-    
-    @Override
-    protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
-    {
         try
         {
             for (IFile file : selectedFiles)
-                makeChangesTo(file, pm);
+            {
+                IFortranAST ast = vpg.acquirePermanentAST(file);
+                if (ast == null)
+                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                makeChangesTo(file, ast, status, pm);
+                vpg.releaseAST(file);
+            }
         }
         finally
         {
@@ -69,15 +71,16 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
         }    
     }
 
-    private void makeChangesTo(IFile file, IProgressMonitor pm) throws Error
+    private void makeChangesTo(IFile file, IFortranAST ast, RefactoringStatus status, IProgressMonitor pm) throws Error
     {
         try
         {
+            if (ast == null) return;
+            
             OperatorReplacingVisitor replacer = new OperatorReplacingVisitor();
-            vpg.acquirePermanentAST(file).accept(replacer);
+            ast.accept(replacer);
             if (replacer.changedAST) // Do not include the file in the list of changes unless it actually changed
                 addChangeFromModifiedAST(file, pm);
-            vpg.releaseAST(file);
         }
         catch (Exception e)
         {
@@ -113,6 +116,11 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
             op.findFirstToken().setText(newText);
             changedAST = true;
         }
+    }
+    
+    @Override
+    protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
+    {
     }
 }
 
