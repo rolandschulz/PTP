@@ -155,7 +155,7 @@ main(int argc, char *argv[])
 	if ( tests == 0 || tests & TEST_SERIES_6 )
 		TestAllCompareByName();
 
-        fprintf(stdout, "\n****** END OF TEST ******\n");
+	fprintf(stdout, "\n****** END OF TEST ******\n");
 
 	return 0;
 
@@ -176,9 +176,9 @@ TestAllConstructors()
 	int min, max;
 
 
-        fprintf(stdout, "*********************************** \n");
-        fprintf(stdout, "*** TEST SERIES 1: constructors *** \n");
-        fprintf(stdout, "*********************************** \n\n");
+	fprintf(stdout, "*********************************** \n");
+	fprintf(stdout, "*** TEST SERIES 1: constructors *** \n");
+	fprintf(stdout, "*********************************** \n\n");
 
 
 	aString = StringToAIF("hello, world!");
@@ -193,42 +193,42 @@ TestAllConstructors()
 	anInt = IntToAIF(16);
 	AIFTest("subtest4", anInt, "integer: 16", flag);
 
-	aPointer = PointerToAIF(NULL, anInt);
+	aPointer = PointerToAIF(AddressToAIF("12345678", 4), anInt);
 	AIFTest("subtest5", aPointer, "a pointer", flag);
 
-	aPointer = PointerToAIF(NULL, aPointer);
+	aPointer = PointerToAIF(AddressToAIF("ffffffff", 4), aPointer);
 	AIFTest("subtest6", aPointer, "a double pointer", flag);
 
 	aStruct = EmptyStructToAIF("test_struct");
 	AIFTest("subtest7", aStruct, "empty struct", flag);
 
-        AIFAddFieldToStruct(aStruct, "field1", aFloat);
-        AIFTest("subtest8", aStruct, "with one field", flag);
+	AIFAddFieldToStruct(aStruct, "field1", aFloat);
+	AIFTest("subtest8", aStruct, "with one field", flag);
 
-        AIFAddFieldToStruct(aStruct, "field2", IntToAIF(16));
-        AIFTest("subtest9", aStruct, "with two fields", flag);
+	AIFAddFieldToStruct(aStruct, "field2", IntToAIF(16));
+	AIFTest("subtest9", aStruct, "with two fields", flag);
 
-        AIFAddFieldToStruct(aStruct, "field3", aStruct);
+	AIFAddFieldToStruct(aStruct, "field3", aStruct);
 	AIFTest("subtest10", aStruct, "with three fields", flag);
 
-        min = 0; max = 9;
-        anArray = ArrayToAIF(1, &min, &max, "abcdefghij", 10, "c");
-        AIFTest("subtest11", anArray, "array of 10 chars", flag);
+	min = 0; max = 9;
+	anArray = ArrayToAIF(1, &min, &max, "abcdefghij", 10, "c");
+	AIFTest("subtest11", anArray, "array of 10 chars", flag);
 
-        AIFAddFieldToStruct(aStruct, "field4", anArray);
-        AIFTest("subtest12", aStruct, "after the array is field 4", flag);
+	AIFAddFieldToStruct(aStruct, "field4", anArray);
+	AIFTest("subtest12", aStruct, "after the array is field 4", flag);
 
-        /* test a linked list: 1 -> 2 -> nil */
-        aStruct = EmptyStructToAIF("test_struct");
-        aStruct = NameAIF(aStruct, 0);
-        AIFAddFieldToStruct(aStruct, "value", IntToAIF(2));
-        AIFAddFieldToStruct(aStruct, "next", AIFNull(aStruct));
-        aPointer = PointerToAIF(NULL, aStruct);
-        aStruct = EmptyStructToAIF("test_struct");
-        AIFAddFieldToStruct(aStruct, "value", IntToAIF(1));
-        AIFAddFieldToStruct(aStruct, "next", aPointer);
-        aPointer = PointerToAIF(NULL, aStruct);
-        AIFTest("subtest13", aPointer, "linked list 1 -> 2 ", flag);
+	/* test a linked list: 1 -> 2 -> nil */
+	aStruct = EmptyStructToAIF("test_struct");
+	aStruct = NameAIF(aStruct, 0);
+	AIFAddFieldToStruct(aStruct, "value", IntToAIF(2));
+	AIFAddFieldToStruct(aStruct, "next", AIFNull(aStruct));
+	aPointer = PointerToAIF(AddressToAIF(NULL, 4), aStruct);
+	aStruct = EmptyStructToAIF("test_struct");
+	AIFAddFieldToStruct(aStruct, "value", IntToAIF(1));
+	AIFAddFieldToStruct(aStruct, "next", aPointer);
+	aPointer = PointerToAIF(AddressToAIF(NULL, 4), aStruct);
+	AIFTest("subtest13", aPointer, "linked list 1 -> 2 ", flag);
 
 	/* test an array of structs. */
 	{
@@ -291,9 +291,9 @@ TestAllConstructors()
 	{
 		char data[BUFSIZ], *dest;
 		int min=1, max=15, index, val;
-                dest = data;
-                for (index = min; index <= max; index++)
-                {
+		dest = data;
+		for (index = min; index <= max; index++)
+		{
 			val = rand() % 3;
 			switch (val)
 			{
@@ -307,13 +307,13 @@ TestAllConstructors()
 					AIFSetEnum(anEnum, "const3");
 					break;
 			}
-                        memcpy(dest, AIF_DATA(anEnum), AIF_LEN(anEnum));
-                        dest += AIF_LEN(anEnum);
-                }
+			memcpy(dest, AIF_DATA(anEnum), AIF_LEN(anEnum));
+			dest += AIF_LEN(anEnum);
+		}
 
-                anArray = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum), AIF_FORMAT(anEnum));
-                AIFTest("subtest21", anArray, "array of 15 underlying enums (random)", flag);
-        }
+		anArray = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum), AIF_FORMAT(anEnum));
+		AIFTest("subtest21", anArray, "array of 15 underlying enums (random)", flag);
+	}
 
 
 	aUnion = EmptyUnionToAIF("test_union");
@@ -325,9 +325,9 @@ TestAllConstructors()
 	AIFTest("subtest23", aUnion, "union: 10", flag);
 
 	aStruct = EmptyStructToAIF("test_struct");
-        AIFAddFieldToStruct(aStruct, "field1", IntToAIF(1));
-        AIFAddFieldToStruct(aStruct, "field2", StringToAIF("Hello World"));
-        AIFAddFieldToStruct(aStruct, "field3", IntToAIF(2));
+	AIFAddFieldToStruct(aStruct, "field1", IntToAIF(1));
+	AIFAddFieldToStruct(aStruct, "field2", StringToAIF("Hello World"));
+	AIFAddFieldToStruct(aStruct, "field3", IntToAIF(2));
 	AIFTest("subtest24", aStruct, "a struct: 1, Hello World, 2", flag);
 
 	/* Testing for a long string */
@@ -343,8 +343,8 @@ TestAllConstructors()
 void
 _testAscii(char *tst, char *fds, char *data, char *msg, TestFlags flag)
 {
-        AIF *toTest;
-        toTest = AsciiToAIF(fds, data);
+	AIF *toTest;
+	toTest = AsciiToAIF(fds, data);
 	AIFTest(tst, toTest, msg, flag);
 	AIFFree(toTest);
 }
@@ -355,9 +355,9 @@ TestAllAscii()
 	TestFlags flag = all;
 
 
-        fprintf(stdout, "********************************** \n");
-        fprintf(stdout, "*** TEST SERIES 2: ascii input *** \n");
-        fprintf(stdout, "********************************** \n\n");
+	fprintf(stdout, "********************************** \n");
+	fprintf(stdout, "*** TEST SERIES 2: ascii input *** \n");
+	fprintf(stdout, "********************************** \n\n");
 
 
 
@@ -427,9 +427,9 @@ TestAllArithmetic()
 	flag.AIFNot = 1;
 
 
-        fprintf(stdout, "********************************* \n");
-        fprintf(stdout, "*** TEST SERIES 3: arithmetic *** \n");
-        fprintf(stdout, "********************************* \n\n");
+	fprintf(stdout, "********************************* \n");
+	fprintf(stdout, "*** TEST SERIES 3: arithmetic *** \n");
+	fprintf(stdout, "********************************* \n\n");
 
 
 
@@ -454,30 +454,30 @@ TestAllArithmetic()
 	_testArithmetic("subtest10", IntToAIF(3), "3 and 7.0", flag, FloatToAIF(7.0));
 
 
-        anEnum1 = EmptyEnumToAIF("test_enum1");
-        anEnum2 = EmptyEnumToAIF("test_enum2");
-        AIFAddConstToEnum(anEnum1, "const1", IntToAIF(16));
-        AIFAddConstToEnum(anEnum1, "const2", IntToAIF(18));
-        AIFAddConstToEnum(anEnum2, "const1", IntToAIF(17));
-        AIFAddConstToEnum(anEnum2, "const2", IntToAIF(17));
-        AIFSetEnum(anEnum1, "const1");
-        AIFSetEnum(anEnum2, "const1");
+	anEnum1 = EmptyEnumToAIF("test_enum1");
+	anEnum2 = EmptyEnumToAIF("test_enum2");
+	AIFAddConstToEnum(anEnum1, "const1", IntToAIF(16));
+	AIFAddConstToEnum(anEnum1, "const2", IntToAIF(18));
+	AIFAddConstToEnum(anEnum2, "const1", IntToAIF(17));
+	AIFAddConstToEnum(anEnum2, "const2", IntToAIF(17));
+	AIFSetEnum(anEnum1, "const1");
+	AIFSetEnum(anEnum2, "const1");
 	_testArithmetic("subtest11", anEnum1, "anEnum1 and anEnum2", flag, anEnum2);
 
-        aStruct1 = EmptyStructToAIF("test_struct1");
-        aStruct2 = EmptyStructToAIF("test_struct2");
-        AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(16));
-        AIFAddFieldToStruct(aStruct1, "field2", IntToAIF(18));
-        AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
-        AIFAddFieldToStruct(aStruct2, "field2", IntToAIF(17));
+	aStruct1 = EmptyStructToAIF("test_struct1");
+	aStruct2 = EmptyStructToAIF("test_struct2");
+	AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(16));
+	AIFAddFieldToStruct(aStruct1, "field2", IntToAIF(18));
+	AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
+	AIFAddFieldToStruct(aStruct2, "field2", IntToAIF(17));
 	_testArithmetic("subtest12", aStruct1, "aStruct1 and aStruct2", flag, aStruct2);
 
 	aStruct1 = EmptyStructToAIF("test_struct1");
-        aStruct2 = EmptyStructToAIF("test_struct2");
-        AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(18));
-        AIFAddFieldToStruct(aStruct1, "field2", anEnum1);
-        AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
-        AIFAddFieldToStruct(aStruct2, "field2", anEnum2);
+	aStruct2 = EmptyStructToAIF("test_struct2");
+	AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(18));
+	AIFAddFieldToStruct(aStruct1, "field2", anEnum1);
+	AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
+	AIFAddFieldToStruct(aStruct2, "field2", anEnum2);
 	_testArithmetic("subtest13", aStruct1, "aStruct1 and aStruct2", flag, aStruct2);
 
 	_testArithmetic("subtest14", anEnum1, "anEnum1 and 17", flag, IntToAIF(17));
@@ -496,48 +496,48 @@ TestAllArithmetic()
 		AIF *anInt1 = IntToAIF(10);
 		AIF *anInt2 = IntToAIF(20);
 
-                dest = data;
-                memcpy(dest, AIF_DATA(anInt1), AIF_LEN(anInt1));
-                dest += AIF_LEN(anInt1);
-                memcpy(dest, AIF_DATA(anInt1), AIF_LEN(anInt1));
-                dest += AIF_LEN(anInt1);
-                anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt1), AIF_FORMAT(anInt1));
+		dest = data;
+		memcpy(dest, AIF_DATA(anInt1), AIF_LEN(anInt1));
+		dest += AIF_LEN(anInt1);
+		memcpy(dest, AIF_DATA(anInt1), AIF_LEN(anInt1));
+		dest += AIF_LEN(anInt1);
+		anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt1), AIF_FORMAT(anInt1));
 
-                dest = data;
-                memcpy(dest, AIF_DATA(anInt2), AIF_LEN(anInt2));
-                dest += AIF_LEN(anInt2);
-                memcpy(dest, AIF_DATA(anInt2), AIF_LEN(anInt2));
-                dest += AIF_LEN(anInt2);
-                anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt2), AIF_FORMAT(anInt2));
+		dest = data;
+		memcpy(dest, AIF_DATA(anInt2), AIF_LEN(anInt2));
+		dest += AIF_LEN(anInt2);
+		memcpy(dest, AIF_DATA(anInt2), AIF_LEN(anInt2));
+		dest += AIF_LEN(anInt2);
+		anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt2), AIF_FORMAT(anInt2));
 
 		_testArithmetic("subtest18", anArray1, "anArray1 and anArray2", flag, anArray2);
-        }
+	}
 
 	{
 		char data[BUFSIZ], *dest;
 		int min=1, max=2;
 		AIF *anArray1, *anArray2;
 
-                dest = data;
+		dest = data;
 		AIFSetEnum(anEnum1, "const1");
-                memcpy(dest, AIF_DATA(anEnum1), AIF_LEN(anEnum1));
-                dest += AIF_LEN(anEnum1);
+		memcpy(dest, AIF_DATA(anEnum1), AIF_LEN(anEnum1));
+		dest += AIF_LEN(anEnum1);
 		AIFSetEnum(anEnum1, "const2");
-                memcpy(dest, AIF_DATA(anEnum1), AIF_LEN(anEnum1));
-                dest += AIF_LEN(anEnum1);
-                anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum1), AIF_FORMAT(anEnum1));
+		memcpy(dest, AIF_DATA(anEnum1), AIF_LEN(anEnum1));
+		dest += AIF_LEN(anEnum1);
+		anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum1), AIF_FORMAT(anEnum1));
 
-                dest = data;
+		dest = data;
 		AIFSetEnum(anEnum2, "const1");
-                memcpy(dest, AIF_DATA(anEnum2), AIF_LEN(anEnum2));
-                dest += AIF_LEN(anEnum2);
+		memcpy(dest, AIF_DATA(anEnum2), AIF_LEN(anEnum2));
+		dest += AIF_LEN(anEnum2);
 		AIFSetEnum(anEnum2, "const2");
-                memcpy(dest, AIF_DATA(anEnum2), AIF_LEN(anEnum2));
-                dest += AIF_LEN(anEnum2);
-                anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum2), AIF_FORMAT(anEnum2));
+		memcpy(dest, AIF_DATA(anEnum2), AIF_LEN(anEnum2));
+		dest += AIF_LEN(anEnum2);
+		anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum2), AIF_FORMAT(anEnum2));
 
 		_testArithmetic("subtest19", anArray1, "anArray1 and anArray2", flag, anArray2);
-        }
+	}
 
 	{
 		char data[BUFSIZ], *dest;
@@ -546,22 +546,22 @@ TestAllArithmetic()
 		AIF *anInt = IntToAIF(3);
 		AIF *aFloat = FloatToAIF(7);
 
-                dest = data;
-                memcpy(dest, AIF_DATA(anInt), AIF_LEN(anInt));
-                dest += AIF_LEN(anInt);
-                memcpy(dest, AIF_DATA(anInt), AIF_LEN(anInt));
-                dest += AIF_LEN(anInt);
-                anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt), AIF_FORMAT(anInt));
+			dest = data;
+			memcpy(dest, AIF_DATA(anInt), AIF_LEN(anInt));
+			dest += AIF_LEN(anInt);
+			memcpy(dest, AIF_DATA(anInt), AIF_LEN(anInt));
+			dest += AIF_LEN(anInt);
+			anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt), AIF_FORMAT(anInt));
 
-                dest = data;
-                memcpy(dest, AIF_DATA(aFloat), AIF_LEN(aFloat));
-                dest += AIF_LEN(aFloat);
-                memcpy(dest, AIF_DATA(aFloat), AIF_LEN(aFloat));
-                dest += AIF_LEN(aFloat);
-                anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(aFloat), AIF_FORMAT(aFloat));
+			dest = data;
+			memcpy(dest, AIF_DATA(aFloat), AIF_LEN(aFloat));
+			dest += AIF_LEN(aFloat);
+			memcpy(dest, AIF_DATA(aFloat), AIF_LEN(aFloat));
+			dest += AIF_LEN(aFloat);
+			anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(aFloat), AIF_FORMAT(aFloat));
 
 		_testArithmetic("subtest20", anArray1, "anArray1 and anArray2", flag, anArray2);
-        }
+	}
 
 	aStruct1 = EmptyStructToAIF("test_struct1");
 	aStruct2 = EmptyStructToAIF("test_struct2");
@@ -625,32 +625,32 @@ TestAllCircularData()
 
 	TestFlags flag = none;
 
-        fprintf(stdout, "************************************ \n");
-        fprintf(stdout, "*** TEST SERIES 4: circular data *** \n");
-        fprintf(stdout, "************************************ \n\n");
+	fprintf(stdout, "************************************ \n");
+	fprintf(stdout, "*** TEST SERIES 4: circular data *** \n");
+	fprintf(stdout, "************************************ \n\n");
 
 	a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000a03000000000000000a"));
-        b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000b03000000000000000c"));
+	b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000b03000000000000000c"));
 	flag.D_AIFPrint = 3;
-        _testCircularData("subtest1", a, b, flag);
+	_testCircularData("subtest1", a, b, flag);
 
 
-        a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000a01000000140300000000000000150000000b"));
-        b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000b01000000160300000000000000180000000f"));
+	a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000a01000000140300000000000000150000000b"));
+	b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=is4;;;}"), (char *)strdup("02000000000000000b01000000160300000000000000180000000f"));
 	flag.D_AIFPrint = 4;
-        _testCircularData("subtest2", a, b, flag);
+	_testCircularData("subtest2", a, b, flag);
 
 
-        a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000a010000001400010000001e0300000000000000001e00000014000000000a"));
-        b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000b01000000170001000000230300000000000000002400000018000000000c"));
+	a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000a010000001400010000001e0300000000000000001e00000014000000000a"));
+	b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000b01000000170001000000230300000000000000002400000018000000000c"));
 	flag.D_AIFPrint = 5;
-        _testCircularData("subtest3", a, b, flag);
+	_testCircularData("subtest3", a, b, flag);
 
 
-        a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000a0100000014010000001e00010000002800010000003200010000003c0300000000000000003c00000032000000280000001e0000000014000000000a"));
-        b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000a0100000014010000001e00010000002800010000003200010000003c0300000000000000003c00000032000000280000001e0000000014000000000a"));
+	a = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000a0100000014010000001e00010000002800010000003200010000003c0300000000000000003c00000032000000280000001e0000000014000000000a"));
+	b = AsciiToAIF((char *)strdup("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}"), (char *)strdup("02000000000000000a0100000014010000001e00010000002800010000003200010000003c0300000000000000003c00000032000000280000001e0000000014000000000a"));
 	flag.D_AIFPrint = 7;
-        _testCircularData("subtest4", a, b, flag);
+	_testCircularData("subtest4", a, b, flag);
 
 
 }
@@ -662,21 +662,21 @@ void
 _testEPS(AIF *lo, AIF *hi, AIF *a)
 {
 	int val;
-        int ret;
+	int ret;
 
-        ret = AIFEPS(lo, hi, a, &val);
-        if (ret == 0)
-        {
-                printf("AIFEPS(lo = ");
-                AIFPrint(stdout, 0, lo);
-                printf(", hi = ");
-                AIFPrint(stdout, 0, hi);
-                printf(", a = ");
-                AIFPrint(stdout, 0, a);
-                printf("): val = %d\n", val);
-        }
-        else
-                printf("*** ERROR *** : %s\n", AIFErrorStr());
+	ret = AIFEPS(lo, hi, a, &val);
+	if (ret == 0)
+	{
+		printf("AIFEPS(lo = ");
+		AIFPrint(stdout, 0, lo);
+		printf(", hi = ");
+		AIFPrint(stdout, 0, hi);
+		printf(", a = ");
+		AIFPrint(stdout, 0, a);
+		printf("): val = %d\n", val);
+	}
+	else
+		printf("*** ERROR *** : %s\n", AIFErrorStr());
 }
 
 void 
@@ -686,9 +686,9 @@ TestAllEPS()
 	AIF * lo;
 	AIF * hi;
 
-        fprintf(stdout, "********************************** \n");
-        fprintf(stdout, "*** TEST SERIES 5: AIFEPS      *** \n");
-        fprintf(stdout, "********************************** \n\n");
+	fprintf(stdout, "********************************** \n");
+	fprintf(stdout, "*** TEST SERIES 5: AIFEPS      *** \n");
+	fprintf(stdout, "********************************** \n\n");
 
 	//AIF_BOOLEAN
 	printf("\n>>>>>>> BOOLEAN\n");
@@ -716,41 +716,41 @@ TestAllEPS()
 
 	//AIF_ENUM
 	printf("\n>>>>>>> ENUM\n");
-        a = EmptyEnumToAIF("test_enum");
-        AIFAddConstToEnum(a, "const1", IntToAIF(10));
-        AIFAddConstToEnum(a, "const2", IntToAIF(20));
-        AIFAddConstToEnum(a, "const3", IntToAIF(15));
-        AIFSetEnum(a, "const3");
-        lo = EmptyEnumToAIF(NULL);
-        AIFAddConstToEnum(lo, "const1", IntToAIF(10));
-        AIFAddConstToEnum(lo, "const2", IntToAIF(20));
-        AIFAddConstToEnum(lo, "const3", IntToAIF(15));
-        AIFSetEnum(lo, "const1");
-        hi = EmptyEnumToAIF(NULL);
-        AIFAddConstToEnum(hi, "const1", IntToAIF(10));
-        AIFAddConstToEnum(hi, "const2", IntToAIF(20));
-        AIFAddConstToEnum(hi, "const3", IntToAIF(15));
-        AIFSetEnum(hi, "const2");
+	a = EmptyEnumToAIF("test_enum");
+	AIFAddConstToEnum(a, "const1", IntToAIF(10));
+	AIFAddConstToEnum(a, "const2", IntToAIF(20));
+	AIFAddConstToEnum(a, "const3", IntToAIF(15));
+	AIFSetEnum(a, "const3");
+	lo = EmptyEnumToAIF(NULL);
+	AIFAddConstToEnum(lo, "const1", IntToAIF(10));
+	AIFAddConstToEnum(lo, "const2", IntToAIF(20));
+	AIFAddConstToEnum(lo, "const3", IntToAIF(15));
+	AIFSetEnum(lo, "const1");
+	hi = EmptyEnumToAIF(NULL);
+	AIFAddConstToEnum(hi, "const1", IntToAIF(10));
+	AIFAddConstToEnum(hi, "const2", IntToAIF(20));
+	AIFAddConstToEnum(hi, "const3", IntToAIF(15));
+	AIFSetEnum(hi, "const2");
 	_testEPS(lo, hi, a);
 	_testEPS(a, lo, hi);
 	_testEPS(hi, a, lo);
 	AIFFree(a); AIFFree(lo); AIFFree(hi);
 
-        a = EmptyEnumToAIF("test_enum");
-        AIFAddConstToEnum(a, "const1a", IntToAIF(10));
-        AIFAddConstToEnum(a, "const2a", IntToAIF(20));
-        AIFAddConstToEnum(a, "const3a", IntToAIF(15));
-        AIFSetEnum(a, "const3a");
-        lo = EmptyEnumToAIF(NULL);
-        AIFAddConstToEnum(lo, "const1lo", IntToAIF(10));
-        AIFAddConstToEnum(lo, "const2lo", IntToAIF(20));
-        AIFAddConstToEnum(lo, "const3lo", IntToAIF(15));
-        AIFSetEnum(lo, "const1lo");
-        hi = EmptyEnumToAIF(NULL);
-        AIFAddConstToEnum(hi, "const1hi", IntToAIF(10));
-        AIFAddConstToEnum(hi, "const2hi", IntToAIF(20));
-        AIFAddConstToEnum(hi, "const3hi", IntToAIF(15));
-        AIFSetEnum(hi, "const2hi");
+	a = EmptyEnumToAIF("test_enum");
+	AIFAddConstToEnum(a, "const1a", IntToAIF(10));
+	AIFAddConstToEnum(a, "const2a", IntToAIF(20));
+	AIFAddConstToEnum(a, "const3a", IntToAIF(15));
+	AIFSetEnum(a, "const3a");
+	lo = EmptyEnumToAIF(NULL);
+	AIFAddConstToEnum(lo, "const1lo", IntToAIF(10));
+	AIFAddConstToEnum(lo, "const2lo", IntToAIF(20));
+	AIFAddConstToEnum(lo, "const3lo", IntToAIF(15));
+	AIFSetEnum(lo, "const1lo");
+	hi = EmptyEnumToAIF(NULL);
+	AIFAddConstToEnum(hi, "const1hi", IntToAIF(10));
+	AIFAddConstToEnum(hi, "const2hi", IntToAIF(20));
+	AIFAddConstToEnum(hi, "const3hi", IntToAIF(15));
+	AIFSetEnum(hi, "const2hi");
 	_testEPS(lo, hi, a);
 	_testEPS(a, lo, hi);
 	_testEPS(hi, a, lo);
@@ -758,9 +758,9 @@ TestAllEPS()
 
 	//AIF_STRING
 	printf("\n>>>>>>> STRING\n");
-        a = StringToAIF("b");
-        lo = StringToAIF("a");
-        hi = StringToAIF("c");
+	a = StringToAIF("b");
+	lo = StringToAIF("a");
+	hi = StringToAIF("c");
 	_testEPS(lo, hi, a);
 	_testEPS(a, lo, hi);
 	_testEPS(hi, a, lo);
@@ -909,25 +909,25 @@ TestAllCompareByName()
 
 	AIFSetOption(AIFOPT_CMP_METHOD, AIF_CMP_BY_NAME);
 
-        fprintf(stdout, "************************************** \n");
-        fprintf(stdout, "*** TEST SERIES 6: compare by name *** \n");
-        fprintf(stdout, "************************************** \n\n");
+	fprintf(stdout, "************************************** \n");
+	fprintf(stdout, "*** TEST SERIES 6: compare by name *** \n");
+	fprintf(stdout, "************************************** \n\n");
 
 	a = AsciiToAIF("{|a=is4,b=s;;;}", "0000000400026363");
-        b = AsciiToAIF("{|b=s,a=is4;;;}", "0002646400000002");
+	b = AsciiToAIF("{|b=s,a=is4;;;}", "0002646400000002");
 	_testCompareByName(0, a, b, "AIFDiff");
 	AIFFree(a); AIFFree(b);
 
-        a = AsciiToAIF("^%0/{|c=is4,b=^>0/,a=is4;;;}", "02000000000000000a01000000140300000000000000150000000b");
-        b = AsciiToAIF("^%2/{|a=is4,b=^>2/,c=is4;;;}", "02000000000000000b01000000160300000000000000180000000f");
+	a = AsciiToAIF("^%0/{|c=is4,b=^>0/,a=is4;;;}", "02000000000000000a01000000140300000000000000150000000b");
+	b = AsciiToAIF("^%2/{|a=is4,b=^>2/,c=is4;;;}", "02000000000000000b01000000160300000000000000180000000f");
 	_testCompareByName(0, a, b, "AIFDiff");
 	_testCompareByName(1, a, b, "AIFDiff");
 	_testCompareByName(2, a, b, "AIFDiff");
 	_testCompareByName(3, a, b, "AIFDiff");
 	AIFFree(a); AIFFree(b);
 
-        a = AsciiToAIF("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}", "02000000000000000a010000001400010000001e0300000000000000001e00000014000000000a");
-        b = AsciiToAIF("^%2/{|d=is4,b=^>2/,c=^%3/{|d=is4,b=^>2/,c=^>3/,a=is4;;;},a=is4;;;}", "02000000000000000b01000000170001000000230300000000000000002400000018000000000c");
+	a = AsciiToAIF("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}", "02000000000000000a010000001400010000001e0300000000000000001e00000014000000000a");
+	b = AsciiToAIF("^%2/{|d=is4,b=^>2/,c=^%3/{|d=is4,b=^>2/,c=^>3/,a=is4;;;},a=is4;;;}", "02000000000000000b01000000170001000000230300000000000000002400000018000000000c");
 	_testCompareByName(0, a, b, "AIFDiff");
 	_testCompareByName(1, a, b, "AIFDiff");
 	_testCompareByName(2, a, b, "AIFDiff");
@@ -940,8 +940,8 @@ TestAllCompareByName()
 	** rearrangement
 	*/
 
-        a = AsciiToAIF("{|a=is4,c=is4,b=is4;;;}", "0000000b0000001500000016");
-        b = AsciiToAIF("{|a=is4,b=%0/is4,c=>0/;;;}", "0000000a0000001400000015");
+	a = AsciiToAIF("{|a=is4,c=is4,b=is4;;;}", "0000000b0000001500000016");
+	b = AsciiToAIF("{|a=is4,b=%0/is4,c=>0/;;;}", "0000000a0000001400000015");
 	_testCompareByName(0, a, b, "AIFDiff");
 	AIFFree(a); AIFFree(b);
 
@@ -950,13 +950,13 @@ TestAllCompareByName()
 	_testCompareByName(0, a, b, "AIFCompare");
 	AIFFree(a); AIFFree(b);
 
-        a = AsciiToAIF("{|a=is4,c=is4,b=is4;;;}", "0000000b0000001500000016");
-        b = AsciiToAIF("{|a=is4,b=%0/is4,c=>0/;;;}", "0000000b0000001600000015");
+	a = AsciiToAIF("{|a=is4,c=is4,b=is4;;;}", "0000000b0000001500000016");
+	b = AsciiToAIF("{|a=is4,b=%0/is4,c=>0/;;;}", "0000000b0000001600000015");
 	_testCompareByName(0, a, b, "AIFCompare");
 	AIFFree(a); AIFFree(b);
 
-        a = AsciiToAIF("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}", "02000000000000000b010000001400010000001e0300000000000000001e00000014000000000a");
-        b = AsciiToAIF("^%2/{|d=is4,b=^>2/,c=^%3/{|d=is4,b=^>2/,c=^>3/,a=is4;;;},a=is4;;;}", "02000000000000000a01000000170001000000230300000000000000002400000018000000000b");
+	a = AsciiToAIF("^%0/{|a=is4,b=^>0/,c=^%1/{|a=is4,b=^>0/,c=^>1/,d=is4;;;},d=is4;;;}", "02000000000000000b010000001400010000001e0300000000000000001e00000014000000000a");
+	b = AsciiToAIF("^%2/{|d=is4,b=^>2/,c=^%3/{|d=is4,b=^>2/,c=^>3/,a=is4;;;},a=is4;;;}", "02000000000000000a01000000170001000000230300000000000000002400000018000000000b");
 	_testCompareByName(0, a, b, "AIFCompare");
 	_testCompareByName(1, a, b, "AIFCompare");
 	AIFFree(a); AIFFree(b);
@@ -980,20 +980,20 @@ AIFTest(char *title, AIF *a, char *msg, TestFlags f)
 {
 	int ret;
 
-       	if ( title != NULL )
+	if ( title != NULL )
 		fprintf(stdout, "%s > ", title);
 
-       	if ( msg != NULL )
+	if ( msg != NULL )
         	fprintf(stdout, "%s:", msg);
 
-        fprintf(stdout, "\n\tAIFPrint: ");
-        if (AIFPrint(stdout, f.D_AIFPrint, a) != 0)
+	fprintf(stdout, "\n\tAIFPrint: ");
+	if (AIFPrint(stdout, f.D_AIFPrint, a) != 0)
 		fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-        fprintf(stdout, " (%s)", AIF_FORMAT(a));
+	fprintf(stdout, " (%s)", AIF_FORMAT(a));
 
 	ret = _aif_test(a, f);
 
-        fprintf(stdout, "\n");
+	fprintf(stdout, "\n");
 
 	return ret;
 }
@@ -1006,54 +1006,54 @@ _aif_test(AIF *a, TestFlags f)
 
 	_aif_test_general(a, f);
 
-        switch ( AIFType(a) )
-        {
-        case AIF_BOOLEAN:
-                return _aif_test_bool(a, f);
+	switch ( AIFType(a) )
+	{
+	case AIF_BOOLEAN:
+			return _aif_test_bool(a, f);
 
-        case AIF_CHARACTER:
-                return _aif_test_char(a, f);
+	case AIF_CHARACTER:
+			return _aif_test_char(a, f);
 
-        case AIF_INTEGER:
-                return _aif_test_int(a, f);
+	case AIF_INTEGER:
+			return _aif_test_int(a, f);
 
-        case AIF_FLOATING:
-                return _aif_test_float(a, f);
+	case AIF_FLOATING:
+			return _aif_test_float(a, f);
 
-        case AIF_ARRAY:
-                return _aif_test_array(a, f);
+	case AIF_ARRAY:
+			return _aif_test_array(a, f);
 
-        case AIF_POINTER:
-                return _aif_test_pointer(a, f);
+	case AIF_POINTER:
+			return _aif_test_pointer(a, f);
 
-        case AIF_REGION:
-                return _aif_test_region(a, f);
+	case AIF_REGION:
+			return _aif_test_region(a, f);
 
-        case AIF_STRUCT:
-                return _aif_test_struct(a, f);
+	case AIF_STRUCT:
+			return _aif_test_struct(a, f);
 
-        case AIF_NAME:
-                return _aif_test_name(a, f);
+	case AIF_NAME:
+			return _aif_test_name(a, f);
 
-        case AIF_REFERENCE:
-                //tmp = (char *) _fds_lookup(fds);
-                //return _aif_test(fp, depth, &tmp, data);
+	case AIF_REFERENCE:
+			//tmp = (char *) _fds_lookup(fds);
+			//return _aif_test(fp, depth, &tmp, data);
 
-        case AIF_STRING:
-                return _aif_test_string(a, f);
+	case AIF_STRING:
+			return _aif_test_string(a, f);
 
-        case AIF_ENUM:
-                return _aif_test_enum(a, f);
+	case AIF_ENUM:
+			return _aif_test_enum(a, f);
 
-        case AIF_UNION:
-                return _aif_test_union(a, f);
+	case AIF_UNION:
+			return _aif_test_union(a, f);
 
-        case AIF_FUNCTION:
-        case AIF_VOID:
-        default:
+	case AIF_FUNCTION:
+	case AIF_VOID:
+	default:
 		fprintf(stdout, "Unsupported Type\n");
                 break;
-        }
+	}
 
 	return -1;
 }
@@ -1065,53 +1065,53 @@ _aif_test_general(AIF *a, TestFlags f)
 	AIF * result;
 
 	// Test AIFIsZero
-	if (f.AIFIsZero == 1){
+	if (f.AIFIsZero == 1) {
 
-	if (AIFIsZero(a, &zeroVal)) 
-		fprintf(stdout, "\n\tAIFIsZero ERROR: trouble checking against zero: %s", AIFErrorStr());
-	else
-		fprintf(stdout, "\n\tAIFIsZero: %sequal to zero", zeroVal ? "" : "not ");
+		if (AIFIsZero(a, &zeroVal))
+			fprintf(stdout, "\n\tAIFIsZero ERROR: trouble checking against zero: %s", AIFErrorStr());
+		else
+			fprintf(stdout, "\n\tAIFIsZero: %sequal to zero", zeroVal ? "" : "not ");
 
 	}
 
 	// Test AIFCompare
-	if (f.AIFCompare == 1){
+	if (f.AIFCompare == 1) {
 
-	if (AIFCompare(0, a, a, &compareVal))  
-		fprintf(stdout, "\n\tAIFCompare (a,a) ERROR: trouble comparing against self: %s", AIFErrorStr());
-	else if (compareVal) 
-		fprintf(stdout, "\n\tAIFCompare (a,a) ERROR: not equal to itself");
-	else
-		fprintf(stdout, "\n\tAIFCompare (a,a): OK");
+		if (AIFCompare(0, a, a, &compareVal))
+			fprintf(stdout, "\n\tAIFCompare (a,a) ERROR: trouble comparing against self: %s", AIFErrorStr());
+		else if (compareVal)
+			fprintf(stdout, "\n\tAIFCompare (a,a) ERROR: not equal to itself");
+		else
+			fprintf(stdout, "\n\tAIFCompare (a,a): OK");
 
 	}
 
 	// Test AIFTypeCompare
-	if (f.AIFTypeCompare == 1){
+	if (f.AIFTypeCompare == 1) {
 
-	if (!AIFTypeCompare(a, a)) 
-		fprintf(stdout, "\n\tAIFTypeCompare (a,a) ERROR: not the same type as itself");
-	else
-		fprintf(stdout, "\n\tAIFTypeCompare (a,a): OK");
+		if (!AIFTypeCompare(a, a))
+			fprintf(stdout, "\n\tAIFTypeCompare (a,a) ERROR: not the same type as itself");
+		else
+			fprintf(stdout, "\n\tAIFTypeCompare (a,a): OK");
 
 	}
 
 	// Test AIFDiff
-	if (f.AIFDiff != NULL){
+	if (f.AIFDiff != NULL) {
 
-	if ( f.AIFDiff == (AIF*)SELF ) 
-		result = AIFDiff(0, a, a); 
-	else  
-		result = AIFDiff(0, a, f.AIFDiff);
-	if ( result != NULL ) 
-	{
-		fprintf(stdout, "\n\tAIFDiff (a,a or f.AIFDiff): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-	}
-	else
-		fprintf(stdout, "\n\tAIFDiff (a,a or f.AIFDiff) ERROR: %s", AIFErrorStr());
+		if ( f.AIFDiff == (AIF*)SELF )
+			result = AIFDiff(0, a, a);
+		else
+			result = AIFDiff(0, a, f.AIFDiff);
+		if ( result != NULL )
+		{
+			fprintf(stdout, "\n\tAIFDiff (a,a or f.AIFDiff): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+		}
+		else
+			fprintf(stdout, "\n\tAIFDiff (a,a or f.AIFDiff) ERROR: %s", AIFErrorStr());
 
 	}
 
@@ -1124,78 +1124,78 @@ _aif_test_bool(AIF *a, TestFlags f)
 	AIF * result;
 
 	// Test AIFAnd
-	if (f.AIFAnd != NULL){
+	if (f.AIFAnd != NULL) {
 
-	if ( f.AIFAnd == (AIF*)SELF ) 
-		result = AIFAnd(a,a); 
-	else
-		result = AIFAnd(a, f.AIFAnd);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFAnd (a, a or f.AIFAnd): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFAnd (a, a or f.AIFAnd) ERROR: %s", AIFErrorStr());
+		if ( f.AIFAnd == (AIF*)SELF )
+			result = AIFAnd(a,a);
+		else
+			result = AIFAnd(a, f.AIFAnd);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFAnd (a, a or f.AIFAnd): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFAnd (a, a or f.AIFAnd) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFOr
-	if (f.AIFOr != NULL){
+	if (f.AIFOr != NULL) {
 
-	if ( f.AIFOr == (AIF*)SELF )
-		result = AIFOr(a,a);
-        else
-		result = AIFOr(a, f.AIFOr);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFOr (a, a or f.AIFOr): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFOr (a, a or f.AIFOr) ERROR: %s", AIFErrorStr());
+		if ( f.AIFOr == (AIF*)SELF )
+			result = AIFOr(a,a);
+		else
+			result = AIFOr(a, f.AIFOr);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFOr (a, a or f.AIFOr): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFOr (a, a or f.AIFOr) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFNeg
-	if (f.AIFNeg == 1){
+	if (f.AIFNeg == 1) {
 
-	result = AIFNeg(a);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFNeg: ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFNeg ERROR: %s", AIFErrorStr());
+		result = AIFNeg(a);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFNeg: ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFNeg ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFNot
-	if (f.AIFNot == 1){
+	if (f.AIFNot == 1) {
 
-	result = AIFNot(a);
+		result = AIFNot(a);
         if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFNot: ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFNot ERROR: %s", AIFErrorStr());
+		{
+			fprintf(stdout, "\n\tAIFNot: ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFNot ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	return 0;
 }
@@ -1216,104 +1216,104 @@ _aif_test_int(AIF *a, TestFlags f)
 	_aif_test_bool(a, f);
 
 	// Test AIFAdd
-	if (f.AIFAdd != NULL){
+	if (f.AIFAdd != NULL) {
 
-	if ( f.AIFAdd == (AIF*)SELF ) 
-		result = AIFAdd(a,a);
-        else
-		result = AIFAdd(a, f.AIFAdd);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFAdd (a, a or f.AIFAdd): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFAdd (a, a or f.AIFAdd) ERROR: %s", AIFErrorStr());
+		if ( f.AIFAdd == (AIF*)SELF )
+			result = AIFAdd(a,a);
+		else
+			result = AIFAdd(a, f.AIFAdd);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFAdd (a, a or f.AIFAdd): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFAdd (a, a or f.AIFAdd) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFSub
-	if (f.AIFSub != NULL){
+	if (f.AIFSub != NULL) {
 
-	if (f.AIFSub == (AIF*)SELF) 
-		result = AIFSub(a,a); 
-	else
-		result = AIFSub(a, f.AIFSub);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFSub (a, a or f.AIFSub): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFSub (a, a or f.AIFSub) ERROR: %s", AIFErrorStr());
+		if (f.AIFSub == (AIF*)SELF)
+			result = AIFSub(a,a);
+		else
+			result = AIFSub(a, f.AIFSub);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFSub (a, a or f.AIFSub): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFSub (a, a or f.AIFSub) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFMul
-	if (f.AIFMul != NULL){
+	if (f.AIFMul != NULL) {
 
-	if ( f.AIFMul == (AIF*)SELF) 
-		result = AIFMul(a,a); 
-	else
-		result = AIFMul(a, f.AIFMul);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFMul (a, a or f.AIFMul): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFMul (a, a or f.AIFMul) ERROR: %s", AIFErrorStr());
+		if ( f.AIFMul == (AIF*)SELF)
+			result = AIFMul(a,a);
+		else
+			result = AIFMul(a, f.AIFMul);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFMul (a, a or f.AIFMul): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFMul (a, a or f.AIFMul) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFDiv
-	if (f.AIFDiv != NULL){
+	if (f.AIFDiv != NULL) {
 
-	if (f.AIFDiv == (AIF*)SELF) 
-		result = AIFDiv(a,a);
-	else 
-		result = AIFDiv(a, f.AIFDiv);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFDiv (a, a or f.AIFDiv): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFDiv (a, a or f.AIFDiv) ERROR: %s", AIFErrorStr());
+		if (f.AIFDiv == (AIF*)SELF)
+			result = AIFDiv(a,a);
+		else
+			result = AIFDiv(a, f.AIFDiv);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFDiv (a, a or f.AIFDiv): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFDiv (a, a or f.AIFDiv) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	// Test AIFRem
-	if (f.AIFRem != NULL){
+	if (f.AIFRem != NULL) {
 
-	if (f.AIFRem == (AIF*)SELF) 
-		result = AIFRem(a,a);
-	else 
-		result = AIFRem(a, f.AIFRem);
-        if ( result != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFRem (a, a or f.AIFRem): ");
-        	if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(result));
-                AIFFree(result);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFRem (a, a or f.AIFRem) ERROR: %s", AIFErrorStr());
+		if (f.AIFRem == (AIF*)SELF)
+			result = AIFRem(a,a);
+		else
+			result = AIFRem(a, f.AIFRem);
+		if ( result != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFRem (a, a or f.AIFRem): ");
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+			AIFFree(result);
+		}
+		else
+			fprintf(stdout, "\n\tAIFRem (a, a or f.AIFRem) ERROR: %s", AIFErrorStr());
 
-        }
+	}
 
 	return 0;
 }
@@ -1338,7 +1338,7 @@ _aif_test_array(AIF *a, TestFlags f)
 	AIF * ax;
 
 	ix = AIFArrayIndexInit(a);
-        if (ix == NULL)
+	if (ix == NULL)
 	{
 		fprintf(stdout, "\n\tAIFArrayIndexInit FATAL ERROR: %s", AIFErrorStr());
 		exit(100);
@@ -1346,222 +1346,222 @@ _aif_test_array(AIF *a, TestFlags f)
 
 
 	// Test AIFArrayRank
-	if (f.AIFArrayRank == 1){
+	if (f.AIFArrayRank == 1) {
 
-	if ( (tmp1 = AIFArrayRank(a)) < 0) 
-		fprintf(stdout, "\n\tAIFArrayRank ERROR: %s", AIFErrorStr());
-	else
-		fprintf(stdout, "\n\tAIFArrayRank: %d", tmp1);
+		if ( (tmp1 = AIFArrayRank(a)) < 0)
+			fprintf(stdout, "\n\tAIFArrayRank ERROR: %s", AIFErrorStr());
+		else
+			fprintf(stdout, "\n\tAIFArrayRank: %d", tmp1);
 
 	}
 
 	// Test AIFArrayInfo
-	if (f.AIFArrayInfo == 1){
+	if (f.AIFArrayInfo == 1) {
 
-	if ( AIFArrayInfo(a, &tmp1, &tmp2, &tmp3) ) 
-		fprintf(stdout, "\n\tAIFArrayInfo ERROR: %s", AIFErrorStr());
-	else
-	{
-		fprintf(stdout, "\n\tAIFArrayInfo: rank (%d), type (%s), type_id (%d)", tmp1, tmp2, tmp3);
-		_aif_free(tmp2);
-	}
+		if ( AIFArrayInfo(a, &tmp1, &tmp2, &tmp3) )
+			fprintf(stdout, "\n\tAIFArrayInfo ERROR: %s", AIFErrorStr());
+		else
+		{
+			fprintf(stdout, "\n\tAIFArrayInfo: rank (%d), type (%s), type_id (%d)", tmp1, tmp2, tmp3);
+			_aif_free(tmp2);
+		}
 
 	}
 
 	// Test AIFArrayBounds
-	if (f.AIFArrayBounds == 1){
+	if (f.AIFArrayBounds == 1) {
 
-	int *min, *max, *size;
+		int *min, *max, *size;
 
-	if ( AIFArrayBounds(a, ix->i_rank, &min, &max, &size) < 0 )
-		fprintf(stdout, "\n\tAIFArrayBounds ERROR: %s", AIFErrorStr());
-	else
-	{
-		fprintf(stdout, "\n\tAIFArrayBounds: ");
+		if ( AIFArrayBounds(a, ix->i_rank, &min, &max, &size) < 0 )
+			fprintf(stdout, "\n\tAIFArrayBounds ERROR: %s", AIFErrorStr());
+		else
+		{
+			fprintf(stdout, "\n\tAIFArrayBounds: ");
 
-		for ( tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
-			fprintf(stdout, "[rank:%d min:%d max:%d size:%d] ", 
-					tmp3, min[tmp3], max[tmp3], size[tmp3]);
+			for ( tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
+				fprintf(stdout, "[rank:%d min:%d max:%d size:%d] ",
+						tmp3, min[tmp3], max[tmp3], size[tmp3]);
 
-		_aif_free(min);
-		_aif_free(max);
-		_aif_free(size);
-	}
+			_aif_free(min);
+			_aif_free(max);
+			_aif_free(size);
+		}
 
 	}
 
 	// Test AIFArrayIndexType
-	if (f.AIFArrayIndexType == 1){
+	if (f.AIFArrayIndexType == 1) {
 
-	if ( (tmp2 = AIFArrayIndexType(a)) == NULL )
-		fprintf(stdout, "\n\tAIFArrayIndexType ERROR: %s", AIFErrorStr());
-	else
-	{
-		fprintf(stdout, "\n\tAIFArrayIndexType: %s", tmp2);
-		_aif_free(tmp2);
-	}
+		if ( (tmp2 = AIFArrayIndexType(a)) == NULL )
+			fprintf(stdout, "\n\tAIFArrayIndexType ERROR: %s", AIFErrorStr());
+		else
+		{
+			fprintf(stdout, "\n\tAIFArrayIndexType: %s", tmp2);
+			_aif_free(tmp2);
+		}
 
 	}
 
 	// Test AIFArrayMinIndex
-	if (f.AIFArrayMinIndex == 1){
+	if (f.AIFArrayMinIndex == 1) {
 
-	for ( tmp1 = 0 ; tmp1 < ix->i_rank ; tmp1++ )
-	{
-		if ( (tmp3 = AIFArrayMinIndex(a, tmp1)) < 0 )
-			fprintf(stdout, "\n\tAIFArrayMinIndex ERROR: %s", 
-					AIFErrorStr());
-		else
-			fprintf(stdout, "\n\tAIFArrayMinIndex: [rank %d: %d]", tmp1, tmp3);
-	}
+		for ( tmp1 = 0 ; tmp1 < ix->i_rank ; tmp1++ )
+		{
+			if ( (tmp3 = AIFArrayMinIndex(a, tmp1)) < 0 )
+				fprintf(stdout, "\n\tAIFArrayMinIndex ERROR: %s",
+						AIFErrorStr());
+			else
+				fprintf(stdout, "\n\tAIFArrayMinIndex: [rank %d: %d]", tmp1, tmp3);
+		}
 
 	}
 
 	// Test AIFArrayMaxIndex
-	if (f.AIFArrayMaxIndex == 1){
+	if (f.AIFArrayMaxIndex == 1) {
 
-	for ( tmp1 = 0 ; tmp1 < ix->i_rank ; tmp1++ )
-	{
-		if ( (tmp3 = AIFArrayMaxIndex(a, tmp1)) < 0 )
-			fprintf(stdout, "\n\tAIFArrayMaxIndex ERROR: %s", 
-					AIFErrorStr());
-		else
-			fprintf(stdout, "\n\tAIFArrayMaxIndex: [rank %d: %d]", tmp1, tmp3);
-	}
+		for ( tmp1 = 0 ; tmp1 < ix->i_rank ; tmp1++ )
+		{
+			if ( (tmp3 = AIFArrayMaxIndex(a, tmp1)) < 0 )
+				fprintf(stdout, "\n\tAIFArrayMaxIndex ERROR: %s",
+						AIFErrorStr());
+			else
+				fprintf(stdout, "\n\tAIFArrayMaxIndex: [rank %d: %d]", tmp1, tmp3);
+		}
 
 	}
 
 
 	// Test AIFArraySize
-	if (f.AIFArraySize == 1){
+	if (f.AIFArraySize == 1) {
 
-	if ( (tmp1 = AIFArraySize(a)) < 0) 
-		fprintf(stdout, "\n\tAIFArraySize ERROR: %s", AIFErrorStr());
-	else
-		fprintf(stdout, "\n\tAIFArraySize: %d", tmp1);
+		if ( (tmp1 = AIFArraySize(a)) < 0)
+			fprintf(stdout, "\n\tAIFArraySize ERROR: %s", AIFErrorStr());
+		else
+			fprintf(stdout, "\n\tAIFArraySize: %d", tmp1);
 
 	}
 
 	// Test AIFArraySlice
-	if (f.AIFArraySlice == 1){
+	if (f.AIFArraySlice == 1) {
+
+		int * mn;
+		int * mx;
+
+		mn = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
+		mx = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
 	
-	int * mn; 
-	int * mx;
-
-	mn = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
-	mx = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
-
-	// AIFArraySlice (first element)
-	for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
-	{
-		mn[tmp3] = ix->i_min[tmp3];
-		mx[tmp3] = ix->i_min[tmp3];
-	}
-	ax = AIFArraySlice(a, ix->i_rank, mn, mx);
-        if ( ax != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFArraySlice (first): ");
-        	if (AIFPrint(stdout, 0, ax) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(ax));
-                AIFFree(ax);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFArraySlice (first) ERROR: %s", AIFErrorStr());
-
-	// AIFArraySlice (last element)
-	for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
-	{
-		mn[tmp3] = ix->i_max[tmp3];
-		mx[tmp3] = ix->i_max[tmp3];
-	}
-	ax = AIFArraySlice(a, ix->i_rank, mn, mx);
-        if ( ax != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFArraySlice (last): ");
-        	if (AIFPrint(stdout, 0, ax) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(ax));
-                AIFFree(ax);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFArraySlice (last) ERROR: %s", AIFErrorStr());
-
-	// AIFArraySlice (2nd to 2nd last or all)
-	for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
-	{
-		if (ix->i_min[tmp3] < ix->i_max[tmp3] - 1)
-		{
-			mn[tmp3] = ix->i_min[tmp3] + 1;
-			mx[tmp3] = ix->i_max[tmp3] - 1;
-		}
-		else
+		// AIFArraySlice (first element)
+		for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
 		{
 			mn[tmp3] = ix->i_min[tmp3];
+			mx[tmp3] = ix->i_min[tmp3];
+		}
+		ax = AIFArraySlice(a, ix->i_rank, mn, mx);
+		if ( ax != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFArraySlice (first): ");
+			if (AIFPrint(stdout, 0, ax) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(ax));
+				AIFFree(ax);
+		}
+		else
+			fprintf(stdout, "\n\tAIFArraySlice (first) ERROR: %s", AIFErrorStr());
+
+		// AIFArraySlice (last element)
+		for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
+		{
+			mn[tmp3] = ix->i_max[tmp3];
 			mx[tmp3] = ix->i_max[tmp3];
 		}
-	}
-	ax = AIFArraySlice(a, ix->i_rank, mn, mx);
-        if ( ax != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFArraySlice (2nd to 2nd last or all): ");
-        	if (AIFPrint(stdout, 0, ax) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(ax));
-                AIFFree(ax);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFArraySlice (2nd to 2nd last or all) ERROR: %s", AIFErrorStr());
+		ax = AIFArraySlice(a, ix->i_rank, mn, mx);
+		if ( ax != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFArraySlice (last): ");
+			if (AIFPrint(stdout, 0, ax) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(ax));
+			AIFFree(ax);
+		}
+		else
+			fprintf(stdout, "\n\tAIFArraySlice (last) ERROR: %s", AIFErrorStr());
+
+		// AIFArraySlice (2nd to 2nd last or all)
+		for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
+		{
+			if (ix->i_min[tmp3] < ix->i_max[tmp3] - 1)
+			{
+				mn[tmp3] = ix->i_min[tmp3] + 1;
+				mx[tmp3] = ix->i_max[tmp3] - 1;
+			}
+			else
+			{
+				mn[tmp3] = ix->i_min[tmp3];
+				mx[tmp3] = ix->i_max[tmp3];
+			}
+		}
+		ax = AIFArraySlice(a, ix->i_rank, mn, mx);
+		if ( ax != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFArraySlice (2nd to 2nd last or all): ");
+			if (AIFPrint(stdout, 0, ax) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(ax));
+			AIFFree(ax);
+		}
+		else
+			fprintf(stdout, "\n\tAIFArraySlice (2nd to 2nd last or all) ERROR: %s", AIFErrorStr());
 
 
-	_aif_free(mn);
-	_aif_free(mx);
+		_aif_free(mn);
+		_aif_free(mx);
 
 	}
 
 
 	// Test AIFArrayPerm (the rank must be > 1)
-	if (f.AIFArrayPerm == 1 && ix->i_rank > 1){
+	if (f.AIFArrayPerm == 1 && ix->i_rank > 1) {
 
-	int *perm;
+		int *perm;
 
-	perm = (int *) _aif_alloc(sizeof(int) * ix->i_rank);
+		perm = (int *) _aif_alloc(sizeof(int) * ix->i_rank);
 
-	for ( tmp3 = ix->i_rank-1; tmp3 >= 0; tmp3-- )
-		perm[tmp3] = ix->i_rank - tmp3 - 1;
+		for ( tmp3 = ix->i_rank-1; tmp3 >= 0; tmp3-- )
+			perm[tmp3] = ix->i_rank - tmp3 - 1;
 
-	if ( (ax = AIFArrayPerm(a, perm)) == NULL )
-		fprintf(stdout, "\n\tAIFArrayPerm ERROR: %s", AIFErrorStr());
-	else
-	{
-		fprintf(stdout, "\n\tAIFArrayPerm: "); 
-        	if (AIFPrint(stdout, 0, ax) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(ax));
-                AIFFree(ax);
-	}
+		if ( (ax = AIFArrayPerm(a, perm)) == NULL )
+			fprintf(stdout, "\n\tAIFArrayPerm ERROR: %s", AIFErrorStr());
+		else
+		{
+			fprintf(stdout, "\n\tAIFArrayPerm: ");
+			if (AIFPrint(stdout, 0, ax) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(ax));
+			AIFFree(ax);
+		}
 
-	_aif_free(perm);
+		_aif_free(perm);
 
 	}
 
 	// Test AIFArrayElementToInt
 	tmp4 = AIFArrayIndexInit(a);
-        if (tmp4 == NULL)
+	if (tmp4 == NULL)
 		fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
 
-	if (f.AIFArrayElementToInt == 1 && AIFBaseType(a) == AIF_INTEGER ){
+	if (f.AIFArrayElementToInt == 1 && AIFBaseType(a) == AIF_INTEGER ) {
 
-	while (tmp4->i_finished != 1)
-	{
-		int x;
-		if (AIFArrayElementToInt(a, tmp4, &x) < 0)
-			fprintf(stdout, "\n\tAIFArrayElementToInt ERROR: %s", AIFErrorStr());
-		else
-			printf("\n\tAIFArrayElementToInt: %d (int)", x);
+		while (tmp4->i_finished != 1)
+		{
+			int x;
+			if (AIFArrayElementToInt(a, tmp4, &x) < 0)
+				fprintf(stdout, "\n\tAIFArrayElementToInt ERROR: %s", AIFErrorStr());
+			else
+				printf("\n\tAIFArrayElementToInt: %d (int)", x);
 
-		AIFArrayIndexInc(tmp4);
-	}
+			AIFArrayIndexInc(tmp4);
+		}
 
         AIFArrayIndexFree(tmp4);
 
@@ -1569,21 +1569,21 @@ _aif_test_array(AIF *a, TestFlags f)
 
 	// Test AIFArrayElementToLongest
 	tmp4 = AIFArrayIndexInit(a);
-        if (tmp4 == NULL)
+	if (tmp4 == NULL)
 		fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
 
-	if (f.AIFArrayElementToLongest == 1 && AIFBaseType(a) == AIF_INTEGER ){
+	if (f.AIFArrayElementToLongest == 1 && AIFBaseType(a) == AIF_INTEGER ) {
 
-	while (tmp4->i_finished != 1)
-	{
-		AIFLONGEST x;
-		if (AIFArrayElementToLongest(a, tmp4, &x) < 0)
-			fprintf(stdout, "\n\tAIFArrayElementToLongest ERROR: %s", AIFErrorStr());
-		else
-			printf("\n\tAIFArrayElementToLongest: %lld (AIFLONGEST)", x);
+		while (tmp4->i_finished != 1)
+		{
+			AIFLONGEST x;
+			if (AIFArrayElementToLongest(a, tmp4, &x) < 0)
+				fprintf(stdout, "\n\tAIFArrayElementToLongest ERROR: %s", AIFErrorStr());
+			else
+				printf("\n\tAIFArrayElementToLongest: %lld (AIFLONGEST)", x);
 
-		AIFArrayIndexInc(tmp4);
-	}
+			AIFArrayIndexInc(tmp4);
+		}
 
         AIFArrayIndexFree(tmp4);
 
@@ -1591,21 +1591,21 @@ _aif_test_array(AIF *a, TestFlags f)
 
 	// Test AIFArrayElementToDouble
 	tmp4 = AIFArrayIndexInit(a);
-        if (tmp4 == NULL)
+	if (tmp4 == NULL)
 		fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
 
-	if (f.AIFArrayElementToDouble == 1 && AIFBaseType(a) == AIF_FLOATING ){
+	if (f.AIFArrayElementToDouble == 1 && AIFBaseType(a) == AIF_FLOATING ) {
 
-	while (tmp4->i_finished != 1)
-	{
-		double x;
-		if (AIFArrayElementToDouble(a, tmp4, &x) < 0)
-			fprintf(stdout, "\n\tAIFArrayElementToDouble ERROR: %s", AIFErrorStr());
-		else
-			printf("\n\tAIFArrayElementToDouble: %f (double)", x);
+		while (tmp4->i_finished != 1)
+		{
+			double x;
+			if (AIFArrayElementToDouble(a, tmp4, &x) < 0)
+				fprintf(stdout, "\n\tAIFArrayElementToDouble ERROR: %s", AIFErrorStr());
+			else
+				printf("\n\tAIFArrayElementToDouble: %f (double)", x);
 
-		AIFArrayIndexInc(tmp4);
-	}
+			AIFArrayIndexInc(tmp4);
+		}
 
         AIFArrayIndexFree(tmp4);
 
@@ -1613,27 +1613,27 @@ _aif_test_array(AIF *a, TestFlags f)
 
 	// Test AIFArrayElementToDoublest
 	tmp4 = AIFArrayIndexInit(a);
-        if (tmp4 == NULL)
+	if (tmp4 == NULL)
 		fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
 
-	if (f.AIFArrayElementToDoublest == 1 && AIFBaseType(a) == AIF_FLOATING ){
+	if (f.AIFArrayElementToDoublest == 1 && AIFBaseType(a) == AIF_FLOATING ) {
 
-	while (tmp4->i_finished != 1)
-	{
-		AIFDOUBLEST x;
-		if (AIFArrayElementToDoublest(a, tmp4, &x) < 0)
-			fprintf(stdout, "\n\tAIFArrayElementToDoublest ERROR: %s", AIFErrorStr());
-		else
+		while (tmp4->i_finished != 1)
 		{
-#ifdef HAVE_LONG_DOUBLE
-			printf("\n\tAIFArrayElementToDoublest: %Lf (AIFDOUBLEST)", x);
-#else
-			printf("\n\tAIFArrayElementToDoublest: %f (AIFDOUBLEST)", x);
-#endif
-		}
+			AIFDOUBLEST x;
+			if (AIFArrayElementToDoublest(a, tmp4, &x) < 0)
+				fprintf(stdout, "\n\tAIFArrayElementToDoublest ERROR: %s", AIFErrorStr());
+			else
+			{
+	#ifdef HAVE_LONG_DOUBLE
+				printf("\n\tAIFArrayElementToDoublest: %Lf (AIFDOUBLEST)", x);
+	#else
+				printf("\n\tAIFArrayElementToDoublest: %f (AIFDOUBLEST)", x);
+	#endif
+			}
 
-		AIFArrayIndexInc(tmp4);
-	}
+			AIFArrayIndexInc(tmp4);
+		}
 
         AIFArrayIndexFree(tmp4);
 
@@ -1641,76 +1641,76 @@ _aif_test_array(AIF *a, TestFlags f)
 
 
 	// Test AIFArrayRef
-	if (f.AIFArrayRef == 1){
+	if (f.AIFArrayRef == 1) {
 
-	int * loc;
+		int * loc;
 
-	loc = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
+		loc = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
 
-	for (tmp1 = 0; tmp1 < ix->i_rank; tmp1++)
-		loc[tmp1] = ix->i_min[tmp1];
+		for (tmp1 = 0; tmp1 < ix->i_rank; tmp1++)
+			loc[tmp1] = ix->i_min[tmp1];
 
-	ax = AIFArrayRef(a, ix->i_rank, loc);
-        if ( ax != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFArrayRef (first): ");
-        	if (AIFPrint(stdout, 0, ax) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(ax));
-                AIFFree(ax);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFArrayRef (first) ERROR: %s", AIFErrorStr());
+		ax = AIFArrayRef(a, ix->i_rank, loc);
+		if ( ax != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFArrayRef (first): ");
+			if (AIFPrint(stdout, 0, ax) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(ax));
+				AIFFree(ax);
+		}
+		else
+			fprintf(stdout, "\n\tAIFArrayRef (first) ERROR: %s", AIFErrorStr());
 
-	for (tmp1 = 0; tmp1 < ix->i_rank; tmp1++)
-		loc[tmp1] = ix->i_max[tmp1];
+		for (tmp1 = 0; tmp1 < ix->i_rank; tmp1++)
+			loc[tmp1] = ix->i_max[tmp1];
 
-	ax = AIFArrayRef(a, ix->i_rank, loc);
-        if ( ax != (AIF *)NULL )
-	{
-                fprintf(stdout, "\n\tAIFArrayRef (last): ");
-        	if (AIFPrint(stdout, 0, ax) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-                fprintf(stdout, " (%s)", AIF_FORMAT(ax));
-                AIFFree(ax);
-        }
-	else 
-		fprintf(stdout, "\n\tAIFArrayRef (last) ERROR: %s", AIFErrorStr());
+		ax = AIFArrayRef(a, ix->i_rank, loc);
+		if ( ax != (AIF *)NULL )
+		{
+			fprintf(stdout, "\n\tAIFArrayRef (last): ");
+			if (AIFPrint(stdout, 0, ax) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(ax));
+			AIFFree(ax);
+		}
+		else
+			fprintf(stdout, "\n\tAIFArrayRef (last) ERROR: %s", AIFErrorStr());
 
-	_aif_free(loc);
+		_aif_free(loc);
 	}
 
 
 	// Test AIFSetArrayData
 	if (f.AIFSetArrayData != NULL) {
 
-	AIF * result;
+		AIF * result;
 
-	tmp4 = AIFArrayIndexInit(a);
-       	if (tmp4 == NULL)
-		fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
+		tmp4 = AIFArrayIndexInit(a);
+		if (tmp4 == NULL)
+			fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
 
-	if ( (result = CopyAIF(a)) == NULL) 
-		fprintf(stdout, "\n\tCopyAIF ERROR: %s", AIFErrorStr());
+		if ( (result = CopyAIF(a)) == NULL)
+			fprintf(stdout, "\n\tCopyAIF ERROR: %s", AIFErrorStr());
 
-	if ( f.AIFSetArrayData == (AIF *) SELF )
-		tmp1 = AIFSetArrayData(result, tmp4, result );
-	else
-		tmp1 = AIFSetArrayData(result, tmp4, f.AIFSetArrayData );
+		if ( f.AIFSetArrayData == (AIF *) SELF )
+			tmp1 = AIFSetArrayData(result, tmp4, result );
+		else
+			tmp1 = AIFSetArrayData(result, tmp4, f.AIFSetArrayData );
 
-	if ( tmp1 < 0) 
-		fprintf(stdout, "\n\tAIFSetArrayData ERROR: %s", AIFErrorStr());
-	else
-	{
-		fprintf(stdout, "\n\tAIFSetArrayData: Set [0] to ");
-		if (AIFPrint(stdout, 0, f.AIFSetArrayData) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-               	fprintf(stdout, " (%s): ", AIF_FORMAT((AIF *)f.AIFSetArrayData));
+		if ( tmp1 < 0)
+			fprintf(stdout, "\n\tAIFSetArrayData ERROR: %s", AIFErrorStr());
+		else
+		{
+			fprintf(stdout, "\n\tAIFSetArrayData: Set [0] to ");
+			if (AIFPrint(stdout, 0, f.AIFSetArrayData) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s): ", AIF_FORMAT((AIF *)f.AIFSetArrayData));
 
-		if (AIFPrint(stdout, 0, result) != 0)
-			fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-               	fprintf(stdout, " (%s)", AIF_FORMAT(result));
-	}
+			if (AIFPrint(stdout, 0, result) != 0)
+				fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
+			fprintf(stdout, " (%s)", AIF_FORMAT(result));
+		}
 
        	AIFArrayIndexFree(tmp4);
 	}
@@ -1721,13 +1721,13 @@ _aif_test_array(AIF *a, TestFlags f)
 	tmp1 = 0;
 	tmp2 = (char *) _aif_alloc(sizeof(char) * 100);
 	tmp4 = AIFArrayIndexInit(a);
-        if (tmp4 == NULL)
+	if (tmp4 == NULL)
 		fprintf(stdout, "\n\tAIFArrayIndexInit ERROR: %s", AIFErrorStr());
 	while ( (ax = AIFArrayElement(a, tmp4)) != NULL )
-        {
+	{
 		sprintf(tmp2, "\t --> Element %d", tmp1);
 		AIFTest(NULL, ax, tmp2, f);
-	        AIFFree(ax);
+		AIFFree(ax);
 		tmp1++;
 		AIFArrayIndexInc(tmp4);
 	}  
@@ -1736,11 +1736,11 @@ _aif_test_array(AIF *a, TestFlags f)
 		fprintf(stdout, "\n\tAIFArrayElement ERROR: %s", AIFErrorStr());
 
 	_aif_free(tmp2);
-        AIFArrayIndexFree(tmp4);
+	AIFArrayIndexFree(tmp4);
 
 
 
-        AIFArrayIndexFree(ix);
+	AIFArrayIndexFree(ix);
 	return 0;
 }
 
@@ -1798,20 +1798,20 @@ AIFTestInt(char *title, AIF *a, char *msg, TestFlags f)
 {
 	int ret;
 
-       	if ( title != NULL )
-		fprintf(stdout, "%s > ", title);
+	if ( title != NULL )
+	fprintf(stdout, "%s > ", title);
 
-       	if ( msg != NULL )
-        	fprintf(stdout, "%s:", msg);
+	if ( msg != NULL )
+		fprintf(stdout, "%s:", msg);
 
-        fprintf(stdout, "\n\tAIFPrint: ");
-        if (AIFPrint(stdout, 0, a) != 0)
+	fprintf(stdout, "\n\tAIFPrint: ");
+	if (AIFPrint(stdout, 0, a) != 0)
 		fprintf(stdout, "\n\tAIFPrint ERROR: %s", AIFErrorStr());
-        fprintf(stdout, " (%s)", AIF_FORMAT(a));
+	fprintf(stdout, " (%s)", AIF_FORMAT(a));
 
 	ret = _aif_test_int(a, f);
 
-        fprintf(stdout, "\n");
+	fprintf(stdout, "\n");
 
 	return ret;
 }

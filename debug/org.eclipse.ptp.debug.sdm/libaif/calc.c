@@ -45,7 +45,14 @@
 void
 _aif_and_bool(char *rd, char *d1, int l1, char *d2, int l2)
 {
-	_aif_and_int(rd, d1, l1, d2, l2);
+	AIFLONGEST	b1;
+	AIFLONGEST	b2;
+	AIFLONGEST	res;
+
+	_aif_to_longest(d1, l1, &b1);
+	_aif_to_longest(d2, l2, &b2);
+	res = b1 && b2; /* not bitwise! */
+	_longest_to_aif(&rd, MAX(l1, l2), res);
 }
 
 /*
@@ -54,7 +61,14 @@ _aif_and_bool(char *rd, char *d1, int l1, char *d2, int l2)
 void
 _aif_or_bool(char *rd, char *d1, int l1, char *d2, int l2)
 {
-	_aif_or_int(rd, d1, l1, d2, l2);
+	AIFLONGEST	b1;
+	AIFLONGEST	b2;
+	AIFLONGEST	res;
+
+	_aif_to_longest(d1, l1, &b1);
+	_aif_to_longest(d2, l2, &b2);
+	res = b1 || b2; /* not bitwise! */
+	_longest_to_aif(&rd, MAX(l1, l2), res);
 }
 
 /*
@@ -63,7 +77,12 @@ _aif_or_bool(char *rd, char *d1, int l1, char *d2, int l2)
 void
 _aif_not_bool(char *rd, char *data, int len)
 {
-	_aif_not_int(rd, data, len);
+	AIFLONGEST	b;
+	AIFLONGEST	res;
+
+	_aif_to_longest(data, len, &b);
+	res = !b; /* not bitwise! */
+	_longest_to_aif(&rd, len, res);
 }
 
 /*
@@ -802,7 +821,7 @@ _aif_binary_op(aifop op,
 				return -1;
 
 			if ( *rf == NULL )
-				*rf = strdup(AIF_BOOLEAN_TYPE());
+				*rf = strdup(AIF_BOOLEAN_TYPE(MAX(bytes1, bytes2)));
 
 			*d1 += bytes1;
 			*d2 += bytes2;
@@ -1128,8 +1147,8 @@ _aif_binary_op(aifop op,
 			char * ptr_type_1 = *d1;
 			char * ptr_type_2 = *d2;
 
-			char * target1 = _find_target(d1, 0);
-			char * target2 = _find_target(d2, MAX_VALUES_SEEN/2);
+			char * target1 ;//FIXME: = _find_target(d1, 0);
+			char * target2 ;//FIXME: = _find_target(d2, MAX_VALUES_SEEN/2);
 
 			char * fres;
 			char * dres;
@@ -1194,82 +1213,82 @@ _aif_binary_op(aifop op,
 				return 0;
 			}
 
-                        if ( target1 == 0 )     /* target1 is null, make
-                                                target2 as the result */
-                        {
-                                if ( *rf == NULL )
-                                {
-                                        tmp2 = *f2;
-                                        tmp1 = tmp2;
-                                        _fds_advance(&tmp1);
-                                        len = tmp1 - tmp2;
-                                        *rf = _aif_alloc(sizeof(char)*len + 1);
-                                        strncpy(*rf, tmp2, len);
-                                        (*rf)[len] = '\0';
-                                }
+			if ( target1 == 0 )     /* target1 is null, make
+									target2 as the result */
+			{
+					if ( *rf == NULL )
+					{
+							tmp2 = *f2;
+							tmp1 = tmp2;
+							_fds_advance(&tmp1);
+							len = tmp1 - tmp2;
+							*rf = _aif_alloc(sizeof(char)*len + 1);
+							strncpy(*rf, tmp2, len);
+							(*rf)[len] = '\0';
+					}
 
-                                if ( *rd != NULL )
-                                        _aif_free(*rd);
+					if ( *rd != NULL )
+							_aif_free(*rd);
 
-                                {
-                                        char * _d1;
-                                        char * _d2;
+					{
+							char * _d1;
+							char * _d2;
 
-                                        _d2 = ptr_type_2;
-                                        _d1 = _d2;
-                                        tmp2 = *f2;
-                                        tmp1 = tmp2;
-                                        _fds_skip_data(&tmp1, &_d1);
-                                        len = _d1 - _d2;
-                                        *rd = _aif_alloc(sizeof(char)*len);
-                                        memcpy(*rd, _d2, len);
-                                }
+							_d2 = ptr_type_2;
+							_d1 = _d2;
+							tmp2 = *f2;
+							tmp1 = tmp2;
+							_fds_skip_data(&tmp1, &_d1);
+							len = _d1 - _d2;
+							*rd = _aif_alloc(sizeof(char)*len);
+							memcpy(*rd, _d2, len);
+					}
 
-                                _fds_advance(f1);
-                                (*f2)++;
-                                _fds_skip_data(f2, d2);
+					_fds_advance(f1);
+					(*f2)++;
+					_fds_skip_data(f2, d2);
 
-                                return 0;
-                        }
+					return 0;
+			}
 
-                        if ( target2 == 0 )     /* target2 is null, make
-                                                target1 as the result */
-                        {
-                                if ( *rf == NULL )
-                                {
-                                        tmp2 = *f1;
-                                        tmp1 = tmp2;
-                                        _fds_advance(&tmp1);
-                                        len = tmp1 - tmp2;
-                                        *rf = _aif_alloc(sizeof(char)*len + 1);
-                                        strncpy(*rf, tmp2, len);
-                                        (*rf)[len] = '\0';
-                                }
+			if ( target2 == 0 )     /* target2 is null, make
+									target1 as the result */
+			{
+					if ( *rf == NULL )
+					{
+							tmp2 = *f1;
+							tmp1 = tmp2;
+							_fds_advance(&tmp1);
+							len = tmp1 - tmp2;
+							*rf = _aif_alloc(sizeof(char)*len + 1);
+							strncpy(*rf, tmp2, len);
+							(*rf)[len] = '\0';
+					}
 
-                                if ( *rd != NULL )
-                                        _aif_free(*rd);
+					if ( *rd != NULL )
+							_aif_free(*rd);
 
-                                {
-                                        char * _d1;
-                                        char * _d2;
+					{
+							char * _d1;
+							char * _d2;
 
-                                        _d2 = ptr_type_1;
-                                        _d1 = _d2;
-                                        _d1 = _d2;
-                                        tmp2 = *f1;
-                                        tmp1 = tmp2;
-                                        _fds_skip_data(&tmp1, &_d1);
-                                        len = _d1 - _d2;
-                                        *rd = _aif_alloc(sizeof(char)*len);
-                                        memcpy(*rd, _d2, len);
-                                }
+							_d2 = ptr_type_1;
+							_d1 = _d2;
+							_d1 = _d2;
+							tmp2 = *f1;
+							tmp1 = tmp2;
+							_fds_skip_data(&tmp1, &_d1);
+							len = _d1 - _d2;
+							*rd = _aif_alloc(sizeof(char)*len);
+							memcpy(*rd, _d2, len);
+					}
 
-                                _fds_advance(f2);
-                                (*f1)++;
-                                _fds_skip_data(f1, d1);
+					_fds_advance(f2);
+					(*f1)++;
+					_fds_skip_data(f1, d1);
 
-                                return 0;
-                        }
+					return 0;
+			}
 
 			(*f1)++;
 			(*f2)++;
@@ -1352,8 +1371,8 @@ _aif_binary_op(aifop op,
 		bytes2 = (*(*d2)++ & 0xff) << 8;
 		bytes2 += *(*d2)++ & 0xff;
 
-                if ( *rd != NULL )
-                        _aif_free(*rd);
+		if ( *rd != NULL )
+				_aif_free(*rd);
 
 		d = _aif_alloc(bytes1 + bytes2 + 2);
 
@@ -1372,6 +1391,34 @@ _aif_binary_op(aifop op,
 			*rf = strdup(AIF_STRING_TYPE());
 
 		return 0;
+
+	case AIF_ADDRESS:
+		bytes1 = _fds_count_bytes_na(f1);
+
+		switch ( FDSType(*f2) )
+		{
+		case AIF_ADDRESS:
+			bytes2 = _fds_count_bytes_na(f2);
+
+			if ( _aif_binary_op_int(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+				return -1;
+
+			(*d1) += bytes1;
+			(*d2) += bytes2;
+
+			if ( *rf == NULL )
+				*rf = strdup(AIF_ADDRESS_TYPE(MAX(bytes1, bytes2)));
+
+			_fds_advance(f1);
+			_fds_advance(f2);
+
+			return 0;
+
+		default:
+			SetAIFError(AIFERR_CONV, NULL);
+			return -1;
+		}
+		break;
 
 	case AIF_VOID:
 		if ( FDSType(*f2) == AIF_VOID )
@@ -1431,7 +1478,7 @@ _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 		bytes = _fds_count_bytes(fds);
 
 		if ( *rf == NULL )
-			*rf = strdup(AIF_BOOLEAN_TYPE());
+			*rf = strdup(AIF_BOOLEAN_TYPE(bytes));
 
 		if ( _aif_unary_op_bool(op, rd, *data, bytes) < 0 )
 			return -1;
@@ -1539,26 +1586,26 @@ _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 				AIFArrayIndexInc(ix);
 			}
 
-                        {
-                                char *t1, *t2;
-                                int len;
+			{
+				char *t1, *t2;
+				int len;
 
-                                t1 = _fds_base_type(*rf);
-                                t2 = t1;
-                                _fds_advance(&t2);
+				t1 = _fds_base_type(*rf);
+				t2 = t1;
+				_fds_advance(&t2);
 
-                                len = strlen(fres);
-                                memmove(t1, fres, len);
-                                t1 += len;
+				len = strlen(fres);
+				memmove(t1, fres, len);
+				t1 += len;
 
-                                if ( *t2 != '\0' )
-                                {
-                                        len = strlen(t2);
-                                        memmove(t1, t2, len+1);
-                                }
-                                else
-                                        *t1 = '\0';
-                        }
+				if ( *t2 != '\0' )
+				{
+					len = strlen(t2);
+					memmove(t1, t2, len+1);
+				}
+				else
+					*t1 = '\0';
+			}
 
 
 			_aif_free(fres);
@@ -1599,23 +1646,23 @@ _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 
 			dp += i;
 
-                        {
-                                char *t1, *t2;
-                                int len;
+			{
+				char *t1, *t2;
+				int len;
 
-                                t1 = strstr(*rf, fmt);
-                                t2 = strstr(*rf, *fds);
+				t1 = strstr(*rf, fmt);
+				t2 = strstr(*rf, *fds);
 
-                                len = strlen(fres);
-                                memmove(t1, fres, len);
-                                t1 += len;
+				len = strlen(fres);
+				memmove(t1, fres, len);
+				t1 += len;
 
-                                if ( t1 != t2 )
-                                {
-                                        len = strlen(t2);
-                                        memmove(t1, t2, len+1);
-                                }
-                        }
+				if ( t1 != t2 )
+				{
+					len = strlen(t2);
+					memmove(t1, t2, len+1);
+				}
+			}
 
 			_aif_free(fres);
 
