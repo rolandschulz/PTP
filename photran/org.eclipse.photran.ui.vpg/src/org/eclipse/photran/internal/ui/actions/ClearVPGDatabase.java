@@ -29,7 +29,8 @@ public class ClearVPGDatabase extends FortranEditorActionDelegate
         	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
             PhotranVPG.getDatabase().clearDatabase();
-            PhotranVPG.getInstance().ensureVPGIsUpToDate(progressMonitor);
+            //PhotranVPG.getInstance().ensureVPGIsUpToDate(progressMonitor);
+            PhotranVPG.getInstance().queueJobToEnsureVPGIsUpToDate();
         }
         catch (Exception e)
         {

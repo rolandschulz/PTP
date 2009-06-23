@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -44,7 +45,6 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class SearchPathsPropertyPage extends PropertyPage
 {
-    
     /*
      * This class is needed for only one reason: there is no setters in BooleanFieldEditor
      *  for the button/check-box. So I cannot programmatically set whether or not the button
@@ -243,6 +243,8 @@ public class SearchPathsPropertyPage extends PropertyPage
         
         MessageDialog.openInformation(getShell(), "Preferences Changed", "You may need to close and re-open any " +
             "Fortran editors for the new settings to take effect.");
+        
+        PhotranVPG.getInstance().queueJobToEnsureVPGIsUpToDate();
         
         return true;
     }
