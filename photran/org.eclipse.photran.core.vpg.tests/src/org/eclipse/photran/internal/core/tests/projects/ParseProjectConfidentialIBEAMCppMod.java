@@ -8,19 +8,19 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.tests.a_parser;
+package org.eclipse.photran.internal.core.tests.projects;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.framework.Test;
 
-import org.eclipse.photran.internal.core.tests.ParserTestSuite;
+import org.eclipse.photran.internal.core.tests.MultiTestSuite;
 
-public class ParseProjectConfidentialFMLIB
+public class ParseProjectConfidentialIBEAMCppMod
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("../../org.eclipse.photran-projects.confidential.fmlib", false, false) {};
+        return new MultiTestSuite("../../org.eclipse.photran-projects.confidential.ibeam-cpp-mod", false, false) {};
     }
 }

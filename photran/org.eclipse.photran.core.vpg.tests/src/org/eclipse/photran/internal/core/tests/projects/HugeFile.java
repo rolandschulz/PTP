@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.tests.a_parser;
+package org.eclipse.photran.internal.core.tests.projects;
 
 import java.io.ByteArrayInputStream;
 

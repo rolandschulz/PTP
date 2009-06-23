@@ -15,10 +15,12 @@ Require-Bundle: org.eclipse.photran.core.vpg,
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.photran.refactoring.tests.Activator
 Export-Package: org.eclipse.photran.internal.core.tests,
- org.eclipse.photran.internal.core.tests.a_parser,
- org.eclipse.photran.internal.core.tests.b_source_reproduction,
  org.eclipse.photran.internal.core.tests.f_source_editing,
  org.eclipse.photran.internal.core.tests.g_type_check,
+ org.eclipse.photran.internal.core.tests.h_interface_links,
+ org.eclipse.photran.internal.core.tests.projects,
+ org.eclipse.photran.internal.core.tests.x_cpreprocessor,
  org.eclipse.photran.refactoring.tests,
  org.eclipse.photran.refactoring.tests.introimplicitnone,
+ org.eclipse.photran.refactoring.tests.movesavedtocommonblock,
  org.eclipse.photran.refactoring.tests.rename

@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.core.analysis.loops;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
 import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
+import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -38,7 +39,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 public class ASTProperLoopConstructNode extends ASTNode implements IExecutableConstruct
 {
     ASTLabelDoStmtNode loopHeader;
-    IASTListNode<IExecutableConstruct> body = new ASTListNode<IExecutableConstruct>();
+    IASTListNode<IExecutionPartConstruct> body = new ASTListNode<IExecutionPartConstruct>();
     ASTEndDoStmtNode endDoStmt;
 
     public ASTLabelDoStmtNode getLoopHeader()
@@ -46,7 +47,7 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         return this.loopHeader;
     }
 
-    public IASTListNode<IExecutableConstruct> getBody()
+    public IASTListNode<IExecutionPartConstruct> getBody()
     {
         return this.body;
     }
@@ -86,7 +87,7 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         switch (index)
         {
         case 0:  this.loopHeader = (ASTLabelDoStmtNode)value;
-        case 1:  this.body = (IASTListNode<IExecutableConstruct>)value;
+        case 1:  this.body = (IASTListNode<IExecutionPartConstruct>)value;
         case 2:  this.endDoStmt = (ASTEndDoStmtNode)value;
         default: throw new IllegalArgumentException();
         }

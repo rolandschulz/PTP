@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
@@ -30,9 +29,14 @@ public class SourceReproductionTestCase extends AbstractParserTestCase
     protected void handleAST(ASTExecutableProgramNode ast) throws IOException
     {
         String originalSourceCode = getSourceCodeFromFile(file);
-        LoopReplacer.replaceAllLoopsIn(ast);
+        transform(ast);
         String reproducedSourceCode = getSourceCodeFromAST(ast);
         assertEquals(originalSourceCode, reproducedSourceCode);
+    }
+
+    protected void transform(ASTExecutableProgramNode ast)
+    {
+        // Subclass and override to transform AST first
     }
 
     private String getSourceCodeFromFile(File file) throws IOException

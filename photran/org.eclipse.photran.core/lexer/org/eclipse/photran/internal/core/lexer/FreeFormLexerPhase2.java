@@ -1475,8 +1475,8 @@ public class FreeFormLexerPhase2 implements ILexer
             int i = ((Integer)identifiersContainingEqualSigns.elementAt(j)).intValue();
 
             // t is the "xyz=" token: split it
-            IToken t = (IToken)tokenStream.elementAt(i);
-            IToken afterT = (i < tokenStream.size()-1 ? (IToken)tokenStream.elementAt(i+1) : null);
+            IToken t = (IToken)tokenStream.elementAt(i+j);
+            IToken afterT = (i < tokenStream.size()-1 ? (IToken)tokenStream.elementAt(i+j+1) : null);
             String textWithoutEquals = t.getText().substring(0, t.getText().length()-1);
             String tokenText = textWithoutEquals.trim();
             String whiteAfter = textWithoutEquals.substring(tokenText.length());
