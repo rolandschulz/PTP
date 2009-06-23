@@ -15,7 +15,6 @@ import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAssociationNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
@@ -44,7 +43,6 @@ import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistGroupsNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectTypeStmtNode;
@@ -109,28 +107,6 @@ class DefinitionCollector extends BindingCollector
 //        if (node.getTypeParamNameList() != null)
 //            for (ASTTypeParamNameNode typeParam : node.getTypeParamNameList())
 //                addDefinition(typeParam.getTypeParamName(), Definition.Classification.DERIVED_TYPE_PARAMETER);
-    }
-
-    // # R424
-    // <PrivateSequenceStmt> ::=
-    //     <LblDef> T_PRIVATE T_EOS
-    //  | <LblDef> T_SEQUENCE T_EOS
-    
-    @Override public void visitASTPrivateSequenceStmtNode(ASTPrivateSequenceStmtNode node)
-    {
-        super.traverseChildren(node);
-        
-        if (node.isPrivate())
-        {
-        	try
-        	{
-        		setScopeDefaultVisibilityToPrivate(node.getPrivateToken().getEnclosingScope());
-        	}
-        	catch (Exception e)
-        	{
-        		throw new Error(e);
-        	}
-        }
     }
 
     // # R425
@@ -209,40 +185,6 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(entityDecl);
         return entityDecl.getArraySpec();
-    }
-
-    // # R522
-    // <AccessStmt> ::=
-    // <LblDef> <AccessSpec> ( T_COLON T_COLON )? <AccessIdList> T_EOS
-    // | <LblDef> <AccessSpec> T_EOS
-    //
-    // # R523
-    // <AccessIdList> ::=
-    // <AccessId>
-    // | @:<AccessIdList> T_COMMA <AccessId>
-    //
-    // <AccessId> ::=
-    // <GenericName>
-    // | <GenericSpec>
-
-    @Override public void visitASTAccessStmtNode(final ASTAccessStmtNode node)
-    {
-        super.traverseChildren(node);
-        
-        if (node.getAccessIdList() == null)
-        {
-        	if (node.getAccessSpec().isPrivate())
-        	{
-        		try
-        		{
-        			setScopeDefaultVisibilityToPrivate(node.getAccessSpec().findFirstToken().getEnclosingScope());
-        		}
-        		catch (Exception e)
-        		{
-        			throw new Error(e);
-        		}
-        	}
-        }
     }
 
     // # R544

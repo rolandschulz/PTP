@@ -38,7 +38,7 @@ public class Rename9 extends RenameTestSuite
           /* vvv can be renamed to >>>     i1     j1     k1     f1     i2     j2     k2     f2     j1implicit k1implicit zimplicit i2implicit f2implicit   
           /* i1         */ new boolean[] { false, false, false, false, false, false, false, false, false,     false,     false,    false,     false },
           /* j1         */ new boolean[] { false, false, false, false, true,  true,  true,  true,  false,     false,     true,     true,      true  },
-          /* k1         */ new boolean[] { false, false, false, false, true,  true,  true,  true,  false,     false,     true,     true,      true  },
+          /* k1         */ new boolean[] { false, false, false, false, true,  true,  true,  true,  false,     false,     false,    true,      true  },
           /* f1         */ new boolean[] { false, false, false, false, false, false, false, false, false,     false,     false,    false,     false },
           /* i2         */ new boolean[] { true,  true,  true,  true,  false, false, false, false, true,      true,      true,     false,     false },
           /* j2         */ new boolean[] { false, false, false, false, false, false, false, false, false,     false,     false,    false,     false },

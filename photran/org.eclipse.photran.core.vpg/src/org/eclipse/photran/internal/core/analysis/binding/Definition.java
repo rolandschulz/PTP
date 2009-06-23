@@ -564,6 +564,7 @@ public class Definition implements Serializable, Comparable<Definition>
             return findAllImmediateReferences();
         
         Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
+        result.addAll(findAllImmediateReferences()); // e.g., PRIVATE referring to subprogram in an INTERFACE block
         for (Definition subprogram : subprogramDefinitions)
             result.addAll(subprogram.internalFindAllReferencesToSubprogIncludingInterfacesAndExternalStmts());
         result.remove(this.getTokenRef()); // By contract, the set of references does not include this

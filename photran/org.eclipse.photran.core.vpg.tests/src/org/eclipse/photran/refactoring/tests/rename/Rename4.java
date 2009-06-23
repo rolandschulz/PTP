@@ -47,7 +47,7 @@ public class Rename4 extends RenameTestSuite
 
         startTests("Renaming file with Fortran INCLUDE lines");
         addSuccessTests(myProgram, "ziggySockyZiggySockyHoyHoyHoy");
-        addSuccessTests(myProgram, "hello");
+        addPreconditionTests(myProgram, "hello");
         addPreconditionTests(hello, "Goodbye");
         addPreconditionTests(hello, "MyProgram");
         addPreconditionTests(hello, "ziggySockyZiggySockyHoyHoyHoy");
