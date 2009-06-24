@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.IOException;
+
 /**
  * <code>ILexer</code> is the common interface implemented by fixed and free form Fortran lexers.
  * An <code>IAccumulatingLexer</code> is a lexer which maintains a list of tokens which can be
@@ -21,5 +23,5 @@ public interface IAccumulatingLexer extends ILexer
 {
     TokenList getTokenList();
     
-    Token yylex() throws Exception;
+    Token yylex() throws IOException, LexerException;
 }

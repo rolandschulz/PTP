@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.photran.internal.core.parser.ASTBinaryExprNode;
 import org.eclipse.photran.internal.core.parser.ASTComplexConstNode;
 import org.eclipse.photran.internal.core.parser.ASTDblConstNode;
@@ -223,7 +220,7 @@ public class TypeChecker
             if ( lhsType.equals(Type.LOGICAL) || lhsType.equals(Type.CHARACTER) || 
                  rhsType.equals(Type.LOGICAL) || rhsType.equals(Type.CHARACTER)   )
             {
-                System.out.println(lhsType + "\t::\t" + rhsType);
+                //System.out.println(lhsType + "\t::\t" + rhsType);
                 return Type.TYPE_ERROR;
             }
             //Complex only has == and /=

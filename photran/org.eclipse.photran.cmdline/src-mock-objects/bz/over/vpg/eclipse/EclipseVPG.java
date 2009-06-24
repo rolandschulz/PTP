@@ -20,23 +20,24 @@ import bz.over.vpg.TokenRef;
 import bz.over.vpg.VPG;
 import bz.over.vpg.VPGDB;
 
-public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>> extends VPG<A, T, R, D>
+public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends EclipseVPGLog<T, R>>
+			  extends VPG<A, T, R, D, L>
 {
     @SuppressWarnings("unused")
     private String syncMessage;
     
-    public EclipseVPG(D database, String syncMessage, int transientASTCacheSize)
+    public EclipseVPG(L log, D database, String syncMessage, int transientASTCacheSize)
     {
-        super(database, transientASTCacheSize);
+        super(log, database, transientASTCacheSize);
         this.syncMessage = syncMessage;
     }
     
-    public EclipseVPG(D database, String syncMessage)
+    public EclipseVPG(L log, D database, String syncMessage)
     {
-        super(database);
+        super(log, database);
         this.syncMessage = syncMessage;
     }
-    
+	
 	/** Enqueues a job to make sure the VPG is up-to-date with the
 	 *  workspace, and instructs it to automatically update itself
 	 *  when files are added, changed, or deleted in the workspace.
@@ -104,7 +105,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
             }
             catch (Exception e)
             {
-                logError(e);
+                log.logError(e);
             }
             return !(resource instanceof IFile);
         }
@@ -230,6 +231,13 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     ///////////////////////////////////////////////////////////////////////////
     // Abstract Methods (Resource Filtering)
     ///////////////////////////////////////////////////////////////////////////
+    
+	/** @return true iff the given file should be parsed */
+	@Override protected boolean shouldProcessFile(String filename)
+	{
+		IFile file = getIFileForFilename(filename);
+		return file == null ? false : shouldProcessFile(file);
+	}
 
     /** @return true if the given project should be indexed */
     protected abstract boolean shouldProcessProject(IProject project);

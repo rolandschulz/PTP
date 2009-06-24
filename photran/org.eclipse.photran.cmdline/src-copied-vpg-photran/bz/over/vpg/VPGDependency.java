@@ -8,7 +8,7 @@ package bz.over.vpg;
  */
 public class VPGDependency<A, T, R extends TokenRef<T>>
 {
-	@SuppressWarnings("unused") private VPG<A, T, R, ?> vpg;
+	@SuppressWarnings("unused") private VPG<A, T, R, ?, ?> vpg;
 	private String dependentFile;
 	private String dependsOnFile;
 
@@ -17,7 +17,7 @@ public class VPGDependency<A, T, R extends TokenRef<T>>
      * <p>
      * The dependency is <i>not</i> added to the VPG database automatically.
      */
-	public VPGDependency(VPG<A, T, R, ?> vpg,
+	public VPGDependency(VPG<A, T, R, ?, ?> vpg,
 	                        String dependencyFrom,
 	                        String dependsOn)
 	{

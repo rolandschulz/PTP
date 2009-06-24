@@ -14,7 +14,5 @@ public interface IFile extends IResource
 
     IProject getProject();
 
-    IMarker createMarker(String text) throws CoreException;
-
     IResource getParent();
 }

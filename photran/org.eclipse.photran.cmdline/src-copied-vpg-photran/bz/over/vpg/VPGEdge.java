@@ -15,7 +15,7 @@ package bz.over.vpg;
  */
 public class VPGEdge<A, T, R extends TokenRef<T>>
 {
-	private VPG<A, T, R, ?> vpg;
+	private VPG<A, T, R, ?, ?> vpg;
 	private R source;
 	private R sink;
 	private int type;
@@ -25,7 +25,7 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 	 * <p>
 	 * The edge is <i>not</i> added to the VPG database automatically.
 	 */
-	public VPGEdge(VPG<A, T, R, ?> vpg,
+	public VPGEdge(VPG<A, T, R, ?, ?> vpg,
 	                  R source,
 	                  R sink,
 	                  int type)
@@ -36,7 +36,7 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 		this.type = type;
 	}
 	
-	public VPGEdge(VPG<A, T, R, ? extends VPGDB<A, T, R>> vpg,
+	public VPGEdge(VPG<A, T, R, ?, ?> vpg,
 	                  T source,
 	                  T sink,
 	                  int type)

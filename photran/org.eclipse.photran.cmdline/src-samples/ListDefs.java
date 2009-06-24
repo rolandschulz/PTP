@@ -165,7 +165,7 @@ public class ListDefs
         if (ast == null)
         {
             System.err.println("Unable to find or parse file " + filename);
-            vpg.printErrorLogOn(System.err);
+            vpg.log.printOn(System.err);
             System.exit(1);
         }
         return ast;

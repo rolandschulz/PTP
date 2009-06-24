@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Iterator;
 
-public abstract class VPGDB<A, T, R extends TokenRef<T>>
+public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 {
     ///////////////////////////////////////////////////////////////////////////
     // Constants
@@ -21,7 +21,7 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>>
     ///////////////////////////////////////////////////////////////////////////
     
     /** DO NOT ACCESS THIS FIELD DIRECTLY; call {@link #getVPG()} instead. */
-    private VPG<A, T, R, ? extends VPGDB<A, T, R>> vpg = null;
+    private VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg = null;
     
     /**
      * <b>FOR INTERNAL USE ONLY. THIS IS NOT AN API METHOD.</b>
@@ -32,7 +32,7 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>>
      * 
      * @param vpg the VPG for which we are storing information
      */
-    public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R>> vpg)
+    public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg)
     {
         this.vpg = vpg;
     }
@@ -46,7 +46,7 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>>
      * 
      * @return the VPG for which we are storing information
      */
-    protected VPG<A, T, R, ? extends VPGDB<A, T, R>> getVPG()
+    protected VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> getVPG()
     {
         if (vpg == null)
             throw new IllegalStateException("This VPG database has not been "

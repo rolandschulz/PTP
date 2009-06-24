@@ -1,15 +1,27 @@
 package org.eclipse.photran.core.vpg;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
+import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
@@ -17,8 +29,10 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
+import bz.over.vpg.VPGLog;
 import bz.over.vpg.eclipse.EclipseVPG;
 
 /**
@@ -26,7 +40,7 @@ import bz.over.vpg.eclipse.EclipseVPG;
  * 
  * @author Jeff Overbey
  */
-public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB>
+public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB, PhotranVPGLog>
 {
 	// Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
 	// (since our parser declares classes with the same name)
@@ -37,12 +51,14 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
 	public static final int BINDING_EDGE_TYPE = 2;
     public static final int RENAMED_BINDING_EDGE_TYPE = 3;
+    public static final int DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE = 4;
     private static final String[] edgeTypeDescriptions =
 	{
 	    "Definition-scope relationship",
 	    "Definition-scope relationship due to module import",
 	    "Binding",
 	    "Renamed binding",
+	    "Definition is private in scope",
 	};
 	
 	public static final int SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE = 0;
@@ -74,7 +90,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	{
 		if (instance == null)
 	    {
-            if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
+            if (/*inTestingMode() ||*/ FortranPreferences.ENABLE_VPG_LOGGING.getValue())
             {
     		    instance = new PhotranVPGBuilder()
         		{
@@ -147,7 +163,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
 	protected PhotranVPG()
 	{
-        super(new PhotranVPGDB(), "Photran indexer", 2);
+        super(new PhotranVPGLog(), new PhotranVPGDB(), "Photran indexer", 2);
         db = super.db;
     }
 
@@ -202,17 +218,17 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	
 	public IFortranAST acquireTransientAST(IFile file)
 	{
-		return acquireTransientAST(getFilenameForIFile(file));
+	    return file == null ? null : acquireTransientAST(getFilenameForIFile(file));
 	}
 	
 	public IFortranAST acquirePermanentAST(IFile file)
 	{
-		return acquirePermanentAST(getFilenameForIFile(file));
+	    return file == null ? null : acquirePermanentAST(getFilenameForIFile(file));
 	}
 	
 	public void releaseAST(IFile file)
 	{
-		releaseAST(getFilenameForIFile(file));
+	    if (file != null) releaseAST(getFilenameForIFile(file));
 	}
 
 	public static String canonicalizeIdentifier(String moduleName)
@@ -358,7 +374,63 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
                 result.add(def);
         }
     }
+    
+    public ArrayList<Definition> findAllDeclarationsInExternalStmts(String name)
+    {
+        ArrayList<Definition> result = new ArrayList<Definition>();
+        for (IFile file : findFilesThatImportSubprogram(name))
+            result.addAll(findExternalStmts(name, file));
+        return result;
+    }
 
+    private ArrayList<Definition> findExternalStmts(String name, IFile file)
+    {
+        ArrayList<Definition> result = new ArrayList<Definition>();
+        
+        IFortranAST ast = acquireTransientAST(file);
+        if (ast != null)
+            ast.accept(new ExternalStmtVisitor(result, PhotranVPG.canonicalizeIdentifier(name)));
+        
+        return result;
+    }
+    
+    private final class ExternalStmtVisitor extends GenericASTVisitor
+    {
+        private final ArrayList<Definition> result;
+        private final String canonicalizedName;
+        
+        public ExternalStmtVisitor(ArrayList<Definition> result, String canonicalizedName)
+        {
+            this.result = result;
+            this.canonicalizedName = canonicalizedName;
+        }
+
+        // # R1208
+        // <ExternalStmt> ::=
+        // <LblDef> T_EXTERNAL <ExternalNameList> T_EOS
+        // | <LblDef> T_EXTERNAL T_COLON T_COLON <ExternalNameList> T_EOS
+        //
+        // <ExternalNameList> ::=
+        // <ExternalName>
+        // | @:<ExternalNameList> T_COMMA <ExternalName>
+
+        @Override public void visitASTExternalStmtNode(ASTExternalStmtNode node)
+        {
+            super.traverseChildren(node);
+            
+            IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
+            for (int i = 0; i < list.size(); i++)
+                add(PhotranVPG.this.attemptToMatch(canonicalizedName, list.get(i).getExternalName()));
+        }
+
+        private void add(PhotranTokenRef tr)
+        {
+            Definition def = tr == null ? null : getDefinitionFor(tr);
+            if (def != null) // && def.getClassification().equals(Classification.EXTERNAL))
+                result.add(def);
+        }
+    }
+    
     public List<IFile> findFilesThatExportSubprogram(String subprogramName)
     {
         return getOutgoingDependenciesFrom("subprogram:" + canonicalizeIdentifier(subprogramName));
@@ -390,6 +462,17 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	public Type getTypeFor(PhotranTokenRef tokenRef)
 	{
 		return (Type)db.getAnnotation(tokenRef, TYPE_ANNOTATION_TYPE);
+	}
+	
+	public Visibility getVisibilityFor(Definition def, ScopingNode visibilityInScope)
+	{
+	    PhotranTokenRef targetScope = visibilityInScope.getRepresentativeToken();
+	    
+	    for (PhotranTokenRef privateScope : db.getOutgoingEdgeTargets(def.getTokenRef(), DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE))
+	        if (privateScope.equals(targetScope))
+	            return Visibility.PRIVATE;
+	    
+	    return Visibility.PUBLIC;
 	}
     
     public PhotranTokenRef getModuleTokenRef(String moduleName)
@@ -424,5 +507,102 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
         Object result = db.getAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE);
         return result == null || !(result instanceof Integer) ? 0 : ((Integer)result).intValue();
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // VPG Error/Warning Log View/Listener Support
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    public List<IMarker> getErrorLogMarkers()
+    {
+        List<VPGLog<Token, PhotranTokenRef>.Entry> errorLog = log.getEntries();
+        List<IMarker> result = new ArrayList<IMarker>(errorLog.size());
+        for (VPGLog<Token, PhotranTokenRef>.Entry entry : errorLog)
+        {
+            try
+            {
+                result.add(createMarkerFrom(entry));
+            }
+            catch (CoreException e)
+            {
+                // Ignore
+            }
+        }
+        return result;
+    }
+
+    private IMarker createMarkerFrom(VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
+    {
+        IMarker marker = createMarkerOnResource(entry);
+        if (marker != null) setMarkerAttributes(marker, entry);
+        return marker;
+    }
+
+    private IMarker createMarkerOnResource(VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
+    {
+        PhotranTokenRef tr = entry.getTokenRef();
+        IFile file = tr == null ? null : tr.getFile();
+        IResource res = file == null ? ResourcesPlugin.getWorkspace().getRoot() : file;
+        return res.createMarker(determineMarkerType(entry));
+    }
+
+    private String determineMarkerType(VPGLog<Token, PhotranTokenRef>.Entry entry)
+    {
+        if (entry.isWarning())
+            return "org.eclipse.photran.core.vpg.warningMarker";
+        else // (entry.isError())
+            return "org.eclipse.photran.core.vpg.errorMarker";
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setMarkerAttributes(IMarker marker, VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
+    {
+        Map attribs = new HashMap(5);
+        
+        PhotranTokenRef tr = entry.getTokenRef();
+        if (tr != null)
+        {
+            attribs.put(IMarker.CHAR_START, tr.getOffset());
+            attribs.put(IMarker.CHAR_END, tr.getEndOffset());
+        }
+        
+        attribs.put(IMarker.MESSAGE, entry.getMessage());
+        attribs.put(IMarker.USER_EDITABLE, false);
+        
+        marker.setAttributes(attribs);
+    }
+    
+    public static boolean hasFixedFormContentType(IFile file)
+    {
+        return hasFixedFormContentType(getFilenameForIFile(file));
+    }
+    
+    public static boolean hasFreeormContentType(IFile file)
+    {
+        return hasFreeFormContentType(getFilenameForIFile(file));
+    }
+    
+    protected static boolean hasFixedFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".f");
+        else
+            return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
+    }
+    
+    protected static boolean hasFreeFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".f90");
+        else
+            return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
+    }
+    
+    protected static final String getContentType(String filename)
+    {
+        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
+        return contentType == null ? null : contentType.getId();
+        
+        // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
     }
 }

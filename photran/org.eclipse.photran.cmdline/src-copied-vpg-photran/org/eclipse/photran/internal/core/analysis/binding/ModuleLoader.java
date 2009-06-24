@@ -38,10 +38,11 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
  * 
  * @author Jeff Overbey
  */
-public class ModuleLoader extends BindingCollector
+public class ModuleLoader extends VisibilityCollector
 {
-    // Visit USE statements first to make sure all definitions are imported;
-    // the annotate the "module:whatever" virtual file in the VPG with
+    // Visit USE statements and Access-Spec statements first to make sure
+    // all definitions are imported;
+    // then annotate the "module:whatever" virtual file in the VPG with
     // the full module symbol table
     @Override
     public void visitASTModuleNode(ASTModuleNode node)
@@ -168,14 +169,14 @@ public class ModuleLoader extends BindingCollector
     	List<IFile> files = vpg.findFilesThatExportModule(moduleName);
         if (files.isEmpty())
         {
-            vpg.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTokenRef());
+            vpg.log.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTokenRef());
             return;
         }
 
         files = applyModulePaths(files);
         if (files.isEmpty())
         {
-            vpg.logError("The module " + moduleName + " could not be found in any of the"
+            vpg.log.logError("The module " + moduleName + " could not be found in any of the"
             			+ " folders in the module paths for this project.  However, it was found in a folder not in the"
             			+ " module path.", useStmt.getName().getTokenRef());
             return;
@@ -247,7 +248,7 @@ public class ModuleLoader extends BindingCollector
         List<Definition> moduleSymtab = vpg.getModuleSymbolTable(moduleName);
         if (moduleSymtab == null) // Just in case
         {
-            vpg.logError("Module " + moduleName + " not found in " + file.getFullPath().toOSString());
+            vpg.log.logError("Module " + moduleName + " not found in " + file.getFullPath().toOSString());
         }
         else
         {

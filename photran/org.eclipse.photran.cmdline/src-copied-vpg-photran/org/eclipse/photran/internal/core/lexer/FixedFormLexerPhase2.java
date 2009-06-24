@@ -29,7 +29,7 @@ public class FixedFormLexerPhase2 implements ILexer
 
     private IToken nextToken = null;
 
-    public FixedFormLexerPhase2(InputStream in, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase2(InputStream in, IFile file, String filename, TokenFactory tokenFactory)
     {
         final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(in);
         InputStream prepassReader = new InputStream()
@@ -48,11 +48,11 @@ public class FixedFormLexerPhase2 implements ILexer
             }
         };
 
-        FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, filename, tokenFactory);
+        FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, file, filename, tokenFactory);
         freeLexer2 = new FreeFormLexerPhase2(fixedLexer1);
     }
 
-    public IToken yylex() throws Exception
+    public IToken yylex() throws IOException, LexerException
     {
         if (nextToken == null) nextToken = freeLexer2.yylex();
         IToken t = nextToken;

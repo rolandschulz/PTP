@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAllocatableStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayAllocationNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorNode;
@@ -22,7 +21,6 @@ import org.eclipse.photran.internal.core.parser.ASTAsynchronousStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBindStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockBinding;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentParListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamedConstantDefNode;
@@ -39,7 +37,6 @@ import org.eclipse.photran.internal.core.parser.ASTTargetStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTValueStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVariableNameNode;
 import org.eclipse.photran.internal.core.parser.ASTVolatileStmtNode;
-import org.eclipse.photran.internal.core.parser.IAccessId;
 import org.eclipse.photran.internal.core.parser.IBindEntity;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
@@ -49,7 +46,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  * 
  * @author Jeff Overbey
  */
-class SpecificationCollector extends BindingCollector
+class SpecificationCollector extends VisibilityCollector
 {
     // # R520
     // <IntentStmt> ::=
@@ -88,50 +85,6 @@ class SpecificationCollector extends BindingCollector
         IASTListNode<ASTOptionalParListNode> list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
             bind(list.get(i).getVariableName());
-    }
-
-    // # R522
-    // <AccessStmt> ::=
-    // <LblDef> <AccessSpec> ( T_COLON T_COLON )? <AccessIdList> T_EOS
-    // | <LblDef> <AccessSpec> T_EOS
-    //
-    // # R523
-    // <AccessIdList> ::=
-    // <AccessId>
-    // | @:<AccessIdList> T_COMMA <AccessId>
-    //
-    // <AccessId> ::=
-    // <GenericName>
-    // | <GenericSpec>
-
-    @Override public void visitASTAccessStmtNode(final ASTAccessStmtNode node)
-    {
-        super.traverseChildren(node);
-        
-        IASTListNode<IAccessId> list = node.getAccessIdList();
-        if (list == null) return; // This case handled in DefinitionCollector
-
-        for (int i = 0; i < list.size(); i++)
-        {
-            if (list.get(i) instanceof ASTGenericNameNode)
-            {
-                List<PhotranTokenRef> bindings = bind(((ASTGenericNameNode)list.get(i)).getGenericName());
-
-                try
-                {
-	                for (PhotranTokenRef tr : bindings)
-	                {
-	                	Definition def = vpg.getDefinitionFor(tr);
-	                	def.setVisibility(node.getAccessSpec());
-	                	vpg.setDefinitionFor(tr, def);
-	                }
-                }
-                catch (Exception e)
-                {
-                	throw new Error(e);
-                }
-            }
-        }
     }
 
     // # R524

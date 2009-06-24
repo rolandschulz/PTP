@@ -71,9 +71,10 @@ public abstract class BindingCollector extends ASTVisitor
     	try
     	{
     	    Visibility visibility = token.getEnclosingScope().isDefaultVisibilityPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC;
-            Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, visibility, type);
+            Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, /*visibility,*/ type);
     		vpg.setDefinitionFor(token.getTokenRef(), definition);
     		vpg.markScope(token.getTokenRef(), token.getEnclosingScope());
+    		vpg.markDefinitionVisibilityInScope(token.getTokenRef(), token.getEnclosingScope(), visibility);
     		return definition;
     	}
     	catch (Exception e)
@@ -81,6 +82,17 @@ public abstract class BindingCollector extends ASTVisitor
     		throw new Error(e);
     	}
     }
+    
+//    Definition addDefinitionAndDuplicateInLocalScope(Token name, Classification classification, Type type)
+//    {
+//        Definition result = addDefinition(name, classification, type);
+//        // addDefinition called vpg.markScope for the enclosing scope
+//        
+//        ScopingNode localScope = name.findNearestAncestor(ScopingNode.class);
+//        vpg.markScope(name.getTokenRef(), localScope);
+//        
+//        return result;
+//    }
 
     Definition addDefinition(Token token, Definition.Classification classification)
     {
@@ -92,6 +104,9 @@ public abstract class BindingCollector extends ASTVisitor
     	try
     	{
     		vpg.markScope(definitionToImport.getTokenRef(), importIntoScope);
+    		
+    		if (importIntoScope.isDefaultVisibilityPrivate())
+    		    vpg.markDefinitionVisibilityInScope(definitionToImport.getTokenRef(), importIntoScope, Visibility.PRIVATE);
     	}
     	catch (Exception e)
     	{
@@ -101,12 +116,22 @@ public abstract class BindingCollector extends ASTVisitor
 
     List<PhotranTokenRef> bind(Token identifier)
     {
-	    	List<PhotranTokenRef> result = identifier.manuallyResolveBinding();
-	    	
-			for (PhotranTokenRef def : result)
-	    		bind(identifier, def);
-			
-			return result;
+            List<PhotranTokenRef> result = identifier.manuallyResolveBinding();
+            
+            for (PhotranTokenRef def : result)
+                bind(identifier, def);
+            
+            return result;
+    }
+
+    List<PhotranTokenRef> bindNoImplicits(Token identifier)
+    {
+            List<PhotranTokenRef> result = identifier.manuallyResolveBindingNoImplicits();
+            
+            for (PhotranTokenRef def : result)
+                bind(identifier, def);
+            
+            return result;
     }
 
     List<PhotranTokenRef> bindAsParam(Token identifier)

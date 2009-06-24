@@ -16,21 +16,23 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCProjectNature;
-import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.photran.cdtinterface.natures.ProjectNatures;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
@@ -83,6 +85,17 @@ public class PhotranVPGBuilder extends PhotranVPG
 	{
 	    db.setAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE, definition);
 	}
+    
+    public void markDefinitionVisibilityInScope(PhotranTokenRef definitionTokenRef, ScopingNode scope, Visibility visibility)
+    {
+        //System.err.println("Marking " + definitionTokenRef.findToken().getText() + " " + visibility + " in " + scope.getRepresentativeToken().findTokenOrReturnNull());
+        
+        VPGEdge<IFortranAST, Token, PhotranTokenRef> privateEdge = new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, definitionTokenRef, scope.getRepresentativeToken(), DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE);
+        if (visibility.equals(Visibility.PRIVATE))
+            db.ensure(privateEdge);
+        else
+            db.delete(privateEdge);
+    }
 	
 	public void markScope(PhotranTokenRef identifier, ScopingNode scope)
 	{
@@ -167,30 +180,6 @@ public class PhotranVPGBuilder extends PhotranVPG
         String filename = file.getName();
         return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
     }
-    
-    private static boolean hasFixedFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f");
-        else
-            return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
-    }
-    
-    private static boolean hasFreeFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f90");
-        else
-            return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
-    }
-    
-    private static final String getContentType(String filename)
-    {
-        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
-        return contentType == null ? null : contentType.getId();
-        
-        // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
-    }
 
     @Override
     protected boolean shouldProcessProject(IProject project)
@@ -198,7 +187,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         try
         {
             if (!project.isAccessible()) return false;
-            if (!project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) return false;
+            if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID)) return false;
             return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
         }
         catch (CoreException e)
@@ -227,7 +216,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (Exception e)
         {
-            logError(e);
+            log.logError(e);
         }
     }
 
@@ -258,6 +247,12 @@ public class PhotranVPGBuilder extends PhotranVPG
                     
                     return super.getIncludedFileAsStream(fileToInclude);
                 }
+
+                @Override
+                public void logError(String message, IFile topLevelFile, int offset)
+                {
+                    PhotranVPG.getInstance().log.logError(message, new PhotranTokenRef(topLevelFile, offset, 0));
+                }
             });
         }
         return sourceForm;
@@ -279,7 +274,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (Exception e)
         {
-            logError(e);
+            log.logError(e);
         }
     }
 
@@ -327,7 +322,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         if (filename == null || isVirtualFile(filename)) return null;
         
-        IFile file = getIFileForFilename(filename);
+        IFile file = getIFileForFilename(filename); if (file == null) return null;
         SourceForm sourceForm = determineSourceForm(filename);
         try
         {
@@ -337,14 +332,42 @@ public class PhotranVPGBuilder extends PhotranVPG
             debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
             return new FortranAST(file, ast, lexer.getTokenList());
         }
-        catch (Exception e)
+        catch (SyntaxException e)
         {
-            logError("Error parsing " + filename, e);
+            if (e.getFile() != null)
+                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
+            else
+                logError(file, "Error parsing " + filename, e);
+            return null;
+        }
+        catch (LexerException e)
+        {
+            if (e.getFile() != null)
+                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
+            else
+                logError(file, "Error parsing " + filename, e);
+            return null;
+        }
+//        catch (CoreException e)
+//        {
+//            IFile errorFile = getFileFromStatus(e.getStatus());
+//            if (errorFile != null)
+//                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+//                    new PhotranTokenRef(errorFile, 0, 0));
+//            else
+//                logError(file, "Error parsing " + filename, e);
+//            return null;
+//        }
+        catch (Throwable e)
+        {
+            logError(file, "Error parsing " + filename, e);
             return null;
         }
     }
 
-    private void logError(String message, Exception e)
+    private void logError(IFile file, String message, Throwable e)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(message);
@@ -356,7 +379,11 @@ public class PhotranVPGBuilder extends PhotranVPG
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bs));
         sb.append(bs);
-        super.logError(sb.toString());
+        
+        if (file != null)
+            log.logError(sb.toString(), new PhotranTokenRef(file, 0, 0));
+        else
+            log.logError(sb.toString());
     }
 
     @Override
@@ -368,10 +395,15 @@ public class PhotranVPGBuilder extends PhotranVPG
             db.deleteAllOutgoingDependenciesFor(filename);
         }
         
-        if (ast == null) return;
+        if (ast == null || isEmpty(ast.getRoot())) return;
 
         long start = System.currentTimeMillis();
         Binder.bind(ast, getIFileForFilename(filename));
         debug("  - Elapsed time in Binder#bind: " + (System.currentTimeMillis()-start) + " ms", filename);
+    }
+
+    public static boolean isEmpty(ASTExecutableProgramNode ast)
+    {
+        return ast.findFirstToken() == null;
     }
 }

@@ -1,8 +1,8 @@
 package org.eclipse.photran.core.vpg;
 
-import org.eclipse.core.resources.IPath;
 import org.eclipse.core.resources.Util;
 import org.eclipse.core.resources.WorkspaceRoot;
+import org.eclipse.core.runtime.IPath;
 
 public class Activator
 {

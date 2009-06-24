@@ -3,6 +3,7 @@ package org.eclipse.core.resources;
 import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 
 public interface IProject extends IContainer
 {
@@ -37,5 +38,10 @@ public interface IProject extends IContainer
         {
             return new File(".").getName();
         }
+
+		public IMarker createMarker(String type) throws CoreException
+		{
+			throw new UnsupportedOperationException();
+		}
     };
 }

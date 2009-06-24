@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
@@ -162,6 +163,11 @@ public class Util
             {
                 traverse(dir, visitor);
             }
+
+    		public IMarker createMarker(String type) throws CoreException
+    		{
+    			throw new UnsupportedOperationException();
+    		}
         };
     }
 }

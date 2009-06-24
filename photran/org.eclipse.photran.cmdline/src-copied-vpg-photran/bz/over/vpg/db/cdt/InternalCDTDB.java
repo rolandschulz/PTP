@@ -40,7 +40,6 @@ import bz.over.vpg.cdtdb.org.eclipse.cdt.internal.core.pdom.db.IString;
  * 
  * @author Jeff Overbey
  */
-@SuppressWarnings("restriction")
 public class InternalCDTDB
 {
     static final int FILENAME_BTREE_ROOT           = Database.DATA_AREA + 0;
@@ -733,7 +732,7 @@ public class InternalCDTDB
         
         private int findRecordFor(final int fromFileRecordPtr, int fromOffset, int fromLength, final int toFileRecordPtr, int toOffset, int toLength, int edgeType) throws CoreException
         {
-            final int[] tuple2 = new int[] { fromFileRecordPtr, fromOffset, fromLength, toFileRecordPtr, toOffset, toLength, edgeType };
+            final int[] tuple2 = new int[] { fromFileRecordPtr, fromOffset, fromLength, edgeType, toFileRecordPtr, toOffset, toLength };
             
             FindVisitor visitor = new FindVisitor()
             {

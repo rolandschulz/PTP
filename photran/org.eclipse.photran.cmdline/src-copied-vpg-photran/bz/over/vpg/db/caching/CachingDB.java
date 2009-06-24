@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import org.eclipse.core.runtime.Assert;
 
@@ -12,6 +13,7 @@ import bz.over.vpg.VPG;
 import bz.over.vpg.VPGDB;
 import bz.over.vpg.VPGDependency;
 import bz.over.vpg.VPGEdge;
+import bz.over.vpg.VPGLog;
 
 /**
  * Base class for a typical Virtual Program Graph database the caches the result of another
@@ -30,8 +32,8 @@ import bz.over.vpg.VPGEdge;
  * @param <R> TokenRef type
  * @param <D> database type
  */
-@SuppressWarnings("restriction")
-public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>> extends VPGDB<A, T, R>
+public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
+     extends VPGDB<A, T, R, L>
 {
     private final class CacheKey
     {
@@ -98,7 +100,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>> ex
         this.annotationCache = new HashMap<CacheKey, Serializable>();
     }
     
-    @Override public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R>> vpg)
+    @Override public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg)
     {
         super.setVPG(vpg);
         db.setVPG(vpg);
@@ -242,7 +244,17 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>> ex
 //                Iterator<CacheKey> it = cache.keySet().iterator();
 //                if (it.next() != null)
 //                    it.remove();
-                cache.remove(cache.keySet().iterator().next());
+            	try
+            	{
+            		cache.remove(cache.keySet().iterator().next());
+            	}
+            	catch (NoSuchElementException e)
+            	{
+            		// This should not happen since cache.size() > 1,
+            		// but it's been reported (S Kalogerakos on Photran
+            		// mailing list), so we should handle it
+            		cache.clear();
+            	}
             }
     
             if (maxEdgeCacheEntries > 0)

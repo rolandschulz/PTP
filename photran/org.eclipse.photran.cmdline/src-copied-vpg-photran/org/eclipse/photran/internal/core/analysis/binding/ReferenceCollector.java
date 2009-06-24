@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.parser.ASTArrayElementNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignedGotoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTCPrimaryNode;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
@@ -67,6 +68,7 @@ import org.eclipse.photran.internal.core.parser.ASTOutputImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerFieldNode;
 import org.eclipse.photran.internal.core.parser.ASTPointerObjectNode;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
+import org.eclipse.photran.internal.core.parser.ASTSFDataRefNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
 import org.eclipse.photran.internal.core.parser.ASTSFVarNameNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
@@ -96,6 +98,20 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  */
 class ReferenceCollector extends BindingCollector
 {
+    @Override public void visitASTSFDataRefNode(ASTSFDataRefNode node)
+    {
+        super.traverseChildren(node);
+        if (node.getName() != null)
+            bind(node.getName());
+    }
+
+    @Override public void visitASTCPrimaryNode(ASTCPrimaryNode node)
+    {
+        super.traverseChildren(node);
+        if (node.getName() != null)
+            bind(node.getName().getName());
+    }
+
     @Override public void visitASTUFPrimaryNode(ASTUFPrimaryNode node)
     {
         super.traverseChildren(node);
@@ -955,12 +971,15 @@ class ReferenceCollector extends BindingCollector
         
         for (ASTWaitSpecNode waitSpec : node.getWaitSpecList())
         {
-            String keyword = waitSpec.getKeyword().getText().toLowerCase();
-            if (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat"))
+            if (waitSpec.getKeyword() != null)
             {
-                Token variable = waitSpec.getExpr().findFirstToken();
-                if (variable != null && variable.getTerminal() == Terminal.T_IDENT)
-                    bind(variable);
+                String keyword = waitSpec.getKeyword().getText().toLowerCase();
+                if (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat"))
+                {
+                    Token variable = waitSpec.getExpr().findFirstToken();
+                    if (variable != null && variable.getTerminal() == Terminal.T_IDENT)
+                        bind(variable);
+                }
             }
         }
     }

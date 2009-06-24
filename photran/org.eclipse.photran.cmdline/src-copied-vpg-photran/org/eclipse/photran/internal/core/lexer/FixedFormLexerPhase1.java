@@ -907,9 +907,10 @@ class FixedFormLexerPhase1 implements ILexer {
         
     private String filename = "<stdin>";
     
-    public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
     {
         this(in, _prepass, tokenFactory);
+        this.lastTokenFile = file;
         this.filename = filename;
     }
         
@@ -1186,7 +1187,7 @@ class FixedFormLexerPhase1 implements ILexer {
    * @return      the next token
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
-  public IToken yylex() throws java.io.IOException, Exception {
+  public IToken yylex() throws java.io.IOException, LexerException {
     int zzInput;
     int zzAction;
 
@@ -1353,7 +1354,7 @@ class FixedFormLexerPhase1 implements ILexer {
           }
         case 243: break;
         case 22: 
-          { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): String literal spans multiple lines without continuation");
+          { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): String literal spans multiple lines without continuation");
           }
         case 244: break;
         case 96: 
@@ -1409,7 +1410,7 @@ class FixedFormLexerPhase1 implements ILexer {
           }
         case 257: break;
         case 26: 
-          { throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Hollerith literal spans multiple lines without continuation");
+          { throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Hollerith literal spans multiple lines without continuation");
           }
         case 258: break;
         case 157: 
@@ -2122,7 +2123,7 @@ class FixedFormLexerPhase1 implements ILexer {
                                                   stringBuffer.append(text);                                                              
                                                   hollerithLength=Integer.parseInt(text.substring(0,text.length()-1));
                                                   if (hollerithLength==0)
-                                                      throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0"); 
+                                                      throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0"); 
                                                   yybegin(HOLLERITH);
           }
         case 431: break;
@@ -2296,11 +2297,11 @@ class FixedFormLexerPhase1 implements ILexer {
             }
             case 977: break;
             case DBLQUOTED: {
-              throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated");
+              throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated");
             }
             case 978: break;
             case QUOTED: {
-              throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated");
+              throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before string literal terminated");
             }
             case 979: break;
             case YYINITIAL: {
@@ -2308,7 +2309,7 @@ class FixedFormLexerPhase1 implements ILexer {
             }
             case 980: break;
             case HOLLERITH: {
-              throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before hollerith literal terminated");
+              throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): End of file encountered before hollerith literal terminated");
             }
             case 981: break;
             case YYSTANDARD: {

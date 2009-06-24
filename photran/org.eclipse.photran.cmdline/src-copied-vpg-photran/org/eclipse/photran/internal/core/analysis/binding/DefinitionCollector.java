@@ -13,10 +13,8 @@ package org.eclipse.photran.internal.core.analysis.binding;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
-import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAssociationNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
@@ -45,7 +43,6 @@ import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistGroupsNode;
 import org.eclipse.photran.internal.core.parser.ASTNamelistStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSelectTypeStmtNode;
@@ -94,13 +91,15 @@ class DefinitionCollector extends BindingCollector
         
         Definition d = addDefinition(node.getTypeName(), Definition.Classification.DERIVED_TYPE, Type.VOID);
         
+        ScopingNode enclosingScope = node.findNearestAncestor(ScopingNode.class);
+        
 //        if (node.getAccessSpec() != null)
 //            d.setVisibility(node.getAccessSpec());
         // Change for Fortran 2003
         if (node.getTypeAttrSpecList() != null)
             for (ASTTypeAttrSpecNode attrSpec : node.getTypeAttrSpecList())
                 if (attrSpec.getAccessSpec() != null)
-                    d.setVisibility(attrSpec.getAccessSpec());
+                    d.setVisibility(attrSpec.getAccessSpec(), enclosingScope);
         
         // F03 -- Don't bind derived type parameters since we don't bind derived type components yet
         // (so there is no scope for the derived type).  When we do, should also bind
@@ -108,28 +107,6 @@ class DefinitionCollector extends BindingCollector
 //        if (node.getTypeParamNameList() != null)
 //            for (ASTTypeParamNameNode typeParam : node.getTypeParamNameList())
 //                addDefinition(typeParam.getTypeParamName(), Definition.Classification.DERIVED_TYPE_PARAMETER);
-    }
-
-    // # R424
-    // <PrivateSequenceStmt> ::=
-    //     <LblDef> T_PRIVATE T_EOS
-    //  | <LblDef> T_SEQUENCE T_EOS
-    
-    @Override public void visitASTPrivateSequenceStmtNode(ASTPrivateSequenceStmtNode node)
-    {
-        super.traverseChildren(node);
-        
-        if (node.isPrivate())
-        {
-        	try
-        	{
-        		setScopeDefaultVisibilityToPrivate(node.getPrivateToken().getEnclosingScope());
-        	}
-        	catch (Exception e)
-        	{
-        		throw new Error(e);
-        	}
-        }
     }
 
     // # R425
@@ -174,6 +151,8 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
+        ScopingNode enclosingScope = node.findNearestAncestor(ScopingNode.class);
+        
         IASTListNode<ASTEntityDeclNode> decls = node.getEntityDeclList();
         for (int i = 0; i < decls.size(); i++)
         {
@@ -183,7 +162,7 @@ class DefinitionCollector extends BindingCollector
             Definition def = addDefinition(objectNameIdent,
                                            Definition.Classification.VARIABLE_DECLARATION,
                                            Type.parse(node.getTypeSpec()));
-            def.setAttributes(node.getAttrSpecSeq());
+            def.setAttributes(node.getAttrSpecSeq(), enclosingScope);
             def.setArraySpec(getArraySpec(entityDecl)); // (p.119) This overrides the DIMENSION attribute
             setDefinition(objectNameIdent, def);
         }
@@ -206,40 +185,6 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(entityDecl);
         return entityDecl.getArraySpec();
-    }
-
-    // # R522
-    // <AccessStmt> ::=
-    // <LblDef> <AccessSpec> ( T_COLON T_COLON )? <AccessIdList> T_EOS
-    // | <LblDef> <AccessSpec> T_EOS
-    //
-    // # R523
-    // <AccessIdList> ::=
-    // <AccessId>
-    // | @:<AccessIdList> T_COMMA <AccessId>
-    //
-    // <AccessId> ::=
-    // <GenericName>
-    // | <GenericSpec>
-
-    @Override public void visitASTAccessStmtNode(final ASTAccessStmtNode node)
-    {
-        super.traverseChildren(node);
-        
-        if (node.getAccessIdList() == null)
-        {
-        	if (node.getAccessSpec().isPrivate())
-        	{
-        		try
-        		{
-        			setScopeDefaultVisibilityToPrivate(node.getAccessSpec().findFirstToken().getEnclosingScope());
-        		}
-        		catch (Exception e)
-        		{
-        			throw new Error(e);
-        		}
-        	}
-        }
     }
 
     // # R544
@@ -452,8 +397,10 @@ class DefinitionCollector extends BindingCollector
         
         IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
         for (int i = 0; i < list.size(); i++)
+        {
             addDefinition(list.get(i).getExternalName(), Definition.Classification.EXTERNAL, Type.UNKNOWN);
-        // TODO: addExternalDefinition
+            markSubprogramImport(list.get(i).getExternalName());
+        }
     }
 
     // # R1209
@@ -671,12 +618,12 @@ class DefinitionCollector extends BindingCollector
     @Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
     {
         super.visitASTInterfaceBlockNode(node);
-        if (node.getInterfaceStmt().getGenericName() == null
-            && node.getInterfaceStmt().getGenericSpec() == null)
-            markExternalSubprogramImports(node);
+//        if (node.getInterfaceStmt().getGenericName() == null
+//            && node.getInterfaceStmt().getGenericSpec() == null)
+            markMatchingDeclarationsInInterfacesForExtSubprog(node);
     }
 
-    private void markExternalSubprogramImports(ASTInterfaceBlockNode node)
+    private void markMatchingDeclarationsInInterfacesForExtSubprog(ASTInterfaceBlockNode node)
     {
         for (IInterfaceSpecification pu : node.getInterfaceBlockBody())
         {

@@ -16,11 +16,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.types.ArraySpec;
 import org.eclipse.photran.internal.core.analysis.types.DerivedType;
 import org.eclipse.photran.internal.core.analysis.types.FunctionType;
@@ -32,11 +34,15 @@ import org.eclipse.photran.internal.core.parser.ASTAccessSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
-import org.eclipse.photran.internal.core.parser.ASTBodyPlusInternalsNode;
+import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
+import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
@@ -110,7 +116,7 @@ public class Definition implements Serializable, Comparable<Definition>
     protected Classification classification;
     protected PhotranTokenRef tokenRef;
     protected String declaredName, canonicalizedName;
-    protected Visibility visibility;
+    //protected Visibility visibility;
     protected Type type;
     protected ArraySpec arraySpec;
     
@@ -122,13 +128,13 @@ public class Definition implements Serializable, Comparable<Definition>
     protected Definition() {}
     
     /** Creates a definition and binds it to the given token */
-    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, Visibility visibility, Type type)
+    public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, /*Visibility visibility,*/ Type type)
     {
         this.classification = classification;
     	this.tokenRef = tokenRef;
     	this.declaredName = declaredName;
     	this.canonicalizedName = canonicalize(declaredName);
-        this.visibility = visibility; //Visibility.INHERIT_FROM_SCOPE;
+        //this.visibility = visibility; //Visibility.INHERIT_FROM_SCOPE;
         this.type = type;
         this.arraySpec = null;
     }
@@ -155,11 +161,22 @@ public class Definition implements Serializable, Comparable<Definition>
     
     private boolean isInternal()
     {
-        for (IASTNode parent = tokenRef.findToken().getParent(); parent != null; parent = parent.getParent())
-            if (parent instanceof ASTBodyPlusInternalsNode || parent instanceof ASTModuleNode)
+        IASTNode startFrom = tokenRef.findToken();
+        if (this.isSubprogram()) startFrom = startFrom.findNearestAncestor(ScopingNode.class); // Look upward from this function/subroutine
+        
+        for (IASTNode parent = startFrom.getParent(); parent != null; parent = parent.getParent())
+            if (parent instanceof ASTModuleNode
+                || parent instanceof ASTSubroutineSubprogramNode
+                || parent instanceof ASTFunctionSubprogramNode
+                || parent instanceof ASTMainProgramNode)
                 return true;
         
         return false;
+    }
+    
+    public boolean isInternalSubprogramDefinition()
+    {
+        return isInternal() && isSubprogram();
     }
     
     public boolean isExternallyVisibleSubprogramDefinition()
@@ -189,6 +206,21 @@ public class Definition implements Serializable, Comparable<Definition>
     {
         return classification == Classification.SUBROUTINE
             || classification == Classification.FUNCTION;
+    }
+
+    public boolean isModule()
+    {
+        return classification == Classification.MODULE;
+    }
+
+    public boolean isExternal()
+    {
+        return classification == Classification.EXTERNAL;
+    }
+
+    public boolean isInterface()
+    {
+        return classification == Classification.INTERFACE;
     }
     
     public boolean isRenamedModuleEntity()
@@ -318,12 +350,12 @@ public class Definition implements Serializable, Comparable<Definition>
     // | @:<AttrSpecSeq> T_COMMA <AttrSpec>
     
     /** Sets the attributes according to an AttrSpecSeq node */
-    void setAttributes(IASTListNode<ASTAttrSpecSeqNode> listNode)
+    void setAttributes(IASTListNode<ASTAttrSpecSeqNode> listNode, ScopingNode setInScope)
     {
         if (listNode == null) return;
         
         for (int i = 0; i < listNode.size(); i++)
-            setAttribute(listNode.get(i).getAttrSpec());
+            setAttribute(listNode.get(i).getAttrSpec(), setInScope);
     }
 
     // # R503
@@ -340,7 +372,7 @@ public class Definition implements Serializable, Comparable<Definition>
     // | T_SAVE
     // | T_TARGET
 
-    private void setAttribute(ASTAttrSpecNode attrSpec)
+    private void setAttribute(ASTAttrSpecNode attrSpec, ScopingNode setInScope)
     {
         ASTArraySpecNode arraySpec = attrSpec.getArraySpec();
         ASTAccessSpecNode accessSpec = attrSpec.getAccessSpec();
@@ -348,7 +380,7 @@ public class Definition implements Serializable, Comparable<Definition>
         if (arraySpec != null)
             setArraySpec(arraySpec);
         else if (accessSpec != null)
-            setVisibility(accessSpec);
+            setVisibility(accessSpec, setInScope);
         else if (attrSpec.isParameter())
             setParameter();
 
@@ -360,12 +392,17 @@ public class Definition implements Serializable, Comparable<Definition>
     //     T_PUBLIC
     //   | T_PRIVATE
 
-    void setVisibility(ASTAccessSpecNode accessSpec)
+    void setVisibility(ASTAccessSpecNode accessSpec, ScopingNode setInScope)
     {
-        if (accessSpec.isPublic())
-            this.visibility = Visibility.PUBLIC;
-        else if (accessSpec.isPrivate())
-            this.visibility = Visibility.PRIVATE;
+//        if (accessSpec.isPublic())
+//            this.visibility = Visibility.PUBLIC;
+//        else if (accessSpec.isPrivate())
+//            this.visibility = Visibility.PRIVATE;
+        
+        ((PhotranVPGBuilder)PhotranVPG.getInstance()).markDefinitionVisibilityInScope(
+            tokenRef,
+            setInScope,
+            accessSpec.isPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC);
     }
     
     void setParameter()
@@ -379,12 +416,12 @@ public class Definition implements Serializable, Comparable<Definition>
         return parameter;
     }
     
-    boolean isPublic()
-    {
-        // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
-        return this.visibility.equals(Visibility.PUBLIC);
-            //|| this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
-    }
+//    boolean isPublic()
+//    {
+//        // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
+//        return this.visibility.equals(Visibility.PUBLIC);
+//            //|| this.visibility.equals(Visibility.INHERIT_FROM_SCOPE) && getTokenRef().findToken().getEnclosingScope().isDefaultVisibilityPrivate() == false;
+//    }
 
     void markAsTypeBoundProcedure(boolean renamed)
     {
@@ -418,14 +455,158 @@ public class Definition implements Serializable, Comparable<Definition>
     }
     
     /** @return all workspace references to this definition, not including renamed references */
-    public ArrayList<PhotranTokenRef> findAllReferences()
+    public Set<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesAndExternals)
     {
-		ArrayList<PhotranTokenRef> result = new ArrayList<PhotranTokenRef>();
-		
-		for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
-			result.add((PhotranTokenRef)r);
-		
-		return result;
+        if (this.isImpliedFunctionResultVar() && findEnclosingFunctionDefinition() != null)
+            return findAllReferencesToEnclosingSubprogramInstead(shouldBindInterfacesAndExternals);
+        else
+            return internalFindAllReferences(shouldBindInterfacesAndExternals);
+    }
+
+    private Set<PhotranTokenRef> findAllReferencesToEnclosingSubprogramInstead(boolean aggressive)
+    {
+        Definition fnDef = findEnclosingFunctionDefinition();
+        Set<PhotranTokenRef> result = fnDef.internalFindAllReferences(aggressive);
+        result.add(fnDef.getTokenRef());
+        result.remove(this.getTokenRef());
+        return result;
+    }
+
+    private boolean isImpliedFunctionResultVar()
+    {
+        if (!this.isLocalVariable()) return false;
+        
+        ASTFunctionSubprogramNode fn = findEnclosingFunction();
+        if (fn != null && !fn.getFunctionStmt().hasResultClause())
+        {
+            Definition fnDef = findEnclosingFunctionDefinition();
+            return this.getCanonicalizedName().equals(fnDef.getCanonicalizedName());
+        }
+        return false;
+    }
+
+    private ASTFunctionSubprogramNode findEnclosingFunction()
+    {
+        return this.getTokenRef().findToken().findNearestAncestor(ASTFunctionSubprogramNode.class);
+    }
+
+    private Definition findEnclosingFunctionDefinition()
+    {
+        ASTFunctionSubprogramNode fn = findEnclosingFunction();
+        return fn == null ? null : PhotranVPG.getInstance().getDefinitionFor(fn.getRepresentativeToken());
+    }
+
+    private Set<PhotranTokenRef> internalFindAllReferences(boolean shouldBindInterfacesAndExternals)
+    {
+		if ((this.isSubprogram() || this.isExternal()) && shouldBindInterfacesAndExternals)
+		    return internalFindAllReferencesToSubprogramAggressively();
+		else
+		    return findAllImmediateReferences();
+    }
+    
+    private Set<PhotranTokenRef> findAllImmediateReferences()
+    {
+        Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
+        addImmediateBindings(result);
+        if (this.isFunction())
+            matchFunctionAndImpliedResultVariable(result);
+        result.remove(this.getTokenRef()); // By contract, the set of references does not include this
+        return result;
+    }
+
+    private void matchFunctionAndImpliedResultVariable(Collection<PhotranTokenRef> result)
+    {
+        try
+        {
+            ASTFunctionSubprogramNode fn = findEnclosingFunction();
+            if (fn.getFunctionStmt().hasResultClause()) return;
+            
+            for (Definition def : fn.getAllDefinitions())
+            {
+                if (def.getCanonicalizedName().equals(this.getCanonicalizedName()))
+                {
+                    result.add(def.getTokenRef());
+                    result.addAll(def.internalFindAllReferences(false));
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            // Ignore
+        }
+    }
+
+    private boolean isFunction()
+    {
+        return this.getClassification().equals(Classification.FUNCTION);
+    }
+
+    private void addImmediateBindings(Collection<PhotranTokenRef> result)
+    {
+        result.add(this.getTokenRef());
+        
+        for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
+            result.add((PhotranTokenRef)r);
+    }
+
+    private Set<PhotranTokenRef> internalFindAllReferencesToSubprogramAggressively()
+    {
+        assert this.isSubprogram();
+        
+        Collection<Definition> subprogramDefinitions;
+        if (this.isInInterfaceBlock())
+            subprogramDefinitions = this.resolveInterfaceBinding();
+        else if (this.isInExternalStmt())
+            subprogramDefinitions = this.resolveExternalBinding();
+        else if (this.isExternallyVisibleSubprogramDefinition())
+            subprogramDefinitions = this.findAllSimilarlyNamedExternalSubprograms();
+        else // probably an internal subprogram
+            return findAllImmediateReferences();
+        
+        Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
+        result.addAll(findAllImmediateReferences()); // e.g., PRIVATE referring to subprogram in an INTERFACE block
+        for (Definition subprogram : subprogramDefinitions)
+            result.addAll(subprogram.internalFindAllReferencesToSubprogIncludingInterfacesAndExternalStmts());
+        result.remove(this.getTokenRef()); // By contract, the set of references does not include this
+        return result;
+    }
+
+    private Set<PhotranTokenRef> internalFindAllReferencesToSubprogIncludingInterfacesAndExternalStmts()
+    {
+        assert this.isExternallyVisibleSubprogramDefinition();
+        
+        Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
+        addExternalSubprogramDefinitions(result);
+        addInterfaceDecls(result);
+        addExternalStmts(result);
+        return result;
+    }
+
+    private void addExternalSubprogramDefinitions(Collection<PhotranTokenRef> result)
+    {
+        for (Definition externalSubprogDef : this.findAllSimilarlyNamedExternalSubprograms())
+        {
+            result.add(externalSubprogDef.getTokenRef());
+            result.addAll(externalSubprogDef.internalFindAllReferences(false));
+        }
+    }
+
+    private void addInterfaceDecls(Collection<PhotranTokenRef> result)
+    {
+        for (Definition interfaceDef : this.findMatchingDeclarationsInInterfaces())
+        {
+            result.add(interfaceDef.getTokenRef());
+            result.addAll(interfaceDef.internalFindAllReferences(false));
+        }
+    }
+
+    private void addExternalStmts(Collection<PhotranTokenRef> result)
+    {
+        for (Definition externalDef : this.findMatchingDeclarationsInExternalStmts())
+        {
+            result.add(externalDef.getTokenRef());
+            result.addAll(externalDef.internalFindAllReferences(false));
+        }
     }
     
     /** @return true iff this is an entity defined inside an INTERFACE block */
@@ -446,9 +627,15 @@ public class Definition implements Serializable, Comparable<Definition>
 //        ASTInterfaceStmtNode stmt = tokenRef.findToken().findNearestAncestor(ASTInterfaceBlockNode.class).getInterfaceStmt();
 //        return stmt.getGenericName() == null && stmt.getGenericSpec() == null;
 //    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /** @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
-     * Definitions; otherwise, <code>null</code> */
+    /**
+     * @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
+     * Definitions; otherwise, <code>null</code>
+     * 
+     * @see #findMatchingDeclarationsInInterfaces()
+     */
     public Collection<Definition> resolveInterfaceBinding()
     {
         if (!isInInterfaceBlock()) return Collections.emptySet();
@@ -508,14 +695,72 @@ public class Definition implements Serializable, Comparable<Definition>
         return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(token.getText());
     }
     
-    /** @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
-     * Definitions; otherwise, <code>null</code> */
+    /**
+     * @return if this is an external subprogram, a list of all other external subprograms with the same name
+     * (i.e., subprograms that might also be referenced by a similar INTERFACE block or EXTERNAL statement)
+     */
+    public Collection<Definition> findAllSimilarlyNamedExternalSubprograms()
+    {
+        return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(this.canonicalizedName);
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return if this is a subprogram declared in an EXTERNAL statement, a list of all possible matching subprogram
+     * Definitions; otherwise, <code>null</code>
+     * 
+     * @see #findMatchingDeclarationsInExternalStmts()
+     */
+    public Collection<Definition> resolveExternalBinding()
+    {
+        if (!isInExternalStmt()) return Collections.emptySet();
+
+        Token token = getTokenRef().findToken();
+        ScopingNode scopeOfThisDef = token.getEnclosingScope();
+        ScopingNode parentScope = scopeOfThisDef.getEnclosingScope();
+        
+        HashSet<Definition> result = collectExternalResolutions(token, scopeOfThisDef);
+        if (resolvesToSubprogramArgument(result)) return Collections.emptyList();
+        if (needToResolveInParentScope(result)) result = collectResolutions(token, parentScope);
+        result.addAll(collectMatchingExternalSubprograms(token));
+        return result;
+    }
+
+    /** @return true iff this is an entity defined inside an EXTERNAL statement */
+    public boolean isInExternalStmt()
+    {
+        Token tok = getTokenRef().findTokenOrReturnNull();
+        return tok != null && tok.findNearestAncestor(ASTExternalStmtNode.class) != null;
+    }
+    
+    private HashSet<Definition> collectExternalResolutions(Token token, ScopingNode scope)
+    {
+        HashSet<Definition> result = new HashSet<Definition>();
+        for (PhotranTokenRef d : scope.manuallyResolve(new FakeToken(token, token.getText())))
+        {
+            Definition def = PhotranVPG.getInstance().getDefinitionFor(d);
+            if (def != null)
+                if ((def.isSubprogram() && !def.isInInterfaceBlock()) || def.isSubprogramArgument())
+                    result.add(def);
+        }
+        return result;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * @return if this is an external subprogram, a list of all possible matching declarations in INTERFACE blocks;
+     * otherwise, the empty set
+     * 
+     * @see #resolveInterfaceBinding()
+     */
     public Collection<Definition> findMatchingDeclarationsInInterfaces()
     {
         if /*(isModuleSubprogram())
             return findMatchesForModuleSubprogram();
         else if*/ (isExternallyVisibleSubprogramDefinition())
-            return findMatchesForExternalSubprogram();
+            return PhotranVPG.getInstance().findAllDeclarationsInInterfacesForExternalSubprogram(canonicalizedName);
         else
             return Collections.emptySet();
     }
@@ -530,10 +775,16 @@ public class Definition implements Serializable, Comparable<Definition>
 //        // TODO Auto-generated method stub
 //        return null;
 //    }
-
-    private ArrayList<Definition> findMatchesForExternalSubprogram()
+    
+    /**
+     * @return if this is an external subprogram, a list of all possible matching declarations in EXTERNAL statements;
+     * otherwise, <code>null</code>
+     * 
+     * @see #resolveExternalBinding()
+     */
+    public Collection<Definition> findMatchingDeclarationsInExternalStmts()
     {
-        return PhotranVPG.getInstance().findAllDeclarationsInInterfacesForExternalSubprogram(canonicalizedName);
+        return PhotranVPG.getInstance().findAllDeclarationsInExternalStmts(canonicalizedName);
     }
 
     @Override public String toString()
@@ -562,7 +813,7 @@ public class Definition implements Serializable, Comparable<Definition>
             && this.subprogramArgument == o.subprogramArgument
             && equals(this.tokenRef, o.tokenRef)
             && equals(this.type, o.type)
-            && equals(this.visibility, o.visibility);
+            ; // && equals(this.visibility, o.visibility);
     }
     
     private boolean equals(Object a, Object b)
@@ -584,7 +835,7 @@ public class Definition implements Serializable, Comparable<Definition>
             + (this.subprogramArgument ? 1 : 0)
             + hashCode(this.tokenRef)
             + 0 //hashCode(this.type)
-            + hashCode(this.visibility);
+            ; // + hashCode(this.visibility);
     }
 
     private int hashCode(Object o)
@@ -626,9 +877,9 @@ public class Definition implements Serializable, Comparable<Definition>
                     if (first != null) commentsBefore = first.getWhiteBefore();
                     if (last != null) commentsAfter = last.getWhiteAfter();
                     
-//                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-//                    headerStmt.printOn(new PrintStream(out), null);
-//                    return out.toString();
+                    Token after = findFirstTokenAfter(last, localScope);
+                    if (after != null && !startsWithBlankLine(after.getWhiteBefore()))
+                        commentsAfter += after.getWhiteBefore();
                 }
             }
         }
@@ -636,6 +887,35 @@ public class Definition implements Serializable, Comparable<Definition>
         return commentsBefore + describe(name) + "\n" + commentsAfter;
     }
     
+    private boolean startsWithBlankLine(String string)
+    {
+        while (string.startsWith(" ") || string.startsWith("\t"))
+            string = string.substring(1);
+        
+        return string.startsWith("\r") || string.startsWith("\n");
+    }
+
+    private Token findFirstTokenAfter(final Token target, ScopingNode localScope)
+    {
+        class TokenFinder extends GenericASTVisitor
+        {
+            private Token lastToken = null;
+            private Token result = null;
+            
+            @Override public void visitToken(Token thisToken)
+            {
+                if (lastToken == target)
+                    result = thisToken;
+                
+                lastToken = thisToken;
+            }
+        }
+        
+        TokenFinder t = new TokenFinder();
+        localScope.accept(t);
+        return t.result;
+    }
+
     private IASTNode findEnclosingSpecificationStmt(Token tok)
     {
         for (IASTNode candidate = tok.getParent(); candidate != null; candidate = candidate.getParent())

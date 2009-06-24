@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -111,7 +112,7 @@ public class FreeFormLexerPhase2 implements ILexer
      * @return      the next token
      * @exception   Exception  if any I/O-Error or lexer exceptions occur
      */
-    public IToken yylex() throws Exception
+    public IToken yylex() throws IOException, LexerException
     {
         if (tokenIt == null || !tokenIt.hasNext())
             processNextStatement();
@@ -144,7 +145,7 @@ public class FreeFormLexerPhase2 implements ILexer
      * Read a statement into <code>tokenStream</code> using the JFlex lexer,
      * and replace keywords with identifiers as necessary
      */
-    private void processNextStatement() throws Exception
+    private void processNextStatement() throws IOException, LexerException
     {
         readNextStatement();
         
@@ -203,7 +204,7 @@ public class FreeFormLexerPhase2 implements ILexer
     /**
      * Read an entire statement into tokenStream using the JFlex lexer
      */
-    private void readNextStatement() throws Exception
+    private void readNextStatement() throws IOException, LexerException
     {
         IToken t;
         tokenStream.clear();
@@ -1474,8 +1475,8 @@ public class FreeFormLexerPhase2 implements ILexer
             int i = ((Integer)identifiersContainingEqualSigns.elementAt(j)).intValue();
 
             // t is the "xyz=" token: split it
-            IToken t = (IToken)tokenStream.elementAt(i);
-            IToken afterT = (i < tokenStream.size()-1 ? (IToken)tokenStream.elementAt(i+1) : null);
+            IToken t = (IToken)tokenStream.elementAt(i+j);
+            IToken afterT = (i < tokenStream.size()-1 ? (IToken)tokenStream.elementAt(i+j+1) : null);
             String textWithoutEquals = t.getText().substring(0, t.getText().length()-1);
             String tokenText = textWithoutEquals.trim();
             String whiteAfter = textWithoutEquals.substring(tokenText.length());

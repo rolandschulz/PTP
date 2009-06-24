@@ -1,14 +1,9 @@
 package bz.over.vpg;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,8 +29,9 @@ import java.util.Set;
  * @param <T> token type
  * @param <R> TokenRef type
  * @param <D> database type
+ * @param <L> error/warning log type
  */
-public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
+public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fields
@@ -52,22 +48,22 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
 	protected Object[] transientASTCache;
 	private int transientASTCacheIndex = 0;
 	
-	/** The error/warning log. */
-	protected List<VPGErrorOrWarning<T, R>> log = new LinkedList<VPGErrorOrWarning<T, R>>();
-	
 	/** The VPG database, which persists edges and annotations. */
 	public final D db;
+	
+	/** The VPG error/warning log. */
+	public final VPGLog<T, R> log;
 	
     ///////////////////////////////////////////////////////////////////////////
     // Constructor
     ///////////////////////////////////////////////////////////////////////////
 
-    protected VPG(D database)
+    protected VPG(L log, D database)
     {
-        this(database, 5);
+        this(log, database, 5);
     }
 
-	protected VPG(D database, int transientASTCacheSize)
+	protected VPG(L log, D database, int transientASTCacheSize)
 	{
 	    assert transientASTCacheSize > 0;
 	    
@@ -75,6 +71,8 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
 		this.permanentASTs = new HashMap<String, A>();
 		this.transientASTCache = new Object[transientASTCacheSize];
 		this.db = database;
+		this.db.setVPG(this);
+	    this.log = log;
 		this.db.setVPG(this);
 	}
 	
@@ -92,6 +90,8 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
 	
 	private A acquireTransientAST(String filename, boolean forceRecomputationOfEdgesAndAnnotations)
 	{
+		if (!shouldProcessFile(filename)) return null;
+		
 		A ast = null;
 		
 		if (!forceRecomputationOfEdgesAndAnnotations)
@@ -103,6 +103,8 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
 
 			if (ast != null) return ast;
 		}
+		
+		log.clearEntriesFor(filename);
 
 		long start = System.currentTimeMillis();
 		ast = parse(filename);
@@ -208,6 +210,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
      */ 
     public void forceRecomputationOfEdgesAndAnnotations(String filename)
     {
+    	releaseAST(filename);
         acquireTransientAST(filename, true);
     }
 	
@@ -261,161 +264,12 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R>>
 //		throw new UnsupportedOperationException(); 
 //	}
 	
-	////////////////////////////////////////////////////////////////////////////
-	// API: ERROR LOGGING
-	////////////////////////////////////////////////////////////////////////////
-	
-	/** Clears the error/warning log. */
-	public void clearLog()
-	{
-		log.clear();
-	}
-	
-	/** Removes all entries for the given file from the error/warning log. */
-	public void clearLogEntriesFor(String filename)
-	{
-	    List<VPGErrorOrWarning<T, R>> newLog = new LinkedList<VPGErrorOrWarning<T, R>>();
-	    
-		for (VPGErrorOrWarning<T, R> entry : log)
-		{
-			R tokenRef = entry.getTokenRef();
-			if (tokenRef == null || !tokenRef.getFilename().equals(filename))
-				newLog.add(entry);
-		}
-		
-		log = newLog;
-	}
+    ///////////////////////////////////////////////////////////////////////////
+    // Abstract Methods (Resource Filtering)
+    ///////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Adds the given warning to the error/warning log.
-	 * 
-	 * @param message the warning message to display to the user
-	 */
-	public void logWarning(String message)
-	{
-		log.add(new VPGErrorOrWarning<T, R>(true, message, null));
-	}
-	
-    /**
-     * Adds the given warning to the error/warning log.
-     * 
-     * @param message the warning message to display to the user
-     * @param filename the file with which the warning is associated
-     */
-	public void logWarning(String message, String filename)
-	{
-		log.add(new VPGErrorOrWarning<T, R>(true, message, createTokenRef(filename, 0, 0)));
-	}
-	
-    /**
-     * Adds the given warning to the error/warning log.
-     * 
-     * @param message the warning message to display to the user
-     * @param tokenRef a specific token with which the warning is associated;
-     *                 for example, if an identifier was used without being
-     *                 initialized, it could reference that identifier
-     */
-	public void logWarning(String message, R tokenRef)
-	{
-		log.add(new VPGErrorOrWarning<T, R>(true, message, tokenRef));
-	}
-
-    /**
-     * Adds the given error to the error/warning log.
-     * 
-     * @param e an exception that will be displayed to the user
-     */
-	public void logError(Throwable e)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(e.getClass().getName());
-		sb.append(": ");
-		sb.append(e.getMessage());
-		sb.append("\n");
-		ByteArrayOutputStream bs = new ByteArrayOutputStream();
-		e.printStackTrace(new PrintStream(bs));
-		sb.append(bs);
-		
-		log.add(new VPGErrorOrWarning<T, R>(false, sb.toString(), null));
-	}
-
-    /**
-     * Adds the given error to the error/warning log.
-     * 
-     * @param message the error message to display to the user
-     */
-	public void logError(String message)
-	{
-		log.add(new VPGErrorOrWarning<T, R>(false, message, null));
-	}
-
-    /**
-     * Adds the given error to the error/warning log.
-     * 
-     * @param message the error message to display to the user
-     * @param filename the file with which the warning is associated
-     */
-	public void logError(String message, String filename)
-	{
-		log.add(new VPGErrorOrWarning<T, R>(false, message, createTokenRef(filename, 0, 0)));
-	}
-	
-    /**
-     * Adds the given error to the error/warning log.
-     * 
-     * @param message the error message to display to the user
-     * @param tokenRef a specific token with which the error is associated;
-     *                 for example, if an identifier was used but not
-     *                 declared, it could reference that identifier
-     */
-	public void logError(String message, R tokenRef)
-	{
-		log.add(new VPGErrorOrWarning<T, R>(false, message, tokenRef));
-	}
-	
-	/** @return true iff at least one error exists in the error/warning log */
-	public boolean hasErrorsLogged()
-	{
-		for (VPGErrorOrWarning<T, R> entry : log)
-			if (entry.isError())
-				return true;
-		
-		return false;
-	}
-
-    /** @return true iff at least one entry exists in the error/warning log */
-	public boolean hasErrorsOrWarningsLogged()
-	{
-		return !log.isEmpty();
-	}
-	
-	/** @return the error/warning log */
-	public List<VPGErrorOrWarning<T, R>> getErrorLog()
-	{
-		return log;
-	}
-	
-	/** Prints the error/warning log on the given <code>PrintStream</code> */
-	public void printErrorLogOn(PrintStream out)
-	{
-	    for (VPGErrorOrWarning<T, R> entry : log)
-	    {
-	        out.print(entry.isError() ? "ERROR:   " : "Warning: ");
-	        out.println(entry.getMessage());
-	        
-	        R t = entry.getTokenRef();
-	        if (t != null)
-	        {
-	            out.print("         (");
-	            out.print(t.getFilename());
-                out.print(", offset ");
-                out.print(t.getOffset());
-                out.print(", length ");
-                out.print(t.getLength());
-                out.println(")");
-	        }
-	    }
-	}
+	/** @return true iff the given file should be parsed */
+	protected abstract boolean shouldProcessFile(String filename);
 
 	////////////////////////////////////////////////////////////////////////////
 	// CREATION METHODS
