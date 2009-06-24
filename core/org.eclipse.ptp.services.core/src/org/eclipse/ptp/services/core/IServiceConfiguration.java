@@ -11,6 +11,7 @@
 package org.eclipse.ptp.services.core;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  *
@@ -45,6 +46,14 @@ public interface IServiceConfiguration {
 	 * @return all of the services that are part of this configuration.
 	 */
 	public Set<IService> getServices();
+	
+	/**
+	 * Return the set of providers sorted by priority
+	 * 
+	 * @param service service containing providers
+	 * @return sorted providers
+	 */
+	public SortedSet<IService> getServicesByPriority();
 	
 	/**
 	 * Remove a service and its provider from this configuration
