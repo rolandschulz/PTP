@@ -117,6 +117,16 @@ public interface ICIndexSubsystem {
 	 * @return
 	 */
 	public IStatus unregisterScope(Scope scope, IProgressMonitor monitor);
+	
+	/**
+	 * Remove index file on remote host.
+	 * 
+	 * @param scope
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus removeIndexFile(Scope scope, IProgressMonitor monitor);
+
 
 	// call hierarchy service
 	/**
