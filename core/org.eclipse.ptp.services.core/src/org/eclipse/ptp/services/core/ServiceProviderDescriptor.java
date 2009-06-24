@@ -25,16 +25,18 @@ public class ServiceProviderDescriptor implements IServiceProviderDescriptor {
 	private String fId;
 	private String fName;
 	private String fServiceId;
-	private Integer fPriority;
+	private Integer fPriority = Integer.MAX_VALUE;
 	
 	public ServiceProviderDescriptor(String id, String name, String serviceId, String priority) {
 		fId = id;
 		fName = name;
 		fServiceId = serviceId;
-		try {
-			fPriority = Integer.parseInt(priority);
-		} catch (NumberFormatException e) {
-			fPriority = Integer.MAX_VALUE;
+		if (priority != null) {
+			try {
+				fPriority = Integer.parseInt(priority);
+			} catch (NumberFormatException e) {
+				// Ignore
+			}
 		}
 	}
 

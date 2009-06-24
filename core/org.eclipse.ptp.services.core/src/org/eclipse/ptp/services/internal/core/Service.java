@@ -28,7 +28,7 @@ import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 public class Service implements IService {
 	private String fServiceId;
 	private String fServiceName;
-	private Integer fServicePriority;
+	private Integer fServicePriority = Integer.MAX_VALUE;
 	private Set<String> fServiceNatures;
 	private Set<IServiceProviderDescriptor> fServiceProviderDescriptors = new HashSet<IServiceProviderDescriptor>();
 	private Map<String, IServiceProviderDescriptor> fIdToServiceProviderDescriptorMap = new HashMap<String, IServiceProviderDescriptor>();
@@ -36,10 +36,12 @@ public class Service implements IService {
 	public Service(String id, String name, String priority, Set<String>natures) {
 		fServiceId = id;
 		fServiceName = name;
-		try {
-			fServicePriority = Integer.parseInt(priority);
-		} catch (NumberFormatException e) {
-			fServicePriority = Integer.MAX_VALUE;
+		if (priority != null) {
+			try {
+				fServicePriority = Integer.parseInt(priority);
+			} catch (NumberFormatException e) {
+				// Ignore
+			}
 		}
 		fServiceNatures = natures;
 	}
@@ -109,7 +111,11 @@ public class Service implements IService {
 		SortedSet<IServiceProviderDescriptor> sortedProviders = 
 			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
 				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
-					return o2.getPriority().compareTo(o1.getPriority());
+					int cmp = o1.getPriority().compareTo(o2.getPriority());
+					if (cmp != 0) {
+						return cmp;
+					}
+					return o1.getId().compareTo(o2.getId());
 				}
 			});
 		for (IServiceProviderDescriptor p : getProviders()) {
