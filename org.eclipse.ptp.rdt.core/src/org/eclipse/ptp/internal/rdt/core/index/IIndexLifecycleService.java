@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,15 +48,19 @@ public interface IIndexLifecycleService {
 	 *   
 	 * @param scope
 	 * @param elements The elements to re-index within the scope.  Must not be null.
+	 * @param monitor
+	 * @param task that this operation originates from
 	 */
-	void reindex(Scope scope, List<ICElement> elements, IProgressMonitor monitor);
+	void reindex(Scope scope, List<ICElement> elements, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	/**
 	 * Re-indexes a scope in its entirety.
 	 * 
 	 * @param scope
+	 * @param monitor
+	 * @param task that this operation originates from
 	 */
-	void reindex(Scope scope, IProgressMonitor monitor);
+	void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	/**
 	 * Updates the index identified by <code>scope</code>.  The elements

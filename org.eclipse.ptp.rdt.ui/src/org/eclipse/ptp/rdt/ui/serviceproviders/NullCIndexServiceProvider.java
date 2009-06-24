@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -195,12 +195,12 @@ public class NullCIndexServiceProvider extends
 				return Collections.emptySet();
 			}
 
-			public void reindex(Scope scope, List<ICElement> elements, IProgressMonitor monitor) {
+			public void reindex(Scope scope, List<ICElement> elements, IProgressMonitor monitor, RemoteIndexerTask task) {
 				// do nothing
 				
 			}
 
-			public void reindex(Scope scope, IProgressMonitor monitor) {
+			public void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task) {
 				// do nothing
 				
 			}
