@@ -222,7 +222,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
 								|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
 						InputStream is;
-						if (configuration.getServiceVersion() > 0) {
+						if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)
+								|| configuration.getServiceVersion() > 0) {
 							is = new OpenMPI131InputStream(parserInputStream);
 						} else {
 							is = new OpenMPI130InputStream(parserInputStream);
