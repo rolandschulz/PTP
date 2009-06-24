@@ -147,6 +147,9 @@ public class PhotranVPGBuilder extends PhotranVPG
     private void clearModuleSymbolTableEntries(Token moduleNameToken)
     {
         String canonicalizedModuleName = canonicalizeIdentifier(moduleNameToken.getText());
+        
+        moduleSymTabCache.remove(canonicalizedModuleName);
+        
         int entries = countModuleSymbolTableEntries(canonicalizedModuleName);
         if (entries > 0)
         {

@@ -11,7 +11,6 @@
 package org.eclipse.photran.core.vpg;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.photran.internal.core.parser.Parser;
 import org.osgi.framework.BundleContext;
 
 /**

@@ -14,5 +14,7 @@ public class VPGStats extends CmdLineBase
         Binder.printStatisticsOn(System.out);
         System.out.println();
         PhotranVPG.getDatabase().printStatisticsOn(System.out);
+        System.out.println();
+        PhotranVPG.getInstance().printModuleSymTabCacheStatisticsOn(System.out);
     }
 }

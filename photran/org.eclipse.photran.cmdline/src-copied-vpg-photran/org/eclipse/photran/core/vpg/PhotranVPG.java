@@ -1,5 +1,6 @@
 package org.eclipse.photran.core.vpg;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.vpg.util.LRUCache;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
@@ -42,7 +44,10 @@ import bz.over.vpg.eclipse.EclipseVPG;
  */
 public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB, PhotranVPGLog>
 {
-	// Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
+	// Tested empirically on ibeam-cpp-mod: 5 does better than 3, but 10 does not do better than 5
+    private static final int MODULE_SYMTAB_CACHE_SIZE = 5;
+    
+    // Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
 	// (since our parser declares classes with the same name)
     public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
     public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
@@ -483,8 +488,18 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return (PhotranTokenRef)db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE);
     }
     
+    protected LRUCache<String, List<Definition>> moduleSymTabCache = new LRUCache<String, List<Definition>>(MODULE_SYMTAB_CACHE_SIZE);
+    protected long moduleSymTabCacheHits = 0L, moduleSymTabCacheMisses = 0L;
+    
     public List<Definition> getModuleSymbolTable(String moduleName)
     {
+        if (moduleSymTabCache.contains(moduleName))
+        {
+            moduleSymTabCacheHits++;
+            return moduleSymTabCache.get(moduleName);
+        }
+        moduleSymTabCacheMisses++;
+        
         int entries = countModuleSymbolTableEntries(moduleName);
         
         if (entries == 0) return new LinkedList<Definition>();
@@ -498,8 +513,11 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
             if (entry != null && entry instanceof Definition)
                 result.add((Definition)entry);
         }
+        
+        moduleSymTabCache.cache(moduleName, result);
+        
         return result;
-   }
+    }
 
     protected int countModuleSymbolTableEntries(String canonicalizedModuleName)
     {
@@ -509,6 +527,20 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return result == null || !(result instanceof Integer) ? 0 : ((Integer)result).intValue();
     }
     
+    public void printModuleSymTabCacheStatisticsOn(PrintStream out)
+    {
+        out.println("Module Symbol Table Cache Statistics:");
+        
+        long edgeTotal = moduleSymTabCacheHits + moduleSymTabCacheMisses;
+        float edgeHitRatio = edgeTotal == 0 ? 0 : ((float)moduleSymTabCacheHits) / edgeTotal * 100;
+        out.println("    Hit Ratio:        " + moduleSymTabCacheHits + "/" + edgeTotal + " (" + (long)Math.round(edgeHitRatio) + "%)");
+    }
+    
+    public void resetStatistics()
+    {
+        moduleSymTabCacheHits = moduleSymTabCacheMisses = 0L;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     // VPG Error/Warning Log View/Listener Support
     ////////////////////////////////////////////////////////////////////////////////
