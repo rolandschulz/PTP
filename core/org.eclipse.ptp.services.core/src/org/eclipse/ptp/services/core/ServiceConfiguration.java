@@ -11,9 +11,12 @@
 package org.eclipse.ptp.services.core;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * A named configuration which consists of a mapping of services to providers.
@@ -57,7 +60,28 @@ public class ServiceConfiguration implements IServiceConfiguration {
 	public Set<IService> getServices() {
 		return Collections.unmodifiableSet(fServiceToProviderMap.keySet());
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getServicesByPriority()
+	 */
+	public SortedSet<IService> getServicesByPriority() {
+		SortedSet<IService> sortedServices = 
+			new TreeSet<IService>(new Comparator<IService>() {
+				public int compare(IService o1, IService o2) {
+					int cmp = o1.getPriority().compareTo(o2.getPriority());
+					if (cmp != 0) {
+						return cmp;
+					}
+					return o1.getId().compareTo(o2.getId());
+				}
+			});
+		for (IService s : getServices()) {
+			sortedServices.add(s);
+		}
+		
+		return sortedServices;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#removeService(org.eclipse.ptp.services.core.IService)
 	 */
