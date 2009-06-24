@@ -77,9 +77,10 @@ public interface ICIndexSubsystem {
 	 * 
 	 * @param scope
 	 * @param monitor
+	 * @param task that this operation originates from
 	 * @return IStatus indicating success or failure
 	 */
-	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor);
+	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	/**
 	 * Incrementally indexes based on a delta of added, changed, and removed elements.  Valid elements can be
