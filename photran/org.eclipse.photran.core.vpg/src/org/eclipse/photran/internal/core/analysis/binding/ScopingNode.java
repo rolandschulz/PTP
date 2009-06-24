@@ -210,7 +210,29 @@ public abstract class ScopingNode extends ASTNode
     	return (ScopingNode)result;
     }
 
+    /*
+     * According to a profile obtained (6/24/09) by running
+     *     org.eclipse.photran.cmdline/vpgstats-profiled
+     * on
+     *     org.eclipse.photran-projects.confidential.fmlib
+     * caching the representative token for a scope reduced
+     * the Binder's maximal times as follows:
+     *                            BEFORE============   AFTER============
+     *     DefinitionCollector:     8771 ms (FM.f90)    3475 ms (FM.f90)
+     *     ImplicitSpecCollector:   1816 ms (FM.f90)     404 ms (FM.f90)
+     *     ReferenceCollector:    122225 ms (FM.f90)   35226 ms (FM.f90)
+     */
+    private PhotranTokenRef cachedRepresentataiveToken = null;
+
     public PhotranTokenRef getRepresentativeToken()
+    {
+        if (cachedRepresentataiveToken == null)
+            cachedRepresentataiveToken = internalGetRepresentativeToken();
+        
+        return cachedRepresentataiveToken;
+    }
+
+    private PhotranTokenRef internalGetRepresentativeToken()
     {
     	// TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
     	// AND DYNAMICALLY DISPATCHED TO!
