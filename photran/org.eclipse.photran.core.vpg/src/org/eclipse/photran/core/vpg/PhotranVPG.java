@@ -605,4 +605,9 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         
         // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
     }
+    
+    private boolean isDefinitionCachingEnabled = false;
+    public void enableDefinitionCaching() { isDefinitionCachingEnabled = true; }
+    public void disableDefinitionCaching() { isDefinitionCachingEnabled = false; }
+    public boolean isDefinitionCachingEnabled() { return isDefinitionCachingEnabled; }
 }

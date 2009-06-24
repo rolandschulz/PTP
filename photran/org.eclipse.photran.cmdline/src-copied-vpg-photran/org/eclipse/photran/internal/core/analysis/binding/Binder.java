@@ -47,7 +47,9 @@ public class Binder
         logTime(start, ModuleLoader.class, filename);
         
         start = System.currentTimeMillis();
+        PhotranVPG.getInstance().enableDefinitionCaching();
         ast.accept(new ReferenceCollector());
+        PhotranVPG.getInstance().disableDefinitionCaching();
         logTime(start, ReferenceCollector.class, filename);
         
         PhotranVPG.getInstance().debug(sb.toString(), "");

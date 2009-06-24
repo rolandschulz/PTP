@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.binding;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -505,8 +506,18 @@ public abstract class ScopingNode extends ASTNode
 	        return vpg.findToken(tr).findNearestAncestor(ScopingNode.class);
 	}
     
+	private HashMap<String, List<PhotranTokenRef>> definitionCache = new HashMap<String, List<PhotranTokenRef>>();
+
     public List<PhotranTokenRef> manuallyResolve(Token identifier)
     {
+        String cid = null;
+        if (PhotranVPG.getInstance().isDefinitionCachingEnabled())
+        {
+            cid = PhotranVPG.canonicalizeIdentifier(identifier.getText());
+            if (definitionCache.containsKey(cid))
+                return definitionCache.get(cid);
+        }
+        
     	final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
     	
     	manuallyResolve(identifier, new BindingResolutionCallback()
@@ -516,7 +527,10 @@ public abstract class ScopingNode extends ASTNode
 				bindings.add(definition);
 			}
     	});
-    	
+
+        if (PhotranVPG.getInstance().isDefinitionCachingEnabled())
+            definitionCache.put(cid, bindings);
+
     	return bindings;
     }
 
