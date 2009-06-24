@@ -5,8 +5,8 @@ import org.eclipse.photran.core.vpg.PhotranVPG;
 
 public class ContentTypeManager
 {
-    private static final String[] fixedFormExtensions = { ".f77", ".f" };
-    private static final String[] freeFormExtensions = { ".f90", ".f95", ".f03" };
+    private static final String[] fixedFormExtensions = { ".f77", ".f", ".fix", ".F77", ".F", ".FIX", };
+    private static final String[] freeFormExtensions = { ".f90", ".f95", ".f03", ".fre", ".F90", ".F95", ".F03", ".FRE" };
     
     private static IContentType FIXED = new IContentType()
     {
