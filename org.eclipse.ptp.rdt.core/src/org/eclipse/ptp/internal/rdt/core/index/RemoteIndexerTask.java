@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,11 +35,13 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 	protected ITranslationUnit[] fAdded;
 	protected ITranslationUnit[] fChanged;
 	protected ITranslationUnit[] fRemoved;
+	protected boolean fUpdate;
 	
 	private RemoteIndexerProgress fRemoteProgress = new RemoteIndexerProgress();
 	
 	public RemoteIndexerTask(RemoteFastIndexer indexer,
-			IIndexServiceProvider indexingServiceProvider, ITranslationUnit[] added, ITranslationUnit[] changed, ITranslationUnit[] removed) {
+			IIndexServiceProvider indexingServiceProvider, 
+			ITranslationUnit[] added, ITranslationUnit[] changed, ITranslationUnit[] removed, boolean update) {
 		fIndexer = indexer;
 		
 		fIndexServiceProvider = indexingServiceProvider;
@@ -47,6 +49,7 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 		fAdded = added;
 		fChanged = changed;
 		fRemoved = removed;
+		fUpdate = update;
 	}
 	
 	public IPDOMIndexer getIndexer() {
@@ -71,7 +74,10 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 		IIndexLifecycleService service = fIndexServiceProvider.getIndexLifeCycleService();
 		IProject project = fIndexer.getProject().getProject();
 		String name = project.getName();
-		service.update(new Scope(name), Arrays.<ICElement>asList(fAdded), Arrays.<ICElement>asList(fChanged), Arrays.<ICElement>asList(fRemoved), monitor, this);
+		if (fUpdate)
+			service.update(new Scope(name), Arrays.<ICElement>asList(fAdded), Arrays.<ICElement>asList(fChanged), Arrays.<ICElement>asList(fRemoved), monitor, this);
+		else
+			service.reindex(new Scope(name), Arrays.<ICElement>asList(fAdded), monitor, this);
 	}
 
 }

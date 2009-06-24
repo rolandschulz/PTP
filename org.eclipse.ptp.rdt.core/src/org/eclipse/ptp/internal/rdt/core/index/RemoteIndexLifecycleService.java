@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008,2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,14 +68,15 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		return set;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#reindex(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#reindex(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask)
 	 */
-	public void reindex(Scope scope, List<ICElement> changedElements, IProgressMonitor monitor) {
+	public void reindex(Scope scope, List<ICElement> changedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(changedElements);
 		// TODO:  handle changedElements
-		indexSubsystem.reindexScope(scope, provider, monitor);
+		indexSubsystem.reindexScope(scope, provider, monitor, task);
 
 	}
 
@@ -93,11 +94,15 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		indexSubsystem.indexDelta(scope, provider, newElements, changedElements, deletedElements, monitor, task);
 	}
 	
-	public void reindex(Scope scope, IProgressMonitor monitor) {
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#reindex(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask)
+	 */
+	public void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task) {
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(scope.getName());
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		
-		indexSubsystem.reindexScope(scope, provider, monitor);
+		indexSubsystem.reindexScope(scope, provider, monitor, task);
 	}
 
 }
