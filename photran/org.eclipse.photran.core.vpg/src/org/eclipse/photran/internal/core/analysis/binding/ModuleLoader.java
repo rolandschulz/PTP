@@ -18,14 +18,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
-import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTOnlyNode;
 import org.eclipse.photran.internal.core.parser.ASTRenameNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
@@ -141,29 +141,20 @@ public class ModuleLoader extends VisibilityCollector
     
     private ASTModuleNode findModuleIn(IFile file) throws Exception
     {
-        ASTModuleNode result = null;
-        try
-        {
-            vpg.acquireTransientAST(file).accept(new ASTVisitor()
-            {
-                @Override
-                public void visitASTModuleNode(ASTModuleNode node)
-                {
-                    String thisModule = PhotranVPG.canonicalizeIdentifier(node.getModuleStmt().getModuleName().getModuleName().getText());
-                    if (thisModule.equals(moduleName))
-                    	throw new Notification(node);
-                    
-                    //traverseChildren(node);
-                }
-            });
-        }
-        catch (Notification n)
-        {
-            result = (ASTModuleNode)n.getResult();
-        }
-        return result;
+        ASTExecutableProgramNode fileAST = vpg.acquireTransientAST(file).getRoot();
+        for (IProgramUnit pu : fileAST.getProgramUnitList())
+            if (pu instanceof ASTModuleNode && isNamed(moduleName, (ASTModuleNode)pu))
+                return (ASTModuleNode)pu;
+        
+        return null;
     }
-    
+
+    private boolean isNamed(String targetName, ASTModuleNode node)
+    {
+        String nameOfThisModule = PhotranVPG.canonicalizeIdentifier(node.getModuleStmt().getModuleName().getModuleName().getText());
+        return nameOfThisModule.equals(targetName);
+    }
+
     private void findModuleInModulePaths() throws Exception
     {
     	List<IFile> files = vpg.findFilesThatExportModule(moduleName);
