@@ -1,5 +1,6 @@
 package org.eclipse.core.resources;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -77,7 +78,7 @@ public class Util
             {
                 try
                 {
-                    return new FileInputStream(file);
+                    return new BufferedInputStream(new FileInputStream(file));
                 }
                 catch (FileNotFoundException e)
                 {
