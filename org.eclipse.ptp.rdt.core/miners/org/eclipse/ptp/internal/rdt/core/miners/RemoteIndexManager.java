@@ -13,7 +13,6 @@ package org.eclipse.ptp.internal.rdt.core.miners;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,5 +109,26 @@ public class RemoteIndexManager {
 		}
 
 		return indexer;
+	}
+	
+	/**
+	 * Deletes the index file associated with the given scope name.
+	 * @param scope
+	 * @return true if and only if the file is successfully deleted; false otherwise
+	 */
+	public boolean removeIndexFile(String scope) {
+		
+		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
+			throw new IllegalArgumentException("Attempted to remove index file for root scope."); //$NON-NLS-1$
+		}
+		
+		scopeToIndexerMap.remove(scope);
+		
+		File indexFile = new File(scope + PDOM_EXTENSION);
+		
+		System.out.println("Remove index at location: " + indexFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.flush();
+		
+		return indexFile.delete();
 	}
 }

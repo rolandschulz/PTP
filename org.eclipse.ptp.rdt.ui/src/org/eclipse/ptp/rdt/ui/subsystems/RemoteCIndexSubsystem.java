@@ -586,6 +586,47 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		return Status.OK_STATUS;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#removeIndexFile(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IStatus removeIndexFile(Scope scope, IProgressMonitor monitor) {
+		DataStore dataStore = getDataStore();
+		   
+	    if (dataStore != null)
+	    {
+	     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+     		
+	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.10"), 100); //$NON-NLS-1$
+	   
+	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_REMOVE_INDEX_FILE);
+            if (queryCmd != null)
+            {
+            	ArrayList<Object> args = new ArrayList<Object>();
+            	            	
+            	// need to know the scope
+            	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+            	args.add(scopeElement);
+            	
+            	// execute the command
+            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+            	
+            	try
+                {
+                	smonitor.waitForUpdate(status, monitor);
+                	if (monitor.isCanceled())
+                	{
+                		cancelOperation(monitor, status.getParent());
+                	}
+                }
+                catch (Exception e)
+                {                	
+                } 
+            }	
+	    }
+		
+		return Status.OK_STATUS;
+	}	
 	
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.9"), 100); //$NON-NLS-1$
