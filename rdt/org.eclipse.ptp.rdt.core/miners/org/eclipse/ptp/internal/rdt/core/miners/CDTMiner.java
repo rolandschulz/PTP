@@ -89,6 +89,7 @@ public class CDTMiner extends Miner {
 	public static final String T_INDEX_DELTA_ADDED = "Type.Index.Delta.Added"; //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_REMOVED = "Type.Index.Delta.Removed"; //$NON-NLS-1$
 	public static final String T_INDEX_SCANNER_INFO_PROVIDER = "Type.Index.ScannerInfoProvider"; //$NON-NLS-1$
+	public static final String C_REMOVE_INDEX_FILE = "C_REMOVE_INDEX_FILE"; //$NON-NLS-1$
 	
 	// indexer progress
 	public static final String T_INDEXER_PROGRESS_INFO = "Type.Indexer.ProgressInfo"; //$NON-NLS-1$
@@ -186,6 +187,13 @@ public class CDTMiner extends Miner {
 			
 			handleUnregisterScope(scopeName, status);
 			
+		}
+		
+		else if(name.equals(C_REMOVE_INDEX_FILE))
+		{
+			DataElement scopeName = getCommandArgument(theCommand, 1);
+	
+			handleRemoveIndexFile(scopeName, status);
 		}
 
 		else if (name.equals(C_INDEX_START)) {
@@ -1188,6 +1196,7 @@ public class CDTMiner extends Miner {
 		createCommandDescriptor(schemaRoot, "Start Index", C_INDEX_START, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Reindex", C_INDEX_REINDEX, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Index Delta", C_INDEX_DELTA, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Remove Index File", C_REMOVE_INDEX_FILE, false); //$NON-NLS-1$
 		
 		// call hierarchy
 		createCommandDescriptor(schemaRoot, "Get Callers", C_CALL_HIERARCHY_GET_CALLERS, false); //$NON-NLS-1$
@@ -1358,6 +1367,13 @@ public class CDTMiner extends Miner {
 		ScopeManager.getInstance().removeScope(scope);
 		statusDone(status);
 		
+	}
+	
+	protected void handleRemoveIndexFile(DataElement scopeName, DataElement status) {
+		String scope = scopeName.getName();
+		
+		RemoteIndexManager.getInstance().removeIndexFile(scope);
+		statusDone(status);
 	}
 
 	protected void handleGetCallers(String scopeName, ICElement subject, String hostName, DataElement status) {
