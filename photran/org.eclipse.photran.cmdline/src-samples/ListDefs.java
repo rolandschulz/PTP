@@ -1,7 +1,6 @@
 import java.io.PrintStream;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.photran.cmdline.CmdLineBase;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
@@ -14,12 +13,12 @@ import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
-public class ListDefs
+public class ListDefs extends CmdLineBase
 {
     public static void main(String[] args)
     {
-        String filename = parseCommandLine(args);
-        startVPG();
+        String filename = parseCommandLine("listdefs", args);
+        PhotranVPG.getInstance().start();
         IFortranAST ast = parse(filename);
 
         System.out.println("COMPLETE SOURCE CODE FOR " + filename.toUpperCase() + "\n");
@@ -139,35 +138,4 @@ public class ListDefs
             }
         });
     }
-    
-    private static String parseCommandLine(String[] args)
-    {
-        if (args.length != 1)
-        {
-            System.err.println("Usage: listdefs filename");
-            System.exit(1);
-        }
-        String filename = args[0];
-        return filename;
-    }
-
-    private static PhotranVPG startVPG()
-    {
-        PhotranVPG vpg = PhotranVPG.getInstance();
-        vpg.start();
-        return vpg;
-    }
-
-    private static IFortranAST parse(String filename)
-    {
-        PhotranVPG vpg = PhotranVPG.getInstance();
-        IFortranAST ast = vpg.acquireTransientAST((IFile)ResourcesPlugin.getWorkspace().getRoot().findMember(filename));
-        if (ast == null)
-        {
-            System.err.println("Unable to find or parse file " + filename);
-            vpg.log.printOn(System.err);
-            System.exit(1);
-        }
-        return ast;
-    }
-}
+ }

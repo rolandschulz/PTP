@@ -1,18 +1,18 @@
 import java.io.File;
 import java.lang.reflect.Method;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.photran.cmdline.CmdLineBase;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
-public class TokenAnalysis
+public class TokenAnalysis extends CmdLineBase
 {
     public static void main(String[] args) throws CoreException
     {
@@ -101,16 +101,4 @@ public class TokenAnalysis
             }
         }
     };
-
-    private static IFortranAST parse(String filename)
-    {
-        PhotranVPG vpg = PhotranVPG.getInstance();
-        IFortranAST ast = vpg.acquireTransientAST((IFile)ResourcesPlugin.getWorkspace().getRoot().findMember(filename));
-        if (ast == null)
-        {
-            System.err.println("Unable to find or parse file " + filename);
-            return null;
-        }
-        return ast;
-    }
 }
