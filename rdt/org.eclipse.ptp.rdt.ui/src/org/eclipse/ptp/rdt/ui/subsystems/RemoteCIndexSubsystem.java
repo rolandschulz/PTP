@@ -78,7 +78,6 @@ import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.SubSystem;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * An RSE subsystem which is used to provide C/C++ indexing services from a Miner
@@ -193,17 +192,18 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#reindexScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#reindexScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask)
 	 */
-	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor)
+	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor, RemoteIndexerTask task)
 	{
 		DataStore dataStore = getDataStore();
 		   
 	    if (dataStore != null)
 	    {
 	     	
-	    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, null);
+	    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
 	     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
 	     	
 //	     	int count = 0;
@@ -226,15 +226,18 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 //	    	}
 //	    	
 //	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.1"), count); //$NON-NLS-1$
+	     	
+	     	monitor.beginTask("Rebuilding indexing...", 100); //$NON-NLS-1$
 	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(result.getDescriptor(), CDTMiner.C_INDEX_REINDEX);
+	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INDEX_REINDEX);
             if (queryCmd != null)
             {
                       	
             	ArrayList<Object> args = new ArrayList<Object>();
             	            	
             	// need to know the scope
-            	args.add(scope.getName());
+            	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+               	args.add(scopeElement);
             	
             	String serializedProvider = null;
             	try {
@@ -248,68 +251,27 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 				args.add(providerElement);
             	
                 DataElement status = dataStore.command(queryCmd, args, result);   
-                int num = 0;
-                try
-                {
-                	Display display = Display.getCurrent();
 
-//                	if (count > 0)
-//                	{
-             		String statValue = status.getName();
-//                		int totalWorked = 0;
-               			while (!statValue.equals("done") && !monitor.isCanceled()) //$NON-NLS-1$
-               			{
-//                			  
-//                			while (display != null && display.readAndDispatch());
-//                			             			
-//      
-//                			String numStr = status.getValue();
-//                			if (!numStr.equals("start") && !numStr.equals("working")) //$NON-NLS-1$ //$NON-NLS-2$
-//                			{
-//                				try
-//                				{
-//                					int newnum = Integer.parseInt(numStr);
-//                					if (newnum > num)
-//                					{
-//                						int delta = newnum - num; 
-//                		
-//                						num = newnum;
-//                				   
-//                						
-//                			       		monitor.subTask(Messages.getString("RemoteCIndexSubsystem.2") + status.getAttribute(DE.A_SOURCE));   //$NON-NLS-1$
-//                						monitor.worked(delta);
-//                						totalWorked+=delta;
-//                						while (display != null && display.readAndDispatch());
-//                					}    
-//                					else
-//                					{
-                						Thread.sleep(100); 
-//                					}
-//                				}
-//                				catch (Exception e)
-//                				{
-//                					e.printStackTrace();
-//                				}
-//               			}
-//             
-//                			
-                			statValue = status.getName();
-                		}
-                		monitor.done();
-//                	}
-//                	else
-//                	{               
-//                		smonitor.waitForUpdate(status, monitor, 5000);
-//                		if (monitor.isCanceled())
-//                		{
-//                			cancelOperation(monitor, status.getParent());
-//                		}
-//                	}
+                //poll for progress information until the operation is done or canceled
+                while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+
+                	RemoteIndexerProgress progress = getIndexerProgress(status);
+                	task.updateProgressInformation(progress);
+                	try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
                 }
-                catch (Exception e)
-                {       
-                	e.printStackTrace();
-                }
+                
+				try {
+					if (monitor.isCanceled()) 
+						cancelOperation(monitor, status.getParent());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				monitor.done();
             }
 	    }
 	    
@@ -400,7 +362,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
             	
                 DataElement status = dataStore.command(queryCmd, args, result);   
                 
-                //poll for progress information until the operation is done or cancelled
+                //poll for progress information until the operation is done or canceled
                 while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
 
                 	RemoteIndexerProgress progress = getIndexerProgress(status);

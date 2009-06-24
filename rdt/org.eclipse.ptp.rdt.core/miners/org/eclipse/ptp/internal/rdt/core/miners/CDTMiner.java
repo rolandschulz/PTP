@@ -1523,6 +1523,9 @@ public class CDTMiner extends Miner {
 		List<String> sourcesList = new LinkedList<String>(sources);
 	
 		try {
+			indexer.setTraceStatistics(true);
+			indexer.setShowProblems(true);
+			indexer.setShowActivity(true);
 			indexer.rebuild(sourcesList, getProgressMonitor());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
