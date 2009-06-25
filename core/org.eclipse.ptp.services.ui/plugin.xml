@@ -3,4 +3,5 @@
 <plugin>
    <extension-point id="providerContributors" name="Service Provider Contributors" schema="schema/providerContributors.exsd"/>
    <extension-point id="serviceContributors" name="Service Contributors" schema="schema/serviceContributors.exsd"/>
+   <extension-point id="wizardExtensions" name="Service Configuration Wizard Extensions" schema="schema/wizardExtensions.exsd"/>
 </plugin>

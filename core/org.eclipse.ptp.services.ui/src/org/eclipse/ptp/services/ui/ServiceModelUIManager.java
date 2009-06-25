@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 
@@ -33,6 +34,7 @@ import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 public class ServiceModelUIManager {
 	private final static String SERVICE_EXTENSION_ID = "serviceContributors"; //$NON-NLS-1$
 	private final static String PROVIDER_EXTENSION_ID = "providerContributors"; //$NON-NLS-1$
+	private final static String WIZARD_EXTENSION_ID = "wizardExtensions"; //$NON-NLS-1$
 	private final static String ATTR_ID = "id"; //$NON-NLS-1$
 	private final static String ATTR_CLASS = "class"; //$NON-NLS-1$
 
@@ -51,22 +53,22 @@ public class ServiceModelUIManager {
 	 * @return class implementing IServiceContributor
 	 */
 	public IServiceContributor getServiceContributor(IService service) {
-		IServiceContributor contrib = null;
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	SERVICE_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
 					if (element.getAttribute(ATTR_ID).equals(service.getId())) {
 						try {
-							contrib = (IServiceContributor) element.createExecutableExtension(ATTR_CLASS);
+							return (IServiceContributor) element.createExecutableExtension(ATTR_CLASS);
 						} catch (Exception e) {
+							Activator.getDefault().log(e);
 							return null;
 						}
 					}
 				}
 			}
 		}
-		return contrib;
+		return null;
 	}
 	
 	/**
@@ -76,21 +78,43 @@ public class ServiceModelUIManager {
 	 * @return class implementing IServiceProviderContributor
 	 */
 	public IServiceProviderContributor getServiceProviderContributor(IServiceProviderDescriptor desc) {
-		IServiceProviderContributor contrib = null;
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
 					if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
 						try {
-							contrib = (IServiceProviderContributor) element.createExecutableExtension(ATTR_CLASS);
+							return (IServiceProviderContributor) element.createExecutableExtension(ATTR_CLASS);
 						} catch (Exception e) {
+							Activator.getDefault().log(e);
 							return null;
 						}
 					}
 				}
 			}
 		}
-		return contrib;
+		return null;
+	}
+	
+	/**
+	 * Get any wizard extensions.
+	 * 
+	 * @return IWizard providing a wizard extension
+	 */
+	public IWizard getWizardExtensions() {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	WIZARD_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					try {
+						return (IWizard) element.createExecutableExtension(ATTR_CLASS);
+					} catch (Exception e) {
+						Activator.getDefault().log(e);
+						return null;
+					}
+				}
+			}
+		}
+		return null;
 	}
 }
