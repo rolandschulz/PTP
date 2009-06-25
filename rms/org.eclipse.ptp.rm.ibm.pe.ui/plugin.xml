@@ -27,5 +27,14 @@
             class="org.eclipse.ptp.rm.ibm.pe.ui.rmLaunchConfiguration.PERMLaunchConfigurationFactory"
             id="org.eclipse.ptp.ibmpe.ui.launchConfiguration"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.ibm.pe.ui.PEServiceProvider"
+            id="org.eclipse.ptp.rm.ibm.pe.ui.PEServiceProvider"
+            name="IBM Parallel Environment"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
 
 </plugin>

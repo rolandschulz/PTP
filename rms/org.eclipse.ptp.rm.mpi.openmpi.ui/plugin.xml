@@ -13,4 +13,13 @@
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.launch.OpenMPIRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.rm.openmpi.ui.launchConfiguration"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIServiceProvider"
+            id="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIServiceProvider"
+            name="Open MPI"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
 </plugin>
