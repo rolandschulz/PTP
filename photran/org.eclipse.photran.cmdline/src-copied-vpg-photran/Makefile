@@ -41,7 +41,6 @@ copy:
 	rm -rf `find bz -name CVS`
 	rm -rf `find . -name Activator.java`
 	rm -rf `find . -name PhotranVPGStartup.java`
-	rm -rf `find . -name FortranRefactoring.java`
 	rm -rf `find . -name AbstractFortranRefactoring.java`
 	rm -rf `find . -name SingleFileFortranRefactoring.java`
 	rm -rf `find . -name MultipleFileFortranRefactoring.java`
