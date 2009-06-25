@@ -33,6 +33,7 @@ import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 import bz.over.vpg.VPGLog;
 import bz.over.vpg.eclipse.EclipseVPG;
@@ -637,6 +638,17 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         
         // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
     }
+    
+    public boolean doesProjectHaveRefactoringEnabled(IFile file)
+    {
+        if (PhotranVPG.inTestingMode()) return true;
+        
+        String vpgEnabledProperty = SearchPathProperties.getProperty(
+            file,
+            SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
+        return vpgEnabledProperty != null && vpgEnabledProperty.equals("true");
+    }
+
     
     private boolean isDefinitionCachingEnabled = false;
     public void enableDefinitionCaching() { isDefinitionCachingEnabled = true; }

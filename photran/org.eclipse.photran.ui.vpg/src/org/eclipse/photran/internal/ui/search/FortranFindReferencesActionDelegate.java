@@ -36,9 +36,12 @@ public abstract class FortranFindReferencesActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
+            if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(getFortranEditor().getIFile()))
+                throw new Exception("Please enable analysis and refactoring in the project properties.");
+            
+        	//progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
-        	PhotranVPG.getInstance().ensureVPGIsUpToDate(progressMonitor);
+        	//PhotranVPG.getInstance().ensureVPGIsUpToDate(progressMonitor);
         	
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());
             if (token == null || token.getTerminal() != Terminal.T_IDENT)

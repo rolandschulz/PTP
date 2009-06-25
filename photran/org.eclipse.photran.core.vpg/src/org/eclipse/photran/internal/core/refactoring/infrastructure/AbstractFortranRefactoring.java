@@ -558,6 +558,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     ///////////////////////////////////////////////////////////////////////////
     
     protected abstract void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure;
+    
     protected boolean isIdentifier(Token token)
     {
         return token != null && token.getTerminal() == Terminal.T_IDENT;

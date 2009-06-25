@@ -15,7 +15,6 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**
  * This is a base class for all Photran refactorings that apply to a single file 
@@ -69,12 +68,7 @@ public abstract class SingleFileFortranRefactoring extends AbstractFortranRefact
     @Override
     protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
     {
-        if (PhotranVPG.inTestingMode()) return;
-        
-        String vpgEnabledProperty = SearchPathProperties.getProperty(
-            fileInEditor,
-            SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
-        if (vpgEnabledProperty == null || !vpgEnabledProperty.equals("true"))
+        if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(fileInEditor))
             fail("Please enable analysis and refactoring in the project properties.");
     }
 

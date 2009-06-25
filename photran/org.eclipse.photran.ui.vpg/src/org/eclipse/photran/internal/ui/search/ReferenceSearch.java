@@ -74,7 +74,7 @@ public class ReferenceSearch implements ISearchQuery
 
     public IStatus run(IProgressMonitor monitor)
     {
-        PhotranVPG.getInstance().ensureVPGIsUpToDate(monitor);
+        //PhotranVPG.getInstance().ensureVPGIsUpToDate(monitor);
         try
         {
             filterAndAddSearchResult(getDef().getTokenRef());

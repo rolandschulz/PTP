@@ -18,7 +18,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**
  * This is a base class for all Photran refactorings that apply to multiple files
@@ -51,10 +50,7 @@ public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefa
         
         for(IFile f : this.selectedFiles)
         {
-            String vpgEnabledProperty = SearchPathProperties.getProperty(
-                f,
-                SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
-            if (vpgEnabledProperty == null || !vpgEnabledProperty.equals("true"))
+            if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(f))
             {
                 //FIXME: If a file is not associated with a project, this will return null 
                 // and needs to be fixed
