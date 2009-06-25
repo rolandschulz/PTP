@@ -196,7 +196,6 @@ public class SDMDebugger implements IPDebugger {
 			}
 			attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
 		}
-		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 
 		/*
 		 * Save SDM command line for future use.
