@@ -8,6 +8,21 @@
             class="org.eclipse.ptp.core.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.services">
+      <service
+            id="org.eclipse.ptp.core.LaunchService"
+            name="%LaunchServiceName">
+      </service>
+      <service
+            id="org.eclipse.ptp.core.DebugService"
+            name="%DebugServiceName">
+      </service>
+      <service
+            id="org.eclipse.ptp.core.ProfileService"
+            name="%ProfileServiceName">
+      </service>
+   </extension>
 
 		
 </plugin>
