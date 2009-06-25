@@ -103,9 +103,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.getDebugger();
 				debugger.initialize(configuration, attrManager, monitor);
-				if (monitor.isCanceled())
+				if (monitor.isCanceled()) {
 					return;
+				}
 				debugger.getLaunchAttributes(configuration, attrManager);
+				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
 
 			monitor.worked(10);
