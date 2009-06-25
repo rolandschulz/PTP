@@ -187,5 +187,12 @@
 			</menu>
 		</objectContribution>
 	</extension>
+ <extension
+       point="org.eclipse.ptp.services.ui.serviceContributors">
+    <serviceContributor
+          class="org.eclipse.ptp.ui.wizards.LaunchServiceContributor"
+          id="org.eclipse.ptp.core.LaunchService">
+    </serviceContributor>
+ </extension>
 
 </plugin>
