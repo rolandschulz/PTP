@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -45,13 +46,22 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
     public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException
     {
         AbstractFortranEditor editor = getFortranEditor();
-        TextSelection selection = (TextSelection)editor.getSelection();
         Shell shell = editor.getShell();
-        IWorkbenchPage page = editor.getEditorSite().getPage();
         
-        FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
-        tasks.addASTTask(new OpenDeclarationASTTask(editor, selection, shell, page));
-        tasks.getRunner().runTasks(false);
+        if (PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(editor.getIFile()))
+        {
+            TextSelection selection = (TextSelection)editor.getSelection();
+            IWorkbenchPage page = editor.getEditorSite().getPage();
+            
+            FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
+            tasks.addASTTask(new OpenDeclarationASTTask(editor, selection, shell, page));
+            tasks.getRunner().runTasks(false);
+        }
+        else
+        {
+            MessageDialog.openError(shell, "Error",
+                "Please enable analysis and refactoring in the project properties.");
+        }
     }
     
     private static class OpenDeclarationASTTask implements IFortranEditorASTTask
