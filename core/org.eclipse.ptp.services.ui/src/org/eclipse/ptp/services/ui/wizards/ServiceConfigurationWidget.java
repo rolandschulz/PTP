@@ -11,21 +11,22 @@
 
 package org.eclipse.ptp.services.ui.wizards;
 
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.IService;
@@ -40,8 +41,6 @@ import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.ptp.services.ui.dialogs.ServicesDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -50,10 +49,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.TableItem;
  * with the RDT team.
  * 
  */
-public class ServiceModelWidget {
+public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	
 	public class AddListener implements Listener {
 		public void handleEvent(Event event) {
@@ -78,10 +78,10 @@ public class ServiceModelWidget {
 			if (dialog.open() == Dialog.OK) {
 				IService[] selectedServices = dialog.getSelectedServices();
 				for (IService service : selectedServices) {
-					SortedSet<IServiceProviderDescriptor> providers = service.getProvidersByPriority();
+					SortedSet<IServiceProviderDescriptor> providers = getProvidersByPriority(service);
 					if (providers.size() > 0) {
 						IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(providers.iterator().next());
-						addTableRow(service, provider);
+//						addTableRow(service, provider);
 						getServiceConfiguration().setServiceProvider(service, provider);
 					} else {
 						Activator.getDefault().log(NLS.bind(Messages.ServiceModelWidget_8, service.getId()));
@@ -140,6 +140,7 @@ public class ServiceModelWidget {
 	protected static final String PROVIDER_KEY = "provider-id"; //$NON-NLS-1$
 	protected static final String SERVICE_KEY = "service-id"; //$NON-NLS-1$
 
+	protected Set<IServiceConfiguration> fServiceConfigurations;
 	protected IServiceConfiguration fServiceConfiguration;
 	protected Map<String, String> fServiceIDToSelectedProviderID;
 	protected Map<String, IServiceProvider> fProviderIDToProviderMap;
@@ -147,20 +148,15 @@ public class ServiceModelWidget {
 	protected Button fConfigureButton;
 	protected Button fAddButton;
 	protected Button fRemoveButton;
-	
 	protected Listener fConfigChangeListener = null;
+	protected IWorkbench fWorkbench = null;
+	protected IStructuredSelection fSelection = null;
 	
-	private Shell fShell;
-	
-	public ServiceModelWidget(IServiceConfiguration serviceConfiguration) {
-		fServiceConfiguration = serviceConfiguration;
-		fServiceIDToSelectedProviderID = new HashMap<String, String>();
-		fProviderIDToProviderMap = new HashMap<String, IServiceProvider>();
+	public ServiceConfigurationWidget(Set<IServiceConfiguration> serviceConfigurations) {
+		fServiceConfigurations = serviceConfigurations;
 	}
 	
 	public Control createContents(Composite parent) {
-		fShell = parent.getShell();
-		
 		Composite canvas = new Composite(parent, SWT.NONE);
 		GridLayout canvasLayout = new GridLayout(2, false);
 		canvas.setLayout(canvasLayout);
@@ -173,8 +169,7 @@ public class ServiceModelWidget {
 		fTable.setHeaderVisible (true);
 		
 		TableColumnLayout layout = new TableColumnLayout();
-		// create the columns and headers... note fourth column holds "Configure..." buttons and hence has no title.
-		String[] titles = {Messages.ServiceModelWidget_0, Messages.ServiceModelWidget_1, Messages.ServiceModelWidget_3};
+		String[] titles = {"Project", "Configuration", "Status"};
 		for (int i=0; i<titles.length; i++) {
 			TableColumn column = new TableColumn (fTable, SWT.NONE);
 			column.setText (titles [i]);
@@ -182,14 +177,14 @@ public class ServiceModelWidget {
 			
 			// set the column widths
 			switch (i) {
-			case 0: // Service name... usually short
+			case 0: // Project name... usually short
 				width = 100;
 				break;
 
-			case 1: // provider name... typically long
-				width = 250;
+			case 1: // Configuation name... usually short
+				width = 100;
 				break;
-				
+
 			case 2: // configuration status... typically short
 				width = 100;
 				break;
@@ -206,89 +201,6 @@ public class ServiceModelWidget {
 		createTableContent();
 		
 		fTable.setVisible(true);
-		
-		final TableEditor editor = new TableEditor(fTable);
-		editor.horizontalAlignment = SWT.BEGINNING;
-		editor.grabHorizontal = true;
-		fTable.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				int selectionIndex = fTable.getSelectionIndex();
-				if (selectionIndex == -1) {
-					fConfigureButton.setEnabled(false);
-					return;
-				}
-				final TableItem item = fTable.getItem(selectionIndex);
-				IService service = (IService) item.getData(SERVICE_KEY);
-				IServiceProvider provider = (IServiceProvider) item.getData(PROVIDER_KEY);
-				
-				updateConfigureButton(provider);
-				
-				final CCombo combo = new CCombo(fTable, SWT.READ_ONLY);
-				
-				// populate with list of providers
-				int index = 0;
-				final List<IServiceProviderDescriptor> providerIds = new LinkedList<IServiceProviderDescriptor>();
-				SortedSet<IServiceProviderDescriptor> providers = service.getProvidersByPriority();
-				for (IServiceProviderDescriptor descriptor : providers) {
-					combo.add(descriptor.getName(), index);
-					providerIds.add(descriptor);
-					if (descriptor.getId().equals(provider.getId())) {
-						combo.select(index);
-					}
-					++index;
-				}
-				
-				combo.setFocus();
-				Listener listener = new Listener() {
-					public void handleEvent(Event event) {
-						switch (event.type) {
-						case SWT.FocusOut:
-							combo.dispose();
-							break;
-						case SWT.Selection:
-							int selection = combo.getSelectionIndex();
-							if (selection == -1) {
-								return;
-							}
-							IServiceProviderDescriptor descriptor = providerIds.get(selection);
-							IServiceProvider provider = getServiceProvider(descriptor);
-							
-							/*
-							 * Set the provider name in the second field of the row
-							 */
-							item.setText(1, provider.getName());
-							item.setData(PROVIDER_KEY, provider);
-
-							updateConfigureButton(descriptor);							
-							
-							/*
-							 * Set the configured status in the third field
-							 */
-							item.setText(2, provider.getConfigurationString());
-
-							/*
-							 * Update the configuration
-							 */
-							IService service = (IService) item.getData(SERVICE_KEY);
-							fServiceIDToSelectedProviderID.put(service.getId(), descriptor.getId());
-							getServiceConfiguration().setServiceProvider(service, provider);
-							
-							// allow container page to check if configurations are set
-							if (fConfigChangeListener != null) {
-								fConfigChangeListener.handleEvent(null);
-							}
-							
-							combo.dispose();
-							break;
-						}
-					}
-				};
-				combo.addListener(SWT.FocusOut, listener);
-				combo.addListener(SWT.Selection, listener);
-
-				editor.setEditor(combo, item, 1);
-			}
-		});
 		
 		Composite buttonParent = new Composite(canvas, SWT.NONE);
 		GridLayout buttonLayout = new GridLayout(1, true);
@@ -349,6 +261,14 @@ public class ServiceModelWidget {
 		return fTable;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		fWorkbench = workbench;
+		fSelection = selection;
+	}
+	
 	/**
 	 * Sub-class may override behaviour
 	 * @return true if all available services have been configured
@@ -356,7 +276,15 @@ public class ServiceModelWidget {
 	public boolean isConfigured() {
 		return isConfigured(null, fServiceIDToSelectedProviderID, getProviderIDToProviderMap());
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
+	 */
+	@Override
+	public boolean performFinish() {
+		return true;
+	}
+
 	/**
 	 * Listens for changes in service provider configuration
 	 * @param configChangeListener the configuration change listener to set
@@ -379,29 +307,48 @@ public class ServiceModelWidget {
 		fTable = table;
 	}
 
-	private void addTableRow(IService service, IServiceProvider provider) {
+	private void addTableRow(IServiceConfiguration config) {
+		IProject project = ServiceModelManager.getInstance().getProject(config);
+		
 		TableItem item = new TableItem (fTable, SWT.NONE);
 
-		// column 0 lists the name of the service
-		item.setText (0, service.getName());
-		item.setData(SERVICE_KEY, service);
+		// column 0 lists the name of the project
+		item.setText (0, project != null ? project.getName() : "<none>");
+
+		// column 1 lists the name of the configuration
+		item.setText (1, config.getName());
 		
-		// column 1 holds a dropdown with a list of providers
-		// default entry is the first provider if there is one		
-		item.setText(1, provider.getName());
-		item.setData(PROVIDER_KEY, provider);
-		
-		// column 2 holds the status string
-		item.setText(2, provider.getConfigurationString());
-		
-		fServiceIDToSelectedProviderID.put(service.getId(), provider.getId());
+		// column 1 holds the status string
+		item.setText(1, "Not configured");
+
+		item.setData(SERVICE_KEY, config);
 
 		// allow container page to check if configurations are set
 		if (fConfigChangeListener != null) {
 			fConfigChangeListener.handleEvent(null);
 		}
 	}
-
+	
+	/**
+	 * Return the set of providers sorted by priority
+	 * 
+	 * @param service service containing providers
+	 * @return sorted providers
+	 */
+	private SortedSet<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
+		SortedSet<IServiceProviderDescriptor> sortedProviders = 
+			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
+				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
+					return o2.getPriority().compareTo(o1.getPriority());
+				}
+			});
+		for (IServiceProviderDescriptor p : service.getProviders()) {
+			sortedProviders.add(p);
+		}
+		
+		return sortedProviders;
+	}
+	
 	/**
 	 * Get a the service provider for the descriptor. Keeps a cache of service providers.
 	 * 
@@ -419,10 +366,6 @@ public class ServiceModelWidget {
 		return serviceProvider;
 	}
 	
-	private Shell getShell() {
-		return fShell;
-	}
-
 	/**
 	 * Generate the services, providers and provider configuration available for
 	 * the given configuration in the table
@@ -433,8 +376,8 @@ public class ServiceModelWidget {
 	protected void createTableContent() {
 		fTable.removeAll();
 		
-		for (IService service : getServiceConfiguration().getServices()) {
-			addTableRow(service, getServiceConfiguration().getServiceProvider(service));
+		for (IServiceConfiguration config : fServiceConfigurations) {
+			addTableRow(config);
 		}
 	}
 	
@@ -447,7 +390,7 @@ public class ServiceModelWidget {
 	protected Listener getConfigureListener() {
 		return new ConfigureListener();		
 	}
-	
+
 	/**
 	 * Find available remote services and service providers for a given project
 	 */
@@ -474,12 +417,12 @@ public class ServiceModelWidget {
 		}
 		return allApplicableServices;
 	}
-	
+		
 	//sub class may override to change behaviour
 	protected Listener getRemoveListener() {
 		return new RemoveListener();		
 	}
-
+	
 	/**
 	 * Determine if all service providers have been configured
 	 * @param project
@@ -505,13 +448,13 @@ public class ServiceModelWidget {
 		}
 		return configured;
 	}
-		
+
 	protected void updateAddRemoveButtons() {
 		Set<IService> services = ServiceModelManager.getInstance().getServices();
 		fAddButton.setEnabled(services.size() > fTable.getItemCount());
 		fRemoveButton.setEnabled(fTable.getItemCount() > 0);
 	}
-	
+
 	/**
 	 * Enable/disable the configure button in this widget based on the service provider descriptor selected
 	 * @param enabled

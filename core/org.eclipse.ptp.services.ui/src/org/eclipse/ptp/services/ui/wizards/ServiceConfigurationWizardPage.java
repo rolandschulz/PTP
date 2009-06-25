@@ -12,9 +12,6 @@
 package org.eclipse.ptp.services.ui.wizards;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -24,6 +21,7 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -62,7 +60,7 @@ public class ServiceConfigurationWizardPage extends WizardPage {
         setControl(container);
         
         Label providerLabel = new Label(container, SWT.LEFT);
-        providerLabel.setText("Select a Provider:");
+        providerLabel.setText(Messages.ServiceConfigurationWizardPage_0);
         
         final Combo providerCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
         providerCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -99,26 +97,6 @@ public class ServiceConfigurationWizardPage extends WizardPage {
     }
 
 	/**
-	 * Return the set of providers sorted by priority
-	 * 
-	 * @param service service containing providers
-	 * @return sorted providers
-	 */
-	private SortedSet<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
-		SortedSet<IServiceProviderDescriptor> sortedProviders = 
-			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
-				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
-					return o1.getPriority().compareTo(o2.getPriority());
-				}
-			});
-		for (IServiceProviderDescriptor p : service.getProviders()) {
-			sortedProviders.add(p);
-		}
-		
-		return sortedProviders;
-	}
-
-	/**
 	 * @param combo
 	 */
 	private void handleComboSelection(Combo combo) {
@@ -143,7 +121,7 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 		int index = 0;
 		int selection = 0;
 		combo.removeAll();
-		for (IServiceProviderDescriptor descriptor : getProvidersByPriority(getService())) {
+		for (IServiceProviderDescriptor descriptor : getService().getProvidersByPriority()) {
 			combo.add(descriptor.getName());
 			fProviderComboList.add(index, descriptor);
 			if (descriptor.getId().equals(provider.getId())) {
