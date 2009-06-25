@@ -19,16 +19,13 @@ public class Messages extends NLS {
 	
 	public static String ServiceConfigurationWizard_0;
 	public static String ServiceConfigurationWizard_1;
-
 	public static String ServiceConfigurationWizard_2;
-
 	public static String ServiceConfigurationWizard_3;
-
 	public static String ServiceConfigurationWizard_4;
-
 	public static String ServiceConfigurationWizard_5;
-
 	public static String ServiceConfigurationWizard_6;
+
+	public static String ServiceConfigurationWizardPage_0;
 
 	public static String ServiceModelWidget_0;
 	public static String ServiceModelWidget_1;

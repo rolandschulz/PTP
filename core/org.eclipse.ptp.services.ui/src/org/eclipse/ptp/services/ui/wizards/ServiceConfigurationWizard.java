@@ -19,68 +19,65 @@
 package org.eclipse.ptp.services.ui.wizards;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardNode;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.wizard.WizardSelectionPage;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.ui.IServiceContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 
-public class ServiceConfigurationWizard extends Wizard {
+public class ServiceConfigurationWizard extends Wizard implements INewWizard {
 
-	private class IntroPage extends WizardPage {
-
-		public IntroPage(ServiceConfigurationWizard wizard, String pageName) {
-			super(pageName);
-			setTitle(pageName);
-			setDescription(Messages.ServiceConfigurationWizard_2);
-		}
-
-		public void createControl(Composite parent) {
-			Composite canvas = new Composite(parent, SWT.NONE);
-			GridLayout canvasLayout = new GridLayout(1, false);
-			canvas.setLayout(canvasLayout);
+	private class ServicesPage extends WizardSelectionPage {
+		private class WizardExtensionNode implements IWizardNode {
+			private IWizard fWizard = null;
 			
-			Label label = new Label(canvas, SWT.NONE);
-			label.setText(Messages.ServiceConfigurationWizard_3);
-			
-			Label label2 = new Label(canvas, SWT.NONE);
-			label2.setText(Messages.ServiceConfigurationWizard_4);
-			
-			Button button = new Button(canvas, SWT.CHECK);
-			button.setText(Messages.ServiceConfigurationWizard_5);
-			GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-			button.setLayoutData(data);
-			
-			setControl(canvas);
-		}
+			public WizardExtensionNode(IWizard wizard) {
+				fWizard = wizard;
+			}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.wizard.WizardPage#isPageComplete()
-		 */
-		@Override
-		public boolean isPageComplete() {
-			return true;
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.wizard.IWizardNode#dispose()
+			 */
+			public void dispose() {
+			}
+
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.wizard.IWizardNode#getExtent()
+			 */
+			public Point getExtent() {
+				return new Point(-1, -1);
+			}
+
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.wizard.IWizardNode#getWizard()
+			 */
+			public IWizard getWizard() {
+				return fWizard;
+			}
+
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.wizard.IWizardNode#isContentCreated()
+			 */
+			public boolean isContentCreated() {
+				return fWizard != null;
+			}
+			
 		}
 		
-	}
-	
-	private class ServicesPage extends WizardPage {
-
-		public ServicesPage(ServiceConfigurationWizard wizard, String pageName) {
+		public ServicesPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
 			setDescription(Messages.ServiceConfigurationWizard_0);
@@ -88,17 +85,38 @@ public class ServiceConfigurationWizard extends Wizard {
 
 		public void createControl(Composite parent) {
 			setControl(new ServiceModelWidget(fServiceConfiguration).createContents(parent));
+			INewWizard wizard = (INewWizard)ServiceModelUIManager.getInstance().getWizardExtensions();
+			if (wizard != null) {
+				wizard.init(getWorkbench(), getSelection());
+				wizard.addPages();
+				setSelectedNode(new WizardExtensionNode(wizard));
+			}
 		}
 	}
 
 	private final IServiceConfiguration fServiceConfiguration;
+	private IWorkbench fWorkbench = null;
+	private IStructuredSelection fSelection = null;
 
 	public ServiceConfigurationWizard(IServiceConfiguration serviceConfiguration) {
 		setForcePreviousAndNextButtons(true);
 		fServiceConfiguration = serviceConfiguration;
-		addPage(new IntroPage(this, Messages.ServiceConfigurationWizard_6));
-		setWizardPages(getWizardPagesFromServiceConfiguration(serviceConfiguration));
-		addPage(new ServicesPage(this, Messages.ServiceConfigurationWizard_1));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#addPages()
+	 */
+	@Override
+	public void addPages() {
+		setWizardPages(getWizardPagesFromServiceConfiguration(fServiceConfiguration));
+		addPage(new ServicesPage(Messages.ServiceConfigurationWizard_1));
+	}
+	
+	/**
+	 * @return the Selection
+	 */
+	public IStructuredSelection getSelection() {
+		return fSelection;
 	}
 
 	/**
@@ -108,6 +126,21 @@ public class ServiceConfigurationWizard extends Wizard {
 		return fServiceConfiguration;
 	}
 	
+	/**
+	 * @return the Workbench
+	 */
+	public IWorkbench getWorkbench() {
+		return fWorkbench;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		fWorkbench = workbench;
+		fSelection = selection;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
@@ -117,7 +150,7 @@ public class ServiceConfigurationWizard extends Wizard {
 	
 	private WizardPage[] getWizardPagesFromServiceConfiguration(IServiceConfiguration serviceConfiguration) {
 		List<WizardPage> wizardPages = new ArrayList<WizardPage>();
-		for (IService service : getServicesByPriority(serviceConfiguration)) {
+		for (IService service : serviceConfiguration.getServicesByPriority()) {
 			IServiceContributor contrib = ServiceModelUIManager.getInstance().getServiceContributor(service);
 			if (contrib != null) {
 				WizardPage[] pages = contrib.getWizardPages(service);
@@ -129,30 +162,10 @@ public class ServiceConfigurationWizard extends Wizard {
 		
 		return wizardPages.toArray(new WizardPage[wizardPages.size()]);
 	}
-	
+
 	private void setWizardPages(WizardPage[] pages) {
 		for (IWizardPage page : pages) {
 			addPage(page);
 		}
-	}
-	
-	/**
-	 * Return the set of providers sorted by priority
-	 * 
-	 * @param service service containing providers
-	 * @return sorted providers
-	 */
-	private SortedSet<IService> getServicesByPriority(IServiceConfiguration serviceConfiguration) {
-		SortedSet<IService> sortedServices = 
-			new TreeSet<IService>(new Comparator<IService>() {
-				public int compare(IService o1, IService o2) {
-					return o1.getPriority().compareTo(o2.getPriority());
-				}
-			});
-		for (IService s : serviceConfiguration.getServices()) {
-			sortedServices.add(s);
-		}
-		
-		return sortedServices;
 	}
 }
