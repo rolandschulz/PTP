@@ -35,7 +35,9 @@ public class Activator extends Plugin {
 		// If the plugin fails to activate because of an exception in the ServiceModelManager
 		// then we need to know what happened, so log it.
 		try {
-			ServiceModelManager.getInstance().loadModelConfiguration();
+			//ServiceModelManager.getInstance().loadModelConfiguration();
+			// TODO: can we get notified when a project opens so we can
+			// automatically read the configuration?
 		} catch(Exception e) {
 			log(e);
 		}

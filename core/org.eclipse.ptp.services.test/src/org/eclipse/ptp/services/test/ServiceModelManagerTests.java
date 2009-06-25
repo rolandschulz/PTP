@@ -51,14 +51,14 @@ public class ServiceModelManagerTests {
 		
 		Writer writer = new BufferedWriter(new FileWriter(file));
 		try {
-			manager.saveModelConfiguration(writer);
+			manager.saveModelConfiguration(fProject, writer);
 		} finally {
 			writer.close();
 		}
 		
 		Reader reader = new BufferedReader(new FileReader(file));
 		try {
-			manager.loadModelConfiguration(reader);
+			manager.loadModelConfiguration(fProject, reader);
 		} finally {
 			reader.close();
 		}
