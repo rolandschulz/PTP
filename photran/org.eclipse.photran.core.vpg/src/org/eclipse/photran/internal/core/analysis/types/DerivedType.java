@@ -10,6 +10,12 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.types;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
+
 /**
  * A <code>Type</code> corresponding to a derived type with a particular name.
  * 
@@ -17,6 +23,7 @@ package org.eclipse.photran.internal.core.analysis.types;
  */
 public class DerivedType extends Type
 {
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     private String name;
 
     public DerivedType(String name)
@@ -28,7 +35,7 @@ public class DerivedType extends Type
     {
         return "type(" + name + ")";
     }
-    
+   
     public <T> T processUsing(TypeProcessor<T> p)
     {
         return p.ifDerivedType(name, this);
@@ -43,5 +50,30 @@ public class DerivedType extends Type
     @Override public int hashCode()
     {
         return name.hashCode();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    public static String getStaticThreeLetterTypeSerializationCode()
+    {
+        return "dtv";
+    }
+    
+    @Override public String getThreeLetterTypeSerializationCode()
+    {
+        return "dtv";
+    }
+
+    @Override void finishWriteTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(name, out);
+    }
+
+    public static Type finishReadFrom(InputStream in) throws IOException
+    {
+        String name = PhotranVPGSerializer.deserialize(in);
+        return new DerivedType(name);
     }
 }

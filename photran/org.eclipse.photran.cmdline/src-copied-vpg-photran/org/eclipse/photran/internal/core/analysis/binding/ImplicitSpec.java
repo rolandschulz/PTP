@@ -11,9 +11,13 @@
 package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Serializable;
 
+import org.eclipse.photran.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTImplicitSpecNode;
@@ -26,10 +30,12 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
  * 
  * @author Jeff Overbey
  */
-public class ImplicitSpec implements Serializable
+public class ImplicitSpec implements IPhotranSerializable
 {
 	private static final long serialVersionUID = 1L;
 
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
+    
 	private String toString = "Implicit Enabled - Default Implicit Spec: real (a-h), integer (i-n), real (o-z)";
     private Type[] typeMap = { Type.REAL,    // A
                                Type.REAL,    // B
@@ -158,5 +164,37 @@ public class ImplicitSpec implements Serializable
     @Override public String toString()
     {
     	return toString;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+
+//    private String toString = "Implicit Enabled - Default Implicit Spec: real (a-h), integer (i-n), real (o-z)";
+//    private Type[] typeMap = { Type.REAL,    // A
+
+    public void writeTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(toString, out);
+        
+        for (int i = 0; i < typeMap.length; i++)
+            PhotranVPGSerializer.serialize(typeMap[i], out);
+    }
+    
+    public static ImplicitSpec readFrom(InputStream in) throws IOException
+    {
+        ImplicitSpec result = new ImplicitSpec();
+        
+        result.toString = PhotranVPGSerializer.deserialize(in);
+        
+        for (int i = 0; i < result.typeMap.length; i++)
+            result.typeMap[i] = PhotranVPGSerializer.deserialize(in);
+        
+        return result;
+    }
+    
+    public char getSerializationCode()
+    {
+        return PhotranVPGSerializer.CLASS_IMPLICITSPEC;
     }
 }

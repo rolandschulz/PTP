@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.core.vpg;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.Token;
@@ -22,10 +24,12 @@ import bz.over.vpg.TokenRef;
  * 
  * @author Jeff Overbey
  */
-public class PhotranTokenRef extends TokenRef<Token> implements Serializable, Comparable<PhotranTokenRef>
+public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializable, Comparable<PhotranTokenRef>
 {
 	private static final long serialVersionUID = 1L;
 	
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
+
 	public PhotranTokenRef(String filename, int offset, int length)
 	{
 		super(filename, offset, length);
@@ -76,5 +80,29 @@ public class PhotranTokenRef extends TokenRef<Token> implements Serializable, Co
         if (result == 0) result = Integer.valueOf(this.getOffset()).compareTo(that.getOffset());
         if (result == 0) result = Integer.valueOf(this.getLength()).compareTo(that.getLength());
         return result;
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    public static PhotranTokenRef readFrom(InputStream in) throws IOException
+    {
+        String filename = PhotranVPGSerializer.deserialize(in);
+        int offset = PhotranVPGSerializer.deserialize(in);
+        int length = PhotranVPGSerializer.deserialize(in);
+        return new PhotranTokenRef(filename, offset, length);
+    }
+    
+    public void writeTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(getFilename(), out);
+        PhotranVPGSerializer.serialize(getOffset(), out);
+        PhotranVPGSerializer.serialize(getLength(), out);
+    }
+    
+    public char getSerializationCode()
+    {
+        return PhotranVPGSerializer.CLASS_TOKENREF;
     }
 }

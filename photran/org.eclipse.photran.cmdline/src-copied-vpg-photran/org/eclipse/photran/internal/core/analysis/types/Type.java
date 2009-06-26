@@ -10,8 +10,15 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.types;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.photran.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 
 /**
@@ -22,11 +29,17 @@ import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
  * 
  * @author Jeff Overbey
  */
-public abstract class Type implements Serializable
+public abstract class Type implements IPhotranSerializable, Serializable
 {
 	private static final long serialVersionUID = 1L;
-	
+
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
+
     public abstract String toString();
+    
+    public abstract String getThreeLetterTypeSerializationCode();
+    
+    abstract void finishWriteTo(OutputStream out) throws IOException;
     
     public abstract <T> T processUsing(TypeProcessor<T> p);
     
@@ -76,11 +89,24 @@ public abstract class Type implements Serializable
             throw new Error("Unexpected case parsing <TypeSpec> node");
     }
 
-    public static Type INTEGER = new Type()
+    private static abstract class PrimitiveType extends Type
+    {
+        @Override final void finishWriteTo(OutputStream out) throws IOException
+        {
+            // Nothing extra to write for primitive types
+        }
+    }
+    
+    public static Type INTEGER = new PrimitiveType()
     {
         public String toString()
         {
             return "integer";
+        }
+        
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "int"; 
         }
         
         public <T> T processUsing(TypeProcessor<T> p)
@@ -101,11 +127,16 @@ public abstract class Type implements Serializable
         }
     };
 
-    public static Type REAL = new Type()
+    public static Type REAL = new PrimitiveType()
     {
         public String toString()
         {
             return "real";
+        }
+        
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "rea"; 
         }
         
         public <T> T processUsing(TypeProcessor<T> p)
@@ -126,11 +157,16 @@ public abstract class Type implements Serializable
         }
     };
 
-    public static Type DOUBLEPRECISION = new Type()
+    public static Type DOUBLEPRECISION = new PrimitiveType()
     {
         public String toString()
         {
             return "double precision";
+        }
+        
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "dbl"; 
         }
         
         public <T> T processUsing(TypeProcessor<T> p)
@@ -151,13 +187,18 @@ public abstract class Type implements Serializable
         }
     };
 
-    public static Type COMPLEX = new Type()
+    public static Type COMPLEX = new PrimitiveType()
     {
         public String toString()
         {
             return "complex";
         }
         
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "cpx"; 
+        }
+
         public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifComplex(this);
@@ -176,26 +217,36 @@ public abstract class Type implements Serializable
         }
     };
 
-    public static Type LOGICAL = new Type()
+    public static Type LOGICAL = new PrimitiveType()
     {
         public String toString()
         {
             return "logical";
         }
         
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "log"; 
+        }
+
         public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifLogical(this);
         }
     };
 
-    public static Type CHARACTER = new Type()
+    public static Type CHARACTER = new PrimitiveType()
     {
         public String toString()
         {
             return "character";
         }
         
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "chr"; 
+        }
+
         public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifCharacter(this);
@@ -212,13 +263,18 @@ public abstract class Type implements Serializable
      * <li> functions
      * </ul>
      */
-    public static Type UNKNOWN = new Type()
+    public static Type UNKNOWN = new PrimitiveType()
     {
         public String toString()
         {
             return "(unknown)";
         }
         
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "unk"; 
+        }
+
         public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifUnknown(this);
@@ -228,13 +284,18 @@ public abstract class Type implements Serializable
     /**
      * Name of a derived type, namelist, common block, where statement, program name, etc.
      */
-    public static Type VOID = new Type()
+    public static Type VOID = new PrimitiveType()
     {
         public String toString()
         {
             return "(unclassified)";
         }
         
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "voi"; 
+        }
+
         public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifUnclassified(this);
@@ -244,16 +305,103 @@ public abstract class Type implements Serializable
     /**
      * Type of expressions which do not type check
      */
-    public static Type TYPE_ERROR = new Type()
+    public static Type TYPE_ERROR = new PrimitiveType()
     {
         public String toString()
         {
             return "(type error)";
         }
         
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "err"; 
+        }
+
         public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifError(this);
         }
     };
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    private static Map<String, Object> threeLetterTypeSerializationCodes;
+    
+    private static void setThreeLetterTypeSerializationCode(Type type)
+    {
+        String code = type.getThreeLetterTypeSerializationCode();
+        checkCode(code);
+        threeLetterTypeSerializationCodes.put(code, type);
+    }
+    
+    private static void setThreeLetterSerializationCode(Class<? extends Type> typeClass)
+    {
+        threeLetterTypeSerializationCodes.put((String)invokeStatic("getStaticThreeLetterTypeSerializationCode", typeClass, new Class<?>[0]), typeClass);
+    }
+
+    private static void checkCode(String code)
+    {
+        if (code == null || code.length() != 3)
+            throw new IllegalArgumentException("Invalid three-letter code for Type serialization: " + code);
+        else if (threeLetterTypeSerializationCodes.containsKey(code))
+            throw new IllegalArgumentException("Duplicate three-letter code for Type serialization: " + code);
+    }
+
+    static
+    {
+        threeLetterTypeSerializationCodes = new HashMap<String, Object>();
+        setThreeLetterTypeSerializationCode(INTEGER);
+        setThreeLetterTypeSerializationCode(REAL);
+        setThreeLetterTypeSerializationCode(DOUBLEPRECISION);
+        setThreeLetterTypeSerializationCode(COMPLEX);
+        setThreeLetterTypeSerializationCode(LOGICAL);
+        setThreeLetterTypeSerializationCode(CHARACTER);
+        setThreeLetterTypeSerializationCode(UNKNOWN);
+        setThreeLetterTypeSerializationCode(VOID);
+        setThreeLetterTypeSerializationCode(TYPE_ERROR);
+        setThreeLetterSerializationCode(DerivedType.class);
+        setThreeLetterSerializationCode(FunctionType.class);
+    }
+    
+    public static Type readFrom(InputStream in) throws IOException
+    {
+        String code = PhotranVPGSerializer.deserialize(in);
+        if (!threeLetterTypeSerializationCodes.containsKey(code))
+            throw new IOException("Unrecognized type code: " + code);
+        
+        Object o = threeLetterTypeSerializationCodes.get(code);
+        if (o instanceof Type)
+            return (Type)o;
+        else if (o instanceof Class)
+            return invokeStatic("finishReadFrom", (Class<?>)o, new Class<?>[] { InputStream.class }, in);
+        else
+            throw new IOException();
+    }
+
+    public void writeTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(getThreeLetterTypeSerializationCode(), out);
+        finishWriteTo(out);
+    }
+    
+    public char getSerializationCode()
+    {
+        return PhotranVPGSerializer.CLASS_TYPE;
+    }
+
+    
+    @SuppressWarnings("unchecked")
+    private static <T> T invokeStatic(String method, Class<?> o, Class<?>[] argTypes, Object... args)
+    {
+        try
+        {
+            return (T)o.getMethod(method, argTypes).invoke(null, args);
+        }
+        catch (Exception e)
+        {
+            throw new Error(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+    }
 }

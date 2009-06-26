@@ -28,6 +28,8 @@ public class TokenAnalysis extends CmdLineBase
                 return true;
             }   
         });
+        
+        PhotranVPG.getDatabase().close();
     }
     
     private static void analyze(String filename)

@@ -11,9 +11,13 @@
 package org.eclipse.photran.internal.core.analysis.types;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Serializable;
 
+import org.eclipse.photran.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
 import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
@@ -25,10 +29,11 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
  * 
  * @see ArraySpec
  */
-public class Dimension implements Serializable
+public class Dimension implements IPhotranSerializable
 {
 	private static final long serialVersionUID = 1L;
 	
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     private String lboundAsString, uboundAsString;
 
     //    <ExplicitShapeSpec> ::=
@@ -119,5 +124,32 @@ public class Dimension implements Serializable
     private int hashCode(Object o)
     {
         return o == null ? 0 : o.hashCode();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+
+//    private String lboundAsString, uboundAsString;
+
+    private Dimension() {;}
+
+    public static Dimension readFrom(InputStream in) throws IOException
+    {
+        Dimension result = new Dimension();
+        result.lboundAsString = PhotranVPGSerializer.deserialize(in);
+        result.uboundAsString = PhotranVPGSerializer.deserialize(in);
+        return result;
+    }
+    
+    public void writeTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(lboundAsString, out);
+        PhotranVPGSerializer.serialize(uboundAsString, out);
+    }
+    
+    public char getSerializationCode()
+    {
+        return PhotranVPGSerializer.CLASS_DIMENSION;
     }
 }

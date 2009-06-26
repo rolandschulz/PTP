@@ -10,10 +10,15 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.types;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.photran.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedShapeSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedSizeSpecNode;
@@ -28,10 +33,11 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  * 
  * @see Dimension
  */
-public class ArraySpec implements Serializable
+public class ArraySpec implements IPhotranSerializable
 {
 	private static final long serialVersionUID = 1L;
 	
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     protected List<Dimension> dimensions = new LinkedList<Dimension>();
     protected boolean assumedOrDeferredShape = false;
 
@@ -149,5 +155,46 @@ public class ArraySpec implements Serializable
     @Override public int hashCode()
     {
         return dimensions.hashCode() + (assumedOrDeferredShape ? 1 : 0);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+
+//  protected List<Dimension> dimensions = new LinkedList<Dimension>();
+//  protected boolean assumedOrDeferredShape = false;
+
+    private ArraySpec(List<Dimension> dimensions, boolean assumedOrDeferredShape)
+    {
+        this.dimensions = dimensions;
+        this.assumedOrDeferredShape = assumedOrDeferredShape;
+    }
+    
+    public void writeTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(dimensions.size(), out);
+        
+        for (Dimension dim : dimensions)
+            PhotranVPGSerializer.serialize(dim, out);
+        
+        PhotranVPGSerializer.serialize(assumedOrDeferredShape, out);
+    }
+    
+    public static ArraySpec readFrom(InputStream in) throws IOException
+    {
+        int numDimensions = PhotranVPGSerializer.deserialize(in);
+        
+        ArrayList<Dimension> dimensions = new ArrayList<Dimension>(numDimensions);
+        for (int i = 0; i < numDimensions; i++)
+            dimensions.add((Dimension)PhotranVPGSerializer.deserialize(in));
+        
+        boolean assumedOrDeferredShape = PhotranVPGSerializer.deserialize(in);
+        
+        return new ArraySpec(dimensions, assumedOrDeferredShape);
+    }
+    
+    public char getSerializationCode()
+    {
+        return PhotranVPGSerializer.CLASS_ARRAYSPEC;
     }
 }

@@ -510,12 +510,12 @@ public abstract class ScopingNode extends ASTNode
 
     public List<PhotranTokenRef> manuallyResolve(Token identifier)
     {
-        String cid = null;
+        String canonicalizedIdentifier = null;
         if (PhotranVPG.getInstance().isDefinitionCachingEnabled())
         {
-            cid = PhotranVPG.canonicalizeIdentifier(identifier.getText());
-            if (definitionCache.containsKey(cid))
-                return definitionCache.get(cid);
+            canonicalizedIdentifier = PhotranVPG.canonicalizeIdentifier(identifier.getText());
+            if (definitionCache.containsKey(canonicalizedIdentifier))
+                return definitionCache.get(canonicalizedIdentifier);
         }
         
     	final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
@@ -529,7 +529,7 @@ public abstract class ScopingNode extends ASTNode
     	});
 
         if (PhotranVPG.getInstance().isDefinitionCachingEnabled())
-            definitionCache.put(cid, bindings);
+            definitionCache.put(canonicalizedIdentifier, bindings);
 
     	return bindings;
     }

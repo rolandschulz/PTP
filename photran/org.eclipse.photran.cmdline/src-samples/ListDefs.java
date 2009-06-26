@@ -29,6 +29,8 @@ public class ListDefs extends CmdLineBase
         
         System.out.println("\nIDENTIFIER BINDINGS IN " + filename.toUpperCase() + "\n");
         printAllIdentifierBindings(ast);
+        
+        PhotranVPG.getDatabase().close();
     }
 
     private static void printSourceCodeFromAST(IFortranAST ast)

@@ -16,5 +16,8 @@ public class VPGStats extends CmdLineBase
         PhotranVPG.getDatabase().printStatisticsOn(System.out);
         System.out.println();
         PhotranVPG.getInstance().printModuleSymTabCacheStatisticsOn(System.out);
+        
+        // We should do this, but we'll omit it for better profiling of the indexer
+        //PhotranVPG.getDatabase().close();
     }
 }

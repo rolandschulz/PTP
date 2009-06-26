@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.eclipse.core.resources.IFile;
@@ -29,7 +27,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         {
             this(PhotranVPG.inTestingMode()
                  ? createTempFile()
-                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran40b5avpg");
+                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran40b5bvpg");
         }
         
         private PhotranCDTDB(String filename)
@@ -66,13 +64,19 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         @Override protected byte[] serialize(Serializable annotation) throws IOException
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            new ObjectOutputStream(out).writeObject(annotation);
+            PhotranVPGSerializer.serialize(annotation, out);
             return out.toByteArray();
+            
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            new ObjectOutputStream(out).writeObject(annotation);
+//            return out.toByteArray();
         }
         
         @Override protected Serializable deserialize(InputStream binaryStream) throws IOException, ClassNotFoundException
         {
-            return (Serializable)new ObjectInputStream(binaryStream).readObject();
+            return PhotranVPGSerializer.deserialize(binaryStream);
+            
+//            return (Serializable)new ObjectInputStream(binaryStream).readObject();
         }
     }
     

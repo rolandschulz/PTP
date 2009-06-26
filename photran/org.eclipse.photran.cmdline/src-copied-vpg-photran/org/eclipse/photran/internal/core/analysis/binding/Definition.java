@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.binding;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,9 +22,11 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.photran.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.analysis.types.ArraySpec;
 import org.eclipse.photran.internal.core.analysis.types.DerivedType;
 import org.eclipse.photran.internal.core.analysis.types.FunctionType;
@@ -60,10 +64,12 @@ import bz.over.vpg.TokenRef;
  * 
  * @author Jeff Overbey
  */
-public class Definition implements Serializable, Comparable<Definition>
+public class Definition implements IPhotranSerializable, Comparable<Definition>
 {
 	private static final long serialVersionUID = 1L;
-	
+
+    // ***WARNING*** If the enum values change order or new values are inserted in the middle, serialization will break!
+
 	/** Enumerates the various entities that can be named with an identifier: variables, functions, namelists, etc. */
     public static enum Classification
     {
@@ -98,7 +104,9 @@ public class Definition implements Serializable, Comparable<Definition>
         	return name.charAt(0) + name.substring(1).toLowerCase();
         }
     }
-    
+
+    // ***WARNING*** If the enum values change order or new values are inserted in the middle, serialization will break!
+
     /** Enumerates visibilities of module entities */
     public static enum Visibility
     {
@@ -113,6 +121,8 @@ public class Definition implements Serializable, Comparable<Definition>
         }
     }
 
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
+    
     protected Classification classification;
     protected PhotranTokenRef tokenRef;
     protected String declaredName, canonicalizedName;
@@ -124,6 +134,8 @@ public class Definition implements Serializable, Comparable<Definition>
     private boolean parameter = false;
     private boolean typeBoundProcedure = false;
     private boolean renamedTypeBoundProcedure = false;
+
+    // ***WARNING*** If any fields change, the serialization methods (below) must also change!
 
     protected Definition() {}
     
@@ -1050,5 +1062,43 @@ public class Definition implements Serializable, Comparable<Definition>
                 return "";
             }
         });
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // IPhotranSerializable Implementation
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    public static Definition readFrom(InputStream in) throws IOException
+    {
+        Definition result = new Definition();
+        result.classification = Classification.values()[PhotranVPGSerializer.deserialize(in)];
+        result.tokenRef = PhotranVPGSerializer.deserialize(in);
+        result.declaredName = PhotranVPGSerializer.deserialize(in);
+        result.canonicalizedName = PhotranVPG.canonicalizeIdentifier(result.declaredName);
+        result.type = PhotranVPGSerializer.deserialize(in);
+        result.arraySpec = PhotranVPGSerializer.deserialize(in);
+        result.subprogramArgument = PhotranVPGSerializer.deserialize(in);
+        result.parameter = PhotranVPGSerializer.deserialize(in);
+        result.typeBoundProcedure = PhotranVPGSerializer.deserialize(in);
+        result.renamedTypeBoundProcedure = PhotranVPGSerializer.deserialize(in);
+        return result;
+    }
+    
+    public void writeTo(OutputStream out) throws IOException
+    {
+        PhotranVPGSerializer.serialize(classification.ordinal(), out);
+        PhotranVPGSerializer.serialize(tokenRef, out);
+        PhotranVPGSerializer.serialize(declaredName, out);
+        PhotranVPGSerializer.serialize(type, out);
+        PhotranVPGSerializer.serialize(arraySpec, out);
+        PhotranVPGSerializer.serialize(subprogramArgument, out);
+        PhotranVPGSerializer.serialize(parameter, out);
+        PhotranVPGSerializer.serialize(typeBoundProcedure, out);
+        PhotranVPGSerializer.serialize(renamedTypeBoundProcedure, out);
+    }
+    
+    public char getSerializationCode()
+    {
+        return PhotranVPGSerializer.CLASS_DEFINITION;
     }
 }
