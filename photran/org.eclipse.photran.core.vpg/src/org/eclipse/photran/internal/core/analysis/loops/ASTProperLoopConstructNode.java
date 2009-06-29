@@ -39,8 +39,14 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 public class ASTProperLoopConstructNode extends ASTNode implements IExecutableConstruct
 {
     ASTLabelDoStmtNode loopHeader;
-    IASTListNode<IExecutionPartConstruct> body = new ASTListNode<IExecutionPartConstruct>();
+    IASTListNode<IExecutionPartConstruct> body;
     ASTEndDoStmtNode endDoStmt;
+    
+    public ASTProperLoopConstructNode()
+    {
+        body = new ASTListNode<IExecutionPartConstruct>();
+        body.setParent(this);
+    }
 
     public ASTLabelDoStmtNode getLoopHeader()
     {

@@ -29,9 +29,13 @@ import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
+import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
+import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
@@ -90,10 +94,13 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         
     	selection = this.findEnclosingStatementSequence(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selection == null || selection.selectedStmts.isEmpty())
-            fail("Please select a sequence of statements to extract.");
+            fail("Please select a sequence of contiguous statements to extract.");
         
-        if (!selection.enclosingScope.isSubprogram())
-            fail("Statements can only be extracted from inside a subprogram.");
+        if (selection.enclosingScope == null)
+            fail("INTERNAL ERROR: Unable to locate enclosing scope");
+        
+        if (!selection.enclosingScope.isSubprogram() && !selection.enclosingScope.isMainProgram())
+            fail("Statements can only be extracted from inside a subprogram or main program.");
         
         for (IASTNode stmt : selection.selectedStmts)
             if (!(stmt instanceof IBodyConstruct))
@@ -247,9 +254,23 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         
         sb.append("end subroutine\n");
         
-        
         ASTSubroutineSubprogramNode newSubroutine = (ASTSubroutineSubprogramNode)parseLiteralProgramUnit(sb.toString());
-        return insertAfterEnclosingSubprogram(newSubroutine);
+        
+        return insertNewSubprogram(newSubroutine);
+    }
+
+    /* The new subprogram must be an internal subprogram if the statements are being extracted
+     * from a main program or subprogram that contains other internal subprograms.  Otherwise,
+     * references to existing internal subprograms will not carry over to the extracted subprogram. 
+     */
+    private ASTSubroutineSubprogramNode insertNewSubprogram(ASTSubroutineSubprogramNode newSubroutine)
+    {
+        if (selection.enclosingScope.isSubprogram())
+            return insertAfterEnclosingSubprogram(newSubroutine);
+        else if (selection.enclosingScope.isMainProgram())
+            return insertAsInternalSubprogramOf((ASTMainProgramNode)selection.enclosingScope, newSubroutine);
+        else
+            throw new IllegalStateException();
     }
 
     private String parameterList()
@@ -313,6 +334,29 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         Reindenter.reindent(newSubroutine, this.astOfFileInEditor);
 
         return newSubroutine;
+    }
+
+    private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(ASTMainProgramNode program, ASTSubroutineSubprogramNode subprogram)
+    {
+        if (program.getContainsStmt() == null)
+        {
+            ASTContainsStmtNode containsStmt = createContainsStmt();
+            program.setContainsStmt(containsStmt);
+            containsStmt.setParent(program);
+        }
+        
+        if (program.getInternalSubprograms() == null)
+        {
+            ASTListNode<IInternalSubprogram> internals = new ASTListNode<IInternalSubprogram>();
+            program.setInternalSubprograms(internals);
+            internals.setParent(program);
+        }
+        
+        program.getInternalSubprograms().add(subprogram);
+        
+        Reindenter.reindent(subprogram, this.astOfFileInEditor);
+
+        return subprogram;
     }
 
     @SuppressWarnings("unchecked")

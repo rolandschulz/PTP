@@ -367,6 +367,11 @@ public abstract class ScopingNode extends ASTNode
         return this instanceof ASTFunctionSubprogramNode || this instanceof ASTSubroutineSubprogramNode;
     }
 
+    public boolean isMainProgram()
+    {
+        return this instanceof ASTMainProgramNode;
+    }
+
     public boolean isInternal()
     {
     	return getParent() instanceof IInternalSubprogram;

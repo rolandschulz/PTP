@@ -43,6 +43,7 @@ import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
@@ -226,6 +227,13 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         string = "program p\n" + string + "\nend program";
         return ((ASTMainProgramNode)parseLiteralProgramUnit(string)).getBody();
+    }
+
+    /** @return a CONTAINS statement */
+    protected ASTContainsStmtNode createContainsStmt()
+    {
+        String string = "program p\ncontains\nsubroutine s\nend subroutine\nend program";
+        return ((ASTMainProgramNode)parseLiteralProgramUnit(string)).getContainsStmt();
     }
 
     /**
