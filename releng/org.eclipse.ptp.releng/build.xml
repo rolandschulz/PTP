@@ -148,16 +148,16 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.remotetools-feature"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.ibm.ll-feature"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.ibm.pe-feature"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpich2-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.mpich2-feature"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.openmpi-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.openmpi-feature"/>
 		</antcall>		
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.external-feature"/>
@@ -184,7 +184,7 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rdt-feature"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/cell/org.eclipse.ptp.cell-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.services-feature"/>
 		</antcall>		
 		
 		<!--Plugins-->
@@ -424,6 +424,15 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.services.test"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.services.core"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.services.test"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.services.ui"/>
 		</antcall>
 	</target>
 </project>
