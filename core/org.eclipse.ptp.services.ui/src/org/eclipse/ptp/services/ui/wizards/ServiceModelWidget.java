@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.IService;
@@ -102,7 +103,8 @@ public class ServiceModelWidget {
 			TableItem item = selection[0];
 			IServiceProvider provider = (IServiceProvider) item.getData(PROVIDER_KEY);
 
-			ServiceProviderConfigurationWizard wizard = new ServiceProviderConfigurationWizard(getServiceConfiguration(), provider, null);
+			IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderContributor(provider);
+			IWizard wizard = config.getWizard(provider, null);
 			WizardDialog dialog = new WizardDialog(getShell(), wizard);
 			dialog.open();
 			
