@@ -40,24 +40,33 @@ public abstract class DefinitionMap<T>
     {
         if (PhotranVPGBuilder.isEmpty(ast)) return;
         
-        ast.accept(new GenericASTVisitor()
+        try
         {
-            @Override public void visitASTNode(IASTNode node)
+            ast.accept(new GenericASTVisitor()
             {
-                if (ScopingNode.isScopingNode(node))
-                    for (Definition def : ((ScopingNode)node).getAllDefinitions())
-                    {
-                        if (def != null)
+                @Override public void visitASTNode(IASTNode node)
+                {
+                    if (ScopingNode.isScopingNode(node))
+                        for (Definition def : ((ScopingNode)node).getAllDefinitions())
                         {
-                            String name = def.getCanonicalizedName();
-                            String qualifiedName = qualify(name, (ScopingNode)node);
-                            definitions.put(qualifiedName, map(qualifiedName, def));
+                            if (def != null)
+                            {
+                                String name = def.getCanonicalizedName();
+                                String qualifiedName = qualify(name, (ScopingNode)node);
+                                definitions.put(qualifiedName, map(qualifiedName, def));
+                            }
                         }
-                    }
-                
-                traverseChildren(node);
-            }
-        });
+                    
+                    traverseChildren(node);
+                }
+            });
+        }
+        catch (IllegalArgumentException e)
+        {
+            // Ignore
+            // TODO: Caused by PhotranTokenRef getting passed "null" for the filename;
+            //       why does that happen?
+        }
         
 //        for (String def : definitions.keySet())
 //            System.out.println(def);
