@@ -370,32 +370,6 @@
       </perspectiveExtension>
    </extension>
    <extension
-         point="org.eclipse.ui.exportWizards">
-      <wizard
-            category="org.eclipse.cdt.ui.exportWizardCategory"
-            class="org.eclipse.ptp.internal.rdt.ui.wizards.settings.ProjectSettingsExportWizard"
-            icon="icons/etool16/exportc_settings.gif"
-            id="org.eclipse.ptp.rdt.ui.settingswizard.export"
-            name="%export.name">
-         <selection
-               class="org.eclipse.core.resources.IProject">
-         </selection>
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.importWizards">
-      <wizard
-            category="org.eclipse.cdt.ui.import"
-            class="org.eclipse.ptp.internal.rdt.ui.wizards.settings.ProjectSettingsImportWizard"
-            icon="icons/etool16/importc_settings.gif"
-            id="org.eclipse.ptp.rdt.ui.settingswizard.import"
-            name="%import.name">
-         <selection
-               class="org.eclipse.core.resources.IProject">
-         </selection>
-      </wizard>
-   </extension>
-   <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
             label="%CSearchActionSet.label"
