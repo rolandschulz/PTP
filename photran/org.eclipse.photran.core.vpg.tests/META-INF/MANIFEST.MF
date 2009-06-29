@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.photran.core.vpg,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.junit,
- org.eclipse.cdt.core
+ org.eclipse.cdt.core,
+ org.eclipse.jface;bundle-version="3.4.2"
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.photran.refactoring.tests.Activator
 Export-Package: org.eclipse.photran.internal.core.tests,
@@ -19,8 +20,10 @@ Export-Package: org.eclipse.photran.internal.core.tests,
  org.eclipse.photran.internal.core.tests.g_type_check,
  org.eclipse.photran.internal.core.tests.h_interface_links,
  org.eclipse.photran.internal.core.tests.projects,
+ org.eclipse.photran.internal.core.tests.serialization,
  org.eclipse.photran.internal.core.tests.x_cpreprocessor,
  org.eclipse.photran.refactoring.tests,
+ org.eclipse.photran.refactoring.tests.extractprocedure,
  org.eclipse.photran.refactoring.tests.introimplicitnone,
  org.eclipse.photran.refactoring.tests.movesavedtocommonblock,
  org.eclipse.photran.refactoring.tests.rename

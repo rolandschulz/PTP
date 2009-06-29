@@ -1,0 +1,9 @@
+subroutine sub
+    call new_procedure()
+end subroutine
+
+
+subroutine new_procedure()
+    implicit none
+    print *, "Hello" !<<<<<START !<<<<<END
+end subroutine

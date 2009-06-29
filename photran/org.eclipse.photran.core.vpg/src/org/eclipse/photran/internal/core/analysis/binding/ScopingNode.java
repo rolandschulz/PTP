@@ -362,6 +362,11 @@ public abstract class ScopingNode extends ASTNode
             throw new UnsupportedOperationException();
     }
 
+    public boolean isSubprogram()
+    {
+        return this instanceof ASTFunctionSubprogramNode || this instanceof ASTSubroutineSubprogramNode;
+    }
+
     public boolean isInternal()
     {
     	return getParent() instanceof IInternalSubprogram;

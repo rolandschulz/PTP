@@ -1,0 +1,16 @@
+subroutine hmmm
+    do 10 i = 1, 5
+       call new_procedure(i)
+       print *, i
+10  continue
+end subroutine
+
+
+subroutine new_procedure(i)
+    implicit none
+    integer :: i
+       print *, i                   !<<<<<START
+       if (i .gt. 3) then
+         print *, i * 10
+       end if                       !<<<<<END
+end subroutine

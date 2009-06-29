@@ -1,0 +1,13 @@
+subroutine prob
+        integer, parameter :: SIZE = 5
+        real :: matrix(SIZE, SIZE)
+        call new_procedure(matrix)
+end subroutine
+
+
+subroutine new_procedure(matrix, SIZE)
+    implicit none
+    real :: matrix(SIZE, SIZE)
+    integer :: SIZE
+        matrix(:, :) = 0.0          !<<<<<START !<<<<<END
+end subroutine

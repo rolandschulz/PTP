@@ -420,37 +420,6 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         return false;
     }
 
-    protected IASTListNode<? extends IASTNode> findEnclosingBodyNode(IFortranAST ast, ITextSelection selection)
-    {
-        Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
-        Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
-        if (firstToken == null || lastToken == null) return null;
-
-        IASTListNode<? extends IASTNode> bodyAtBeginning = this.findEnclosingBodyNode(firstToken);
-        IASTListNode<? extends IASTNode> bodyAtEnd = this.findEnclosingBodyNode(lastToken);
-        if (bodyAtBeginning == null || bodyAtEnd == null || bodyAtBeginning != bodyAtEnd) return null;
-
-        return bodyAtBeginning;
-    }
-    
-    private IASTListNode<? extends IASTNode> findEnclosingBodyNode(Token token)
-    {
-        ScopingNode scope = token.findNearestAncestor(ScopingNode.class);
-        return scope == null ? null : scope.getBody();
-    }
-
-//    private boolean isBodyNode(IASTNode currentNode)
-//    {
-//        return currentNode instanceof ASTBodyNode;
-//    }
-//
-//    private boolean isNestedBodyNode(IASTNode currentNode)
-//    {
-//        return isBodyNode(currentNode)
-//               && currentNode.getParent() != null
-//               && currentNode.getParent() instanceof ASTBodyNode;
-//    }
-
     private Token findFirstTokenAfter(IFortranAST ast, final int targetFileOffset)
     {
         for (Token token : new IterableWrapper<Token>(ast))
@@ -472,37 +441,90 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         return null;
     }
 
-//    protected static class StatementSequence
-//    {
-//        public ASTBodyNode body = null;
-//        public List<IBodyConstruct> statements = new ArrayList<IBodyConstruct>();
-//    }
-    
-    protected List<? extends IASTNode> findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
+    protected static class StatementSequence
     {
-        IASTListNode<? extends IASTNode> body = this.findEnclosingBodyNode(ast, selection);
-        if (body == null) return null;
-        
-        List<IASTNode> result = new ArrayList<IASTNode>();
-        
-        for (int i = 0; i < body.size(); i++)
+        public final ScopingNode enclosingScope;
+        public final IASTListNode<? extends IASTNode> listContainingStmts;
+        public final int startIndex;
+        public final int endIndex;
+        public final List<IASTNode> selectedStmts;
+
+        private StatementSequence(ScopingNode enclosingScope, IASTListNode<? extends IASTNode> body, int startIndex, int endIndex)
         {
-            IASTNode thisBodyConstruct = body.get(i);
+            this.enclosingScope = enclosingScope;
+            this.listContainingStmts = body;
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
             
-            Token firstToken = thisBodyConstruct.findFirstToken();
-            Token lastToken = thisBodyConstruct.findLastToken();
+//            this.precedingStmts = new ArrayList<IASTNode>();
+//            for (int i = 1; i < startIndex; i++)
+//                this.precedingStmts.add(body.get(i));
             
-            boolean containsStart = OffsetLength.contains(selection.getOffset(), selection.getLength(), firstToken.getFileOffset(), firstToken.getLength());
-            boolean containsEnd = OffsetLength.contains(selection.getOffset(), selection.getLength(), lastToken.getFileOffset(), lastToken.getLength());
+            this.selectedStmts = new ArrayList<IASTNode>();
+            for (int i = startIndex; i <= endIndex; i++)
+                this.selectedStmts.add(body.get(i));
             
-            if (containsStart != containsEnd) return null; // "You must select entire statements.");
-            
-            if (containsStart && containsEnd) result.add(thisBodyConstruct);
+//            this.followingStmts = new ArrayList<IASTNode>();
+//            for (int i = endIndex + 1; i < body.size(); i++)
+//                this.followingStmts.add(body.get(i));
         }
-        
-        return result;
+
+        public IASTNode firstStmt()
+        {
+            return selectedStmts.get(0);
+        }
     }
     
+    @SuppressWarnings("unchecked")
+    protected StatementSequence findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
+    {
+        Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
+        Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
+        if (firstToken == null || lastToken == null) return null;
+
+        IASTListNode<? extends IASTNode> listContainingFirstToken = firstToken.findNearestAncestor(IASTListNode.class);
+        IASTListNode<? extends IASTNode> listContainingLastToken = lastToken.findNearestAncestor(IASTListNode.class);
+        if (listContainingFirstToken == null || listContainingLastToken == null || listContainingFirstToken != listContainingLastToken) return null;
+
+        IASTListNode<? extends IASTNode> listContainingStmts = listContainingFirstToken;
+        int startIndex = -1;
+        int endIndex = -1;
+        for (int i = 0; i < listContainingStmts.size(); i++)
+        {
+            IASTNode node = listContainingStmts.get(i);
+            if (contains(node, firstToken))
+                startIndex = i;
+            if (contains(node, lastToken))
+                endIndex = i;
+        }
+        if (startIndex < 0 || endIndex < 0 || endIndex < startIndex)
+            throw new Error("INTERNAL ERROR: Unable to locate selected statements in IASTListNode");
+        
+        return new StatementSequence(
+            listContainingStmts.findNearestAncestor(ScopingNode.class),
+            listContainingStmts,
+            startIndex,
+            endIndex);
+    }
+
+//    private IASTListNode<? extends IASTNode> findEnclosingBodyNode(Token token)
+//    {
+//        ScopingNode scope = token.findNearestAncestor(ScopingNode.class);
+//        return scope == null ? null : scope.getBody();
+//    }
+//
+//    private boolean isBodyNode(IASTNode currentNode)
+//    {
+//        return currentNode instanceof ASTBodyNode;
+//    }
+//
+//    private boolean isNestedBodyNode(IASTNode currentNode)
+//    {
+//        return isBodyNode(currentNode)
+//               && currentNode.getParent() != null
+//               && currentNode.getParent() instanceof ASTBodyNode;
+//    }
+
     protected int findIndexToInsertTypeDeclaration(IASTListNode<? extends IASTNode> body)
     {
         IASTNode node = null;

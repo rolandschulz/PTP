@@ -409,11 +409,11 @@
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand">
       </command>
-      <!--command
+      <command
             name="Extract Procedure"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
-      </command-->
+      </command>
       <!--command
             name="Extract Local Variable"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
@@ -439,12 +439,12 @@
    <!-- 2. Optionally associate the command with an accelerator key -->
    <extension
          point="org.eclipse.ui.bindings">
-     <!--key
+     <key
             sequence="M3+M2+M"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
-     /-->
+     />
      <!--key
             sequence="M3+M2+L"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -485,49 +485,48 @@
             <separator name="typeGroup"/>
             <separator name="codingGroup"/>
          </menu>
+         <action
+               label="Replace Obsolete Operators"
+               definitionId="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>               
          <!--action 
                label="Extract Common Block to &amp;Module"
                definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand" 
                class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup" 
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup" 
                id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
          <action
-               label="&amp;Move Saved Variables to Common Block (Fortran)..."
+               label="&amp;Move Saved Variables to Common Block..."
                definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>         
-         <!--action
+         <action
                label="E&amp;xtract Procedure..."
                definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
-               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/-->
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
+               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
          <!--action
-               label="Extract &amp;Local Variable (Fortran)..."
+               label="Extract &amp;Local Variable..."
                definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
                id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
          <action
-               label="&amp;Introduce Implicit None (Fortran)"
+               label="&amp;Introduce Implicit None"
                definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
                id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
          <action
-               label="Re&amp;name (Fortran)..."
+               label="Re&amp;name..."
                definitionId="org.eclipse.photran.ui.RenameRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-          <action
-               label="Replace Obsolete Operators (Fortran)"
-               definitionId="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>               
-               
       </actionSet>
    </extension>
    <!--extension
@@ -552,42 +551,44 @@
                id="org.eclipse.photran.ui.RefactoringMenu"
                label="Refac&amp;tor"
                path="group.reorganize"><!-- See IContextMenuConstants -->
-            <separator name="refactorings"/>
+            <separator name="reorgGroup"/>
+            <separator name="typeGroup"/>
+            <separator name="codingGroup"/>
          </menu>
-         <!--action 
-               label="Extract Common Block to &amp;Module" 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
-               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
-         <!--action 
-               label="E&amp;xtract Procedure..." 
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
-               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/-->
-         <!--action 
-               label="Extract &amp;Local Variable..." 
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
-               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
-         <action 
-               label="&amp;Move Saved Variables to Global Common Block..." 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
          <action 
                label="Replace Obsolete &amp;Operators" 
                class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
                id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>      
+         <!--action 
+               label="Extract Common Block to &amp;Module" 
+               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
+               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
+         <action 
+               label="&amp;Move Saved Variables to Global Common Block..." 
+               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
+               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
+         <action 
+               label="E&amp;xtract Procedure..." 
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
+               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
+         <!--action 
+               label="Extract &amp;Local Variable..." 
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
+               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
          <action 
                label="&amp;Introduce Implicit None" 
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup" 
                id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
          <action 
                label="&amp;Rename..." 
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
                
       </viewerContribution>
@@ -625,13 +626,13 @@
       	    <separator name="group1"/>
       	</menu>
         <action
-            label="Replace Obsolete Operators (Fortran)"
+            label="Replace Obsolete Operators"
             menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
             class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
             id="org.eclipse.photran.ui.RepObsOpersFileRefactoringAction">
         </action>
         <action
-            label="Introduce Implicit None (Fortran)"
+            label="Introduce Implicit None"
             menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
             class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
             id="org.eclipse.photran.ui.IntroImplicitNoneFileRefactoringAction">
