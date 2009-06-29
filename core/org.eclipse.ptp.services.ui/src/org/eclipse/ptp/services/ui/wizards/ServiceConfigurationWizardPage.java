@@ -21,6 +21,8 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.ui.IServiceProviderContributor;
+import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -107,7 +109,10 @@ public class ServiceConfigurationWizardPage extends WizardPage {
 		fChildWizard = null; // need to set fChildWizard to null so we get the next service configuration page
 		if (!provider.isConfigured()) {
 			IWizardPage page = getNextPage();
-			fChildWizard = new ServiceProviderConfigurationWizard(config, provider, page);
+			IServiceProviderContributor contrib = ServiceModelUIManager.getInstance().getServiceProviderContributor(provider);
+			if (contrib != null) {
+				fChildWizard = contrib.getWizard(provider, page);
+			}
 		}
 		setPageComplete(true);
 	}

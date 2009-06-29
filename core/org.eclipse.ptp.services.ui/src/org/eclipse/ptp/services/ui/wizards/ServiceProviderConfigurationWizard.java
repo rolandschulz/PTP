@@ -20,34 +20,40 @@ package org.eclipse.ptp.services.ui.wizards;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 
 public class ServiceProviderConfigurationWizard extends Wizard {
 
-	private final IWizardPage fFinalPage;
+	private final IWizardPage fPageLink;
+	private final IServiceProvider fProvider;
 	
 	/**
 	 * Create wizard with pages from a single service provider.
 	 * 
-	 * NOTE: The service provider MUST provide a configuration that supports the wizard.
-	 * 
-	 * @param serviceConfiguration service configuration this wizard is for
 	 * @param provider service provider we are configuring
-	 * @param page next ServiceConfigurationWizardPage if we are being called by a ServiceConfigurationWizard, null otherwise
+	 * @param page next ServiceConfigurationWizardPage if we are being called by a ServiceConfigurationWizard, or null otherwise
 	 */
-	public ServiceProviderConfigurationWizard(IServiceConfiguration serviceConfiguration, IServiceProvider provider, IWizardPage page) {
+	public ServiceProviderConfigurationWizard(IServiceProvider provider, IWizardPage page) {
+		fProvider = provider;
+		fPageLink = page;
 		setForcePreviousAndNextButtons(true);
-		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderContributor(provider);
-		if (config != null) {
-			setWizardPages(config.getWizardPages(provider));
-		}
-		fFinalPage = page;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#addPages()
+	 */
+	@Override
+	public void addPages() {
+		IServiceProviderContributor contrib = ServiceModelUIManager.getInstance().getServiceProviderContributor(fProvider);
+		if (contrib != null) {
+			for (IWizardPage page : contrib.getWizardPages(fProvider)) {
+				addPage(page);
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#getNextPage(org.eclipse.jface.wizard.IWizardPage)
 	 */
@@ -55,18 +61,15 @@ public class ServiceProviderConfigurationWizard extends Wizard {
 	public IWizardPage getNextPage(IWizardPage page) {
 		IWizardPage nextPage = super.getNextPage(page);
 		if (nextPage == null) {
-			return fFinalPage;
+			return fPageLink;
 		}
 		return nextPage;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
+	 */
 	public boolean performFinish() {
 		return true;
-	}
-
-	private void setWizardPages(WizardPage[] pages) {
-		for (IWizardPage page : pages) {
-			addPage(page);
-		}
 	}
 }

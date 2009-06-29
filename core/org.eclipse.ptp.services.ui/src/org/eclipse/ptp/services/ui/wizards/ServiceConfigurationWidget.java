@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
@@ -102,7 +103,8 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 			TableItem item = selection[0];
 			IServiceProvider provider = (IServiceProvider) item.getData(PROVIDER_KEY);
 
-			ServiceProviderConfigurationWizard wizard = new ServiceProviderConfigurationWizard(getServiceConfiguration(), provider, null);
+			IServiceProviderContributor contrib = ServiceModelUIManager.getInstance().getServiceProviderContributor(provider);
+			IWizard wizard = contrib.getWizard(provider, null);
 			WizardDialog dialog = new WizardDialog(getShell(), wizard);
 			dialog.open();
 			
@@ -460,7 +462,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	 * @param enabled
 	 */
 	protected void updateConfigureButton(IServiceProviderDescriptor descriptor) {
-		IServiceProviderContributor config = ServiceModelUIManager.getInstance().getServiceProviderContributor(descriptor);
-		fConfigureButton.setEnabled(config != null);
+		IServiceProviderContributor contrib = ServiceModelUIManager.getInstance().getServiceProviderContributor(descriptor);
+		fConfigureButton.setEnabled(contrib != null);
 	}
 }
