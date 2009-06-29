@@ -86,7 +86,7 @@ public class Reindenter
 
 	private String determineIndent(Token firstTokenBelow)
 	{
-		String indent = firstTokenBelow.getWhiteBefore();
+		String indent = firstTokenBelow == null ? "" : firstTokenBelow.getWhiteBefore();
         if (indent == null) indent = "";
         int lastCR = indent.lastIndexOf('\n');
         if (lastCR >= 0) indent = indent.substring(lastCR + 1);
