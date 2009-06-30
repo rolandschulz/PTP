@@ -41,10 +41,13 @@ import org.eclipse.photran.internal.core.parser.IBindEntity;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
+ * Phase 4 of name-binding analysis.
+ * <p> 
  * Visits specification statements in an AST, updating the corresponding
- * Definitions in the VPG.
+ * {@link Definition} objecs stored in the VPG.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 class SpecificationCollector extends VisibilityCollector
 {

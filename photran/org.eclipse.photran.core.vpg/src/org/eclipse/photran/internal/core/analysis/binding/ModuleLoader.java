@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
@@ -30,6 +31,8 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**
+ * Phase 5 of name-binding analysis.
+ * <p> 
  * Visits USE statements in an AST, marking a dependency in the VPG,
  * locating the used module, and importing declarations from it.
  * <p>
@@ -37,6 +40,7 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
  * project properties), which are applied when locating the module.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 public class ModuleLoader extends VisibilityCollector
 {
@@ -87,13 +91,13 @@ public class ModuleLoader extends VisibilityCollector
 	private Token moduleNameToken;
 	private String moduleName;
 
-	public ModuleLoader(IFile fileContainingUseStmt, IProgressMonitor progressMonitor)
+	public ModuleLoader(IFile fileContainingUseStmt /*, IProgressMonitor progressMonitor*/)
 	{
 		this.vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
 
 		this.shouldImportModules = true;
 		this.fileContainingUseStmt = fileContainingUseStmt;
-		this.progressMonitor = progressMonitor;
+		this.progressMonitor = new NullProgressMonitor(); //progressMonitor;
 	}
 	
     // # R1107

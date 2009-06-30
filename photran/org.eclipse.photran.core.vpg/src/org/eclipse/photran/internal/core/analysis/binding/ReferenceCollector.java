@@ -89,12 +89,15 @@ import org.eclipse.photran.internal.core.parser.ASTWaitStmtNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
+ * Phase 6 of name-binding analysis.
+ * <p> 
  * Visits an AST, collecting variables references outside declaration and
  * specification statements.
  * <p>
  * Note: Fields in derived types (e.g., <FieldSelector>) and named function arguments are NOT handled.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 class ReferenceCollector extends BindingCollector
 {

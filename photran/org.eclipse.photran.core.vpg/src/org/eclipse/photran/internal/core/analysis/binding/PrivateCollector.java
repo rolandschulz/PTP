@@ -14,11 +14,14 @@ import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 
 /**
+ * Phase 2 of name-binding analysis.
+ * <p> 
  * Visits an AST, marking scopes whose default visibilities are PRIVATE
  * so that this will be known when the {@link DefinitionCollector}
  * begins collecting declarations.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 class PrivateCollector extends BindingCollector
 {

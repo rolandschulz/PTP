@@ -5,10 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.lexer.Token;
 
+/**
+ * Performs name-binding analysis on a Fortran file, storing the results in the VPG.
+ * <p>
+ * This class should only be invoked by {@link PhotranVPGBuilder}; clients should use
+ * {@link Token#resolveBinding()} and related methods to look up binding information.
+ * 
+ * @author Jeff Overbey
+ */
 public class Binder
 {
     private Binder() {}
@@ -21,38 +30,31 @@ public class Binder
 
     public static void bind(IFortranAST ast, IFile file)
     {
-        String filename = file.getName();
+        // Name-binding analysis                    Logging/timing
+        // =======================================  ===========================================================
+        PhotranVPG vpg = PhotranVPG.getInstance();  String filename = file.getName();
+                                                    StringBuilder sb = new StringBuilder("  - Binder#bind: ");
         
-        StringBuilder sb = new StringBuilder("  - Binder#bind: ");
+                                                    long start = System.currentTimeMillis();
+        ast.accept(new ImplicitSpecCollector());    logTime(start, ImplicitSpecCollector.class, filename);
         
-        long start = System.currentTimeMillis();
-        ast.accept(new ImplicitSpecCollector());
-        logTime(start, ImplicitSpecCollector.class, filename);
+                                                    start = System.currentTimeMillis();
+        ast.accept(new PrivateCollector());         logTime(start, PrivateCollector.class, filename);
         
-        start = System.currentTimeMillis();
-        ast.accept(new PrivateCollector());
-        logTime(start, PrivateCollector.class, filename);
+                                                    start = System.currentTimeMillis();
+        ast.accept(new DefinitionCollector(file));  logTime(start, DefinitionCollector.class, filename);
         
-        start = System.currentTimeMillis();
-        ast.accept(new DefinitionCollector(file));
-        logTime(start, DefinitionCollector.class, filename);
+                                                    start = System.currentTimeMillis();
+        ast.accept(new SpecificationCollector());   logTime(start, SpecificationCollector.class, filename);
         
-        start = System.currentTimeMillis();
-        ast.accept(new SpecificationCollector());
-        logTime(start, SpecificationCollector.class, filename);
-        
-        start = System.currentTimeMillis();
-        ast.accept(new ModuleLoader(file, new NullProgressMonitor()));
+                                                    start = System.currentTimeMillis();
+        ast.accept(new ModuleLoader(file));         logTime(start, ModuleLoader.class, filename);
         // TODO: Type check here so derived type components can be resolved
-        logTime(start, ModuleLoader.class, filename);
-        
-        start = System.currentTimeMillis();
-        PhotranVPG.getInstance().enableDefinitionCaching();
+                                                    start = System.currentTimeMillis();
+        vpg.enableDefinitionCaching();
         ast.accept(new ReferenceCollector());
-        PhotranVPG.getInstance().disableDefinitionCaching();
-        logTime(start, ReferenceCollector.class, filename);
-        
-        PhotranVPG.getInstance().debug(sb.toString(), "");
+        vpg.disableDefinitionCaching();             logTime(start, ReferenceCollector.class, filename);
+                                                    vpg.debug(sb.toString(), "");
     }
 
     private static void logTime(long start, Class<?> clazz, String filename)
