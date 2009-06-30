@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.lexer;
+package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,9 +20,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
+import org.eclipse.photran.internal.core.lexer.LineInputStream;
 
 /**
- * An <code>InputStream</code> that recognizes and processes Fortran INCLUDE lines. 
+ * An <code>InputStream</code> that recognizes and processes Fortran INCLUDE lines.
+ * <p> 
+ * This class implements an {@link InputStream} the provides the contents of a
+ * Fortran file <i>after</i> INCLUDE lines have been processed.  Photran's
+ * machine-constructed, free-form lexer ({@link FreeFormLexerPhase1}) tokenizes
+ * this InputStream, oblivious to the fact that it is actually tokenizing
+ * preprocessed text.  However, a special subclass
+ * ({@link PreprocessingFreeFormLexerPhase1}) takes care of mapping the
+ * preprocessed tokens back to their images and locations in the original files.
+ * This is done by invoking the various public methods provided by this class
+ * ({@link #getDirectiveAtOffset(int)}, {@link #getFilenameAtOffset(int)},
+ * and several others); the lexer provides an offset in the preprocessed stream,
+ * and those methods provide the INCLUDE line (if any) that was active at that
+ * offset, or the filename from which the text at that offset came, etc.  
  * 
  * @author Jeff Overbey
  */

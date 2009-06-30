@@ -8,15 +8,29 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.lexer;
+package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.photran.internal.core.lexer.ASTTokenFactory;
+import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
+import org.eclipse.photran.internal.core.lexer.LexerException;
+import org.eclipse.photran.internal.core.lexer.LineAppendingInputStream;
+import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.TokenFactory;
 
 /**
  * Phase 1 lexer that handles Fortran INCLUDE directives.
+ * <p>
+ * This class feeds {@link FreeFormLexerPhase1} with a {@link FortranPreprocessor},
+ * an {@link InputStream} that expands Fortran INCLUDE lines.
+ * {@link FreeFormLexerPhase1} tokenizes the preprocessed stream.  However, this
+ * class subclasses {@link FreeFormLexerPhase1} and overrides its tokenization
+ * method ({@link #yylex()}), so when it produces a token, it can reset the
+ * filename, line number, file offset, and guarding preprocessor directive
+ * (INCLUDE line) correctly. 
  * 
  * @author Jeff Overbey
  */

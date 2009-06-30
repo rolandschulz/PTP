@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.lexer;
+package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
