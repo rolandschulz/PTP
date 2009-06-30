@@ -39,6 +39,8 @@
       <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.ptp.utils.ui"/>
+      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
