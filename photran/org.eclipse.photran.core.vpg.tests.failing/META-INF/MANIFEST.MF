@@ -10,4 +10,4 @@ Require-Bundle: org.eclipse.photran.core.vpg.tests,
  org.eclipse.photran.core.vpg,
  org.eclipse.cdt.core,
  org.eclipse.cdt.core.tests,
- org.eclipse.jface;bundle-version="3.4.2"
+ org.eclipse.jface

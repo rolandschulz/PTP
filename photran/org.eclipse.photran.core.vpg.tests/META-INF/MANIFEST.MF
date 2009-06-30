@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.photran.core.vpg,
  org.eclipse.jface.text,
  org.junit,
  org.eclipse.cdt.core,
- org.eclipse.jface;bundle-version="3.4.2"
+ org.eclipse.jface
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.photran.refactoring.tests.Activator
 Export-Package: org.eclipse.photran.internal.core.tests,
