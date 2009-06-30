@@ -29,15 +29,17 @@
       <import plugin="org.eclipse.search"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.ptp.remote.core"/>
       <import plugin="org.eclipse.ptp.rm.remote"/>
       <import plugin="org.eclipse.ptp.proxy.protocol"/>
       <import plugin="org.eclipse.ptp.proxy"/>
       <import plugin="org.eclipse.ptp.utils"/>
       <import plugin="org.eclipse.ptp.ui"/>
       <import plugin="org.eclipse.ptp.launch"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
       <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
