@@ -14,10 +14,11 @@ import java.util.ArrayList;
 
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenList;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
@@ -76,21 +77,51 @@ public class Reindenter
     private Reindenter(Token firstTokenInRegion, Token lastTokenInRegion, IFortranAST ast)
     {
         // Recompute TokenList so that line number-based searches will be correct
+        this.lineNumOfLastTokenInAST = recomputeLineColInfo(ast.getRoot());
         this.ast = new FortranAST(ast.getFile(), ast.getRoot(), new TokenList(ast.getRoot()));
-        this.lineNumOfLastTokenInAST = recomputeLineColInfo();
         
         if (firstTokenInRegion != null && lastTokenInRegion != null)
             ast.accept(new ReindentingVisitor(firstTokenInRegion, lastTokenInRegion));
     }
 
-    private int recomputeLineColInfo()
+    private int recomputeLineColInfo(ASTExecutableProgramNode astRoot)
     {
         LineColComputer lcc = new LineColComputer();
-        ast.accept(lcc);
+        astRoot.accept(lcc);
         return lcc.line; // line number of last token
     }
 
-    private final class ReindentingVisitor extends ASTVisitor
+    private final class LineColComputer extends ASTVisitorWithLoops
+    {
+        private int streamOffset = 0, line = 1, col = 1;
+
+        @Override public void visitToken(Token token)
+        {
+            consider(token.getWhiteBefore());
+            token.setStreamOffset(streamOffset);
+            token.setLine(line);
+            token.setCol(col);
+            consider(token.getText());
+            consider(token.getWhiteAfter());
+        }
+
+        private void consider(String s)
+        {
+            for (int i = 0, len = s.length(); i < len; i++)
+            {
+                streamOffset++;
+                
+                if (s.charAt(i) == '\n')
+                {
+                    line++;
+                    col = 1;
+                }
+                else col++;
+            }
+        }
+    }
+
+    private final class ReindentingVisitor extends ASTVisitorWithLoops
     {
         private final Token firstTokenInRegion;
         private final Token lastTokenInRegion;
@@ -214,33 +245,6 @@ public class Reindenter
             
             newIndentation += addIndent;
             return newIndentation;
-        }
-    }
-
-    private final class LineColComputer extends ASTVisitor
-    {
-        private int line = 1, col = 1;
-
-        @Override public void visitToken(Token token)
-        {
-            update(token.getWhiteBefore());
-            token.setLine(line);
-            token.setCol(col);
-            update(token.getText());
-            update(token.getWhiteAfter());
-        }
-
-        private void update(String s)
-        {
-            for (int i = 0, len = s.length(); i < len; i++)
-            {
-                if (s.charAt(i) == '\n')
-                {
-                    line++;
-                    col = 1;
-                }
-                else col++;
-            }
         }
     }
     

@@ -25,6 +25,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.loops.GenericASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
@@ -36,7 +37,6 @@ import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
@@ -168,7 +168,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     private Set<Definition> localVariablesUsedIn(IASTNode node)
     {
         final Set<Definition> result = new HashSet<Definition>();
-        node.accept(new GenericASTVisitor()
+        node.accept(new GenericASTVisitorWithLoops()
         {
             @Override public void visitToken(Token token)
             {
@@ -371,6 +371,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         
         IBodyConstruct callStmt = parseLiteralStatement(sb.toString());
         ((IASTListNode)selection.listContainingStmts).insertBefore(selection.firstStmt(), callStmt);
+        callStmt.setParent(selection.listContainingStmts);
         Reindenter.reindent(callStmt, this.astOfFileInEditor);
     }
 

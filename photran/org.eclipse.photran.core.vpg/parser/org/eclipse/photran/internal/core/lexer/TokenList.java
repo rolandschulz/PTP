@@ -12,8 +12,8 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.util.Iterator;
 
+import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
  * Maintains a list of all of the tokens in a program, allowing them to be
@@ -35,7 +35,7 @@ public class TokenList
     public TokenList(ASTExecutableProgramNode ast)
     {
     	this();
-    	ast.accept(new ASTVisitor()
+    	ast.accept(new ASTVisitorWithLoops()
     	{
 			public void visitToken(Token token)
 			{
@@ -159,9 +159,9 @@ public class TokenList
         return array[index];
     }
 
-    public Iterator/*<Token>*/ iterator()
+    public Iterator<Token> iterator()
     {
-        return new Iterator/*<Token>*/()
+        return new Iterator<Token>()
         {
             int index = 0;
             
@@ -170,7 +170,7 @@ public class TokenList
                 return index < size;
             }
 
-            public Object next()
+            public Token next()
             {
                 return index < size ? array[index++] : null;
             }
