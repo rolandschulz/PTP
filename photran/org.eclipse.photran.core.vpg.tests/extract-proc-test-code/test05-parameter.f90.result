@@ -9,5 +9,5 @@ subroutine new_procedure(matrix, SIZE)
     implicit none
     real :: matrix(SIZE, SIZE)
     integer :: SIZE
-        matrix(:, :) = 0.0          !<<<<<START !<<<<<END
+    matrix(:, :) = 0.0          !<<<<<START !<<<<<END
 end subroutine

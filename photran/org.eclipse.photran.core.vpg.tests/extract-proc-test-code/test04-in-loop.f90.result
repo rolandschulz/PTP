@@ -9,8 +9,8 @@ end subroutine
 subroutine new_procedure(i)
     implicit none
     integer :: i
-       print *, i                   !<<<<<START
-       if (i .gt. 3) then
-         print *, i * 10
-       end if                       !<<<<<END
+    print *, i                   !<<<<<START
+    if (i .gt. 3) then
+      print *, i * 10
+    end if                       !<<<<<END
 end subroutine

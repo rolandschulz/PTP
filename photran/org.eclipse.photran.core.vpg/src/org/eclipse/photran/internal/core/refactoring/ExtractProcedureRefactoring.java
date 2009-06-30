@@ -61,6 +61,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     public ExtractProcedureRefactoring(IFile file, ITextSelection selection)
     {
         super(file, selection);
+        //System.out.println(this.fileInEditor.getName());
     }
     
     @Override
@@ -273,6 +274,45 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
             throw new IllegalStateException();
     }
 
+    @SuppressWarnings("unchecked")
+    private ASTSubroutineSubprogramNode insertAfterEnclosingSubprogram(ASTSubroutineSubprogramNode newSubroutine)
+    {
+        ScopingNode enclosingSubprogram = selection.enclosingScope;
+        
+        IASTNode parent = enclosingSubprogram.getParent();
+        if (!(parent instanceof IASTListNode))
+            throw new Error("INTERNAL ERROR: Subprogram parent is not IASTListNode");
+        
+        ((IASTListNode)parent).insertAfter(enclosingSubprogram, newSubroutine);
+        
+        Reindenter.reindent(newSubroutine, this.astOfFileInEditor);
+
+        return newSubroutine;
+    }
+
+    private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(ASTMainProgramNode program, ASTSubroutineSubprogramNode subprogram)
+    {
+        if (program.getContainsStmt() == null)
+        {
+            ASTContainsStmtNode containsStmt = createContainsStmt();
+            program.setContainsStmt(containsStmt);
+            containsStmt.setParent(program);
+        }
+        
+        if (program.getInternalSubprograms() == null)
+        {
+            ASTListNode<IInternalSubprogram> internals = new ASTListNode<IInternalSubprogram>();
+            program.setInternalSubprograms(internals);
+            internals.setParent(program);
+        }
+        
+        program.getInternalSubprograms().add(subprogram);
+        
+        Reindenter.reindent(subprogram, this.astOfFileInEditor);
+
+        return subprogram;
+    }
+
     private String parameterList()
     {
         StringBuilder sb = new StringBuilder();
@@ -321,45 +361,6 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     }
 
     @SuppressWarnings("unchecked")
-    private ASTSubroutineSubprogramNode insertAfterEnclosingSubprogram(ASTSubroutineSubprogramNode newSubroutine)
-    {
-        ScopingNode enclosingSubprogram = selection.enclosingScope;
-        
-        IASTNode parent = enclosingSubprogram.getParent();
-        if (!(parent instanceof IASTListNode))
-            throw new Error("INTERNAL ERROR: Subprogram parent is not IASTListNode");
-        
-        ((IASTListNode)parent).insertAfter(enclosingSubprogram, newSubroutine);
-        
-        Reindenter.reindent(newSubroutine, this.astOfFileInEditor);
-
-        return newSubroutine;
-    }
-
-    private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(ASTMainProgramNode program, ASTSubroutineSubprogramNode subprogram)
-    {
-        if (program.getContainsStmt() == null)
-        {
-            ASTContainsStmtNode containsStmt = createContainsStmt();
-            program.setContainsStmt(containsStmt);
-            containsStmt.setParent(program);
-        }
-        
-        if (program.getInternalSubprograms() == null)
-        {
-            ASTListNode<IInternalSubprogram> internals = new ASTListNode<IInternalSubprogram>();
-            program.setInternalSubprograms(internals);
-            internals.setParent(program);
-        }
-        
-        program.getInternalSubprograms().add(subprogram);
-        
-        Reindenter.reindent(subprogram, this.astOfFileInEditor);
-
-        return subprogram;
-    }
-
-    @SuppressWarnings("unchecked")
     private void insertSubroutineCall()
     {
         StringBuilder sb = new StringBuilder();
@@ -382,11 +383,8 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
             stmt.removeFromTree();
             newSubprogram.getBody().add((IBodyConstruct)stmt);
             stmt.setParent(newSubprogram.getBody());
-        
-            // TODO: This doesn't work quite right
-            // But since we're inserting the new subroutine as a sibling of the
-            // old one, the indentation is probably right, so we can get by without it
-            //Reindenter.reindent(stmt, this.astOfFileInEditor);
         }
+        
+        Reindenter.reindent(selection.firstToken(), selection.lastToken(), this.astOfFileInEditor);
     }
 }

@@ -17,7 +17,6 @@ import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 
 /**
@@ -27,11 +26,13 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
  */
 public class FortranAST implements IFortranAST
 {
+    private IFile file;
     private ASTExecutableProgramNode root;
     private TokenList tokenList;
     
     public FortranAST(IFile file, ASTExecutableProgramNode root, TokenList tokenList)
     {
+        this.file = file;
         this.root = root;
         this.tokenList = tokenList;
         
@@ -43,6 +44,11 @@ public class FortranAST implements IFortranAST
     public void accept(IASTVisitor visitor)
     {
         root.accept(visitor);
+    }
+    
+    public IFile getFile()
+    {
+        return file;
     }
     
     public ASTExecutableProgramNode getRoot()
@@ -112,5 +118,11 @@ public class FortranAST implements IFortranAST
     {
         // Binary Search
         return tokenList.findFirstTokenOnLine(line);
+    }
+    
+    public Token findLastTokenOnLine(int line)
+    {
+        // Binary Search
+        return tokenList.findLastTokenOnLine(line);
     }
 }

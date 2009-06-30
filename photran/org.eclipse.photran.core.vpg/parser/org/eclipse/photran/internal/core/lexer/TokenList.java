@@ -149,6 +149,15 @@ public class TokenList
         }
         return -1;
     }
+    
+    public Token findLastTokenOnLine(int line)
+    {
+        int index = findIndexOfAnyTokenOnLine(line);
+        if (index < 0) return null;
+        while (index+1 < array.length && array[index+1].getLine() == line)
+            index++;
+        return array[index];
+    }
 
     public Iterator/*<Token>*/ iterator()
     {

@@ -481,6 +481,21 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         {
             return selectedStmts.get(0);
         }
+
+        public Token firstToken()
+        {
+            return firstStmt().findFirstToken();
+        }
+
+        public IASTNode lastStmt()
+        {
+            return selectedStmts.get(selectedStmts.size()-1);
+        }
+
+        public Token lastToken()
+        {
+            return lastStmt().findLastToken();
+        }
     }
     
     @SuppressWarnings("unchecked")
