@@ -22,7 +22,6 @@ import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.IObsoleteActionStmt;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
@@ -93,7 +92,7 @@ public class LoopReplacer
         return nodeBuilder.result;
     }
     
-    private class ASTProperLoopConstructBuilder extends GenericASTVisitor
+    private class ASTProperLoopConstructBuilder extends ASTVisitorWithLoops
     {
         private ASTProperLoopConstructNode result = new ASTProperLoopConstructNode();
         private boolean loopHeaderFound = false;
@@ -109,6 +108,8 @@ public class LoopReplacer
         {
             if (node == this.result.loopHeader)
                 loopHeaderFound = true;
+            
+            traverseChildren(node);
         }
 
         // Accumulate all statements between the loop header and the END DO stmt
@@ -158,11 +159,18 @@ public class LoopReplacer
         {
             if (loopHeaderFound && !endDoStmtFound() && !(node.getParent() instanceof ASTProperLoopConstructNode))
                 this.result.endDoStmt = node;
+            
+            traverseChildren(node);
         }
 
         private boolean endDoStmtFound()
         {
             return this.result.endDoStmt != null;
+        }
+        
+        @Override public void visitASTProperLoopConstructNode(ASTProperLoopConstructNode node)
+        {
+            // Do not traverse child statements of nested loops
         }
     }
 
