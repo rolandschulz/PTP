@@ -33,6 +33,8 @@ public final class FortranPreferences
 {
     public static final FortranBooleanPreference ENABLE_VPG_LOGGING = new FortranBooleanPreference("vpglogging", false);
     public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false);
+    public static final FortranBooleanPreference ENABLE_FIXED_FORM_FOLDING = new FortranBooleanPreference("fixedfolding", false);
+    public static final FortranBooleanPreference ENABLE_FREE_FORM_FOLDING = new FortranBooleanPreference("freefolding", false);
 
     public static final FortranRGBPreference COLOR_COMMENTS    = new FortranRGBPreference("comments",    new RGB(63,  127, 95 ));
     public static final FortranRGBPreference COLOR_IDENTIFIERS = new FortranRGBPreference("identifiers", new RGB(0,   0,   192));

@@ -10,8 +10,14 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.preferences;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 /**
  * Fortran Editor preference page
@@ -20,9 +26,18 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  */
 public class EditorPreferencePage extends AbstractFortranPreferencePage
 {
-    ColorFieldEditor cx, sx;
     protected void createFieldEditors()
     {
+        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FREE_FORM_FOLDING.getName(),
+                                        "Enable folding rather than ruler in free-form Fortran editors",
+                                        getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FIXED_FORM_FOLDING.getName(),
+                                        "Enable folding rather than ruler in fixed-form Fortran editors",
+                                        getFieldEditorParent()));
+        
+        addField(new Separator(getFieldEditorParent()));
+        
         addField(new ColorFieldEditor(FortranPreferences.COLOR_COMMENTS.getName(),
                                       "Comments",
                                       getFieldEditorParent()));
@@ -32,11 +47,41 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         addField(new ColorFieldEditor(FortranPreferences.COLOR_INTRINSICS.getName(),
                                       "Intrinsics",
                                       getFieldEditorParent()));
-        addField(cx=new ColorFieldEditor(FortranPreferences.COLOR_KEYWORDS.getName(),
+        addField(new ColorFieldEditor(FortranPreferences.COLOR_KEYWORDS.getName(),
                                       "Keywords",
                                       getFieldEditorParent()));
-        addField(sx=new ColorFieldEditor(FortranPreferences.COLOR_STRINGS.getName(),
+        addField(new ColorFieldEditor(FortranPreferences.COLOR_STRINGS.getName(),
                                       "Strings",
                                       getFieldEditorParent()));
+    }
+    
+    private static class Separator extends FieldEditor
+    {
+        private Label label;
+        
+        public Separator(Composite parent)
+        {
+            this.createControl(parent);
+        }
+        
+        protected void adjustForNumColumns(int numColumns)
+        {
+            ((GridData)label.getLayoutData()).horizontalSpan = 2;
+        }
+
+        protected void doFillIntoGrid(Composite parent, int numColumns)
+        {
+            label = new Label(parent, SWT.SEPARATOR);
+            label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns, 1));
+        }
+
+        public int getNumberOfControls()
+        {
+            return 1;
+        }
+        
+        protected void doLoad() {}
+        protected void doLoadDefault() {}
+        protected void doStore() {}
     }
 }

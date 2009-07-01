@@ -11,6 +11,7 @@
 package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -34,6 +35,11 @@ public class FreeFormFortranEditor extends AbstractFortranEditor
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Custom Ruler
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected boolean shouldDisplayHorizontalRulerRatherThanFolding()
+    {
+        return FortranPreferences.ENABLE_FREE_FORM_FOLDING.getValue() == false;
+    }
 
     protected FortranHorizontalRuler getFortranHorizontalRuler(Composite mainComposite)
     {

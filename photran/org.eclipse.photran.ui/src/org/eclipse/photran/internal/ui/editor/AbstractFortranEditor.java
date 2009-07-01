@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -32,7 +35,12 @@ import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
+import org.eclipse.jface.text.source.projection.ProjectionSupport;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -69,6 +77,7 @@ import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
  * Base class for the fixed and free-form Fortran editors
  * 
  * @author Jeff Overbey
+ * @author Kurt Hendle - folding support
  */
 public abstract class AbstractFortranEditor extends CDTBasedTextEditor implements ISelectionChangedListener
 {
@@ -104,6 +113,8 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     protected Color verticalLineColor;
     protected boolean contentTypeMismatch;
     
+    // More fields in Folding, below
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,6 +157,106 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
             checkForContentTypeMismatch((FileEditorInput)input);
     }
 
+    public void createPartControl(Composite parent)
+    {
+        super.createPartControl(parent);
+
+        if (shouldDisplayHorizontalRulerRatherThanFolding())
+        {
+            Composite childComp = (Composite)((Composite) parent.getChildren()[0]).getChildren()[0];
+            GridLayout layout = new GridLayout();
+            layout.marginHeight = 0;
+            layout.marginWidth = 0;
+            layout.verticalSpacing = 2;
+            childComp.setLayout(layout);
+
+            GridData data = new GridData(GridData.FILL_BOTH);
+            childComp.getChildren()[0].setLayoutData(data);
+
+            fMainComposite = childComp;
+
+            createHorizontalRuler(fMainComposite);
+        }
+        else
+        {
+            installProjectionSupport();
+        }
+        
+        createLightGrayLines();
+        
+        addWatermark(parent);
+    }
+    
+    /*
+     * TODO: The code above for drawing a horizontal ruler doesn't work when projection support
+     * (folding) is enabled, since it uses a ProjectionViewer and the ugly "childComp = ..."
+     * needs to change somehow.  In the mean time, we'll enable the ruler in the fixed-form
+     * editor and folding in the free-form editor.
+     */
+    protected abstract boolean shouldDisplayHorizontalRulerRatherThanFolding();
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Editor Folding
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    
+    //protected ProjectionSupport projectionSupport;
+    //protected Annotation[] oldAnnotations;
+    protected ProjectionAnnotationModel annotationModel;
+
+    protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles)
+    {
+        //fAnnotationAccess = createAnnotationAccess();
+        //fOverviewRuler = createOverviewRuler(getSharedColors());
+        
+        ISourceViewer sourceViewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
+
+        getSourceViewerDecorationSupport(sourceViewer); // Ensure decoration support has been created and configured
+    
+        return sourceViewer;
+    }
+    
+    private void installProjectionSupport()
+    {
+        ProjectionViewer viewer =(ProjectionViewer)getSourceViewer();
+        
+        ProjectionSupport projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors());
+        projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.error");
+        projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.warning");
+        projectionSupport.install();
+        
+        viewer.doOperation(ProjectionViewer.TOGGLE); // Turn projection mode on
+        
+        annotationModel = viewer.getProjectionAnnotationModel();
+    }
+    
+    public void updateFoldingStructure(ArrayList/*<Position>*/ positions)
+    {
+        try
+        {
+            annotationModel.modifyAnnotations(null, mapAnnotationsToPositions(positions), null);
+        }
+        catch (Throwable t)
+        {
+            // Ignore
+        }
+    }
+
+    private HashMap/*<ProjectionAnnotation, Position>*/ mapAnnotationsToPositions(ArrayList/*<Position>*/ positions)
+    {
+        HashMap newAnnotations = new HashMap();
+        for (int i = 0; i < positions.size(); i++)
+        {
+            ProjectionAnnotation annotation = new ProjectionAnnotation();
+            newAnnotations.put(annotation, positions.get(i));
+            annotation.setRangeIndication(true);
+        }
+        return newAnnotations;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Watermark Indicating Source Form Mismatch
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     private void checkForContentTypeMismatch(FileEditorInput input)
     {
         contentTypeMismatch = false;
@@ -161,32 +272,6 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         if (actualSourceForm != expectedSourceForm)
             contentTypeMismatch = true;
     }
-
-    public void createPartControl(Composite parent)
-    {
-        super.createPartControl(parent);
-
-        Composite childComp = (Composite)((Composite) parent.getChildren()[0]).getChildren()[0];
-        GridLayout layout = new GridLayout();
-        layout.marginHeight = 0;
-        layout.marginWidth = 0;
-        layout.verticalSpacing = 2;
-        childComp.setLayout(layout);
-
-        GridData data = new GridData(GridData.FILL_BOTH);
-        childComp.getChildren()[0].setLayoutData(data);
-
-        fMainComposite = childComp;
-
-        createHorizontalRuler(fMainComposite);
-        createLightGrayLines();
-        
-        addWatermark(parent);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Watermark Indicating Source Form Mismatch
-    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     private void addWatermark(Composite parent)
     {
