@@ -39,6 +39,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * Modified by Jungyoon Lee, Kun Koh, Nam Kim, David Weiner
  * Modified by Timofey Yuvashev
  */
+@SuppressWarnings("restriction")
 public class SearchPathProperties
 {
     public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG";
@@ -89,7 +90,7 @@ public class SearchPathProperties
         
         //If the path to the current project is different then the one passed in --
         // we need to re-set the project
-        if(!currPath.equals(projPath.append(EclipsePreferences.DEFAULT_PREFERENCES_DIRNAME)))
+        if(currPath == null || !currPath.equals(projPath.append(EclipsePreferences.DEFAULT_PREFERENCES_DIRNAME)))
             initProjScope(project);
     }
     

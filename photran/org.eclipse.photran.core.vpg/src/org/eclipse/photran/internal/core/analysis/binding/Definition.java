@@ -532,7 +532,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         try
         {
             ASTFunctionSubprogramNode fn = findEnclosingFunction();
-            if (fn.getFunctionStmt().hasResultClause()) return;
+            if (fn == null || fn.getFunctionStmt().hasResultClause()) return;
             
             for (Definition def : fn.getAllDefinitions())
             {
