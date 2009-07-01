@@ -38,9 +38,9 @@ public class ReferenceSearchResult
     extends AbstractTextSearchResult
     implements IEditorMatchAdapter, IFileMatchAdapter
 {
-    private ReferenceSearch query;
+    private ISearchQuery query;
 
-    public ReferenceSearchResult(ReferenceSearch query)
+    public ReferenceSearchResult(ISearchQuery query)
     {
         super();
         this.query = query;
@@ -77,7 +77,7 @@ public class ReferenceSearchResult
      */
     public String getLabel()
     {
-        return ((ReferenceSearch)getQuery()).getLabel();
+        return getQuery().getLabel();
     }
 
     /* (non-Javadoc)

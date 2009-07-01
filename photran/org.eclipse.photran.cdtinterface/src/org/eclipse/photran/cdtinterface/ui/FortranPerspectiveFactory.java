@@ -54,6 +54,7 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
 		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);	// This is the "Open Type" search toolbar action
+		layout.addActionSet("org.eclipse.photran.ui.vpg.SearchActionSet");
 		layout.addActionSet("org.eclipse.photran.cdtinterface.FortranElementCreationActionSet");
 		layout.addActionSet(IPageLayout.ID_NAVIGATE_ACTION_SET);
 		

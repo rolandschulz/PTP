@@ -1,0 +1,77 @@
+Fortran Search is displayed in the Fortran perspective:
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search from the menu bar
+4: "Fortran Search" should be in the dropdown menu.
+
+
+Fortran Search is among the choices in the Search Page
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search from the menu bar
+4: Select Search from the dropdown menu
+5: "Fortran Search" should be one of the tabs listed in the Search dialog
+
+
+Search Button is disallowed for empty strings
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search-> Fortran Search
+4: Delete any text in the "Search pattern" text box
+5: The search button should be disabled
+
+
+Search Button is disallowed if no types are specified
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search-> Fortran Search
+4: Enter any characters into the "Search Pattern" text box
+5: Uncheck all check boxes in the "Search for" area 
+   (Common block, Function, Subroutine, Module, Variable, Program)
+6: The "Search" button should be disabled
+
+
+Checked Regular Expression checkbox hides glob string instructions
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search-> Fortran Search
+4: Check the Regular Expression checkbox
+5: The "glob string instructions" (* = any string, ? = any character) should be hidden
+
+
+Unchecked Regular Expression checkbox shows glob string instructions
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search-> Fortran Search
+4: Uncheck the Regular Expression checkbox
+5: The "glob string instructions" (* = any string, ? = any character) 
+   should be visible under the search box
+
+
+Search box saves last search settings
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search-> Fortran Search
+4: Select any desired search criteria which will allow for a search
+5: Perform the search (it does not matter if the search fails)
+6: Select Search-> Fortran Search
+7: The settings from the previous search should be enabled, and the string used in 
+   the last search should be in the drop-down menu for the text box
+   
+
+Search button activates a search
+1: Launch eclipse with the Photran plugin.
+2: Ensure that the workspace is in the Fortran Perspective 
+   (Window->Open Perspective-> Other-> Fortran)
+3: Select Search-> Fortran Search
+4: Select any desired search criteria which will allow for a search
+5: Click the Search button
+6: Ensure that the Search tab becomes active, indicating that the search command 
+   was executed

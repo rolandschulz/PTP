@@ -105,7 +105,42 @@
             menubarPath="group.open"/>
      </viewerContribution>
    </extension>
-   
+   <!--================-->
+   <!-- Fortran Search -->
+   <!--================-->
+   <extension
+      id="vpgSearchPage"
+      name="vpg search name"
+      point="org.eclipse.search.searchPages">
+     <page
+        canSearchEnclosingProjects="true"
+        class="org.eclipse.photran.internal.ui.search.VPGSearchPage"
+        extensions="f:90,f90:90,f77:90"
+        icon="icons/full/obj16/fsearch_obj.gif"
+        id="org.eclipse.photran.ui.vpgSearchPage"
+        label="Fortran Search"
+        showScopeSection="true"
+        sizeHint="460, 160"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="Fortran Search"
+            id="org.eclipse.photran.ui.vpg.SearchActionSet"
+            label="Fortran Search">
+         <action
+               class="org.eclipse.photran.internal.ui.search.OpenFortranSearchPageAction"
+               icon="icons/full/obj16/fsearch_obj.gif"
+               id="org.eclipse.photran.ui.vpg.actions.OpenFortranSearchPage"
+               label="F&amp;ortran..."
+               menubarPath="org.eclipse.search.menu/dialogGroup">
+         </action>
+         <menu
+               id="org.eclipse.search.menu"
+               label="Se&amp;arch">
+         </menu>
+      </actionSet>
+   </extension>
    <!--=====================-->
    <!-- Find All References -->
    <!--=====================-->

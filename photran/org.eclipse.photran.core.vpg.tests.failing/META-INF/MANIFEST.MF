@@ -5,9 +5,11 @@ Bundle-SymbolicName: org.eclipse.photran.core.vpg.tests.failing
 Bundle-Version: 1.0.0
 Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.photran.core.vpg.tests,
+ org.eclipse.photran.ui.vpg,
  org.junit,
  org.eclipse.photran.core,
  org.eclipse.photran.core.vpg,
  org.eclipse.cdt.core,
  org.eclipse.cdt.core.tests,
- org.eclipse.jface
+ org.eclipse.jface,
+ org.eclipse.search

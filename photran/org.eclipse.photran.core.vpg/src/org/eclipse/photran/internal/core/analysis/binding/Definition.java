@@ -158,7 +158,8 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     
     public boolean matches(String canonicalizedName)
     {
-    	return canonicalizedName != null && canonicalizedName.equals(this.canonicalizedName);
+        return canonicalizedName != null &&
+            (canonicalizedName.equals(this.canonicalizedName) || this.canonicalizedName.matches(canonicalizedName));
     }
 
     void markAsSubprogramArgument()
