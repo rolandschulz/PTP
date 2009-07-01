@@ -127,7 +127,11 @@ abstract public class BaseTestFramework extends TestCase {
 //            }
 //        }
         
-        project.delete(true, true, new NullProgressMonitor());
+        try {
+            project.delete(true, true, new NullProgressMonitor());
+        } catch( Throwable e ){
+            /* boo */
+        }
         project = null;
 	}
     protected IFile importFile(String fileName, String contents ) throws Exception{
