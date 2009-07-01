@@ -92,9 +92,9 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
     {
         switch (index)
         {
-        case 0:  this.loopHeader = (ASTLabelDoStmtNode)value;
-        case 1:  this.body = (IASTListNode<IExecutionPartConstruct>)value;
-        case 2:  this.endDoStmt = (ASTEndDoStmtNode)value;
+        case 0:  this.loopHeader = (ASTLabelDoStmtNode)value; break;
+        case 1:  this.body = (IASTListNode<IExecutionPartConstruct>)value; break;
+        case 2:  this.endDoStmt = (ASTEndDoStmtNode)value; break;
         default: throw new IllegalArgumentException();
         }
     }
