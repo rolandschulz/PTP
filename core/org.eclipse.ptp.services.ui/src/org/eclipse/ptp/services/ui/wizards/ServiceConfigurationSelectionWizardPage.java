@@ -20,9 +20,9 @@ import org.eclipse.jface.wizard.IWizardNode;
 import org.eclipse.jface.wizard.WizardSelectionPage;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
-import org.eclipse.ptp.services.core.ServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -101,7 +101,8 @@ public class ServiceConfigurationSelectionWizardPage extends WizardSelectionPage
         container.setLayout(layout);
         setControl(container);
         
-        Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getWorkspaceConfigurations();
+        IServiceModelManager manager = ServiceModelManager.getInstance();
+        Set<IServiceConfiguration> configs = manager.getConfigurations();
         
         if (configs.size() > 0) {
 	        Label label1 = new Label(container, SWT.LEFT);
@@ -118,8 +119,8 @@ public class ServiceConfigurationSelectionWizardPage extends WizardSelectionPage
 	        Label label2 = new Label(container, SWT.LEFT);
 	        label2.setText("The new configuration will be saved with your project, and can be used when creating new projects in the future.");
 	        
-	        IServiceConfiguration config = new ServiceConfiguration("Default");
-	        for (IService service : ServiceModelManager.getInstance().getServices()) {
+	        IServiceConfiguration config = manager.newServiceConfiguration("Default");
+	        for (IService service : manager.getServices()) {
 				SortedSet<IServiceProviderDescriptor> providers = service.getProvidersByPriority();
 				if (providers.size() > 0) {
 					IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(providers.iterator().next());

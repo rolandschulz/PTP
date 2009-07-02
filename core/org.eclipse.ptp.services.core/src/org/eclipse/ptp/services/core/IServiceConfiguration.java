@@ -26,12 +26,19 @@ import java.util.SortedSet;
  */
 public interface IServiceConfiguration {
 	/**
-	 * Get the name for this configuration. A configuration name must be unique for a particular project.
+	 * Get the unique ID for this configuration.
+	 * 
+	 * @return the unique ID of this configuration
+	 */
+	public String getId();
+	
+	/**
+	 * Get the name for this configuration.
 	 * 
 	 * @return the name of this configuration
 	 */
 	public String getName();
-	
+
 	/**
 	 * Get the service provider for a particular service in this configuration.
 	 * 
@@ -61,6 +68,13 @@ public interface IServiceConfiguration {
 	 * @param service service to remove
 	 */
 	public void removeService(IService service);
+	
+	/**
+	 * Set the name for this configuration.
+	 * 
+	 * @param name the name of this configuration
+	 */
+	public void setName(String name);
 	
 	/**
 	 * Set the service provider for a particular service in this configuration.

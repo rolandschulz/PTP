@@ -42,6 +42,13 @@ public interface IServiceModelManager {
 	public IServiceConfiguration getConfiguration(IProject project, String name);
 	
 	/**
+	 * Get all configurations available in the workspace.
+	 * 
+	 * @return all configurations that could be found, or an empty set
+	 */
+	public Set<IServiceConfiguration> getConfigurations();
+	
+	/**
 	 * Get all the configurations that are known by the project
 	 * 
 	 * @param project project containing the configurations
@@ -51,15 +58,6 @@ public interface IServiceModelManager {
 	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
-	
-	/**
-	 * Get the project associated with a configuration
-	 * 
-	 * @param configuration the configuration
-	 * @return the project associated with the configuration, or null if there is no project
-	 */
-	public IProject getProject(IServiceConfiguration configuration);
-	
 	
 	/**
 	 * Retrieves the service corresponding to a given id.
@@ -104,29 +102,19 @@ public interface IServiceModelManager {
 	public Set<IService> getServices(String natureID);
 	
 	/**
-	 * Get all configurations available in the workspace.
-	 * 
-	 * @return all configurations that could be found, or an empty set
-	 */
-	public Set<IServiceConfiguration> getWorkspaceConfigurations();
-	
-	/**
 	 * Returns true if the given project has a configuration.
 	 * 
 	 */
 	public boolean isConfigured(IProject project);
 	
-	
 	/**
-	 * Associate the service configuration with a project
+	 * Obtain a new service configuration with name 'name'. The name
+	 * does not need to be unique.
 	 * 
-	 * @param project the project
-	 * @param conf the configuration
-	 * 
-	 * @throws NullPointerException if project or conf is null
+	 * @param name name of service configuration
+	 * @return new service configuration
 	 */
-	public void putConfiguration(IProject project, IServiceConfiguration conf);
-	
+	public IServiceConfiguration newServiceConfiguration(String name);
 	
 	/**
 	 * Removes all the configurations and services associated to the given project.
@@ -135,7 +123,15 @@ public interface IServiceModelManager {
 	 * @throws NullPointerException if project is null
 	 */
 	public void remove(IProject project);
-
+	
+	
+	/**
+	 * Removes the configuration.
+	 * 
+	 * @param conf the configuration
+	 */
+	public void remove(IServiceConfiguration conf);
+	
 	/**
 	 * TODO What happens if you try to remove the active configuration?
 	 * TODO What happens if there are no configurations left after removing the given configuration?
@@ -164,5 +160,15 @@ public interface IServiceModelManager {
 	 * @throws IllegalArgumentException if the configuration was not part of the project
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
+
+	/**
+	 * Associate the service configuration with a project
+	 * 
+	 * @param project the project
+	 * @param conf the configuration
+	 * 
+	 * @throws NullPointerException if project or conf is null
+	 */
+	public void setConfiguration(IProject project, IServiceConfiguration conf);
 
 }

@@ -16,7 +16,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.ServiceConfiguration;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.wizards.ServiceConfigurationWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -24,7 +24,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  */
 public class LaunchWizardHandler extends AbstractHandler {
-	private static IServiceConfiguration fConfig = new ServiceConfiguration("test");
+	private static IServiceConfiguration fConfig = ServiceModelManager.getInstance().newServiceConfiguration("test");
 	
 	/**
 	 * The constructor.

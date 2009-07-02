@@ -8,7 +8,7 @@
  * Contributors:
  * IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.core;
+package org.eclipse.ptp.services.internal.core;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +17,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
  * A named configuration which consists of a mapping of services to providers.
@@ -33,11 +37,20 @@ import java.util.TreeSet;
  */
 public class ServiceConfiguration implements IServiceConfiguration {
 	
+	protected final String fId;
 	protected String fName;
 	protected Map<IService, IServiceProvider> fServiceToProviderMap = new HashMap<IService, IServiceProvider>();
 
-	public ServiceConfiguration(String name) {
+	public ServiceConfiguration(String id, String name) {
+		fId = id;
 		fName = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getId()
+	 */
+	public String getId() {
+		return fId;
 	}
 	
 	/* (non-Javadoc)
@@ -46,21 +59,21 @@ public class ServiceConfiguration implements IServiceConfiguration {
 	public String getName() {
 		return fName;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getServiceProvider(org.eclipse.ptp.services.core.IService)
 	 */
 	public IServiceProvider getServiceProvider(IService service) {
 		return fServiceToProviderMap.get(service);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getServices()
 	 */
 	public Set<IService> getServices() {
 		return Collections.unmodifiableSet(fServiceToProviderMap.keySet());
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getServicesByPriority()
 	 */
@@ -89,6 +102,13 @@ public class ServiceConfiguration implements IServiceConfiguration {
 		if (fServiceToProviderMap.containsKey(service)) {
 			fServiceToProviderMap.remove(service);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#setName(java.lang.String)
+	 */
+	public void setName(String name) {
+		fName = name;
 	}
 
 	/* (non-Javadoc)
