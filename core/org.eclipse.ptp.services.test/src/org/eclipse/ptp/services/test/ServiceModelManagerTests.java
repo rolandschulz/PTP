@@ -32,7 +32,6 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
-import org.eclipse.ptp.services.core.ServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +39,7 @@ import org.junit.Test;
 
 public class ServiceModelManagerTests {
 	IProject fProject;
-	ServiceConfiguration fConfig;
+	IServiceConfiguration fConfig;
 	IService fService1;
 	IService fService2;
 	
@@ -51,21 +50,21 @@ public class ServiceModelManagerTests {
 		
 		Writer writer = new BufferedWriter(new FileWriter(file));
 		try {
-			manager.saveModelConfiguration(fProject, writer);
+			manager.saveModelConfiguration(writer);
 		} finally {
 			writer.close();
 		}
 		
 		Reader reader = new BufferedReader(new FileReader(file));
 		try {
-			manager.loadModelConfiguration(fProject, reader);
+			manager.loadModelConfiguration(reader);
 		} finally {
 			reader.close();
 		}
 	}
 	
 	void addProvider(String providerId, IService service, IServiceConfiguration config) {
-		ServiceModelManager manager = ServiceModelManager.getInstance();
+		IServiceModelManager manager = ServiceModelManager.getInstance();
 		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
 		IServiceProvider provider = manager.getServiceProvider(descriptor);
 		config.setServiceProvider(service, provider);
@@ -75,7 +74,7 @@ public class ServiceModelManagerTests {
 	public void setUp() throws Exception {
 		fProject = ResourcesPlugin.getWorkspace().getRoot().getProject("testProject");
 		fProject.create(new NullProgressMonitor());
-		fConfig = new ServiceConfiguration("myconf"); //$NON-NLS-1$
+		fConfig = ServiceModelManager.getInstance().newServiceConfiguration("myconf"); //$NON-NLS-1$
 	}
 	
 	@After
@@ -94,7 +93,7 @@ public class ServiceModelManagerTests {
 		fService2 = manager.getService("TestService2"); //$NON-NLS-1$
 		addProvider("TestProvider3", fService2, fConfig); //$NON-NLS-1$
 
-		manager.putConfiguration(fProject, fConfig);
+		manager.setConfiguration(fProject, fConfig);
 		
 		persistAndReplaceModel();
 		
@@ -124,7 +123,7 @@ public class ServiceModelManagerTests {
 		
 		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
 		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
-		manager.putConfiguration(fProject, fConfig);
+		manager.setConfiguration(fProject, fConfig);
 		
 		persistAndReplaceModel();
 		

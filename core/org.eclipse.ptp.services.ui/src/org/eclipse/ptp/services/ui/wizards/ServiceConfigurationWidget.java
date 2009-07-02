@@ -310,15 +310,10 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	}
 
 	private void addTableRow(IServiceConfiguration config) {
-		IProject project = ServiceModelManager.getInstance().getProject(config);
-		
 		TableItem item = new TableItem (fTable, SWT.NONE);
 
-		// column 0 lists the name of the project
-		item.setText (0, project != null ? project.getName() : "<none>");
-
-		// column 1 lists the name of the configuration
-		item.setText (1, config.getName());
+		// column 0 lists the name of the configuration
+		item.setText (0, config.getName());
 		
 		// column 1 holds the status string
 		item.setText(1, "Not configured");
