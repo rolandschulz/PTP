@@ -13,23 +13,26 @@ package org.eclipse.photran.refactoring.tests.infrastructure;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
+
 public class ReindenterTestSuite extends TestSuite
 {
     public static Test suite() throws Exception
     {
         TestSuite suite = new TestSuite();
-        suite.addTest(getSuiteFor("01-simple.f90"));
-        suite.addTest(getSuiteFor("02-end-after.f90"));
-        suite.addTest(getSuiteFor("03-blank-after.f90"));
-        suite.addTest(getSuiteFor("04-guess-indent.f90"));
-        //suite.addTest(getSuiteFor("0.f90"));
+        suite.addTest(getSuiteFor("01-simple.f90", Strategy.SHIFT_ENTIRE_BLOCK));
+        suite.addTest(getSuiteFor("02-end-after.f90", Strategy.SHIFT_ENTIRE_BLOCK));
+        suite.addTest(getSuiteFor("03-blank-after.f90", Strategy.SHIFT_ENTIRE_BLOCK));
+        suite.addTest(getSuiteFor("04-guess-indent.f90", Strategy.SHIFT_ENTIRE_BLOCK));
+        suite.addTest(getSuiteFor("05-eachline-test.f90", Strategy.REINDENT_EACH_LINE));
+        //suite.addTest(getSuiteFor("0.f90", Strategy));
         return suite;
     }
     
-    private static TestSuite getSuiteFor(String baseFilename)
+    private static TestSuite getSuiteFor(String baseFilename, Strategy strategy)
     {
         TestSuite subSuite = new TestSuite("Reindenting " + baseFilename);
-        subSuite.addTest(new ReindenterTestCase(baseFilename, null));
+        subSuite.addTest(new ReindenterTestCase(baseFilename, strategy));
         return subSuite;
     }
 }

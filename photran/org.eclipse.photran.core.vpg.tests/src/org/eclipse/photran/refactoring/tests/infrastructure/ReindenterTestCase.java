@@ -21,6 +21,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 public class ReindenterTestCase extends RefactoringTestCase
@@ -28,14 +29,16 @@ public class ReindenterTestCase extends RefactoringTestCase
     private static final String DIR = "reindenter-test-code";
     
     protected String filename = null;
+    protected Strategy strategy;
     private int fromLine;
     private int thruLine;
 
     public ReindenterTestCase() {;}  // when JUnit invokes a subclass outside a test suite
 
-    public ReindenterTestCase(String filename, Object ignored) // avoid JUnit constructor
+    public ReindenterTestCase(String filename, Strategy strategy)
     {
         this.filename = filename;
+        this.strategy = strategy;
         this.setName("test");
     }
 
@@ -48,7 +51,7 @@ public class ReindenterTestCase extends RefactoringTestCase
         IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(thisFile);
         assertNotNull(ast);
         
-        Reindenter.reindent(fromLine, thruLine, ast);
+        Reindenter.reindent(fromLine, thruLine, ast, strategy);
         
         thisFile.setContents(
             new ByteArrayInputStream(SourcePrinter.getSourceCodeFromAST(ast).getBytes()),
