@@ -22,6 +22,10 @@
          version="0.0.0"/>
 
    <includes
+         id="org.eclipse.ptp.services"
+         version="0.0.0"/>
+         
+  <includes
          id="org.eclipse.ptp.remote"
          version="0.0.0"/>
 
@@ -93,8 +97,5 @@
          id="org.eclipse.ptp.perf.tau.fortran"
          version="0.0.0"/>
 
-   <includes
-         id="org.eclipse.ptp.services"
-         version="0.0.0"/>
 
 </feature>
