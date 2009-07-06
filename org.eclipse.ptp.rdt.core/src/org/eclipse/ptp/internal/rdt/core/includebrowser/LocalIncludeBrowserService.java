@@ -38,6 +38,7 @@ import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.rdt.core.RDTLog;
 
 public class LocalIncludeBrowserService extends AbstractIncludeBrowserService {
 
@@ -197,8 +198,9 @@ public class LocalIncludeBrowserService extends AbstractIncludeBrowserService {
 			}
 		}
 		catch (CoreException e) {
-			e.printStackTrace();
+			RDTLog.logError(e);
 		} catch (InterruptedException e) {
+			RDTLog.logError(e);
 		}
 		
 		return false;
