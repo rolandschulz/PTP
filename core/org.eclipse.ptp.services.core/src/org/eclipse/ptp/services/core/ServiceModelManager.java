@@ -172,7 +172,13 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
 	 */
 	public IServiceConfiguration getConfiguration(IProject project, String name) {
-		return getConf(fProjectConfigurations, project).get(name);
+		Map<String, IServiceConfiguration> confMap = getConf(fProjectConfigurations, project);
+		for (IServiceConfiguration conf : confMap.values()) {
+			if (conf.getName().equals(name)) {
+				return conf;
+			}
+		}
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -316,7 +322,7 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 		
 		for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
-			String projectName = rootMemento.getString(ATTR_NAME);
+			String projectName = projectMemento.getString(ATTR_NAME);
 			IProject project = root.getProject(projectName);
 			
 			if (!project.exists()) {
@@ -437,8 +443,9 @@ public class ServiceModelManager implements IServiceModelManager {
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
 		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
 		
-		if(!confs.containsKey(configuration.getId()))
+		if(!confs.containsKey(configuration.getId())) {
 			throw new IllegalArgumentException();
+		}
 		
 		fActiveConfigurations.put(project, configuration);
 	}
