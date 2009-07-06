@@ -21,6 +21,7 @@ import org.eclipse.cdt.managedbuilder.envvar.IConfigurationEnvironmentVariableSu
 import org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider;
 import org.eclipse.cdt.managedbuilder.internal.envvar.BuildEnvVar;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;
@@ -118,7 +119,7 @@ public class RemoteConfigurationEnvironmentSupplier implements
 					try {
 						connection.open(null);
 					} catch (RemoteConnectionException e) {
-						e.printStackTrace();
+						RDTLog.logError(e);
 					}
 				}
 
