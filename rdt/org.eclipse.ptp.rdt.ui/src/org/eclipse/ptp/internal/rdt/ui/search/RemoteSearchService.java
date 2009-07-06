@@ -24,6 +24,7 @@ import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchPatternQuery;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchTextSelectionQuery;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.RemoteSearchTextSelectionQueryAdapter;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.search.ui.ISearchQuery;
@@ -48,7 +49,7 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 			try {
 				result[i] = ModelAdapter.adaptElement(null, searchScope[i], 0, false);
 			} catch (CModelException e) {
-				e.printStackTrace();
+				RDTLog.logError(e);	
 			}
 		}
 		return result;
