@@ -55,6 +55,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.services.core.IService;
@@ -274,8 +275,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 								try {
 									Thread.sleep(500);
 								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									RDTLog.logError(e);
 								}
 								if(monitor.isCanceled() && !p.isCompleted()) {
 									p.destroy();

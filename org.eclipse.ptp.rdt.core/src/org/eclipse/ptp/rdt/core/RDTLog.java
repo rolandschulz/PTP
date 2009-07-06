@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.core;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.core.activator.Activator;
@@ -31,7 +32,10 @@ public class RDTLog {
 	}
 	
 	public static void logError(Throwable exception, String message) {
-		log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.OK, message, exception));
+		if(exception instanceof CoreException)
+			log(((CoreException)exception).getStatus());
+		else
+			log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.OK, message, exception));
 	}
 	
 	public static void logError(Throwable exception) {
