@@ -66,6 +66,7 @@ import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.CElement;
 import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 
 public class IndexQueries {
@@ -192,8 +193,7 @@ public class IndexQueries {
 				try {
 					uri = convertRemoteURIToLocal(tu.getLocationURI());
 				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					RDTLog.logError(e);
 				}
 				
 				IIndexFileLocation location = null;

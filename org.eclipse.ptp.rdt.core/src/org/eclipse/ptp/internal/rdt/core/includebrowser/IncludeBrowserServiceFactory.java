@@ -3,6 +3,7 @@ package org.eclipse.ptp.internal.rdt.core.includebrowser;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
@@ -29,7 +30,7 @@ public class IncludeBrowserServiceFactory
 		}
 		catch (CoreException e)
 		{
-			e.printStackTrace();
+			RDTLog.logError(e);
 			return null;
 		}
 		

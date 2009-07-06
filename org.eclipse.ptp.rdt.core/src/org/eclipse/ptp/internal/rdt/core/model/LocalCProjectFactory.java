@@ -14,6 +14,7 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.ptp.rdt.core.RDTLog;
 
 /**
  * @author crecoskie
@@ -29,8 +30,7 @@ public class LocalCProjectFactory implements ICProjectFactory {
 		try {
 			tu = CoreModelUtil.findTranslationUnitForLocation(new Path(filename), null);
 		} catch (CModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			RDTLog.logError(e);
 		}
 		return tu.getCProject();
 	}

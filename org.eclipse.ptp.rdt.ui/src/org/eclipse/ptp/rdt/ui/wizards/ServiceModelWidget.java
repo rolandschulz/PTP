@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.services.core.IService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
 import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
@@ -341,7 +342,7 @@ public class ServiceModelWidget{
 				//get the project natures of the project
 				natureIds = project.getDescription().getNatureIds();			
 			} catch (CoreException e) {
-				e.printStackTrace();
+				RDTLog.logError(e);	
 			}		
 	
 			for (int i = 0; i < natureIds.length; i++) {
