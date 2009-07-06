@@ -58,13 +58,7 @@ public abstract class AbstractParserTestCase extends TestCase
         
         try
         {
-            SourceForm sourceForm = (isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM); /*SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)
-            {
-                @Override public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
-                {
-                    throw new FileNotFoundException("INCLUDE lines not supported in JUnit tests");
-                }
-            }));*/
+            SourceForm sourceForm = createSourceForm();
             ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(file, sourceForm, true));
             assertTrue(ast != null);
             handleAST(ast);
@@ -78,6 +72,18 @@ public abstract class AbstractParserTestCase extends TestCase
             System.err.println(file.getName());
             throw new Exception(fileDescription, t);
         }
+    }
+
+    protected SourceForm createSourceForm()
+    {
+        SourceForm sourceForm = (isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM); /*SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)
+        {
+            @Override public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
+            {
+                throw new FileNotFoundException("INCLUDE lines not supported in JUnit tests");
+            }
+        }));*/
+        return sourceForm;
     }
 
     /**

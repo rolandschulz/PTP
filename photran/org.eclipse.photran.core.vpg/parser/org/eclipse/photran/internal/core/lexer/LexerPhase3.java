@@ -26,7 +26,7 @@ import org.eclipse.core.resources.IFile;
  * @see FreeFormLexerPhase2
  * @see FixedFormLexerPhase2
  */
-class LexerPhase3 implements IAccumulatingLexer
+public class LexerPhase3 implements IAccumulatingLexer
 {
     private ILexer phase2Lexer;
     private TokenList tokenList;

@@ -26,13 +26,13 @@ import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.Prep
  */
 public abstract class SourceForm
 {
-    private SourceForm() {;}
+    protected SourceForm() {;}
     
-    abstract IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
+    public abstract IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
     
     public static final SourceForm UNPREPROCESSED_FREE_FORM = new SourceForm()
     {
-        IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+        @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
         {
             return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext)));
         }
@@ -40,7 +40,7 @@ public abstract class SourceForm
     
     public static final SourceForm FIXED_FORM = new SourceForm()
     {
-        IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+        @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
         {
             return new LexerPhase3(new FixedFormLexerPhase2(in, file, filename, ASTTokenFactory.getInstance()));
         }
@@ -53,7 +53,7 @@ public abstract class SourceForm
     {
         return new SourceForm()
         {
-            IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+            @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
             {
                 return new LexerPhase3(new FreeFormLexerPhase2(new PreprocessingFreeFormLexerPhase1(in, file, filename, callback, accumulateWhitetext)));
             }
