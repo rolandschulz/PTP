@@ -133,7 +133,9 @@ abstract public class BaseTestFramework extends TestCase {
         } catch( Throwable e ){
             /* boo */
             project.close(new NullProgressMonitor());
-            PhotranVPG.getDatabase().clearDatabase(); // To speed things up a bit
+            // To speed things up a bit and conserve memory...
+            PhotranVPG.getInstance().releaseAllASTs();
+            PhotranVPG.getDatabase().clearDatabase();
         }
         project = null;
 	}
