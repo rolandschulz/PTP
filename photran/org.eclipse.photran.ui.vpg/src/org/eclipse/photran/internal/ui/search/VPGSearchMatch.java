@@ -38,4 +38,11 @@ public class VPGSearchMatch extends Match
             && getOffset() == other.getOffset()
             && getLength() == other.getLength();
     }
+    
+    @Override
+    public String toString() {
+        return this.getElement().toString() +
+            ", offset " + this.getOffset() +
+            ", length " + this.getLength();
+    }
 }
