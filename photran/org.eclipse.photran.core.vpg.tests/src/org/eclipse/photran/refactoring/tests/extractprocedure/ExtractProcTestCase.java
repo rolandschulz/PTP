@@ -97,7 +97,7 @@ public class ExtractProcTestCase extends RefactoringTestCase
         
         doRefactoring();
         assertEquals(
-            readTestFile(filename + ".result"), // expected result
-            readWorkspaceFile(filename));       // actual refactored file
+            readTestFile(filename + ".result").replaceAll("\\r", ""), // expected result
+            readWorkspaceFile(filename).replaceAll("\\r", ""));       // actual refactored file
     }
 }

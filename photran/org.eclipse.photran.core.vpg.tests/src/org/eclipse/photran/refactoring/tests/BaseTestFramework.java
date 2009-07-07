@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 
 /**
  * Copied and modified from org.eclipse.cdt.core.tests.BaseTestFramework
@@ -131,6 +132,8 @@ abstract public class BaseTestFramework extends TestCase {
             project.delete(true, true, new NullProgressMonitor());
         } catch( Throwable e ){
             /* boo */
+            project.close(new NullProgressMonitor());
+            PhotranVPG.getDatabase().clearDatabase(); // To speed things up a bit
         }
         project = null;
 	}
