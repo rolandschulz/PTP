@@ -22,13 +22,23 @@
 
 #include <sys/select.h>
 
-#define HANDLER_FILE		1
-#define HANDLER_SIGNAL		2
-#define HANDLER_EVENT		3
+#define HANDLER_FILE		0x01
+#define HANDLER_SIGNAL		0x02
+#define HANDLER_EVENT		0x04
+#define HANDLER_DISPOSED	0x80
 
-#define READ_FILE_HANDLER	1
-#define WRITE_FILE_HANDLER	2
-#define EXCEPT_FILE_HANDLER	4
+#define IS_FILE_HANDLER(h) (((h)->htype & HANDLER_FILE) == HANDLER_FILE)
+#define IS_SIGNAL_HANDLER(h) (((h)->htype & HANDLER_SIGNAL) == HANDLER_SIGNAL)
+#define IS_EVENT_HANDLER(h) (((h)->htype & HANDLER_EVENT) == HANDLER_EVENT)
+#define IS_DISPOSED(h) (((h)->htype & HANDLER_DISPOSED) == HANDLER_DISPOSED)
+
+#define READ_FILE_HANDLER	0x01
+#define WRITE_FILE_HANDLER	0x02
+#define EXCEPT_FILE_HANDLER	0x04
+
+#define IS_FILE_READ_HANDLER(h) (((h)->file_type & READ_FILE_HANDLER) == READ_FILE_HANDLER)
+#define IS_FILE_WRITE_HANDLER(h) (((h)->file_type & WRITE_FILE_HANDLER) == WRITE_FILE_HANDLER)
+#define IS_FILE_EXCEPT_HANDLER(h) (((h)->file_type & EXCEPT_FILE_HANDLER) == EXCEPT_FILE_HANDLER)
 
 struct handler {
 	int		htype;
@@ -55,10 +65,6 @@ struct handler {
 };
 typedef struct handler	handler;
 
-handler *	NewHandler(int, void *);
-void		DestroyHandler(handler *);
-void		SetHandler(void);
-handler *	GetHandler(void);
 void		RegisterEventHandler(int, void (*)(void *, void *), void *);
 void		UnregisterEventHandler(int, void (*)(void *, void *));
 void		RegisterFileHandler(int fd, int type, int (*)(int, void *), void *);
