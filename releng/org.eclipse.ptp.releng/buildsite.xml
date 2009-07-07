@@ -9,6 +9,9 @@
 	<feature url="features/org.eclipse.ptp.core_@buildVersion@.jar" id="org.eclipse.ptp.core" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
+	<feature url="features/org.eclipse.ptp.services_@buildVersion@.jar" id="org.eclipse.ptp.services" version="@buildVersion@">
+		<category name="Parallel Tools Platform 3.0"/>
+	</feature>
 	<feature url="features/org.eclipse.ptp.utils_@buildVersion@.jar" id="org.eclipse.ptp.utils" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
