@@ -25,70 +25,40 @@
 
 static List *		dbg_handlers = NULL;
 
-/**
- * Create an event handler structure and add it to the list of handlers
- */
-handler *
-NewHandler(int type, void *data)
-{
-	handler *	h;
-	
-	if (dbg_handlers == NULL)
-		dbg_handlers = NewList();
-		
-	h = (handler *)malloc(sizeof(handler));
-	h->htype = type;
-	h->data = data;
-	
-	AddToList(dbg_handlers, (void *)h);
-	
-	return h;
-}
+static handler *	new_handler(int type, void *data);
+static void			dispose_handler(handler *h);
+static void			set_handler(void);
+static handler *	get_handler(void);
 
 /**
- * Remove handler from list and dispose of memory
+ * Register a handler for general events.
  */
-void
-DestroyHandler(handler *h)
-{
-	RemoveFromList(dbg_handlers, (void *)h);
-	free(h);
-}
-
-void
-SetHandler(void)
-{
-	SetList(dbg_handlers);
-}
-
-handler *
-GetHandler(void)
-{
-	return (handler *)GetListElement(dbg_handlers);
-}
-
 void
 RegisterEventHandler(int type, void (*event_callback)(void *, void *), void *data)
 {
 	handler *	h;
 
-	h = NewHandler(HANDLER_EVENT, NULL);
+	h = new_handler(HANDLER_EVENT, NULL);
 	h->event_type = type;
 	h->event_handler = event_callback;
 	h->data = data;
 }
 
 /**
- * Unregister file descriptor handler
+ * Unregister file descriptor handler.
+ * Can be called from callback function.
  */
 void
 UnregisterEventHandler(int type, void (*event_callback)(void *, void *))
 {
 	handler *	h;
 
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_EVENT && h->event_type == type && h->event_handler == event_callback)
-			DestroyHandler(h);
+	for (set_handler(); (h = get_handler()) != NULL; ) {
+		if (IS_EVENT_HANDLER(h)
+				&& h->event_type == type
+				&& h->event_handler == event_callback) {
+			h->htype |= HANDLER_DISPOSED;
+		}
 	}
 }
 
@@ -100,7 +70,7 @@ RegisterFileHandler(int fd, int type, int (*file_handler)(int, void *), void *da
 {
 	handler *	h;
 	
-	h = NewHandler(HANDLER_FILE, data);
+	h = new_handler(HANDLER_FILE, data);
 	h->file_type = type;
 	h->fd = fd;
 	h->error = 0;
@@ -109,15 +79,17 @@ RegisterFileHandler(int fd, int type, int (*file_handler)(int, void *), void *da
 
 /**
  * Unregister file descriptor handler
+ * Can be called from callback function.
  */
 void
 UnregisterFileHandler(int fd)
 {
 	handler *	h;
 
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE && h->fd == fd)
-			DestroyHandler(h);
+	for (set_handler(); (h = get_handler()) != NULL; ) {
+		if (IS_FILE_HANDLER(h) && h->fd == fd) {
+			h->htype |= HANDLER_DISPOSED;
+		}
 	}
 }
 
@@ -129,9 +101,14 @@ CallEventHandlers(int type, void *data)
 {
 	handler *	h;
 
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_EVENT && h->event_type == type)
-			h->event_handler(h->data, data);
+	for (set_handler(); (h = get_handler()) != NULL; ) {
+		if (IS_EVENT_HANDLER(h)) {
+			if (IS_DISPOSED(h)) {
+				dispose_handler(h);
+			} else if (h->event_type == type) {
+				h->event_handler(h->data, data);
+			}
+		}
 	}
 }
 
@@ -144,15 +121,19 @@ CallFileHandlers(fd_set *rfds, fd_set *wfds, fd_set *efds)
 	int			ret = 0;
 	handler *	h;
 	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE
-			&& h->error >= 0
-			&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, rfds))
-				|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, wfds))
-				|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, efds)))) {
-			h->error = h->file_handler(h->fd, h->data);
-			if (h->error < 0)
-				ret = -1;
+	for (set_handler(); (h = get_handler()) != NULL; ) {
+		if (IS_FILE_HANDLER(h)) {
+			if (IS_DISPOSED(h)) {
+				dispose_handler(h);
+			} else if (h->error >= 0
+					&& ((IS_FILE_READ_HANDLER(h) && FD_ISSET(h->fd, rfds))
+							|| (IS_FILE_WRITE_HANDLER(h) && FD_ISSET(h->fd, wfds))
+							|| (IS_FILE_EXCEPT_HANDLER(h) && FD_ISSET(h->fd, efds)))) {
+				h->error = h->file_handler(h->fd, h->data);
+				if (h->error < 0) {
+					ret = -1;
+				}
+			}
 		}
 	}
 	
@@ -172,16 +153,62 @@ GenerateFDSets(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
 	FD_ZERO(wfds);
 	FD_ZERO(efds);
 	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE) {
-			if (h->file_type & READ_FILE_HANDLER)
+	for (set_handler(); (h = get_handler()) != NULL; ) {
+		if (IS_FILE_HANDLER(h) && !IS_DISPOSED(h)) {
+			if (IS_FILE_READ_HANDLER(h)) {
 				FD_SET(h->fd, rfds);
-			if (h->file_type & WRITE_FILE_HANDLER)
+			}
+			if (IS_FILE_WRITE_HANDLER(h)) {
 				FD_SET(h->fd, wfds);
-			if (h->file_type & EXCEPT_FILE_HANDLER)
+			}
+			if (IS_FILE_EXCEPT_HANDLER(h)) {
 				FD_SET(h->fd, efds);
-			if (h->fd > *nfds)
+			}
+			if (h->fd > *nfds) {
 				*nfds = h->fd;
+			}
 		}
 	}
+}
+
+/**
+ * Create an event handler structure and add it to the list of handlers
+ */
+static handler *
+new_handler(int type, void *data)
+{
+	handler *	h;
+
+	if (dbg_handlers == NULL)
+		dbg_handlers = NewList();
+
+	h = (handler *)malloc(sizeof(handler));
+	h->htype = type;
+	h->data = data;
+
+	AddToList(dbg_handlers, (void *)h);
+
+	return h;
+}
+
+/**
+ * Remove handler from list and dispose of memory
+ */
+static void
+dispose_handler(handler *h)
+{
+	RemoveFromList(dbg_handlers, (void *)h);
+	free(h);
+}
+
+void
+set_handler(void)
+{
+	SetList(dbg_handlers);
+}
+
+handler *
+get_handler(void)
+{
+	return (handler *)GetListElement(dbg_handlers);
 }
