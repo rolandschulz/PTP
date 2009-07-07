@@ -24,8 +24,8 @@
    <includes
          id="org.eclipse.ptp.services"
          version="0.0.0"/>
-         
-  <includes
+
+   <includes
          id="org.eclipse.ptp.remote"
          version="0.0.0"/>
 
@@ -48,7 +48,11 @@
    <includes
          id="org.eclipse.ptp.pldt.lapi"
          version="0.0.0"/>
-
+  
+   <includes
+         id="org.eclipse.ptp.pldt.upc"
+         version="0.0.0"/>
+  
    <includes
          id="org.eclipse.ptp.rdt"
          version="0.0.0"/>
@@ -74,6 +78,10 @@
          version="0.0.0"/>
 
    <includes
+         id="org.eclipse.ptp.rm.mpich2"
+         version="0.0.0"/>
+
+   <includes
          id="org.eclipse.ptp.rm.openmpi"
          version="0.0.0"/>
 
@@ -86,16 +94,11 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.rm.mpich2"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.perf.tau.fortran"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp"
+         version="0.0.0"/>
 
 </feature>

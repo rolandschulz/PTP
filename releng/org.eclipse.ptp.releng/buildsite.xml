@@ -51,6 +51,9 @@
 	<feature url="features/org.eclipse.ptp.pldt.lapi_@buildVersion@.jar" id="org.eclipse.ptp.pldt.lapi" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
+	<feature url="features/org.eclipse.ptp.pldt.upc_@buildVersion@.jar" id="org.eclipse.ptp.pldt.upc" version="@buildVersion@">
+		<category name="Parallel Tools Platform 3.0"/>
+	</feature>
 	<feature url="features/org.eclipse.ptp.perf_@buildVersion@.jar" id="org.eclipse.ptp.perf" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
