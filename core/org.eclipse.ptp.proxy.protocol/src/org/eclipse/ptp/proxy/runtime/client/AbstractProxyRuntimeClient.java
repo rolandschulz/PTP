@@ -73,7 +73,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
-import org.eclipse.ptp.proxy.util.DebugOptions;
 
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		implements IProxyRuntimeClient, IProxyEventListener {
@@ -152,7 +151,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		super.setEventFactory(eventFactory);
 		super.addProxyEventListener(this);
 
-		if (DebugOptions.CLIENT_TRACING) {
+		if (getDebugOptions().CLIENT_TRACING) {
 			this.logEvents = true;
 		}
 	}

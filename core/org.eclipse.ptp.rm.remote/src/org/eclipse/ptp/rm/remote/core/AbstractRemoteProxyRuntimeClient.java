@@ -29,7 +29,6 @@ import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.proxy.runtime.client.AbstractProxyRuntimeClient;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
-import org.eclipse.ptp.proxy.util.DebugOptions;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -100,7 +99,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	public void startup(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 12);
 
-		if (DebugOptions.CLIENT_TRACING) {
+		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . ."); //$NON-NLS-1$
 			System.out.println("PROXY_SERVER path = '" + config.getName() + "'");  //$NON-NLS-1$  //$NON-NLS-2$
 		}
@@ -139,12 +138,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					args.add("--host=" + config.getLocalAddress()); //$NON-NLS-1$
 				}
 				args.add("--port="+getSessionPort()); //$NON-NLS-1$
-				if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
-					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL); //$NON-NLS-1$
+				if (getDebugOptions().SERVER_DEBUG_LEVEL > 0) {
+					args.add("--debug=" + getDebugOptions().SERVER_DEBUG_LEVEL); //$NON-NLS-1$
 				}
 				args.addAll(config.getInvocationOptions());
 				
-				if (DebugOptions.CLIENT_TRACING) {
+				if (getDebugOptions().CLIENT_TRACING) {
 					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 				
@@ -219,12 +218,12 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					args.add("--port="+ getSessionPort()); //$NON-NLS-1$
 				}
 
-				if (DebugOptions.SERVER_DEBUG_LEVEL > 0) {
-					args.add("--debug=" + DebugOptions.SERVER_DEBUG_LEVEL); //$NON-NLS-1$
+				if (getDebugOptions().SERVER_DEBUG_LEVEL > 0) {
+					args.add("--debug=" + getDebugOptions().SERVER_DEBUG_LEVEL); //$NON-NLS-1$
 				}
 				args.addAll(config.getInvocationOptions());
 				
-				if (DebugOptions.CLIENT_TRACING) {
+				if (getDebugOptions().CLIENT_TRACING) {
 					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 
@@ -264,7 +263,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					}
 				}, Messages.AbstractRemoteProxyRuntimeClient_14).start(); 
 				
-				if (DebugOptions.CLIENT_TRACING) {
+				if (getDebugOptions().CLIENT_TRACING) {
 					System.out.println(toString() + ": Waiting on accept."); //$NON-NLS-1$
 				}
 			}
@@ -296,9 +295,9 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		/*
 		 * Set up debug options
 		 */
-		DebugOptions.PROTOCOL_TRACING = DebugUtil.PROTOCOL_TRACING;
-		DebugOptions.CLIENT_TRACING = DebugUtil.PROXY_CLIENT_TRACING;
-		DebugOptions.SERVER_DEBUG_LEVEL = DebugUtil.PROXY_SERVER_DEBUG_LEVEL;
+		getDebugOptions().PROTOCOL_TRACING = DebugUtil.PROTOCOL_TRACING;
+		getDebugOptions().CLIENT_TRACING = DebugUtil.PROXY_CLIENT_TRACING;
+		getDebugOptions().SERVER_DEBUG_LEVEL = DebugUtil.PROXY_SERVER_DEBUG_LEVEL;
 
 	}
 }

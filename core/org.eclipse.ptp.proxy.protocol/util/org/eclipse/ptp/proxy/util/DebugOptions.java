@@ -11,7 +11,7 @@
 package org.eclipse.ptp.proxy.util;
 
 public class DebugOptions {
-	public static boolean CLIENT_TRACING = false;
-	public static int SERVER_DEBUG_LEVEL = 0;
-	public static boolean PROTOCOL_TRACING = false;
+	public boolean CLIENT_TRACING = false;
+	public int SERVER_DEBUG_LEVEL = 0;
+	public boolean PROTOCOL_TRACING = false;
 }

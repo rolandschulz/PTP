@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -48,6 +49,8 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
+import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
@@ -263,6 +266,15 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			args.add("--port=" + port); //$NON-NLS-1$
 		} else {
 			throw new PDIException(null, "Error getting resource manager"); //$NON-NLS-1$
+		}
+		
+		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
+		
+		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+			int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
+			if ((level & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) {
+				getDebugOptions().PROTOCOL_TRACING = true;
+			}
 		}
 	}
 

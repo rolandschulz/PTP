@@ -138,6 +138,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			throw new IOException(Messages.AbstractProxyClient_0);
 		}
 		ProxyPacket packet = new ProxyPacket(cmd);
+		if (getDebugOptions().PROTOCOL_TRACING) {
+			packet.setDebug(true);
+		}
 		packet.send(sessOutput);
 	}
 	
@@ -166,12 +169,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionCreate(int, int)
 	 */
 	public void sessionCreate(int port, int timeout) throws IOException {
-		if (DebugOptions.CLIENT_TRACING) {
+		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println("sessionCreate("+port+","+timeout+")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		sessSvrSock = ServerSocketChannel.open();
 		InetSocketAddress isa = new InetSocketAddress(port);
-		if (DebugOptions.CLIENT_TRACING) {
+		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println("bind("+isa.toString()+")"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		sessSvrSock.socket().bind(isa);
@@ -183,7 +186,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			state = SessionState.WAITING;
 		}
 		
-		if (DebugOptions.CLIENT_TRACING) {
+		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println("port=" + sessPort); //$NON-NLS-1$
 		}
 		
@@ -191,7 +194,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			public void run() {
 				boolean error = false;
 				try {
-					if (DebugOptions.CLIENT_TRACING) {
+					if (getDebugOptions().CLIENT_TRACING) {
 						System.out.println("accept thread starting..."); //$NON-NLS-1$
 					}
 					sessSock = sessSvrSock.accept();
@@ -210,7 +213,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					try {
 						sessSvrSock.close();
 					} catch (IOException e) {
-						if (DebugOptions.CLIENT_TRACING) {
+						if (getDebugOptions().CLIENT_TRACING) {
 							System.out.println("IO Exception trying to close server socket (non fatal)"); //$NON-NLS-1$
 						}
 					}
@@ -226,7 +229,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 							state = SessionState.SHUTDOWN;
 						}
 					}
-					if (DebugOptions.CLIENT_TRACING) {
+					if (getDebugOptions().CLIENT_TRACING) {
 						System.out.println("accept thread exiting..."); //$NON-NLS-1$
 					}
 				}
@@ -244,7 +247,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @param	input		stream to read from
 	 */
 	public void sessionCreate(OutputStream output, InputStream input) {
-		if (DebugOptions.CLIENT_TRACING) {
+		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println("sessionCreate(stdin, stdout)"); //$NON-NLS-1$
 		}
 		sessInput = Channels.newChannel(input);
@@ -311,7 +314,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				boolean error = false;
 				int errorCount = 0;			
 				
-				if (DebugOptions.CLIENT_TRACING) {
+				if (getDebugOptions().CLIENT_TRACING) {
 					System.out.println("event thread starting..."); //$NON-NLS-1$
 				}
 				try {
@@ -329,7 +332,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					synchronized (state) {
 						if (!isInterrupted() && state != SessionState.SHUTTING_DOWN) {
 							error = true;
-							if (DebugOptions.CLIENT_TRACING) {
+							if (getDebugOptions().CLIENT_TRACING) {
 								System.out.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
 							}
 						}
@@ -351,7 +354,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 
 				fireProxyDisconnectedEvent(new ProxyDisconnectedEvent(error));
 				
-				if (DebugOptions.CLIENT_TRACING) {
+				if (getDebugOptions().CLIENT_TRACING) {
 					System.out.println("event thread exited"); //$NON-NLS-1$
 				}
 			}
@@ -383,7 +386,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	private boolean sessionProgress() throws IOException {
 		ProxyPacket packet = new ProxyPacket();
-		if (DebugOptions.PROTOCOL_TRACING) {
+		if (getDebugOptions().PROTOCOL_TRACING) {
 			packet.setDebug(true);
 		}
 		if (!packet.read(sessInput)) {
@@ -499,5 +502,14 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		for (IProxyEventListener listener : la) {
 			listener.handleEvent(event);
 		}
+	}
+	
+	/**
+	 * Get the debug options
+	 * 
+	 * @return debug options
+	 */
+	protected DebugOptions getDebugOptions() {
+		return debugOptions;
 	}
 }
