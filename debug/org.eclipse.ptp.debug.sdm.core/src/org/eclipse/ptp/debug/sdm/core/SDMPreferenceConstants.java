@@ -35,33 +35,34 @@ public interface SDMPreferenceConstants {
 	public static final String PLUGIN_ID = SDMDebugCorePlugin.getUniqueIdentifier();
 
 	/**
-	 * Location of the sdm
-	 */
-	//public static final String SDM_DEBUGGER_FILE = PLUGIN_ID + ".debugger_file";
-	
-	/**
 	 * Extra arguments to pass to the sdm (e.g. debugging flags)
 	 */
-	public static final String SDM_DEBUGGER_ARGS = PLUGIN_ID + ".debugger_args";
-
+	public static final String SDM_DEBUGGER_ARGS = PLUGIN_ID + ".debugger_args"; //$NON-NLS-1$
+	
 	/**
-	 * Host for the sdm client
+	 * SDM debugging
 	 */
-	//public static final String SDM_DEBUGGER_HOST = PLUGIN_ID + ".debugger_host";
-	//public static final String SDM_DEFAULT_DEUBGGER_HOST = "localhost";
+	public static final String SDM_DEBUG_ENABLED = PLUGIN_ID + ".debug_enabled"; //$NON-NLS-1$
+	public static final String SDM_DEBUG_LEVEL = PLUGIN_ID + ".debug_level"; //$NON-NLS-1$
+	public static final int DEBUG_LEVEL_NONE = 0x00;
+	public static final int DEBUG_LEVEL_STARTUP = 0x01;
+	public static final int DEBUG_LEVEL_CLIENT = 0x02;
+	public static final int DEBUG_LEVEL_SERVER = 0x04;
+	public static final int DEBUG_LEVEL_BACKEND = 0x08;
+	public static final int DEBUG_LEVEL_PROTOCOL = 0x10;
 
 	/**
 	 * Debugger backend
 	 */
-	public static final String SDM_DEBUGGER_BACKEND_TYPE = PLUGIN_ID + ".debugger_backend";
+	public static final String SDM_DEBUGGER_BACKEND_TYPE = PLUGIN_ID + ".debugger_backend"; //$NON-NLS-1$
 	public static final int SDM_DEFAULT_DEDUGGER_BACKEND_INDEX = 0;
 	public static final String[] SDM_DEBUGGER_BACKENDS = new String[] {
-		"gdb-mi"
+		"gdb-mi" //$NON-NLS-1$
 	};
 	
 	/**
 	 * Path to backend debugger
 	 */
-	public static final String SDM_DEBUGGER_BACKEND_PATH = PLUGIN_ID + ".debugger_backend_path";
-	public static final String SDM_DEFAULT_DEDUGGER_BACKEND_PATH = "";
+	public static final String SDM_DEBUGGER_BACKEND_PATH = PLUGIN_ID + ".debugger_backend_path"; //$NON-NLS-1$
+	public static final String SDM_DEFAULT_DEDUGGER_BACKEND_PATH = ""; //$NON-NLS-1$
 }
