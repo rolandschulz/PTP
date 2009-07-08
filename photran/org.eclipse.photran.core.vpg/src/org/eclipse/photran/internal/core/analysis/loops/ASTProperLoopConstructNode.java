@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.loops;
 
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
 import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
@@ -97,5 +98,17 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         case 2:  this.endDoStmt = (ASTEndDoStmtNode)value; break;
         default: throw new IllegalArgumentException();
         }
+    }
+    
+    // UTILITY METHODS ////////////////////////////////////////////////////////////////////////////
+    
+    public boolean isDoWhileLoop()
+    {
+        return getLoopHeader().getLoopControl().getVariableName() == null;
+    }
+    
+    public Token getIndexVariable()
+    {
+        return getLoopHeader().getLoopControl().getVariableName();
     }
 }
