@@ -13,6 +13,7 @@ import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
@@ -78,9 +79,14 @@ public class FortranModelBuilder implements IFortranModelBuilder
             createSourceFormNode();
             
             if (isParseTreeModelEnabled())
+            {
+            	 LoopReplacer.replaceAllLoopsIn(ast.getRoot());
                  ast.accept(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
+            }
             else
+            {
                  ast.accept(new FortranModelBuildingVisitor(translationUnit, this));
+            }
             
             //FortranElement note = new FortranElement.UnknownNode(translationUnit, isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>");
             //this.addF90Element(note);
