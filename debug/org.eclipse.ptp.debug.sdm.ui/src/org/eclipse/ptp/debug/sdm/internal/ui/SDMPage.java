@@ -23,6 +23,7 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
@@ -86,7 +87,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		Label label = new Label(comp, SWT.NONE);
-		label.setText(Messages.getString("SDMDebuggerPage.path")); //$NON-NLS-1$
+		label.setText(Messages.SDMPage_0);
 		GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -99,7 +100,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		fRMDebuggerBrowseButton = createPushButton(comp, Messages.getString("SDMDebuggerPage.browse"), null); //$NON-NLS-1$
+		fRMDebuggerBrowseButton = createPushButton(comp, Messages.SDMPage_1, null);
 		fRMDebuggerBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -111,7 +112,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		});
 
 		label = new Label(comp, SWT.NONE);
-		label.setText(Messages.getString("SDMDebuggerPage.host")); //$NON-NLS-1$
+		label.setText(Messages.SDMPage_2);
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -131,7 +132,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return Messages.getString("SDMDebuggerPage.debuggname"); //$NON-NLS-1$
+		return Messages.SDMPage_3;
 	}
 
 	/* (non-Javadoc)
@@ -157,9 +158,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	public boolean isValid(ILaunchConfiguration launchConfig) {
 		setErrorMessage(null);
 		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
-			setErrorMessage(Messages.getString("SDMDebuggerPage.err3")); //$NON-NLS-1$
+			setErrorMessage(Messages.SDMPage_4);
 		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
-			setErrorMessage(Messages.getString("SDMDebuggerPage.err1")); //$NON-NLS-1$
+			setErrorMessage(Messages.SDMPage_5);
 		} else {
 			if (pathIsDirty) {
 				if (!verifyPath(fRMDebuggerPathText.getText())) {
@@ -171,7 +172,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			} 
 			
 			if (!pathIsValid) {
-				setErrorMessage(Messages.getString("SDMDebuggerPage.err4")); //$NON-NLS-1$
+				setErrorMessage(Messages.SDMPage_6);
 			}
 		}
 		return (getErrorMessage() == null);
@@ -184,9 +185,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	public boolean canSave() {
 		setErrorMessage(null);
 		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
-			setErrorMessage(Messages.getString("SDMDebuggerPage.err3")); //$NON-NLS-1$
+			setErrorMessage(Messages.SDMPage_7);
 		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
-			setErrorMessage(Messages.getString("SDMDebuggerPage.err1")); //$NON-NLS-1$
+			setErrorMessage(Messages.SDMPage_8);
 		} else {
 			if (pathIsDirty) {
 				if (!verifyPath(fRMDebuggerPathText.getText())) {
@@ -198,7 +199,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			} 
 			
 			if (!pathIsValid) {
-				setErrorMessage(Messages.getString("SDMDebuggerPage.err4")); //$NON-NLS-1$
+				setErrorMessage(Messages.SDMPage_9);
 			}
 		}
 		//setErrorMessage(errMsg);
@@ -255,11 +256,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		/*
 		 * We have just selected SDM as the debugger...
 		 */
-		//Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-		String path = "";//store.getString(SDMPreferenceConstants.SDM_DEBUGGER_FILE);
+		String path = ""; //$NON-NLS-1$
 		/*
-		 * Guess that the sdm executable is in the same location as the proxy. If not then use the
-		 * preference setting.
+		 * Guess that the sdm executable is in the same location as the proxy. 
 		 */
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
@@ -292,14 +291,14 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			if (fileManager != null) {
 				fileManager.setConnection(getRemoteConnection());
 				IPath path = fileManager.browseFile(getShell(),
-						Messages.getString("SDMDebuggerPage.selectDebuggerExe"),
+						Messages.SDMPage_10,
 						fRMDebuggerPathText.getText());
 				if (path != null)
 					return path.toString();
 			}
 		} else {
 			FileDialog dialog = new FileDialog(getShell());
-			dialog.setText(Messages.getString("SDMDebuggerPage.selectDebuggerExe"));
+			dialog.setText(Messages.SDMPage_10);
 			dialog.setFileName(fRMDebuggerPathText.getText());
 			return dialog.open();
 		}
