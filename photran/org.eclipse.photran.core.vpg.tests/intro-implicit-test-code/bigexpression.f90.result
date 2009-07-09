@@ -1,6 +1,8 @@
 program p
 	implicit none
 	integer :: hello
+	call s
+	stop
 contains
 	subroutine s
 		implicit none
@@ -8,7 +10,7 @@ contains
 		parameter (THREE = 3)
 		print *, THREE + 2 + 63 * twice(4)
 	end subroutine
-	
+
 	integer function twice(n)
 		implicit none
 		integer :: n

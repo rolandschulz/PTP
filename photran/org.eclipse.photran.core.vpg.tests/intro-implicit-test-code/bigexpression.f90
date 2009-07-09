@@ -1,11 +1,13 @@
 program p
 	integer :: hello
+	call s
+	stop
 contains
 	subroutine s
 		parameter (THREE = 3)
 		print *, THREE + 2 + 63 * twice(4)
 	end subroutine
-	
+
 	integer function twice(n)
 		intent(in) :: n
 		twice = 2 * n

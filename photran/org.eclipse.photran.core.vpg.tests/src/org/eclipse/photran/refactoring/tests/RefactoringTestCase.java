@@ -150,6 +150,25 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         }
     }
     
+    /**
+     * If the environment variables COMPILER and EXECUTABLE are set during the JUnit run,
+     * this will compile the file(s) that are currently being refactored (i.e., the files
+     * imported into the test project using {@link #importFile(String, String)}) into a
+     * single executable, and then run that executable.  This can be invoked before and
+     * after a refactoring is performed to make sure runtime behavior is actually preserved
+     * for the test program.
+     * <p>
+     * COMPILER must be set to the path of your Fortran compiler, e.g.,
+     * /usr/local/gfortran/bin/gfortran
+     * <p>
+     * EXECUTABLE gives a path for the generated executable, e.g.,
+     * /Users/joverbey/fortran-test-program.exe
+     * <p>
+     * The actual command line that is invoked is printed to standard output.
+     * 
+     * @return the output from the compiler and executable
+     * @throws Exception
+     */
     protected String compileAndRunFortranProgram() throws Exception
     {
         String compiler = System.getenv("COMPILER");
@@ -172,15 +191,23 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         builder.directory(project.getLocation().toFile());
         builder.redirectErrorStream(true);
         Process process = builder.start();
-        
         ConcurrentReader output = new ConcurrentReader(process.getInputStream());
         output.start();
-        
         int exitCode = process.waitFor();
         if (exitCode != 0)
-            return "Process exited abnormally with exit code " + exitCode + "\n" + output.toString();
-        else
-            return output.toString();
+            fail("Compilation exited abnormally with exit code " + exitCode + "\n" + output.toString());
+        
+        builder = new ProcessBuilder(exe);
+        builder.directory(project.getLocation().toFile());
+        builder.redirectErrorStream(true);
+        process = builder.start();
+        ConcurrentReader output2 = new ConcurrentReader(process.getInputStream());
+        output2.start();
+        exitCode = process.waitFor();
+        if (exitCode != 0)
+            fail("Compilation succeeded, but execution exited abnormally with exit code " + exitCode + "\n" + output.toString() + "\n" + output2.toString());
+        
+        return output.toString() + "\n" + output2.toString();
     }
 
     private String toString(ArrayList<String> args)

@@ -4,6 +4,7 @@ program hello
     print *, i, j, MYsIlLyVaRiAbLe
     CALL wORTHLESSfUNCTION(i+1,j+1,MySillyVariable)
     print *, i, j, mYsILLYvARIABLE
+    stop
 
     contains
     subroutine WorthlessFunction(i,j,mySillyVariable)

@@ -2,11 +2,19 @@ program p
     implicit none
     real :: a
     real :: d
-    a = 3
-    d = 4
+    type t
+        integer n
+    end type
+    type(t) u
+
+    a = 1
+    d = 1
+    u = t(5)
+    call s
+    print *, a, d, u
     stop
 contains
-subroutine s
+  subroutine s
     implicit none
     integer :: b
     integer :: c
@@ -14,10 +22,7 @@ subroutine s
     type(t) :: f
     integer :: g
     complex :: h
-    type t
-        integer n
-    end type
-    
+
     a = 3
     b = 3
     c = 3
@@ -26,5 +31,5 @@ subroutine s
     f%n = 3
     g = 3
     h = (3, 4)
-end subroutine
+  end subroutine
 end program

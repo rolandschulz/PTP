@@ -4,6 +4,7 @@ program functioncalling
   call sum(1.0,2.0,3.0)
   call factorial(3)
   print *, 'Done'
+  stop
 
 contains
 
@@ -12,9 +13,9 @@ contains
 	  real :: x
 	  real :: y
 	  real :: z
-  
-  
-	  x = x+y+z
+
+
+	  !x = x+y+z ! gfortran 4.4.0 on Mac OS X 10.5.7 gives "Bus error"
 	  print *, x
   end subroutine sum
 
@@ -28,7 +29,7 @@ contains
 	  do i=1,j
 	    p=p*i
 	  end do
-	
+
 	  print *, j, "! = ", p
   end subroutine factorial
 

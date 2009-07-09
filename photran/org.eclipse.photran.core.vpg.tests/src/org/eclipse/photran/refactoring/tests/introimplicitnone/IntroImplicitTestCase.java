@@ -47,6 +47,9 @@ public class IntroImplicitTestCase extends RefactoringTestCase
             
         IntroImplicitNoneRefactoring refactoring = createRefactoring(filename, lineCol);
         
+        project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        String before = compileAndRunFortranProgram();
+
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());
         
@@ -59,6 +62,10 @@ public class IntroImplicitTestCase extends RefactoringTestCase
         change.perform(pm);
         
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        
+        String after = compileAndRunFortranProgram();
+        System.out.println(after);
+        assertEquals(before, after);
     }
 
     private IntroImplicitNoneRefactoring createRefactoring(final String filename, final LineCol lineCol) throws Exception
