@@ -151,11 +151,15 @@ public abstract class RefactoringTestCase extends BaseTestFramework
     }
     
     /**
-     * Compiles and runs the Fortran program being refactored and returns the output of
-     * the compilation and execution.
-     * <p>
      * If the environment variables COMPILER and EXECUTABLE are set during the JUnit run,
-     * this will compile the file(s) that are currently being refactored (i.e., the files
+     * compiles and runs the Fortran program being refactored and returns the output of
+     * the compilation and execution.  Otherwise, returns the empty string.
+     * <p>
+     * (This is intended to allow developers creating refactorings to test their refactorings
+     * by actually compiling the code, while not forcing other developers to do so, since
+     * it can be time-consuming.  Tests should NOT assume that a compiler is available.)
+     * <p>
+     * This will compile the file(s) that are currently being refactored (i.e., the files
      * imported into the test project using {@link #importFile(String, String)}) into a
      * single executable, and then run that executable.  This can be invoked before and
      * after a refactoring is performed to make sure runtime behavior is actually preserved
