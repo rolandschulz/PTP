@@ -232,11 +232,18 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         assert selection != null && selection.enclosingScope.isSubprogram();
         assert newName != null;
 
-        ASTSubroutineSubprogramNode newSubprogram = createNewSubprogram();
-        insertSubroutineCall();
-        moveStatementsIntoBodyOf(newSubprogram);
-        
-        this.addChangeFromModifiedAST(this.fileInEditor, pm);
+        try
+        {
+            ASTSubroutineSubprogramNode newSubprogram = createNewSubprogram();
+            insertSubroutineCall();
+            moveStatementsIntoBodyOf(newSubprogram);
+            
+            this.addChangeFromModifiedAST(this.fileInEditor, pm);
+        }
+        finally
+        {
+            vpg.releaseAllASTs();
+        }
     }
 
     private ASTSubroutineSubprogramNode createNewSubprogram()

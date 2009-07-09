@@ -159,13 +159,20 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
         assert commonBlockToMove != null && nameOfCommonBlockToMove != null && affectedFiles != null;
         assert newModuleName != null;
         
-        for (IFile file : affectedFiles)
+        try
         {
-            if (file.equals(fileInEditor))
-                createModule();
-
-            replaceCommonBlockWithModuleUseIn(file);
-            addChangeFromModifiedAST(file, pm);
+            for (IFile file : affectedFiles)
+            {
+                if (file.equals(fileInEditor))
+                    createModule();
+    
+                replaceCommonBlockWithModuleUseIn(file);
+                addChangeFromModifiedAST(file, pm);
+            }
+        }
+        finally
+        {
+            vpg.releaseAllASTs();
         }
     }
 
