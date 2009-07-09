@@ -105,15 +105,21 @@ public /*was package-private*/ class VariableReference
          *     \w matches [A-Za-z_0-9]
          *     Parentheses define a capturing group (capturing groups are numbered below)
          */
-        //                                            123                      4                      5
-        //                                              ==m==         *        ==x==         +        ==b==
-        private static Pattern mxb = Pattern.compile("(((\\d+)[ \t]*\\*[ \t]*)?(\\w+)[ \t]*\\+[ \t]*)?(\\d+)");
-        //                                             12                      3
-        //                                              ==m==         *        ==x==
-        private static Pattern mx  = Pattern.compile( "((\\d+)[ \t]*\\*[ \t]*)?(\\w+)");
-        //                                            1                    23                      4
-        //                                            ==b==         +       ==m==         *        ==x==
-        private static Pattern bmx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*((\\d+)[ \t]*\\*[ \t]*)?(\\w+)");
+        //                                            123                        4                      5
+        //                                              ===m===         *        ==x==         +        ==b==
+        private static Pattern mxb = Pattern.compile("((-?(\\d+)[ \t]*\\*[ \t]*)?(\\w+)[ \t]*\\+[ \t]*)?(\\d+)");
+        //                                             12                        3
+        //                                              ===m===         *        ==x==
+        private static Pattern mx  = Pattern.compile( "((-?\\d+)[ \t]*\\*[ \t]*)?(\\w+)");
+        //                                            1                    23                        4
+        //                                            ==b==         +       ===m===         *        ==x==
+        private static Pattern bmx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*((-?\\d+)[ \t]*\\*[ \t]*)?(\\w+)");
+        //                                                    1     2               3
+        //                                            -       ==x==          +      ==b==
+        private static Pattern nxb = Pattern.compile("-[ \\t]*(\\w+)([ \t]*\\+[ \t]*(\\d+))?");
+        //                                            1                           2
+        //                                            ==b==         +      -      ==x==
+        private static Pattern bnx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*-[ \t]*(\\w+)");
         
         /** Factory method */
         public static LinearFunction fromNode(IASTNode node)
@@ -125,16 +131,19 @@ public /*was package-private*/ class VariableReference
             Matcher m;
             
             m = mxb.matcher(str);
-            if (m.matches())
-                return LinearFunction.from(m.group(3), m.group(4), m.group(5));
+            if (m.matches()) return LinearFunction.from(m.group(3), m.group(4), m.group(5));
 
             m = mx.matcher(str);
-            if (m.matches())
-                return LinearFunction.from(m.group(2), m.group(3), null);
+            if (m.matches()) return LinearFunction.from(m.group(2), m.group(3), null);
 
             m = bmx.matcher(str);
-            if (m.matches())
-                return LinearFunction.from(m.group(3), m.group(4), m.group(1));
+            if (m.matches()) return LinearFunction.from(m.group(3), m.group(4), m.group(1));
+
+            m = nxb.matcher(str);
+            if (m.matches()) return LinearFunction.from("-1", m.group(1), m.group(3));
+
+            m = bnx.matcher(str);
+            if (m.matches()) return LinearFunction.from("-1", m.group(2), m.group(1));
 
             return null;
         }

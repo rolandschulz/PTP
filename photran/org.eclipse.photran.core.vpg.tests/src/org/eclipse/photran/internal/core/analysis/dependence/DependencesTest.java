@@ -47,7 +47,7 @@ public class DependencesTest extends BaseTestCase
             deps.getDependences().toString());
     }
 
-    public void testFalse() throws Exception
+    public void testFalse1() throws Exception
     {
         LoopDependences deps = dependences(
             "DO I = 1, N\n" +
@@ -77,4 +77,19 @@ public class DependencesTest extends BaseTestCase
                       "Flow dependence from f(1*i+1) to f(1*i+0)]",
             deps.getDependences().toString());
     }
+
+    /*
+    public void testFalse2() throws Exception
+    {
+        LoopDependences deps = dependences(
+            "DO I = 1, N\n" +
+            "    A(-1*I) = A(I)\n" +
+            "ENDDO\n");
+        
+        assertEquals("[a(-1*i+0)]", deps.getWrites().toString());
+        assertEquals("[a(1*i+0), i]", deps.getReads().toString());
+        
+        assertTrue(deps.getDependences().isEmpty());
+    }
+    */
 }

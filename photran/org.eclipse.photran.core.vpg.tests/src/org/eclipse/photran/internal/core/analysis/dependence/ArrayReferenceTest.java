@@ -29,6 +29,9 @@ public class ArrayReferenceTest extends BaseTestCase
         assertEquals("a",        VariableReference.fromLHS(assignment("a(s(n/3)) = 0")).toString());
         assertEquals("a(2*i+5)", VariableReference.fromLHS(assignment("a(5+2*i) = 0")).toString());
         assertEquals("a(1*i+5)", VariableReference.fromLHS(assignment("a(5+i) = 0")).toString());
+        assertEquals("a(-1*i+5)", VariableReference.fromLHS(assignment("a(-i+5) = 0")).toString());
+        assertEquals("a(-1*i+0)", VariableReference.fromLHS(assignment("a(-i) = 0")).toString());
+        //assertEquals("a(-1*i+5)", VariableReference.fromLHS(assignment("a(5+-i) = 0")).toString());
     }
 
     public void test3DLHS() throws Exception
