@@ -82,7 +82,7 @@ sdm_route_init(int argc, char *argv[]) {
 		sdm_idset desc = sdm_set_new();
 		find_descendents(desc, NORMALIZE(child, size, root), root, size, p2, 1);
 		HashInsert(child_descendants, child, (void *)desc);
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] route for %d is %s \n", sdm_route_get_id(), child, _set_to_str(desc));
+		DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] route for %d is %s \n", sdm_route_get_id(), child, _set_to_str(desc));
 	}
 
     return 0;
@@ -114,7 +114,7 @@ sdm_route_get_route(const sdm_idset dest)
 
 	sdm_set_clear(route);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_route_get_route dest %s, parent %d\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] sdm_route_get_route dest %s, parent %d\n",
 			sdm_route_get_id(),
 			_set_to_str(dest),
 			parent);
