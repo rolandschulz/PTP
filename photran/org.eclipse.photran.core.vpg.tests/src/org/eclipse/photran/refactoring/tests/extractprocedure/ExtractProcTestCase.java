@@ -45,7 +45,10 @@ public class ExtractProcTestCase extends RefactoringTestCase
         String description = "Attempt to extract procedure from " + filename;
         
         ExtractProcedureRefactoring refactoring = createRefactoring(filename);
-        
+
+        project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        String before = compileAndRunFortranProgram();
+
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());
         
@@ -60,6 +63,10 @@ public class ExtractProcTestCase extends RefactoringTestCase
         change.perform(pm);
         
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        
+        String after = compileAndRunFortranProgram();
+        System.out.println(after);
+        assertEquals(before, after);
     }
 
     private ExtractProcedureRefactoring createRefactoring(final String filename) throws Exception

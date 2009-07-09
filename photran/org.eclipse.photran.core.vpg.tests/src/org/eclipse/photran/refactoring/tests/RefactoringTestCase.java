@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.util.LineCol;
@@ -146,6 +147,92 @@ public abstract class RefactoringTestCase extends BaseTestFramework
             assertEquals("Unexpected Levenshtein distance " + actual + " (expected " + expected + ") " + errorMessage,
                          s,
                          t);
+        }
+    }
+    
+    protected String compileAndRunFortranProgram() throws Exception
+    {
+        String compiler = System.getenv("COMPILER");
+        if (compiler == null) return "";
+        
+        String exe = System.getenv("EXECUTABLE");
+        if (exe == null) return "";
+        
+        ArrayList<String> args = new ArrayList<String>(8);
+        args.add(compiler);
+        args.add("-o");
+        args.add(exe);
+        for (IResource res : project.members())
+            if (res instanceof IFile && res.getFileExtension().startsWith("f"))
+                args.add(res.getName());
+        
+        System.out.println(toString(args));
+        
+        ProcessBuilder builder = new ProcessBuilder(args);
+        builder.directory(project.getLocation().toFile());
+        builder.redirectErrorStream(true);
+        Process process = builder.start();
+        
+        ConcurrentReader output = new ConcurrentReader(process.getInputStream());
+        output.start();
+        
+        int exitCode = process.waitFor();
+        if (exitCode != 0)
+            return "Process exited abnormally with exit code " + exitCode + "\n" + output.toString();
+        else
+            return output.toString();
+    }
+
+    private String toString(ArrayList<String> args)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < args.size(); i++)
+            sb.append((i == 0 ? "" : " ") + args.get(i));
+        return sb.toString();
+    }
+    
+    private static class ConcurrentReader extends Thread
+    {
+        private InputStream stdout;
+        private StringBuilder sb;
+        
+        public ConcurrentReader(InputStream stdout)
+        {
+            this.stdout = stdout;
+            this.sb = new StringBuilder();
+        }
+        
+        @Override public void run()
+        {
+            BufferedReader in = new BufferedReader(new InputStreamReader(stdout));
+            try
+            {
+                for (String line = in.readLine(); line != null; line = in.readLine())
+                {
+                    sb.append(line);
+                    sb.append('\n');
+                }
+            }
+            catch (IOException e)
+            {
+                sb.append(e.toString());
+            }
+            finally
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    sb.append(e.toString());
+                }
+            }
+        }
+        
+        @Override public String toString()
+        {
+            return sb.toString();
         }
     }
 }
