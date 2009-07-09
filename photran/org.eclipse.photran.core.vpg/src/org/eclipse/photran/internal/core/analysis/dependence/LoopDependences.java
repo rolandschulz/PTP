@@ -84,7 +84,7 @@ public class LoopDependences
         }
     }
 
-    Collection<VariableReference> getReads()
+    public Collection<VariableReference> getReads()
     {
         ArrayList<VariableReference> result = new ArrayList<VariableReference>(varRefs.size());
         for (VariableReference ref : varRefs)
@@ -94,7 +94,7 @@ public class LoopDependences
         return result;
     }
 
-    Collection<VariableReference> getWrites()
+    public Collection<VariableReference> getWrites()
     {
         ArrayList<VariableReference> result = new ArrayList<VariableReference>(varRefs.size());
         for (VariableReference ref : varRefs)
