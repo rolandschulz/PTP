@@ -51,7 +51,7 @@ int_to_hex_str(unsigned int val, char *str, int len, char **end)
 	 * Need a separate buffer because sprintf adds a null to
 	 * the end of the string.
 	 */
-	sprintf(buf, "%0*x", len, val & 0xffffffff);
+	snprintf(buf, len+1, "%0*x", len, val & 0xffffffff);
 
 	memcpy(str, buf, len);
 
