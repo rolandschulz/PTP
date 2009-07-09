@@ -110,7 +110,7 @@ dbg_clnt_cmd_completed(sdm_message msg)
  		 * don't include the bitset, it is only added prior to sending back
  		 * to the client.
  		 */
- 		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] dbg_clnt_cmd_completed src=%s\n", sdm_route_get_id(),
+ 		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] dbg_clnt_cmd_completed src=%s\n", sdm_route_get_id(),
  				_set_to_str(sdm_message_get_source(msg)));
 		proxy_msg_insert_bitset(m, idset_to_bitset(sdm_message_get_source(msg)), 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
@@ -126,7 +126,7 @@ send_command(sdm_idset dest, int timeout, char *cmd, int len, void *cbdata)
 {
 	sdm_message 	msg;
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] send_command dest=%s cmd=%s\n", sdm_route_get_id(), _set_to_str(dest), cmd);
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] send_command dest=%s cmd=%s\n", sdm_route_get_id(), _set_to_str(dest), cmd);
 
 	msg = sdm_message_new(cmd, len);
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
@@ -145,7 +145,7 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, 
 {
 	struct timeval	tv = { 0, CLIENT_TIMEOUT };
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] DbgClntInit num_svrs=%d\n", sdm_route_get_id(), num_svrs);
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] DbgClntInit num_svrs=%d\n", sdm_route_get_id(), num_svrs);
 
 	tmp_idset = sdm_set_new();
 	tmp_bitset = bitset_new(num_svrs);

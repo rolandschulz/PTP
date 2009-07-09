@@ -75,7 +75,7 @@ sdm_create_sockd_map()
 	sdm_idset all_nodes;
 	sdm_idset adjacent_nodes;
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] in sdm_create_sockd_map\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] in sdm_create_sockd_map\n",
 			sdm_route_get_id());
 
 	// Set parent map
@@ -98,7 +98,7 @@ sdm_create_sockd_map()
 
 	adjacent_nodes = sdm_route_get_route(all_nodes);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] adjacent nodes: %s\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] adjacent nodes: %s\n",
 			sdm_route_get_id(), _set_to_str(adjacent_nodes));
 
 	children_sockd_map = NULL;
@@ -110,7 +110,7 @@ sdm_create_sockd_map()
 
 		for (child = sdm_set_first(adjacent_nodes); !sdm_set_done(adjacent_nodes);
 		 child = sdm_set_next(adjacent_nodes)) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] adding %d to my map\n",
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] adding %d to my map\n",
 					sdm_route_get_id(), child);
 			p = (sdm_id_sockd_map_p)malloc(sizeof(sdm_id_sockd_map));
 			p->next = children_sockd_map;
@@ -140,7 +140,7 @@ sdm_parent_port_bind(int parentbaseport)
 	//.Create a socket and bind to the port
 	sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] [ACCEPT] sockfd: %d\n", sdm_route_get_id(), sockfd);
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] [ACCEPT] sockfd: %d\n", sdm_route_get_id(), sockfd);
 
 	memset(&sockaddr_info, 0, sizeof(struct sockaddr_in));
 	sockaddr_info.sin_family = AF_INET;
@@ -152,27 +152,27 @@ sdm_parent_port_bind(int parentbaseport)
 		if(bind(sockfd, (struct sockaddr *)&(sockaddr_info), sizeof(struct sockaddr_in)) < 0) {
 			if(errno != EADDRINUSE) {
 				// Error!
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error binding to the port! - errno %d\n",
+				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error binding to the port! - errno %d\n",
 						sdm_route_get_id(), errno);
 				return -1;
 			}
 		} else { // Bound successfully
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] port bound: %d\n", sdm_route_get_id(), parentport);
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] port bound: %d\n", sdm_route_get_id(), parentport);
 			break;
 		}
 		// Increment port number and try again
 	}
 
 	if (parentport < parentbaseport + MAX_PORT_INCREMENT) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] bound to port %d\n", sdm_route_get_id(), parentport);
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] bound to port %d\n", sdm_route_get_id(), parentport);
 	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] could not find port to bind to\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] could not find port to bind to\n", sdm_route_get_id());
 		close(sockfd);
 		return -1;
 	}
 
 	if(listen(sockfd, 5) < 0) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error listening to the port %d!\n", sdm_route_get_id(), parentport);
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error listening to the port %d!\n", sdm_route_get_id(), parentport);
 		return -1;
 	}
 
@@ -181,11 +181,11 @@ sdm_parent_port_bind(int parentbaseport)
 		memset(&peersockaddr_info, 0, sizeof(struct sockaddr_in));
 		peersockfd = accept(sockfd, (struct sockaddr *)&(peersockaddr_info), &peeraddr_len);
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] peersockfd: %d\n", sdm_route_get_id(), peersockfd);
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] peersockfd: %d\n", sdm_route_get_id(), peersockfd);
 
 		if(peersockfd < 0) {
 			perror("Status of accepting data from parent");
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Could not accept port connection on port %d - errno %d!\n",
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Could not accept port connection on port %d - errno %d!\n",
 					sdm_route_get_id(), parentport, errno);
 			return -1;
 		}
@@ -230,7 +230,7 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 		sockfd = socket(PF_INET, SOCK_STREAM, 0);
 		if(sockfd < 0) {
 			perror("Socket");
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] socket syscall error\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] socket syscall error\n", sdm_route_get_id());
 			return -1;
 		}
 
@@ -238,7 +238,7 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 		sprintf(port_str, "%d", childport);
 		if(getaddrinfo(hostname, port_str, &hints, &result)) {
 			perror("getaddrinfo");
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] getaddrinfo error. hostname: %s, port: %s\n",
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] getaddrinfo error. hostname: %s, port: %s\n",
 					sdm_route_get_id(), hostname, port_str);
 			return -1;
 		}
@@ -252,7 +252,7 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 				(errno != ETIMEDOUT) ) {
 				perror("connect");
 				freeaddrinfo(result);
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] connect error. hostname: %s, port: %s\n",
+				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] connect error. hostname: %s, port: %s\n",
 						sdm_route_get_id(), hostname, port_str);
 				return -1;
 			}
@@ -272,7 +272,7 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 		}
 	}
 	// No valid peer found!
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] No port found for the sdm child. hostname: %s\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] No port found for the sdm child. hostname: %s\n",
 			sdm_route_get_id(), hostname);
 	return -1;
 }
@@ -292,23 +292,23 @@ sdm_tcpip_init()
 	if(sdm_route_get_id() != SDM_MASTER) {
 		int parentsockd = -1;
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] This node is a server!\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] This node is a server!\n", sdm_route_get_id());
 
 		for (sdm_routing_table_set(); (entry = sdm_routing_table_next()) != NULL; ) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] found entry for node %d\n", sdm_route_get_id(), entry->nodeID);
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] found entry for node %d\n", sdm_route_get_id(), entry->nodeID);
 			if(entry->nodeID == sdm_route_get_id()) {
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] found my entry\n", sdm_route_get_id());
+				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] found my entry\n", sdm_route_get_id());
 				parentsockd = sdm_parent_port_bind(entry->port);
 				break;
 			}
 		}
 
 		if(parentsockd < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to port\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] failed to bind to port\n", sdm_route_get_id());
 			return -1;
 		}
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Parent %d successfully connected\n", sdm_route_get_id(), parent_sockd_map->id);
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Parent %d successfully connected\n", sdm_route_get_id(), parent_sockd_map->id);
 
 		// Update the parent socket descriptor
 		parent_sockd_map->sockd = parentsockd;
@@ -316,7 +316,7 @@ sdm_tcpip_init()
 
 	// If node is leaf, initialization is done
 	if(children_sockd_map == NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] This node is a leaf\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] This node is a leaf\n", sdm_route_get_id());
 		return 0;
 	}
 
@@ -332,10 +332,10 @@ sdm_tcpip_init()
 				childsockd = sdm_connect_to_child(entry->hostname, entry->port);
 
 				if(childsockd < 0) {
-					DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] failed to bind to connect to child %s:%d\n", sdm_route_get_id(), entry->hostname, entry->port);
+					DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] failed to bind to connect to child %s:%d\n", sdm_route_get_id(), entry->hostname, entry->port);
 					return -1;
 				}
-				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Connection to child %d successful\n", sdm_route_get_id(), mapp->id);
+				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Connection to child %d successful\n", sdm_route_get_id(), mapp->id);
 
 				// Set the children socket descriptor
 				mapp->sockd = childsockd;
@@ -469,7 +469,7 @@ sdm_get_active_sock_desc()
 
 	if(selrv < 0) {
 		perror("select syscall status");
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "select syscall failed!\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_MESSAGES, "select syscall failed!\n");
 		return -1;
 	} else if(selrv == 0) { // No socket has data. Return appropriated code
 //		printf("The sockets listened dont have data!\n");
@@ -525,6 +525,8 @@ sdm_tcpip_msgheader_receive(int sockfd, int *length)
 		len -= n;
 	}
 
+	DEBUG_PRINTF(DEBUG_LEVEL_PROTOCOL, "HEADER:<%*s>\n", MESSAGE_LENGTH_SIZE, length_str);
+
 	*length = hex_str_to_int(length_str, MESSAGE_LENGTH_SIZE, NULL) - MESSAGE_LENGTH_SIZE;
 
 	return 0;
@@ -549,6 +551,8 @@ sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
 		length -= n;
 	}
 
+	DEBUG_PRINTF(DEBUG_LEVEL_PROTOCOL, "BODY:<%*s>\n", length, buf);
+
 	return 0;
 }
 
@@ -565,7 +569,7 @@ sdm_tcpip_send(int sockd, char *buf, int length)
 			if (wcount < 0) {
 				perror("write syscall status");
 			}
-			DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Could not send message data - write syscall failed!\n");
+			DEBUG_PRINTS(DEBUG_LEVEL_MESSAGES, "Could not send message data - write syscall failed!\n");
 			return -1;
 		}
 
@@ -632,7 +636,7 @@ sdm_message_send(const sdm_message msg)
 	 */
 	if (sdm_set_contains(msg->dest, sdm_route_get_id())) {
 		sdm_set_remove_element(msg->dest, sdm_route_get_id());
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send removing me from dest\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_message_send removing me from dest\n", sdm_route_get_id());
 	}
 
 	/*
@@ -640,7 +644,7 @@ sdm_message_send(const sdm_message msg)
 	 */
 	route = sdm_route_get_route(msg->dest);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_send src %s dest %s route %s\n", sdm_route_get_id(),
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_message_send src %s dest %s route %s\n", sdm_route_get_id(),
 		_set_to_str(msg->src),
 		_set_to_str(msg->dest),
 		_set_to_str(route));
@@ -689,18 +693,18 @@ sdm_message_send(const sdm_message msg)
 		for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
 			int sockd;
 
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
 
 			// Get socket descriptor corresponding to the node where the message will be sent
 			sockd = sdm_fetch_sockd(dest_id);
 			if (sockd < 0) {
-				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Socket descriptor not found!\n");
+				DEBUG_PRINTS(DEBUG_LEVEL_MESSAGES, "Socket descriptor not found!\n");
 				return -1;
 			}
 
 			// Write all message to the socket
 			if (sdm_tcpip_send(sockd, buf, len) < 0) {
-				DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error sending message!\n");
+				DEBUG_PRINTS(DEBUG_LEVEL_MESSAGES, "Error sending message!\n");
 				return -1;
 			}
 		}
@@ -711,7 +715,7 @@ sdm_message_send(const sdm_message msg)
 		free(buf);
 	}
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] About to call send_complete\n", sdm_route_get_id());
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] About to call send_complete\n", sdm_route_get_id());
 
 	/*
 	 * Notify that the send is complete.
@@ -720,26 +724,12 @@ sdm_message_send(const sdm_message msg)
 		msg->send_complete(msg);
 	}
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Leaving sdm_message_send\n", sdm_route_get_id());
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Leaving sdm_message_send\n", sdm_route_get_id());
 
 	return 0;
 }
 
 /**
- * Return one socket description related to a socket that is
- * ready to read.
- *
- * @return the socket descriptor, -2 if no socket available for reading, -1 on failure
- *
- * Get the size of the message in bytes
- * @return 0 if successful, -1 if socket closed or error
- *
- * Get a message from a socket. Since message length comes
- * before the message, the sdm_get_count function must
- * be executed first
- *
- * @return 0 if successful, -1 if error
- *
  * Message progress. Caller is responsible for freeing allocated message resources.
  *
  * @return 0 on success, -1 on failure
@@ -756,17 +746,17 @@ sdm_message_progress(void)
 	int sockfd = sdm_get_active_sock_desc();
 
 	if(sockfd == -1) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving socket descriptor\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error retrieving socket descriptor\n", sdm_route_get_id());
 		return -1;
 	}
 
 	if (sockfd >= 0) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] receiving header\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] receiving header\n", sdm_route_get_id());
 
 		err = sdm_tcpip_msgheader_receive(sockfd, &len);
 
 		if(err != 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving message size!\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error retrieving message size!\n", sdm_route_get_id());
 			return -1;
 		}
 
@@ -775,30 +765,30 @@ sdm_message_progress(void)
 		sdm_message msg = sdm_message_new(buf, len);
 
 		if(sdm_tcpip_msgbody_receive(sockfd, buf, len) < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error retrieving message!\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error retrieving message!\n", sdm_route_get_id());
 			return -1;
 		}
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress received len %d from %d\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_message_progress received len %d from %d\n",
 				sdm_route_get_id(), len, sdm_fetch_nodeid(sockfd));
 
 		msg->id = hex_str_to_int(buf, MESSAGE_ID_SIZE, &buf);
 		len -= MESSAGE_ID_SIZE;
 
 		if ((n = sdm_aggregate_deserialize(msg->aggregate, buf, &buf)) < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] invalid header\n", sdm_route_get_id());
 			return -1;
 		}
 		len -= n;
 
 		if ((n = sdm_set_deserialize(msg->src, buf, &buf)) < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] invalid header\n", sdm_route_get_id());
 			return -1;
 		}
 		len -= n;
 
 		if ((n = sdm_set_deserialize(msg->dest, buf, &buf)) < 0) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] invalid header\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] invalid header\n", sdm_route_get_id());
 			return -1;
 		}
 		len -= n;
@@ -806,19 +796,19 @@ sdm_message_progress(void)
 		msg->payload = buf;
 		msg->payload_len = len;
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_progress agg=%s src=%s dest=%s\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_message_progress agg=%s src=%s dest=%s\n",
 				sdm_route_get_id(),
 				_aggregate_to_str(msg->aggregate),
 				_set_to_str(msg->src),
 				_set_to_str(msg->dest));
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] About to call recv_callback\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] About to call recv_callback\n", sdm_route_get_id());
 
 		if (sdm_recv_callback  != NULL) {
 			sdm_recv_callback(msg);
 		}
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Finished recv_callback\n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Finished recv_callback\n", sdm_route_get_id());
 	}
 
 	return 0;
@@ -931,7 +921,7 @@ void
 sdm_message_deliver(const sdm_message msg)
 {
 	if (deliver_callback != NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_message_deliver \n", sdm_route_get_id());
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_message_deliver \n", sdm_route_get_id());
 		deliver_callback(msg);
 	}
 }

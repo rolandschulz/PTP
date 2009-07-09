@@ -136,7 +136,7 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 
 		id = sdm_message_get_id(msg);
 
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: upstream message #%d from %s\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_aggregate_message: upstream message #%d from %s\n",
 				sdm_route_get_id(), id, _set_to_str(sdm_message_get_source(msg)));
 
 		/*
@@ -166,7 +166,7 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 			 * the original request.
 			 *
 			 */
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sdm_aggregate_message: message is unsolicited\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_aggregate_message: message is unsolicited\n", sdm_route_get_id());
 
 			req = new_request(sdm_route_reachable(empty_set), id, SDM_EVENT_WAIT_TIME);
 			update_reply(req, msg, a->value);
@@ -286,7 +286,7 @@ new_request(sdm_idset dest, int id, int timeout)
 
 	AddToList(all_requests, (void *)r);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request #%d expected replies %s\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Creating new request #%d expected replies %s\n",
 			sdm_route_get_id(), r->id, _set_to_str(r->outstanding));
 
 	return r;
@@ -298,14 +298,14 @@ new_request(sdm_idset dest, int id, int timeout)
 static void
 free_request(request *r)
 {
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Enter free_request\n", sdm_route_get_id());
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Enter free_request\n", sdm_route_get_id());
 
 	RemoveFromList(all_requests, (void *)r);
 	sdm_set_free(r->outstanding);
 	HashDestroy(r->replys, NULL);
 	free(r);
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Leaving free_request\n", sdm_route_get_id());
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Leaving free_request\n", sdm_route_get_id());
 
 }
 
@@ -322,7 +322,7 @@ request_completed(request *req)
 		msg = (sdm_message)he->h_data;
 
 		if (completion_callback != NULL) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request %d completed for #%x\n", sdm_route_get_id(),
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] request %d completed for #%x\n", sdm_route_get_id(),
 					req->id,
 					he->h_hval);
 			completion_callback(msg);
@@ -384,7 +384,7 @@ update_reply(request *req, sdm_message msg, int hash)
 	 */
 	sdm_set_diff(req->outstanding, sdm_message_get_source(msg));
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] reply updated: src=%s replies outstanding: %s\n",
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] reply updated: src=%s replies outstanding: %s\n",
 			sdm_route_get_id(),
 			_set_to_str(sdm_message_get_source(msg)),
 			_set_to_str(req->outstanding));
@@ -393,11 +393,11 @@ update_reply(request *req, sdm_message msg, int hash)
 	 * Save reply if it is new, otherwise just update the reply set
 	 */
 	if ((reply_msg = (sdm_message)HashSearch(req->replys, na->value)) == NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply #%x for request %d\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] creating new reply #%x for request %d\n",
 				sdm_route_get_id(), na->value, req->id);
 		HashInsert(req->replys, na->value, (void *)msg);
 	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x with src %s for request %d\n",
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] updating reply #%x with src %s for request %d\n",
 				sdm_route_get_id(),
 				na->value,
 				_set_to_str(sdm_message_get_source(msg)),

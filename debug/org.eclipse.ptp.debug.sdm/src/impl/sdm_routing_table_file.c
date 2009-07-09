@@ -60,16 +60,16 @@ sdm_routing_table_init(int argc, char *argv[])
 	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
 	if(rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error opening the routing file\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Error opening the routing file\n");
 		return -1;
 	} else if(rv == -2){
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Timeout while waiting for routing file\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Timeout while waiting for routing file\n");
 		return -1;
 	}
 	close_routing_file(rt_file);
 
 	if (tbl_size == 0) {
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Invalid routing file size\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Invalid routing file size\n");
 		return -1;
 	}
 
@@ -91,7 +91,7 @@ sdm_routing_table_init(int argc, char *argv[])
 	}
 
 	if (!master && envval == NULL) {
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Could not find my ID!\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Could not find my ID!\n");
 		return -1;
 	}
 
@@ -102,7 +102,7 @@ sdm_routing_table_init(int argc, char *argv[])
 		sdm_route_set_id(SDM_MASTER);
 	}
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] size %d\n", sdm_route_get_id(), sdm_route_get_size());
+	DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] size %d\n", sdm_route_get_id(), sdm_route_get_size());
 
 	/*
 	 * Once we have size and ID we can initialize child/parent relationships. This may need
@@ -129,9 +129,9 @@ sdm_routing_table_set(void)
 	rv = wait_for_routing_file("routing_file", &routing_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
 	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Error opening the routing file\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Error opening the routing file\n");
 	} else if (rv == -2) {
-		DEBUG_PRINTS(DEBUG_LEVEL_CLIENT, "Timeout while waiting for routing file\n");
+		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Timeout while waiting for routing file\n");
 	}
 }
 
@@ -149,7 +149,7 @@ sdm_routing_table_next(void)
 
 	if (rv < 0) {
 		if (rv == -1) {
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Error reading routing table entry\n", sdm_route_get_id());
+			DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] Error reading routing table entry\n", sdm_route_get_id());
 		}
 		close_routing_file(routing_file);
 		routing_file = NULL;
@@ -209,7 +209,7 @@ read_routing_table_entry(FILE *routing_file, routing_table_entry *entry)
 			&(entry->nodeID), entry->hostname,
 			&(entry->port));
 
-	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] nodeID: %d, hostname: %s, port: %d\n", sdm_route_get_id(),
+	DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] nodeID: %d, hostname: %s, port: %d\n", sdm_route_get_id(),
 			entry->nodeID, entry->hostname, entry->port);
 
 	if (rv == EOF)
@@ -318,7 +318,7 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 			rv = read_routing_table_size(fp, &size); // Returns FILE pointer to
 															// the after the header
 
-			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] effsize: %d, size: %d, rv: %d\n", sdm_route_get_id(),
+			DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] effsize: %d, size: %d, rv: %d\n", sdm_route_get_id(),
 					eff_size, size, rv);
 
 			switch (rv) {
