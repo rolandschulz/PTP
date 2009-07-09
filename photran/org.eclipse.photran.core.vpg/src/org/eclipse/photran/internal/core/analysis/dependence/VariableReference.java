@@ -34,7 +34,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
  * 
  * @author Jeff Overbey
  */
-class VariableReference
+public /*was package-private*/ class VariableReference
 {
     /**
      * Represents a linear function <i>m*x+b</i>, where <i>m</i> and <i>b</i> are integer

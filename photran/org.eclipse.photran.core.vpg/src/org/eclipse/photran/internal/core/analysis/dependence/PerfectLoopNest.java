@@ -25,7 +25,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  * 
  * @author Jeff Overbey
  */
-class PerfectLoopNest
+public /*was package-private*/ class PerfectLoopNest
 {
     /** The loops in the nest, from outermost to innermost */
     private ArrayList<ASTProperLoopConstructNode> loopNest;

@@ -22,7 +22,7 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * @author Jeff Overbey
  * @see IDependenceTester
  */
-class GCDTest implements IDependenceTester
+public /*was package-private*/ class GCDTest implements IDependenceTester
 {
     public boolean test(int n, int[] L, int[] U, int[] a, int[] b, Direction[] direction)
     {

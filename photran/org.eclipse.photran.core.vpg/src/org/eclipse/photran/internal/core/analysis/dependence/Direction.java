@@ -24,7 +24,7 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * @author Jeff Overbey
  * @see IDependenceTester
  */
-enum Direction
+public /*was package-private*/ enum Direction
 {
     /** &quot;&lt;&quot */
     LESS_THAN,
