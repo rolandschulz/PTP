@@ -151,6 +151,9 @@ public abstract class RefactoringTestCase extends BaseTestFramework
     }
     
     /**
+     * Compiles and runs the Fortran program being refactored and returns the output of
+     * the compilation and execution.
+     * <p>
      * If the environment variables COMPILER and EXECUTABLE are set during the JUnit run,
      * this will compile the file(s) that are currently being refactored (i.e., the files
      * imported into the test project using {@link #importFile(String, String)}) into a
@@ -165,6 +168,12 @@ public abstract class RefactoringTestCase extends BaseTestFramework
      * /Users/joverbey/fortran-test-program.exe
      * <p>
      * The actual command line that is invoked is printed to standard output.
+     * <p>
+     * NOTE: Occasionally, the last part of the output from the Fortran program may seem to
+     * be missing.  (This may be a gfortran-specific problem.)  You should include a
+     * statement to manually flush the output to ensure that your test cases always pass.
+     * In gfortran, you can "CALL FLUSH" to invoke the (proprietary) flush intrinsic; or
+     * there is also a FLUSH statement in Fortran 2003.
      * 
      * @return the output from the compiler and executable
      * @throws Exception

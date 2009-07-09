@@ -5,7 +5,6 @@ subroutine hmmm
 10  continue
 end subroutine
 
-
 subroutine new_procedure(i)
     implicit none
     integer :: i
@@ -14,3 +13,6 @@ subroutine new_procedure(i)
       print *, i * 10
     end if                       !<<<<<END
 end subroutine
+
+
+program main; call hmmm; call flush; stop; end program

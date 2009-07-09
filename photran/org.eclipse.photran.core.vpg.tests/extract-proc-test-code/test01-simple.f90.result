@@ -2,8 +2,10 @@ subroutine sub
     call new_procedure()
 end subroutine
 
-
 subroutine new_procedure()
     implicit none
     print *, "Hello" !<<<<<START !<<<<<END
 end subroutine
+
+
+program main; call sub; call flush; stop; end program

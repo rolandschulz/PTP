@@ -11,3 +11,5 @@ subroutine new_procedure(matrix, SIZE)
     integer :: SIZE
     matrix(:, :) = 0.0          !<<<<<START !<<<<<END
 end subroutine
+
+program main; call prob; call flush; stop; end program

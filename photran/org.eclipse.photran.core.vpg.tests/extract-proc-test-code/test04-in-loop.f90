@@ -7,3 +7,5 @@ subroutine hmmm
        print *, i
 10  continue
 end subroutine
+
+program main; call hmmm; call flush; stop; end program
