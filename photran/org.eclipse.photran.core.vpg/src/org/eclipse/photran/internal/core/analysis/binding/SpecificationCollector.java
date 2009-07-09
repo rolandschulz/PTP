@@ -44,7 +44,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
  * Phase 4 of name-binding analysis.
  * <p> 
  * Visits specification statements in an AST, updating the corresponding
- * {@link Definition} objecs stored in the VPG.
+ * {@link Definition} objects stored in the VPG.
  * 
  * @author Jeff Overbey
  * @see Binder
