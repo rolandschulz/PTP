@@ -469,6 +469,11 @@
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
       </command>
+      <command
+            name="Easter Egg"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.EasterEggCommand">
+      </command>
             
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
@@ -503,6 +508,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
+     />
+      <!--  win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
+            carbon: M1=COMMAND, M2=SHIFT, M3=ALT, M4=CTRL -->
+     <key
+            sequence="M1+M2+M3+M4+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.EasterEggCommand"
      />
    </extension>
    <!-- 3. Add the refactoring to the Refactoring dropdown menu (in the menu bar) -->
@@ -562,6 +575,11 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+         <action
+               label=""
+               definitionId="org.eclipse.photran.ui.EasterEggCommand"
+               class="org.eclipse.photran.ui.vpg.EasterEggAction"
+               id="org.eclipse.photran.ui.EasterEggAction"/>
       </actionSet>
    </extension>
    <!--extension
