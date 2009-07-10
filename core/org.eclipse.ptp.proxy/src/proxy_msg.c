@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "proxy.h"
 #include "proxy_msg.h"
@@ -91,6 +92,8 @@ proxy_serialize_msg(proxy_msg *m, char **result, int *result_len)
 		memcpy(p, m->args[i], arg_len);
 		p += arg_len;
 	}
+
+	assert(p - packet == hdr_len + len);
 
 	*result = packet;
 	*result_len = hdr_len + len;
@@ -228,7 +231,7 @@ proxy_msg_decode_string(char *str, int len, char **arg, char **end)
 }
 
 static void
-add_arg(proxy_msg *m, char *arg, int free_arg)
+add_arg(proxy_msg *m, char *arg)
 {
 	int 	size = m->arg_size;
 
@@ -239,14 +242,11 @@ add_arg(proxy_msg *m, char *arg, int free_arg)
 	if (size == 0) {
 		m->arg_size++; // extra space to null terminate arguments
 		m->args = (char **)malloc(sizeof(char *) * m->arg_size);
-		m->free_args = (int *)malloc(sizeof(int *) * m->arg_size);
 	} else if (size < m->arg_size) {
 		m->args = (char **)realloc(m->args, sizeof(char *) * m->arg_size);
-		m->free_args = (int *)realloc(m->free_args, sizeof(int *) * m->arg_size);
 	}
 
 	m->args[m->num_args] = arg;
-	m->free_args[m->num_args] = free_arg;
 	m->num_args++;
 
 	/*
@@ -290,7 +290,7 @@ proxy_msg_add_int(proxy_msg *m, int val)
 	char *	str_val;
 
 	asprintf(&str_val, "%d", val);
-	add_arg(m, str_val, 1);
+	add_arg(m, str_val);
 }
 
 void
@@ -299,7 +299,7 @@ proxy_msg_add_string(proxy_msg *m, char *val)
 	if (val == NULL) {
 		val = "";
 	}
-	add_arg(m, strdup(val), 1);
+	add_arg(m, strdup(val));
 }
 
 void
@@ -308,7 +308,7 @@ proxy_msg_add_string_nocopy(proxy_msg *m, char *val)
 	if (val == NULL) {
 		val = "";
 	}
-	add_arg(m, val, 0);
+	add_arg(m, val);
 }
 
 void
@@ -320,20 +320,7 @@ proxy_msg_add_args(proxy_msg *m, int nargs, char **args)
 		return;
 
 	for (i = 0; i < nargs; i++) {
-		add_arg(m, strdup(args[i]), 1);
-	}
-}
-
-void
-proxy_msg_add_args_nocopy(proxy_msg *m, int nargs, char **args)
-{
-	int i;
-
-	if (nargs == 0)
-		return;
-
-	for (i = 0; i < nargs; i++) {
-		add_arg(m, args[i], 0);
+		add_arg(m, strdup(args[i]));
 	}
 }
 
@@ -343,7 +330,7 @@ proxy_msg_add_keyval_int(proxy_msg *m, char *key, int val)
 	char *	kv;
 
 	asprintf(&kv, "%s=%d", key, val);
-	add_arg(m, kv, 1);
+	add_arg(m, kv);
 }
 
 void
@@ -352,20 +339,19 @@ proxy_msg_add_keyval_string(proxy_msg *m, char *key, char *val)
 	char *	kv;
 
 	asprintf(&kv, "%s=%s", key, val);
-	add_arg(m, kv, 1);
+	add_arg(m, kv);
 }
 
 void
 proxy_msg_add_bitset(proxy_msg *m, bitset *b)
 {
-	add_arg(m, bitset_to_str(b), 1);
+	add_arg(m, bitset_to_str(b));
 }
 
 void
 proxy_msg_insert_bitset(proxy_msg *m, bitset *b, int idx)
 {
 	int 	i;
-	int		tmp_free;
 	char *	tmp_arg;
 
 	if (idx < 0)
@@ -388,15 +374,12 @@ proxy_msg_insert_bitset(proxy_msg *m, bitset *b, int idx)
 	 */
 
 	tmp_arg = m->args[m->num_args-1];
-	tmp_free = m->free_args[m->num_args-1];
 
 	for (i = m->num_args-1; i > idx; i--) {
 		m->args[i] = m->args[i-1];
-		m->free_args[i] = m->free_args[i-1];
 	}
 
 	m->args[idx] = tmp_arg;
-	m->free_args[idx] = tmp_free;
 }
 
 proxy_msg *
@@ -409,7 +392,6 @@ new_proxy_msg(int msg_id, int trans_id)
 	m->arg_size = 0;
 	m->num_args = 0;
 	m->args = NULL;
-	m->free_args = NULL;
 
 	return m;
 }
@@ -420,13 +402,10 @@ free_proxy_msg(proxy_msg *m)
 	int i;
 
 	for (i = 0; i < m->num_args; i++) {
-		if (m->free_args[i]) {
-			free(m->args[i]);
-		}
+		free(m->args[i]);
 	}
 
 	free(m->args);
-	free(m->free_args);
 	free(m);
 }
 
