@@ -24,7 +24,6 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 
 /**
- * 
  * @author Jeff Overbey
  */
 public class EasterEgg extends SingleFileFortranRefactoring
