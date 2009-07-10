@@ -42,7 +42,6 @@ struct proxy_msg {
 	int		trans_id;
 	int		num_args;
 	int 	arg_size;
-	int *	free_args;
 	char **	args;
 };
 typedef struct proxy_msg proxy_msg;
@@ -59,7 +58,6 @@ extern void			proxy_msg_add_string(proxy_msg *, char *);
 extern void			proxy_msg_add_string_nocopy(proxy_msg *, char *);
 extern void			proxy_msg_add_data(proxy_msg *, char *, int);
 extern void			proxy_msg_add_args(proxy_msg *, int, char **);
-extern void			proxy_msg_add_args_nocopy(proxy_msg *, int, char **);
 extern void			proxy_msg_add_keyval_int(proxy_msg *, char *, int);
 extern void			proxy_msg_add_keyval_string(proxy_msg *, char *, char *);
 extern void			proxy_msg_add_bitset(proxy_msg *, bitset *);
