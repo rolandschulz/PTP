@@ -47,7 +47,7 @@ public class EasterEgg extends SingleFileFortranRefactoring
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         if (!canRunEasterEgg())
-            status.addFatalError("Invalid key sequence"); // Bogus error message
+            status.addFatalError("The selected operation is not available."); // Bogus but common error message
     }
 
     private boolean canRunEasterEgg()
