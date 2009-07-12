@@ -1604,6 +1604,13 @@ startup_monitor(void *job_ident)
         new_nodes = NewList();
     }
     taskid_list = NewList();
+#ifdef PHONY_ATTACH_CFG
+    strcpy(tasklist_path, "/tmp/PE_attach.cfg");
+    status = stat(tasklist_path, &fileinfo);
+    if (status == -1) {
+    	fprintf(stderr, "/tmp/PE_attach.cfg file not found.\n");
+    }
+#else
     snprintf(tasklist_path, sizeof tasklist_path, "/tmp/.ppe.%d.attach.cfg", job->poe_pid);
     tasklist_path[sizeof tasklist_path - 1] = '\0';
     print_message(TRACE_DETAIL_MESSAGE, "Waiting for task config file %s\n", tasklist_path);
@@ -1624,6 +1631,7 @@ startup_monitor(void *job_ident)
             }
         }
     }
+#endif
     TRACE_DETAIL_V("+++ Have task config file %s\n", tasklist_path);
     done = 0;
     while (!done) {
@@ -1783,6 +1791,7 @@ startup_monitor(void *job_ident)
             }
         }
     }
+    free(cfginfo);
     job->tasks = tasks;
     job->numtasks = numtasks;
 #ifdef PE_DUAL_POE_DEBUG
@@ -1909,7 +1918,7 @@ startup_monitor(void *job_ident)
 
         start_msg = proxy_process_change_event(start_events_transid, proxy_taskid, 1);
         free(proxy_taskid);
-        proxy_add_string_attribute(msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
+        proxy_add_string_attribute(start_msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
         enqueue_event(start_msg);
         proxy_taskid = GetListElement(taskid_list);
     }
