@@ -47,8 +47,8 @@
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
-	<property name="rseVersion" value="S-3.1RC2-200905271930"/>
-	<property name="dStoreBaseName" value="rseserver-3.1RC2"/>
+	<property name="rseVersion" value="R-3.1-200906171400"/>
+	<property name="dStoreBaseName" value="rseserver-3.1"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
