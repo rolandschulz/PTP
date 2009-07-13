@@ -60,10 +60,12 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
-		for (IRemoteConnection conn : getConnections()) {
-			IHost host = ((RSEConnection)conn).getHost();
-			if (host.getName().equals(name)) {
-				return conn;
+		if (name != null) {
+			for (IRemoteConnection conn : getConnections()) {
+				IHost host = ((RSEConnection)conn).getHost();
+				if (host.getName().equals(name)) {
+					return conn;
+				}
 			}
 		}
 		return null;

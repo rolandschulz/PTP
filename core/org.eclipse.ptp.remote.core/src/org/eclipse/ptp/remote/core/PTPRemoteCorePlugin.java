@@ -187,10 +187,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	public IRemoteConnection getConnection(URI uri) {
 		IRemoteServices services = getRemoteServices(uri);
 		if (services != null) {
-			String host = uri.getHost();
-			if (host != null) {
-				return services.getConnectionManager().getConnection(host);
-			}
+			return services.getConnectionManager().getConnection(uri.getHost());
 		}
 		return null;
 	}
