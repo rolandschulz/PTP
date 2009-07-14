@@ -36,12 +36,19 @@ import org.eclipse.ptp.perf.internal.PerformanceLaunchManager;
  */
 public class ParallelPerformanceLaunchConfigurationDelegate extends ParallelLaunchConfigurationDelegate implements IPerformanceLaunchConfigurationConstants{
 	
+	private boolean initialized = false;
+	
 	/**
 	 * The primary launch command of this launch configuration delegate.  The operations in this function are divided into
 	 * three jobs:  Buildig, Running and Data collection
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{
+		if(initialized){
+			super.launch(configuration, mode, launchIn, monitor);
+			return;
+		}
+		
 		// save the executable location so we can access it in the postprocessing 
 		ILaunchConfigurationWorkingCopy  wc=configuration.getWorkingCopy();
 		String progName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME,"defaultValue");
@@ -58,8 +65,10 @@ public class ParallelPerformanceLaunchConfigurationDelegate extends ParallelLaun
 		ILaunchFactory lf = new ParallelLaunchFactory();
 		
 		{
-			PerformanceLaunchManager plaunch=new PerformanceLaunchManager(new ParallelLaunchConfigurationDelegate(), lf);//,IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
+			initialized=true;
+			PerformanceLaunchManager plaunch=new PerformanceLaunchManager(this, lf);//,IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
 			plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
 		}
+		initialized=false;
 	}
 }
