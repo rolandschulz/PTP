@@ -40,6 +40,7 @@ import org.eclipse.photran.internal.core.parser.ASTAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTIntentSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
@@ -134,6 +135,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     private boolean parameter = false;
     private boolean typeBoundProcedure = false;
     private boolean renamedTypeBoundProcedure = false;
+    private boolean target = false;
+    private boolean pointer = false;
+    private boolean allocatable = false;
+    private boolean intent_in = false;
+    private boolean intent_out = false;
+    private boolean optional = false;
+    private boolean save = false;
 
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
 
@@ -396,8 +404,18 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             setVisibility(accessSpec, setInScope);
         else if (attrSpec.isParameter())
             setParameter();
-
-        // TODO: Intent, etc.
+        else if (attrSpec.isPointer())
+            setPointer();
+        else if (attrSpec.isTarget())
+            setTarget();
+        else if (attrSpec.isAllocatable())
+            setAllocatable();
+        else if (attrSpec.isIntent())
+            setIntent(attrSpec.getIntentSpec());
+        else if (attrSpec.isOptional())
+            setOptional();
+        else if (attrSpec.isSave())
+            setSave();
     }
 
     // # R511
@@ -418,15 +436,40 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             accessSpec.isPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC);
     }
     
-    void setParameter()
-    {
-        this.parameter = true;
-    }
-    
     /** @return true iff this entity was declared as a PARAMETER (i.e., it a constant variable) */
-    public boolean isParameter()
+    public boolean isParameter() { return parameter; }
+    void setParameter() { this.parameter = true; }
+    
+    /** @return true iff this entity was declared as a POINTER */
+    public boolean isPointer() { return pointer; }
+    void setPointer() { this.pointer = true; }
+    
+    /** @return true iff this entity was declared as a POINTER */
+    public boolean isTarget() { return target; }
+    void setTarget() { this.target = true; }
+    
+    /** @return true iff this entity was declared as ALLOCATABLE */
+    public boolean isAllocatable() { return allocatable; }
+    void setAllocatable() { this.allocatable = true; }
+    
+    /** @return true iff this entity was declared as OPTIONAL */
+    public boolean isOptional() { return optional; }
+    void setOptional() { this.optional = true; }
+    
+    /** @return true iff this entity was declared as SAVE */
+    public boolean isSave() { return save; }
+    void setSave() { this.save = true; }
+    
+    /** @return true iff this entity was declared with INTENT(IN) */
+    public boolean isIntentIn() { return intent_in; }
+    /** @return true iff this entity was declared with INTENT(OUT) */
+    public boolean isIntentOut() { return intent_out; }
+    void setIntent(ASTIntentSpecNode intent)
     {
-        return parameter;
+        if (intent.isIntentIn() || intent.isIntentInOut())
+            this.intent_in = true;
+        if (intent.isIntentOut() || intent.isIntentInOut())
+            this.intent_out = true;
     }
     
 //    boolean isPublic()
@@ -1082,6 +1125,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         result.parameter = PhotranVPGSerializer.deserialize(in);
         result.typeBoundProcedure = PhotranVPGSerializer.deserialize(in);
         result.renamedTypeBoundProcedure = PhotranVPGSerializer.deserialize(in);
+        result.pointer = PhotranVPGSerializer.deserialize(in);
+        result.target = PhotranVPGSerializer.deserialize(in);
+        result.allocatable = PhotranVPGSerializer.deserialize(in);
+        result.intent_in = PhotranVPGSerializer.deserialize(in);
+        result.intent_out = PhotranVPGSerializer.deserialize(in);
+        result.optional = PhotranVPGSerializer.deserialize(in);
+        result.save = PhotranVPGSerializer.deserialize(in);
         return result;
     }
     
@@ -1096,6 +1146,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         PhotranVPGSerializer.serialize(parameter, out);
         PhotranVPGSerializer.serialize(typeBoundProcedure, out);
         PhotranVPGSerializer.serialize(renamedTypeBoundProcedure, out);
+        PhotranVPGSerializer.serialize(pointer, out);
+        PhotranVPGSerializer.serialize(target, out);
+        PhotranVPGSerializer.serialize(allocatable, out);
+        PhotranVPGSerializer.serialize(intent_in, out);
+        PhotranVPGSerializer.serialize(intent_out, out);
+        PhotranVPGSerializer.serialize(optional, out);
+        PhotranVPGSerializer.serialize(save, out);
     }
     
     public char getSerializationCode()
