@@ -2,6 +2,7 @@ program p
     implicit none
     real :: a
     real :: d
+    intrinsic flush
     type t
         integer n
     end type
@@ -12,7 +13,7 @@ program p
     u = t(5)
     call s
     print *, a, d, u
-    stop
+    call flush; stop
 contains
   subroutine s
     implicit none

@@ -1,4 +1,5 @@
 program p
+    intrinsic flush
     type t
         integer n
     end type
@@ -9,7 +10,7 @@ program p
     u = t(5)
     call s
     print *, a, d, u
-    stop
+    call flush; stop
 contains
   subroutine s
     implicit integer (a-c,g), real (d-e), type(t) (f), complex (h)

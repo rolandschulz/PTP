@@ -1,9 +1,10 @@
 program functioncalling
+  intrinsic flush
   print *, 'This is the Fortran program; I am going to call some functions now...'
   call sum(1.0,2.0,3.0)
   call factorial(3)
   print *, 'Done'
-  stop
+  call flush; stop
 
 contains
 

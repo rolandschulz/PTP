@@ -1,7 +1,8 @@
 program p
 	integer :: hello
+	intrinsic flush
 	call s
-	stop
+	call flush; stop
 contains
 	subroutine s
 		parameter (THREE = 3)

@@ -1,8 +1,9 @@
 program p
 	implicit none
 	integer :: hello
+	intrinsic flush
 	call s
-	stop
+	call flush; stop
 contains
 	subroutine s
 		implicit none

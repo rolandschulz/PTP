@@ -1,9 +1,10 @@
 program hello
+    intrinsic flush
     integer :: i = 2, j = 2, mySillyVariable = 5
     print *, i, j, MYsIlLyVaRiAbLe
     CALL wORTHLESSfUNCTION(i+1,j+1,MySillyVariable)
     print *, i, j, mYsILLYvARIABLE
-    stop
+    call flush; stop
 
     contains
     subroutine WorthlessFunction(i,j,mySillyVariable)
