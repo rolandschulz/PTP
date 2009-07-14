@@ -306,17 +306,6 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 			 */
 			if (source == makecombo) {
 				selmakefile = makecombo.getItem(makecombo.getSelectionIndex());
-				//				if ((selmakefile.indexOf("-papi") > 0)
-				//						&& (selmakefile.indexOf("-multiplecounters") > 0)) {
-				//					papiSelect.setEnabled(true);
-				//				} else {
-				//					papiSelect.setEnabled(false);
-				//				}
-
-				//				if(noParallelRun.getSelection())
-				//				{
-				//				buildonlyCheck.setSelection(selmakefile.indexOf("-mpi")>0);
-				//				}
 				updateComboDerivedOptions(selmakefile);
 				updateLaunchConfigurationDialog();
 			}
@@ -549,11 +538,6 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 				if ((name.indexOf("Makefile.tau") != 0)) {
 					return false;
 				}
-				/*Only include papi makefiles built with multiplecounters*/
-				//				if (name.indexOf("-multiplecounters") <= 0
-				//						&& (name.indexOf("-papi") > 0)) {
-				//					return false;
-				//				}
 
 				return true;
 			}
@@ -626,16 +610,6 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 			updateComboDerivedOptions(makeStub);
 
-			//			/*
-			//			 * If the new makefile has the right options, activate the papi selector
-			//			 */
-			//
-			//			if ((checkMakeStub.indexOf("-papi") > 0)
-			//					&& (checkMakeStub.indexOf("-multiplecounters") > 0)) {
-			//				papiSelect.setEnabled(true);
-			//			} else {
-			//				papiSelect.setEnabled(false);
-			//			}
 			//			
 			//			/*
 			//			 * If the new makefile has no PDT, only compiler instrumentation is available
@@ -664,8 +638,7 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 		 * If the new makefile has the right options, activate the papi selector
 		 */
 
-		if ((makeStub.indexOf("-papi") > 0)
-				&& (makeStub.indexOf("-multiplecounters") > 0)) {
+		if (makeStub.indexOf("-papi") > 0) {
 			papiSelect.setEnabled(true);
 		} else {
 			papiSelect.setEnabled(false);
@@ -1393,8 +1366,22 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 	 */
 	private String getPapiLoc() throws FileNotFoundException {
 
+		if(makecombo==null)
+			return null;
+		
+		int selDex=makecombo.getSelectionIndex();
+		
+		if(selDex==-1)
+			return null;
+		
+		String selItem=makecombo.getItem(selDex);
+		
+		if(selItem==null){
+			return null;
+		}
+		
 		String papimake = tlpath + File.separator
-		+ makecombo.getItem(makecombo.getSelectionIndex());
+		+ selItem;
 
 		File papimakefile = new File(papimake);
 		if (!papimakefile.canRead()) {
@@ -1454,6 +1441,9 @@ public class TAUAnalysisTab extends AbstractPerformanceConfigurationTab {
 
 			String papiBin=getPapiLoc();
 
+			if(papiBin==null)
+				return;
+			
 			File pdir=new File(papiBin);
 			if(!pdir.isDirectory()||!pdir.canRead()){
 				return;

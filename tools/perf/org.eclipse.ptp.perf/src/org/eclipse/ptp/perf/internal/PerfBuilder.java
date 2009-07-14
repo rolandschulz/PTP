@@ -51,19 +51,26 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 
 	/** Executable (application) path attribute name */
 	//private String apppathattrib=null;
-	private IManagedProject managedBuildProj=null;
+	//private IManagedProject managedBuildProj=null;
 	private IConfiguration newBuildConfig=null;
 	private String buildConf = null;
 	//private String projectLocation=null;
 	private IConfiguration olddefbuildconf=null;
+	
+	//private IConfiguration standardbuildconf=null;
 	//private ICProject thisCProject=null;
 	//private IProject thisProject = null;
+	
+	private IManagedBuildInfo buildInfo=null;
+	
 	private String outputLocation=null;
 	private Map<String,String> buildMods=null;
 	
 	private String newname=null;
 	private String binary=null;
 	private BuildTool tool=null;
+	
+	private boolean isManaged;
 	
 	public PerfBuilder(ILaunchConfiguration conf, BuildTool btool,Map<String,String> buildMods) throws CoreException{
 		super(conf,"Instrumenting/Building");
@@ -84,10 +91,18 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		outputLocation=projectLocation;
 		rootLocation=projectLocation;
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
+		
 		if(tool==null)return;
-		if(ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
+		
+		buildInfo=ManagedBuildManager.getBuildInfo(thisCProject.getResource());
+		 olddefbuildconf=buildInfo.getDefaultConfiguration();//TODO: Make sure default configuration always works.  Prompt user?
+		 isManaged = olddefbuildconf.isManagedBuildOn();
+		
+		if(isManaged)
 		{
 			runbuilt=initMMBuild();
+		}else{
+			runbuilt=initSMBuild();
 		}
 	}
 	
@@ -113,7 +128,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		//runbuilt = true;
 		if(tool!=null)
 		{
-			if(!ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
+			if(!isManaged)
 			{
 				standardMakeBuild(monitor);
 			}
@@ -222,26 +237,57 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	}
 	
 	
-	private boolean initMMBuild() throws CoreException{
-		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(thisCProject.getResource());
-		if (info == null||!info.isValid()){
+	private boolean initSMBuild() throws CoreException{
+		if (buildInfo == null||!buildInfo.isValid()){
 			System.out.println("No info!!!");
 			return false;
 		}
 		
-		managedBuildProj = info.getManagedProject();
+		//Make a list of the configurations already within the project
+		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
+		IConfiguration selectedconf = null;
+		for(int i=0;i<buildconfigs.length;i++){
+			if((buildconfigs[i].getName()).equals(buildConf))
+			{
+				selectedconf=buildconfigs[i];
+				break;
+			}
+		}
+		
+		progPath=olddefbuildconf.getEditableBuilder().getBuildLocation()+"?";
+		
+        progPath=newname+File.separator+binary;
+		//System.out.println(progPath);
+		
+		//TODO: We have to do this because PTP puts its output in the build directory
+		if(configuration.getAttribute(PERF_EXECUTABLE_PATH_TAG, (String)null)!=null)
+		{
+			outputLocation=thisProject.getFile(newname).getLocation().toOSString();
+		}
+        
+		
+		
+		return true;
+	}
+	
+	private boolean initMMBuild() throws CoreException{
+		if (buildInfo == null||!buildInfo.isValid()){
+			System.out.println("No info!!!");
+			return false;
+		}
+		
+		IManagedProject managedBuildProj = buildInfo.getManagedProject();
 		if (managedBuildProj == null){
 			System.out.println("No managed project!!!");
 			return false;
 		}
-		olddefbuildconf=info.getDefaultConfiguration();//TODO: Make sure default configuration always works.  Prompt user?
-		binary = info.getBuildArtifactName();
-		String bextension = info.getBuildArtifactExtension();
+		binary = buildInfo.getBuildArtifactName();
+		String bextension = buildInfo.getBuildArtifactExtension();
 		if(bextension.length()>0)
 			binary=binary+"."+bextension;
 		
 		//Make a list of the configurations already within the project
-		IConfiguration[] buildconfigs = info.getManagedProject().getConfigurations();
+		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
 		IConfiguration selectedconf = null;
 		for(int i=0;i<buildconfigs.length;i++){
 			if((buildconfigs[i].getName()).equals(buildConf))
@@ -461,7 +507,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	}
 
 	public void restoreBuild(){
-		if(ManagedBuildManager.canGetBuildInfo(thisCProject.getResource()))
+		if(isManaged)
 		{
 			ManagedBuildManager.setDefaultConfiguration(thisCProject.getProject(),olddefbuildconf);
 //			if(!configuration.getAttribute(NOCLEAN, false)&&managedBuildProj!=null&&newBuildConfig!=null)

@@ -860,7 +860,8 @@ public class PerfDMFView extends ViewPart {
             }
 
         } catch (Throwable t) {
-        	dbApi.terminate();
+        	if(dbApi!=null)
+        		dbApi.terminate();
             if (t instanceof DatabaseException) {
                 ((DatabaseException) t).getException().printStackTrace();
             }

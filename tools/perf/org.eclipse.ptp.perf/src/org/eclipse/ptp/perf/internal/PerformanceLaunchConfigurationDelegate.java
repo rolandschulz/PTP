@@ -41,7 +41,7 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{
-		
+	
 		if(initialized){
 			super.launch(configuration, mode, launchIn, monitor);
 			return;
@@ -66,9 +66,13 @@ public class PerformanceLaunchConfigurationDelegate extends LocalRunLaunchDelega
 		
 		ILaunchFactory lf = null;//TODO: Make a real non-parallel launch factory class.
 		initialized=true;
+		
+		try{
+		
 		PerformanceLaunchManager plaunch=new PerformanceLaunchManager(this,lf);//,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 		plaunch.launch(configuration, mode, launchIn, monitor);//,tool
-		initialized=false;
+		
+		}finally{initialized=false;}
 		
 	}
 }

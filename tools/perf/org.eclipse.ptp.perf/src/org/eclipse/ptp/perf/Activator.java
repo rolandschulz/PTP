@@ -206,7 +206,7 @@ public class Activator extends AbstractUIPlugin {
 					
 					//elements[i].
 					//aGetter.setId(ce.getAttribute("id"));
-					System.out.println(plugspace+" "+aGetter);
+					//System.out.println(plugspace+" "+aGetter);
 					workflowList.add(new File(new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20"))));
 				} 
 				catch (Exception e) {
