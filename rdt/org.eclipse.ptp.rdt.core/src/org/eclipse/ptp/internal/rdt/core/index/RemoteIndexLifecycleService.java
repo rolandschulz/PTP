@@ -18,7 +18,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -75,9 +80,16 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 	public void reindex(Scope scope, List<ICElement> changedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(changedElements);
+		
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot workspaceRoot = workspace.getRoot();
+		IProject project = workspaceRoot.getProject(scope.getName());
+		if (project != null && project.isOpen()){
+			indexSubsystem.checkProject(project, new NullProgressMonitor());
+		}
+		
 		// TODO:  handle changedElements
 		indexSubsystem.reindexScope(scope, provider, monitor, task);
-
 	}
 
 	/* (non-Javadoc)
@@ -101,6 +113,13 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 	public void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task) {
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(scope.getName());
 		ICIndexSubsystem indexSubsystem = getSubSystem();
+		
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot workspaceRoot = workspace.getRoot();
+		IProject project = workspaceRoot.getProject(scope.getName());
+		if (project != null && project.isOpen()){
+			indexSubsystem.checkProject(project, new NullProgressMonitor());
+		}
 		
 		indexSubsystem.reindexScope(scope, provider, monitor, task);
 	}
