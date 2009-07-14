@@ -170,7 +170,7 @@ public class ServiceModelWidget {
 		Composite tableParent = new Composite(canvas, SWT.NONE);
 		tableParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		fTable = new Table (tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL);
+		fTable = new Table(tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL);
 		fTable.setLinesVisible (true);
 		fTable.setHeaderVisible (true);
 		
@@ -366,10 +366,22 @@ public class ServiceModelWidget {
 	public void setConfigChangeListener(Listener configChangeListener) {
 		fConfigChangeListener = configChangeListener;
 	}
-
+	
 	public void setProviderIDToProviderMap(
 			Map<String, IServiceProvider> providerIDToProviderMap) {
 		fProviderIDToProviderMap = providerIDToProviderMap;
+	}
+
+	/**
+	 * Set the service configuration for this widget
+	 * 
+	 * @param service configuration
+	 */
+	public void setServiceConfiguration(IServiceConfiguration config) {
+		fServiceConfiguration = config;
+		if (config != null) {
+			createTableContent();
+		}
 	}
 
 	public void setServiceIDToSelectedProviderID(
@@ -435,8 +447,10 @@ public class ServiceModelWidget {
 	protected void createTableContent() {
 		fTable.removeAll();
 		
-		for (IService service : getServiceConfiguration().getServices()) {
-			addTableRow(service, getServiceConfiguration().getServiceProvider(service));
+		if (getServiceConfiguration() != null) {
+			for (IService service : getServiceConfiguration().getServices()) {
+				addTableRow(service, getServiceConfiguration().getServiceProvider(service));
+			}
 		}
 	}
 	
