@@ -28,14 +28,12 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.Activator;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.ptp.services.ui.dialogs.ServicesDialog;
@@ -69,8 +67,12 @@ public class ServiceModelWidget {
 		public void handleEvent(Event event) {
 			Set<IService> displaySet = new HashSet<IService>();
 			Set<IService> configServices = getServiceConfiguration().getServices();
+			/*
+			 * Calculate the set of services to display. Only include services that 
+			 * are not in the configuration and that have one or more providers.
+			 */
 			for (IService service : ServiceModelManager.getInstance().getServices()) {
-				if (!configServices.contains(service)) {
+				if (!configServices.contains(service) && service.getProviders().size() > 0) {
 					displaySet.add(service);
 				}
 			}
@@ -80,13 +82,9 @@ public class ServiceModelWidget {
 				IService[] selectedServices = dialog.getSelectedServices();
 				for (IService service : selectedServices) {
 					SortedSet<IServiceProviderDescriptor> providers = service.getProvidersByPriority();
-					if (providers.size() > 0) {
-						IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(providers.iterator().next());
-						addTableRow(service, provider);
-						getServiceConfiguration().setServiceProvider(service, provider);
-					} else {
-						Activator.getDefault().log(NLS.bind(Messages.ServiceModelWidget_8, service.getId()));
-					}
+					IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(providers.iterator().next());
+					addTableRow(service, provider);
+					getServiceConfiguration().setServiceProvider(service, provider);
 				}
 				updateAddRemoveButtons();
 			}
