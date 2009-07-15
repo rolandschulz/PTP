@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -338,6 +339,11 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 		return new FileStatusContext(file,
 		                             new Region(tokenRef.getOffset(), tokenRef.getLength()));
 	}
+
+    protected RefactoringStatusContext createContext(Token token)
+    {
+        return createContext(token.getTokenRef());
+    }
 
     // CHANGE CREATION ////////////////////////////////////////////////////////
 
@@ -721,88 +727,108 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     ///////////////////////////////////////////////////////////////////////////
     // Check for conflicting bindings
     ///////////////////////////////////////////////////////////////////////////
+
+    public static final class Conflict
+    {
+        public final String name;
+        public final PhotranTokenRef tokenRef;
+        
+        public Conflict(String name, PhotranTokenRef tokenRef)
+        {
+            this.name = name;
+            this.tokenRef = tokenRef;
+        }
+    }
+    
+
+    public static interface IConflictingBindingCallback
+    {
+        void addConflictError(List<Conflict> conflictingDef);
+        void addConflictWarning(List<Conflict> conflictingDef);
+        void addReferenceWillChangeError(String newName, Token reference);
+    }
     
     /**
      * Given a {@link Definition} and a list of references to that Definition
      * (see {@link Definition#findAllReferences(boolean)}), checks if the name
      * <code>newName</code> will conflict in the scope of any of the given
-     * references; if this is the case, an appropriate error
-     * ({@link RefactoringStatus#addError(String)}) is added to the given
-     * {@link RefactoringStatus}.
+     * references; if this is the case, the given callback is invoked to record
+     * an error or warning.
      * <p>
      * This is the fundamental precondition check for {@link RenameRefactoring}.
      */
     protected void checkForConflictingBindings(
+        IConflictingBindingCallback callback,
         Definition definitionToCheck,
         Collection<PhotranTokenRef> allReferences,
-        String newName,
-        RefactoringStatus status)
+        String... newNames)
     {
-        new CheckForConflictBindings().check(definitionToCheck, allReferences, newName, status);
+        checkForConflictingBindings(callback, definitionToCheck, allReferences, Arrays.asList(newNames));
+    }
+    
+    /**
+     * Given a {@link Definition} and a list of references to that Definition
+     * (see {@link Definition#findAllReferences(boolean)}), checks if the name
+     * <code>newName</code> will conflict in the scope of any of the given
+     * references; if this is the case, the given callback is invoked to record
+     * an error or warning.
+     * <p>
+     * This is the fundamental precondition check for {@link RenameRefactoring}.
+     */
+    protected void checkForConflictingBindings(
+        IConflictingBindingCallback callback,
+        Definition definitionToCheck,
+        Collection<PhotranTokenRef> allReferences,
+        Collection<String> newNames)
+    {
+        new CheckForConflictBindings().check(callback, definitionToCheck, allReferences, newNames);
     }
     
     private final class CheckForConflictBindings
     {
         private Definition definitionToCheck = null;
-        private String newName = null;
+        private Collection<String> newNames = null;
         
-        public void check(
-                           Definition definitionToCheck, 
-                           Collection<PhotranTokenRef> allReferences, 
-                           String newName,
-                           RefactoringStatus status)
+        public void check(IConflictingBindingCallback callback,
+                          Definition definitionToCheck, 
+                          Collection<PhotranTokenRef> allReferences, 
+                          Collection<String> newNames)
         {
             this.definitionToCheck = definitionToCheck;
-            this.newName = newName;
+            this.newNames = newNames;
             
-            checkForConflictingDefinitionOrShadowing(status);
+            checkForConflictingDefinitionOrShadowing(callback);
             
             for (PhotranTokenRef ref : findReferencesToShadowedDefinitions())
-                checkIfReferenceBindingWillChange(status, ref, false);
+                checkIfReferenceBindingWillChange(callback, ref, false);
             
             for (PhotranTokenRef ref : allReferences)
-                checkIfReferenceBindingWillChange(status, ref, true);
+                checkIfReferenceBindingWillChange(callback, ref, true);
         }
         
         /** Check whether the new definition will either conflict with or shadow an existing definition */
-        private void checkForConflictingDefinitionOrShadowing(RefactoringStatus status)
+        private void checkForConflictingDefinitionOrShadowing(IConflictingBindingCallback callback)
         {
-            List<PhotranTokenRef> conflictingDef = findAllPotentiallyConflictingDefinitions();
+            List<Conflict> conflictingDef = findAllPotentiallyConflictingDefinitions();
             if (!conflictingDef.isEmpty())
-                addConflictError(status, conflictingDef);
+                callback.addConflictError(conflictingDef);
             
             conflictingDef = findAllPotentiallyConflictingUnboundSubprogramCalls();
             if (!conflictingDef.isEmpty())
-                addConflictWarning(status, conflictingDef);
+                callback.addConflictWarning(conflictingDef);
         }
     
-        private void addConflictError(RefactoringStatus status, List<PhotranTokenRef> conflictingDef)
+        private List<Conflict> findAllPotentiallyConflictingDefinitions()
         {
-            PhotranTokenRef defToken = conflictingDef.get(0);
-            Definition def = vpg.getDefinitionFor(defToken);
-            String msg = "The name \"" + newName + "\" conflicts with " + def;
-            RefactoringStatusContext context = createContext(defToken); // Highlights problematic definition in file
-            status.addError(msg, context);
-        }
-    
-        private void addConflictWarning(RefactoringStatus status, List<PhotranTokenRef> conflictingDef)
-        {
-            PhotranTokenRef defToken = conflictingDef.get(0);
-            String msg = "The name \"" + newName + "\" might conflict with the name of an invoked subprogram";
-            RefactoringStatusContext context = createContext(defToken); // Highlights problematic definition in file
-            status.addWarning(msg, context);
-        }
-    
-        private List<PhotranTokenRef> findAllPotentiallyConflictingDefinitions()
-        {
-            List<PhotranTokenRef> conflicts = new ArrayList<PhotranTokenRef>();
+            List<Conflict> conflicts = new ArrayList<Conflict>();
     
             // Cannot call a main program (or function, etc.) X if it has an internal subprogram named X,
             // even if that subprogram is never used (in which case it wouldn't be caught below)
             if (definitionToCheck.isMainProgram() || definitionToCheck.isSubprogram() || definitionToCheck.isModule())
                 findAllPotentiallyConflictingDefinitionsInScope(conflicts, definitionToCheck.getTokenRef().findToken().findNearestAncestor(ScopingNode.class), false);
-            if (definitionToCheck.isInternalSubprogramDefinition() && scopeContainingInternalSubprogram().isNamed(newName))
-                conflicts.add(scopeContainingInternalSubprogram().getNameToken().getTokenRef());
+            for (String newName : newNames)
+                if (definitionToCheck.isInternalSubprogramDefinition() && scopeContainingInternalSubprogram().isNamed(newName))
+                    conflicts.add(new Conflict(newName, scopeContainingInternalSubprogram().getNameToken().getTokenRef()));
     
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
                 findAllPotentiallyConflictingDefinitionsInScope(conflicts, importingScope, true);
@@ -821,45 +847,48 @@ public abstract class AbstractFortranRefactoring extends Refactoring
          * The third parameter indicates whether or not we should check that the definition to check is actually imported
          * into the target scope (it may not be if there is a USE statement with a Rename or ONLY list).
          */
-        private void findAllPotentiallyConflictingDefinitionsInScope(List<PhotranTokenRef> conflicts, ScopingNode importingScope, boolean shouldCheckIfDefinitionImportedIntoScope)
+        private void findAllPotentiallyConflictingDefinitionsInScope(List<Conflict> conflicts, ScopingNode importingScope, boolean shouldCheckIfDefinitionImportedIntoScope)
         {
-            Token newNameToken = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
-            
-            List<PhotranTokenRef> definitionsLocalToScope = collectLocalDefinitions(importingScope);
-    
-            if (isProgramOrSubprogramOrModuleScope(importingScope) && shouldCheckIfDefinitionImportedIntoScope)
+            for (String newName : newNames)
             {
-                // Cannot call a variable X inside a function named X
-                if (importingScope.isNamed(newName) && definitionsLocalToScope.contains(definitionToCheck.getTokenRef()))
+                Token newNameToken = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
+                
+                List<PhotranTokenRef> definitionsLocalToScope = collectLocalDefinitions(importingScope);
+        
+                if (isProgramOrSubprogramOrModuleScope(importingScope) && shouldCheckIfDefinitionImportedIntoScope)
                 {
-                    conflicts.add(importingScope.getNameToken().getTokenRef());
-                }
-                // Cannot call a variable X inside a function named Y inside a module named X
-                else
-                {
-                    ScopingNode parent = importingScope.findNearestAncestor(ScopingNode.class);
-                    if (parent != null && parent.isNamed(newName))
+                    // Cannot call a variable X inside a function named X
+                    if (importingScope.isNamed(newName) && definitionsLocalToScope.contains(definitionToCheck.getTokenRef()))
                     {
-                        List<PhotranTokenRef> definitionsLocalToParent = collectLocalDefinitions(parent);
-                        if (definitionsLocalToParent.contains(definitionToCheck.getTokenRef()))
-                            conflicts.add(parent.getNameToken().getTokenRef());
+                        conflicts.add(new Conflict(newName, importingScope.getNameToken().getTokenRef()));
                     }
-                }
-            }
-    
-            // Cannot call a function X if it is defined in or imported into a scope with a function X already defined
-            for (PhotranTokenRef conflict : importingScope.manuallyResolveInLocalScope(newNameToken))
-            {
-                if (definitionsLocalToScope.contains(conflict))
-                {
-                    if (shouldCheckIfDefinitionImportedIntoScope)
-                    {
-                        if (definitionsLocalToScope.contains(definitionToCheck.getTokenRef()))
-                            conflicts.add(conflict);
-                    }
+                    // Cannot call a variable X inside a function named Y inside a module named X
                     else
                     {
-                        conflicts.add(conflict);
+                        ScopingNode parent = importingScope.findNearestAncestor(ScopingNode.class);
+                        if (parent != null && parent.isNamed(newName))
+                        {
+                            List<PhotranTokenRef> definitionsLocalToParent = collectLocalDefinitions(parent);
+                            if (definitionsLocalToParent.contains(definitionToCheck.getTokenRef()))
+                                conflicts.add(new Conflict(newName, parent.getNameToken().getTokenRef()));
+                        }
+                    }
+                }
+        
+                // Cannot call a function X if it is defined in or imported into a scope with a function X already defined
+                for (PhotranTokenRef conflict : importingScope.manuallyResolveInLocalScope(newNameToken))
+                {
+                    if (definitionsLocalToScope.contains(conflict))
+                    {
+                        if (shouldCheckIfDefinitionImportedIntoScope)
+                        {
+                            if (definitionsLocalToScope.contains(definitionToCheck.getTokenRef()))
+                                conflicts.add(new Conflict(newName, conflict));
+                        }
+                        else
+                        {
+                            conflicts.add(new Conflict(newName, conflict));
+                        }
                     }
                 }
             }
@@ -868,45 +897,47 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         /** Check whether the new definition will either conflict with or shadow an existing definition */
         private List<PhotranTokenRef> findReferencesToShadowedDefinitions()
         {
-            Token token = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
-            
-            List<PhotranTokenRef> shadowedDefinitions = scopeOfDefinitionToCheck().manuallyResolve(token);
-            // TODO: Does not consider rename or only lists (need to tell if this SPECIFIC definition will be imported)
-            for (ScopingNode importingScope : scopeOfDefinitionToCheck().findImportingScopes())
-                shadowedDefinitions.addAll(importingScope.manuallyResolve(token));
-    
             List<PhotranTokenRef> referencesToShadowedDefinitions = new LinkedList<PhotranTokenRef>();
-            for (PhotranTokenRef def : shadowedDefinitions)
-                referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences(false));
+
+            for (String newName : newNames)
+            {
+                Token token = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
+                
+                List<PhotranTokenRef> shadowedDefinitions = scopeOfDefinitionToCheck().manuallyResolve(token);
+                // TODO: Does not consider rename or only lists (need to tell if this SPECIFIC definition will be imported)
+                for (ScopingNode importingScope : scopeOfDefinitionToCheck().findImportingScopes())
+                    shadowedDefinitions.addAll(importingScope.manuallyResolve(token));
+        
+                for (PhotranTokenRef def : shadowedDefinitions)
+                    referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences(false));
+            }
+            
             return referencesToShadowedDefinitions;
         }
     
-        private void checkIfReferenceBindingWillChange(RefactoringStatus status, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
+        private void checkIfReferenceBindingWillChange(IConflictingBindingCallback callback, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
         {
             Token reference = ref.findToken();
             
             ScopingNode scopeOfDefinitionToRename = reference.findScopeDeclaringOrImporting(definitionToCheck);
             if (scopeOfDefinitionToRename == null) return;
             
-            for (PhotranTokenRef existingBinding : new FakeToken(reference, newName).manuallyResolveBinding())
+            for (String newName : newNames)
             {
-                ScopingNode scopeOfExistingBinding = existingBinding.findToken().getEnclosingScope();
-                
-                boolean willReferenceRenamedDefinition = scopeOfExistingBinding.isParentScopeOf(scopeOfDefinitionToRename);
-                if (shouldReferenceRenamedDefinition != willReferenceRenamedDefinition)
+                for (PhotranTokenRef existingBinding : new FakeToken(reference, newName).manuallyResolveBinding())
                 {
-                    // The entity with the new name will shadow the definition to which this binding resolves
-                    status.addError("Changing the name to \"" + newName + "\""
-                                + " would change the meaning of \"" + reference.getText() + "\" on line " + reference.getLine()
-                                + " in " + ref.getFilename(),
-                                createContext(ref)); // Highlight problematic reference
+                    ScopingNode scopeOfExistingBinding = existingBinding.findToken().getEnclosingScope();
+                    
+                    boolean willReferenceRenamedDefinition = scopeOfExistingBinding.isParentScopeOf(scopeOfDefinitionToRename);
+                    if (shouldReferenceRenamedDefinition != willReferenceRenamedDefinition)
+                        callback.addReferenceWillChangeError(newName, reference);
                 }
             }
         }
         
-        private List<PhotranTokenRef> findAllPotentiallyConflictingUnboundSubprogramCalls()
+        private List<Conflict> findAllPotentiallyConflictingUnboundSubprogramCalls()
         {
-            final List<PhotranTokenRef> conflictingDef = new ArrayList<PhotranTokenRef>();
+            final List<Conflict> conflictingDef = new ArrayList<Conflict>();
             
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
             {
@@ -926,8 +957,9 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     
                     private void checkForConflict(Token name)
                     {
-                        if (name != null && name.getText().equals(newName) && name.resolveBinding().isEmpty())
-                            conflictingDef.add(name.getTokenRef());
+                        for (String newName : newNames)
+                            if (name != null && name.getText().equals(newName) && name.resolveBinding().isEmpty())
+                                conflictingDef.add(new Conflict(newName, name.getTokenRef()));
                     }
                 });
             }

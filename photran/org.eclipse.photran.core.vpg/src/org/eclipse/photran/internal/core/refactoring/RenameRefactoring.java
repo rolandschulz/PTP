@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
@@ -147,7 +148,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
     
     @Override
-    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    protected void doCheckFinalConditions(final RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         assert definitionToRename != null;
         assert allReferences != null;
@@ -162,10 +163,44 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         removeFixedFormReferences(status);
         checkIfReferencesCanBeRenamed();
         
-        checkForConflictingBindings(definitionToRename, 
-            allReferences, 
-            newName,
-            status);
+        checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
+            definitionToRename,
+            allReferences,
+            newName);
+    }
+    
+    private final class ConflictingBindingErrorHandler implements IConflictingBindingCallback
+    {
+        private final RefactoringStatus status;
+
+        private ConflictingBindingErrorHandler(RefactoringStatus status) { this.status = status; }
+
+        public void addConflictError(List<Conflict> conflictingDef)
+        {
+            Conflict conflict = conflictingDef.get(0);
+
+            String msg = "The name \"" + conflict.name + "\" conflicts with " + vpg.getDefinitionFor(conflict.tokenRef);
+            RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
+            status.addError(msg, context);
+        }
+
+        public void addConflictWarning(List<Conflict> conflictingDef)
+        {
+            Conflict conflict = conflictingDef.get(0);
+
+            String msg = "The name \"" + conflict.name + "\" might conflict with the name of an invoked subprogram";
+            RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
+            status.addWarning(msg, context);
+        }
+
+        public void addReferenceWillChangeError(String newName, Token reference)
+        {
+            // The entity with the new name will shadow the definition to which this binding resolves
+            status.addError("Changing the name to \"" + newName + "\""
+                        + " would change the meaning of \"" + reference.getText() + "\" on line " + reference.getLine()
+                        + " in " + reference.getTokenRef().getFilename(),
+                        createContext(reference)); // Highlight problematic reference
+        }
     }
 
     private void removeFixedFormReferences(RefactoringStatus status)
