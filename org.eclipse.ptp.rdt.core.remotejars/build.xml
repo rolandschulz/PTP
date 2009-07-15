@@ -34,7 +34,7 @@
 	<property name="icuBaseZip" value="com.ibm.icu.base-I20090611-1540.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.0.1.v20090415.jar"/>
 	
-	<property name="cdtCoreVersion" value="5.1.0.200905290807"/>
+	<property name="cdtCoreVersion" value="5.1.1.200907100614"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 
 	<property name="coreRuntimeVersion" value="3.5.0.v20090525"/>

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -63,8 +64,10 @@ import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.model.CModelBuilder2;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -136,6 +139,8 @@ public class CDTMiner extends Miner {
 	public static String LINE_SEPARATOR;
 	
 	public static final String DELIMITER = ";;;"; //$NON-NLS-1$
+	public static final String C_MODEL_BUILDER = "C_MODEL_BUILDER"; //$NON-NLS-1$;
+	public static final String C_MODEL_RESULT= "C_MODEL_RESULT"; //$NON-NLS-1$;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.dstore.core.miners.Miner#getVersion()
@@ -585,12 +590,67 @@ public class CDTMiner extends Miner {
 			}
 			
 		}
+		else if (name.equals(C_MODEL_BUILDER)) 
+		{
+			try 
+			{
+				ITranslationUnit workingCopy = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 1));
+				System.out.println("Model Builder: building working copy: " + workingCopy.getElementName() + "..."); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.flush();
+				
+				handleGetModel(workingCopy, status);
+
+				System.out.println("Finished building model."); //$NON-NLS-1$
+				System.out.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}			
+		}
 		
 		return status;
 	}
 	
 	
+	/**
+	 * Builds a model using content from given translation unit
+	 * @param unit
+	 * @param status
+	 */
+	protected void handleGetModel(ITranslationUnit unit, DataElement status) {
+		try {
+			System.out.println("CDTMiner: get model started"); //$NON-NLS-1$
+			System.out.flush();
+			
+			WorkingCopy workingCopy;
+			
+			if (unit instanceof WorkingCopy) {
+				workingCopy = (WorkingCopy) unit;
+			
+				CModelBuilder2 builder = new CModelBuilder2(workingCopy, new NullProgressMonitor());
+				
+				IASTTranslationUnit ast = workingCopy.getAST();
+				builder.parse(ast);
 	
+				// create the result object
+				String resultString = Serializer.serialize(workingCopy);
+				status.getDataStore().createObject(status, C_MODEL_RESULT, resultString);
+			}
+		} catch (IOException e) {
+			
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			statusDone(status);
+		}
+	}
+
 	protected void handleFindIncludesTo(String scopeName, String hostName, IIndexFileLocation location, DataElement status) 
 	{
 		try 
@@ -1223,6 +1283,9 @@ public class CDTMiner extends Miner {
 		createCommandDescriptor(schemaRoot, "Find included by", C_INCLUDES_FIND_INCLUDED_BY, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Is indexed", C_INCLUDES_IS_INDEXED, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Find include", C_INCLUDES_FIND_INCLUDE, false); //$NON-NLS-1$
+		
+		//get model
+		createCommandDescriptor(schemaRoot, "Get model", C_MODEL_BUILDER, false); //$NON-NLS-1$
 		
 		_dataStore.refresh(schemaRoot);
 	}

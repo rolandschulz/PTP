@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.core.serviceproviders;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
+import org.eclipse.ptp.internal.rdt.core.model.IModelBuilderService;
 import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.rdt.services.core.IServiceProvider;
@@ -38,4 +39,6 @@ public interface IIndexServiceProvider extends IServiceProvider {
 	public ITypeHierarchyService getTypeHierarchyService();
 	
 	public IIncludeBrowserService getIncludeBrowserService();
+	
+	public IModelBuilderService getModelBuilderService();
 }
