@@ -473,11 +473,11 @@
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
       </command>
-      <!--command
+      <command
             name="Extract Local Variable"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
-      </command-->
+      </command>
       <command
             name="Introduce Implicit None"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
@@ -504,12 +504,12 @@
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
      />
-     <!--key
+     <key
             sequence="M3+M2+L"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
-     /-->
+     />
      <key
             sequence="M3+M2+I"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -568,12 +568,12 @@
                class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
                id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
-         <!--action
+         <action
                label="Extract &amp;Local Variable..."
                definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
-               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
+               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
          <action
                label="&amp;Introduce Implicit None"
                definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
@@ -634,11 +634,11 @@
                class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
                id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
-         <!--action 
+         <action 
                label="Extract &amp;Local Variable..." 
                class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
-               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
+               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
          <action 
                label="&amp;Introduce Implicit None" 
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
