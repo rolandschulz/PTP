@@ -253,5 +253,14 @@ public interface ICIndexSubsystem {
 
 	public boolean isIndexed(Scope scope, IIndexFileLocation location, IProgressMonitor monitor);
 	
-	public IIndexIncludeValue findInclude(Scope scope, IIndexFileLocation location, String name, int offset, IProgressMonitor monitor);	
+	public IIndexIncludeValue findInclude(Scope scope, IIndexFileLocation location, String name, int offset, IProgressMonitor monitor);
+	
+	/**
+	 * Returns a model built using the content of the given translation unit
+	 * @param unit
+	 * @param monitor
+	 * @return
+	 */
+	public ITranslationUnit getModel(ITranslationUnit unit, IProgressMonitor monitor);
+
 }
