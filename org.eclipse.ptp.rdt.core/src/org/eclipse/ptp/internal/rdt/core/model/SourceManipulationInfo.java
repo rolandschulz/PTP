@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,22 @@ public class SourceManipulationInfo extends CElementInfo {
 
 	public int getIdStartPos() {
 		return ((SourceManipulation) fParent).getIdStartPos();
+	}
+	
+	public int getLength() {
+		return ((SourceManipulation) fParent).getLength();
+	}
+	
+	public int getIdLength() {
+		return ((SourceManipulation) fParent).getIdLength();
+	}
+
+	public int getStartLine() {
+		return ((SourceManipulation) fParent).getStartLine();
+	}
+
+	public int getEndLine() {
+		return ((SourceManipulation) fParent).getEndLine();
 	}
 
 	public void setPos(int nodeOffset, int nodeLength) {

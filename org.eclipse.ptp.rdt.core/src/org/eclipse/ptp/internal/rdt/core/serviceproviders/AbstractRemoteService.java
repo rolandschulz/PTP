@@ -11,9 +11,11 @@
 package org.eclipse.ptp.internal.rdt.core.serviceproviders;
 
 import org.eclipse.cdt.core.model.CModelException;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfo;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
@@ -56,15 +58,18 @@ public class AbstractRemoteService {
 		if (workingCopy.isConsistent()) {
 			unit = ModelAdapter.adaptElement(null, workingCopy, 0, true);
 		} else {
-			String contents = workingCopy.getSource();
+			String contents = new String (workingCopy.getContents());
 			unit = new WorkingCopy(null, workingCopy, contents);
 		}
 		
 		if (unit instanceof TranslationUnit) {
 			// can't trust getting a resource from adapted C elements
-			IResource resource = workingCopy.getResource();
+			IResource resource = workingCopy.getResource(); //might be null if it is a remote TU
+			ICProject project = workingCopy.getCProject();
+			IProject rproject = project.getProject();
+			IResource infoResource = resource != null ? resource : rproject;
 			
-			IScannerInfo scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(resource);
+			IScannerInfo scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(infoResource);
 			((TranslationUnit) unit).setASTContext(scannerInfo);
 		}
 		return unit;

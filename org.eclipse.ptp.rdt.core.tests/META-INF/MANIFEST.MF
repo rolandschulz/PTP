@@ -28,3 +28,4 @@ Import-Package: org.eclipse.jface.action,
  org.eclipse.rse.core.model,
  org.eclipse.rse.core.subsystems,
  org.eclipse.rse.ui
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
