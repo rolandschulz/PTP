@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.core.model;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
@@ -244,7 +245,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 
 	public char[] getContents() {
 		// TODO Auto-generated method stub
-		return null;
+		return new char[0];
 	}
 
 	public ICElement getElement(String name) throws CModelException {
@@ -268,13 +269,29 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	}
 
 	public IInclude getInclude(String name) {
-		// TODO Auto-generated method stub
+		try {
+			ICElement[] celements = getChildren();
+			for (ICElement celement : celements) {
+				if (celement.getElementType() == ICElement.C_INCLUDE) {
+					if (name.equals(celement.getElementName())) {
+						return (IInclude) celement;
+					}
+				}
+			}
+		} catch (CModelException e) {
+		}
 		return null;
 	}
 
 	public IInclude[] getIncludes() throws CModelException {
-		// TODO Auto-generated method stub
-		return null;
+		ICElement[] celements = getChildren();
+		ArrayList<ICElement> aList = new ArrayList<ICElement>();
+		for (ICElement celement : celements) {
+			if (celement.getElementType() == ICElement.C_INCLUDE) {
+				aList.add(celement);
+			}
+		}
+		return aList.toArray(new IInclude[0]);
 	}
 
 	public ILanguage getLanguage() throws CoreException {

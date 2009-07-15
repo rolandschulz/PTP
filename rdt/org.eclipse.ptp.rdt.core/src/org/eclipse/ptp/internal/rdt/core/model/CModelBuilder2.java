@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,8 +82,8 @@ import org.eclipse.cdt.core.parser.Keywords;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor;
 import org.eclipse.cdt.internal.core.model.ASTStringUtil;
-import org.eclipse.cdt.internal.core.model.DebugLogConstants;
-import org.eclipse.cdt.internal.core.model.Util;
+//import org.eclipse.cdt.internal.core.model.DebugLogConstants;
+//import org.eclipse.cdt.internal.core.model.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -95,7 +95,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
  */
 public class CModelBuilder2 {
 
-	private final static boolean DEBUG= Util.isActive(DebugLogConstants.MODEL);
+//	private final static boolean DEBUG= Util.isActive(DebugLogConstants.MODEL);
 
 	private final TranslationUnit fTranslationUnit;
 	private final IProgressMonitor fProgressMonitor;
@@ -132,10 +132,10 @@ public class CModelBuilder2 {
 		startTime= System.currentTimeMillis();
 		buildModel(ast);
 		elementInfo.setIsStructureKnown(true);
-		Util.debugLog("CModelBuilder2: building " //$NON-NLS-1$
-				+"children="+ fTranslationUnit.getElementInfo().internalGetChildren().size() //$NON-NLS-1$
-				+" time="+ (System.currentTimeMillis() - startTime) + "ms", //$NON-NLS-1$ //$NON-NLS-2$
-				DebugLogConstants.MODEL, false);
+//		Util.debugLog("CModelBuilder2: building " //$NON-NLS-1$
+//				+"children="+ fTranslationUnit.getElementInfo().internalGetChildren().size() //$NON-NLS-1$
+//				+" time="+ (System.currentTimeMillis() - startTime) + "ms", //$NON-NLS-1$ //$NON-NLS-2$
+//				DebugLogConstants.MODEL, false);
 	}
 
 	private boolean isCanceled() {
@@ -144,7 +144,7 @@ public class CModelBuilder2 {
 
 	private void checkCanceled() {
 		if (fProgressMonitor != null && fProgressMonitor.isCanceled()) {
-			if (DEBUG) Util.debugLog("CModelBuilder2: cancelled ", DebugLogConstants.MODEL, false); //$NON-NLS-1$
+//			if (DEBUG) Util.debugLog("CModelBuilder2: cancelled ", DebugLogConstants.MODEL, false); //$NON-NLS-1$
 			throw new OperationCanceledException();
 		}
 	}
