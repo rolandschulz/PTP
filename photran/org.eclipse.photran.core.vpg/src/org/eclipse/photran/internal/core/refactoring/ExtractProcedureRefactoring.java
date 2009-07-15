@@ -124,6 +124,10 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
                 fail("Only executable statements can be extracted; the statement \"" + stmt.toString().trim() + "\" cannot");
         
         determineParameters();
+        
+        for (Definition param : localVarsToPassInAsParams)
+            if (param.isPointer())
+                fail("The selected statements cannot be extracted because doing so would require passing a pointer variable as a parameter");
     }
     
     private void checkForLabels(RefactoringStatus status)
@@ -459,7 +463,13 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         StringBuilder sb = new StringBuilder();
         
         sb.append(var.getType().toString());
-        // TODO: Pointer, target
+        
+        if (var.isAllocatable()) sb.append(", allocatable");
+        if (var.isIntentIn() && !var.isIntentOut()) sb.append(", intent(in)");
+        if (!var.isIntentIn() && var.isIntentOut()) sb.append(", intent(out)");
+        if (var.isPointer()) sb.append(", pointer");
+        if (var.isTarget()) sb.append(", target");
+        
         sb.append(" :: ");
         sb.append(var.getDeclaredName());
         
