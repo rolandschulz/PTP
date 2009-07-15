@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,6 +24,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.loops.GenericASTVisitorWithLoops;
@@ -30,13 +32,21 @@ import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
+import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorNode;
+import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
+import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTObjectNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
@@ -55,7 +65,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
 {
 	private StatementSequence selection = null;
-	private Set<Definition> localVarsToPassInAsParams = new TreeSet<Definition>();
+	private List<Definition> localVarsToPassInAsParams = new LinkedList<Definition>();
 	private String newName = null;
 	
     public ExtractProcedureRefactoring(IFile file, ITextSelection selection)
@@ -135,24 +145,22 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
 
     private void determineParameters()
     {
-        // TODO: This does not consider local variables used in variable declarations.
-        //     integer, parameter :: SIZE = 5
-        //     real :: matrix(SIZE, SIZE)
-        //     matrix(:, :) = 0.0  ! <<<<< EXTRACT THIS STATEMENT
-        // will not extract the SIZE variable
-        
-        
-//        Set<Definition> varsUsedBeforeSelection = localVariablesUsedIn(stmtSeq.precedingStmts);
-        Set<Definition> varsUsedInSelection = localVariablesUsedIn(selection.selectedStmts);
-//        Set<Definition> varsUsedAfterSelection = localVariablesUsedIn(stmtSeq.followingStmts);
+        localVarsToPassInAsParams.addAll(localVariablesUsedIn(selection.selectedStmts));
+        localVarsToPassInAsParams.addAll(0, localVarsReferencedInDecls());
+    }
 
-        for (Definition localVar : varsUsedInSelection)
+    private List<Definition> localVarsReferencedInDecls()
+    {
+        List<Definition> result = new LinkedList<Definition>();
+        
+        for (Set<Definition> addlVars = addlLocalVariablesReferencedIn(localVarsToPassInAsParams);
+             !addlVars.isEmpty();
+             addlVars = addlLocalVariablesReferencedIn(result))
         {
-//            if (varsUsedBeforeSelection.contains(localVar) || varsUsedAfterSelection.contains(localVar))
-                localVarsToPassInAsParams.add(localVar);
-//            else
-//                localVarsToMoveToExtractedSubprogram.add(localVar);
+            result.addAll(0, addlVars);
         }
+        
+        return result;
     }
 
     private Set<Definition> localVariablesUsedIn(List<IASTNode> stmts)
@@ -167,7 +175,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
 
     private Set<Definition> localVariablesUsedIn(IASTNode node)
     {
-        final Set<Definition> result = new HashSet<Definition>();
+        final Set<Definition> result = new TreeSet<Definition>();
         node.accept(new GenericASTVisitorWithLoops()
         {
             @Override public void visitToken(Token token)
@@ -179,6 +187,100 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
             }
         });
         return result;
+    }
+
+    /**
+     * The extraction
+     * <pre>
+     * integer, parameter :: FIVE = 5
+     * integer, parameter :: SIZE = FIVE
+     * real :: matrix(SIZE, SIZE)
+     * matrix(:, :) = 0.0  ! <<<<< EXTRACT THIS STATEMENT
+     * </pre>
+     * will initially compute the set of local variables to be { matrix }.
+     * However, the declaration of matrix uses the declaration of SIZE,
+     * so the &quot;closure&quot; is { matrix, SIZE }, since this is the
+     * minimal set of variables that must be passed to the new procedure.
+     */
+    private Set<Definition> addlLocalVariablesReferencedIn(Collection<Definition> vars)
+    {
+        final Set<Definition> result = new TreeSet<Definition>();
+        
+        for (Definition def : vars)
+        {
+            ASTArraySpecNode arraySpec = findArraySpec(def);
+            if (arraySpec != null)
+                result.addAll(localVariablesUsedIn(arraySpec));
+        }
+        
+        return result;
+    }
+
+    private ASTArraySpecNode findArraySpec(Definition def)
+    {
+        ASTArraySpecNode arraySpec = findArraySpecInTypeDecl(def);
+        if (arraySpec != null)
+            return arraySpec;
+        
+        arraySpec = findArraySpecInDimensionStmt(def);
+        return arraySpec;
+    }
+
+    private ASTArraySpecNode findArraySpecInTypeDecl(Definition def)
+    {
+        ASTTypeDeclarationStmtNode typeDecl = findTypeDeclaration(def);
+        if (typeDecl != null)
+        {
+            if (typeDecl.getAttrSpecSeq() != null)
+                for (ASTAttrSpecSeqNode attrSpecSeq : typeDecl.getAttrSpecSeq())
+                    if (attrSpecSeq.getAttrSpec().isDimension())
+                        return attrSpecSeq.getAttrSpec().getArraySpec();
+            
+            for (ASTEntityDeclNode decl : typeDecl.getEntityDeclList())
+                if (decl.getArraySpec() != null && matches(decl.getObjectName(), def))
+                    return decl.getArraySpec();
+        }
+        
+        return null;
+    }
+
+    private ASTTypeDeclarationStmtNode findTypeDeclaration(Definition def)
+    {
+        return def.getTokenRef().findToken().findNearestAncestor(ASTTypeDeclarationStmtNode.class);
+    }
+
+    private ASTArraySpecNode findArraySpecInDimensionStmt(final Definition def)
+    {
+        class Visitor extends GenericASTVisitor
+        {
+            private ASTArraySpecNode result = null;
+            
+            @Override public void visitASTDimensionStmtNode(ASTDimensionStmtNode node)
+            {
+                for (ASTArrayDeclaratorNode arrayDeclarator : node.getArrayDeclaratorList())
+                    if (matches(arrayDeclarator, def))
+                        result = arrayDeclarator.getArraySpec();
+            }
+        }
+        
+        ScopingNode scope = def.getTokenRef().findToken().findNearestAncestor(ScopingNode.class);
+        Visitor v = new Visitor();
+        scope.accept(v);
+        return v.result;
+    }
+
+    private boolean matches(ASTArrayDeclaratorNode arrayDeclarator, Definition def)
+    {
+        String declVar = PhotranVPG.canonicalizeIdentifier(arrayDeclarator.getVariableName().getText());
+        String targetVar = def.getCanonicalizedName();
+        return declVar.equals(targetVar);
+    }
+
+    private boolean matches(ASTObjectNameNode objectName, Definition def)
+    {
+        String declVar = PhotranVPG.canonicalizeIdentifier(objectName.getObjectName().getText());
+        String targetVar = def.getCanonicalizedName();
+        return declVar.equals(targetVar);
     }
 
     ///////////////////////////////////////////////////////////////////////////

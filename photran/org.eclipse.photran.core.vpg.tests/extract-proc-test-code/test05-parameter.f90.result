@@ -1,15 +1,16 @@
 subroutine prob
         integer, parameter :: SIZE = 5
         real :: matrix(SIZE, SIZE)
-        call new_procedure(matrix)
+        call new_procedure(SIZE, matrix)
+        print *, matrix
 end subroutine
 
-
-subroutine new_procedure(matrix, SIZE)
+subroutine new_procedure(SIZE, matrix)
     implicit none
-    real :: matrix(SIZE, SIZE)
     integer :: SIZE
+    real :: matrix(SIZE, SIZE)
     matrix(:, :) = 0.0          !<<<<<START !<<<<<END
 end subroutine
+
 
 program main; call prob; call flush; stop; end program

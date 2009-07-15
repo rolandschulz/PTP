@@ -1,0 +1,17 @@
+subroutine prob
+        integer, parameter :: ROWS = 5, COLS = 7
+        real :: matrix(ROWS, COLS)
+        call new_procedure(COLS, ROWS, matrix)
+        print *, matrix
+end subroutine
+
+subroutine new_procedure(COLS, ROWS, matrix)
+    implicit none
+    integer :: COLS
+    integer :: ROWS
+    real :: matrix(ROWS, COLS)
+    matrix(:, :) = 0.0          !<<<<<START !<<<<<END
+end subroutine
+
+
+program main; call prob; call flush; stop; end program

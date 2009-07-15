@@ -22,6 +22,8 @@ public class ExtractProcTestSuite extends TestSuite
         suite.addTest(getSuiteFor("test02-locals.f90"));
         suite.addTest(getSuiteFor("test03-locals2.f90"));
         suite.addTest(getSuiteFor("test04-in-loop.f90"));
+        suite.addTest(getSuiteFor("test05-parameter.f90"));
+        suite.addTest(getSuiteFor("test06-parameter.f90"));
         return suite;
     }
     
