@@ -68,6 +68,7 @@ import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
 import org.eclipse.text.edits.ReplaceEdit;
 
 import bz.over.vpg.TokenRef;
@@ -721,21 +722,31 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     // Check for conflicting bindings
     ///////////////////////////////////////////////////////////////////////////
     
+    /**
+     * Given a {@link Definition} and a list of references to that Definition
+     * (see {@link Definition#findAllReferences(boolean)}), checks if the name
+     * <code>newName</code> will conflict in the scope of any of the given
+     * references; if this is the case, an appropriate error
+     * ({@link RefactoringStatus#addError(String)}) is added to the given
+     * {@link RefactoringStatus}.
+     * <p>
+     * This is the fundamental precondition check for {@link RenameRefactoring}.
+     */
     protected void checkForConflictingBindings(
-        Definition definitionToCheck, 
-        Collection<PhotranTokenRef> allReferences, 
+        Definition definitionToCheck,
+        Collection<PhotranTokenRef> allReferences,
         String newName,
         RefactoringStatus status)
     {
         new CheckForConflictBindings().check(definitionToCheck, allReferences, newName, status);
     }
     
-    private class CheckForConflictBindings
+    private final class CheckForConflictBindings
     {
         private Definition definitionToCheck = null;
         private String newName = null;
         
-        protected void check(
+        public void check(
                            Definition definitionToCheck, 
                            Collection<PhotranTokenRef> allReferences, 
                            String newName,
