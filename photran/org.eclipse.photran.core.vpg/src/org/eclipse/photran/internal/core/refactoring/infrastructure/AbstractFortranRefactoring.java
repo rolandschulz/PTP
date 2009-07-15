@@ -750,10 +750,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     
     /**
      * Given a {@link Definition} and a list of references to that Definition
-     * (see {@link Definition#findAllReferences(boolean)}), checks if the name
-     * <code>newName</code> will conflict in the scope of any of the given
-     * references; if this is the case, the given callback is invoked to record
-     * an error or warning.
+     * (see {@link Definition#findAllReferences(boolean)}), checks if any of
+     * the <code>newNames</code> will conflict in the scope of any of the given
+     * references; if so, the given callback is invoked to record an error or
+     * warning.
      * <p>
      * This is the fundamental precondition check for {@link RenameRefactoring}.
      */
@@ -768,10 +768,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     
     /**
      * Given a {@link Definition} and a list of references to that Definition
-     * (see {@link Definition#findAllReferences(boolean)}), checks if the name
-     * <code>newName</code> will conflict in the scope of any of the given
-     * references; if this is the case, the given callback is invoked to record
-     * an error or warning.
+     * (see {@link Definition#findAllReferences(boolean)}), checks if any of
+     * the <code>newNames</code> will conflict in the scope of any of the given
+     * references; if so, the given callback is invoked to record an error or
+     * warning.
      * <p>
      * This is the fundamental precondition check for {@link RenameRefactoring}.
      */
