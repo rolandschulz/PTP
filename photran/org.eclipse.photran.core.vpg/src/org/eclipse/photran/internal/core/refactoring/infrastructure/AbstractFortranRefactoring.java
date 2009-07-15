@@ -14,7 +14,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -37,20 +40,32 @@ import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.core.vpg.util.OffsetLength;
+import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
+import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
+import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -219,6 +234,43 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     }
     
     /**
+     * Parses the given Fortran statement, or returns <code>null</code> if the
+     * statement cannot be parsed.
+     * 
+     * @see #parseLiteralStatement(String)
+     */
+    protected IBodyConstruct parseLiteralStatementNoFail(String string)
+    {
+        try
+        {
+            return parseLiteralStatement(string);
+        }
+        catch (Throwable e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Parses the given Fortran expression.
+     * <p>
+     * Internally, <code>string</code> is embedded into the following program
+     * <pre>
+     * program p
+     *   x = (string is placed here)
+     * end program
+     * </pre>
+     * which is parsed and the resulting expression extracted and returned,
+     * so <code>string</code> must "make sense" (syntactically) in this context.
+     * No semantic analysis is done; it is only necessary that the
+     * program be syntactically correct.
+     */
+    protected IExpr parseLiteralExpression(String string)
+    {
+        return ((ASTAssignmentStmtNode)parseLiteralStatement("x = " + string)).getRhs();
+    }
+    
+    /**
      * Parses the given list of Fortran statements.
      * <p>
      * @see parseLiteralStatement
@@ -260,26 +312,6 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         }
     }
     private Parser parser = null;
-
-//    /**
-//     * Parses the given Fortran expression.
-//     * <p>
-//     * Internally, <code>string</code> is embedded into the following program
-//     * <pre>
-//     * program p
-//     *   x = (string is placed here)
-//     * end program
-//     * </pre>
-//     * which is parsed and the resulting expression extracted and returned,
-//     * so <code>string</code> must "make sense" (syntactically) in this context.
-//     * No semantic analysis is done; it is only necessary that the
-//     * program be syntactically correct.
-//     */
-//    protected ASTExpressionNode parseLiteralExpression(String string)
-//    {
-//        IBodyConstruct stmt = parseLiteralStatement("x = " + string);
-//        return ((ASTAssignmentStmtNode)stmt).getExpr();
-//    }
 
     // USER INTERACTION ///////////////////////////////////////////////////////
     
@@ -339,6 +371,17 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     }
     
     // TEXT<->TREE MAPPING ////////////////////////////////////////////////////
+    
+    protected Definition findUnambiguousTokenDefinition(Token t)
+    {
+        if(t == null)
+            return null;
+        
+        List<Definition> defs = t.resolveBinding();
+        if(defs.size() <= 0 || defs.size() > 1)
+            return null;
+        return defs.get(0);
+    }
     
     protected Token findEnclosingToken(IFortranAST ast, final ITextSelection selection)
     {
@@ -498,6 +541,51 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         }
     }
     
+    protected ASTProperLoopConstructNode getLoopNode(IFortranAST ast, ITextSelection selection)
+    {
+        /*Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
+        Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
+        if (firstToken == null || lastToken == null) 
+            return null;
+
+        return getLoopNode(firstToken, lastToken);*/
+        return (ASTProperLoopConstructNode)getNode(ast, selection, ASTProperLoopConstructNode.class);
+    }
+    
+    protected ASTNode getNode(IFortranAST ast, ITextSelection selection, Class<? extends Parser.ASTNode> node)
+    {
+        Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
+        Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
+        if (firstToken == null || lastToken == null) 
+            return null;
+        return getNode(firstToken, lastToken, node);
+    }
+    
+    protected ASTNode getNode(Token firstToken, Token lastToken, Class<? extends Parser.ASTNode> node)
+    {
+        assert(firstToken != null);
+        assert(lastToken  != null);
+        ASTNode firstTokenNode = firstToken.findNearestAncestor(node);
+        ASTNode lastTokenNode = lastToken.findNearestAncestor(node);
+        if(firstTokenNode == null || lastTokenNode == null || firstTokenNode != lastTokenNode)
+            return null;
+        return firstTokenNode;
+        //return null;
+    }
+    
+    protected ASTProperLoopConstructNode getLoopNode(Token firstToken, Token lastToken)
+    {
+        /*assert(firstToken != null);
+        assert(lastToken  != null);
+        ASTProperLoopConstructNode loopContainingFirstToken = firstToken.findNearestAncestor(ASTProperLoopConstructNode.class);
+        ASTProperLoopConstructNode loopContainingLastToken = lastToken.findNearestAncestor(ASTProperLoopConstructNode.class);
+        if (loopContainingFirstToken == null || loopContainingLastToken == null || loopContainingFirstToken != loopContainingLastToken) 
+            return null;
+        
+        return loopContainingFirstToken;*/
+        return (ASTProperLoopConstructNode)getNode(firstToken, lastToken, ASTProperLoopConstructNode.class);
+    }
+    
     @SuppressWarnings("unchecked")
     protected StatementSequence findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
     {
@@ -627,5 +715,273 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     protected boolean isUniquelyDefinedIdentifer(Token t)
     {
         return isBoundIdentifier(t) && t.resolveBinding().size() == 1;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Check for conflicting bindings
+    ///////////////////////////////////////////////////////////////////////////
+    
+    protected void checkForConflictingBindings(
+        Definition definitionToCheck, 
+        Collection<PhotranTokenRef> allReferences, 
+        String newName,
+        RefactoringStatus status)
+    {
+        new CheckForConflictBindings().check(definitionToCheck, allReferences, newName, status);
+    }
+    
+    private class CheckForConflictBindings
+    {
+        private Definition definitionToCheck = null;
+        private String newName = null;
+        
+        protected void check(
+                           Definition definitionToCheck, 
+                           Collection<PhotranTokenRef> allReferences, 
+                           String newName,
+                           RefactoringStatus status)
+        {
+            this.definitionToCheck = definitionToCheck;
+            this.newName = newName;
+            
+            checkForConflictingDefinitionOrShadowing(status);
+            
+            for (PhotranTokenRef ref : findReferencesToShadowedDefinitions())
+                checkIfReferenceBindingWillChange(status, ref, false);
+            
+            for (PhotranTokenRef ref : allReferences)
+                checkIfReferenceBindingWillChange(status, ref, true);
+        }
+        
+        /** Check whether the new definition will either conflict with or shadow an existing definition */
+        private void checkForConflictingDefinitionOrShadowing(RefactoringStatus status)
+        {
+            List<PhotranTokenRef> conflictingDef = findAllPotentiallyConflictingDefinitions();
+            if (!conflictingDef.isEmpty())
+                addConflictError(status, conflictingDef);
+            
+            conflictingDef = findAllPotentiallyConflictingUnboundSubprogramCalls();
+            if (!conflictingDef.isEmpty())
+                addConflictWarning(status, conflictingDef);
+        }
+    
+        private void addConflictError(RefactoringStatus status, List<PhotranTokenRef> conflictingDef)
+        {
+            PhotranTokenRef defToken = conflictingDef.get(0);
+            Definition def = vpg.getDefinitionFor(defToken);
+            String msg = "The name \"" + newName + "\" conflicts with " + def;
+            RefactoringStatusContext context = createContext(defToken); // Highlights problematic definition in file
+            status.addError(msg, context);
+        }
+    
+        private void addConflictWarning(RefactoringStatus status, List<PhotranTokenRef> conflictingDef)
+        {
+            PhotranTokenRef defToken = conflictingDef.get(0);
+            String msg = "The name \"" + newName + "\" might conflict with the name of an invoked subprogram";
+            RefactoringStatusContext context = createContext(defToken); // Highlights problematic definition in file
+            status.addWarning(msg, context);
+        }
+    
+        private List<PhotranTokenRef> findAllPotentiallyConflictingDefinitions()
+        {
+            List<PhotranTokenRef> conflicts = new ArrayList<PhotranTokenRef>();
+    
+            // Cannot call a main program (or function, etc.) X if it has an internal subprogram named X,
+            // even if that subprogram is never used (in which case it wouldn't be caught below)
+            if (definitionToCheck.isMainProgram() || definitionToCheck.isSubprogram() || definitionToCheck.isModule())
+                findAllPotentiallyConflictingDefinitionsInScope(conflicts, definitionToCheck.getTokenRef().findToken().findNearestAncestor(ScopingNode.class), false);
+            if (definitionToCheck.isInternalSubprogramDefinition() && scopeContainingInternalSubprogram().isNamed(newName))
+                conflicts.add(scopeContainingInternalSubprogram().getNameToken().getTokenRef());
+    
+            for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
+                findAllPotentiallyConflictingDefinitionsInScope(conflicts, importingScope, true);
+            
+            return conflicts;
+        }
+    
+        private ScopingNode scopeContainingInternalSubprogram()
+        {
+            return definitionToCheck.getTokenRef().findToken().getEnclosingScope();
+        }
+    
+        /**
+         * Cannot call a function X if it is defined in or imported into a scope with a function X already defined
+         * <p>
+         * The third parameter indicates whether or not we should check that the definition to check is actually imported
+         * into the target scope (it may not be if there is a USE statement with a Rename or ONLY list).
+         */
+        private void findAllPotentiallyConflictingDefinitionsInScope(List<PhotranTokenRef> conflicts, ScopingNode importingScope, boolean shouldCheckIfDefinitionImportedIntoScope)
+        {
+            Token newNameToken = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
+            
+            List<PhotranTokenRef> definitionsLocalToScope = collectLocalDefinitions(importingScope);
+    
+            if (isProgramOrSubprogramOrModuleScope(importingScope) && shouldCheckIfDefinitionImportedIntoScope)
+            {
+                // Cannot call a variable X inside a function named X
+                if (importingScope.isNamed(newName) && definitionsLocalToScope.contains(definitionToCheck.getTokenRef()))
+                {
+                    conflicts.add(importingScope.getNameToken().getTokenRef());
+                }
+                // Cannot call a variable X inside a function named Y inside a module named X
+                else
+                {
+                    ScopingNode parent = importingScope.findNearestAncestor(ScopingNode.class);
+                    if (parent != null && parent.isNamed(newName))
+                    {
+                        List<PhotranTokenRef> definitionsLocalToParent = collectLocalDefinitions(parent);
+                        if (definitionsLocalToParent.contains(definitionToCheck.getTokenRef()))
+                            conflicts.add(parent.getNameToken().getTokenRef());
+                    }
+                }
+            }
+    
+            // Cannot call a function X if it is defined in or imported into a scope with a function X already defined
+            for (PhotranTokenRef conflict : importingScope.manuallyResolveInLocalScope(newNameToken))
+            {
+                if (definitionsLocalToScope.contains(conflict))
+                {
+                    if (shouldCheckIfDefinitionImportedIntoScope)
+                    {
+                        if (definitionsLocalToScope.contains(definitionToCheck.getTokenRef()))
+                            conflicts.add(conflict);
+                    }
+                    else
+                    {
+                        conflicts.add(conflict);
+                    }
+                }
+            }
+        }
+        
+        /** Check whether the new definition will either conflict with or shadow an existing definition */
+        private List<PhotranTokenRef> findReferencesToShadowedDefinitions()
+        {
+            Token token = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
+            
+            List<PhotranTokenRef> shadowedDefinitions = scopeOfDefinitionToCheck().manuallyResolve(token);
+            // TODO: Does not consider rename or only lists (need to tell if this SPECIFIC definition will be imported)
+            for (ScopingNode importingScope : scopeOfDefinitionToCheck().findImportingScopes())
+                shadowedDefinitions.addAll(importingScope.manuallyResolve(token));
+    
+            List<PhotranTokenRef> referencesToShadowedDefinitions = new LinkedList<PhotranTokenRef>();
+            for (PhotranTokenRef def : shadowedDefinitions)
+                referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences(false));
+            return referencesToShadowedDefinitions;
+        }
+    
+        private void checkIfReferenceBindingWillChange(RefactoringStatus status, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
+        {
+            Token reference = ref.findToken();
+            
+            ScopingNode scopeOfDefinitionToRename = reference.findScopeDeclaringOrImporting(definitionToCheck);
+            if (scopeOfDefinitionToRename == null) return;
+            
+            for (PhotranTokenRef existingBinding : new FakeToken(reference, newName).manuallyResolveBinding())
+            {
+                ScopingNode scopeOfExistingBinding = existingBinding.findToken().getEnclosingScope();
+                
+                boolean willReferenceRenamedDefinition = scopeOfExistingBinding.isParentScopeOf(scopeOfDefinitionToRename);
+                if (shouldReferenceRenamedDefinition != willReferenceRenamedDefinition)
+                {
+                    // The entity with the new name will shadow the definition to which this binding resolves
+                    status.addError("Changing the name to \"" + newName + "\""
+                                + " would change the meaning of \"" + reference.getText() + "\" on line " + reference.getLine()
+                                + " in " + ref.getFilename(),
+                                createContext(ref)); // Highlight problematic reference
+                }
+            }
+        }
+        
+        private List<PhotranTokenRef> findAllPotentiallyConflictingUnboundSubprogramCalls()
+        {
+            final List<PhotranTokenRef> conflictingDef = new ArrayList<PhotranTokenRef>();
+            
+            for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
+            {
+                importingScope.accept(new GenericASTVisitor()
+                {
+                    @Override public void visitASTVarOrFnRefNode(ASTVarOrFnRefNode node)
+                    {
+                        if (node.getName() != null)
+                            checkForConflict(node.getName().getName());
+                    }
+                    
+                    @Override public void visitASTCallStmtNode(ASTCallStmtNode node)
+                    {
+                        if (node.getSubroutineName() != null)
+                            checkForConflict(node.getSubroutineName());
+                    }
+    
+                    private void checkForConflict(Token name)
+                    {
+                        if (name != null && name.getText().equals(newName) && name.resolveBinding().isEmpty())
+                            conflictingDef.add(name.getTokenRef());
+                    }
+                });
+            }
+            
+            return conflictingDef;
+        }
+        
+        private ScopingNode scopeOfDefinitionToCheck()
+        {
+            return definitionToCheck.getTokenRef().findToken().getEnclosingScope();
+        }
+        
+        private Iterable<ScopingNode> scopeItselfAndAllScopesThatImport(final ScopingNode scope)
+        {
+            if (scope == null) return Collections.emptySet();
+    
+            return new Iterable<ScopingNode>()
+            {
+                public Iterator<ScopingNode> iterator()
+                {
+                    return new Iterator<ScopingNode>()
+                    {
+                        private ScopingNode first = scope;
+                        private Iterator<ScopingNode> rest = scope.findImportingScopes().iterator();
+                       
+                        public boolean hasNext()
+                        {
+                            if (first != null)
+                                return true;
+                            else
+                                return rest.hasNext();
+                        }
+                        
+                        public ScopingNode next()
+                        {
+                            if (first != null)
+                            {
+                                ScopingNode result = first;
+                                first = null;
+                                return result;
+                            }
+                            else return rest.next();
+                        }
+                        
+                        public void remove() { throw new UnsupportedOperationException(); }
+                    };
+                }
+            };
+        }
+        
+        private List<PhotranTokenRef> collectLocalDefinitions(ScopingNode importingScope)
+        {
+            List<PhotranTokenRef> definitionsLocalToScope = new ArrayList<PhotranTokenRef>();
+            for (Definition def : importingScope.getAllDefinitions())
+                if (!def.isIntrinsic())
+                    definitionsLocalToScope.add(def.getTokenRef());
+            return definitionsLocalToScope;
+        }
+    
+        private boolean isProgramOrSubprogramOrModuleScope(ScopingNode scope)
+        {
+            return scope instanceof ASTMainProgramNode
+                || scope instanceof ASTFunctionSubprogramNode
+                || scope instanceof ASTSubroutineSubprogramNode
+                || scope instanceof ASTModuleNode;
+        }
     }
 }
