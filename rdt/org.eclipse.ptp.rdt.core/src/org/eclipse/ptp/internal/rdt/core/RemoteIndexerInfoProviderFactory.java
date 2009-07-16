@@ -15,10 +15,9 @@ package org.eclipse.ptp.internal.rdt.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ILinkage;
@@ -26,14 +25,17 @@ import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.core.model.LanguageManager;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
+import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.ptp.rdt.core.RDTLog;
 
 /**
@@ -43,6 +45,9 @@ import org.eclipse.ptp.rdt.core.RDTLog;
  * eclipse and CDT APIs.
  */
 public class RemoteIndexerInfoProviderFactory {
+	
+	// These are the linkages supported by RDT
+	private static final int[] LINKAGE_IDS = new int[] { ILinkage.C_LINKAGE_ID, ILinkage.CPP_LINKAGE_ID };
 	
 	
 	/**
@@ -66,6 +71,8 @@ public class RemoteIndexerInfoProviderFactory {
 			return new RemoteIndexerInfoProvider();
 		
 		final List<ICElement> elements = new ArrayList<ICElement>();
+		
+		// TODO replace with ICElementVisitor
 		IResourceVisitor resourceVisitor = new IResourceVisitor() {
 			public boolean visit(IResource resource) throws CoreException {
 				if (!(resource instanceof IFile))
@@ -76,6 +83,7 @@ public class RemoteIndexerInfoProviderFactory {
 				return true;
 			}
 		};
+
 		
 		try {
 			project.accept(resourceVisitor);
@@ -160,8 +168,8 @@ public class RemoteIndexerInfoProviderFactory {
 		IProject project = elements.get(0).getCProject().getProject(); 
 		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
 		
+
 		RemoteScannerInfoCache cache = new RemoteScannerInfoCache();
-		Set<Integer> linkageIDs = new HashSet<Integer>();
 		
 		for(ICElement element : elements) {
 			if(element instanceof ITranslationUnit) {
@@ -183,21 +191,54 @@ public class RemoteIndexerInfoProviderFactory {
 				
 				// is it a header file?
 				isHeaderMap.put(path, tu.isHeaderUnit());
-				
-				try {
-					linkageIDs.add(((ITranslationUnit)element).getLanguage().getLinkageID());
-				} catch(CoreException e) { } // do nothing, worst thing is we don't provide a scanner info for that linkage
 			}
 		}
 		
-		for(int id : linkageIDs) {
+		for(int id : LINKAGE_IDS) {
 			IScannerInfo defaultScannerInfo = getDefaultScannerInfo(project, id);
 			RemoteScannerInfo remoteScannerInfo = cache.get(defaultScannerInfo);
 			linkageMap.put(id, remoteScannerInfo);
 		}
 		
-		return new RemoteIndexerInfoProvider(scannerInfoMap, linkageMap, languageMap, isHeaderMap);
+		// compute the indexer preferences
+		Properties props = IndexerPreferences.getProperties(project);
+		Map<String,Boolean> preferences = computeIndexerPreferences(props);
+		
+		String filePref = (String) props.get(IndexerPreferences.KEY_FILES_TO_PARSE_UP_FRONT);
+		List<String> filesToParseUpFront = Arrays.asList(filePref.split(",")); //$NON-NLS-1$
+		
+		// need to compute the languages of the files to parse up front
+		// TODO there are two things wrong with this:
+		// 1) The file may need to be parsed as more than one language, see PDOMIndexerTask.getLanguages()
+		// 2) If there is a file in the project with the same name as a file to parse up front it may get the wrong scanner info
+		for(String filename : filesToParseUpFront) {
+			IContentType ct= CCorePlugin.getContentType(project, filename);
+			if (ct != null) {
+				ILanguage language = LanguageManager.getInstance().getLanguage(ct);
+				languageMap.put(filename, language.getId());
+			}
+		}
+		
+		return new RemoteIndexerInfoProvider(scannerInfoMap, linkageMap, languageMap, isHeaderMap, preferences, filesToParseUpFront);
 	}
+
+	
+	
+	
+	private static Map<String,Boolean> computeIndexerPreferences(Properties props) {
+		Map<String,Boolean> prefs = new HashMap<String,Boolean>(props.size());
+		//prefs.put(IRemoteIndexerInfoProvider.KEY_INDEX_UNUSED_HEADERS_WITH_DEFAULT_LANG, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_INDEX_UNUSED_HEADERS_WITH_DEFAULT_LANG)));
+		//prefs.put(IRemoteIndexerInfoProvider.KEY_INDEX_UNUSED_HEADERS_WITH_ALTERNATE_LANG, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_INDEX_UNUSED_HEADERS_WITH_ALTERNATE_LANG)));
+		prefs.put(IRemoteIndexerInfoProvider.KEY_INDEX_ALL_FILES, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_INDEX_ALL_FILES)));
+		//prefs.put(IRemoteIndexerInfoProvider.KEY_INCLUDE_HEURISTICS, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_INCLUDE_HEURISTICS)));
+		prefs.put(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_SKIP_ALL_REFERENCES)));
+		//prefs.put(IRemoteIndexerInfoProvider.KEY_SKIP_IMPLICIT_REFERENCES, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_SKIP_IMPLICIT_REFERENCES)));
+		prefs.put(IRemoteIndexerInfoProvider.KEY_SKIP_TYPE_REFERENCES, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_SKIP_TYPE_REFERENCES)));
+		prefs.put(IRemoteIndexerInfoProvider.KEY_SKIP_MACRO_REFERENCES, Boolean.valueOf(props.getProperty(IndexerPreferences.KEY_SKIP_MACRO_REFERENCES)));
+		return prefs;
+	}
+	
+	
 	
 	
 	/*
