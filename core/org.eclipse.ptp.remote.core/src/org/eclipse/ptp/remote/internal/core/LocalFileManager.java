@@ -53,4 +53,11 @@ public class LocalFileManager implements IRemoteFileManager {
 	public URI toURI(IPath path) {
 		return URIUtil.toURI(path);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
+	 */
+	public URI toURI(String path) {
+		return URIUtil.toURI(path);
+	}
 }
