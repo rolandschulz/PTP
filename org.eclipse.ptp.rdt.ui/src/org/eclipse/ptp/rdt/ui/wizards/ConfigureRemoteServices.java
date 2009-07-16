@@ -81,9 +81,6 @@ public class ConfigureRemoteServices {
 		
 		ICProject cProject = CModelManager.getDefault().getCModel().getCProject(project);
 		CCorePlugin.getIndexManager().setIndexerId(cProject, RemoteFastIndexer.ID);
-		Properties properties = new Properties();
-		properties.put(IndexerPreferences.KEY_FILES_TO_PARSE_UP_FRONT, ""); //$NON-NLS-1$
-		IndexerPreferences.setProperties(project, IndexerPreferences.SCOPE_PROJECT_PRIVATE, properties);
 		monitor.worked(10);
 		monitor.done();		
 	}
