@@ -241,7 +241,6 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
             	String serializedProvider = null;
             	try {
 					serializedProvider = Serializer.serialize(provider);
-					System.out.println("length " + serializedProvider.length());//$NON-NLS-1$
 				} catch (IOException e) {
 					RDTLog.logError(e);
 				}

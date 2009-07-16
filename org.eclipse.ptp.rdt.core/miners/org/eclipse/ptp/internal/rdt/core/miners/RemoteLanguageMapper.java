@@ -21,11 +21,9 @@ import org.eclipse.cdt.internal.core.indexer.ILanguageMapper;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 
 /**
- * @author crecoskie
  *
  */
 public class RemoteLanguageMapper implements ILanguageMapper {
-	
 	
 	private static final Map<String,ILanguage> RDT_SUPPORTED_LANGUAGES;
 	static {
@@ -34,17 +32,22 @@ public class RemoteLanguageMapper implements ILanguageMapper {
 		RDT_SUPPORTED_LANGUAGES.put(GCCLanguage.ID, GCCLanguage.getDefault());
 	}
 	
+	private static final ILanguage DEFAULT_LANGUAGE = GPPLanguage.getDefault();
+	
+	
 	
 	private final IRemoteIndexerInfoProvider provider;
 	
 	public RemoteLanguageMapper(IRemoteIndexerInfoProvider provider) {
+		if(provider == null)
+			throw new NullPointerException();
 		this.provider = provider;
 	}
 	
-	
 	public ILanguage getLanguage(String file) {
 		String id = provider.getLanguageID(file);
-		return RDT_SUPPORTED_LANGUAGES.get(id);
+		ILanguage language = RDT_SUPPORTED_LANGUAGES.get(id);
+		return language == null ? DEFAULT_LANGUAGE : language;
 	}
 	
 }
