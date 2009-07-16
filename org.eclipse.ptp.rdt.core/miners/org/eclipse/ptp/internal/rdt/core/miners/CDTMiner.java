@@ -1189,29 +1189,18 @@ public class CDTMiner extends Miner {
 	protected void handleIndexDelta(String scopeName, List<String> addedFiles,
 			List<String> changedFiles, List<String> removedFiles, IRemoteIndexerInfoProvider provider, DataElement status) {
 		try {
-
 //			statusWorking(status);
 			
-			
-			
-			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
-			indexer.setScannerInfoProvider(provider);
-			indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
-			
+			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider);
 			ScopeManager scopeManager = ScopeManager.getInstance();
 			
-			
 			// update the scope if required
-			Iterator<String> iterator = addedFiles.iterator();
-			
-			while(iterator.hasNext()) {
-				scopeManager.addFileToScope(scopeName, iterator.next());
+			for(String file : addedFiles) {
+				scopeManager.addFileToScope(scopeName, file);
 			}
 			
-			iterator = removedFiles.iterator();
-			
-			while(iterator.hasNext()) {
-				scopeManager.removeFileFromScope(scopeName, iterator.next());
+			for(String file : removedFiles) {
+				scopeManager.removeFileFromScope(scopeName, file);
 			}
 			
 			try {
@@ -1569,12 +1558,8 @@ public class CDTMiner extends Miner {
 
 	protected void handleIndexStart(String scopeName, IRemoteIndexerInfoProvider provider, DataElement status) {
 		try {
-			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
-			indexer.setScannerInfoProvider(provider);
-			indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
-			
+			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider);
 			Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
-			
 			List<String> sourcesList = new LinkedList<String>(sources);
 
 			try {
@@ -1593,10 +1578,7 @@ public class CDTMiner extends Miner {
 	}
 	
 	protected void handleReindex(String scopeName, IRemoteIndexerInfoProvider provider, DataElement status) {
-		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName);
-		indexer.setScannerInfoProvider(provider);
-		indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
-		
+		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider);
 		Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
 		
 		List<String> sourcesList = new LinkedList<String>(sources);
@@ -1675,29 +1657,4 @@ public class CDTMiner extends Miner {
 		return status;
 	}
 
-	 
-	public IASTTranslationUnit getASTTranslationUnit(String filePath, IRemoteIndexerInfoProvider indexerInfoProvider, IIndex index) {
-		ILanguageMapper languageMapper = new RemoteLanguageMapper(indexerInfoProvider);
-		
-		ILanguage language = languageMapper.getLanguage(filePath);
-		if(language == null)
-			return null;
-		
-		IASTTranslationUnit tu = null;
-		try {
-			int options = 0;
-			if(indexerInfoProvider.isHeaderUnit(filePath))
-				options = ILanguage.OPTION_IS_SOURCE_UNIT;
-			
-			tu = language.getASTTranslationUnit(new CodeReader(filePath), indexerInfoProvider.getScannerInformation(filePath),
-					StandaloneSavedCodeReaderFactory.getInstance(), index, options, new NullLogService());
-		} catch (CoreException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return tu;
-	}
-	
 }

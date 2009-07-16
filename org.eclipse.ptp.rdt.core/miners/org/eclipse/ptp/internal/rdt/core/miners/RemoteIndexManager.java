@@ -25,10 +25,13 @@ import org.eclipse.cdt.internal.core.index.CIndex;
 import org.eclipse.cdt.internal.core.index.IIndexFragment;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.cdt.internal.core.indexer.StandaloneIndexer;
+import org.eclipse.cdt.internal.core.pdom.PDOMWriter;
 import org.eclipse.cdt.internal.core.pdom.dom.IPDOMLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.c.PDOMCLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.cpp.PDOMCPPLinkageFactory;
+import org.eclipse.cdt.internal.core.pdom.indexer.PDOMIndexerTask;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
 /**
@@ -82,6 +85,46 @@ public class RemoteIndexManager {
 			return indexer.getIndex();
 		}
 	}
+	
+	
+	/**
+	 * Gets the indexer and also sets up indexer preferences.
+	 * 
+	 * @see PDOMIndexerTask constructor
+	 */
+	public StandaloneFastIndexer getIndexerForScope(String scope, IRemoteIndexerInfoProvider provider) {
+		StandaloneFastIndexer indexer = getIndexerForScope(scope);
+		
+		// configure the indexer using the provider
+		indexer.setScannerInfoProvider(provider);
+		indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
+		indexer.setFilesToParseUpFront(provider.getFilesToParseUpFront().toArray(new String[]{}));
+		
+		Map<String,Boolean> prefs = provider.getIndexerPreferences();
+		
+		if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {
+			indexer.setSkipReferences(PDOMWriter.SKIP_ALL_REFERENCES);
+		}
+		else {
+			int skipReferences = 0;
+			if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_TYPE_REFERENCES))
+				skipReferences |= PDOMWriter.SKIP_TYPE_REFERENCES;
+			if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_MACRO_REFERENCES))
+				skipReferences |= PDOMWriter.SKIP_MACRO_REFERENCES;
+			//if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_IMPLICIT_REFERENCES))
+			//	skipReferences |= PDOMWriter.SKIP_IMPLICIT_REFERENCES;
+			
+			if(skipReferences == 0)
+				indexer.setSkipReferences(PDOMWriter.SKIP_NO_REFERENCES);
+			else
+				indexer.setSkipReferences(skipReferences);
+		}
+		
+		indexer.setIndexAllFiles(prefs.get(IRemoteIndexerInfoProvider.KEY_INDEX_ALL_FILES));
+		
+		return indexer;
+	}
+	
 	
 	public StandaloneFastIndexer getIndexerForScope(String scope) {
 		
