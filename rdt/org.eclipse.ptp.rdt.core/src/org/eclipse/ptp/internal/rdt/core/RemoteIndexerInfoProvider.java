@@ -14,6 +14,7 @@ package org.eclipse.ptp.internal.rdt.core;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.core.parser.IScannerInfo;
@@ -29,14 +30,24 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 	private final Map<Integer,RemoteScannerInfo> linkageMap; // used by the "parse up front" feature
 	private final Map<String,String> languageMap; // (path -> language ID)
 	private final Map<String,Boolean> isHeaderMap; // (path -> isHeaderUnit(boolean))
+	private final Map<String,Boolean> indexerPreferences; // (preference key -> boolean)
+	private final List<String> filesToParseUpFront;
 	
 
-	RemoteIndexerInfoProvider(Map<String,RemoteScannerInfo> pathMap, Map<Integer,RemoteScannerInfo> linkageMap, 
-			                  Map<String,String> languageMap, Map<String,Boolean> isHeaderMap) {
+	RemoteIndexerInfoProvider(Map<String,RemoteScannerInfo> pathMap, 
+						      Map<Integer,RemoteScannerInfo> linkageMap, 
+			                  Map<String,String> languageMap, 
+			                  Map<String,Boolean> isHeaderMap, 
+			                  Map<String,Boolean> indexerPreferences,
+			                  List<String> filesToParseUpFront) {
+		
+		
 		this.pathMap = pathMap == null ? Collections.<String,RemoteScannerInfo>emptyMap() : pathMap;
 		this.linkageMap = linkageMap == null ? Collections.<Integer,RemoteScannerInfo>emptyMap() : linkageMap;
 		this.languageMap = languageMap == null ? Collections.<String,String>emptyMap() : languageMap;
 		this.isHeaderMap = isHeaderMap == null ? Collections.<String,Boolean>emptyMap() : isHeaderMap;
+		this.indexerPreferences = indexerPreferences == null ? Collections.<String,Boolean>emptyMap() : indexerPreferences;
+		this.filesToParseUpFront = filesToParseUpFront == null ? Collections.<String>emptyList() : filesToParseUpFront;
 	}
 	
 	RemoteIndexerInfoProvider() {
@@ -44,6 +55,8 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		linkageMap = Collections.emptyMap();
 		languageMap = Collections.emptyMap();
 		isHeaderMap = Collections.emptyMap();
+		indexerPreferences = Collections.emptyMap();
+		filesToParseUpFront = Collections.emptyList();
 	}
 
 	public IScannerInfo getScannerInformation(String path) {
@@ -59,20 +72,30 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		return si == null ? new RemoteScannerInfo() : si;
 	}
 	
-	
 	public String getLanguageID(String path) {
 		return languageMap.get(path);
+	}
+	
+	public boolean isHeaderUnit(String path) {
+		return isHeaderMap.get(path);
+	}
+	
+	public Map<String,Boolean> getIndexerPreferences() {
+		return Collections.unmodifiableMap(indexerPreferences);
+	}
+	
+	public List<String> getFilesToParseUpFront() {
+		return Collections.unmodifiableList(filesToParseUpFront);
 	}
 	
 	public String toString() {
 		return "pathMap:" + pathMap +  //$NON-NLS-1$
 		       " linkageMap:" + linkageMap + //$NON-NLS-1$
 		       " languageMap:" + languageMap + //$NON-NLS-1$
-		       " isHeaderMap:" + isHeaderMap; //$NON-NLS-1$
+		       " isHeaderMap:" + isHeaderMap + //$NON-NLS-1$
+		       " preferences: " + indexerPreferences; //$NON-NLS-1$
 	}
 
-	public boolean isHeaderUnit(String path) {
-		return isHeaderMap.get(path);
-	}
+	
 }
 
