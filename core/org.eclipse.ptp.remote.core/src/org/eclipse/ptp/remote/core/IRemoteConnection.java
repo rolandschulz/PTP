@@ -15,10 +15,17 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public interface IRemoteConnection {
 	/**
+	 * Register a listener that will be notified when this connection's status changes.
+	 * 
+	 * @param listener
+	 */
+	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener);
+	
+	/**
 	 * Close the connection. Must be called to terminate the connection.
 	 */
 	public void close();
-	
+
 	/**
 	 * Forward local port localPort to remote port fwdPort on remote machine fwdAddress. If this
 	 * IRemoteConnection is not to fwdAddress, the port will be routed via the connection machine to
@@ -30,18 +37,7 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
-
-	/**
-	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. When a connection is made to remotePort
-	 * on the remote machine, it is forwarded via this IRemoteConnection to fwdPort on machine fwdAddress.
-	 * 
-	 * @param remotePort remote port to forward
-	 * @param fwdAddress address of recipient machine
-	 * @param fwdPort port on recipient machine
-	 * @throws RemoteConnectionException
-	 */
-	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
-
+	
 	/**
 	 * Forward a local port to remote port fwdPort on remote machine fwdAddress. The local port is chosen
 	 * dynamically and returned by the method. If this IRemoteConnection is not to fwdAddress, the port will 
@@ -54,7 +50,18 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public int forwardLocalPort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
-	
+
+	/**
+	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. When a connection is made to remotePort
+	 * on the remote machine, it is forwarded via this IRemoteConnection to fwdPort on machine fwdAddress.
+	 * 
+	 * @param remotePort remote port to forward
+	 * @param fwdAddress address of recipient machine
+	 * @param fwdPort port on recipient machine
+	 * @throws RemoteConnectionException
+	 */
+	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
+
 	/**
 	 * Forward a remote port to port fwdPort on remote machine fwdAddress. The remote port is chosen
 	 * dynamically and returned by the method. When a connection is made to this port
@@ -70,14 +77,14 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public int forwardRemotePort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
-
+	
 	/**
 	 * Gets the implementation dependent address for this connection
 	 * 
 	 * return address
 	 */
 	public String getAddress();
-	
+
 	/**
 	 * Get unique name for this connection.
 	 * 
@@ -98,7 +105,7 @@ public interface IRemoteConnection {
 	 * @return true if connection is open.
 	 */
 	public boolean isOpen();
-
+	
 	/**
 	 * Open the connection. Must be called before the connection can be used.
 	 * 
@@ -108,6 +115,13 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException;
+
+	/**
+	 * Remove a listener that will be notified when this connection's status changes.
+	 * 
+	 * @param listener
+	 */
+	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener);
 	
 	/**
 	 * Set the address for this connection

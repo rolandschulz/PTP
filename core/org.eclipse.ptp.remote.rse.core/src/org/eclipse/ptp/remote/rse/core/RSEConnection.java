@@ -12,11 +12,12 @@ package org.eclipse.ptp.remote.rse.core;
 
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
@@ -32,15 +33,15 @@ public class RSEConnection implements IRemoteConnection {
 	private IFileSystem fileSystem;
 	private IShellService shellService = null;
 	private ISubSystem subSystem = null;
-	private IRemoteConnectionManager conMgr;
 	private final IRemoteConnection connection = this;
+	private final ListenerList listeners = new ListenerList();
 
 	private ICommunicationsListener commsListener = new ICommunicationsListener() {
 
 		public void communicationsStateChange(CommunicationsEvent event) {
 			switch (event.getState()) {
 			case CommunicationsEvent.AFTER_CONNECT:
-				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 					public IRemoteConnection getConnection() {
 						return connection;
 					}
@@ -53,7 +54,7 @@ public class RSEConnection implements IRemoteConnection {
 				break;
 				
 			case CommunicationsEvent.AFTER_DISCONNECT:
-				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 					public IRemoteConnection getConnection() {
 						return connection;
 					}
@@ -66,7 +67,7 @@ public class RSEConnection implements IRemoteConnection {
 				break;
 				
 			case CommunicationsEvent.CONNECTION_ERROR:
-				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+				fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 					public IRemoteConnection getConnection() {
 						return connection;
 					}
@@ -85,11 +86,17 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		
 	};
-
-	public RSEConnection(IHost host, IFileSystem fileSystem, IRemoteConnectionManager conMgr) {
+	
+	public RSEConnection(IHost host, IFileSystem fileSystem) {
 		this.rseHost = host;
 		this.fileSystem = fileSystem;
-		this.conMgr = conMgr;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.add(listener);
 	}
 	
 	/* (non-Javadoc)
@@ -103,7 +110,7 @@ public class RSEConnection implements IRemoteConnection {
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -111,7 +118,7 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -119,7 +126,7 @@ public class RSEConnection implements IRemoteConnection {
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
@@ -160,14 +167,14 @@ public class RSEConnection implements IRemoteConnection {
 	public IHost getHost() {
 		return rseHost;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
 	public String getName() {
 		return rseHost.getAliasName();
 	}
-	
+
 	/**
 	 * Get the shell service for this connection
 	 * 
@@ -180,7 +187,7 @@ public class RSEConnection implements IRemoteConnection {
 	public String getUsername() {
 		return rseHost.getDefaultUserId();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#isOpen()
 	 */
@@ -211,19 +218,26 @@ public class RSEConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
 		rseHost.setHostName(address);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setUsername(java.lang.String)
 	 */
 	public void setUsername(String username) {
 		rseHost.setDefaultUserId(username);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#supportsTCPPortForwarding()
 	 */
@@ -232,12 +246,23 @@ public class RSEConnection implements IRemoteConnection {
 	}
 
 	/**
+	 * Notify all listeners when this connection's status changes.
+	 * 
+	 * @param event
+	 */
+	private void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
+		}
+	}
+	
+	/**
 	 * Called to release any resources
 	 */
 	protected void dispose() {
 		subSystem.getConnectorService().removeCommunicationsListener(commsListener);
 	}
-
+	
 	/**
 	 * Initialize the connection
 	 * 
@@ -261,5 +286,4 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		return true;
 	}
-
 }

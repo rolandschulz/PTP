@@ -11,9 +11,10 @@
 package org.eclipse.ptp.remote.internal.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.core.messages.Messages;
@@ -23,16 +24,23 @@ public class LocalConnection implements IRemoteConnection {
 	private String address;
 	private String username;
 	private boolean connected;
-	private IRemoteConnectionManager conMgr;
 	private final IRemoteConnection connection = this;
+	private final ListenerList listeners = new ListenerList();
 	
-	public LocalConnection(IRemoteConnectionManager conMgr) {
-		this.conMgr = conMgr;
+	public LocalConnection() {
 		this.name = Messages.LocalConnection_0;
 		this.address = Messages.LocalConnection_1;
 		this.username = System.getProperty("user.name"); //$NON-NLS-1$
 		this.connected = true;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.add(listener);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
@@ -40,7 +48,7 @@ public class LocalConnection implements IRemoteConnection {
 		if (connected) {
 			connected = false;
 			
-			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+			fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 				public IRemoteConnection getConnection() {
 					return connection;
 				}
@@ -91,14 +99,14 @@ public class LocalConnection implements IRemoteConnection {
 	public String getAddress() {
 		return address;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getName()
 	 */
 	public String getName() {
 		return name;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getUsername()
 	 */
@@ -120,7 +128,7 @@ public class LocalConnection implements IRemoteConnection {
 		if (!connected) {
 			connected = true;
 			
-			conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+			fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 				public IRemoteConnection getConnection() {
 					return connection;
 				}
@@ -131,6 +139,13 @@ public class LocalConnection implements IRemoteConnection {
 				
 			});	
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.remove(listener);
 	}
 
 	/* (non-Javadoc)
@@ -152,6 +167,17 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return false;
+	}
+
+	/**
+	 * Notify all listeners when this connection's status changes.
+	 * 
+	 * @param event
+	 */
+	private void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
+		}
 	}
 
 }

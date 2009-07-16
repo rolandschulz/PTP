@@ -19,8 +19,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsConnection;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -62,8 +62,7 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 	 */
 	private int state;
 	
-	private IRemoteConnectionManager conMgr = null;
-	private IRemoteConnection connection = null;
+	private RemoteToolsConnection connection = null;
 
 	/**
 	 * Creates a target control. If some attribute related to the environment has an invalid
@@ -85,8 +84,7 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		currentTargetConfig = configFactory.createTargetConfig();
 	}
 
-	public void setConnection(IRemoteConnectionManager conMgr, IRemoteConnection conn) {
-		this.conMgr = conMgr;
+	public void setConnection(RemoteToolsConnection conn) {
 		this.connection = conn;
 	}
 	
@@ -135,8 +133,8 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 			super.create(monitor);
 			setState(CONNECTED);
 			
-			if (conMgr != null) {
-				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+			if (connection != null) {
+				connection.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 					public IRemoteConnection getConnection() {
 						return connection;
 					}
@@ -242,8 +240,8 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		} finally {
 			setState(NOT_OPERATIONAL);
 			
-			if (conMgr != null) {
-				conMgr.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
+			if (connection != null) {
+				connection.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 					public IRemoteConnection getConnection() {
 						return connection;
 					}

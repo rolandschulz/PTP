@@ -14,10 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.remotetools.core.environment.PTPTargetControl;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
@@ -28,7 +25,6 @@ import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
-	private final ListenerList listeners = new ListenerList();
 	private TargetTypeElement remoteHost = null;
 	private Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
 	
@@ -36,7 +32,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
 		for (Object obj : targetMgr.getTypeElements()) {
 			TargetTypeElement element = (TargetTypeElement)obj;
-			if (element.getName().equals("Remote Host")) {
+			if (element.getName().equals("Remote Host")) { //$NON-NLS-1$
 				remoteHost = element;
 				break;
 			}
@@ -44,22 +40,6 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		refreshConnections();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
-	 */
-	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.add(listener);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#fireConnectionChangeEvent(org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
-	 */
-	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
-			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
-		}
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
@@ -82,13 +62,6 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	public void removeConnection(IRemoteConnection conn) {
 		connections.remove(conn);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
-	 */
-	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.remove(listener);
-	}
 
 	/**
 	 * Refresh the list of connections that we know about. Deals with connection that are added or deleted
@@ -106,10 +79,10 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 					/*
 					 * FIXME: need to work out how to get this information correctly!!!!
 					 */
-					String address = (String) element.getAttributes().get("ptp.connection-address");
-					String user = (String) element.getAttributes().get("ptp.login-username");
+					String address = (String) element.getAttributes().get("ptp.connection-address"); //$NON-NLS-1$
+					String user = (String) element.getAttributes().get("ptp.login-username"); //$NON-NLS-1$
 					conn = new RemoteToolsConnection(element.getName(), address, user, (PTPTargetControl)control);
-					((PTPTargetControl)control).setConnection(this, conn);
+					((PTPTargetControl)control).setConnection((RemoteToolsConnection)conn);
 				} catch (CoreException e) {
 				}
 			}
