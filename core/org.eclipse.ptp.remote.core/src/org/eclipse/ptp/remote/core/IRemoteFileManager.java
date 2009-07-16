@@ -52,4 +52,13 @@ public interface IRemoteFileManager {
 	 * @return URI representing path on remote system
 	 */
 	public URI toURI(IPath path);
+	
+	/**
+	 * Convert string representation of a remote path to equivalent URI. This URI is suitable
+	 * for EFS operations <i>on the local system</i>.
+	 * 
+	 * @param path path on remote system
+	 * @return URI representing path on remote system
+	 */
+	public URI toURI(String path);
 }

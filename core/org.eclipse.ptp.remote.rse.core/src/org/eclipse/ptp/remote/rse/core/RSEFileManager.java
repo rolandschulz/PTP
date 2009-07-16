@@ -58,4 +58,15 @@ public class RSEFileManager implements IRemoteFileManager {
 			return null;
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
+	 */
+	public URI toURI(String path) {
+		try {
+			return new URI("rse", connection.getHost().getHostName(), path, null); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
+			return null;
+		}
+	}
 }
