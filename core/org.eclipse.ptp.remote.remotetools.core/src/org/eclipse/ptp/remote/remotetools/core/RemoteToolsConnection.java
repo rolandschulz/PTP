@@ -13,10 +13,13 @@ package org.eclipse.ptp.remote.remotetools.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.exception.AddressInUseException;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
@@ -33,12 +36,20 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private String address;
 	private String userName;
 	private PTPTargetControl control;
+	private final ListenerList listeners = new ListenerList();
 
 	public RemoteToolsConnection(String name, String address, String userName, PTPTargetControl control) {
 		this.control = control;
 		this.connName = name;
 		this.address = address;
 		this.userName = userName;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.add(listener);
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +80,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public IRemoteExecutionManager createExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
 		return control.createExecutionManager();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -118,7 +129,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new AddressInUseException(e.getMessage());
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -152,7 +163,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		monitor.done();
 		return -1;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAddress()
 	 */
@@ -187,7 +198,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		}
 		monitor.beginTask(Messages.RemoteToolsConnection_open, 2);
 		if (control.query() == ITargetStatus.STOPPED) {
-			Job job = new Job("Start the Environment") {
+			Job job = new Job("Start the Environment") { //$NON-NLS-1$
 				protected IStatus run(IProgressMonitor monitor) {
 					
 					IStatus status = null;
@@ -224,6 +235,13 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		listeners.remove(listener);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
@@ -236,11 +254,22 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public void setUsername(String userName) {
 		this.userName = userName;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#supportsTCPPortForwarding()
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return true;
+	}
+	
+	/**
+	 * Notify all listeners when this connection's status changes.
+	 * 
+	 * @param event
+	 */
+	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
+		}
 	}
 }

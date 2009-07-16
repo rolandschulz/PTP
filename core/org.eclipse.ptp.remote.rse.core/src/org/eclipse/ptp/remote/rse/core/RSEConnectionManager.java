@@ -16,17 +16,13 @@ import java.util.Map;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
 
 public class RSEConnectionManager implements IRemoteConnectionManager {
-	private final ListenerList listeners = new ListenerList();
 	private IFileSystem fileSystem = null;
 	private ISystemRegistry registry;
 	private Map<IHost, IRemoteConnection> connections = new HashMap<IHost,IRemoteConnection>();
@@ -37,22 +33,6 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 			this.fileSystem = EFS.getFileSystem("rse"); //$NON-NLS-1$
 		} catch (CoreException e) {
 			// Could not find the rse filesystem!
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
-	 */
-	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.add(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#fireConnectionChangeEvent(org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
-	 */
-	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
-			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
 		}
 	}
 	
@@ -87,7 +67,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
 			for (IHost host : hosts) {
 				if (!connections.containsKey(host)) {
-					RSEConnection conn = new RSEConnection(host, fileSystem, this);
+					RSEConnection conn = new RSEConnection(host, fileSystem);
 					if (conn.initialize()) {
 						connections.put(host, conn);
 					}
@@ -104,12 +84,5 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 			((RSEConnection)conn).dispose();
 		}
 		connections.remove(conn);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
-	 */
-	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.remove(listener);
 	}
 }

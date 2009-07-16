@@ -14,20 +14,6 @@ package org.eclipse.ptp.remote.core;
 
 public interface IRemoteConnectionManager {	
 	/**
-	 * Register a listener that will be notified when a connection's status changes.
-	 * 
-	 * @param listener
-	 */
-	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener);
-	
-	/**
-	 * Notify all listeners when a connection's status changes.
-	 * 
-	 * @param event
-	 */
-	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event);
-	
-	/**
 	 * Find a remote connection given its name
 	 * 
 	 * @param name
@@ -48,11 +34,4 @@ public interface IRemoteConnectionManager {
 	 * @param connection connection to remove
 	 */
 	public void removeConnection(IRemoteConnection connection);
-
-	/**
-	 * Remove a listener that will be notified when a connection's status changes.
-	 * 
-	 * @param listener
-	 */
-	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener);
 }
