@@ -30,7 +30,7 @@
 	
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
 	<property name="platformVersion" value="R-3.5-200906111540"/>
-	<property name="platformBaseName" value="eclipse-platform"/>
+	<property name="platformBaseName" value="eclipse-platform-3.5"/>
 	<property name="icuBaseZip" value="com.ibm.icu.base-3.5.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.0.1.v20090415.jar"/>
 	
