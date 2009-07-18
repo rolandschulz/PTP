@@ -29,9 +29,9 @@
 	<property name="platformTempDir" value="${basedir}/platform.temp"/>
 	
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="I20090611-1540"/>
-	<property name="platformBaseName" value="eclipse-platform-I20090611-1540"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-I20090611-1540.zip"/>
+	<property name="platformVersion" value="R-3.5-200906111540"/>
+	<property name="platformBaseName" value="eclipse-platform"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.5.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.0.1.v20090415.jar"/>
 	
 	<property name="cdtCoreVersion" value="5.1.1.200907100614"/>
