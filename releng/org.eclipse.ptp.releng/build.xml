@@ -11,7 +11,7 @@
 	<target name="init">
 		<touch file="${user.home}/.cvspass" />
 		<tstamp/>
-		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/I20090611-1540/eclipse-SDK-I20090611-1540-linux-gtk-ppc.tar.gz"/>
+		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/R-3.5-200906111540/eclipse-SDK-3.5-linux-gtk-ppc.tar.gz"/>
 		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/6.0.1/I.I200907100614/cdt-master-6.0.1-I200907100614.zip"/>
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/galileo/mylyn-3.2.0.I20090520-2300-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.1-200906171400/RSE-SDK-3.1.zip"/>
