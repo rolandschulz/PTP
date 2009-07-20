@@ -20,6 +20,8 @@ import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.NullInputStream;
 
 public class RemoteToolsProcess extends AbstractRemoteProcess {
+	private static int refCount = 0;
+	
 	private Process remoteProcess;
 	private InputStream procStdout;
 	private InputStream procStderr;
@@ -35,6 +37,9 @@ public class RemoteToolsProcess extends AbstractRemoteProcess {
 		public ProcReader(InputStream input, OutputStream output) {
 			this.input = input;
 			this.output = output;
+			synchronized (this.output) {
+				refCount++;
+			}
 		}
 		
 		public void run() {
@@ -47,13 +52,13 @@ public class RemoteToolsProcess extends AbstractRemoteProcess {
 				}
 			} catch (IOException e) {
 			}
-			try {
-				input.close();
-			} catch (IOException e) {
-			}
-			try {
-				output.close();
-			} catch (IOException e) {
+			synchronized (output) {
+				if (--refCount == 0) {
+					try {
+						output.close();
+					} catch (IOException e) {
+					}
+				}
 			}
 		}
 	}

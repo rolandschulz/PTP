@@ -20,21 +20,33 @@ import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.NullInputStream;
 
 public class LocalProcess extends AbstractRemoteProcess {
+	private static int refCount = 0;
+
 	private Process localProcess;
 	private InputStream procStdout;
 	private InputStream procStderr;
 	private Thread stdoutReader;
 	private Thread stderrReader;
 
-	private class ProcReader implements Runnable {
+	/**
+	 * Thread to merge stdout and stderr. Keeps refcount so that output stream
+	 * is not closed too early.
+	 * 
+	 * @author greg
+	 *
+	 */
+	private class ProcOutputMerger implements Runnable {
 		private final static int BUF_SIZE = 8192;
 		
 		private InputStream input;
 		private OutputStream output;
 		
-		public ProcReader(InputStream input, OutputStream output) {
+		public ProcOutputMerger(InputStream input, OutputStream output) {
 			this.input = input;
 			this.output = output;
+			synchronized (this.output) {
+				refCount++;
+			}
 		}
 		
 		public void run() {
@@ -47,13 +59,13 @@ public class LocalProcess extends AbstractRemoteProcess {
 				}
 			} catch (IOException e) {
 			}
-			try {
-				input.close();
-			} catch (IOException e) {
-			}
-			try {
-				output.close();
-			} catch (IOException e) {
+			synchronized (output) {
+				if (--refCount == 0) {
+					try {
+						output.close();
+					} catch (IOException e) {
+					}
+				}
 			}
 		}
 	}
@@ -64,17 +76,17 @@ public class LocalProcess extends AbstractRemoteProcess {
 		if (merge) {
 			PipedOutputStream pipedOutput = new PipedOutputStream();
 			
-			procStdout = new PipedInputStream(pipedOutput);
 			procStderr = new NullInputStream();
+			procStdout = new PipedInputStream(pipedOutput);
 
-			stderrReader = new Thread(new ProcReader(proc.getErrorStream(), pipedOutput));
-			stdoutReader = new Thread(new ProcReader(proc.getInputStream(), pipedOutput));
+			stderrReader = new Thread(new ProcOutputMerger(proc.getErrorStream(), pipedOutput));
+			stdoutReader = new Thread(new ProcOutputMerger(proc.getInputStream(), pipedOutput));
 			
 			stderrReader.start();
 			stdoutReader.start();
 		} else {
-			procStdout = localProcess.getInputStream();
 			procStderr = localProcess.getErrorStream();
+			procStdout = localProcess.getInputStream();
 		}
 
 	}
