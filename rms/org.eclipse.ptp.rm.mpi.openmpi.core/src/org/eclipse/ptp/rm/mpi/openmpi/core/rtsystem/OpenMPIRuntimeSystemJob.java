@@ -260,16 +260,26 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							}
 
 							public void stderr(Process proc, String output) {
+								String stderr = output;
+								if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
+										&& configuration.getServiceVersion() < 4) {
+									stderr += "\n"; //$NON-NLS-1$
+								}
 								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(proc.getIndex());
 								if (process != null) {
-									process.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(output));
+									process.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(stderr));
 								}
 							}
 
 							public void stdout(Process proc, String output) {
+								String stdout = output;
+								if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
+										&& configuration.getServiceVersion() < 4) {
+									stdout += "\n"; //$NON-NLS-1$
+								}
 								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(proc.getIndex());
 								if (process != null) {
-									process.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(output));
+									process.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(stdout));
 								}
 							}
 							
