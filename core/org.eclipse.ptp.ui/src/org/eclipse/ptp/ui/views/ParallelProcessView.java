@@ -231,7 +231,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				
 				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
 				if (stdoutAttr != null) {
-					outputText.append(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
+					outputText.append(stdoutAttr.getValue());
 				}
 			}
 		});

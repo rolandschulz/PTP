@@ -254,7 +254,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @param output
 	 */
 	private void addOutput(String output) {
-		outputFile.write(output + "\n"); //$NON-NLS-1$
+		outputFile.write(output);
 	}
 
 	/**
