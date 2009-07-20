@@ -141,7 +141,7 @@ public class JobConsole implements IJobChildListener, IProcessListener {
 			output = msg;
 		}
 		
-		stream.println(output);				
+		stream.print(output);				
 	}
 	
 	/* (non-Javadoc)
