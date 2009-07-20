@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
@@ -43,6 +41,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
+import org.eclipse.ptp.rm.core.utils.IInputStreamListener;
 import org.eclipse.ptp.rm.core.utils.InputStreamListenerToOutputStream;
 import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
@@ -68,6 +67,8 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
  * 
  * OMPI 1.3.2 adds <noderesolve> elements to the XML map data.
  * 
+ * OMPI 1.3.[1,2,3] malform the XML by dropping </stdout> tags on some lines.   
+ * 
  * @author Daniel Felix Ferber
  * @author Greg Watson
  *
@@ -77,7 +78,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	private InputStreamObserver stdoutObserver;
 
 	/** Exception raised while parsing mpi map information. */
-	protected IOException parserException = null;
+	protected Exception parserException = null;
 	
 	/** Error detected in mpirun output */
 	protected boolean errorDetected = false;
@@ -276,9 +277,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					} else {
 						assert false;
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
 					parserException = e;
-					DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {0}", e); //$NON-NLS-1$
+					DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {1}", getJobID(), e); //$NON-NLS-1$
 				} finally {
 					if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
 						getParserListener().disable();
@@ -297,10 +298,11 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
 		final OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 		/*
-		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] and 1.4 since the streams are wrapped in the appropriate XML tags.
+		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] since the streams are wrapped in the appropriate XML tags, but
+		 * are still sent separately.
 		 */
-		if ((configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13) && configuration.getServiceVersion() > 0)
-			|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
+		if ((configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13) && 
+				(configuration.getServiceVersion() > 0 || configuration.getServiceVersion() < 3))) {
 			builder.redirectErrorStream(true);
 		}
 	}
@@ -370,97 +372,69 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * 
 		 * Listener that saves stdout.
 		 */
-		final PipedOutputStream stdoutOutputStream = new PipedOutputStream();
-		final PipedInputStream stdoutInputStream = new PipedInputStream();
-		try {
-			stdoutInputStream.connect(stdoutOutputStream);
-		} catch (IOException e) {
-			assert false; // This exception is not possible
-		}
-		final InputStreamListenerToOutputStream stdoutPipedStreamListener = new InputStreamListenerToOutputStream(stdoutOutputStream);
-
-		Thread stdoutThread = new Thread() {
-			@Override
-			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: started", getJobID()); //$NON-NLS-1$
-				BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(stdoutInputStream));
-				try {
-					String line = stdoutBufferedReader.readLine();
-					while (line != null) {
-						if (!errorDetected && OpenMPIErrorParser.parse(line)) {
-							errorDetected = true;
-							errorMessage = OpenMPIErrorParser.getErrorMessage();
-						}
-						if (procZero != null) {
-							procZero.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
-						}
-						DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
-						line = stdoutBufferedReader.readLine();
-					}
-				} catch (IOException e) {
-					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: {0}", e); //$NON-NLS-1$
-					OpenMPIPlugin.log(e);
-				} finally {
-					stdoutPipedStreamListener.disable();
+		final IInputStreamListener stdoutListener = new IInputStreamListener() {
+			public void newBytes(byte[] bytes, int length) {
+				String line = new String(bytes, 0, length);
+				if (!errorDetected && OpenMPIErrorParser.parse(line)) {
+					errorDetected = true;
+					errorMessage = OpenMPIErrorParser.getErrorMessage();
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout thread: finished", getJobID()); //$NON-NLS-1$
+				if (procZero != null) {
+					procZero.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+				}
+				DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:>>>{1}<<<", getJobID(), line); //$NON-NLS-1$
+			}
+			
+			public void streamClosed() {
+				//
+			}
+			
+			public void streamError(Exception e) {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout stream: {0}", e); //$NON-NLS-1$
+				OpenMPIPlugin.log(e);
 			}
 		};
-
+		
 		/*
+		 * 
 		 * Listener that saves stderr.
 		 */
-		final PipedOutputStream stderrOutputStream = new PipedOutputStream();
-		final PipedInputStream stderrInputStream = new PipedInputStream();
-		try {
-			stderrInputStream.connect(stderrOutputStream);
-		} catch (IOException e) {
-			assert false; // This exception is not possible
-		}
-		final InputStreamListenerToOutputStream stderrPipedStreamListener = new InputStreamListenerToOutputStream(stderrOutputStream);
-	
-		Thread stderrThread = new Thread() {
-			@Override
-			public void run() {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: started", getJobID()); //$NON-NLS-1$
-				final BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(stderrInputStream));
-				try {
-					String line = stderrBufferedReader.readLine();
-					while (line != null) {
-						if (!errorDetected && OpenMPIErrorParser.parse(line)) {
-							errorDetected = true;
-							errorMessage = OpenMPIErrorParser.getErrorMessage();
-						}
-						if (procZero != null) {
-							procZero.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
-						}
-						DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
-						line = stderrBufferedReader.readLine();
-					}
-				} catch (IOException e) {
-					DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: {0}", e); //$NON-NLS-1$
-					OpenMPIPlugin.log(e);
-				} finally {
-					stderrPipedStreamListener.disable();
+		final IInputStreamListener stderrListener = new IInputStreamListener() {
+			public void newBytes(byte[] bytes, int length) {
+				String line = new String(bytes, 0, length);
+				if (!errorDetected && OpenMPIErrorParser.parse(line)) {
+					errorDetected = true;
+					errorMessage = OpenMPIErrorParser.getErrorMessage();
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr thread: finished", getJobID()); //$NON-NLS-1$
+				if (procZero != null) {
+					procZero.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
+				}
+				DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:>>>{1}<<<", getJobID(), line); //$NON-NLS-1$
+			}
+			
+			public void streamClosed() {
+				//
+			}
+			
+			public void streamError(Exception e) {
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr stream: {0}", e); //$NON-NLS-1$
+				OpenMPIPlugin.log(e);
 			}
 		};
-
+		
 		createParser(configuration, ipJob);
 
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", getJobID()); //$NON-NLS-1$
+
 		/*
 		 * Create and start listeners.
 		 */
-		stdoutThread.start();
-		stderrThread.start();
 		getParser().start();
 
 		setStderrObserver(new InputStreamObserver(getProcess().getErrorStream()));
-		getStderrObserver().addListener(stderrPipedStreamListener);
+		getStderrObserver().addListener(stderrListener);
 		setStdoutObserver(new InputStreamObserver(getProcess().getInputStream()));
-		getStdoutObserver().addListener(stdoutPipedStreamListener);
+		getStdoutObserver().addListener(stdoutListener);
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 		if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
