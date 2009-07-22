@@ -1,5 +1,5 @@
 !!
-!! Demonstrates COMMON block hell
+!! Demonstrates COMMON block nightmare
 !!
 !! J. Overbey 8/18/08
 !!
