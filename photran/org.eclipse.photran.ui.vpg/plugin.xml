@@ -601,7 +601,9 @@
          <!--part id="org.eclipse.photran.ui.FixedFormFortranEditor"/-->
       </actionSetPartAssociation>
    </extension>
-   <!-- 4. Add the refactoring to the editor's popup menu -->
+   <!-- 4. Add the refactoring to the editor's popup menu.
+           DO NOT list it here if the refactoring is listed in #5 below
+           (i.e., it is added to the Package Explorer's context menu) -->
    <extension point="org.eclipse.ui.popupMenus">
       <viewerContribution 
             targetID="#FreeFormFortranEditorContextMenu" 
@@ -614,11 +616,11 @@
             <separator name="typeGroup"/>
             <separator name="codingGroup"/>
          </menu>
-         <action 
+         <!--action 
                label="Replace Obsolete &amp;Operators" 
                class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>      
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/-->      
          <!--action 
                label="Extract Common Block to &amp;Module" 
                class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
@@ -639,11 +641,11 @@
                class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
                id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
-         <action 
+         <!--action 
                label="&amp;Introduce Implicit None" 
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup" 
-               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
+               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/-->
          <action 
                label="&amp;Rename..." 
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
@@ -653,7 +655,7 @@
       </viewerContribution>
    </extension>
    
-   <!-- 5. Add refactorings that do not require user input to the objects popup menu -->
+   <!-- 5. Add multi-file refactorings to the context menu for files selected in the Package Explorer or elsewhere -->
    <extension point="org.eclipse.ui.popupMenus">
    <objectContribution
    		adaptable="true"
@@ -678,7 +680,7 @@
                 name="contentTypeId" 
                 value="org.eclipse.photran.core.freeFormFortranSource"/>
    		</visibility>
-   		<menu
+   		<!--menu
          id="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu"
          label="Refactoring"
          path="additions">
@@ -695,7 +697,25 @@
             menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
             class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
             id="org.eclipse.photran.ui.IntroImplicitNoneFileRefactoringAction">
-        </action>
+        </action-->
+         <menu
+               id="org.eclipse.photran.ui.RefactoringMenu"
+               label="Refac&amp;tor"
+               path="group.reorganize"><!-- See IContextMenuConstants -->
+            <separator name="reorgGroup"/>
+            <separator name="typeGroup"/>
+            <separator name="codingGroup"/>
+         </menu>
+         <action 
+               label="Replace Obsolete &amp;Operators" 
+               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>      
+         <action 
+               label="&amp;Introduce Implicit None" 
+               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup" 
+               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
    	</objectContribution>
    	</extension>
    

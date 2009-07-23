@@ -27,7 +27,6 @@ import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.photran.internal.ui.actions.FortranEditorActionDelegate;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -40,8 +39,10 @@ import org.eclipse.ui.internal.Workbench;
  * 
  * @author Jeff Overbey, Timofey Yuvashev
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractFortranRefactoringActionDelegate extends FortranEditorActionDelegate
 {
+    @SuppressWarnings("unused")
     private Class<?> refactoringClass, wizardClass;
     
     public AbstractFortranRefactoringActionDelegate(Class<?> refactoringClass, Class<?> wizardClass)
@@ -63,7 +64,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
     
     private boolean saveFile(AbstractFortranEditor editor)
     {
-        ArrayList<IFile> filesToCheck = new ArrayList();
+        ArrayList<IFile> filesToCheck = new ArrayList<IFile>();
         filesToCheck.add(editor.getIFile());
         IEditorPart[] dirtyEditors = {editor};
         return saveModifiedFiles(filesToCheck, dirtyEditors);
@@ -174,10 +175,10 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
     {
         ArrayList<IFile> myFiles = new ArrayList<IFile>();
         Iterator<?> iter = structSel.iterator();
-        for(;iter.hasNext();)
+        while (iter.hasNext())
         {
             Object obj = iter.next();
-            if(obj instanceof IFile)
+            if (obj instanceof IFile)
             {
                 IFile file = (IFile)obj;
                 myFiles.add(file);
