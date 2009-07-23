@@ -28,6 +28,7 @@
  
 package org.eclipse.photran.internal.core.lexer;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.core.resources.IFile;
@@ -57,14 +58,18 @@ import org.eclipse.core.resources.IFile;
         if (accumulateWhitetext) whiteBeforeSB.append(yytext());
     }
     
-    private IToken token(Terminal terminal)
+    private IToken token(Terminal terminal) throws IOException
     {
-        if (terminal == Terminal.END_OF_INPUT && lastToken != null)
+        if (terminal == Terminal.END_OF_INPUT)
         {
-            if (accumulateWhitetext)
+            try { zzReader.close(); } catch (IOException e) { throw new Error(e); }
+            if (lastToken != null)
             {
-                lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
-                whiteBeforeSB = new StringBuffer();
+                if (accumulateWhitetext)
+                {
+                    lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
+                    whiteBeforeSB = new StringBuffer();
+                }
             }
         }
         
