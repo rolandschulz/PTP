@@ -311,11 +311,19 @@ public class ServiceModelManager implements IServiceModelManager {
 				String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
 				
 				IService service = getService(serviceId);
-				IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
-				IServiceProvider provider = getServiceProvider(descriptor);
-				IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-				provider.restoreState(providerMemento);
-				config.setServiceProvider(service, provider);
+				if (service != null) {
+					IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+					if (descriptor != null) {
+						IServiceProvider provider = getServiceProvider(descriptor);
+						IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+						provider.restoreState(providerMemento);
+						config.setServiceProvider(service, provider);
+					} else {
+						Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
+					}
+				} else {
+					Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_1 + serviceId);
+				}
 			}
 			
 			fConfigurations.put(configId, config);
