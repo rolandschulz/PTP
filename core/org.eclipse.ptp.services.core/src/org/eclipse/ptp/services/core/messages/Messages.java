@@ -16,6 +16,9 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME= "org.eclipse.ptp.services.core.messages.messages";//$NON-NLS-1$
 	
+	public static String ServiceModelManager_0;
+	public static String ServiceModelManager_1;
+
 	public static String ServiceProvider_0;
 	public static String ServiceProvider_1;
 
