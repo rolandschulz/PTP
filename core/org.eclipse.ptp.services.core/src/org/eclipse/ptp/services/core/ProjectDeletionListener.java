@@ -1,5 +1,7 @@
 package org.eclipse.ptp.services.core;
 
+import java.io.IOException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -33,8 +35,15 @@ public class ProjectDeletionListener implements IResourceChangeListener {
 	 */
 	public void resourceChanged(IResourceChangeEvent event) {
 		IProject project = (IProject) event.getResource();
+		ServiceModelManager manager = ServiceModelManager.getInstance();
+		
 		// does nothing if the project is not part of the service model
-		ServiceModelManager.getInstance().remove(project);
+		manager.remove(project);
+		try {
+			manager.saveModelConfiguration();
+		} catch (IOException e) {
+			Activator.getDefault().log(e);
+		}
 	}
 
 }
