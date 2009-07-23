@@ -65,6 +65,18 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     // VPG DATABASE METHODS
     ////////////////////////////////////////////////////////////////////////////
     
+    public void flush()
+    {
+        try
+        {
+            db.flush();
+        }
+        catch (CoreException e)
+        {
+            throw new Error("Unable to flush VPG database to disk", e);
+        }
+    }
+    
     public void close()
     {
         try

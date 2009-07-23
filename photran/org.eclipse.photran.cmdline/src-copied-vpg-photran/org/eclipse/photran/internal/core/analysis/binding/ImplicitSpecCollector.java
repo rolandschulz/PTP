@@ -21,6 +21,8 @@ import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 
 /**
+ * Phase 1 of name-binding analysis.
+ * <p> 
  * Visits an AST, collecting implicit statements and updating the VPG accordingly.
  * <p>
  * This visitor should be run <i>top-down:</i> Each scoping node initially inherits the implicit
@@ -28,6 +30,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
  * children of that scoping node are visited), its implicit spec will be adjusted accordingly.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 class ImplicitSpecCollector extends BindingCollector
 {

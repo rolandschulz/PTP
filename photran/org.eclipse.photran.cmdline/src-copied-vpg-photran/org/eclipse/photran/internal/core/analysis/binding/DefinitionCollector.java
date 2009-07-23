@@ -60,11 +60,15 @@ import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
- * Visits an AST, binding identifier (T_IDENT) tokens in declaration statements.
+ * Phase 3 of name-binding analysis.
+ * <p> 
+ * Visits an AST, constructing {@link Definition} objects and binding identifier
+ * (T_IDENT) tokens in declaration statements.
  * <p> 
  * Operators are NOT included in the symbol table.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 class DefinitionCollector extends BindingCollector
 {

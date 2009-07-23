@@ -19,8 +19,8 @@ import org.eclipse.photran.internal.core.parser.IAccessId;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
- * Visits PUBLIC and PRIVATE specification statements in the VPG and
- * sets the visibility of the corresponding definition accordingly.
+ * Abstract superclass that visits PUBLIC and PRIVATE specification statements
+ * and sets the visibility of the corresponding definition accordingly.
  * <p>
  * This is a common superclass of both {@link SpecificationCollector}
  * and {@link ModuleLoader}.  Since Access-Spec statements can be

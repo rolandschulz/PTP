@@ -22,38 +22,27 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 public class ASTBindingAttrNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTBindingAttrNode
-    ASTAccessSpecNode accessSpec; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token isNonOverridable; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTBindingAttrNode
+    ASTAccessSpecNode accessSpec; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token argName; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token isDeferred; // in ASTBindingAttrNode
-    org.eclipse.photran.internal.core.lexer.Token isNonOverridable; // in ASTBindingAttrNode
 
-    public boolean isNoPass()
+    public boolean isNonOverridable()
     {
-        return this.isNoPass != null;
+        return this.isNonOverridable != null;
     }
 
-    public void setIsNoPass(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsNonOverridable(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isNoPass = newValue;
-    }
-
-
-    public ASTAccessSpecNode getAccessSpec()
-    {
-        return this.accessSpec;
-    }
-
-    public void setAccessSpec(ASTAccessSpecNode newValue)
-    {
-        this.accessSpec = newValue;
+        this.isNonOverridable = newValue;
     }
 
 
@@ -68,6 +57,17 @@ public class ASTBindingAttrNode extends ASTNode
     }
 
 
+    public ASTAccessSpecNode getAccessSpec()
+    {
+        return this.accessSpec;
+    }
+
+    public void setAccessSpec(ASTAccessSpecNode newValue)
+    {
+        this.accessSpec = newValue;
+    }
+
+
     public org.eclipse.photran.internal.core.lexer.Token getArgName()
     {
         return this.argName;
@@ -79,6 +79,17 @@ public class ASTBindingAttrNode extends ASTNode
     }
 
 
+    public boolean isNoPass()
+    {
+        return this.isNoPass != null;
+    }
+
+    public void setIsNoPass(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isNoPass = newValue;
+    }
+
+
     public boolean isDeferred()
     {
         return this.isDeferred != null;
@@ -87,17 +98,6 @@ public class ASTBindingAttrNode extends ASTNode
     public void setIsDeferred(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isDeferred = newValue;
-    }
-
-
-    public boolean isNonOverridable()
-    {
-        return this.isNonOverridable != null;
-    }
-
-    public void setIsNonOverridable(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isNonOverridable = newValue;
     }
 
 
@@ -116,14 +116,14 @@ public class ASTBindingAttrNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isNoPass;
-        case 1:  return this.accessSpec;
-        case 2:  return this.isPass;
+        case 0:  return this.isNonOverridable;
+        case 1:  return this.isPass;
+        case 2:  return this.accessSpec;
         case 3:  return this.hiddenTLparen;
         case 4:  return this.argName;
         case 5:  return this.hiddenTRparen;
-        case 6:  return this.isDeferred;
-        case 7:  return this.isNonOverridable;
+        case 6:  return this.isNoPass;
+        case 7:  return this.isDeferred;
         default: return null;
         }
     }
@@ -132,14 +132,14 @@ public class ASTBindingAttrNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.accessSpec = (ASTAccessSpecNode)value; return;
-        case 2:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isNonOverridable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.accessSpec = (ASTAccessSpecNode)value; return;
         case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.isDeferred = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.isNonOverridable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.isDeferred = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

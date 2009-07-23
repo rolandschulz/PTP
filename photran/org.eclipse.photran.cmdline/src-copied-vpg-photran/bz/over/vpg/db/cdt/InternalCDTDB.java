@@ -67,6 +67,11 @@ public class InternalCDTDB
         annotations = new Annotations();
     }
     
+    public void flush() throws CoreException
+    {
+        db.flush();
+    }
+    
     public void close() throws CoreException
     {
         db.close();

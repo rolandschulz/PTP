@@ -22,23 +22,12 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 public class ASTFormatsepNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFormatsepNode
     org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFormatsepNode
-
-    public boolean colonFormatSep()
-    {
-        return this.colonFormatSep != null;
-    }
-
-    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.colonFormatSep = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFormatsepNode
 
     public boolean slashFormatSep()
     {
@@ -48,6 +37,17 @@ public class ASTFormatsepNode extends ASTNode
     public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.slashFormatSep = newValue;
+    }
+
+
+    public boolean colonFormatSep()
+    {
+        return this.colonFormatSep != null;
+    }
+
+    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.colonFormatSep = newValue;
     }
 
 
@@ -66,8 +66,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.colonFormatSep;
-        case 1:  return this.slashFormatSep;
+        case 0:  return this.slashFormatSep;
+        case 1:  return this.colonFormatSep;
         default: return null;
         }
     }
@@ -76,8 +76,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

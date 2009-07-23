@@ -22,15 +22,15 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
-import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeBodyConstruct
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTPrivateSequenceStmtNode
     org.eclipse.photran.internal.core.lexer.Token sequenceToken; // in ASTPrivateSequenceStmtNode
-    org.eclipse.photran.internal.core.lexer.Token isSequence; // in ASTPrivateSequenceStmtNode
     org.eclipse.photran.internal.core.lexer.Token privateToken; // in ASTPrivateSequenceStmtNode
     org.eclipse.photran.internal.core.lexer.Token isPrivate; // in ASTPrivateSequenceStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isSequence; // in ASTPrivateSequenceStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
@@ -51,17 +51,6 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     public void setSequenceToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.sequenceToken = newValue;
-    }
-
-
-    public boolean isSequence()
-    {
-        return this.isSequence != null;
-    }
-
-    public void setIsSequence(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isSequence = newValue;
     }
 
 
@@ -87,6 +76,17 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     }
 
 
+    public boolean isSequence()
+    {
+        return this.isSequence != null;
+    }
+
+    public void setIsSequence(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isSequence = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPrivateSequenceStmtNode(this);
@@ -105,9 +105,9 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
         {
         case 0:  return this.label;
         case 1:  return this.sequenceToken;
-        case 2:  return this.isSequence;
-        case 3:  return this.privateToken;
-        case 4:  return this.isPrivate;
+        case 2:  return this.privateToken;
+        case 3:  return this.isPrivate;
+        case 4:  return this.isSequence;
         default: return null;
         }
     }
@@ -118,9 +118,9 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.sequenceToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.isSequence = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.isSequence = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

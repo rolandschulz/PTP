@@ -22,10 +22,11 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
- * Abstract superclass providing utility methods for the various ASTVisitors
- * that collect bindings in an AST.
+ * Abstract superclass providing utility methods for several visitor classes
+ * that collect bindings in an AST.  See subclasses and {@link Binder}.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 public abstract class BindingCollector extends ASTVisitor
 {

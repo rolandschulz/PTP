@@ -41,10 +41,13 @@ import org.eclipse.photran.internal.core.parser.IBindEntity;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 
 /**
+ * Phase 4 of name-binding analysis.
+ * <p> 
  * Visits specification statements in an AST, updating the corresponding
- * Definitions in the VPG.
+ * {@link Definition} objects stored in the VPG.
  * 
  * @author Jeff Overbey
+ * @see Binder
  */
 class SpecificationCollector extends VisibilityCollector
 {
@@ -65,7 +68,16 @@ class SpecificationCollector extends VisibilityCollector
         
         IASTListNode<ASTIntentParListNode> list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.get(i).getVariableName());
+        {
+            List<PhotranTokenRef> bindings = bind(list.get(i).getVariableName());
+
+            for (PhotranTokenRef tr : bindings)
+            {
+                Definition def = vpg.getDefinitionFor(tr);
+                def.setIntent(node.getIntentSpec());
+                vpg.setDefinitionFor(tr, def);
+            }
+        }
     }
 
     // # R521
@@ -84,7 +96,16 @@ class SpecificationCollector extends VisibilityCollector
         
         IASTListNode<ASTOptionalParListNode> list = node.getVariableList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.get(i).getVariableName());
+        {
+            List<PhotranTokenRef> bindings = bind(list.get(i).getVariableName());
+
+            for (PhotranTokenRef tr : bindings)
+            {
+                Definition def = vpg.getDefinitionFor(tr);
+                def.setOptional();
+                vpg.setDefinitionFor(tr, def);
+            }
+        }
     }
 
     // # R524
@@ -113,9 +134,27 @@ class SpecificationCollector extends VisibilityCollector
         {
             ASTSavedEntityNode entity = list.get(i);
             if (entity.getVariableName() != null)
-                bind(entity.getVariableName());
+            {
+                List<PhotranTokenRef> bindings = bind(entity.getVariableName());
+
+                for (PhotranTokenRef tr : bindings)
+                {
+                    Definition def = vpg.getDefinitionFor(tr);
+                    def.setSave();
+                    vpg.setDefinitionFor(tr, def);
+                }
+            }
             else if (entity.getCommonBlockName() != null)
-                bind(entity.getCommonBlockName());
+            {
+                List<PhotranTokenRef> bindings = bind(entity.getCommonBlockName());
+
+                for (PhotranTokenRef tr : bindings)
+                {
+                    Definition def = vpg.getDefinitionFor(tr);
+                    def.setSave();
+                    vpg.setDefinitionFor(tr, def);
+                }
+            }
         }
     }
 
@@ -172,7 +211,16 @@ class SpecificationCollector extends VisibilityCollector
         
         IASTListNode<ASTArrayAllocationNode> list = node.getArrayAllocationList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.get(i).getArrayName());
+        {
+            List<PhotranTokenRef> bindings = bind(list.get(i).getArrayName());
+
+            for (PhotranTokenRef tr : bindings)
+            {
+                Definition def = vpg.getDefinitionFor(tr);
+                def.setAllocatable();
+                vpg.setDefinitionFor(tr, def);
+            }
+        }
     }
 
     // # R528 /* <ObjectName> renamed to <PointerName> to simplify Sem. Anal. */
@@ -195,7 +243,16 @@ class SpecificationCollector extends VisibilityCollector
         
         IASTListNode<ASTPointerStmtObjectNode> list = node.getPointerStmtObjectList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.get(i).getPointerName());
+        {
+            List<PhotranTokenRef> bindings = bind(list.get(i).getPointerName());
+
+            for (PhotranTokenRef tr : bindings)
+            {
+                Definition def = vpg.getDefinitionFor(tr);
+                def.setPointer();
+                vpg.setDefinitionFor(tr, def);
+            }
+        }
     }
 
     //
@@ -220,7 +277,16 @@ class SpecificationCollector extends VisibilityCollector
         
         IASTListNode<ASTTargetObjectNode> list = node.getTargetObjectList();
         for (int i = 0; i < list.size(); i++)
-            bind(list.get(i).getTargetName());
+        {
+            List<PhotranTokenRef> bindings = bind(list.get(i).getTargetName());
+
+            for (PhotranTokenRef tr : bindings)
+            {
+                Definition def = vpg.getDefinitionFor(tr);
+                def.setTarget();
+                vpg.setDefinitionFor(tr, def);
+            }
+        }
     }
 
     // # R530

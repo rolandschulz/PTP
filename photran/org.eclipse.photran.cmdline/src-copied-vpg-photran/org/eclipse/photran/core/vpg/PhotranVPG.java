@@ -237,9 +237,9 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	    if (file != null) releaseAST(getFilenameForIFile(file));
 	}
 
-	public static String canonicalizeIdentifier(String moduleName)
+	public static String canonicalizeIdentifier(String identifier)
 	{
-		return moduleName.trim().toLowerCase().replaceAll("[ \t\r\n]", "");
+		return identifier.trim().toLowerCase().replaceAll("[ \t\r\n]", "");
 	}
 
     private List<IFile> getOutgoingDependenciesFrom(String targetFilename)

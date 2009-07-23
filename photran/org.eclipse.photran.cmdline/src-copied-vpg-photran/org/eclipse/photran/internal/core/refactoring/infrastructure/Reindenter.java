@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2007-2009 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,166 +10,369 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
+import java.util.ArrayList;
+
+import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.util.Notification;
+import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
+import org.eclipse.photran.internal.core.lexer.TokenList;
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
- * The Reindenter is used to correct indentation when a node is pasted into an AST
- * so that the pasted lines are correctly indented in their new context.
- * <p>
- * This code is very specific to the way Photran's parser uses the whiteBefore and
- * whiteAfter parts of a Token; it will not generalize to parsers that, say, include
- * newlines in the whitetext.
+ * The Reindenter is used to correct indentation when a node is inserted or
+ * moved in an AST so that the affected lines are correctly indented in their
+ * new context.
  *  
  * @author Jeff Overbey
  */
+/*
+ * This code is very specific to the way Photran's parser uses the whiteBefore and
+ * whiteAfter parts of a Token; it will not generalize to parsers that, say, include
+ * newlines in the whitetext.
+ */
 public class Reindenter
 {
-	public static void reindent(IASTNode node, IFortranAST ast)
+    public static enum Strategy
     {
-    	new Reindenter(node, ast);
-    }
-
-	private IFortranAST ast;
-	private int lastLine;
-	
-    private Reindenter(IASTNode node, IFortranAST ast)
-	{
-    	this.ast = ast;
-    	
-        this.lastLine = recomputeLineColInfo();
-        
-        final Token firstToken = findFirstTokenIn(node); if (firstToken == null) return;
-        final Token lastToken = findLastTokenIn(node);
-        
-        int startLine = firstToken.getLine();
-        Token tokenStartingLine = ast.findFirstTokenOnLine(startLine);
-        if (tokenStartingLine != firstToken) startLine++;
-        
-        Token firstTokenBelow = findTokenStartingFirstNonemptyLineBelow(lastToken.getLine()-1);
-        //System.out.println("Below: " + firstTokenBelow.getTerminal() + " - " + firstTokenBelow.getText() + " - " + firstTokenBelow.getCol() + ";");
-        
-//        int indentSize = 0;
-//        indentSize = firstTokenBelow == null ? 0 : Math.max(firstTokenBelow.getCol()-1, 0);
-//        if (endsIndentedRegion(firstTokenBelow)) indentSize = Math.max(indentSize-4, 0);
-//        indentSize -= getUnindentAmount(node);
-//        
-//        final int indentAmount = indentSize;
-        
-        final String indent = determineIndent(firstTokenBelow);
-        
-        ast.accept(new ASTVisitor()
+        /**
+         * Shifts the entire region left or right to match its new surroundings, keeping
+         * the relative indentation of each line the same.
+         * <p>
+         * The algorithm is as follows:
+         * <ul>
+         *   <li> Usually, the reindented region is adjusted to match the indentation of
+         *        the next non-empty line following the region.
+         *   <li> However, if the next non-empty line starts with "END" (or something),
+         *        the reindented region is adjusted to match the indentation of
+         *        the last non-empty line above the region.
+         *   <li> However, if the last non-empty line above starts with a token like
+         *        "PROGRAM" or "IF," then a guess is made, and the indentation is set
+         *        to match the following line, but four spaces are added.
+         * </ul>
+         */
+        SHIFT_ENTIRE_BLOCK
         {
-            private boolean inFormatRegion = false;
-            private Token previousToken = null;
-
-        	@Override public void visitToken(Token token)
-			{
-	        	if (token == firstToken)
-	                inFormatRegion = true;
-	            else if (token == lastToken)
-	                inFormatRegion = false;
-	            
-	            //System.out.println(token.getTerminal() + " - " + inFormatRegion + " - " + token.getLine());
-	        	
-	            if (inFormatRegion && (previousToken == null || token.getLine() > previousToken.getLine()))
-	                updateIndentationInWhitetext(token, previousToken, indent /*indentAmount*/);
-	                
-	            previousToken = token;
-			}
-        });
+            @Override protected ReindentingVisitor createVisitor(Reindenter reindenter, Token firstTokenInRegion, Token lastTokenInRegion)
+            {
+                return reindenter.new ShiftBlockReindentingVisitor(firstTokenInRegion, lastTokenInRegion);
+            }
+        },
+        
+        /**
+         * Shifts each lines in the region left or right to match its new surroundings.
+         * <p>
+         * The algorithm is as follows:
+         * <ul>
+         *   <li> Initially, the line is indented the same as the previous line.
+         *   <li> If the preceding line starts with PROGRAM, IF, DO, etc., the line is
+         *        indented an additional 4 spaces.
+         *   <li> If the line starts with END, it is unindented 4 spaces.
+         * </ul>
+         */
+        REINDENT_EACH_LINE
+        {
+            @Override protected ReindentingVisitor createVisitor(Reindenter reindenter, Token firstTokenInRegion, Token lastTokenInRegion)
+            {
+                return reindenter.new ReindentEachLineReindentingVisitor(firstTokenInRegion, lastTokenInRegion);
+            }
+        };
+        
+        protected abstract ReindentingVisitor createVisitor(Reindenter reindenter, Token firstTokenInRegion, Token lastTokenInRegion);
+    }
+    
+    public static void reindent(IASTNode node, IFortranAST ast)
+    {
+        new Reindenter(node, ast, Strategy.SHIFT_ENTIRE_BLOCK);
     }
 
-	private String determineIndent(Token firstTokenBelow)
+    public static void reindent(Token firstTokenInAffectedNode, Token lastTokenInAffectedNode, IFortranAST ast)
+    {
+        new Reindenter(firstTokenInAffectedNode, lastTokenInAffectedNode, ast, Strategy.SHIFT_ENTIRE_BLOCK);
+    }
+
+    public static void reindent(int fromLine, int thruLine, IFortranAST ast)
+    {
+        new Reindenter(fromLine, thruLine, ast, Strategy.SHIFT_ENTIRE_BLOCK);
+    }
+    
+    public static void reindent(IASTNode node, IFortranAST ast, Strategy strategy)
+    {
+        new Reindenter(node, ast, strategy);
+    }
+
+    public static void reindent(Token firstTokenInAffectedNode, Token lastTokenInAffectedNode, IFortranAST ast, Strategy strategy)
+    {
+        new Reindenter(firstTokenInAffectedNode, lastTokenInAffectedNode, ast, strategy);
+    }
+
+    public static void reindent(int fromLine, int thruLine, IFortranAST ast, Strategy strategy)
+    {
+        new Reindenter(fromLine, thruLine, ast, strategy);
+    }
+
+	private final IFortranAST ast;
+	private final int lineNumOfLastTokenInAST;
+	
+    private Reindenter(IASTNode node, IFortranAST ast, Strategy strategy)
 	{
-		String indent = firstTokenBelow.getWhiteBefore();
+        this(node.findFirstToken(), node.findLastToken(), ast, strategy);
+    }
+    
+    private Reindenter(int fromLine, int thruLine, IFortranAST ast, Strategy strategy)
+    {
+        this(ast.findFirstTokenOnLine(fromLine), ast.findLastTokenOnLine(thruLine), ast, strategy);
+    }
+    
+    private Reindenter(Token firstTokenInRegion, Token lastTokenInRegion, IFortranAST ast, Strategy strategy)
+    {
+        // Recompute TokenList so that line number-based searches will be correct
+        this.lineNumOfLastTokenInAST = recomputeLineColInfo(ast.getRoot());
+        this.ast = new FortranAST(ast.getFile(), ast.getRoot(), new TokenList(ast.getRoot()));
+        
+        if (firstTokenInRegion != null && lastTokenInRegion != null)
+            ast.accept(strategy.createVisitor(this, firstTokenInRegion, lastTokenInRegion));
+    }
+
+    private int recomputeLineColInfo(ASTExecutableProgramNode astRoot)
+    {
+        LineColComputer lcc = new LineColComputer();
+        astRoot.accept(lcc);
+        return lcc.line; // line number of last token
+    }
+
+    private final class LineColComputer extends ASTVisitorWithLoops
+    {
+        private int streamOffset = 0, line = 1, col = 1;
+
+        @Override public void visitToken(Token token)
+        {
+            consider(token.getWhiteBefore());
+            token.setStreamOffset(streamOffset);
+            token.setLine(line);
+            token.setCol(col);
+            consider(token.getText());
+            consider(token.getWhiteAfter());
+        }
+
+        private void consider(String s)
+        {
+            for (int i = 0, len = s.length(); i < len; i++)
+            {
+                streamOffset++;
+                
+                if (s.charAt(i) == '\n')
+                {
+                    line++;
+                    col = 1;
+                }
+                else col++;
+            }
+        }
+    }
+
+    private abstract class ReindentingVisitor extends ASTVisitorWithLoops
+    {
+        protected final Token firstTokenInRegion;
+        protected final Token lastTokenInRegion;
+        protected String removeIndent, addIndent;
+
+        protected boolean inFormatRegion = false;
+        protected Token previousToken = null;
+
+        /**
+         * @param firstTokenInRegion
+         * @param lastTokenInRegion
+         */
+        protected ReindentingVisitor(Token firstTokenInRegion, Token lastTokenInRegion)
+        {
+            this.lastTokenInRegion = lastTokenInRegion;
+            this.firstTokenInRegion = firstTokenInRegion;
+            
+            //System.out.println("Indenting from " + firstTokenInRegion + " through " + lastTokenInRegion);
+        }
+
+        @Override public void visitToken(Token token)
+        {
+        	if (token == firstTokenInRegion)
+                inFormatRegion = true;
+            else if (token == lastTokenInRegion)
+                inFormatRegion = false;
+            
+            //System.out.println(token.getTerminal() + " - " + inFormatRegion + " - " + token.getLine());
+        	
+            if (inFormatRegion && (previousToken == null || token.getLine() > previousToken.getLine()))
+                updateIndentation(token);
+                
+            previousToken = token;
+        }
+
+        protected abstract void updateIndentation(Token firstTokenOnLine);
+
+        protected String reindentedComments(String comments)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (String line : splitLines(comments))
+                sb.append(reindentComment(line));
+            return sb.toString();
+        }
+
+        private ArrayList<String> splitLines(String comments)
+        {
+            ArrayList<String> result = new ArrayList<String>();
+            
+            int start = 0;
+            int end = comments.indexOf('\n', start);
+            
+            while (end > start)
+            {
+                result.add(comments.substring(start, end+1));
+                
+                start = end + 1;
+                end = comments.indexOf('\n', start);
+            }
+            
+            if (comments.length() > start)
+                result.add(comments.substring(start, comments.length()));
+            
+            return result;
+        }
+
+        private String reindentComment(String line)
+        {
+            if (line.trim().equals("")) return line;
+            
+            int endIndex = 0;
+            while (endIndex < line.length() && (line.charAt(endIndex) == ' ' || line.charAt(endIndex) == '\t'))
+                endIndex++;
+            
+            String indentation = line.substring(0, endIndex);
+            String comment = line.substring(endIndex);
+            
+            return newIndentation(indentation) + comment;
+        }
+
+        protected String newIndentation(String currentIndentation)
+        {
+            String newIndentation;
+            if (currentIndentation.startsWith(removeIndent))
+                newIndentation = currentIndentation.substring(removeIndent.length());
+            else
+                newIndentation = currentIndentation;
+            
+            newIndentation += addIndent;
+            return newIndentation;
+        }
+    }
+    
+    private final class ShiftBlockReindentingVisitor extends ReindentingVisitor
+    {
+        /**
+         * @param firstTokenInRegion
+         * @param lastTokenInRegion
+         */
+        protected ShiftBlockReindentingVisitor(Token firstTokenInRegion, Token lastTokenInRegion)
+        {
+            super(firstTokenInRegion, lastTokenInRegion);
+            
+            int firstLineNumToReindent = firstTokenInRegion.getLine();
+            Token firstTokenOnFirstLineToAdjust = ast.findFirstTokenOnLine(firstLineNumToReindent);
+            if (firstTokenOnFirstLineToAdjust != firstTokenInRegion) firstLineNumToReindent++;
+            
+            Token firstTokenOnLineAfterReindentedRegion = findTokenStartingFirstNonemptyLineBelow(lastTokenInRegion.getLine());
+            //if (firstTokenOnLineAfterReindentedRegion != null) System.out.println("Below: " + firstTokenOnLineAfterReindentedRegion.getTerminal() + " - " + firstTokenOnLineAfterReindentedRegion.getText() + " - " + firstTokenOnLineAfterReindentedRegion.getCol() + ";");
+            
+            this.removeIndent = getIndentation(firstTokenOnFirstLineToAdjust);
+            this.addIndent = getIndentation(firstTokenOnLineAfterReindentedRegion);
+            
+            if (endsIndentedRegion(firstTokenOnLineAfterReindentedRegion))
+            {
+                Token firstTokenOnLineAboveReindentedRegion = findTokenStartingLastNonemptyLineAbove(firstTokenInRegion.getLine());
+                //if (firstTokenOnLineAboveReindentedRegion != null) System.out.println("Above: " + firstTokenOnLineAboveReindentedRegion.getTerminal() + " - " + firstTokenOnLineAboveReindentedRegion.getText() + " - " + firstTokenOnLineAboveReindentedRegion.getCol() + ";");
+
+                if (firstTokenOnLineAboveReindentedRegion != null && !startsIndentedRegion(firstTokenOnLineAboveReindentedRegion))
+                    this.addIndent = getIndentation(firstTokenOnLineAboveReindentedRegion);
+                else
+                    this.addIndent = addIndent + "    ";
+            }
+            
+            //System.out.println("Removing [" + removeIndent + "] and adding [" + addIndent + "]");
+        }
+
+        protected void updateIndentation(Token firstTokenOnLine)
+        {
+            String whiteBeforeFirstTok = firstTokenOnLine.getWhiteBefore();
+            String currentIndentation = getIndentation(firstTokenOnLine);
+            if (!whiteBeforeFirstTok.endsWith(currentIndentation)) return;
+            String comments = whiteBeforeFirstTok.substring(0, whiteBeforeFirstTok.length()-currentIndentation.length());
+            //System.out.println("Reindenting [" + firstTokenOnLine.getWhiteBefore() + firstTokenOnLine.getText() + "]");
+            
+            firstTokenOnLine.setWhiteBefore(reindentedComments(comments) + newIndentation(currentIndentation));
+            //System.out.println("         to [" + firstTokenOnLine.getWhiteBefore() + firstTokenOnLine.getText() + "]");
+        }
+    }
+    
+    private final class ReindentEachLineReindentingVisitor extends ReindentingVisitor
+    {
+        private Token firstTokenOnPreviousLine;
+        private String indentationOfPreviousLine;
+        
+        /**
+         * @param firstTokenInRegion
+         * @param lastTokenInRegion
+         */
+        protected ReindentEachLineReindentingVisitor(Token firstTokenInRegion, Token lastTokenInRegion)
+        {
+            super(firstTokenInRegion, lastTokenInRegion);
+            
+            int firstLineNumToReindent = firstTokenInRegion.getLine();
+            Token firstTokenOnFirstLineToAdjust = ast.findFirstTokenOnLine(firstLineNumToReindent);
+            if (firstTokenOnFirstLineToAdjust != firstTokenInRegion) firstLineNumToReindent++;
+            
+            this.firstTokenOnPreviousLine = findTokenStartingLastNonemptyLineAbove(firstTokenInRegion.getLine());
+            this.indentationOfPreviousLine = getIndentation(firstTokenOnPreviousLine);
+            
+            this.removeIndent = indentationOfPreviousLine;
+            this.addIndent = getIndentation(firstTokenOnFirstLineToAdjust);
+        }
+
+        protected void updateIndentation(Token firstTokenOnLine)
+        {
+            String whiteBeforeFirstTok = firstTokenOnLine.getWhiteBefore();
+            String currentIndentation = getIndentation(firstTokenOnLine);
+            if (!whiteBeforeFirstTok.endsWith(currentIndentation)) return;
+            String comments = whiteBeforeFirstTok.substring(0, whiteBeforeFirstTok.length()-currentIndentation.length());
+            //System.out.println("Reindenting [" + firstTokenOnLine.getWhiteBefore() + firstTokenOnLine.getText() + "]");
+
+            this.removeIndent = currentIndentation;
+            this.addIndent = indentationOfPreviousLine;
+            if (startsIndentedRegion(firstTokenOnPreviousLine))
+                this.addIndent += "    ";
+            else if (endsIndentedRegion(firstTokenOnLine) && this.addIndent.endsWith("    "))
+                this.addIndent = this.addIndent.substring(0, this.addIndent.length()-4);
+
+            firstTokenOnLine.setWhiteBefore(reindentedComments(comments) + newIndentation(currentIndentation));
+            //System.out.println("         to [" + firstTokenOnLine.getWhiteBefore() + firstTokenOnLine.getText() + "]");
+            
+            this.firstTokenOnPreviousLine = firstTokenOnLine;
+            this.indentationOfPreviousLine = this.addIndent;
+        }
+    }
+
+	private String getIndentation(Token token)
+	{
+		String indent = token == null ? "" : token.getWhiteBefore();
         if (indent == null) indent = "";
         int lastCR = indent.lastIndexOf('\n');
         if (lastCR >= 0) indent = indent.substring(lastCR + 1);
-        if (endsIndentedRegion(firstTokenBelow))
-        {
-        	if (indent.length() >= 4)
-        		indent = indent.substring(0, indent.length()-4);
-        	else
-        		indent = "";
-        }
 		return indent;
-	}
-
-    private void updateIndentationInWhitetext(Token firstTokenOnLine, Token previousToken, String indent)
-    {
-        if (indent == null || indent.equals("")) return;
-        if (lineIsEmpty(firstTokenOnLine, previousToken)) return;
-        
-        //String whiteAfterPrevTok = previousToken.getWhiteAfter();
-        String whiteBeforeFirstTok = firstTokenOnLine.getWhiteBefore();
-        
-        firstTokenOnLine.setWhiteBefore(whiteBeforeFirstTok + indent);
-        
-//        if (indentAmount > 0)
-//            firstTokenOnLine.setWhiteBefore(whiteBeforeFirstTok + spaces);
-//        else if (indentAmount < 0 && whiteAfterPrevTok.endsWith(spaces))
-//            previousToken.setWhiteAfter(whiteAfterPrevTok.substring(0, whiteAfterPrevTok.length() + indentAmount));
-//        else if (indentAmount < 0 && whiteBeforeFirstTok.endsWith(spaces))
-//            firstTokenOnLine.setWhiteBefore(whiteBeforeFirstTok.substring(0, whiteBeforeFirstTok.length() + indentAmount));
-    }
-
-    private boolean lineIsEmpty(Token firstTokenOnLine, Token previousToken)
-    {
-        // TODO: lineIsEmpty()
-        return false;
-    }
-
-//    private String spaces(int indentAmount)
-//    {
-//        StringBuffer sb = new StringBuffer();
-//        for (int i = 0; i < Math.abs(indentAmount); i++)
-//            sb.append(' ');
-//        String spaces = sb.toString();
-//        return spaces;
-//    }
-
-    private int recomputeLineColInfo()
-    {
-    	LineColComputer lcc = new LineColComputer();
-    	ast.accept(lcc);
-    	return lcc.line; // line number of last token
-    }
-
-    private final class LineColComputer extends ASTVisitor
-    {
-		private int line = 1, col = 1;
-
-    	@Override public void visitToken(Token token)
-		{
-            update(token.getWhiteBefore());
-            token.setLine(line);
-            token.setCol(col);
-            update(token.getText());
-            update(token.getWhiteAfter());
-		}
-
-		private void update(String s)
-		{
-		    for (int i = 0, len = s.length(); i < len; i++)
-		    {
-		        if (s.charAt(i) == '\n')
-		        {
-		            line++;
-		            col = 1;
-		        }
-		        else col++;
-		    }
-		}
 	}
 
     private Token findTokenStartingFirstNonemptyLineBelow(int startLine)
     {
-        for (int line = startLine + 1; line <= lastLine; line++)
+        for (int line = startLine + 1; line <= lineNumOfLastTokenInAST; line++)
         {
             Token firstBlockOnLine = ast.findFirstTokenOnLine(line);
             if (firstBlockOnLine != null) return firstBlockOnLine;
@@ -177,31 +380,42 @@ public class Reindenter
         return null;
     }
 
-//    private boolean startsIndentedRegion(Token token)
-//    {
-//        if (token == null) return false;
-//        
-//        Terminal t = token.getTerminal();
-//        return t == Terminal.T_PROGRAM
-//            || t == Terminal.T_FUNCTION
-//            || t == Terminal.T_SUBROUTINE
-//            || t == Terminal.T_MODULE
-//            || t == Terminal.T_BLOCK
-//            || t == Terminal.T_BLOCKDATA
-//            //|| t == Terminal.T_TYPE
-//            || t == Terminal.T_FORALL
-//            || t == Terminal.T_WHERE
-//            || t == Terminal.T_ELSE
-//            || t == Terminal.T_ELSEWHERE
-//            || t == Terminal.T_IF
-//            || t == Terminal.T_ELSEIF
-//            || t == Terminal.T_SELECTCASE
-//            || t == Terminal.T_SELECT
-//            || t == Terminal.T_CASE
-//            || t == Terminal.T_DO
-//            || t == Terminal.T_INTERFACE
-//            || t == Terminal.T_CONTAINS;
-//    }
+    private Token findTokenStartingLastNonemptyLineAbove(int startLine)
+    {
+        for (int line = startLine - 1; line >= 0; line--)
+        {
+            Token firstBlockOnLine = ast.findFirstTokenOnLine(line);
+            if (firstBlockOnLine != null) return firstBlockOnLine;
+        }
+        return null;
+    }
+
+    private boolean startsIndentedRegion(Token token)
+    {
+        if (token == null) return false;
+        
+        Terminal t = token.getTerminal();
+        return t == Terminal.T_PROGRAM
+            || t == Terminal.T_FUNCTION
+            || t == Terminal.T_SUBROUTINE
+            || t == Terminal.T_MODULE
+            || t == Terminal.T_BLOCK
+            || t == Terminal.T_BLOCKDATA
+            //|| t == Terminal.T_TYPE
+            || t == Terminal.T_FORALL
+            || t == Terminal.T_WHERE
+            || t == Terminal.T_ELSE
+            || t == Terminal.T_ELSEWHERE
+            || t == Terminal.T_IF
+            || t == Terminal.T_ELSEIF
+            || t == Terminal.T_SELECTCASE
+            || t == Terminal.T_SELECT
+            || t == Terminal.T_CASE
+            || t == Terminal.T_DO
+            || t == Terminal.T_INTERFACE
+            || t == Terminal.T_CONTAINS
+            || t == Terminal.T_ASSOCIATE;
+    }
 
     private boolean endsIndentedRegion(Token token)
     {
@@ -228,78 +442,4 @@ public class Reindenter
             || t == Terminal.T_ELSEIF
             || t == Terminal.T_CONTAINS;
     }
-
-//    /**
-//     * @return the number of characters by which the source code in this node needs to be shifted
-//     * to the left so that the leftmost token will begin on column one.
-//     */
-//    private int getUnindentAmount(IASTNode node)
-//    {
-//        return Math.max(getStartColOfLeftmostBlockIn(node) - 1, 0);
-//    }
-
-    private Token findFirstTokenIn(final IASTNode node)
-    {
-        try
-        {
-            node.accept(new ASTVisitor()
-            {
-                public void visitToken(Token token)
-                {
-                    throw new Notification(token);
-                }
-            });
-        }
-        catch (Notification n)
-        {
-            return (Token)n.getResult();
-        }
-        return null;
-    }
-
-    private Token findLastTokenIn(final IASTNode node)
-    {
-        return new Object()
-        {
-            private Token lastToken;
-            
-            public Token getLastToken()
-            {
-                node.accept(new ASTVisitor()
-                {
-                    public void visitToken(Token token)
-                    {
-                        lastToken = token;
-                    }
-                });
-
-                return lastToken;
-            }
-        }.getLastToken();
-    }
-
-//    /**
-//     * @return the leftmost column at which a token in this PartialProgram is positioned
-//     * (useful for unindenting code)
-//     */
-//    private int getStartColOfLeftmostBlockIn(final IASTNode node)
-//    {
-//        return new Object()
-//        {
-//            int minCol = Integer.MAX_VALUE;
-//
-//            int getMinCol()
-//            {
-//                node.visitUsing(new GenericParseTreeVisitor()
-//                {
-//                    public void visitToken(Token token)
-//                    {
-//                        minCol = Math.min(token.getCol(), minCol);
-//                    }
-//                });
-//
-//                return minCol == Integer.MAX_VALUE ? 0 : minCol;
-//            }
-//        }.getMinCol();
-//    }
 }

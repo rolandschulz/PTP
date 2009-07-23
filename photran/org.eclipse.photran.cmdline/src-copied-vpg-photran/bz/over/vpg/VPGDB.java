@@ -60,6 +60,9 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     // API
     ///////////////////////////////////////////////////////////////////////////
     
+    /** Forces any in-memory data to be flushed to disk */
+    abstract public void flush();
+    
     /** Called when the database is no longer needed.  Typically ensures that
      * any data in memory is flushed to disk and any locks are released.
      */

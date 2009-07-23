@@ -110,6 +110,11 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
     // VPG DATABASE METHODS
     ////////////////////////////////////////////////////////////////////////////
     
+    public void flush()
+    {
+        db.flush();
+    }
+    
     public void close()
     {
         db.close();

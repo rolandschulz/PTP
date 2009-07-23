@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.lexer;
+package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -20,8 +20,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**

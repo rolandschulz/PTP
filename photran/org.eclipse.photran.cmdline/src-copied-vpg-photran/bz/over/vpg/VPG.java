@@ -179,6 +179,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         db.deleteAllEdgesAndAnnotationsFor(filename);
         populateVPG(filename, ast);
         db.updateModificationStamp(filename);
+        db.flush();
         return System.currentTimeMillis()-start;
     }
 
@@ -244,13 +245,16 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	}
 	
     /**
-     * Releases all permanent ASTs.
+     * Releases all ASTs, regardless of whether they were acquired as
+     * transient and permanent ASTs.
      * 
+     * @see #acquireTransientAST(String)
      * @see #acquirePermanentAST(String)
      * @see #makeTransientASTPermanent(String)
      */
 	public void releaseAllASTs()
 	{
+		transientASTs.clear();
 		permanentASTs.clear();
 	}
 	
