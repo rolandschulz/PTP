@@ -72,7 +72,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	private final static String SERVICE_CONFIGURATION_ELEMENT_NAME = "service-configuration"; //$NON-NLS-1$
 	private final static String PROVIDER_CONFIGURATION_ELEMENT_NAME = "provider-configuration"; //$NON-NLS-1$
 	private final static String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
-	private final static String DEFAULT_SAVE_FILE_NAME = ".service_model";  //$NON-NLS-1$
+	private final static String DEFAULT_SAVE_FILE_NAME = "service_model.xml";  //$NON-NLS-1$
 	
 	/** Default location to save service model configuration */
 	private final IPath defaultSaveFile; 
