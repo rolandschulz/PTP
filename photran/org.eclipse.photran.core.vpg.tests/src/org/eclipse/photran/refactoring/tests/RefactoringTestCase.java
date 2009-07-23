@@ -205,22 +205,41 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         builder.redirectErrorStream(true);
         Process process = builder.start();
         ConcurrentReader output = new ConcurrentReader(process.getInputStream());
-        output.start();
-        int exitCode = process.waitFor();
-        if (exitCode != 0)
-            fail("Compilation exited abnormally with exit code " + exitCode + "\n" + output.toString());
+        synchronized (output)
+        {
+            output.start();
+            int exitCode = process.waitFor();
+            if (exitCode != 0)
+                fail("Compilation exited abnormally with exit code " + exitCode + "\n" + output.toString());
+            waitFor(output);
+        }
         
         builder = new ProcessBuilder(exe);
         builder.directory(project.getLocation().toFile());
         builder.redirectErrorStream(true);
         process = builder.start();
         ConcurrentReader output2 = new ConcurrentReader(process.getInputStream());
-        output2.start();
-        exitCode = process.waitFor();
-        if (exitCode != 0)
-            fail("Compilation succeeded, but execution exited abnormally with exit code " + exitCode + "\n" + output.toString() + "\n" + output2.toString());
+        synchronized (output2)
+        {
+            output2.start();
+            int exitCode = process.waitFor();
+            if (exitCode != 0)
+                fail("Compilation succeeded, but execution exited abnormally with exit code " + exitCode + "\n" + output.toString() + "\n" + output2.toString());
+            waitFor(output2);
+        }
         
         return output.toString() + "\n" + output2.toString();
+    }
+
+    private void waitFor(ConcurrentReader output)
+    {
+        try
+        {
+            output.wait();
+        }
+        catch (InterruptedException e)
+        {
+        }
     }
 
     private String toString(ArrayList<String> args)
@@ -252,6 +271,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                     sb.append(line);
                     sb.append('\n');
                 }
+                done();
             }
             catch (IOException e)
             {
@@ -268,6 +288,11 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                     sb.append(e.toString());
                 }
             }
+        }
+        
+        private synchronized void done()
+        {
+            notifyAll();
         }
         
         @Override public String toString()
