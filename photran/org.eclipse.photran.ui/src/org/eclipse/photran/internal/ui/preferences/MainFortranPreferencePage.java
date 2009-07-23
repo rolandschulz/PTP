@@ -33,7 +33,7 @@ public class MainFortranPreferencePage extends AbstractFortranPreferencePage
     protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.SHOW_PARSE_TREE.getName(),
-                                        "(Debugging) Show entire parse tree rather than Outline view",
+                                        "(Debugging) Show entire abstract syntax tree rather than Outline view",
                                         getFieldEditorParent()));
         
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_VPG_LOGGING.getName(),
