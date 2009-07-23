@@ -519,6 +519,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("select");
             else if (keyword.equalsIgnoreCase("data"))
                 return precedingKeyword.equalsIgnoreCase("block");
+            else if (keyword.equalsIgnoreCase("subroutine"))
+                return precedingKeyword.equalsIgnoreCase("end") || isPrefixSpec(precedingKeyword);
             else if (keyword.equalsIgnoreCase("function"))
                 return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword) || match("type", firstTokenPos);
             else if (keyword.equalsIgnoreCase("if"))
