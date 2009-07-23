@@ -19,6 +19,8 @@ public class Messages extends NLS {
 	public static String ServiceModelManager_0;
 	public static String ServiceModelManager_1;
 
+	public static String ServiceModelManager_2;
+
 	public static String ServiceProvider_0;
 	public static String ServiceProvider_1;
 

@@ -278,6 +278,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @throws CoreException 
 	 */
 	public void loadModelConfiguration() throws IOException, CoreException {
+		loadServices();
 		File file = defaultSaveFile.toFile();
 		if(file.exists()) {
 			Reader reader = new BufferedReader(new FileReader(file));
@@ -315,9 +316,13 @@ public class ServiceModelManager implements IServiceModelManager {
 					IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
 					if (descriptor != null) {
 						IServiceProvider provider = getServiceProvider(descriptor);
-						IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-						provider.restoreState(providerMemento);
-						config.setServiceProvider(service, provider);
+						if (provider != null) {
+							IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+							provider.restoreState(providerMemento);
+							config.setServiceProvider(service, provider);
+						} else {
+							Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
+						}
 					} else {
 						Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
 					}
