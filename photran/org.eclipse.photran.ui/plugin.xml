@@ -230,4 +230,16 @@
    	id="sourceViewerConfig"
    	name="Source Viewer Configuration"
    	schema="schema/sourceViewerConfig.exsd"/>
+   	
+   <!--=============================================-->
+   <!-- Image Associated with Photran Projects      -->
+   <!--=============================================-->
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/full/obj16/f_ovr.gif"
+            natureId="org.eclipse.photran.core.fnature"
+            id="org.eclipse.photran.ui.fProjectNatureImage">
+      </image>
+   </extension> 
 </plugin>

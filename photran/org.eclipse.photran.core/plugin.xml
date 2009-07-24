@@ -129,4 +129,18 @@
 		  priority="high"/>
   </extension>
 
+<!-- =================================================================================== -->
+<!-- Photran Nature for Fortran Projects                                                 -->
+<!-- =================================================================================== -->
+   <extension
+         id="fnature"
+         name="%fnature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.photran.core.FProjectNature">
+         </run>
+      </runtime>
+   </extension>
+
 </plugin>

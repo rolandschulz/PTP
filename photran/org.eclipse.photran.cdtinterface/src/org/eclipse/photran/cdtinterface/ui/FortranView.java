@@ -11,13 +11,23 @@
 package org.eclipse.photran.cdtinterface.ui;
 
 import org.eclipse.cdt.internal.ui.cview.CView;
+import org.eclipse.cdt.internal.ui.cview.CViewLabelProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
 
 /**
  * The Fortran Projects View is just the C/C++ Projects View with a different name.
  * 
  * @author Jeff Overbey
+ * @author Matt Scarpino - 7/20/2009 - Updated to access Fortran-specific label provider.
  */
 public class FortranView extends CView
 {
     public static final String FORTRAN_VIEW_ID = "org.eclipse.photran.ui.FortranView";
+    
+    protected CUILabelProvider createLabelProvider()
+    {
+        return new FViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS);
+    }
 }
