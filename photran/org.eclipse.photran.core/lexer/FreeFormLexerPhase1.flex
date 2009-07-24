@@ -46,19 +46,19 @@ import org.eclipse.core.resources.IFile;
 %ignorecase
 %type IToken
 %{
-    private boolean accumulateWhitetext;
-    private StringBuffer whiteBeforeSB = new StringBuffer();
+    protected boolean accumulateWhitetext;
+    protected StringBuffer whiteBeforeSB = new StringBuffer();
     protected IFile lastTokenFile = null;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
-    private IToken lastToken = null;
-    private StringBuffer whiteAfterSB = new StringBuffer();
+    protected IToken lastToken = null;
+    protected StringBuffer whiteAfterSB = new StringBuffer();
     
-    private void storeNonTreeToken()
+    protected void storeNonTreeToken()
     {
         if (accumulateWhitetext) whiteBeforeSB.append(yytext());
     }
     
-    private IToken token(Terminal terminal) throws IOException
+    protected IToken token(Terminal terminal) throws IOException
     {
         if (terminal == Terminal.END_OF_INPUT)
         {
@@ -67,7 +67,7 @@ import org.eclipse.core.resources.IFile;
             {
                 if (accumulateWhitetext)
                 {
-                    lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
+                    storeWhiteTextAtEndOfFile();
                     whiteBeforeSB = new StringBuffer();
                 }
             }
@@ -105,6 +105,11 @@ import org.eclipse.core.resources.IFile;
                      terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext());
         }
         return lastToken;
+    }
+    
+    protected void storeWhiteTextAtEndOfFile()
+    {
+        lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
     }
 
     //public static void main(String[] args) throws Exception
