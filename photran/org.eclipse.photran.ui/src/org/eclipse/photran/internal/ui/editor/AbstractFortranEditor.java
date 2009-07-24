@@ -233,7 +233,8 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     {
         try
         {
-            annotationModel.modifyAnnotations(null, mapAnnotationsToPositions(positions), null);
+            if (annotationModel != null)
+                annotationModel.modifyAnnotations(null, mapAnnotationsToPositions(positions), null);
         }
         catch (Throwable t)
         {
