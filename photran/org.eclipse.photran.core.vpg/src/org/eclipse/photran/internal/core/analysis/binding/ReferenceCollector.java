@@ -424,7 +424,8 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        if (node.getName() != null) bind(node.getName().getName());
+        if (node.getName() != null && node.getName().getName() != null && node.getName().getName().getText().trim().length() > 0)
+            bind(node.getName().getName());
 
         IASTListNode<ASTFunctionArgListNode> list = node.getFunctionArgList();
         if (list != null)
