@@ -59,7 +59,7 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	 * 
 	 * NOTE: This should only be implemented if a provider 
 	 * wishes to override the default behavior.
-
+	 * 
 	 * @param memento for restoring the provider's state.
 	 */
 	public void restoreState(IMemento memento);
