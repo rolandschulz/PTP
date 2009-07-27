@@ -34,7 +34,8 @@ class FixedFormLexerPrepass {
 	static final int inQuote=4;
 	static final int inQuoteEnd=5;
 	
-	private String fileContent = "";
+	//private String fileContent = "";
+	StringBuilder strBuilder = new StringBuilder();
 
 	private int state = inStart;
     int hollerithLength = -2; //-1: hollerith could start, -2: hollerith cant start
@@ -92,9 +93,10 @@ class FixedFormLexerPrepass {
 	
 	public String getTokenText(int offset, int length)
 	{
-	    if(offset >= 0 && length > 0 && offset < fileContent.length() && length <= fileContent.length() && offset+length < fileContent.length())
+	    int strLen = strBuilder.length();
+	    if(offset >= 0 && length > 0 && offset < strLen && length <= strLen && offset+length < strLen)
 	    {
-	        String res = fileContent.substring(offset, offset+length);
+	        String res = strBuilder.substring(offset, offset+length);
 	        return res;
 	    }
 	    return "";
@@ -102,9 +104,9 @@ class FixedFormLexerPrepass {
 	
 	public String getTokenText(int offset)
 	{
-	    if(offset >= 0 && offset < fileContent.length())
+	    if(offset >= 0 && offset < strBuilder.length())
 	    {
-	        String res = fileContent.substring(offset);
+	        String res = strBuilder.substring(offset);
 	        return res;
 	    }
 	    return "";
@@ -112,11 +114,11 @@ class FixedFormLexerPrepass {
 	
 	public String getTrailingWhitespace()
 	{
-	    String trimmed = fileContent.trim();
+	    String trimmed = strBuilder.toString().trim();
 	    //This gets the index of the beginning of the whitespace AFTER the first "end of line" symbol on the last line
 	    // with actual text of the file
-	    int start = fileContent.indexOf(trimmed) + trimmed.length() + in.getFileEOL().length();
-	    String res = fileContent.substring(start);
+	    int start = strBuilder.indexOf(trimmed) + trimmed.length() + in.getFileEOL().length();
+	    String res = strBuilder.substring(start);
 	    return res;
 	}
 	
@@ -205,8 +207,11 @@ class FixedFormLexerPrepass {
 			String line = in.readLine();
 			if (line==null) 
 			    return null;
-			fileContent = fileContent.concat(line);
-			fileContent = fileContent.concat(in.getFileEOL());
+			
+			strBuilder.append(line);
+			strBuilder.append(in.getFileEOL());
+			//fileContent = fileContent.concat(line);
+			//fileContent = fileContent.concat(in.getFileEOL());
 			EOFLinePos=in.getLineNumber()+1;//-1; //Move that token past the last line
 			EOFColPos=0;//line.length();
 			EOFOffsetPos=actOffset+line.length()+in.getFileEOL().length();//To accomodate for End-of-line statement
@@ -226,13 +231,14 @@ class FixedFormLexerPrepass {
 	{
 	    int colBefore = lastCol;
 	    int offsetBefore = lastOffset;
-
+	    
 	    if(colBefore < 0 || offsetBefore < 0)
 	        return "";
 	    
 	    //Create a positionInFile object, with line,col and offset set to the END of the potential whitespace
 	    PositionInFile posInFile = new PositionInFile(ln, colBefore, offsetBefore, false);
-	    Iterator iter = whiteSpaceMapping.keySet().iterator();
+	    String result = (String)whiteSpaceMapping.get(posInFile);
+	    /* Iterator iter = whiteSpaceMapping.keySet().iterator();
 	    while(iter.hasNext())
 	    {
 	        PositionInFile temp = (PositionInFile)iter.next();
@@ -240,8 +246,11 @@ class FixedFormLexerPrepass {
 	        {
 	            return (String)whiteSpaceMapping.get(temp);
 	        }
-	    }
-	    return "";
+	    }*/
+	    if(result==null)
+	        return "";
+	    
+	    return result;
 	}
 	
 	private int extractWhitespace(PreLexerLine line, int startPos)
@@ -637,6 +646,17 @@ class PositionInFile
         return (other.line == this.line &&
                 other.endCol == this.endCol &&
                 other.endOffset == this.endOffset);
+    }
+    
+    //Override
+    public int hashCode()
+    {
+        return this.endOffset;
+    }
+    
+    public boolean equals(Object obj)
+    {
+        return ((PositionInFile)obj).endOffset == this.endOffset;
     }
 }
 

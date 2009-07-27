@@ -82,6 +82,9 @@ public interface IToken
     public int getLength();
     public void setLength(int length);
     
+    public String getPreprocessorDirective();
+    public void setPreprocessorDirective(String preprocessorDirective);
+    
 //    public Object getBinding()
 //    {
 //        return binding;

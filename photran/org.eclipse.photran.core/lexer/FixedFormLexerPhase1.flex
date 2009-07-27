@@ -52,6 +52,8 @@ import org.eclipse.core.resources.IFile;
 %type IToken
 
 %{
+    private IToken prevToken = null;
+
     private FixedFormLexerPrepass prepass;
         
     private TokenFactory tokenFactory;
@@ -80,17 +82,73 @@ import org.eclipse.core.resources.IFile;
     
     private IToken token(Terminal terminal)
     {
+        //For some there are 2 terminals of type Terminal.END_OF_INPUT that get here in a row
+        // so, technically, the function below sets the whitespaceAfter on the first one it sees,
+        // which is not really the expected behavior, but that token's whitespace is not used for 
+        // anything anyway, so this should be OK
+        if(prevToken != null && terminal == Terminal.END_OF_INPUT)
+        {
+            //We need to manually set this, because the input string to the lexer does not 
+            // have any whitespace, or at the very list has it trimmed, so we are loosing all
+            // of the trailing whitespace on any refactoring. That is why we assign it as 
+            // whitespaceAfter to the last END_OF_STATEMENT token before END_OF_INPUT
+            String whiteAfter = prepass.getTrailingWhitespace();
+            prevToken.setWhiteAfter(whiteAfter);
+        }
+        
         lastTokenLine = prepass.getLine(yychar)+1;
         lastTokenCol = prepass.getColumn(yychar)+1;
         lastTokenFileOffset = prepass.getOffset(yychar);
         lastTokenStreamOffset = prepass.getOffset(yychar);
         lastTokenLength = prepass.getOffset(yychar+yylength()-1)-prepass.getOffset(yychar)+1;
-        return tokenFactory.createToken(terminal,
-                                        "",
-                                        terminal == Terminal.T_SCON || terminal == Terminal.T_HCON
-                                            ? stringBuffer.toString()
-                                            : yytext(),
+        
+        //For some reason the author of above code needed to add 1 to the line/col values
+        // for my code, I actually need the original value of token positions, so
+        // I added those variables for that
+        int tokLine = lastTokenLine-1;
+        int tokCol = lastTokenCol-1;
+        int tokOff = lastTokenFileOffset;
+        
+        String tokenText = "";
+        //If it is the end of statement, use text from original string to get the line separator.
+        // For some reason the text returned by yytext() in this case is always '/n', while the 
+        // actual separator is '/r/n'
+        if(terminal == Terminal.T_EOS)
+        {
+            tokenText = prepass.getFileEOL();
+        }
+        //If it is the end of input, use the Lexer's text. 
+        else if(terminal == Terminal.END_OF_INPUT)
+        {
+            tokenText = yytext();
+        }
+        //If it is a quote, use text accumulated in the buffer string
+        else if(terminal == Terminal.T_SCON || terminal == Terminal.T_HCON)
+        {
+            tokenText = stringBuffer.toString();
+            //lastTokenColumn and lastTokenOffset of quoted strings actually IS the position of the last character
+            // of that string (for some reason w/o the final quote). So, in order to correctly map it to the whitespace
+            // before it, we need to shift the column and offset we are using by 1 less than the length of the string
+            tokCol = tokCol - (tokenText.length() - 1);
+            tokOff = tokOff - (tokenText.length() - 1);
+        }
+        //Otherwise, use the text directly from file (that way all the whitespace is preserved in the
+        // tokens text)
+        else
+            tokenText = prepass.getTokenText(lastTokenFileOffset, lastTokenLength);
+            
+        prevToken = tokenFactory.createToken(terminal,
+                                        prepass.getWhitespaceBefore(tokLine, tokCol, tokOff),
+                                        tokenText,
                                         "");
+                                        
+        if(!tokenText.equals(yytext()) && terminal != Terminal.T_EOS)
+        {
+            prevToken.setPreprocessorDirective(tokenText);
+            prevToken.setText(yytext());
+        }
+        
+        return prevToken;
     }
 
     /*
