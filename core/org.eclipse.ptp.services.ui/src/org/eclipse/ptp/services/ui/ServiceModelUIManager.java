@@ -37,6 +37,7 @@ public class ServiceModelUIManager {
 	private final static String WIZARD_EXTENSION_ID = "wizardExtensions"; //$NON-NLS-1$
 	private final static String ATTR_ID = "id"; //$NON-NLS-1$
 	private final static String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private final static String ATTR_UI_CLASS = "configurationUIClass"; //$NON-NLS-1$
 
 	private static ServiceModelUIManager fInstance;
 	
@@ -117,4 +118,29 @@ public class ServiceModelUIManager {
 		}
 		return null;
 	}
+	
+	/**
+	 * @param desc
+	 * @return
+	 * @deprecated
+	 */
+	public IServiceProviderConfiguration getServiceProviderConfigurationUI(IServiceProviderDescriptor desc) {
+		IServiceProviderConfiguration config = null;
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
+		if (extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
+						try {
+							config = (IServiceProviderConfiguration) element.createExecutableExtension(ATTR_UI_CLASS);
+						} catch (Exception e) {
+							return null;
+						}
+					}
+				}
+			}
+		}
+		return config;
+	}
+
 }
