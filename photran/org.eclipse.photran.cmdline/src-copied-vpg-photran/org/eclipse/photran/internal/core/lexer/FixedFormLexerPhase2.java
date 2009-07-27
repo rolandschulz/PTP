@@ -31,6 +31,7 @@ public class FixedFormLexerPhase2 implements ILexer
 
     public FixedFormLexerPhase2(InputStream in, IFile file, String filename, TokenFactory tokenFactory)
     {
+        in = new LineAppendingInputStream(in);
         final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(in);
         InputStream prepassReader = new InputStream()
         {

@@ -32,6 +32,11 @@ public class SimpleToken implements IToken
      * The token text
      */
     protected String text = "";
+
+    /**
+     * The guarding directive
+     */
+    protected String preprocessorDirective = null;
     
     ///////////////////////////////////////////////////////////////////////////
     // Additional Fields - Not updated when refactoring
@@ -94,6 +99,10 @@ public class SimpleToken implements IToken
      * Sets whitespace and whitetext appearing after this token that should be associated with this token, not the next
      */
     public void setWhiteAfter(String value) {;}
+    
+    public String getPreprocessorDirective() { return preprocessorDirective; }
+    
+    public void setPreprocessorDirective(String preprocessorDirective) { this.preprocessorDirective = preprocessorDirective; }
 
     public int getLine()
     {

@@ -241,10 +241,11 @@ public final class FortranPreprocessor extends InputStream
         }
     }
 
-    private void finishInclude()
+    private void finishInclude() throws IOException
     {
         if (!inTopLevelFile())
         {
+            streamStack.topStream.close();
             streamStack.pop();
             
             fileNames.add(streamStack.topStream.getFilename());
