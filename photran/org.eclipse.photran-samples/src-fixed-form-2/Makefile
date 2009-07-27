@@ -1,3 +1,5 @@
+# gfortran 4.4.0 cannot parse sample.f, so only compile if Intel Fortran is available
+
 .PHONY: all clean
 
 SRC=sample.f
