@@ -19,6 +19,7 @@ import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.text.ICPartitions;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
@@ -130,6 +131,12 @@ public class RemoteCEditor extends CEditor {
 		//since it hasn't been stored in the editor yet
 		this.input = input; 
 		super.doSetInput(input);
+	}
+
+	@Override
+	public void editorContextMenuAboutToShow(IMenuManager menu) {
+		super.editorContextMenuAboutToShow(menu);
+		menu.remove("org.eclipse.search.text.ctxmenu"); //$NON-NLS-1$
 	}
 	
 	
