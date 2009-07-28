@@ -40,4 +40,9 @@ public class RemoteCContentOutlinePage extends CContentOutlinePage {
 		ovag.setEnableIncludeBrowser(true);
 		return ovag;
 	}
+	
+	@Override
+	protected ActionGroup createRefactoringActionGroup() {
+		return null;
+	}
 }
