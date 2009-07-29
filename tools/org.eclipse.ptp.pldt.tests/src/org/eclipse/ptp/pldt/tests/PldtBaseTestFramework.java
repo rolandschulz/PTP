@@ -22,6 +22,9 @@ import org.eclipse.core.runtime.CoreException;
 public abstract class PldtBaseTestFramework extends BaseTestFramework {
 	private static HashMap<String, ArrayList<Integer>> lineMaps = new HashMap<String, ArrayList<Integer>>();
 
+	/**
+	 * Put the file into the test project
+	 */
 	protected IFile importFile(String srcDir, String filename) throws Exception {
 		// project.getProject().getFile(filename).delete(true, new
 		// NullProgressMonitor());
