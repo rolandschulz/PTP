@@ -267,12 +267,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 				for (IConfigurationElement ce : elements)
 				{
 					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
-					if (proxy.initialize()) {
-						allRemoteServicesById.put(proxy.getId(), proxy);
-						allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
-					} else {
-						log("Failed to initialize remote service: " + proxy.getId() + "(" + proxy.getName() + ")");  //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
-					}
+					allRemoteServicesById.put(proxy.getId(), proxy);
+					allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
 				}
 			}
 		}
