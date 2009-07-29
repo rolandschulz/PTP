@@ -23,7 +23,7 @@ public class Template implements ITemplate, Serializable {
 	private String fSignature;
 
 	public int getNumberOfTemplateParameters() {
-		return fParameterTypes.length;
+		return fParameterTypes == null ? 0 : fParameterTypes.length;
 	}
 
 	public String[] getTemplateParameterTypes() {
