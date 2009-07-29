@@ -33,11 +33,4 @@ public interface IRemoteServices extends IRemoteServicesDelegate {
 	 * @return display name
 	 */
 	public String getScheme();
-
-	/**
-	 * Get state of this service
-	 * 
-	 * @return true if initialized successfully
-	 */
-	public boolean isInitialized();
 }
