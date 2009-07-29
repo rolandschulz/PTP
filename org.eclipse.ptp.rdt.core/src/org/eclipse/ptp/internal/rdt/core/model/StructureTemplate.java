@@ -14,6 +14,7 @@ package org.eclipse.ptp.internal.rdt.core.model;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.ICompositeType;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateDefinition;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateParameter;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.IStructureTemplate;
@@ -36,6 +37,13 @@ public class StructureTemplate extends Structure implements IStructureTemplate {
 
 	public StructureTemplate(Parent parent, ICompositeType binding, ICPPTemplateDefinition template) throws DOMException {
 		super(parent, adaptASTType(binding), binding);
+		fTemplate = new Template();
+		ICPPTemplateParameter[] params = template.getTemplateParameters();
+		String[] parameterTypes = new String[params.length];
+		for(int i = 0; i < params.length; i++) {
+			parameterTypes[i] = params[i].getName();
+		}
+		fTemplate.setTemplateParameterTypes(parameterTypes);
 	}
 
 	static int adaptASTType(ICompositeType type) throws DOMException {
