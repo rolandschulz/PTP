@@ -15,35 +15,11 @@ import java.util.List;
 
 public interface IRemoteServicesDelegate {
 	/**
-	 * Get a connection manager for managing remote connections
+	 * Get a connection manager for managing remote connections. 
 	 * 
-	 * @return connection manager
+	 * @return connection manager or null if services are not initialized
 	 */
 	public IRemoteConnectionManager getConnectionManager();
-	
-	/**
-	 * Get a file manager for managing remote files
-	 * 
-	 * @param conn connection to use for managing files
-	 * @return file manager
-	 */
-	public IRemoteFileManager getFileManager(IRemoteConnection conn);
-	
-	/**
-	 * Get a process builder for creating remote processes
-	 * 
-	 * @param conn connection to use for creating remote processes
-	 * @return process builder
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command);
-	
-	/**
-	 * Get a process builder for creating remote processes
-	 * 
-	 * @param conn connection to use for creating remote processes
-	 * @return process builder
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
 	
 	/**
 	 * Gets the directory separator on the target system.
@@ -53,9 +29,48 @@ public interface IRemoteServicesDelegate {
 	public String getDirectorySeparator(IRemoteConnection conn);
 	
 	/**
-	 * Initialize the remote service.
+	 * Get a file manager for managing remote files
+	 * 
+	 * @param conn connection to use for managing files
+	 * @return file manager or null if services are not initialized
+	 */
+	public IRemoteFileManager getFileManager(IRemoteConnection conn);
+	
+	/**
+	 * Get a process builder for creating remote processes
+	 * 
+	 * @param conn connection to use for creating remote processes
+	 * @return process builder or null if services are not initialized
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command);
+	
+	/**
+	 * Get a process builder for creating remote processes
+	 * 
+	 * @param conn connection to use for creating remote processes
+	 * @return process builder or null if services are not initialized
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
+	
+	/**
+	 * Get a remote services extension
+	 * 
+	 * @param conn connection used by the extension
+	 * @param extension class name of the extension
+	 * @return object implementing the requested extension class, or null if the extension is not supported
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getServicesExtension(IRemoteConnection conn, Class extension);
+	
+	/**
+	 * Start initializing the remote service.
+	 */
+	public void initialize();
+	
+	/**
+	 * Check if the remote service is initialized
 	 * 
 	 * @return true if successfully initialized, false otherwise
 	 */
-	public boolean initialize();
+	public boolean isInitialized();
 }
