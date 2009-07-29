@@ -17,8 +17,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.rse.core.RSEConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.rse.core.IRSESystemType;
-import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.ui.actions.SystemNewConnectionAction;
 import org.eclipse.swt.widgets.Shell;
 
@@ -38,10 +36,6 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 
 		if (action == null) {
  			action = new SystemNewConnectionAction(shell, false, false, null);
- 	   		IRSESystemType systemType = RSECorePlugin.getTheCoreRegistry().getSystemTypeById(IRSESystemType.SYSTEMTYPE_SSH_ONLY_ID);
-			if (systemType != null) {
- 	   			action.restrictSystemTypes(new IRSESystemType[] { systemType });
-			}
 		}
     		
 		try 
