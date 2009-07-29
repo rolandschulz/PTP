@@ -15,16 +15,21 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
+import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
+import org.eclipse.rse.connectorservice.dstore.DStoreConnectorServiceManager;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.CommunicationsEvent;
 import org.eclipse.rse.core.subsystems.ICommunicationsListener;
+import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.ISubSystem;
+import org.eclipse.rse.services.dstore.IDStoreService;
 import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShellServiceSubSystem;
 
@@ -184,6 +189,22 @@ public class RSEConnection implements IRemoteConnection {
 		return shellService;
 	}
 	
+	/**
+	 * Get the DStore connector service for this connection.
+	 * 
+	 * @return connector service for DStores or null if this connection does not support DStore
+	 */
+	public DataStore getDataStore() {
+		IConnectorService connector = DStoreConnectorServiceManager.getInstance().getConnectorService(rseHost, IDStoreService.class);
+		if (connector != null && connector instanceof DStoreConnectorService) {
+			return ((DStoreConnectorService) connector).getDataStore();
+		}
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getUsername()
+	 */
 	public String getUsername() {
 		return rseHost.getDefaultUserId();
 	}
