@@ -23,8 +23,8 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
 public class RemoteToolsServices implements IRemoteServicesDelegate {
 	private static RemoteToolsServices instance = new RemoteToolsServices();
-	private static RemoteToolsConnectionManager connMgr = null;
 
+	private static RemoteToolsConnectionManager connMgr = null;
 	/**
 	 * Get shared instance of this class
 	 * 
@@ -33,12 +33,17 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 	public static RemoteToolsServices getInstance() {
 		return instance;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getConnectionManager()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		return connMgr;
+	}
+	
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		// dunno if there is a way to do this for Remote Tools... just return the forward slash
+		return "/"; //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)
@@ -73,17 +78,27 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
+		return null;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#initialize()
 	 */
-	public boolean initialize() {
+	public void initialize() {
 		if (connMgr == null) {
 			connMgr = new RemoteToolsConnectionManager();
 		}
-		return true;
 	}
-
-	public String getDirectorySeparator(IRemoteConnection conn) {
-		// dunno if there is a way to do this for Remote Tools... just return the forward slash
-		return "/";
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#isInitialized()
+	 */
+	public boolean isInitialized() {
+		initialize();
+		return connMgr != null;
 	}
 }
