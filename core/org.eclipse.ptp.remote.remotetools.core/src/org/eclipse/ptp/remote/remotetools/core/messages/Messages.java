@@ -37,7 +37,13 @@ public class Messages extends NLS
 	public static String RemoteToolsFileStore_2;
 	public static String RemoteToolsFileStore_3;
 	public static String RemoteToolsFileStore_4;
+	public static String RemoteToolsFileStore_5;
 	public static String RemoteToolsFileStore_6;
+	public static String RemoteToolsFileStore_7;
+	public static String RemoteToolsFileStore_8;
+	public static String RemoteToolsFileStore_9;
+	public static String RemoteToolsFileStore_10;
+	public static String RemoteToolsFileStore_11;
 	
 	static {
 		// load message values from bundle file

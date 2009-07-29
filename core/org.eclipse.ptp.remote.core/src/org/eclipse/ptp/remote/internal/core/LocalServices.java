@@ -17,12 +17,35 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
-import org.eclipse.ptp.remote.core.messages.Messages;
 
 public class LocalServices implements IRemoteServicesDelegate {
 	public static final String LocalServicesId = "org.eclipse.ptp.remote.LocalServices"; //$NON-NLS-1$
-	
+
 	private IRemoteConnectionManager connMgr;
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getConnectionManager()
+	 */
+	public IRemoteConnectionManager getConnectionManager() {
+		return connMgr;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		return System.getProperty("file.separator", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
+		if (!(conn instanceof LocalConnection)) {
+			return null;
+		}
+		return new LocalFileManager();
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
@@ -39,35 +62,27 @@ public class LocalServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getConnectionManager()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
 	 */
-	public IRemoteConnectionManager getConnectionManager() {
-		return connMgr;
+	@SuppressWarnings("unchecked")
+	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
+		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
-	 */
-	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
-		if (!(conn instanceof LocalConnection)) {
-			return null;
-		}
-		return new LocalFileManager();
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#initialize()
 	 */
-	public boolean initialize() {
-		connMgr = new LocalConnectionManager();
-		return true;
+	public void initialize() {
+		if (connMgr == null) {
+			connMgr = new LocalConnectionManager();
+		}
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#isInitialized()
 	 */
-	public String getDirectorySeparator(IRemoteConnection conn) {
-		return System.getProperty("file.separator", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+	public boolean isInitialized() {
+		initialize();
+		return connMgr != null;
 	}
-
 }

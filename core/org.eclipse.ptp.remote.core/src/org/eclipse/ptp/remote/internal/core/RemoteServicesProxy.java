@@ -42,8 +42,6 @@ public class RemoteServicesProxy implements IRemoteServices {
 		throw new IllegalArgumentException(NLS.bind(Messages.RemoteServicesProxy_0, name));
 	}
 
-	private boolean initialized;
-
 	private final IConfigurationElement configElement;
 	private final String id;
 	private final String name;
@@ -59,7 +57,6 @@ public class RemoteServicesProxy implements IRemoteServices {
 		getAttribute(configElement, ATTR_CLASS, null);
 		this.factory = null;
 		this.delegate = null;
-		this.initialized = false;
 	}
 	
 	/* (non-Javadoc)
@@ -68,6 +65,11 @@ public class RemoteServicesProxy implements IRemoteServices {
 	public IRemoteConnectionManager getConnectionManager() {
 		loadServices();
 		return delegate.getConnectionManager();
+	}
+
+	public String getDirectorySeparator(IRemoteConnection conn) {
+		loadServices();
+		return delegate.getDirectorySeparator(conn);
 	}
 
 	/**
@@ -140,18 +142,27 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
 	 */
-	public boolean initialize() {
+	@SuppressWarnings("unchecked")
+	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
 		loadServices();
-		return initialized;
+		return delegate.getServicesExtension(conn, extension);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServices#isInitialized()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize()
+	 */
+	public void initialize() {
+		loadServices();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#isInitialized()
 	 */
 	public boolean isInitialized() {
-		return initialized;
+		loadServices();
+		return delegate.isInitialized();
 	}
 	
 	/**
@@ -162,15 +173,8 @@ public class RemoteServicesProxy implements IRemoteServices {
 			IRemoteServicesFactory factory = getFactory();
 			if (factory != null) {
 				delegate = factory.getServices();
-				if (delegate.initialize()) {
-					initialized = true;
-				}
+				delegate.initialize();
 			}
 		}
-	}
-
-	public String getDirectorySeparator(IRemoteConnection conn) {
-		loadServices();
-		return delegate.getDirectorySeparator(conn);
 	}
 }
