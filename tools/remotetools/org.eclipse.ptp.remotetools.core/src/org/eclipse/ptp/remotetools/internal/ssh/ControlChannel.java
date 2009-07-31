@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.Debug;
 import org.eclipse.ptp.remotetools.utils.stream.ILineStreamListener;
@@ -29,14 +30,13 @@ public class ControlChannel implements ILineStreamListener {
 	/*
 	 * Patterns recognized by the observer.
 	 */
-	final static String marker = "//"; //$NON-NLS-1$
-	final static String markerPID = "PID:"; //$NON-NLS-1$
-	final static String markerPIID = "PIID:"; //$NON-NLS-1$
-	final static String markerSSH = "SSH_TTY:"; //$NON-NLS-1$
-	final Pattern pidPattern = Pattern.compile("^" + marker + markerPID + "\\p{Digit}+" + marker + markerPIID //$NON-NLS-1$ //$NON-NLS-2$
-			+ "\\p{Digit}+" + marker + "$"); //$NON-NLS-1$ //$NON-NLS-2$
-	final Pattern pidFilterPattern = Pattern.compile("\\p{Digit}+"); //$NON-NLS-1$
-	final Pattern terminalPathPattern = Pattern.compile("^" + marker + markerSSH + ".+" + marker + "$"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	final static String markerPID = "<pid value=\\\""; //$NON-NLS-1$
+	final static String markerPIID = "<piid value=\\\""; //$NON-NLS-1$
+	final static String markerSSH = "<ssh_tty value=\\\""; //$NON-NLS-1$
+	final static String endMarker = "\\\"/>"; //$NON-NLS-1$
+	final Pattern pidPattern = Pattern.compile(markerPID + "(\\p{Digit}+)" + endMarker + markerPIID //$NON-NLS-1$
+			+ "(\\p{Digit}+)" + endMarker); //$NON-NLS-1$
+	final Pattern terminalPathPattern = Pattern.compile(markerSSH + "(.+)" + endMarker); //$NON-NLS-1$
 
 	// OutputStream that sends input to remote process input stream.
 	OutputStream outputToControlTerminalInput;
@@ -60,12 +60,12 @@ public class ControlChannel implements ILineStreamListener {
 		this.connection = connection;
 	}
 	
-	public void open() throws RemoteConnectionException {
+	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
 		try{
 			// Open exec channel and alloc terminal
 			shell = connection.createExecChannel(false);
 			shell.setPty(true);
-			shell.setCommand("/bin/bash"); //$NON-NLS-1$
+			shell.setCommand("/bin/ksh"); //$NON-NLS-1$
 			inputFromControlTerminalOutput = shell.getInputStream();
 			outputToControlTerminalInput = shell.getOutputStream();
 			shell.connect();
@@ -86,9 +86,7 @@ public class ControlChannel implements ILineStreamListener {
 			outputToControlTerminalInput.write("export PS1=\n".getBytes()); //$NON-NLS-1$
 			
 			// Write terminal path on control channel, to be read by the observer
-			// "//SSH_TTY: $SSH_TTY//\"\n"
-			outputToControlTerminalInput.write(new String("echo \"" + marker + markerSSH + "$SSH_TTY" + marker + "\"\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			//outputToControlTerminalInput.write(new String("echo helloworld > /tmp/helloworld\n").getBytes());
+			outputToControlTerminalInput.write(new String("echo \"" + markerSSH + "$SSH_TTY" + endMarker + "\"\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			outputToControlTerminalInput.flush();
 		} catch (IOException e) {
 			throw new RemoteConnectionException(Messages.ControlChannel_Open_FailedSendInitCommands, e);
@@ -97,13 +95,17 @@ public class ControlChannel implements ILineStreamListener {
 		// Wait until the channel answers the terminal path
 		Debug.println2(Messages.ControlChannel_Debug_StartedWaitingControlTerminalPath);
 		synchronized (this) {
-			while (controlTerminalPath == null) {
+			while (!monitor.isCanceled() && controlTerminalPath == null) {
 				try {
 					this.wait(200);
 				} catch (InterruptedException e) {
 					throw new RemoteConnectionException(Messages.ControlChannel_Open_WaitControlTerminalPathInterrupted, e);
 				}
 			}
+		}
+		if (monitor.isCanceled()) {
+			close();
+			throw new RemoteConnectionException(Messages.ControlChannel_Open_WaitControlTerminalPathInterrupted);
 		}
 		Debug.println2(Messages.ControlChannel_Debug_ReceivedControlTerminalPath + controlTerminalPath);
 	}
@@ -115,22 +117,16 @@ public class ControlChannel implements ILineStreamListener {
 		 */
 		Matcher pidmatch = pidPattern.matcher(line);
 		if (pidmatch.find()) {
-			Matcher pidmatch2 = pidFilterPattern.matcher(line);
-			pidmatch2.find();
-			String temppid = pidmatch2.group();
-			pidmatch2.find();
-			String temppiid = pidmatch2.group();
-			connection.setPID(Integer.parseInt(temppiid), Integer.parseInt(temppid));
+			String pid = pidmatch.group(1);
+			String piid = pidmatch.group(2);
+			connection.setPID(Integer.parseInt(piid), Integer.parseInt(pid));
 			return;
 		}
 
 		Matcher terminalPathMatcher = terminalPathPattern.matcher(line);
 		if (terminalPathMatcher.find()) {
-			int pre = new String(marker + markerSSH).length();
-			int pos = marker.length();
-
 			synchronized (this) {
-				controlTerminalPath = line.substring(pre, line.length() - pos);
+				controlTerminalPath = terminalPathMatcher.group(1);
 				this.notifyAll();
 			}
 		}
@@ -157,8 +153,9 @@ public class ControlChannel implements ILineStreamListener {
 	}
 
 	public synchronized String getKillablePrefix(int internaID) {
-		return "echo " + marker + markerPID + "$$" + marker + markerPIID + Integer.toString(internaID) + marker + " > " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ controlTerminalPath;
+		return "echo \"" + markerPID + "$$" + endMarker //$NON-NLS-1$ //$NON-NLS-2$
+				+ markerPIID + Integer.toString(internaID) + endMarker 
+				+ "\" > " + controlTerminalPath; //$NON-NLS-1$
 	}
 
 	public void close() {
