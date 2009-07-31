@@ -12,11 +12,8 @@ package org.eclipse.ptp.remote.remotetools.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
@@ -196,39 +193,12 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask(Messages.RemoteToolsConnection_open, 2);
 		if (control.query() == ITargetStatus.STOPPED) {
-			Job job = new Job("Start the Environment") { //$NON-NLS-1$
-				protected IStatus run(IProgressMonitor monitor) {
-					
-					IStatus status = null;
-					
-					try {
-						if (control.create(monitor)) {
-							status = Status.OK_STATUS;
-						}
-					} catch (CoreException e) {
-						status = e.getStatus();
-					}
-					
-					return status;
-				}
-			};
-			job.setUser(true);
-			job.schedule();
-			monitor.worked(1);
-			/*
-			 * Wait for the job to finish
-			 */
-			while (!monitor.isCanceled() && control.query() != ITargetStatus.RESUMED) {
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-				}
-			}
-			
-			if (monitor.isCanceled()) {
-				job.cancel();
+			monitor.beginTask(Messages.RemoteToolsConnection_open, 2);
+			try {
+				control.create(monitor);
+			} catch (CoreException e) {
+				throw new RemoteConnectionException(e);
 			}
 		}
 		monitor.done();
