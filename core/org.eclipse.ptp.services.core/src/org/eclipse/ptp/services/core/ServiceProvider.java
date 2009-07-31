@@ -16,7 +16,7 @@ import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
- * An abstract base class for service provider implementations.
+ * An abstract base class for service provider implementations. 
  * 
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is no guarantee that this API will work or
@@ -85,11 +85,17 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		return fDescriptor.getServiceId();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceProvider#getString(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#getString(java.lang.String, java.lang.String)
 	 */
-	public String getString(String key) {
-		return fAttributes.get(key);
+	public String getString(String key, String defaultValue)
+	{
+		String value = fAttributes.get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		return value;
 	}
 	
 	/* (non-Javadoc)
@@ -99,8 +105,14 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		fAttributes.put(key, value);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceProvider#restoreState(org.eclipse.ui.IMemento)
+	/**
+	 * Restores the state of this provider from the
+	 * given <code>IMemento</code>.
+	 * 
+	 * NOTE: This should only be implemented if a provider 
+	 * wishes to override the default behavior.
+	 * 
+	 * @param memento for restoring the provider's state.
 	 */
 	public void restoreState(IMemento memento) {
 		fAttributes.clear();
@@ -109,8 +121,14 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceProvider#saveState(org.eclipse.ui.IMemento)
+	/**
+	 * Saves the state of this provider in the given
+	 * <code>IMemento</code>. 
+	 * 
+	 * NOTE: This should only be implemented if a provider  
+	 * wishes to override the default behavior.
+	 * 
+	 * @param memento for saving the provider's state.
 	 */
 	public void saveState(IMemento memento) {
 		for (String key : fAttributes.keySet()) {
