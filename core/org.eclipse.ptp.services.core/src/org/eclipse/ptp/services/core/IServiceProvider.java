@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
-import org.eclipse.ui.IMemento;
 
 /**
  * An interface that represents the provider of a service.
@@ -34,9 +33,10 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	 * Returns the string value of the given key.
 	 * 
 	 * @param key the key
-	 * @return the value or null if no value was found
+	 * @param defaultValue The value to return if key not stored
+	 * @return the value or defaultValue if no value was found
 	 */
-	public String getString(String key);
+	public String getString(String key, String defaultValue);
 
 	/**
 	 * Test if this service provider has been configured.
@@ -52,26 +52,4 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	 * @param value the value
 	 */
 	public void putString(String key, String value);
-	
-	/**
-	 * Restores the state of this provider from the
-	 * given <code>IMemento</code>.
-	 * 
-	 * NOTE: This should only be implemented if a provider 
-	 * wishes to override the default behavior.
-	 * 
-	 * @param memento for restoring the provider's state.
-	 */
-	public void restoreState(IMemento memento);
-	
-	/**
-	 * Saves the state of this provider in the given
-	 * <code>IMemento</code>. 
-	 * 
-	 * NOTE: This should only be implemented if a provider  
-	 * wishes to override the default behavior.
-	 * 
-	 * @param memento for saving the provider's state.
-	 */
-	public void saveState(IMemento memento);
 }

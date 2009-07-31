@@ -126,8 +126,10 @@ public class ServiceModelManager implements IServiceModelManager {
 					serviceMemento.putString(ATTR_ID, service.getId());
 					serviceMemento.putString(ATTR_PROVIDER_ID, provider.getId());
 				
-					IMemento providerMemento = serviceMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-					provider.saveState(providerMemento);
+					if (provider instanceof ServiceProvider) {
+						IMemento providerMemento = serviceMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+						((ServiceProvider)provider).saveState(providerMemento);
+					}
 				}
 			}
 		}
@@ -317,8 +319,10 @@ public class ServiceModelManager implements IServiceModelManager {
 					if (descriptor != null) {
 						IServiceProvider provider = getServiceProvider(descriptor);
 						if (provider != null) {
-							IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-							provider.restoreState(providerMemento);
+							if (provider instanceof ServiceProvider) {
+								IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+								((ServiceProvider)provider).restoreState(providerMemento);
+							}
 							config.setServiceProvider(service, provider);
 						} else {
 							Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
