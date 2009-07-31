@@ -11,6 +11,7 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.core;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
 
@@ -23,7 +24,13 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
  */
 public interface IRemoteConnection
 {
-	void connect() throws RemoteConnectionException;
+	/**
+	 * Connect to the remote machine.
+	 * 
+	 * @param monitor progress monitor
+	 * @throws RemoteConnectionException
+	 */
+	public void connect(IProgressMonitor monitor) throws RemoteConnectionException;
 
 	/**
 	 * Terminate connection to remote machine.

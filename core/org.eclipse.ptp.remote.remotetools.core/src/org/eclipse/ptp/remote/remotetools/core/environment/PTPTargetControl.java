@@ -130,7 +130,16 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		
 		try {
 			setState(CONNECTING);
+			
 			super.create(monitor);
+			
+			if (monitor.isCanceled()) {
+				disconnect();
+				setState(NOT_OPERATIONAL);
+				monitor.done();
+				return true;
+			}
+			
 			setState(CONNECTED);
 			
 			if (connection != null) {

@@ -18,6 +18,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remotetools.core.AuthToken;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
@@ -172,7 +173,7 @@ public class Connection implements IRemoteConnection {
 		this(authToken, hostname, port, CipherTypes.CIPHER_DEFAULT, ConnectionProperties.defaultTimeout);
 	}
 
-	public synchronized void connect() throws RemoteConnectionException {
+	public synchronized void connect(IProgressMonitor monitor) throws RemoteConnectionException {
 		this.nextInternalPID = 0;
 
 		/*
@@ -218,7 +219,7 @@ public class Connection implements IRemoteConnection {
 		 */
 		try {
 			controlChannel = new ControlChannel(this);
-			controlChannel.open();
+			controlChannel.open(monitor);
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			throw new RemoteConnectionException(Messages.Connection_Connect_FailedCreateControlChannel, e);
@@ -264,6 +265,9 @@ public class Connection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remotetools.IRemoteConnection#getRemoteExecutionManager()
 	 */
 	public synchronized IRemoteExecutionManager createRemoteExecutionManager() throws RemoteConnectionException {
+		if (executionManagers.size() > 0) {
+			return (IRemoteExecutionManager) executionManagers.get(0);
+		}
 		ExecutionManager e =  new ExecutionManager(this);
 		executionManagers.add(e);
 		return e;
