@@ -392,7 +392,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				if (procZero != null) {
 					procZero.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
 				}
-				DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:>>>{1}<<<", getJobID(), line); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
 			
 			public void streamClosed() {
@@ -419,7 +419,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				if (procZero != null) {
 					procZero.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
 				}
-				DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:>>>{1}<<<", getJobID(), line); //$NON-NLS-1$
+				DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
 			
 			public void streamClosed() {
