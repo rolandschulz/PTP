@@ -14,7 +14,6 @@ package org.eclipse.ptp.remotetools.environment.control;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +28,7 @@ import org.eclipse.ptp.remotetools.core.IRemoteConnection;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.KeyAuthToken;
 import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
+import org.eclipse.ptp.remotetools.environment.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
@@ -47,7 +47,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 	/**
 	 * Set of jobs running on the remote target environment.
 	 */
-	private Map remoteJobs;
+	private Map<ITargetJob, TargetControlledJob> remoteJobs;
 
 	/**
 	 * A connection (using ssh) to the remote target environment.
@@ -57,7 +57,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 	/**
 	 * Listeners notified when jobs ared added/removed from the target environment.
 	 */
-	private Set jobListeners = new HashSet();
+	private Set<ITargetControlJobListener> jobListeners = new HashSet<ITargetControlJobListener>();
 	
 	/**
 	 * Exception to terminate the environment.
@@ -207,7 +207,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 	 */
 	public synchronized void startJob(ITargetJob job) throws CoreException {
 		if ((query() != ITargetStatus.PAUSED) &&(query() != ITargetStatus.RESUMED)) {
-			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, "Target not ready to execute jobs", null));
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, Messages.SSHTargetControl_0, null));
 		}
 		TargetControlledJob controlledJob = new TargetControlledJob(this, job);
 		remoteJobs.put(job, controlledJob);
@@ -216,8 +216,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	protected synchronized void notifyStartingJob(ITargetJob job) {
 		/** Notify listeners. */
-		for (Iterator listenerIterator = jobListeners.iterator(); listenerIterator.hasNext();) {
-			ITargetControlJobListener listener = (ITargetControlJobListener) listenerIterator.next();
+		for (ITargetControlJobListener listener : jobListeners) {
 			listener.beforeJobStart(job);
 		}
 		/** Guarantee that the target is operational. */
@@ -230,8 +229,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	protected synchronized void notifyFinishedJob(ITargetJob job) {
 		/** Notify listeners. */
-		for (Iterator listenerIterator = jobListeners.iterator(); listenerIterator.hasNext();) {
-			ITargetControlJobListener listener = (ITargetControlJobListener) listenerIterator.next();
+		for (ITargetControlJobListener listener : jobListeners) {
 			listener.afterJobFinish(job);
 		}
 		/** Remove job from list of jobs. */
@@ -273,33 +271,26 @@ public abstract class SSHTargetControl implements ITargetControl {
 	 * must be called.
 	 */
 	public boolean create(IProgressMonitor monitor) throws CoreException {
-		Assert.isNotNull(sshParameters, "missing ssh parameters");
-		while (true) {
-			try {
-				if (monitor.isCanceled()) {
-					disconnect();
-					throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, "Connection to target canceled", null));
-				}
-				connect();
-				if (monitor.isCanceled()) {
-					disconnect();
-					throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, "Connection to target canceled", null));
-				}
-				return true;
-			} catch (RemoteConnectionException e) {
-				monitor.subTask("Failed: " + e.getMessage());
-				/*
-				 * Ignore failure, unfortunately, it is not possible to know the reason.
-				 */
+		Assert.isNotNull(sshParameters, "missing ssh parameters"); //$NON-NLS-1$
+		try {
+			if (monitor.isCanceled()) {
 				disconnect();
+				throw new CoreException(new Status(IStatus.CANCEL, getPluginId(), 0, Messages.SSHTargetControl_1, null));
 			}
-			
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
+			connect(monitor);
+			if (monitor.isCanceled()) {
 				disconnect();
-				throw new CoreException(new Status(IStatus.CANCEL, getPluginId(), 0, "Connection to target canceled", null));
+				throw new CoreException(new Status(IStatus.CANCEL, getPluginId(), 0, Messages.SSHTargetControl_1, null));
 			}
+			return true;
+		} catch (RemoteConnectionException e) {
+			disconnect();
+			String message = e.getMessage();
+			Throwable t =e.getCause();
+			if (t != null) {
+				message += ": " + t.getMessage(); //$NON-NLS-1$
+			}
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), message));
 		}
 	}
 
@@ -307,10 +298,11 @@ public abstract class SSHTargetControl implements ITargetControl {
 	 * Create the SSH connection to the remote target environment.
 	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)}
 	 * must be called.
+	 * @param monitor progress monitor
 	 * @throws RemoteConnectionException
 	 */
-	protected synchronized void connect() throws RemoteConnectionException {
-		Assert.isNotNull(sshParameters, "missing ssh parameters");
+	protected synchronized void connect(IProgressMonitor monitor) throws RemoteConnectionException {
+		Assert.isNotNull(sshParameters, "missing ssh parameters"); //$NON-NLS-1$
 		/*
 		 * Try to connect, else undo the connection.
 		 */
@@ -330,8 +322,8 @@ public abstract class SSHTargetControl implements ITargetControl {
 				remoteConnection = RemotetoolsPlugin.createSSHConnection(authToken, sshParameters.hostname, sshParameters.port, 
 						sshParameters.cipherType, sshParameters.timeout);
 			}
-			remoteConnection.connect();
-			remoteJobs = new HashMap();
+			remoteConnection.connect(monitor);
+			remoteJobs = new HashMap<ITargetJob, TargetControlledJob>();
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			throw e;
@@ -385,7 +377,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	public boolean executeRemoteCommand(IProgressMonitor monitor, String command, String[] args) throws CoreException {
 		for (int i = 0; i < args.length; i++) {
-			command += (" " + args[i]);
+			command += (" " + args[i]); //$NON-NLS-1$
 		}
 
 		try {
@@ -395,13 +387,13 @@ public abstract class SSHTargetControl implements ITargetControl {
 			return true;
 		} catch (RemoteConnectionException e) {
 			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
-					"Failed to connect with remote target environment", e));
+					Messages.SSHTargetControl_2, e));
 		} catch (CancelException e) {
 			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
-					"Cancelled execution on remote target environment", e));
+					Messages.SSHTargetControl_3, e));
 		} catch (RemoteExecutionException e) {
 			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
-					"Failed to execute on remote target environment", e));
+					Messages.SSHTargetControl_4, e));
 		}
 	}
 	
@@ -418,7 +410,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 		 * to the same local port. 
 		 */
 		TargetSocket test = new TargetSocket();
-		test.host = "localhost";
+		test.host = "localhost"; //$NON-NLS-1$
 		test.port = port;
 		return test;
 	}
@@ -439,9 +431,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 		/*
 		 * Issue each job to terminate gracefully.
 		 */
-		Iterator iterator = remoteJobs.keySet().iterator();
-		while (iterator.hasNext()) {
-			ITargetJob job = (ITargetJob) iterator.next();
+		for (ITargetJob job : remoteJobs.keySet()) {
 			TargetControlledJob controlledJob = (TargetControlledJob) remoteJobs.get(job);
 			controlledJob.cancelExecution();
 		}
@@ -492,7 +482,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 	
 	public IRemoteConnection getConnection() {
-		Assert.isTrue(false, "this method is not supported");
+		Assert.isTrue(false, "this method is not supported"); //$NON-NLS-1$
 		return remoteConnection;
 	}
 
