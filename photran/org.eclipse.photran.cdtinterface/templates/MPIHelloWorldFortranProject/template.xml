@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<template type="ProjTempl" version="1.0" supplier="Eclipse.org" revision="1.0" author="Beth Tibbitts (IBM Research), Jeff Overbey (UIUC)"
+        copyright="Copyright (c) University of Illinois at Urbana-Champaign and others. All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html"
+		id="MPIHelloWorldFortranProject" label="%HelloWorld.CAnsitemplate.label" description="%HelloWorld.CAnsitemplate.description"
+		help="help.html">
+	<property-group id="basics" label="%HelloWorld.basics.label" description="%HelloWorld.basics.description" type="PAGES-ONLY" help="help.html">
+		<property id="author"
+			label="%HelloWorld.author.label"
+			description="%HelloWorld.author.description"
+			type="input"
+			pattern=".*"
+			default=""
+			hidden="false"
+			persist="true"/>
+		<property id="copyright"
+			label="%HelloWorld.copyright.label"
+			description="%HelloWorld.copyright.description"
+			type="input"
+			pattern=".*"
+			default="%HelloWorld.copyright.default"
+			hidden="false"
+			persist="true"/>
+		<property id="mpi.hello.message"
+			label="%HelloWorld.message.label"
+			description="%HelloWorld.message.description"
+			type="input"
+			pattern=".*"
+			default="%HelloWorld.message.default.mpi"
+			hidden="false"
+			persist="true"/>
+		<property id="sourceDir"
+			label="%MPIpi.sourceDir.label"
+			description="%MPIpi.sourceDir.description"
+			type="input"
+			default="%MPIpi.sourceDir.default"
+			pattern="[a-zA-Z0-9]+"
+			mandatory="false"
+			persist="true"/>
+		<property id="binDir"
+			label="%MPIpi.binDir.label"
+			description="%MPIpi.binDir.description"
+			type="input"
+			default="%MPIpi.binDir.default"
+			pattern="[a-zA-Z0-9]+"
+			mandatory="false"
+			persist="true"/>
+	</property-group>
+
+	<process type="org.eclipse.cdt.core.CreateSourceFolder">
+		<simple name="projectName" value="$(projectName)"/>
+		<simple name="path" value="$(sourceDir)"/>
+	</process>
+
+	<process type="org.eclipse.cdt.core.AddFiles">
+		<simple name="projectName" value="$(projectName)"/>
+		<complex-array name="files">
+			<element>
+				<simple name="source" value="src/Basename.f90"/>
+				<simple name="target" value="$(sourceDir)/$(projectName).f90"/>
+				<simple name="replaceable" value="true"/>
+			</element>
+		</complex-array>
+	</process>
+	
+	<process type="org.eclipse.cdt.core.CreateFolder">
+		<simple name="projectName" value="$(projectName)"/>
+		<simple name="path" value="$(binDir)"/>
+	</process>
+	
+	<process type="org.eclipse.cdt.managedbuilder.gnu.ui.SimpleGNUMakefileGenerator">
+		<simple name="projectName" value="$(projectName)"/>
+	</process>
+	
+	<!--process type="org.eclipse.cdt.managedbuilder.core.AppendToMBSStringOptionValue">
+		<simple name="projectName" value="$(projectName)"/>
+		<complex-array name="resourcePaths">
+			<element>
+				<simple name="id" value="org.eclipse.cdt.core.errorOutputParser" />
+				<simple name="value" value=";org.eclipse.photran.core.GFortranErrorParser" />
+				<simple name="path" value="" />
+			</element>
+		</complex-array>
+	</process-->
+    
+    <!--process type="org.eclipse.ptp.pldt.wizards.mpiProjectProcess"-->
+        <!-- no arguments as we go straight to the store (not recommended usage of template engine..) -->
+    <!--/process-->
+
+</template>
+

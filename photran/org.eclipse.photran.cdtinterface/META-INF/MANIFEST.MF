@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.cdtinterface; singleton:=true
-Bundle-Version: 4.0.5.qualifier
+Bundle-Version: 5.0.0.qualifier
 Bundle-ClassPath: cdtinterface.jar
 Bundle-Activator: org.eclipse.photran.cdtinterface.CDTInterfacePlugin
 Bundle-Vendor: %providerName
@@ -31,6 +31,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.jface.text,
+ org.eclipse.cdt.debug.ui,
+ org.eclipse.cdt.debug.core,
+ com.ibm.icu,
+ org.eclipse.jface.text,
  org.eclipse.ui.editors,
  org.eclipse.ui.views
 Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

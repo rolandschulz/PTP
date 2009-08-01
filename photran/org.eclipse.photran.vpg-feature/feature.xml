@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran.vpg_feature"
       label="Photran Advanced Features (Content Assist, Declaration View, Refactoring) (Eclipse Technology Incubation)"
-      version="4.0.5"
+      version="5.0.0"
       provider-name="University of Illinois at Urbana-Champaign"
       nl="en_US">
 

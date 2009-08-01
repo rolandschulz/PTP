@@ -55,7 +55,7 @@
             label="Local Fortran Application"
             icon="icons/obj16/f_app.gif"
             modes="run, debug"
-            class="org.eclipse.photran.cdtinterface.launch.FortranApplicationLaunchShortcut"
+            class="org.eclipse.photran.cdtinterface.launch.CApplicationLaunchShortcut"
             id="org.eclipse.photran.debug.ui.localCShortcut">
          <contextualLaunch>
            <enablement>
@@ -264,7 +264,10 @@
       </actionSet>
    </extension>
    
-   <!--- Editor templates -->
+   <!--====================-->
+   <!-- New File Templates -->
+   <!--====================-->
+   
    <extension
          point="org.eclipse.ui.editors.templates">
       <!--contextType
@@ -274,6 +277,26 @@
       </contextType-->
       <include file="templates/fortran-codetemplates.xml" />
    </extension>
+   
+   <!--=======================-->
+   <!-- New Project Templates -->
+   <!--=======================-->
+   
+   <extension point="org.eclipse.cdt.core.templates">
+      <template
+            filterPattern=".*"
+            id="org.eclipse.photran.projects.MPIHelloWorldFortranProject"
+            location="templates/MPIHelloWorldFortranProject/template.xml"
+            projectType="org.eclipse.cdt.build.makefile.projectType">
+      </template>
+      <template
+            filterPattern=".*"
+            id="org.eclipse.photran.projects.MPIPiFortranProject"
+            location="templates/MPIPiFortranProject/template.xml"
+            projectType="org.eclipse.cdt.build.makefile.projectType">
+      </template>
+   </extension>
+
    
    <!--=============================-->
    <!-- ActionSet-part associations -->
@@ -298,4 +321,5 @@
    <!--============================-->
 
    <extension-point id="domparser" name="DOM Parser" schema="schema/domparser.exsd"/>
+   
 </plugin>

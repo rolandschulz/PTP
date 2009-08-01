@@ -141,9 +141,9 @@
             id="org.eclipse.photran.ui.FreeFormBreakpointRulerAction">
          <action
                label="Toggle Breakpoint"
-               class="org.eclipse.cdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.cdt.debug.ui.CEditor.ManageBreakpointRulerAction">
+               id="org.eclipse.cdt.debug.ui.CEditor.RulerTobbleBreakpointAction">
          </action>
       </editorContribution>
       <editorContribution
@@ -151,12 +151,47 @@
             id="org.eclipse.photran.ui.FixedFormBreakpointRulerAction">
          <action
                label="Toggle Breakpoint"
-               class="org.eclipse.cdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.cdt.debug.ui.CEditor.ManageBreakpointRulerAction">
+               id="org.eclipse.cdt.debug.ui.CEditor.RulerTobbleBreakpointAction">
          </action>
       </editorContribution>
    </extension>
+   <!-- Enable CDT breakpoint toggle for Photran's editors and model elements -->
+   <extension point="org.eclipse.debug.ui.toggleBreakpointsTargetFactories">
+      <toggleTargetFactory
+            id="ToggleFortranBreakpointsTargetFactory"
+            class="org.eclipse.cdt.debug.internal.ui.actions.ToggleCBreakpointsTargetFactory">
+            <enablement>
+            <or>
+               <instanceof value="org.eclipse.photran.internal.ui.editor.AbstractFortranEditor"/>
+            </or>
+         </enablement>
+      </toggleTargetFactory>
+   </extension>
+   <!-- Also support PTP parallel breakpoints -->
+   <!--extension point="org.eclipse.core.runtime.adapters">
+      <factory 
+            class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+            adaptableType="org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor">
+            <adapter
+                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+            </adapter>
+            <adapter
+                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
+            </adapter>
+      </factory>
+      <factory 
+            class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
+            adaptableType="org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor">
+            <adapter
+                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+            </adapter>
+            <adapter
+                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
+            </adapter>
+      </factory>
+   </extension-->
    
    <!--=============================-->
    <!-- ActionSet-part associations -->
@@ -210,15 +245,15 @@
          </filter>            
          <enabledWhen>
             <or>
-		     <instanceof value="org.eclipse.core.resources.IProject"/>
-		     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
-		     
-		     <instanceof value="org.eclipse.core.resources.IFolder"/>
-		     <instanceof value="org.eclipse.cdt.core.model.ICContainer"/>
+             <instanceof value="org.eclipse.core.resources.IProject"/>
+             <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+             
+             <instanceof value="org.eclipse.core.resources.IFolder"/>
+             <instanceof value="org.eclipse.cdt.core.model.ICContainer"/>
 
-	         <instanceof value="org.eclipse.core.resources.IFile"/>
-         	 <instanceof value="org.eclipse.cdt.core.model.ITranslationUnit"/>
-		    </or>          
+             <instanceof value="org.eclipse.core.resources.IFile"/>
+              <instanceof value="org.eclipse.cdt.core.model.ITranslationUnit"/>
+            </or>          
          </enabledWhen>
       </page>
     </extension>    
@@ -227,9 +262,9 @@
    <!-- Source Viewer Configuration Extension Point -->
    <!--=============================================-->
    <extension-point
-   	id="sourceViewerConfig"
-   	name="Source Viewer Configuration"
-   	schema="schema/sourceViewerConfig.exsd"/>
+      id="sourceViewerConfig"
+      name="Source Viewer Configuration"
+      schema="schema/sourceViewerConfig.exsd"/>
    	
    <!--=============================================-->
    <!-- Image Associated with Photran Projects      -->
@@ -241,5 +276,5 @@
             natureId="org.eclipse.photran.core.fnature"
             id="org.eclipse.photran.ui.fProjectNatureImage">
       </image>
-   </extension> 
+   </extension>
 </plugin>

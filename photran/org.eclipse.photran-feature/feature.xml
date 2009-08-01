@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran"
       label="%featureName"
-      version="4.0.5.qualifier"
+      version="5.0.0.qualifier"
       provider-name="%providerName">
 
    <description url="http://www.eclipse.org/photran">
@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/4.0"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/5.0"/>
    </url>
 
    <requires>

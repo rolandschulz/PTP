@@ -14,6 +14,8 @@
  *******************************************************************************/
 package org.eclipse.photran.cdtinterface.ui.editor;
 
+import java.util.ResourceBundle;
+
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
@@ -23,7 +25,7 @@ import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
-import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.cdt.internal.ui.editor.ConstructedCEditorMessages;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -87,17 +89,14 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
 
         // See CEditor#createActions
         
-//        IAction action = new TextOperationAction(CEditorMessages.getResourceBundle(), "Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
-//        action.setActionDefinitionId(ICEditorActionDefinitionIds.FORMAT);
-//        setAction("Format", action); //$NON-NLS-1$
-//        markAsStateDependentAction("Format", true); //$NON-NLS-1$
+        final ResourceBundle bundle = ConstructedCEditorMessages.getResourceBundle();
 
-        IAction action = new ContentAssistAction(CEditorMessages.getResourceBundle(), "ContentAssistProposal.", this); //$NON-NLS-1$
+        IAction action = new ContentAssistAction(bundle, "ContentAssistProposal.", this); //$NON-NLS-1$
         action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
         setAction("ContentAssistProposal", action); //$NON-NLS-1$
         markAsStateDependentAction("ContentAssistProposal", true); //$NON-NLS-1$
 
-        action= new TextOperationAction(CEditorMessages.getResourceBundle(), "ContentAssistContextInformation.", this, ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION); //$NON-NLS-1$
+        action= new TextOperationAction(bundle, "ContentAssistContextInformation.", this, ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION); //$NON-NLS-1$
         action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_CONTEXT_INFORMATION);
         setAction("ContentAssistContextInformation", action); //$NON-NLS-1$
         markAsStateDependentAction("ContentAssistContextInformation", true); //$NON-NLS-1$
