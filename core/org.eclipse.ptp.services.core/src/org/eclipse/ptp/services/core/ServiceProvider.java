@@ -39,6 +39,18 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#getBoolean(java.lang.String, boolean)
+	 */
+	public boolean getBoolean(String key, boolean defaultValue) {
+		String value = getString(key, null);
+		boolean result = defaultValue;
+		if (value != null) {
+			result = Boolean.parseBoolean(value);
+		}
+		return result;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#getConfigurationString()
 	 */
 	public String getConfigurationString() {
@@ -53,6 +65,22 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 			return null;
 		}
 		return fDescriptor.getId();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#getInt(java.lang.String, int)
+	 */
+	public int getInt(String key, int defaultValue) {
+		String value = getString(key, null);
+		int result = defaultValue;
+		if (value != null) {
+			try {
+				result = Integer.parseInt(value);
+			} catch (NumberFormatException e) {
+				// Use default
+			}
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +102,7 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		}
 		return fDescriptor.getPriority();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProviderDescriptor#getServiceId()
 	 */
@@ -84,7 +112,7 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		}
 		return fDescriptor.getServiceId();
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#getString(java.lang.String, java.lang.String)
@@ -97,14 +125,30 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		}
 		return value;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#putBoolean(java.lang.String, boolean)
+	 */
+	public void putBoolean(String key, boolean value) {
+		String strVal = Boolean.toString(value);
+		putString(key, strVal);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#putInt(java.lang.String, int)
+	 */
+	public void putInt(String key, int value) {
+		String strVal = Integer.toString(value);
+		putString(key, strVal);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#putString(java.lang.String, java.lang.String)
 	 */
 	public void putString(String key, String value) {
 		fAttributes.put(key, value);
 	}
-	
+
 	/**
 	 * Restores the state of this provider from the
 	 * given <code>IMemento</code>.

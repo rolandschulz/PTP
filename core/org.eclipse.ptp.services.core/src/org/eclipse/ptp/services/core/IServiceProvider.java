@@ -30,6 +30,24 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	public String getConfigurationString();
 
 	/**
+	 * Returns the boolean value of the given key.
+	 * 
+	 * @param key the key
+	 * @param defaultValue The value to return if key not stored
+	 * @return the value or defaultValue if no value was found
+	 */
+	public boolean getBoolean(String key, boolean defaultValue);
+
+	/**
+	 * Returns the int value of the given key.
+	 * 
+	 * @param key the key
+	 * @param defaultValue The value to return if key not stored
+	 * @return the value or defaultValue if no value was found
+	 */
+	public int getInt(String key, int defaultValue);
+
+	/**
 	 * Returns the string value of the given key.
 	 * 
 	 * @param key the key
@@ -37,7 +55,7 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	 * @return the value or defaultValue if no value was found
 	 */
 	public String getString(String key, String defaultValue);
-
+	
 	/**
 	 * Test if this service provider has been configured.
 	 * 
@@ -45,6 +63,22 @@ public interface IServiceProvider extends IServiceProviderDescriptor {
 	 */
 	public boolean isConfigured();
 	
+	/**
+	 * Sets the value of the given key to the given boolean
+	 * 
+	 * @param key the key
+	 * @param value the value
+	 */
+	public void putBoolean(String key, boolean value);
+	
+	/**
+	 * Sets the value of the given key to the given int
+	 * 
+	 * @param key the key
+	 * @param value the value
+	 */
+	public void putInt(String key, int value);
+
 	/**
 	 * Sets the value of the given key to the given string
 	 * 
