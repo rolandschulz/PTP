@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ui.IMemento;
@@ -33,9 +35,19 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 	
 	public ServiceProvider() {
 	}
-	
-	public ServiceProvider(IServiceProviderDescriptor descriptor) {
-		fDescriptor = descriptor;
+
+	public ServiceProvider(ServiceProvider provider) {
+		setDescriptor(provider.getDescriptor());
+		fAttributes.putAll(provider.getAttributes());
+	}
+
+	/**
+	 * Get the attributes for this service provider
+	 * 
+	 * @return service provider attributes
+	 */
+	public Map<String, String> getAttributes() {
+		return Collections.unmodifiableMap(fAttributes);
 	}
 
 	/* (non-Javadoc)
@@ -49,12 +61,21 @@ public abstract class ServiceProvider implements IServiceProvider, IServiceProvi
 		}
 		return result;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#getConfigurationString()
 	 */
 	public String getConfigurationString() {
 		return isConfigured() ? Messages.ServiceProvider_0 : Messages.ServiceProvider_1;
+	}
+	
+	/**
+	 * Get the descriptor for this service provider
+	 * 
+	 * @return service provider descriptor
+	 */
+	public IServiceProviderDescriptor getDescriptor() {
+		return fDescriptor;
 	}
 
 	/* (non-Javadoc)
