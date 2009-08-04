@@ -88,7 +88,7 @@ public class FortranProjectWizard extends CDTCommonProjectWizard
         
         // Access the .project file in the recently-created project
         final IFile projFile = (IFile)newProject.findMember(IProjectDescription.DESCRIPTION_FILE_NAME);
-        if(projFile.exists()) 
+        if(projFile.exists() && projFile.getLocation() != null) // JO: Prevent NPE on remote projects
         {
             try 
             {
