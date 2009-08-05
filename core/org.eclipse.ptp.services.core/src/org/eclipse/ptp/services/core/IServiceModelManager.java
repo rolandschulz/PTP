@@ -42,6 +42,14 @@ public interface IServiceModelManager {
 	public IServiceConfiguration getConfiguration(IProject project, String name);
 	
 	/**
+	 * Get the configuration with the specified ID.
+	 * 
+	 * @param id ID of the configuration
+	 * @return the service configuration or null if no configurations with the supplied ID exist
+	 */
+	public IServiceConfiguration getConfiguration(String id);
+	
+	/**
 	 * Get all configurations available in the workspace.
 	 * 
 	 * @return all configurations that could be found, or an empty set

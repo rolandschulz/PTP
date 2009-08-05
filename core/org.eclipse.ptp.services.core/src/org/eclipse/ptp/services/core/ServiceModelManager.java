@@ -184,6 +184,13 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(java.lang.String)
+	 */
+	public IServiceConfiguration getConfiguration(String id) {
+		return fConfigurations.get(id);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations()
 	 */
 	public Set<IServiceConfiguration> getConfigurations() {
