@@ -32,7 +32,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -81,7 +81,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 	
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	private AbstractRemoteResourceManagerConfiguration config;
+	private IRemoteResourceManagerConfiguration config;
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnectionManager connectionManager = null;
@@ -315,7 +315,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 */
 	private void initContents() {
 		loading = true;
-		config = (AbstractRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
+		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		initializeRemoteServicesCombo();

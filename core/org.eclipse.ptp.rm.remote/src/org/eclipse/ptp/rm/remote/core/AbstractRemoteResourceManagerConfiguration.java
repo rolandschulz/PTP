@@ -27,7 +27,9 @@ import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
 
 
-public abstract class AbstractRemoteResourceManagerConfiguration extends AbstractResourceManagerConfiguration {
+public abstract class AbstractRemoteResourceManagerConfiguration 
+	extends AbstractResourceManagerConfiguration 
+	implements IRemoteResourceManagerConfiguration {
 	
 	/**
 	 * Static class to hold remote configuration information
@@ -121,11 +123,8 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		setInvocationOptions(remoteConfig.getInvocationOptions());
 	}
 	
-	/**
-	 * Append invocation options to existing options. The contents of optionString are 
-	 * split into space separated strings.
-	 * 
-	 * @param optionString string containing the space separated invocation options
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#addInvocationOptions(java.lang.String)
 	 */
 	public void addInvocationOptions(String optionString) {
 		if (!optionString.equals(EMPTY_STRING)) {
@@ -137,21 +136,16 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		}
 	}
 	
-	/**
-	 * Get the invocation options as a list of strings. Returns
-	 * an empty list if there are no options
-	 * 
-	 * @return list of strings containing invocation options
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#getInvocationOptions()
 	 */
 	public List<String> getInvocationOptions()
 	{
 	    return invocationOptions;
 	}
 
-	/**
-	 * Convert invocation options to a string
-	 * 
-	 * @return invocation options separated by spaces
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#getInvocationOptionsStr()
 	 */
 	public String getInvocationOptionsStr() {
 		String opts = EMPTY_STRING;
@@ -164,28 +158,22 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		return opts;
 	}	
 	
-	/**
-	 * Get the local address for the proxy to connect to
-	 * 
-	 * @return local address
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#getLocalAddress()
 	 */
 	public String getLocalAddress() {
 		return localAddress;
 	}
 	
-	/**
-	 * Get the remote configuration options.
-	 * 
-	 * @return remote configuration options
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#getOptions()
 	 */
 	public int getOptions() {
 		return options;
 	}
 	
-	/**
-	 * Get the proxy server path. This may be a path on a remote system.
-	 * 
-	 * @return path
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#getProxyServerPath()
 	 */
 	public String getProxyServerPath() {
 		return proxyServerPath;
@@ -202,49 +190,37 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		memento.putString(TAG_INVOCATION_OPTIONS, getInvocationOptionsStr());
 	}
 
-	/**
-	 * Set the invocation options. The contents of optionString are split into space
-	 * separated strings. Any existing options are discarded.
-	 * 
-	 * @param optionString string containing the space separated invocation options
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#setInvocationOptions(java.lang.String)
 	 */
 	public void setInvocationOptions(String optionString) {
 		this.invocationOptions.clear();
 		addInvocationOptions(optionString);
 	}
 	
-	/**
-	 * Set the local address
-	 * 
-	 * @param localAddr
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#setLocalAddress(java.lang.String)
 	 */
 	public void setLocalAddress(String localAddr) {
 		this.localAddress = localAddr;
 	}
 	
-	/**
-	 * Set the remote configuration options
-	 * 
-	 * @param options
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#setOptions(int)
 	 */
 	public void setOptions(int options) {
 		this.options = options;
 	}
 	
-	/**
-	 * Set the proxy server path
-	 * 
-	 * @param proxyServerPath
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#setProxyServerPath(java.lang.String)
 	 */
 	public void setProxyServerPath(String proxyServerPath) {
 		this.proxyServerPath = proxyServerPath;
 	}
 
-	/**
-	 * Test if option is set.
-	 * 
-	 * @param option option to check
-	 * @return true if option is set
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#testOption(int)
 	 */
 	public boolean testOption(int option) {
 		return (getOptions() & option) == option;

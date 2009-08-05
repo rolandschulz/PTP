@@ -59,7 +59,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.Activator;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -146,7 +146,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	public static final int VALIDATE_TIMER = 250;
-	private AbstractRemoteResourceManagerConfiguration config;
+	private IRemoteResourceManagerConfiguration config;
 	private String proxyPath = EMPTY_STRING;
 	private String proxyArgs = EMPTY_STRING;
 	private String localAddr = EMPTY_STRING;
@@ -461,7 +461,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	private void initContents() {
 		loading = true;
-		config = (AbstractRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
+		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();

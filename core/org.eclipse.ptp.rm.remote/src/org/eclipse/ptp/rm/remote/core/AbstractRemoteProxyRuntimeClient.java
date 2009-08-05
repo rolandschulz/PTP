@@ -44,16 +44,16 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	
 	private IRemoteConnection connection = null;
 	private IProgressMonitor startupMonitor = null;
-	private AbstractRemoteResourceManagerConfiguration config;
+	private IRemoteResourceManagerConfiguration config;
 
-	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
+	public AbstractRemoteProxyRuntimeClient(IRemoteResourceManagerConfiguration config, 
 			int baseModelId) {
 		super(config.getName(), baseModelId);
 		this.config = config;
 		initDebugOptions();
 	}
 
-	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
+	public AbstractRemoteProxyRuntimeClient(IRemoteResourceManagerConfiguration config, 
 			int baseModelId,
 			IProxyRuntimeCommandFactory cmdFactory,
 			IProxyRuntimeEventFactory eventFactory) {
