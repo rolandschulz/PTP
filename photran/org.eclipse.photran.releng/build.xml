@@ -101,6 +101,9 @@
 	
 	<target name="tag" depends="init">
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
+		</antcall>	
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface"/>
 		</antcall>
         <antcall target="tagone">
@@ -118,6 +121,9 @@
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.errorparsers.xlf"/>
 		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.intel-feature"/>
+		</antcall>	
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.core"/>
 		</antcall>
@@ -140,7 +146,7 @@
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui.vpg"/>
 		</antcall>	
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature"/>
 		</antcall>	
 	</target>
 </project>
