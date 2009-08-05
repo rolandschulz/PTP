@@ -64,6 +64,8 @@ public class RemoteCNavigatorRefactorActionProvider extends CommonActionProvider
 				if (!RemoteNature.hasRemoteNature(project)){
 					fCDTRefactorActionProvider.fillContextMenu(menu);
 				}
+			} else { //other resources
+				fCDTRefactorActionProvider.fillContextMenu(menu);
 			}
 		}
 	}
