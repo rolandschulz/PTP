@@ -41,7 +41,7 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
-		OpenMPIResourceManagerConfiguration config = (OpenMPIResourceManagerConfiguration) getConfiguration();
+		IOpenMPIResourceManagerConfiguration config = (IOpenMPIResourceManagerConfiguration) getConfiguration();
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
 		rts = new OpenMPIRuntimeSystem(OPENMPI_RMID, config, attrDefMgr);

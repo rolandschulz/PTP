@@ -29,7 +29,7 @@ import org.eclipse.ui.IMemento;
  *
  */
 public class OpenMPIResourceManagerConfiguration extends
-AbstractToolRMConfiguration implements Cloneable {
+AbstractToolRMConfiguration implements Cloneable, IOpenMPIResourceManagerConfiguration {
 
 	/**
 	 * Static class to hold openmpi configuration information
@@ -68,20 +68,12 @@ AbstractToolRMConfiguration implements Cloneable {
 		}
 	}
 
-	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
-
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
-	public static final String VERSION_UNKNOWN = "0.0"; //$NON-NLS-1$
-	public static final String VERSION_AUTO = "auto"; //$NON-NLS-1$
-	public static final String VERSION_12 = "1.2"; //$NON-NLS-1$
-	public static final String VERSION_13 = "1.3"; //$NON-NLS-1$
-	public static final String VERSION_14 = "1.4"; //$NON-NLS-1$
-
-	public static OpenMPIResourceManagerConfiguration load(
+	public static IOpenMPIResourceManagerConfiguration load(
 			OpenMPIResourceManagerFactory factory, IMemento memento) {
 		OpenMpiConfig openMpiConfig = loadOpenMpiConfig(factory, memento);
-		OpenMPIResourceManagerConfiguration config = new OpenMPIResourceManagerConfiguration(factory, openMpiConfig);
+		IOpenMPIResourceManagerConfiguration config = new OpenMPIResourceManagerConfiguration(factory, openMpiConfig);
 		return config;
 	}
 	public static OpenMpiConfig loadOpenMpiConfig(IResourceManagerFactory factory,
@@ -155,30 +147,22 @@ AbstractToolRMConfiguration implements Cloneable {
 				(OpenMPIResourceManagerFactory) getFactory(), openMpiConfig);
 	}
 
-	/**
-	 * Get the detected Open MPI version. Only the major and minor version
-	 * numbers are used. Any point or beta release information is discarded.
-	 * 
-	 * @return string representing the detected version 
-	 *         or "unknown" if no version has been detected
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getDetectedVersion()
 	 */
 	public String getDetectedVersion() {
 		return majorVersion + "." + minorVersion; //$NON-NLS-1$
 	}
 
-	/**
-	 * Get the detected Open MPI service version.
-	 * 
-	 * @return the detected point version (default 0)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getServiceVersion()
 	 */
 	public int getServiceVersion() {
 		return serviceVersion;
 	}
 
-	/**
-	 * Get the version selected when configuring the RM
-	 * 
-	 * @return string representing the Open MPI version
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getVersionId()
 	 */
 	public String getVersionId() {
 		return versionId;
@@ -201,20 +185,8 @@ AbstractToolRMConfiguration implements Cloneable {
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
 	
-	/**
-	 * Set the detected Open MPI version. Allowable version formats are:
-	 * 
-	 * 1.3		-> major=1, minor=3, point=0
-	 * 1.2.8	-> major=1, minor=2, point=8
-	 * 1.2b1	-> major=1, minor=2, point=0
-	 * 
-	 * Currently only 1.2 and 1.3 versions are valid.
-	 * 
-	 * If the versionId is not VERSION_AUTO, then the detected version
-	 * must match the versionId.
-	 * 
-	 * @param version string representing the detected version
-	 * @return true if version was correct
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#setDetectedVersion(java.lang.String)
 	 */
 	public boolean setDetectedVersion(String version) {
 		Pattern p = Pattern.compile("^(\\d+)\\.(\\d+)[^.]*(\\.(\\d+))?"); //$NON-NLS-1$
@@ -228,7 +200,7 @@ AbstractToolRMConfiguration implements Cloneable {
 			if (!validateVersion()) {
 				return false;
 			}
-			if (!getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
+			if (!getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
 				return getVersionId().equals(getDetectedVersion());
 			}
 			return true;
@@ -236,10 +208,8 @@ AbstractToolRMConfiguration implements Cloneable {
 		return false;
 	}
 
-	/**
-	 * Set the version that is selected when configuring the RM
-	 * 
-	 * @param versionId string representing the Open MPI version
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#setVersionId(java.lang.String)
 	 */
 	public void setVersionId(String versionId) {
 		this.versionId = versionId;

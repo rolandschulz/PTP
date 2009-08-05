@@ -47,7 +47,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIHostMap.Host;
 
 /**
@@ -79,7 +79,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		assert remoteServices != null;
 		IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 		OmpiInfo info = rts.getOmpiInfo();
-		OpenMPIResourceManagerConfiguration rmConfiguration = (OpenMPIResourceManagerConfiguration) rts.getRmConfiguration();
+		IOpenMPIResourceManagerConfiguration rmConfiguration = (IOpenMPIResourceManagerConfiguration) rts.getRmConfiguration();
 		assert fileMgr != null;
 
 		/*
@@ -210,7 +210,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	private OpenMPIHostMap readHostFile(IRemoteConnection connection,
 			IRemoteServices remoteServices, IRemoteFileManager fileMgr,
 			OmpiInfo info,
-			OpenMPIResourceManagerConfiguration rmConfiguration)
+			IOpenMPIResourceManagerConfiguration rmConfiguration)
 	throws CoreException, IOException {
 
 		/*
@@ -244,7 +244,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 		
 		if (hostFilePath == null) {
-			if (rmConfiguration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			if (rmConfiguration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Missing mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
 				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandMissingHostFilePath));
 			}
@@ -260,7 +260,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "hostFilePath: {0}", hostFilePath); //$NON-NLS-1$
 
 		if (!hostFilePath.isAbsolute()) {
-			if (rmConfiguration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			if (rmConfiguration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFilePathNotAbsolute, hostFilePath)));
 			}
 			
@@ -301,7 +301,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		 * Only for Open MPI 1.2. On 1.3, there is no default host file assumed.
 		 */
 		if (hostMap.count() == 0) {
-			if (rmConfiguration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			if (rmConfiguration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 				// This was not correct for remote hosts. Worked only for local hosts.
 				//					try {
 				//						InetAddress localhost = InetAddress.getLocalHost();

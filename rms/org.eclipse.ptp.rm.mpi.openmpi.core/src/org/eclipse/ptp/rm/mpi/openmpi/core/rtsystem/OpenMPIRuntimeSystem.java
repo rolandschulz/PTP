@@ -24,7 +24,7 @@ import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
 
 /**
  * 
@@ -43,7 +43,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	private Map<String,String> nodeToIDMap = new HashMap<String, String>();
 
 	public OpenMPIRuntimeSystem(Integer openmpi_rmid,
-			OpenMPIResourceManagerConfiguration config,
+			IOpenMPIResourceManagerConfiguration config,
 			AttributeDefinitionManager attrDefMgr) {
 		super(openmpi_rmid, config, attrDefMgr);
 	}
