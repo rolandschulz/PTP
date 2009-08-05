@@ -27,7 +27,8 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
+import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.ToolsRMUIPlugin;
 import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -58,7 +59,7 @@ import org.eclipse.swt.widgets.Text;
 public class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
 
 	protected class DataSource extends WizardPageDataSource {
-		private AbstractToolRMConfiguration config = null;
+		private IToolRMConfiguration config = null;
 
 		private boolean commandsEnabled = false;
 		private boolean useToolDefaults = false;
@@ -132,7 +133,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		public void setConfig(IResourceManagerConfiguration configuration) {
 			super.setConfig(configuration);
 			// Store a local reference to the configuration
-			this.config = (AbstractToolRMConfiguration) configuration;
+			this.config = (IToolRMConfiguration) configuration;
 		}
 
 		public void setCommandsEnabled(boolean enable) {
@@ -534,7 +535,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		 */
 
 		IRemoteUIServices remUIServices = null;
-		AbstractRemoteResourceManagerConfiguration config = (AbstractRemoteResourceManagerConfiguration)getDataSource().getConfig();
+		IRemoteResourceManagerConfiguration config = (IRemoteResourceManagerConfiguration)getDataSource().getConfig();
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
 			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
