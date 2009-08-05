@@ -51,7 +51,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory;
@@ -108,7 +108,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	private int jobNumber;
 
 	/** A local reference of the RM configuration used by the RM manager that created the RTS. */
-	protected AbstractToolRMConfiguration rmConfiguration;
+	protected IToolRMConfiguration rmConfiguration;
 
 	/** Attribute definitions for the RTS. */
 	protected AttributeDefinitionManager attrMgr;
@@ -138,7 +138,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/** Helper object to create events for the RM. */
 	private IRuntimeEventFactory eventFactory = new RuntimeEventFactory();
 
-	public AbstractToolRuntimeSystem(Integer id, AbstractToolRMConfiguration config, AttributeDefinitionManager manager) {
+	public AbstractToolRuntimeSystem(Integer id, IToolRMConfiguration config, AttributeDefinitionManager manager) {
 		this.rmID = id.toString();
 		this.nextID = id.intValue() + 1;
 		this.jobNumber = 0;
@@ -708,7 +708,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return rmID;
 	}
 
-	public AbstractToolRMConfiguration getRmConfiguration() {
+	public IToolRMConfiguration getRmConfiguration() {
 		return rmConfiguration;
 	}
 
