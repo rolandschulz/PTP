@@ -63,9 +63,9 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	public String getRemoteServicesId();
 	
 	/**
-	 * Returns the id of the resource manager
+	 * Returns the id of the factory that created the resource manager.
 	 *
-	 * @return the id of the resource manager
+	 * @return the id of the factory that created the resource manager
 	 */
 	public String getResourceManagerId();
 
@@ -77,7 +77,7 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	public String getType();
 
 	/**
-	 * Get a unique name for this resource manager
+	 * Get a unique name for this resource manager. 
 	 * 
 	 * @return unique name
 	 */
