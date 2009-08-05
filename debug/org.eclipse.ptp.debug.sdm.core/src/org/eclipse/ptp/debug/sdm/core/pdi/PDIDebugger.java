@@ -60,7 +60,7 @@ import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
@@ -228,8 +228,8 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		if (rm != null) {
 			port = getSessionPort();
 			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof AbstractRemoteResourceManagerConfiguration) {
-				AbstractRemoteResourceManagerConfiguration remConf = (AbstractRemoteResourceManagerConfiguration)conf;
+			if (conf instanceof IRemoteResourceManagerConfiguration) {
+				IRemoteResourceManagerConfiguration remConf = (IRemoteResourceManagerConfiguration)conf;
 				if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 					IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
 					if (remoteServices != null) {
