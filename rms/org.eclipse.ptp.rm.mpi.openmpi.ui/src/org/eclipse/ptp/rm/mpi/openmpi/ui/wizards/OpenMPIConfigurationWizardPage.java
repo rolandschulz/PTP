@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
@@ -38,10 +39,10 @@ public class OpenMPIConfigurationWizardPage extends
 AbstractToolRMConfigurationWizardPage {
 
 	String versionIds[] = new String[] { 
-			OpenMPIResourceManagerConfiguration.VERSION_AUTO, 
-			OpenMPIResourceManagerConfiguration.VERSION_12, 
-			OpenMPIResourceManagerConfiguration.VERSION_13,
-			OpenMPIResourceManagerConfiguration.VERSION_14
+			IOpenMPIResourceManagerConfiguration.VERSION_AUTO, 
+			IOpenMPIResourceManagerConfiguration.VERSION_12, 
+			IOpenMPIResourceManagerConfiguration.VERSION_13,
+			IOpenMPIResourceManagerConfiguration.VERSION_14
 			};
 	String versionsNames[] = new String[] { 
 			Messages.OpenMPIConfigurationWizardPage_VersionCombo_Auto, 
@@ -76,7 +77,7 @@ AbstractToolRMConfigurationWizardPage {
 			super(page);
 		}
 
-		private OpenMPIResourceManagerConfiguration config;
+		private IOpenMPIResourceManagerConfiguration config;
 		private String versionId = null;
 
 		public String getVersionId() {
@@ -130,7 +131,7 @@ AbstractToolRMConfigurationWizardPage {
 
 		@Override
 		public void setConfig(IResourceManagerConfiguration configuration) {
-			this.config = (OpenMPIResourceManagerConfiguration) configuration;
+			this.config = (IOpenMPIResourceManagerConfiguration) configuration;
 			super.setConfig(configuration);
 		}
 	}
@@ -200,26 +201,26 @@ AbstractToolRMConfigurationWizardPage {
 		String discoverCmd = null;
 		String remoteInstallPath = null;
 		boolean enabled = true;
-		if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
+		if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
 			Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			remoteInstallPath = preferences.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 			enabled = false;
-		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+		} else if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 			Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			remoteInstallPath = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
-		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
+		} else if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)) {
 			Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
 			discoverCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			remoteInstallPath = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
-		} else if (dataSource.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
+		} else if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 			Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 			launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_14 + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 			debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_14 + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);

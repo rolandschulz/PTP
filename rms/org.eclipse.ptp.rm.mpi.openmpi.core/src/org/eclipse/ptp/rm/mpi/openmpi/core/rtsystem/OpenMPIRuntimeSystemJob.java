@@ -47,7 +47,7 @@ import org.eclipse.ptp.rm.core.utils.InputStreamObserver;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 
 /**
@@ -169,7 +169,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 * Create the parser thread
 	 * 
 	 */
-	protected void createParser(final OpenMPIResourceManagerConfiguration configuration, final IPJob job) {
+	protected void createParser(final IOpenMPIResourceManagerConfiguration configuration, final IPJob job) {
 		/*
 		 * Thread that parses map information.
 		 */
@@ -189,7 +189,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: started", getJobID()); //$NON-NLS-1$
 				try {
 					// Parse stdout or stderr, depending on mpi 1.2 or 1.3
-					if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+					if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 						OpenMPIProcessMapText12Parser.parse(parserInputStream, new IOpenMPIProcessMapParserListener() {
 							public void finish() {
 								// Empty
@@ -220,10 +220,10 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								// Empty
 							}
 						});
-					} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
-								|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
+					} else if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
+								|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 						InputStream is;
-						if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)
+						if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)
 								|| configuration.getServiceVersion() > 0) {
 							is = new OpenMPI131InputStream(parserInputStream);
 						} else {
@@ -261,7 +261,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 							public void stderr(Process proc, String output) {
 								String stderr = output;
-								if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
+								if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
 										&& configuration.getServiceVersion() < 4) {
 									stderr += "\n"; //$NON-NLS-1$
 								}
@@ -273,7 +273,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 							public void stdout(Process proc, String output) {
 								String stdout = output;
-								if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
+								if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
 										&& configuration.getServiceVersion() < 4) {
 									stdout += "\n"; //$NON-NLS-1$
 								}
@@ -291,7 +291,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					parserException = e;
 					DebugUtil.error(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: display-map parser thread: {1}", getJobID(), e); //$NON-NLS-1$
 				} finally {
-					if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+					if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 						getParserListener().disable();
 						if (getStderrObserver() != null) {
 							getStderrObserver().removeListener(getParserListener());
@@ -306,12 +306,12 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
-		final OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
+		final IOpenMPIResourceManagerConfiguration configuration = (IOpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 		/*
 		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] since the streams are wrapped in the appropriate XML tags, but
 		 * are still sent separately.
 		 */
-		if ((configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13) && 
+		if ((configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13) && 
 				(configuration.getServiceVersion() > 0 || configuration.getServiceVersion() < 3))) {
 			builder.redirectErrorStream(true);
 		}
@@ -359,7 +359,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * Create processes for the job.
 		 */
-		final OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
+		final IOpenMPIResourceManagerConfiguration configuration = (IOpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		assert numProcsAttr != null;
@@ -370,8 +370,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * for stdout and stderr.
 		 */
 		final IPProcess procZero;
-		if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)
-				|| (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12) 
+		if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)
+				|| (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12) 
 						&& configuration.getServiceVersion() < 1)) {
 			procZero = ipJob.getProcessByIndex(0);
 		} else {
@@ -447,7 +447,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		getStdoutObserver().addListener(stdoutListener);
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
-		if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+		if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 			 /* 
 			  * Fix for bug #271810 
 			  */
@@ -456,8 +456,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			} else {
 				getStdoutObserver().addListener(getParserListener());
 			}
-		} else if (configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_13)
-					|| configuration.getDetectedVersion().equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
+		} else if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
+					|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 			getStdoutObserver().addListener(getParserListener());
 		} else {
 			assert false;

@@ -3,7 +3,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 
 /**
@@ -20,9 +20,9 @@ public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffect
 	private static final String BINDIR = "bin"; //$NON-NLS-1$
 	
 	public EffectiveOpenMPIResourceManagerConfiguration(
-			AbstractToolRMConfiguration configuration) {
+			IToolRMConfiguration configuration) {
 		super(configuration);
-		OpenMPIResourceManagerConfiguration conf = (OpenMPIResourceManagerConfiguration)configuration;
+		IOpenMPIResourceManagerConfiguration conf = (IOpenMPIResourceManagerConfiguration)configuration;
 		String launchCmd = null;
 		String debugCmd = null;
 		String discoverCmd = null;
@@ -30,21 +30,21 @@ public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffect
 
 		if (conf.getUseToolDefaults()) {
 			String version = conf.getDetectedVersion();
-			if (version.equals(OpenMPIResourceManagerConfiguration.VERSION_UNKNOWN) &&
-					conf.getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
+			if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_UNKNOWN) &&
+					conf.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
 				Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 				discoverCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
-			} else if (version.equals(OpenMPIResourceManagerConfiguration.VERSION_12)) {
+			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 				Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 				launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 				debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
 				discoverCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_12 + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
-			} else if (version.equals(OpenMPIResourceManagerConfiguration.VERSION_13)) {
+			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_13)) {
 				Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 				launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 				debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
 				discoverCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_13 + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
-			} else if (version.equals(OpenMPIResourceManagerConfiguration.VERSION_14)) {
+			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 				Preferences preferences = OpenMPIPreferenceManager.getPreferences();
 				launchCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_14 + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
 				debugCmd = preferences.getString(OpenMPIPreferenceManager.PREFIX_14 + OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
