@@ -33,10 +33,10 @@ public class AbstractEffectiveToolRMConfiguration {
 	private String remoteInstallPath;
 	int capabilities;
 
-	private AbstractToolRMConfiguration configuration;
+	private IToolRMConfiguration configuration;
 
 	public AbstractEffectiveToolRMConfiguration(
-			AbstractToolRMConfiguration configuration) {
+			IToolRMConfiguration configuration) {
 		this.configuration = configuration;
 		this.capabilities = configuration.getCapabilities();
 	}
@@ -117,7 +117,7 @@ public class AbstractEffectiveToolRMConfiguration {
 		&& !periodicMonitorCmd.trim().equals(EMPTY_STRING);
 	}
 	
-	protected AbstractToolRMConfiguration getConfiguration() {
+	protected IToolRMConfiguration getConfiguration() {
 		return configuration;
 	}
 
