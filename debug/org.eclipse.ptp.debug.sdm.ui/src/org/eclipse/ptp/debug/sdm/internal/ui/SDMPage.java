@@ -32,7 +32,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -265,8 +265,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			if (rm != null) {
 				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
-				if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-					AbstractRemoteResourceManagerConfiguration remConfig = (AbstractRemoteResourceManagerConfiguration)rmConfig;
+				if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
+					IRemoteResourceManagerConfiguration remConfig = (IRemoteResourceManagerConfiguration)rmConfig;
 					IPath rmPath = new Path(remConfig.getProxyServerPath());
 					path = rmPath.removeLastSegments(1).append("sdm").toString(); //$NON-NLS-1$/
 				}
@@ -340,7 +340,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			 */
 			if (resourceManager != rm) {
 				resourceManager = rm;
-				AbstractRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
+				IRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
 				if (config != null) {
 					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 						return getRemoteConnection().getAddress();
@@ -360,11 +360,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return AbstractRemoteResourceManagerConfiguration
 	 */
-	private AbstractRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
+	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
 		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-			if (rmConfig instanceof AbstractRemoteResourceManagerConfiguration) {
-				return (AbstractRemoteResourceManagerConfiguration)rmConfig;
+			if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
+				return (IRemoteResourceManagerConfiguration)rmConfig;
 			}
 		}
 		return null;
