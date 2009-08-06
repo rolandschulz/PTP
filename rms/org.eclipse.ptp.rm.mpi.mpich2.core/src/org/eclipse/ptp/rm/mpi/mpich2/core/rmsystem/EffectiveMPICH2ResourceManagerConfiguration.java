@@ -2,14 +2,14 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 
 public class EffectiveMPICH2ResourceManagerConfiguration extends
 AbstractEffectiveToolRMConfiguration {
 
 	public EffectiveMPICH2ResourceManagerConfiguration(
-			AbstractToolRMConfiguration configuration) {
+			IToolRMConfiguration configuration) {
 		super(configuration);
 		MPICH2ResourceManagerConfiguration MPICH2configuration = (MPICH2ResourceManagerConfiguration)configuration;
 		String launchCmd = null;
