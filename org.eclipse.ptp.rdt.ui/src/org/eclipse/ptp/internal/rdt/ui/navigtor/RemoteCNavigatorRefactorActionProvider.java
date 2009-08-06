@@ -12,6 +12,7 @@
 package org.eclipse.ptp.internal.rdt.ui.navigtor;
 
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.ui.navigator.CNavigatorRefactorActionProvider;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IMenuManager;
@@ -59,7 +60,7 @@ public class RemoteCNavigatorRefactorActionProvider extends CommonActionProvider
 		ISelection selection = context.getSelection();
 		if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
 			Object sel = ((StructuredSelection)selection).getFirstElement();
-			if (sel instanceof ICElement) {
+			if (sel instanceof ICElement && !(sel instanceof ITranslationUnit)) {
 				IProject project = ((ICElement)sel).getCProject().getProject();
 				if (!RemoteNature.hasRemoteNature(project)){
 					fCDTRefactorActionProvider.fillContextMenu(menu);
