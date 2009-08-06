@@ -6,16 +6,16 @@ public interface IMPICH2ResourceManagerConfiguration extends IToolRMConfiguratio
 	public static int MPICH2_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_PERIODIC_MONITOR | CAP_REMOTE_INSTALL_PATH;
 
 	/**
-	 * Get the version ID
+	 * Get the version selected when configuring the RM
 	 * 
-	 * @return version ID
+	 * @return string representing the MPICH2 version
 	 */
 	public String getVersionId();
 
 	/**
-	 * Set the version ID
+	 * Set the version that is selected when configuring the RM
 	 * 
-	 * @param versionId
+	 * @param versionId string representing the MPICH2 version
 	 */
 	public void setVersionId(String versionId);
 
