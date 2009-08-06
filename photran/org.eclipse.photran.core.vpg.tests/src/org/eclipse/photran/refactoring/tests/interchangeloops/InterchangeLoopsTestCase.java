@@ -97,8 +97,8 @@ public class InterchangeLoopsTestCase extends RefactoringTestCase
         
         doRefactoring();
         assertEquals(
-            readTestFile(myFilename + ".result"), // expected result
-            readWorkspaceFile(myFilename));       // actual refactored file
+            readTestFile(myFilename + ".result").replaceAll("\\r", ""), // expected result
+            readWorkspaceFile(myFilename).replaceAll("\\r", ""));       // actual refactored file
     }
     
     public static class InterchangeLoopsFailureTest extends InterchangeLoopsTestCase
