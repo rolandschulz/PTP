@@ -26,9 +26,7 @@ import org.eclipse.ui.IMemento;
  *
  */
 public class MPICH2ResourceManagerConfiguration extends
-AbstractToolRMConfiguration implements Cloneable {
-
-	public static int MPICH2_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_PERIODIC_MONITOR | CAP_REMOTE_INSTALL_PATH;
+AbstractToolRMConfiguration implements Cloneable, IMPICH2ResourceManagerConfiguration {
 
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
@@ -81,10 +79,10 @@ AbstractToolRMConfiguration implements Cloneable {
 		return config;
 	}
 
-	public static MPICH2ResourceManagerConfiguration load(
+	public static IMPICH2ResourceManagerConfiguration load(
 			MPICH2ResourceManagerFactory factory, IMemento memento) {
 		MPICH2Config mpich2Config = loadOpenMpiConfig(factory, memento);
-		MPICH2ResourceManagerConfiguration config = new MPICH2ResourceManagerConfiguration(factory, mpich2Config);
+		IMPICH2ResourceManagerConfiguration config = new MPICH2ResourceManagerConfiguration(factory, mpich2Config);
 		return config;
 	}
 
@@ -149,10 +147,16 @@ AbstractToolRMConfiguration implements Cloneable {
 		setDescription(Messages.MPICH2ResourceManagerConfiguration_defaultDescription);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration#getVersionId()
+	 */
 	public String getVersionId() {
 		return versionId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration#setVersionId(java.lang.String)
+	 */
 	public void setVersionId(String versionId) {
 		this.versionId = versionId;
 	}
