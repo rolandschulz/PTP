@@ -25,14 +25,6 @@ import org.eclipse.ui.IMemento;
 public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
-	 */
-	public IResourceManagerConfiguration copyConfiguration(
-			IResourceManagerConfiguration configuration) {
-		return (IResourceManagerConfiguration)configuration.clone();
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
@@ -46,9 +38,7 @@ public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactor
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		OpenMPIResourceManagerConfiguration conf = new OpenMPIResourceManagerConfiguration(this);
-
-		return conf;
+		return new OpenMPIResourceManagerConfiguration(this);
 	}
 
 	/* (non-Javadoc)

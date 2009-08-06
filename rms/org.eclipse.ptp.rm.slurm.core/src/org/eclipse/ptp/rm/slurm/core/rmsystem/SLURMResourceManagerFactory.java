@@ -25,14 +25,6 @@ import org.eclipse.ui.IMemento;
 public class SLURMResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
-	 */
-	public IResourceManagerConfiguration copyConfiguration(
-			IResourceManagerConfiguration configuration) {
-		return (IResourceManagerConfiguration)configuration.clone();
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {

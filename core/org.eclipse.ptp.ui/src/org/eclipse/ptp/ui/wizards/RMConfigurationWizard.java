@@ -329,7 +329,7 @@ public class RMConfigurationWizard extends Wizard {
 			config.setDefaultNameAndDesc();
 		}
 		if (resourceManager != null) {
-			resourceManager.setConfiguration(config);
+			resourceManagerFactory.saveConfiguration(config, resourceManager);
 			PTPCorePlugin.getDefault().getModelManager().saveResourceManagers();
 		} else {
 			IResourceManagerControl rm = resourceManagerFactory.create(config);

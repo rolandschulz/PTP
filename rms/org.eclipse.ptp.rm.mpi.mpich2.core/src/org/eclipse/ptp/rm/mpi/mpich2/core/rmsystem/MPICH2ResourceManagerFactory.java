@@ -25,14 +25,6 @@ import org.eclipse.ui.IMemento;
 public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
-	 */
-	public IResourceManagerConfiguration copyConfiguration(
-			IResourceManagerConfiguration configuration) {
-		return (IResourceManagerConfiguration)configuration.clone();
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
@@ -46,9 +38,7 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		MPICH2ResourceManagerConfiguration conf = new MPICH2ResourceManagerConfiguration(this);
-
-		return conf;
+		return new MPICH2ResourceManagerConfiguration(this);
 	}
 
 	/* (non-Javadoc)
