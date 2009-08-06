@@ -489,6 +489,11 @@
             id="org.eclipse.photran.ui.RenameRefactoringCommand">
       </command>
       <command
+            name="Interchange Loops"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand">
+      </command>
+      <command
             name="Replace Obsolete Operators"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
@@ -586,6 +591,12 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+          <action
+               label="Interchange Loops"
+               definitionId="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
+               id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
       </actionSet>
    </extension>
    <!--extension
@@ -651,6 +662,11 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+         <action 
+               label="Interchange Loops" 
+               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
+               id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
                
       </viewerContribution>
    </extension>
