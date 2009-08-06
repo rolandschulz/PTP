@@ -24,12 +24,17 @@ import org.eclipse.ui.IMemento;
  */
 public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManagerConfiguration copyConfiguration(
 			IResourceManagerConfiguration configuration) {
 		return (IResourceManagerConfiguration)configuration.clone();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		MPICH2ResourceManagerConfiguration configuration = (MPICH2ResourceManagerConfiguration) confIn;
 		PTPCorePlugin plugin = PTPCorePlugin.getDefault();
@@ -37,12 +42,18 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 		return new MPICH2ResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 */
 	public IResourceManagerConfiguration createConfiguration() {
 		MPICH2ResourceManagerConfiguration conf = new MPICH2ResourceManagerConfiguration(this);
 
 		return conf;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
+	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
 		return MPICH2ResourceManagerConfiguration.load(this, memento);
 	}

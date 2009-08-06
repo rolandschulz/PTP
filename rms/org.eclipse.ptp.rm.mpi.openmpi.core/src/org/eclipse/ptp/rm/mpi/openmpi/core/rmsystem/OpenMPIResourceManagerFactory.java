@@ -24,12 +24,17 @@ import org.eclipse.ui.IMemento;
  */
 public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactory {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManagerConfiguration copyConfiguration(
 			IResourceManagerConfiguration configuration) {
 		return (IResourceManagerConfiguration)configuration.clone();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		OpenMPIResourceManagerConfiguration configuration = (OpenMPIResourceManagerConfiguration) confIn;
 		PTPCorePlugin plugin = PTPCorePlugin.getDefault();
@@ -37,12 +42,18 @@ public class OpenMPIResourceManagerFactory extends AbstractResourceManagerFactor
 		return new OpenMPIResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 */
 	public IResourceManagerConfiguration createConfiguration() {
 		OpenMPIResourceManagerConfiguration conf = new OpenMPIResourceManagerConfiguration(this);
 
 		return conf;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
+	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
 		return OpenMPIResourceManagerConfiguration.load(this, memento);
 	}

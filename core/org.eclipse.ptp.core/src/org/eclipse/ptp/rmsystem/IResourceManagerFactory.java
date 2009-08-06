@@ -39,6 +39,14 @@ public interface IResourceManagerFactory {
 	public IResourceManagerConfiguration copyConfiguration(IResourceManagerConfiguration configuration);
 
 	/**
+	 * Create a resource manager using the supplied configuration
+	 * 
+	 * @param configuration configuration to use when creating resource manager
+	 * @return resource manager control
+	 */
+	public IResourceManagerControl create(IResourceManagerConfiguration configuration);
+
+	/**
 	 * Create a default configuration
 	 * 
 	 * @return default configuration
@@ -51,7 +59,7 @@ public interface IResourceManagerFactory {
 	 * @return factory ID
 	 */
 	public String getId();
-
+	
 	/**
 	 * Get the name of this factory
 	 * 
@@ -66,12 +74,4 @@ public interface IResourceManagerFactory {
 	 * @return resource manager configuration
 	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento);
-	
-	/**
-	 * Create a resource manager using the supplied configuration
-	 * 
-	 * @param configuration configuration to use when creating resource manager
-	 * @return resource manager control
-	 */
-	IResourceManagerControl create(IResourceManagerConfiguration configuration);
 }
