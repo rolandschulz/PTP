@@ -1,0 +1,8 @@
+! Taken from reindenter-test-code in org.eclipse.photran.core.vpg.tests
+PROGRAM program
+  IMPLICIT NONE
+! Don't forget about comments
+  ! That would be bad
+PRINT *, "Hello" !<<<<<START !<<<<<END
+  STOP
+END PROGRAM program

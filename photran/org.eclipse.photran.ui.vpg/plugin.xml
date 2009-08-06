@@ -498,6 +498,11 @@
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
       </command>
+      <command
+      		name="Unify Keyword Case"
+      		categoryId="org.eclipse.photran.ui.RefactoringCategory"
+      		id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand">
+      </command>
             
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
@@ -554,7 +559,13 @@
                definitionId="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>               
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>        
+         <action
+         	   label="Unify Keyword Case"
+         	   definitionId="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"
+         	   class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
+         	   menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
+         	   id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"/>       
          <!--action 
                label="Extract Common Block to &amp;Module"
                definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand" 
@@ -709,6 +720,12 @@
             id="org.eclipse.photran.ui.RepObsOpersFileRefactoringAction">
         </action>
         <action
+        	label="Unify Keyword Case"
+        	menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
+        	class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
+        	id="org.eclipse.photran.ui.KeywordCaseFileRefactoringAction">
+        </action>
+        <action
             label="Introduce Implicit None"
             menubarPath="org.eclipse.photran.ui.vpg.PackageExplorer.subMenu/group1"
             class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
@@ -727,6 +744,12 @@
                class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
                id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>      
+        <action
+        	label="Unify Keyword Case"
+        	menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup"
+        	class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
+        	id="org.eclipse.photran.ui.KeywordCaseFileRefactoringAction">
+        </action>
          <action 
                label="&amp;Introduce Implicit None" 
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 

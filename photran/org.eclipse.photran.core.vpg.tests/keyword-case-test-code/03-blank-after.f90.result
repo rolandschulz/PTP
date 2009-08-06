@@ -1,0 +1,4 @@
+! Taken from reindenter-test-code in org.eclipse.photran.core.vpg.tests
+SUBROUTINE s     !<<<<<START
+PRINT *, 'Yip'
+END SUBROUTINE   !<<<<<END
