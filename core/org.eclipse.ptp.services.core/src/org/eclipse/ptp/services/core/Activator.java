@@ -36,7 +36,7 @@ public class Activator extends Plugin {
 		// then we need to know what happened, so log it.
 		try {
 			ServiceModelManager.getInstance().loadModelConfiguration();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			log(e);
 		}
 		
@@ -47,6 +47,11 @@ public class Activator extends Plugin {
 	public void stop(BundleContext context) throws Exception {
 		try {
 			ProjectDeletionListener.stopListening();
+			try {
+				ServiceModelManager.getInstance().saveModelConfiguration();
+			} catch (Exception e) {
+				log(e);
+			}
 		}
 		finally {
 			plugin = null;
