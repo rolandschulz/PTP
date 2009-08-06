@@ -21,6 +21,8 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+
 
 
 
@@ -38,6 +40,14 @@ public abstract class AbstractResourceManagerFactory implements IResourceManager
 	private String id;
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#copyConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
+	public IResourceManagerConfiguration copyConfiguration(
+			IResourceManagerConfiguration configuration) {
+		return (IResourceManagerConfiguration)configuration.clone();
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
 	 */
 	public String getId() {
@@ -53,6 +63,13 @@ public abstract class AbstractResourceManagerFactory implements IResourceManager
 		return name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#saveConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration, org.eclipse.ptp.core.elementcontrols.IResourceManagerControl)
+	 */
+	public void saveConfiguration(IResourceManagerConfiguration configuration, IResourceManagerControl resourceManager) {
+		resourceManager.setConfiguration(configuration);		
+	}
+
 	/**
 	 * Set the extension point ID
 	 * 
@@ -61,7 +78,7 @@ public abstract class AbstractResourceManagerFactory implements IResourceManager
 	public void setId(String id) {
 		this.id = id;
 	}
-
+	
 	/**
 	 * Set the extension point name
 	 * 
