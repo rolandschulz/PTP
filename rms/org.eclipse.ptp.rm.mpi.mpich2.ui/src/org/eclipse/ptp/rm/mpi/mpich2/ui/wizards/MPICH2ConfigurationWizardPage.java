@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui.wizards;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
+import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
@@ -65,7 +66,7 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 			super(page);
 		}
 
-		private MPICH2ResourceManagerConfiguration config;
+		private IMPICH2ResourceManagerConfiguration config;
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
@@ -95,7 +96,7 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 
 		@Override
 		public void setConfig(IResourceManagerConfiguration configuration) {
-			this.config = (MPICH2ResourceManagerConfiguration) configuration;
+			this.config = (IMPICH2ResourceManagerConfiguration) configuration;
 			super.setConfig(configuration);
 		}
 	}
