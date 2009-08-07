@@ -93,7 +93,7 @@ public class ServiceModelManagerTests {
 		fService2 = manager.getService("TestService2"); //$NON-NLS-1$
 		addProvider("TestProvider3", fService2, fConfig); //$NON-NLS-1$
 
-		manager.setConfiguration(fProject, fConfig);
+		manager.addConfiguration(fProject, fConfig);
 		
 		persistAndReplaceModel();
 		
@@ -123,7 +123,7 @@ public class ServiceModelManagerTests {
 		
 		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
 		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
-		manager.setConfiguration(fProject, fConfig);
+		manager.addConfiguration(fProject, fConfig);
 		
 		persistAndReplaceModel();
 		
