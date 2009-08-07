@@ -33,12 +33,14 @@ public class KeywordCaseTestCase extends RefactoringTestCase
     private static NullProgressMonitor pm = new NullProgressMonitor();
     
     protected String filename;
+    protected boolean lowerCase;
     
     public KeywordCaseTestCase() {;} // when JUnit invokes a subclass outside a test suite
     
-    public KeywordCaseTestCase(String filename, Object ignored)
+    public KeywordCaseTestCase(String filename, boolean lowerCase)
     {
         this.filename = filename;
+        this.lowerCase = lowerCase;
         this.setName("test");
     }
     
@@ -48,6 +50,7 @@ public class KeywordCaseTestCase extends RefactoringTestCase
         String description = "Attempt to upcase keywords in " + filename;
         
         KeywordCaseRefactoring refactoring = createRefactoring(filename);
+        refactoring.setLowerCase(lowerCase);
         
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());

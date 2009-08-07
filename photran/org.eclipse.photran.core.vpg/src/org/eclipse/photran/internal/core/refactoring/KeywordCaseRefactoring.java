@@ -45,7 +45,6 @@ public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
     
     public void setLowerCase(boolean value)
     {
-        System.out.println(value);
         this.lowerCase = value;
     }
 

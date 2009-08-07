@@ -32,7 +32,7 @@ public class KeywordCaseTestSuite extends TestSuite
     private static TestSuite getSuiteFor(String baseFilename)
     {
         TestSuite subSuite = new TestSuite("Upcasing all keywords in " + baseFilename);
-        subSuite.addTest(new KeywordCaseTestCase(baseFilename, null));
+        subSuite.addTest(new KeywordCaseTestCase(baseFilename, false));
         return subSuite;
     }
     
@@ -41,7 +41,7 @@ public class KeywordCaseTestSuite extends TestSuite
         TestSuite subSuite = new TestSuite("Upcasing all keywords in selected files");
         for(String filename : filenames)
         {
-            subSuite.addTest(new KeywordCaseTestCase(filename, null));
+            subSuite.addTest(new KeywordCaseTestCase(filename, false));
         }
         return subSuite;
     }
