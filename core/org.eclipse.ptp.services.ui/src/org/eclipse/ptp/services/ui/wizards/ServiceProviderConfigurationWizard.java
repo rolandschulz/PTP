@@ -26,8 +26,8 @@ import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 
 public class ServiceProviderConfigurationWizard extends Wizard {
 
-	private final IWizardPage fPageLink;
-	private final IServiceProvider fProvider;
+	protected final IWizardPage fPageLink;
+	protected final IServiceProvider fProvider;
 	
 	/**
 	 * Create wizard with pages from a single service provider.
@@ -48,7 +48,7 @@ public class ServiceProviderConfigurationWizard extends Wizard {
 	public void addPages() {
 		IServiceProviderContributor contrib = ServiceModelUIManager.getInstance().getServiceProviderContributor(fProvider);
 		if (contrib != null) {
-			for (IWizardPage page : contrib.getWizardPages(fProvider)) {
+			for (IWizardPage page : contrib.getWizardPages(this, fProvider)) {
 				addPage(page);
 			}
 		}
