@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,10 +32,10 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.remote.messages.Messages;
-import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.ui.wizards.ServiceProviderConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -51,44 +51,46 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-/**
- * RM configuration is now handled by the service model
- * 
- * @deprecated
- * @see AbstractRemoteRMServiceProviderConfigurationWizardPage
- *
- */
-public abstract class AbstractRemoteResourceManagerConfigurationWizardPage extends
-		RMConfigurationWizardPage {
-	
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
-	{
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+public abstract class AbstractRemoteRMServiceProviderConfigurationWizardPage extends ServiceProviderConfigurationWizardPage {
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.
+		 * events.ModifyEvent)
 		 */
 		public void modifyText(ModifyEvent evt) {
 		}
-	
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org
+		 * .eclipse.jface.util.PropertyChangeEvent)
 		 */
 		public void propertyChange(PropertyChangeEvent event) {
 			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePage();
 			}
 		}
-	
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
+		 * .swt.events.SelectionEvent)
 		 */
 		public void widgetSelected(SelectionEvent e) {
 			updateSettings();
 			updatePage();
 		}
 	}
-	
+
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	private IRemoteResourceManagerConfiguration config;
+	// private AbstractRemoteResourceManagerConfiguration config;
 	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnectionManager connectionManager = null;
@@ -103,50 +105,57 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private Button portForwardingButton = null;
 	private WidgetListener listener = new WidgetListener();
 	private Button newConnectionButton;
-	private Combo  remoteCombo;
-	private Combo  connectionCombo;
+	private Combo remoteCombo;
+	private Combo connectionCombo;
 
-	private Combo  localAddrCombo;
+	private Combo localAddrCombo;
+	private AbstractRemoteResourceManagerServiceProvider serviceProvider;
 
-	public AbstractRemoteResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard,
-			String title) {
-		super(wizard, title);
-		
+	public AbstractRemoteRMServiceProviderConfigurationWizardPage(IServiceProvider provider, String title) {
+		super(title);
+
+		serviceProvider = (AbstractRemoteResourceManagerServiceProvider) provider;
 		setPageComplete(false);
 		isValid = false;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org
+	 * .eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
-	    composite.setLayout(topLayout);
+		composite.setLayout(topLayout);
 		createContents(composite);
 		setControl(composite);
 	}
-	
+
 	/**
-	 * Initialize the contents of the local address selection combo. Host names are obtained by
-	 * performing a reverse lookup on the IP addresses of each network interface. If DNS is configured
-	 * correctly, this should add the fully qualified domain name, otherwise it will probably be
-	 * the IP address. We also add the configuration address to the combo in case it was specified manually.
+	 * Initialize the contents of the local address selection combo. Host names
+	 * are obtained by performing a reverse lookup on the IP addresses of each
+	 * network interface. If DNS is configured correctly, this should add the
+	 * fully qualified domain name, otherwise it will probably be the IP
+	 * address. We also add the configuration address to the combo in case it
+	 * was specified manually.
 	 */
 	public void initializeLocalHostCombo() {
 		Set<String> addrs = new TreeSet<String>();
 		try {
 			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
 			while (netInterfaces.hasMoreElements()) {
-				NetworkInterface ni = (NetworkInterface)netInterfaces.nextElement();
+				NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
 				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
 				while (alladdr.hasMoreElements()) {
-					InetAddress ip = (InetAddress)alladdr.nextElement();
+					InetAddress ip = (InetAddress) alladdr.nextElement();
 					if (ip instanceof Inet4Address) {
 						addrs.add(fixHostName(ip.getCanonicalHostName()));
 					}
 				}
-			}                  
+			}
 		} catch (Exception e) {
 		}
 		if (addrs.size() == 0) {
@@ -164,14 +173,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			index++;
 		}
 		/*
-		 * localAddr is not in the list, so add it and make
-		 * it the current selection
+		 * localAddr is not in the list, so add it and make it the current
+		 * selection
 		 */
 		if (selection < 0) {
-			if (!localAddr.equals("")){ //$NON-NLS-1$
+			if (!localAddr.equals("")) { //$NON-NLS-1$
 				localAddrCombo.add(localAddr);
 			}
-			selection = localAddrCombo.getItemCount()-1;
+			selection = localAddrCombo.getItemCount() - 1;
 		}
 		localAddrCombo.select(selection);
 	}
@@ -182,24 +191,25 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * 
 	 * @return
 	 */
-	public boolean performOk() 
-	{
+	public boolean performOk() {
 		int options = 0;
 		if (muxPortFwd) {
 			options |= IRemoteProxyOptions.PORT_FORWARDING;
 		}
 		if (remoteServices != null) {
-			config.setRemoteServicesId(remoteServices.getId());
+			serviceProvider.setRemoteServicesId(remoteServices.getId());
 		}
 		if (connection != null) {
-			config.setConnectionName(connection.getName());
+			serviceProvider.setConnectionName(connection.getName());
 		}
-		config.setLocalAddress(localAddr);
-		config.setOptions(options);
+		serviceProvider.setLocalAddress(localAddr);
+		serviceProvider.setOptions(options);
 		return true;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
 	 */
 	@Override
@@ -209,7 +219,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		super.setVisible(visible);
 	}
-	
+
 	/**
 	 * Create the contents of the wizard page.
 	 * 
@@ -237,12 +247,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
-		
+
 		remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		remoteCombo.setLayoutData(gd);
-		
+
 		/*
 		 * Remote location
 		 */
@@ -251,13 +261,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
-		
+
 		connectionCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		connectionCombo.setLayoutData(gd);
 
-		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_2, null);
+		newConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_2,
+				null);
 
 		/*
 		 * Multiplexing options
@@ -266,10 +277,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		mxGroup.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_3);
-		
-		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_4, "mxGroup", listener); //$NON-NLS-1$
+
+		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_4,
+				"mxGroup", listener); //$NON-NLS-1$
 		noneButton.addSelectionListener(listener);
-		
+
 		/*
 		 * Local address
 		 */
@@ -287,23 +299,26 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
-		
+
 		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		localAddrCombo.setLayoutData(gd);
 
-		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6, "mxGroup", listener); //$NON-NLS-1$
+		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6,
+				"mxGroup", listener); //$NON-NLS-1$
 		portForwardingButton.addSelectionListener(listener);
 
 		registerListeners();
 	}
-	
+
 	/**
-	 * In some nameserver configurations, getCanonicalHostName() will return the inverse mapping 
-	 * of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this case we just use the IP address.
+	 * In some nameserver configurations, getCanonicalHostName() will return the
+	 * inverse mapping of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this
+	 * case we just use the IP address.
 	 * 
-	 * @param hostname host name to be fixed
+	 * @param hostname
+	 *            host name to be fixed
 	 * @return fixed host name
 	 */
 	private String fixHostName(String hostname) {
@@ -315,14 +330,13 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		return hostname;
 	}
-	
+
 	/**
-	 * Initialize the contents of the controls on the page. This is called after the
-	 * controls have been created.
+	 * Initialize the contents of the controls on the page. This is called after
+	 * the controls have been created.
 	 */
 	private void initContents() {
 		loading = true;
-		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		initializeRemoteServicesCombo();
@@ -330,25 +344,24 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		loading = false;
 		updatePage();
 	}
-	
+
 	/**
 	 * Load the initial wizard state from the configuration settings.
 	 */
-	private void loadSaved()
-	{
-		localAddr = config.getLocalAddress();
-		
-		String rmID = config.getRemoteServicesId();
+	private void loadSaved() {
+		localAddr = serviceProvider.getLocalAddress();
+
+		String rmID = serviceProvider.getRemoteServicesId();
 		if (rmID != null) {
 			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
-			String conn = config.getConnectionName();
+			String conn = serviceProvider.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
 			}
 		}
-		
-		int options = config.getOptions();
-		
+
+		int options = serviceProvider.getOptions();
+
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 	}
 
@@ -357,8 +370,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			public void modifyText(ModifyEvent e) {
 				/*
 				 * If we're loading saved settings, then we want to select the
-				 * saved connection after the remote services are selected. Otherwise
-				 * just pick the default item.
+				 * saved connection after the remote services are selected.
+				 * Otherwise just pick the default item.
 				 */
 				if (loading) {
 					handleRemoteServiceSelected(connection);
@@ -379,7 +392,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				handleNewRemoteConnectionSelected();
 				updatePage();
 			}
-		});	
+		});
 		localAddrCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				updateSettings();
@@ -387,20 +400,21 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 		});
 	}
-	
+
 	/**
 	 * Set the isValid flag and page completion status
 	 * 
-	 * @param complete	true if complete
+	 * @param complete
+	 *            true if complete
 	 */
 	private void setValid(boolean complete) {
 		isValid = complete;
 		setPageComplete(isValid);
 	}
-	
+
 	/**
-	 * Update wizard UI selections from settings. This should be called whenever any
-	 * settings are changed.
+	 * Update wizard UI selections from settings. This should be called whenever
+	 * any settings are changed.
 	 */
 	private void updateSettings() {
 		/*
@@ -411,8 +425,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 
 		/*
-		 * If no localAddr has been specified in the configuration, select
-		 * a default one.
+		 * If no localAddr has been specified in the configuration, select a
+		 * default one.
 		 */
 		if (!loading || localAddr.equals("")) { //$NON-NLS-1$
 			localAddr = localAddrCombo.getText();
@@ -424,19 +438,19 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (muxPortFwd && !portFwdSupported) {
 			muxPortFwd = false;
 		}
-		
+
 		/*
 		 * Update UI to display correct settings
 		 */
 		if (noneButton != null) {
 			noneButton.setSelection(!muxPortFwd);
 		}
-		
+
 		if (portForwardingButton != null) {
 			portForwardingButton.setSelection(muxPortFwd);
 			portForwardingButton.setEnabled(portFwdSupported);
 		}
-		
+
 		if (localAddrCombo != null) {
 			localAddrCombo.setEnabled(!muxPortFwd);
 		}
@@ -478,7 +492,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param mw
 	 * @return the new grid layout
 	 */
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -488,14 +502,16 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 
 	/**
-	 * Creates an new radio button instance and sets the default
-	 * layout data.
-	 *
-	 * @param group  the composite in which to create the radio button
-	 * @param label  the string to set into the radio button
-	 * @param value  the string to identify radio button
+	 * Creates an new radio button instance and sets the default layout data.
+	 * 
+	 * @param group
+	 *            the composite in which to create the radio button
+	 * @param label
+	 *            the string to set into the radio button
+	 * @param value
+	 *            the string to identify radio button
 	 * @return the new radio button
-	 */ 
+	 */
 	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
 		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
 		button.setData((null == value) ? label : value);
@@ -503,7 +519,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.BEGINNING;
 		button.setLayoutData(data);
-		if(null != listener) {
+		if (null != listener) {
 			button.addSelectionListener(listener);
 		}
 		return button;
@@ -515,14 +531,13 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param text
 	 * @return cleaned up text.
 	 */
-	protected String getFieldContent(String text) 
-	{
+	protected String getFieldContent(String text) {
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
 			return null;
-	
+
 		return text;
 	}
-	
+
 	/**
 	 * Handle the section of a new connection. Update connection option buttons
 	 * appropriately.
@@ -533,48 +548,50 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			String connectionName = connectionCombo.getItem(currentSelection);
 			connection = connectionManager.getConnection(connectionName);
 		}
-		
+
 		/*
-		 * Disable port forwarding button if it's not supported. If port forwarding was selected,
-		 * switch to 'none' instead.
+		 * Disable port forwarding button if it's not supported. If port
+		 * forwarding was selected, switch to 'none' instead.
 		 */
 		if (connection != null) {
 			portFwdSupported = connection.supportsTCPPortForwarding();
 		}
 		/*
-		 * Linux doesn't call modify handler (which calls updateSettings & updatePage) so need to call them explicitly here 
+		 * Linux doesn't call modify handler (which calls updateSettings &
+		 * updatePage) so need to call them explicitly here
 		 */
 		updateSettings();
 		updatePage();
 	}
-	
+
 	/**
-	 * Handle creation of a new connection by pressing the 'New...' button. Calls
-	 * handleRemoteServicesSelected() to update the connection combo with the new
-	 * connection.
+	 * Handle creation of a new connection by pressing the 'New...' button.
+	 * Calls handleRemoteServicesSelected() to update the connection combo with
+	 * the new connection.
 	 * 
 	 * TODO should probably select the new connection
 	 */
-	protected void handleNewRemoteConnectionSelected() 
-	{
+	protected void handleNewRemoteConnectionSelected() {
 		if (uiConnectionManager != null) {
 			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
 		}
 	}
-	
+
 	/**
-	 * Handle selection of a new remote services provider from the 
-	 * remote services combo.
+	 * Handle selection of a new remote services provider from the remote
+	 * services combo.
 	 * 
-	 * The assumption is that this will trigger a call to the selection
-	 * handler for the connection combo.
+	 * The assumption is that this will trigger a call to the selection handler
+	 * for the connection combo.
 	 * 
-	 * @param conn connection to select as current. If conn is null, select the first item in the list.
+	 * @param conn
+	 *            connection to select as current. If conn is null, select the
+	 *            first item in the list.
 	 */
 	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
 		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
-		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
+		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >= 0) {
 			remoteServices = allRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
 			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
@@ -598,11 +615,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			if (connections.length > 0) {
 				connectionCombo.select(selected);
 				/*
-				 * Linux doesn't call selection handler so need to call it explicitly here 
+				 * Linux doesn't call selection handler so need to call it
+				 * explicitly here
 				 */
-				handleConnectionSelected(); 
+				handleConnectionSelected();
 			}
-			
+
 			/*
 			 * Enable 'new' button if new connections are supported
 			 */
@@ -624,12 +642,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		} else {
 			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		}
-		int defIndex = 0; 
+		int defIndex = 0;
 		Arrays.sort(allServices, new Comparator<IRemoteServices>() {
 			public int compare(IRemoteServices c1, IRemoteServices c2) {
 				return c1.getName().compareToIgnoreCase(c2.getName());
 			}
-		});		
+		});
 		remoteCombo.removeAll();
 		for (int i = 0; i < allServices.length; i++) {
 			remoteCombo.add(allServices[i].getName());
@@ -640,9 +658,10 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (allServices.length > 0) {
 			remoteCombo.select(defIndex);
 			/*
-			 * Linux doesn't call selection handler so need to call it explicitly here
-			 */ 
-			handleRemoteServiceSelected(connection); 
+			 * Linux doesn't call selection handler so need to call it
+			 * explicitly here
+			 */
+			handleRemoteServiceSelected(connection);
 			handleConnectionSelected();
 		}
 	}
@@ -650,18 +669,16 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	/**
 	 * @return
 	 */
-	protected boolean isValidSetting() 
-	{
+	protected boolean isValidSetting() {
 		return true;
 	}
-	
+
 	/**
 	 * @param style
 	 * @param space
 	 * @return
 	 */
-	protected GridData spanGridData(int style, int space) 
-	{
+	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1)
 			gd = new GridData();
@@ -670,16 +687,15 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = space;
 		return gd;
 	}
-	
+
 	/**
 	 * Call to update page status and store any changed settings
 	 */
-	protected void updatePage() 
-	{
+	protected void updatePage() {
 		if (!loading) {
 			setErrorMessage(null);
 			setMessage(null);
-		
+
 			if (!isValidSetting()) {
 				setValid(false);
 			} else {

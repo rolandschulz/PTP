@@ -1,21 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2006 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly marked, 
- * so as not to confuse it with the version available from LANL.
- * 
- * Additionally, this program and the accompanying materials 
+ * Copyright (c) 2009 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * LA-CC 04-115
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.rm.remote.ui.wizards;
 
 import java.io.IOException;
@@ -59,10 +52,10 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.Activator;
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.remote.messages.Messages;
-import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.ui.wizards.ServiceProviderConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -81,16 +74,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
-/**
- * RM configuration is now handled by the service model
- * 
- * @deprecated
- * @see AbstractProxyRMServiceProviderConfigurationWizardPage
- *
- */
-public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage extends
-		RMConfigurationWizardPage {
-	
+public abstract class AbstractProxyRMServiceProviderConfigurationWizardPage extends
+		ServiceProviderConfigurationWizardPage {
 	/**
 	 * Job to validate proxyPath. We use a job here so that the input is
 	 * only validated after the user finishes (or pauses typing). This is
@@ -110,8 +95,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		}
 	}
 	
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
-	{
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
 		 */
@@ -153,7 +137,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	public static final int VALIDATE_TIMER = 250;
-	private IRemoteResourceManagerConfiguration config;
+//	private AbstractRemoteResourceManagerConfiguration config;
 	private String proxyPath = EMPTY_STRING;
 	private String proxyArgs = EMPTY_STRING;
 	private String localAddr = EMPTY_STRING;
@@ -181,11 +165,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	private Combo  remoteCombo;
 	private Combo  connectionCombo;
 	private Combo  localAddrCombo;
+	protected AbstractRemoteResourceManagerServiceProvider serviceProvider;
 
-	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard,
+	public AbstractProxyRMServiceProviderConfigurationWizardPage(IServiceProvider provider,
 			String title) {
-		super(wizard, title);
+		super(title);
 		
+		serviceProvider = (AbstractRemoteResourceManagerServiceProvider) provider;
 		setPageComplete(false);
 		isValid = false;
 	}
@@ -256,8 +242,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * 
 	 * @return
 	 */
-	public boolean performOk() 
-	{
+	public boolean performOk() {
 		store();
 		int options = 0;
 		if (muxPortFwd) {
@@ -267,15 +252,15 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
 		}
 		if (remoteServices != null) {
-			config.setRemoteServicesId(remoteServices.getId());
+			serviceProvider.setRemoteServicesId(remoteServices.getId());
 		}
 		if (connection != null) {
-			config.setConnectionName(connection.getName());
+			serviceProvider.setConnectionName(connection.getName());
 		}
-		config.setLocalAddress(localAddr);
-		config.setProxyServerPath(proxyPath);
-		config.setInvocationOptions(proxyArgs);
-		config.setOptions(options);
+		serviceProvider.setLocalAddress(localAddr);
+		serviceProvider.setProxyServerPath(proxyPath);
+		serviceProvider.setInvocationOptions(proxyArgs);
+		serviceProvider.setOptions(options);
 		return true;
 	}
 
@@ -468,7 +453,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	private void initContents() {
 		loading = true;
-		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();
@@ -481,22 +465,21 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * Load the initial wizard state from the configuration settings.
 	 */
-	private void loadSaved()
-	{
-		proxyPath = config.getProxyServerPath();
-		proxyArgs = config.getInvocationOptionsStr();
-		localAddr = config.getLocalAddress();
+	private void loadSaved() {
+		proxyPath = serviceProvider.getProxyServerPath();
+		proxyArgs = serviceProvider.getInvocationOptionsStr();
+		localAddr = serviceProvider.getLocalAddress();
 		
-		String rmID = config.getRemoteServicesId();
+		String rmID = serviceProvider.getRemoteServicesId();
 		if (rmID != null) {
 			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
-			String conn = config.getConnectionName();
+			String conn = serviceProvider.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
 			}
 		}
 		
-		int options = config.getOptions();
+		int options = serviceProvider.getOptions();
 		
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
@@ -551,8 +534,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * Store text fields
 	 */
-	private void store() 
-	{
+	private void store()  {
 		if (proxyPathText != null) {
 			proxyPath = proxyPathText.getText();
 		}
@@ -747,8 +729,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * Transfer current settings to text fields
 	 */
-	protected void defaultSetting() 
-	{
+	protected void defaultSetting() {
 		proxyPathText.setText(proxyPath);
 	}
 	
@@ -758,8 +739,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @param text
 	 * @return cleaned up text.
 	 */
-	protected String getFieldContent(String text) 
-	{
+	protected String getFieldContent(String text) {
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
 			return null;
 	
@@ -798,8 +778,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * 
 	 * TODO should probably select the new connection
 	 */
-	protected void handleNewRemoteConnectionSelected() 
-	{
+	protected void handleNewRemoteConnectionSelected() {
 		if (uiConnectionManager != null) {
 			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
 		}
@@ -808,8 +787,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
-	protected void handlePathBrowseButtonSelected() 
-	{
+	protected void handlePathBrowseButtonSelected() {
 		if (connection != null) {
 			checkConnection();
 			if (connection.isOpen()) {
@@ -917,8 +895,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * @return
 	 */
-	protected boolean isValidSetting() 
-	{
+	protected boolean isValidSetting() {
 		if (proxyPathText != null) {
 			String name = getFieldContent(proxyPathText.getText());
 			if (name == null || !proxyPathIsValid) {
@@ -935,8 +912,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @param space
 	 * @return
 	 */
-	protected GridData spanGridData(int style, int space) 
-	{
+	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1)
 			gd = new GridData();
@@ -949,8 +925,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * Call to update page status and store any changed settings
 	 */
-	protected void updatePage() 
-	{
+	protected void updatePage() {
 		if (!loading) {
 			setErrorMessage(null);
 			setMessage(null);

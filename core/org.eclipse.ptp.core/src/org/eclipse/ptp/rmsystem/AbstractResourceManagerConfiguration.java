@@ -21,7 +21,13 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
-
+/**
+ * RM configuration is now handled by the service model
+ * 
+ * @deprecated
+ * @see AbstractResourceManagerServiceProvider
+ *
+ */
 public abstract class AbstractResourceManagerConfiguration implements IResourceManagerConfiguration {
 
 	static public class CommonConfig {

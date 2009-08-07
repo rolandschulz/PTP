@@ -26,7 +26,13 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
 
-
+/**
+ * RM configuration is now handled by the service model
+ * 
+ * @deprecated
+ * @see AbstractRemoteResourceManagerServiceProvider
+ *
+ */
 public abstract class AbstractRemoteResourceManagerConfiguration 
 	extends AbstractResourceManagerConfiguration 
 	implements IRemoteResourceManagerConfiguration {
