@@ -26,7 +26,6 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.ToolsRMUIPlugin;
@@ -342,7 +341,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 	
 	protected boolean isEnabled;
 
-	protected int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
+	protected int capabilities = IToolRMConfiguration.NO_CAP_SET;
 
 	public AbstractToolRMConfigurationWizardPage(IRMConfigurationWizard wizard, int capabilities, String pageName, String title, String description) {
 		super(wizard, pageName);
@@ -412,7 +411,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		/*
 		 * launch cmd
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_LAUNCH) != 0) {
 			Label label = new Label(cmdGroup, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_LaunchCommand);
 
@@ -431,7 +430,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		/*
 		 * discover cmd
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_DISCOVER) != 0) {
 			Label label = new Label(cmdGroup, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DiscoverCommand);
 
@@ -443,7 +442,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		/*
 		 * Periodic monitor cmd and time
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
 			Label label = new Label(cmdGroup, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommand);
 
@@ -462,7 +461,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		/*
 		 * Continuous monitor cmd
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
 			Label label = new Label(cmdGroup, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_ContinuousMinitorCommand);
 
@@ -474,7 +473,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		/*
 		 * Installation path
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
 			Group pathGroup = new Group(contents, SWT.SHADOW_ETCHED_IN);
 			pathGroup.setLayout(new GridLayout(4, false));
 			pathGroup.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));

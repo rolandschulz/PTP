@@ -7,14 +7,15 @@ Bundle-Activator: org.eclipse.ptp.rm.core.ToolsRMPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
- org.eclipse.ptp.core,
- org.eclipse.ptp.ui,
- org.eclipse.ptp.rm.remote,
  org.eclipse.ui,
  org.eclipse.search,
  org.eclipse.core.filesystem,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.utils.core
+ org.eclipse.ptp.services.core;bundle-version="1.0.0",
+ org.eclipse.ptp.utils.core,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.rm.remote,
+ org.eclipse.ptp.remote.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.core,
  org.eclipse.ptp.rm.core.messages,
