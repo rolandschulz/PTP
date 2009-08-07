@@ -20,7 +20,7 @@ import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.WizardPageDataSource;
 import org.eclipse.ptp.rm.ui.wizards.WizardPageWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -111,7 +111,7 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 		return new DataSource(this);
 	}
 
-	public MPICH2ConfigurationWizardPage(RMConfigurationWizard wizard) {
+	public MPICH2ConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, MPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES, 
 				Messages.MPICH2ConfigurationWizardPage_Name, 
 				Messages.MPICH2ConfigurationWizardPage_Title, 

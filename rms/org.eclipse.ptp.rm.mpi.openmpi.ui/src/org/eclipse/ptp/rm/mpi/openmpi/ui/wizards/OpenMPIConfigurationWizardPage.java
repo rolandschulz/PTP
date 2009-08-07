@@ -20,7 +20,7 @@ import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.WizardPageDataSource;
 import org.eclipse.ptp.rm.ui.wizards.WizardPageWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -146,7 +146,7 @@ AbstractToolRMConfigurationWizardPage {
 		return new DataSource(this);
 	}
 
-	public OpenMPIConfigurationWizardPage(RMConfigurationWizard wizard) {
+	public OpenMPIConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , Messages.OpenMPIConfigurationWizardPage_Name, Messages.OpenMPIConfigurationWizardPage_Title, Messages.OpenMPIConfigurationWizardPage_Description);
 	}
 

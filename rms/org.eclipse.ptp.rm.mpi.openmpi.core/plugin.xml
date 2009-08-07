@@ -8,5 +8,21 @@
             id="org.eclipse.ptp.openmpi.core.resourcemanager"
             name="Open MPI"/>
    </extension>
-
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIRMServiceProviderFactory"
+            id="org.eclipse.ptp.rm.mpi.openmpi.resourcemanager"
+            name="Open MPI (Service Model)">
+      </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIServiceProvider"
+            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider"
+            name="Open MPI"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
 </plugin>

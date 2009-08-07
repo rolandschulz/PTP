@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation.
+ * Copyright (c) 2009 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory;
+import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2RMServiceProviderFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -22,13 +22,15 @@ import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
 
 /**
+ * This class is only used to bridge between the old RM factory wizard and the new RMs backed
+ * by service configurations. It will be removed prior to the 3.0 release.
  * 
- * @author Daniel Felix Ferber
+ * @author greg
  *
  */
-public class MPICH2RMConfigurationWizardPageFactory extends RMConfigurationWizardPageFactory {
+public class MPICH2RMServiceProviderConfigurationWizardPageFactory extends RMConfigurationWizardPageFactory {
 
-	public MPICH2RMConfigurationWizardPageFactory() {
+	public MPICH2RMServiceProviderConfigurationWizardPageFactory() {
 		// no-op
 	}
 
@@ -38,7 +40,6 @@ public class MPICH2RMConfigurationWizardPageFactory extends RMConfigurationWizar
 		};
 	}
 
-	//	@Override
 	@Override
 	public RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard) {
 		List<RMConfigurationWizardPage> list = new ArrayList<RMConfigurationWizardPage>();
@@ -47,9 +48,8 @@ public class MPICH2RMConfigurationWizardPageFactory extends RMConfigurationWizar
 		return list.toArray(new RMConfigurationWizardPage[list.size()]);
 	}
 
-	//	@Override
 	@Override
 	public Class<? extends IResourceManagerFactory> getRMFactoryClass() {
-		return MPICH2ResourceManagerFactory.class;
+		return MPICH2RMServiceProviderFactory.class;
 	}
 }
