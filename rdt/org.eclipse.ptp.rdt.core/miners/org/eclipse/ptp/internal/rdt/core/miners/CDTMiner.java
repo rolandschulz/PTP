@@ -1199,6 +1199,10 @@ public class CDTMiner extends Miner {
 				scopeManager.addFileToScope(scopeName, file);
 			}
 			
+			for(String file : changedFiles) {
+				scopeManager.addFileToScope(scopeName, file);
+			}
+			
 			for(String file : removedFiles) {
 				scopeManager.removeFileFromScope(scopeName, file);
 			}
