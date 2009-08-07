@@ -16,6 +16,37 @@ import org.eclipse.core.resources.IProject;
 
 public interface IServiceModelManager {
 	/**
+	 * Associate the service configuration with a project. A project can have multiple
+	 * service configurations. The service configuration will become the active
+	 * configuration for the project.
+	 * 
+	 * @param project the project
+	 * @param conf the configuration
+	 * 
+	 * @throws NullPointerException if project or conf is null
+	 */
+	public void addConfiguration(IProject project, IServiceConfiguration conf);
+	
+	/**
+	 * Adds the given listener for service model events. Has no effect if an 
+	 * identical listener is already registered. 
+	 * <p>
+	 * Listeners can listen for several types of event as defined in
+	 * <code>IServiceModelEvent</code>. Clients are free to register for
+	 * any number of event types. Clients are guaranteed to only receive
+	 * event types for which they are registered.
+	 * </p>
+	 * 
+	 * @param listener the listener
+	 * @param eventMask the bit-wise OR of all event types of interest to the
+	 * listener
+	 * @see IServiceModelEventListener
+	 * @see IServiceModelEvent
+	 * @see #removeEventListener(IServiceModelEventListener)
+	 */
+	public void addEventListener(IServiceModelEventListener listener, int type);
+	
+	/**
 	 * Get the configuration that is currently active for the project. Each project has
 	 * exactly one active configuration, which describes the mapping from services to
 	 * service providers. By default, the first configuration created for a project will 
@@ -157,6 +188,17 @@ public interface IServiceModelManager {
 	public void removeConfiguration(IProject project, IServiceConfiguration conf);
 
 	/**
+	 * Removes the given listener for service model events. Has no effect if the 
+	 * listener is not registered. 
+	 * <p>
+	 * @param listener the listener
+	 * @see IServiceModelEventListener
+	 * @see IServiceModelEvent
+	 * @see #addEventListener(IServiceModelEventListener)
+	 */
+	public void removeEventListener(IServiceModelEventListener listener);
+
+	/**
 	 * Set the active configuration for a project. By default, the first configuration created
 	 * for a project will be the active configuration for that project.
 	 * 
@@ -168,17 +210,5 @@ public interface IServiceModelManager {
 	 * @throws IllegalArgumentException if the configuration was not part of the project
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
-
-	/**
-	 * Associate the service configuration with a project. A project can have multiple
-	 * service configurations. The service configuration will become the active
-	 * configuration for the project.
-	 * 
-	 * @param project the project
-	 * @param conf the configuration
-	 * 
-	 * @throws NullPointerException if project or conf is null
-	 */
-	public void addConfiguration(IProject project, IServiceConfiguration conf);
 
 }

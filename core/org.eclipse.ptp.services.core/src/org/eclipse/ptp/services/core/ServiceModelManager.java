@@ -34,11 +34,13 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ptp.services.internal.core.Service;
 import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
+import org.eclipse.ptp.services.internal.core.ServiceModelEvent;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -86,20 +88,25 @@ public class ServiceModelManager implements IServiceModelManager {
 	private Set<IService> fServiceSet = null;
 	private Map<String, Set<IService>> fNatureServices = null;
 	
+	private ListenerList fEventListeners = new ListenerList();
+	
 	private static ServiceModelManager fInstance;
 	
 	public static synchronized ServiceModelManager getInstance() {
-		if(fInstance == null)
+		if(fInstance == null) {
 			fInstance = new ServiceModelManager();
+		}
 		return fInstance;
 	}
 	
 	private static <T> T getConf(Map<IProject, T> map, IProject project) {
-		if(project == null)
+		if(project == null) {
 			throw new NullPointerException();
+		}
 		T value = map.get(project);
-		if(value == null)
-			throw new ProjectNotConfiguredException();
+		if(value == null) {
+			throw new ProjectNotConfiguredException(); 
+		}
 		return value;
 	}
 
@@ -156,10 +163,45 @@ public class ServiceModelManager implements IServiceModelManager {
 			
 		rootMemento.save(writer);
 	}
-
 	
 	private ServiceModelManager() {
 		defaultSaveFile = Activator.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void addConfiguration(IProject project, IServiceConfiguration conf) {
+		if(project == null || conf == null)
+			throw new NullPointerException();
+		
+		Map<String, IServiceConfiguration> confs = fProjectConfigurations.get(project);
+		if(confs == null) {
+			confs = new HashMap<String, IServiceConfiguration>();
+			fProjectConfigurations.put(project, confs);
+			fActiveConfigurations.put(project, conf);
+		}
+		
+		confs.put(conf.getId(), conf);
+		
+		Set<IService> services = fProjectServices.get(project);
+		if(services == null) {
+			services = new HashSet<IService>();
+			fProjectServices.put(project, services);
+		}
+		
+		for(IServiceConfiguration config : confs.values()) {
+			for(IService service : config.getServices()) {
+				services.add(service);
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener, int)
+	 */
+	public void addEventListener(IServiceModelEventListener listener, int type) {
+		fEventListeners.add(listener);
 	}
 	
 	/* (non-Javadoc)
@@ -168,7 +210,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	public IServiceConfiguration getActiveConfiguration(IProject project) {
 		return getConf(fActiveConfigurations, project);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
 	 */
@@ -291,6 +333,7 @@ public class ServiceModelManager implements IServiceModelManager {
 				reader.close();
 			}
 		}
+		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_LOADED));
 	}
 
 	/* Replaces the current service model configuration with what is
@@ -300,7 +343,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
 	 * @throws IOException 
 	 */
-	public void loadModelConfiguration(Reader reader) throws IOException, CoreException {
+	private void loadModelConfiguration(Reader reader) throws IOException, CoreException {
 		initialize(); // Clear out the existing model
 		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -408,6 +451,7 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}
 		fConfigurations.remove(conf);
+		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
 	}
 
 	/* (non-Javadoc)
@@ -420,13 +464,20 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener)
+	 */
+	public void removeEventListener(IServiceModelEventListener listener) {
+		fEventListeners.remove(listener);
+	}
+
 	/**
 	 * Saves the model configuration into the plugin's metadata area using
 	 * the default file name.
 	 * Will not save data for projects that do not exist.
 	 * 
 	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
 	 * @throws IOException
 	 */
 	public void saveModelConfiguration() throws IOException {
@@ -438,13 +489,13 @@ public class ServiceModelManager implements IServiceModelManager {
 			writer.close();
 		}
 	}
-
+	
 	/**
 	 * Saves the service model configuration to the given <code>file</code>.
 	 * Will not save data for projects that do not exist.
 	 * 
 	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
 	 * @param file
 	 * @throws IOException 
 	 * @throws NullPointerException if file is null
@@ -453,6 +504,7 @@ public class ServiceModelManager implements IServiceModelManager {
 		if(writer == null)
 			throw new NullPointerException();
 		saveModelConfiguration(fConfigurations, fProjectConfigurations, fActiveConfigurations, writer);
+		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_SAVED));
 	}
 	
 	/* (non-Javadoc)
@@ -466,34 +518,6 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 		
 		fActiveConfigurations.put(project, configuration);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void addConfiguration(IProject project, IServiceConfiguration conf) {
-		if(project == null || conf == null)
-			throw new NullPointerException();
-		
-		Map<String, IServiceConfiguration> confs = fProjectConfigurations.get(project);
-		if(confs == null) {
-			confs = new HashMap<String, IServiceConfiguration>();
-			fProjectConfigurations.put(project, confs);
-			fActiveConfigurations.put(project, conf);
-		}
-		
-		confs.put(conf.getId(), conf);
-		
-		Set<IService> services = fProjectServices.get(project);
-		if(services == null) {
-			services = new HashSet<IService>();
-			fProjectServices.put(project, services);
-		}
-		for(IServiceConfiguration config : confs.values()) {
-			for(IService service : config.getServices()) {
-				services.add(service);
-			}
-		}
 	}
 	
 	/**
@@ -584,8 +608,21 @@ public class ServiceModelManager implements IServiceModelManager {
 	private IServiceConfiguration newServiceConfiguration(String id, String name) {
 		IServiceConfiguration config = new ServiceConfiguration(id, name);
 		fConfigurations.put(id, config);
+		notifyListeners(new ServiceModelEvent(config, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED));
 		return config;
 	}
 
+	/**
+	 * Notify listeners of an event occurrence
+	 * 
+	 * FIXME: only notify listeners of events they have registered for!!!!!
+	 * 
+	 * @param event event to notify
+	 */
+	private void notifyListeners(IServiceModelEvent event) {
+		for (Object obj : fEventListeners.getListeners()) {
+			((IServiceModelEventListener)obj).handleEvent(event);
+		}
+	}
 	
 }
