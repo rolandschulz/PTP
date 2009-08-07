@@ -76,7 +76,7 @@ public interface IServiceModelManager {
 	public IService getService(String id);
 	
 	/**
-	 * Return the service provider corresponding to the descriptor.
+	 * Return a new service provider instance.
 	 * 
 	 * @param desc extension description
 	 * @return service provider
@@ -134,7 +134,7 @@ public interface IServiceModelManager {
 	
 	
 	/**
-	 * Removes the configuration.
+	 * Removes the service configuration.
 	 * 
 	 * @param conf the configuration
 	 */
@@ -170,7 +170,9 @@ public interface IServiceModelManager {
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
 
 	/**
-	 * Associate the service configuration with a project
+	 * Associate the service configuration with a project. A project can have multiple
+	 * service configurations. The service configuration will become the active
+	 * configuration for the project.
 	 * 
 	 * @param project the project
 	 * @param conf the configuration
