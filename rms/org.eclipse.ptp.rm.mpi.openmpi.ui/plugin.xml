@@ -14,12 +14,17 @@
             id="org.eclipse.ptp.rm.openmpi.ui.launchConfiguration"/>
    </extension>
    <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIServiceProvider"
-            id="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIServiceProvider"
-            name="Open MPI"
-            serviceId="org.eclipse.ptp.core.LaunchService">
-      </provider>
+         point="org.eclipse.ptp.services.ui.providerContributors">
+      <providerContributor
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIProviderContributor"
+            id="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIServiceProvider">
+      </providerContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMServiceProviderConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.mpi.openmpi.ui.configurationWizard">
+      </configurationWizard>
    </extension>
 </plugin>

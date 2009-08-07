@@ -13,4 +13,18 @@
             class="org.eclipse.ptp.rm.mpi.mpich2.ui.launch.MPICH2RMLaunchConfigurationFactory"
             id="org.eclipse.ptp.rm.mpich2.ui.launchConfiguration"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.services.ui.providerContributors">
+      <providerContributor
+            class="org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2ProviderContributor"
+            id="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ServiceProvider">
+      </providerContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.mpi.mpich2.ui.wizards.MPICH2RMServiceProviderConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.mpi.mpich2.ui.configurationWizard">
+      </configurationWizard>
+   </extension>
 </plugin>

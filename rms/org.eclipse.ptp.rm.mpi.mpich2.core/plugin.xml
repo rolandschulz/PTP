@@ -8,5 +8,21 @@
             id="org.eclipse.ptp.mpich2.core.resourcemanager"
             name="MPICH2"/>
    </extension>
-
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2RMServiceProviderFactory"
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourcemanager"
+            name="MPICH2 (Service Model)">
+      </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ServiceProvider"
+            id="org.eclipse.ptp.rm.mpi.mpich2.MPICH2ServiceProvider"
+            name="MPICH2"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
 </plugin>

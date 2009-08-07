@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
@@ -33,14 +33,14 @@ RMConfigurationWizardPageFactory {
 		// no-op
 	}
 
-	protected RMConfigurationWizardPage[] getOpenMPIConfigurationWizardPages(RMConfigurationWizard wizard) {
+	protected RMConfigurationWizardPage[] getOpenMPIConfigurationWizardPages(IRMConfigurationWizard wizard) {
 		return new RMConfigurationWizardPage[] {
 				new OpenMPIConfigurationWizardPage(wizard)
 		};
 	}
 
 	@Override
-	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
+	public RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard) {
 		List<RMConfigurationWizardPage> list = new ArrayList<RMConfigurationWizardPage>();
 		list.add(new OpenMPIRMConfigurationWizardPage(wizard));
 		list.addAll(Arrays.asList(getOpenMPIConfigurationWizardPages(wizard)));

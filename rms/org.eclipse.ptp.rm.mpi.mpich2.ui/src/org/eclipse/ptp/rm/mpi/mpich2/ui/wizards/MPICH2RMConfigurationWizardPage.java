@@ -12,16 +12,16 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui.wizards;
 
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public final class MPICH2RMConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
 
-	public MPICH2RMConfigurationWizardPage(RMConfigurationWizard wizard) {
+	public MPICH2RMConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.MPICH2RMConfigurationWizardPage_Title);
 		setTitle(Messages.MPICH2RMConfigurationWizardPage_Title);
 		setDescription(Messages.MPICH2RMConfigurationWizardPage_Description);
