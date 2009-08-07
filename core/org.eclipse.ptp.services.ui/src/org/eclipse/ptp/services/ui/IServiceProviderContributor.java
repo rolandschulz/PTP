@@ -40,10 +40,11 @@ public interface IServiceProviderContributor {
 	/**
 	 * Retrieve the wizard pages for a service provider
 	 * 
+	 * @param wizard the wizard that will display the pages
 	 * @param provider the provider being configured
 	 * @return wizard pages for the provider
 	 */
-	public WizardPage[] getWizardPages(IServiceProvider provider);
+	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider);
 	
 	/**
 	 * Retrieve the wizard for a service provider
