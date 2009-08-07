@@ -76,7 +76,7 @@ public interface IServiceModelManager {
 	public IService getService(String id);
 	
 	/**
-	 * Return a new service provider instance.
+	 * Return a new instance of a service provider based on the descriptor.
 	 * 
 	 * @param desc extension description
 	 * @return service provider
@@ -179,6 +179,6 @@ public interface IServiceModelManager {
 	 * 
 	 * @throws NullPointerException if project or conf is null
 	 */
-	public void setConfiguration(IProject project, IServiceConfiguration conf);
+	public void addConfiguration(IProject project, IServiceConfiguration conf);
 
 }

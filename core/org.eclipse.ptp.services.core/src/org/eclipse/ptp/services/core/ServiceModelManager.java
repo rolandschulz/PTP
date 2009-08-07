@@ -351,7 +351,7 @@ public class ServiceModelManager implements IServiceModelManager {
 				String configId = configMemento.getString(ATTR_ID);
 				IServiceConfiguration config = fConfigurations.get(configId);
 				if (config != null) {
-					setConfiguration(project, config);
+					addConfiguration(project, config);
 					Boolean active = configMemento.getBoolean(ATTR_ACTIVE);
 					if (active != null && active.booleanValue()) {
 						setActiveConfiguration(project, config);
@@ -469,9 +469,9 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
-	public void setConfiguration(IProject project, IServiceConfiguration conf) {
+	public void addConfiguration(IProject project, IServiceConfiguration conf) {
 		if(project == null || conf == null)
 			throw new NullPointerException();
 		
