@@ -90,29 +90,29 @@ public class AbstractEffectiveToolRMConfiguration {
 	}
 
 	public boolean hasDiscoverCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0
+		return (capabilities & IToolRMConfiguration.CAP_DISCOVER) != 0
 		&& discoverCmd != null
 		&& !discoverCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasLaunchCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0
+		return (capabilities & IToolRMConfiguration.CAP_LAUNCH) != 0
 		&& launchCmd != null && !launchCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasDebugCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0
+		return (capabilities & IToolRMConfiguration.CAP_LAUNCH) != 0
 		&& debugCmd != null && !debugCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasContinuousMonitorCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0
+		return (capabilities & IToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0
 		&& continuousMonitorCmd != null
 		&& !continuousMonitorCmd.trim().equals(EMPTY_STRING);
 	}
 
 	public boolean hasPeriodicMonitorCmd() {
-		return (capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0
+		return (capabilities & IToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0
 		&& periodicMonitorCmd != null
 		&& !periodicMonitorCmd.trim().equals(EMPTY_STRING);
 	}

@@ -25,6 +25,8 @@ import org.eclipse.ui.IMemento;
  */
 /**
  * @author Daniel Felix Ferber
+ * @deprecated
+ * @see AbstractToolRMServiceProvider
  */
 public abstract class AbstractToolRMConfiguration extends
 AbstractRemoteResourceManagerConfiguration implements Cloneable, IToolRMConfiguration {
