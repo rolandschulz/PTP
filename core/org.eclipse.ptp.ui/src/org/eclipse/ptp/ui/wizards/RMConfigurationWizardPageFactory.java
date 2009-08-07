@@ -36,7 +36,7 @@ public abstract class RMConfigurationWizardPageFactory {
 	 * @param wizard 
 	 * @return The contributed ConfigurationWizardPages
 	 */
-	public abstract RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard);
+	public abstract RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard);
 
 	/**
 	 * Which IResourceManagerFactory does this contributed set

@@ -23,6 +23,6 @@ public abstract class RMConfigurationExtensionWizardPageFactory {
 	 * @param wizard 
 	 * @return configuration pages
 	 */
-	public abstract RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard);
+	public abstract RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard);
 
 }

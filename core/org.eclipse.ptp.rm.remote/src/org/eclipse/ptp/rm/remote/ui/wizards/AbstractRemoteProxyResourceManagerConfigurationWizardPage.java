@@ -61,7 +61,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.remote.Activator;
 import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.messages.Messages;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -175,7 +175,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	private Combo  connectionCombo;
 	private Combo  localAddrCombo;
 
-	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard,
+	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard,
 			String title) {
 		super(wizard, title);
 		
