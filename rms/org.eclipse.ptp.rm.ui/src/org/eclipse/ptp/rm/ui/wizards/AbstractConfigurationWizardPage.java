@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ui.wizards;
 
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -28,7 +28,7 @@ RMConfigurationWizardPage {
 	private final WizardPageWidgetListener listener = createListener();
 	private final WizardPageDataSource dataSource = createDataSource();
 
-	public AbstractConfigurationWizardPage(RMConfigurationWizard wizard, String pageName) {
+	public AbstractConfigurationWizardPage(IRMConfigurationWizard wizard, String pageName) {
 		super(wizard, pageName);
 	}
 

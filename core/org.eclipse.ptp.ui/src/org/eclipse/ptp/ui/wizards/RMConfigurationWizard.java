@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 
-public class RMConfigurationWizard extends Wizard {
+public class RMConfigurationWizard extends Wizard implements IRMConfigurationWizard {
 
 	public final static String EMPTY_STRING = ""; //$NON-NLS-1$
 	
@@ -282,6 +282,9 @@ public class RMConfigurationWizard extends Wizard {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getConfiguration()
+	 */
 	public IResourceManagerConfiguration getConfiguration() {
 		return configs[selectedFactory];
 	}

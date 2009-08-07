@@ -30,13 +30,13 @@ import org.eclipse.swt.widgets.Composite;
  */
 public abstract class RMConfigurationWizardPage extends WizardPage {
 
-	private final RMConfigurationWizard wizard;
+	private final IRMConfigurationWizard wizard;
 	
 	/**
 	 * @param wizard
 	 * @param pageName
 	 */
-	public RMConfigurationWizardPage(RMConfigurationWizard wizard, String pageName) {
+	public RMConfigurationWizardPage(IRMConfigurationWizard wizard, String pageName) {
 		super(pageName);
 		this.wizard = wizard;
 	}
@@ -49,7 +49,7 @@ public abstract class RMConfigurationWizardPage extends WizardPage {
 	/**
 	 * @return
 	 */
-	protected RMConfigurationWizard getConfigurationWizard() {
+	protected IRMConfigurationWizard getConfigurationWizard() {
 		return wizard;
 	}
 }

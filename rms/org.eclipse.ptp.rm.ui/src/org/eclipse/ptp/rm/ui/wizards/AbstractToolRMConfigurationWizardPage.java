@@ -32,7 +32,7 @@ import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.ToolsRMUIPlugin;
 import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -344,7 +344,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 	protected int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
 
-	public AbstractToolRMConfigurationWizardPage(RMConfigurationWizard wizard, int capabilities, String pageName, String title, String description) {
+	public AbstractToolRMConfigurationWizardPage(IRMConfigurationWizard wizard, int capabilities, String pageName, String title, String description) {
 		super(wizard, pageName);
 		this.capabilities = capabilities;
 		setTitle(title);
