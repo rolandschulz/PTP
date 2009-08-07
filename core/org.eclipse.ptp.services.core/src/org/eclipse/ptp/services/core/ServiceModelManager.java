@@ -81,7 +81,6 @@ public class ServiceModelManager implements IServiceModelManager {
 	private Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
 	private Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
-	private Map<String, IServiceProvider> fServiceProviders = new HashMap<String, IServiceProvider>();
 
 	private Map<String, IService> fServices = null;
 	private Set<IService> fServiceSet = null;
@@ -216,10 +215,6 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
-		IServiceProvider provider = fServiceProviders.get(desc.getId());
-		if (provider != null) {
-			return provider;
-		}
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
@@ -227,12 +222,11 @@ public class ServiceModelManager implements IServiceModelManager {
 					if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
 						if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
 							try {
-								provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
+								IServiceProvider provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
 								if (provider instanceof ServiceProvider) {
 									((ServiceProvider)provider).setDescriptor(desc);
-									fServiceProviders.put(desc.getId(), provider);
-									return provider;
 								}
+								return provider;
 							} catch (Exception e) {
 								Activator.getDefault().log(e);
 								return null;
