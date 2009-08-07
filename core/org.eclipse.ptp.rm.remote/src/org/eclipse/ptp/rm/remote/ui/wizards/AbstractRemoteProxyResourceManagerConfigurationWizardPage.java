@@ -82,11 +82,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * RM configuration is now handled by the service model
- * 
- * @deprecated
- * @see AbstractProxyRMServiceProviderConfigurationWizardPage
- *
+ * Abstract base class for wizard pages used to configure proxy resource managers
  */
 public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage extends
 		RMConfigurationWizardPage {

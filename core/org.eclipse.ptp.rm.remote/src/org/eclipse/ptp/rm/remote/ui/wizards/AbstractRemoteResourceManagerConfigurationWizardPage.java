@@ -52,11 +52,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * RM configuration is now handled by the service model
- * 
- * @deprecated
- * @see AbstractRemoteRMServiceProviderConfigurationWizardPage
- *
+ * Abstract base class for wizard pages used to configure remote resource managers
  */
 public abstract class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		RMConfigurationWizardPage {
