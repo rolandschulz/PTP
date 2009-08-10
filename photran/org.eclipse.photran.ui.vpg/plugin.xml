@@ -700,7 +700,7 @@
          <action 
                label="Encapsulate Variable"
                class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu//codingGroup2"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup2"
                id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
          <!-- -->
          <action 
