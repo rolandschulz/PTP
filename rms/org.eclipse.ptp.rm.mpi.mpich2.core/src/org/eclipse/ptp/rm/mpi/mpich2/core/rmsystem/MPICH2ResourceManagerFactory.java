@@ -28,7 +28,7 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
-		MPICH2ResourceManagerConfiguration configuration = (MPICH2ResourceManagerConfiguration) confIn;
+		IMPICH2ResourceManagerConfiguration configuration = (IMPICH2ResourceManagerConfiguration) confIn;
 		PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new MPICH2ResourceManager(universe.getNextResourceManagerId(), universe, configuration);

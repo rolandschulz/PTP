@@ -23,7 +23,7 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.EffectiveMPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
+import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
 
 /**
  * 
@@ -40,7 +40,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	private Map<String,String> nodeNameToIDMap = new HashMap<String, String>();
 
 	public MPICH2RuntimeSystem(Integer rmid,
-			MPICH2ResourceManagerConfiguration config,
+			IMPICH2ResourceManagerConfiguration config,
 			AttributeDefinitionManager attrDefMgr) {
 		super(rmid, config, attrDefMgr);
 	}

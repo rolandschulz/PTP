@@ -40,7 +40,7 @@ public class MPICH2ResourceManager extends AbstractToolResourceManager {
 	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
-		MPICH2ResourceManagerConfiguration config = (MPICH2ResourceManagerConfiguration) getConfiguration();
+		IMPICH2ResourceManagerConfiguration config = (IMPICH2ResourceManagerConfiguration) getConfiguration();
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
 		rts = new MPICH2RuntimeSystem(MPICH2_RMID, config, attrDefMgr);
