@@ -6,6 +6,7 @@ public interface IServiceModelEvent {
 	public static final int SERVICE_CONFIGURATION_REMOVED = 2;
 	public static final int SERVICE_MODEL_SAVED = 4;
 	public static final int SERVICE_MODEL_LOADED = 8;
+	public static final int ALL_EVENTS = 15;
 
 	/**
 	 * Returns an object identifying the source of this event.
