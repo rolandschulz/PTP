@@ -110,6 +110,7 @@ plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvs
 plugin@org.eclipse.ptp.rdt.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui
 plugin@org.eclipse.ptp.rdt.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.services
 plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user
+plugin@org.eclipse.ptp.rdt.managedbuilder.xlc.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui
 
 ! Fragments
 fragment@org.eclipse.ptp.aix.ppc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.aix.ppc
