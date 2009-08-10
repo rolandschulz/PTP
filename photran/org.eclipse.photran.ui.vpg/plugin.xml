@@ -451,6 +451,9 @@
    <!--==============-->
    <!-- Refactorings -->
    <!--==============-->
+   
+   <!-- Please put the refactorings in the same order in each section -->
+   
    <!-- 1. Define a command -->
    <extension
          point="org.eclipse.ui.commands">
@@ -459,34 +462,14 @@
             id="org.eclipse.photran.ui.RefactoringCategory">
       </category>
       <command
-            name="Move Saved Variables to Global Common Block"
+            name="Replace Obsolete Operators"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand">
+            id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
       </command>
       <command
-            name="Extract Common Block to Module"
+            name="Unify Keyword Case"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand">
-      </command>
-      <command
-            name="Extract Procedure"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
-      </command>
-      <command
-            name="Extract Local Variable"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
-      </command>
-      <command
-            name="Introduce Implicit None"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand">
-      </command>
-      <command
-            name="Rename"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.RenameRefactoringCommand">
+            id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand">
       </command>
       <command
             name="Interchange Loops"
@@ -494,16 +477,40 @@
             id="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand">
       </command>
       <command
-            name="Replace Obsolete Operators"
+            name="Extract Common Block to Module"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
+            id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand">
       </command>
       <command
-      		name="Unify Keyword Case"
-      		categoryId="org.eclipse.photran.ui.RefactoringCategory"
-      		id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand">
+            name="Move Saved Variables to Global Common Block"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand">
       </command>
-            
+      <command
+            name="Encapsulate Variable"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.EncapsulateVariableRefactoringCommand">
+      </command>
+      <command
+            name="Introduce Implicit None"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand">
+      </command>
+      <command
+            name="Extract Local Variable"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
+      </command>
+      <command
+            name="Extract Procedure"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
+      </command>
+      <command
+            name="Rename"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.RenameRefactoringCommand">
+      </command>
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
    <extension
@@ -600,6 +607,13 @@
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>         
          <!-- -->
+         <action 
+               label="Encapsulate Variable"
+               definitionId="org.eclipse.photran.ui.EncapsulateVariableRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup2"
+               id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
+         <!-- -->
          <action
                label="&amp;Introduce Implicit None"
                definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
@@ -682,6 +696,12 @@
                class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup" 
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
+         <!-- -->
+         <action 
+               label="Encapsulate Variable"
+               class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu//codingGroup2"
+               id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
          <!-- -->
          <action 
                label="Extract &amp;Local Variable..." 
