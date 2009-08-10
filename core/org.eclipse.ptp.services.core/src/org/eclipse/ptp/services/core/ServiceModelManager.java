@@ -490,14 +490,15 @@ public class ServiceModelManager implements IServiceModelManager {
 		fConfigurations.clear();
 	}
 	
-	/* Replaces the current service model configuration with what is
+	/**
+	 * Replaces the current service model configuration with what is
 	 * specified in the given <code>file</code>.
 	 * 
 	 * This method is not meant to be called outside of the
 	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
 	 * @throws IOException 
 	 */
-	private void loadModelConfiguration(Reader reader) throws IOException, CoreException {
+	public void loadModelConfiguration(Reader reader) throws IOException, CoreException {
 		initialize(); // Clear out the existing model
 		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
