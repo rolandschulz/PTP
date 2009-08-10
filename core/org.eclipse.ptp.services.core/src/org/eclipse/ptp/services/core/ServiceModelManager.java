@@ -34,13 +34,13 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ptp.services.internal.core.Service;
 import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 import org.eclipse.ptp.services.internal.core.ServiceModelEvent;
+import org.eclipse.ptp.services.internal.core.ServiceModelEventManager;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -88,7 +88,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	private Set<IService> fServiceSet = null;
 	private Map<String, Set<IService>> fNatureServices = null;
 	
-	private ListenerList fEventListeners = new ListenerList();
+	private ServiceModelEventManager fEventManager = new ServiceModelEventManager();
 	
 	private static ServiceModelManager fInstance;
 	
@@ -201,7 +201,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener, int)
 	 */
 	public void addEventListener(IServiceModelEventListener listener, int type) {
-		fEventListeners.add(listener);
+		fEventManager.addEventListener(listener, type);
 	}
 	
 	/* (non-Javadoc)
@@ -428,7 +428,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener)
 	 */
 	public void removeEventListener(IServiceModelEventListener listener) {
-		fEventListeners.remove(listener);
+		fEventManager.removeEventListener(listener);
 	}
 
 	/**
@@ -642,16 +642,12 @@ public class ServiceModelManager implements IServiceModelManager {
 	}
 	
 	/**
-	 * Notify listeners of an event occurrence
-	 * 
-	 * FIXME: only notify listeners of events they have registered for!!!!!
+	 * Notify listeners of an event occurrence.
 	 * 
 	 * @param event event to notify
 	 */
 	private void notifyListeners(IServiceModelEvent event) {
-		for (Object obj : fEventListeners.getListeners()) {
-			((IServiceModelEventListener)obj).handleEvent(event);
-		}
+		fEventManager.notifyListeners(event);
 	}
 	
 }
