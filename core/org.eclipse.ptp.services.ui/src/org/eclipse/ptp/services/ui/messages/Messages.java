@@ -17,6 +17,19 @@ public class Messages extends NLS {
 
 	private static final String BUNDLE_NAME= "org.eclipse.ptp.services.ui.messages.messages";//$NON-NLS-1$
 	
+	public static String ServiceConfigurationPreferencePage_0;
+	public static String ServiceConfigurationPreferencePage_1;
+	public static String ServiceConfigurationPreferencePage_2;
+	public static String ServiceConfigurationPreferencePage_3;
+	public static String ServiceConfigurationPreferencePage_4;
+	public static String ServiceConfigurationPreferencePage_5;
+	public static String ServiceConfigurationPreferencePage_6;
+
+	public static String ServiceConfigurationPropertyPage_0;
+	public static String ServiceConfigurationPropertyPage_1;
+	
+	public static String ServiceConfigurationSelectionDialog_0;
+	public static String ServiceConfigurationSelectionDialog_1;
 	public static String ServiceConfigurationWizard_0;
 	public static String ServiceConfigurationWizard_1;
 	public static String ServiceConfigurationWizard_2;

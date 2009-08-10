@@ -454,6 +454,14 @@ public class ServiceModelManager implements IServiceModelManager {
 		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
 	}
 
+	/**
+	 * @param serviceModelEvent
+	 */
+	private void notifyListeners(ServiceModelEvent serviceModelEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -623,6 +631,35 @@ public class ServiceModelManager implements IServiceModelManager {
 		for (Object obj : fEventListeners.getListeners()) {
 			((IServiceModelEventListener)obj).handleEvent(event);
 		}
+	}
+	
+	/**
+	 * Get the set of projects which use the specified service configuration
+	 * 
+	 * @param serviceConfiguration The service configuration
+	 * @return Set of projects which use the service configuration
+	 */
+	public Set<IProject> getProjectsForConfiguration(IServiceConfiguration serviceConfiguration)
+	{
+		Set<IProject> projects;
+		Set<IProject> projectsForConfig;
+		
+			// Get the set of projects known to the service model manager
+		projects = fProjectConfigurations.keySet();
+		projectsForConfig = new HashSet<IProject>();
+			// For each project, check if it uses the specified service configuration
+			// If so, add the project to the projectsForConfig set.
+		for (IProject project : projects) {
+			Set<IServiceConfiguration> configs;
+			
+			configs = getConfigurations(project);
+			for (IServiceConfiguration config : configs) {
+				if (config == serviceConfiguration) {
+					projectsForConfig.add(project);
+				}
+			}
+		}
+		return projectsForConfig;
 	}
 	
 }

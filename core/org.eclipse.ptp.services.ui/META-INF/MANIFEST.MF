@@ -18,3 +18,4 @@ Export-Package: org.eclipse.ptp.services.ui,
  org.eclipse.ptp.services.ui.handlers,
  org.eclipse.ptp.services.ui.messages,
  org.eclipse.ptp.services.ui.wizards
+Import-Package: org.eclipse.ptp.rdt.ui.wizards

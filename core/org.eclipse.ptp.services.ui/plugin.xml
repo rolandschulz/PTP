@@ -4,4 +4,26 @@
    <extension-point id="providerContributors" name="Service Provider Contributors" schema="schema/providerContributors.exsd"/>
    <extension-point id="serviceContributors" name="Service Contributors" schema="schema/serviceContributors.exsd"/>
    <extension-point id="wizardExtensions" name="Service Configuration Wizard Extensions" schema="schema/wizardExtensions.exsd"/>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.ptp.services.ui.ServiceConfigurationPropertyPage"
+            id="org.eclipse.ptp.services.ui.properties"
+            name="Service Configurations">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.services.ui.preferences.ServiceConfigurationPreferencePage"
+            id="org.eclipse.ptp.services.ui.ServiceConfigurationPreference"
+            name="Service Configuration">
+      </page>
+   </extension>
 </plugin>
