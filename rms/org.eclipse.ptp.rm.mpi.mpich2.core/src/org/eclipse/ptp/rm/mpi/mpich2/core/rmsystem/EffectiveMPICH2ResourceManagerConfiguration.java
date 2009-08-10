@@ -11,7 +11,7 @@ AbstractEffectiveToolRMConfiguration {
 	public EffectiveMPICH2ResourceManagerConfiguration(
 			IToolRMConfiguration configuration) {
 		super(configuration);
-		MPICH2ResourceManagerConfiguration MPICH2configuration = (MPICH2ResourceManagerConfiguration)configuration;
+		IMPICH2ResourceManagerConfiguration MPICH2configuration = (IMPICH2ResourceManagerConfiguration)configuration;
 		String launchCmd = null;
 		String debugCmd = null;
 		String discoverCmd = null;
