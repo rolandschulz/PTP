@@ -245,6 +245,34 @@ public class ServiceModelManager implements IServiceModelManager {
 		return new HashSet<IServiceConfiguration>(getConf(fProjectConfigurations, project).values());
 	}
 	
+	/**
+	 * Get the set of projects which use the specified service configuration
+	 * 
+	 * @param serviceConfiguration The service configuration
+	 * @return Set of projects which use the service configuration
+	 */
+	public Set<IProject> getProjectsForConfiguration(IServiceConfiguration serviceConfiguration) {
+		Set<IProject> projects;
+		Set<IProject> projectsForConfig;
+		
+			// Get the set of projects known to the service model manager
+		projects = fProjectConfigurations.keySet();
+		projectsForConfig = new HashSet<IProject>();
+			// For each project, check if it uses the specified service configuration
+			// If so, add the project to the projectsForConfig set.
+		for (IProject project : projects) {
+			Set<IServiceConfiguration> configs;
+			
+			configs = getConfigurations(project);
+			for (IServiceConfiguration config : configs) {
+				if (config == serviceConfiguration) {
+					projectsForConfig.add(project);
+				}
+			}
+		}
+		return projectsForConfig;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getService(java.lang.String)
 	 */
@@ -252,7 +280,7 @@ public class ServiceModelManager implements IServiceModelManager {
 		loadServices();
 		return fServices.get(id);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
@@ -311,7 +339,7 @@ public class ServiceModelManager implements IServiceModelManager {
 	public boolean isConfigured(IProject project) {
 		return fProjectConfigurations.containsKey(project);
 	}
-	
+
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the default save file. If the file does not exist
@@ -334,74 +362,6 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}
 		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_LOADED));
-	}
-
-	/* Replaces the current service model configuration with what is
-	 * specified in the given <code>file</code>.
-	 * 
-	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
-	 * @throws IOException 
-	 */
-	private void loadModelConfiguration(Reader reader) throws IOException, CoreException {
-		initialize(); // Clear out the existing model
-		
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
-		
-		for (IMemento configMemento : rootMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
-			String configId = configMemento.getString(ATTR_ID);
-			String configName = configMemento.getString(ATTR_NAME);
-			IServiceConfiguration config = newServiceConfiguration(configId, configName);
-			for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
-				String serviceId = serviceMemento.getString(ATTR_ID);
-				String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
-				
-				IService service = getService(serviceId);
-				if (service != null) {
-					IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
-					if (descriptor != null) {
-						IServiceProvider provider = getServiceProvider(descriptor);
-						if (provider != null) {
-							if (provider instanceof ServiceProvider) {
-								IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-								((ServiceProvider)provider).restoreState(providerMemento);
-							}
-							config.setServiceProvider(service, provider);
-						} else {
-							Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
-						}
-					} else {
-						Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
-					}
-				} else {
-					Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_1 + serviceId);
-				}
-			}
-			
-			fConfigurations.put(configId, config);
-		}
-		
-		for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
-			String projectName = projectMemento.getString(ATTR_NAME);
-			IProject project = root.getProject(projectName);
-			
-			if (!project.exists()) {
-				continue;
-			}
-			
-			for (IMemento configMemento : projectMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
-				String configId = configMemento.getString(ATTR_ID);
-				IServiceConfiguration config = fConfigurations.get(configId);
-				if (config != null) {
-					addConfiguration(project, config);
-					Boolean active = configMemento.getBoolean(ATTR_ACTIVE);
-					if (active != null && active.booleanValue()) {
-						setActiveConfiguration(project, config);
-					}
-				}
-			}
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -452,14 +412,6 @@ public class ServiceModelManager implements IServiceModelManager {
 		}
 		fConfigurations.remove(conf);
 		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
-	}
-
-	/**
-	 * @param serviceModelEvent
-	 */
-	private void notifyListeners(ServiceModelEvent serviceModelEvent) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/* (non-Javadoc)
@@ -538,6 +490,74 @@ public class ServiceModelManager implements IServiceModelManager {
 		fConfigurations.clear();
 	}
 	
+	/* Replaces the current service model configuration with what is
+	 * specified in the given <code>file</code>.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * @throws IOException 
+	 */
+	private void loadModelConfiguration(Reader reader) throws IOException, CoreException {
+		initialize(); // Clear out the existing model
+		
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
+		
+		for (IMemento configMemento : rootMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
+			String configId = configMemento.getString(ATTR_ID);
+			String configName = configMemento.getString(ATTR_NAME);
+			IServiceConfiguration config = newServiceConfiguration(configId, configName);
+			for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
+				String serviceId = serviceMemento.getString(ATTR_ID);
+				String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
+				
+				IService service = getService(serviceId);
+				if (service != null) {
+					IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+					if (descriptor != null) {
+						IServiceProvider provider = getServiceProvider(descriptor);
+						if (provider != null) {
+							if (provider instanceof ServiceProvider) {
+								IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+								((ServiceProvider)provider).restoreState(providerMemento);
+							}
+							config.setServiceProvider(service, provider);
+						} else {
+							Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
+						}
+					} else {
+						Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
+					}
+				} else {
+					Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_1 + serviceId);
+				}
+			}
+			
+			fConfigurations.put(configId, config);
+		}
+		
+		for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
+			String projectName = projectMemento.getString(ATTR_NAME);
+			IProject project = root.getProject(projectName);
+			
+			if (!project.exists()) {
+				continue;
+			}
+			
+			for (IMemento configMemento : projectMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
+				String configId = configMemento.getString(ATTR_ID);
+				IServiceConfiguration config = fConfigurations.get(configId);
+				if (config != null) {
+					addConfiguration(project, config);
+					Boolean active = configMemento.getBoolean(ATTR_ACTIVE);
+					if (active != null && active.booleanValue()) {
+						setActiveConfiguration(project, config);
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Locate and initialize service extensions.
 	 */
@@ -604,7 +624,7 @@ public class ServiceModelManager implements IServiceModelManager {
 			}
 		}	
 	}
-	
+
 	/**
 	 * Create a service configuration with the specified id and name. Used when
 	 * restoring saved state.
@@ -619,7 +639,7 @@ public class ServiceModelManager implements IServiceModelManager {
 		notifyListeners(new ServiceModelEvent(config, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED));
 		return config;
 	}
-
+	
 	/**
 	 * Notify listeners of an event occurrence
 	 * 
@@ -631,35 +651,6 @@ public class ServiceModelManager implements IServiceModelManager {
 		for (Object obj : fEventListeners.getListeners()) {
 			((IServiceModelEventListener)obj).handleEvent(event);
 		}
-	}
-	
-	/**
-	 * Get the set of projects which use the specified service configuration
-	 * 
-	 * @param serviceConfiguration The service configuration
-	 * @return Set of projects which use the service configuration
-	 */
-	public Set<IProject> getProjectsForConfiguration(IServiceConfiguration serviceConfiguration)
-	{
-		Set<IProject> projects;
-		Set<IProject> projectsForConfig;
-		
-			// Get the set of projects known to the service model manager
-		projects = fProjectConfigurations.keySet();
-		projectsForConfig = new HashSet<IProject>();
-			// For each project, check if it uses the specified service configuration
-			// If so, add the project to the projectsForConfig set.
-		for (IProject project : projects) {
-			Set<IServiceConfiguration> configs;
-			
-			configs = getConfigurations(project);
-			for (IServiceConfiguration config : configs) {
-				if (config == serviceConfiguration) {
-					projectsForConfig.add(project);
-				}
-			}
-		}
-		return projectsForConfig;
 	}
 	
 }
