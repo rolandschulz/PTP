@@ -13,5 +13,12 @@
             id="org.eclipse.ptp.ibmpe.core.resourcemanager"
             name="IBM Parallel Environment"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEServiceProviderFactory"
+            id="org.eclipse.ptp.rm.ibm.pe.resourcemanager"
+            name="IBM Parallel Environment (Service Model)"/>
+   </extension>
 
 </plugin>

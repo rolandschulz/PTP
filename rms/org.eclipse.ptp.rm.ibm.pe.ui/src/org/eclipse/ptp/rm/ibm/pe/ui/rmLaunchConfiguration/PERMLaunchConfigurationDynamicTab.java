@@ -65,7 +65,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.BooleanRowWidget;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.CheckboxRowWidget;
@@ -1702,10 +1702,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
      */
     public void createControl(Composite parent, IResourceManager rm, IPQueue queue)
     {
-	PEResourceManagerConfiguration config;
+	IPEResourceManagerConfiguration config;
 	IRemoteConnectionManager connMgr;
 
-	config = (PEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
+	config = (IPEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
 	remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
 	remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
 	connMgr = remoteService.getConnectionManager();

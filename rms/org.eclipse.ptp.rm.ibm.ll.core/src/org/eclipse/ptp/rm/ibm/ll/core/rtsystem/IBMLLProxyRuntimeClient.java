@@ -8,11 +8,11 @@
 
 package org.eclipse.ptp.rm.ibm.ll.core.rtsystem;
 
-import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeClient;
 
 public class IBMLLProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
-	public IBMLLProxyRuntimeClient(IBMLLResourceManagerConfiguration config, 
+	public IBMLLProxyRuntimeClient(IIBMLLResourceManagerConfiguration config, 
 			int baseModelId) {
 		super(config, baseModelId);
 	}

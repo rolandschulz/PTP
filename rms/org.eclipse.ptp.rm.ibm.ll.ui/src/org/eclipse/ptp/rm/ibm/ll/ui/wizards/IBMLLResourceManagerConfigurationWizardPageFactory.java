@@ -25,7 +25,7 @@
 package org.eclipse.ptp.rm.ibm.ll.ui.wizards;
 
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
@@ -36,7 +36,7 @@ public class IBMLLResourceManagerConfigurationWizardPageFactory extends
 		// no-op
 	}
 
-	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
+	public RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard) {
 		return new RMConfigurationWizardPage[]{new IBMLLResourceManagerConfigurationWizardPage(wizard), 
 						       new IBMLLResourceManagerOptionWizardPage(wizard)};
 	}
