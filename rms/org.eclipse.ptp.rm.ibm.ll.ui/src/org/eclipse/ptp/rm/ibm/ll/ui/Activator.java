@@ -8,6 +8,7 @@
 
 package org.eclipse.ptp.rm.ibm.ll.ui;
 
+import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -17,7 +18,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.ibm.ll.ui";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.ibm.ll.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

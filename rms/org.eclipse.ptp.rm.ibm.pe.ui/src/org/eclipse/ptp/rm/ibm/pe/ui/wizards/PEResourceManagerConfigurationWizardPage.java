@@ -25,27 +25,28 @@
 package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public final class PEResourceManagerConfigurationWizardPage extends
 	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 	
-    private RMConfigurationWizard configWizard;
+    private IRMConfigurationWizard configWizard;
     
-	public PEResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, Messages.getString("PEDialogs.ConfigurationTitle"));
-		setTitle(Messages.getString("PEDialogs.ConfigurationTitle"));
-		setDescription(Messages.getString("PEDialogs.Configuration"));
+	public PEResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard) {
+		super(wizard, Messages.getString("PEDialogs.ConfigurationTitle")); //$NON-NLS-1$
+		setTitle(Messages.getString("PEDialogs.ConfigurationTitle")); //$NON-NLS-1$
+		setDescription(Messages.getString("PEDialogs.Configuration")); //$NON-NLS-1$
 		configWizard = wizard;
 	}
 	
 	protected String createOptionsDialog(Shell shell, String initialOptions) {
 	    PEResourceManagerOptionDialog dialog;
 	    
-	    dialog = new PEResourceManagerOptionDialog(shell, configWizard, initialOptions);
+	    dialog = new PEResourceManagerOptionDialog(shell, (IPEResourceManagerConfiguration)configWizard.getConfiguration(), initialOptions);
 		if (dialog.open() == Dialog.OK) {
 			return dialog.getValue();
 		}

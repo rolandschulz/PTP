@@ -26,17 +26,17 @@
 
  import java.util.Collection;
 
- import org.eclipse.ptp.core.attributes.AttributeManager;
- import org.eclipse.ptp.core.elementcontrols.IPJobControl;
- import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
- import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
- import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
- import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
- import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLRuntimeSystem;
- import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
- import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
  public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
@@ -117,7 +117,7 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  	 */
  	@Override
  	protected IRuntimeSystem doCreateRuntimeSystem() {
- 		IBMLLResourceManagerConfiguration config = (IBMLLResourceManagerConfiguration) getConfiguration();
+ 		IIBMLLResourceManagerConfiguration config = (IIBMLLResourceManagerConfiguration) getConfiguration();
  		/* load up the control and monitoring systems for OMPI */
  		IBMLLProxyRuntimeClient runtimeProxy = new IBMLLProxyRuntimeClient(config, IBMLLRMID);
  		return new IBMLLRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());

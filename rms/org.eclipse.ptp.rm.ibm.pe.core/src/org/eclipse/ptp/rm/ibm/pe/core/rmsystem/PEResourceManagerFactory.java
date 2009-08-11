@@ -41,7 +41,7 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
-		PEResourceManagerConfiguration configuration = (PEResourceManagerConfiguration) confIn;
+		IPEResourceManagerConfiguration configuration = (IPEResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new PEResourceManager(universe.getNextResourceManagerId(), universe, configuration);
@@ -51,7 +51,7 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration()
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		PEResourceManagerConfiguration conf = new PEResourceManagerConfiguration(this);
+		IPEResourceManagerConfiguration conf = new PEResourceManagerConfiguration(this);
 		
 		Preferences preferences = PEPreferenceManager.getPreferences();
 		

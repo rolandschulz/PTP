@@ -7,11 +7,11 @@
  */
 package org.eclipse.ptp.rm.ibm.pe.core.rtsystem;
 
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeClient;
 
 public class PEProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
-	public PEProxyRuntimeClient(PEResourceManagerConfiguration config, 
+	public PEProxyRuntimeClient(IPEResourceManagerConfiguration config, 
 			int baseModelId) {
 		super(config, baseModelId);
 	}

@@ -60,10 +60,10 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
+import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
+import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
+import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
-import org.eclipse.ptp.rm.ibm.ll.ui.preferences.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -1315,10 +1315,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":createControl entered.");
-		IBMLLResourceManagerConfiguration config;
+		IIBMLLResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
-		config = (IBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm)
+		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm)
 				.getConfiguration();
 		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 				config.getRemoteServicesId());

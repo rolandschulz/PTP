@@ -24,18 +24,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui.wizards;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.rm.ibm.ll.ui.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
 import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 public final class IBMLLResourceManagerConfigurationWizardPage extends
 	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 	
-	public IBMLLResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, Messages.getString("Wizard.ConfigurationTitle"));
-		setTitle(Messages.getString("Wizard.ConfigurationTitle"));
-		setDescription(Messages.getString("Wizard.Configuration"));
+	public IBMLLResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard) {
+		super(wizard, Messages.getString("Wizard.ConfigurationTitle")); //$NON-NLS-1$
+		setTitle(Messages.getString("Wizard.ConfigurationTitle")); //$NON-NLS-1$
+		setDescription(Messages.getString("Wizard.Configuration")); //$NON-NLS-1$
 	}
 }

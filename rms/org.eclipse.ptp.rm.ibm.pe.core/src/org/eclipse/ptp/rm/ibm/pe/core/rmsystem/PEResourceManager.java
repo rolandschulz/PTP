@@ -117,7 +117,7 @@ public class PEResourceManager extends AbstractRuntimeResourceManager {
 	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
-		PEResourceManagerConfiguration config = (PEResourceManagerConfiguration) getConfiguration();
+		IPEResourceManagerConfiguration config = (IPEResourceManagerConfiguration) getConfiguration();
 		/* load up the control and monitoring systems for OMPI */
 		PEProxyRuntimeClient runtimeProxy = new PEProxyRuntimeClient(config, PERMID);
 		return new PERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());

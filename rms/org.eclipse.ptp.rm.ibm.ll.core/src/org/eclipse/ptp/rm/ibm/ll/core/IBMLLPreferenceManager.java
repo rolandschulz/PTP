@@ -22,7 +22,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.rm.ibm.ll.ui;
+package org.eclipse.ptp.rm.ibm.ll.core;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
 
 public class IBMLLPreferenceManager {
-	private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmll_proxy";
+	private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmll_proxy"; //$NON-NLS-1$
 	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
 	private static final boolean LAUNCH_MANUALLY = false; // use local fragment directory
 	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
@@ -59,14 +59,14 @@ public class IBMLLPreferenceManager {
 	public static void initializePreferences() {
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		
-		String server = "";
+		String server = ""; //$NON-NLS-1$
 			
 		if (PROXY_EXECUTABLE_PATH != null) {
 			server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
 		} else {
-			server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
+			server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME); //$NON-NLS-1$
 			if (server == null) {
-				server = "";
+				server = ""; //$NON-NLS-1$
 			}
        }
 		

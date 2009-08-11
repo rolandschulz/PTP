@@ -37,7 +37,7 @@ public class IBMLLResourceManagerFactory extends AbstractResourceManagerFactory 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
-		IBMLLResourceManagerConfiguration configuration = (IBMLLResourceManagerConfiguration) confIn;
+		IIBMLLResourceManagerConfiguration configuration = (IIBMLLResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new IBMLLResourceManager(universe.getNextResourceManagerId(), universe, configuration);
