@@ -5,6 +5,19 @@
    <extension-point id="serviceContributors" name="Service Contributors" schema="schema/serviceContributors.exsd"/>
    <extension-point id="wizardExtensions" name="Service Configuration Wizard Extensions" schema="schema/wizardExtensions.exsd"/>
    <extension
+		point="org.eclipse.ui.views">
+      <category
+		name="%ServicesViewsCategory.name"
+		id="org.eclipse.ptp.services.ui.views">
+	 </category>
+  	 <view
+        category="org.eclipse.ptp.services.ui.views"
+        class="org.eclipse.ptp.services.ui.views.ServiceConfigurationView"
+        id="org.eclipse.ptp.services.ui.views.serviceConfigurationView"
+        name="%ServiceConfigurationView.name">
+     </view>
+   </extension>
+   <extension
          point="org.eclipse.ui.propertyPages">
       <page
             class="org.eclipse.ptp.services.ui.ServiceConfigurationPropertyPage"
@@ -25,5 +38,38 @@
             id="org.eclipse.ptp.services.ui.ServiceConfigurationPreference"
             name="Service Configuration">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ptp.services.core.IServiceConfiguration"
+            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter2">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.ptp.services.core.IServiceProvider"
+            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter2">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.ptp.services.core.IServiceModelManager"
+            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter2">
+         </adapter>
+      </factory>
    </extension>
 </plugin>

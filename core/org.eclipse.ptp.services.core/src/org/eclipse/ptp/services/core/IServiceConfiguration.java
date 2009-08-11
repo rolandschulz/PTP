@@ -13,6 +13,8 @@ package org.eclipse.ptp.services.core;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.eclipse.core.runtime.IAdaptable;
+
 /**
  *
  * An IServiceConfiguration represents a particular set of service providers
@@ -24,7 +26,7 @@ import java.util.SortedSet;
  * with the RDT team.
  * 
  */
-public interface IServiceConfiguration {
+public interface IServiceConfiguration extends IAdaptable {
 	/**
 	 * Get the unique ID for this configuration.
 	 * 

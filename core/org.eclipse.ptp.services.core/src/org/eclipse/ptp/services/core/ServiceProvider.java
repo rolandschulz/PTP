@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
@@ -28,7 +29,7 @@ import org.eclipse.ui.IMemento;
  * @author vkong
  *
  */
-public abstract class ServiceProvider implements IServiceProvider, IServiceProviderDescriptor {
+public abstract class ServiceProvider extends PlatformObject implements IServiceProvider, IServiceProviderDescriptor {
 	
 	private IServiceProviderDescriptor fDescriptor = null;
 	private final HashMap<String, String> fAttributes = new HashMap<String, String>();

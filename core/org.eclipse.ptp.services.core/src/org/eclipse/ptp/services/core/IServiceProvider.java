@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
+import org.eclipse.core.runtime.IAdaptable;
+
 
 /**
  * An interface that represents the provider of a service.
@@ -21,7 +23,7 @@ package org.eclipse.ptp.services.core;
  *
  * @see IService
  */
-public interface IServiceProvider extends IServiceProviderDescriptor {
+public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable {
 	/**
 	 * Returns provider specific information for the current configuration.
 	 * 
