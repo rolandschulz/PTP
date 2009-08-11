@@ -99,6 +99,14 @@ public interface IServiceModelManager {
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
 	
 	/**
+	 * Get the set of projects which use the specified service configuration
+	 * 
+	 * @param serviceConfiguration Service configuration to query set of projects using it
+	 * @return Set of projects using the service configuration
+	 */
+	public Set<IProject> getProjectsForConfiguration(IServiceConfiguration serviceConfiguration);
+	
+	/**
 	 * Retrieves the service corresponding to a given id.
 	 * 
 	 * @param id The unique id of the service to retrieve.
@@ -155,6 +163,7 @@ public interface IServiceModelManager {
 	 */
 	public IServiceConfiguration newServiceConfiguration(String name);
 	
+	
 	/**
 	 * Removes all the configurations and services associated to the given project.
 	 * If the project has not been configured then this method does nothing.
@@ -163,14 +172,13 @@ public interface IServiceModelManager {
 	 */
 	public void remove(IProject project);
 	
-	
 	/**
 	 * Removes the service configuration.
 	 * 
 	 * @param conf the configuration
 	 */
 	public void remove(IServiceConfiguration conf);
-	
+
 	/**
 	 * TODO What happens if you try to remove the active configuration?
 	 * TODO What happens if there are no configurations left after removing the given configuration?
@@ -197,7 +205,7 @@ public interface IServiceModelManager {
 	 * @see #addEventListener(IServiceModelEventListener)
 	 */
 	public void removeEventListener(IServiceModelEventListener listener);
-
+	
 	/**
 	 * Set the active configuration for a project. By default, the first configuration created
 	 * for a project will be the active configuration for that project.
@@ -210,5 +218,4 @@ public interface IServiceModelManager {
 	 * @throws IllegalArgumentException if the configuration was not part of the project
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
-
 }
