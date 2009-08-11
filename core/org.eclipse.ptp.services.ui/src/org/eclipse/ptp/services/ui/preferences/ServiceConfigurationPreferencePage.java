@@ -12,14 +12,12 @@ package org.eclipse.ptp.services.ui.preferences;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -43,16 +41,137 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * This class implements a preference page which can be used to view a list
- * of service configurations, to create new service configurations or to delete
- * existing service configurations. This page also displays a list of 
- * projects using a service configuration.
+ * This class implements a preference page which can be used to view a list of
+ * service configurations, to create new service configurations or to delete
+ * existing service configurations. This page also displays a list of projects
+ * using a service configuration.
+ * 
  * @author dave
- *
+ * 
  */
 public class ServiceConfigurationPreferencePage extends PreferencePage
-		implements IWorkbenchPreferencePage 
-	{
+		implements IWorkbenchPreferencePage {
+	/**
+	 * This class implements the ICellModifier required in order to make the
+	 * service configuration table editiable.
+	 * 
+	 * @author dave
+	 * 
+	 */
+	private class ConfigCellModifier implements ICellModifier {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ICellModifier#canModify(java.lang.Object,
+		 * java.lang.String)
+		 */
+		public boolean canModify(Object element, String property) {
+			// The table is a single column table which is always editable.
+			return true;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ICellModifier#getValue(java.lang.Object,
+		 * java.lang.String)
+		 */
+		public Object getValue(Object element, String property) {
+			// Return the existing name of the service configuration. This way,
+			// If the user is just clicking on service configuration names, then
+			// we don't clobber existing names.
+			return ((IServiceConfiguration) element).getName();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ICellModifier#modify(java.lang.Object,
+		 * java.lang.String, java.lang.Object)
+		 */
+		public void modify(Object element, String property, Object value) {
+			IServiceConfiguration config;
+			TableItem item;
+			// Update the service configuration name with the selected value
+			item = (TableItem) element;
+			config = (IServiceConfiguration) item.getData();
+			config.setName((String) value);
+			item.setText((String) value);
+		}
+	}
+	/**
+	 * Handle widget selection events for this page
+	 * 
+	 * @author dave
+	 * 
+	 */
+	private class EventHandler implements SelectionListener {
+
+		public void widgetDefaultSelected(SelectionEvent e) {
+		}
+
+		/**
+		 * Handle selection events for widgets in this page
+		 * 
+		 * @param e
+		 *            The selection event to be handled
+		 */
+		public void widgetSelected(SelectionEvent e) {
+			Object source;
+
+			source = e.getSource();
+			if (source == addButton) {
+				addServiceConfiguration();
+			} else if (source == editButton) {
+				editServiceConfiguration();
+			} else if (source == removeButton) {
+				removeServiceConfiguration();
+			} else if (source == serviceConfigurationTable) {
+				setSelectedConfig();
+			}
+		}
+
+	}
+	/**
+	 * Comparator class used to sort projects in ascending order by name
+	 * 
+	 * @author dave
+	 * 
+	 */
+	private class ProjectComparator implements Comparator {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(Object o1, Object o2) {
+			return ((IProject) o1).getName().compareTo(
+					((IProject) o2).getName());
+		}
+	}
+	/**
+	 * Comparator class used to sort service configurations in ascending order
+	 * by name
+	 * 
+	 * @author dave
+	 * 
+	 */
+	private class ServiceConfigurationComparator implements Comparator {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(Object o1, Object o2) {
+			return ((IServiceConfiguration) o1).getName().compareTo(
+					((IServiceConfiguration) o2).getName());
+		}
+	}
 	private Table serviceConfigurationTable;
 	private TableColumn serviceConfigurationColumn;
 	private TableViewer serviceConfigurationViewer;
@@ -63,163 +182,78 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 	private Button removeButton;
 	private EventHandler eventHandler;
 	private IServiceConfiguration selectedConfiguration;
+
 	private TableItem selectedTableItem;
+
 	private ConfigCellModifier configCellModifier;
+
 	private ServiceConfigurationComparator serviceConfigurationComparator;
+
 	private ProjectComparator projectComparator;
-	
-	/**
-	 * Comparator class used to sort service configurations in ascending order by name
-	 * @author dave
-	 *
-	 */
-	private class ServiceConfigurationComparator implements Comparator
-	{
 
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(Object o1, Object o2) {
-			return ((IServiceConfiguration) o1).getName().compareTo(((IServiceConfiguration) o2).getName());
-		}
-	}
-	
-	/**
-	 * Comparator class used to sort projects in ascending order by name
-	 * @author dave
-	 *
-	 */
-	private class ProjectComparator implements Comparator
-	{
-
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(Object o1, Object o2) {
-			return ((IProject) o1).getName().compareTo(((IProject) o2).getName());
-		}
-	}
-	
-	/**
-	 * This class implements the ICellModifier required in order to make the service configuration table
-	 * editiable.
-	 * @author dave
-	 *
-	 */
-	private class ConfigCellModifier implements ICellModifier
-	{
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ICellModifier#canModify(java.lang.Object, java.lang.String)
-		 */
-		public boolean canModify(Object element, String property) 
-		{
-				// The table is a single column table which is always editable.
-			return true;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ICellModifier#getValue(java.lang.Object, java.lang.String)
-		 */
-		public Object getValue(Object element, String property) 
-		{
-				// Return the existing name of the service configuration. This way,
-				// If the user is just clicking on service configuration names, then
-				// we don't clobber existing names.
-			return ((IServiceConfiguration) element).getName();
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ICellModifier#modify(java.lang.Object, java.lang.String, java.lang.Object)
-		 */
-		public void modify(Object element, String property, Object value) 
-		{
-			IServiceConfiguration config;
-			TableItem item;
-				// Update the service configuration name with the selected value
-			item = (TableItem) element;
-			config = (IServiceConfiguration) item.getData();
-			config.setName((String) value);
-			item.setText((String) value);
-		}
-	}
-	
-	/**
-	 * Handle widget selection events for this page
-	 * @author dave
-	 *
-	 */
-	private class EventHandler implements SelectionListener
-	{
-
-		public void widgetDefaultSelected(SelectionEvent e) 
-		{
-			// TODO Auto-generated method stub
-			
-		}
-
-		/**
-		 * Handle selection events for widgets in this page
-		 * @param e The selection event to be handled
-		 */
-		public void widgetSelected(SelectionEvent e) 
-		{
-			Object source;
-			
-			source = e.getSource();
-			if (source == addButton) {
-				addServiceConfiguration();
-			}
-			else if (source == editButton) {
-				editServiceConfiguration();
-			}
-			else if (source == removeButton) {
-				removeServiceConfiguration();
-			}
-			else if (source == serviceConfigurationTable) {
-				setSelectedConfig();
-			}
-		}
-
-	}
-
-	public ServiceConfigurationPreferencePage() 
-	{
+	public ServiceConfigurationPreferencePage() {
 		super();
 	}
 
-	public ServiceConfigurationPreferencePage(String title) 
-	{
+	public ServiceConfigurationPreferencePage(String title) {
 		super(title);
 	}
 
 	public ServiceConfigurationPreferencePage(String title,
-			ImageDescriptor image) 
-	{
+			ImageDescriptor image) {
 		super(title, image);
 	}
 
 	/**
+	 * Add a service configuration to the set of service configurations
+	 */
+	private void addServiceConfiguration() {
+		IServiceConfiguration config;
+		int status;
+
+		// Create a new service configuration then invoke the service
+		// configuration wizard using
+		// this service configuration. If the user presses ok, then add a new
+		// service configuration to
+		// the list.
+		config = ServiceModelManager.getInstance().newServiceConfiguration(
+				Messages.ServiceConfigurationPreferencePage_6);
+		ServiceConfigurationWizard wizard = new ServiceConfigurationWizard(
+				config);
+		WizardDialog dialog = new WizardDialog(getShell(), wizard);
+		status = dialog.open();
+		if (status == Window.OK) {
+			TableItem item;
+
+			item = new TableItem(serviceConfigurationTable, 0);
+			item.setData(config);
+			item.setText(0, config.getName());
+		}
+	}
+
+	/**
 	 * Create the contents for this page
-	 * @param parent - The parent widget for the client area
+	 * 
+	 * @param parent
+	 *            - The parent widget for the client area
 	 */
 	@Override
-	protected Control createContents(Composite parent) 
-	{
+	protected Control createContents(Composite parent) {
 		Control mainPane;
-		
+
 		mainPane = createWidgets(parent);
 		populateServiceConfigurationList();
 		return mainPane;
 	}
-	
+
 	/**
 	 * Create the widgets for this page
-	 * @param parent The parent widget for the client area
+	 * 
+	 * @param parent
+	 *            The parent widget for the client area
 	 * @return
 	 */
-	private Control createWidgets(Composite parent)
-	{
+	private Control createWidgets(Composite parent) {
 		GridLayout layout;
 		Composite preferencePane;
 		Composite buttonPane;
@@ -229,7 +263,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 		RowLayout buttonLayout;
 
 		eventHandler = new EventHandler();
-		
+
 		preferencePane = new Composite(parent, SWT.NONE);
 		layout = new GridLayout(3, false);
 		layout.marginBottom = 0;
@@ -238,44 +272,46 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 		layout.marginTop = 0;
 		layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		preferencePane.setLayout(layout);
-		
+
 		serviceConfigurationTable = new Table(preferencePane, SWT.SINGLE);
 		serviceConfigurationTable.addSelectionListener(eventHandler);
 		serviceConfigurationTable.setHeaderVisible(true);
 		serviceConfigurationTable.setLinesVisible(true);
 		serviceConfigurationTable.setLayoutData(layoutData);
-		
-		serviceConfigurationColumn = new TableColumn(serviceConfigurationTable, SWT.NONE, 0);
-		serviceConfigurationColumn.setText(Messages.ServiceConfigurationPreferencePage_0);
+
+		serviceConfigurationColumn = new TableColumn(serviceConfigurationTable,
+				SWT.NONE, 0);
+		serviceConfigurationColumn
+				.setText(Messages.ServiceConfigurationPreferencePage_0);
 		serviceConfigurationColumn.pack();
 		serviceConfigurationViewer = new TableViewer(serviceConfigurationTable);
-		
+
 		configEditor = new TextCellEditor[1];
 		configEditor[0] = new TextCellEditor(serviceConfigurationTable);
 		configProperties = new String[1];
 		configProperties[0] = Messages.ServiceConfigurationPreferencePage_1;
-		
+
 		configCellModifier = new ConfigCellModifier();
 		serviceConfigurationViewer.setCellModifier(configCellModifier);
 		serviceConfigurationViewer.setCellEditors(configEditor);
 		serviceConfigurationViewer.setColumnProperties(configProperties);
 		serviceConfigurationTable.addSelectionListener(eventHandler);
-		
+
 		projectTable = new Table(preferencePane, SWT.SINGLE);
 		projectTable.setHeaderVisible(true);
 		projectTable.setLinesVisible(true);
 		projectTable.setLayoutData(layoutData);
-		
+
 		projectColumn = new TableColumn(projectTable, SWT.NONE, 0);
 		projectColumn.setText(Messages.ServiceConfigurationPreferencePage_2);
 		projectColumn.pack();
-		
+
 		buttonPane = new Composite(preferencePane, SWT.NONE);
 		buttonLayout = new RowLayout(SWT.VERTICAL);
 		buttonLayout.fill = true;
 		buttonLayout.center = false;
 		buttonPane.setLayout(buttonLayout);
-		
+
 		addButton = new Button(buttonPane, SWT.PUSH);
 		addButton.setText(Messages.ServiceConfigurationPreferencePage_3);
 		addButton.addSelectionListener(eventHandler);
@@ -287,122 +323,98 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 		removeButton.setText(Messages.ServiceConfigurationPreferencePage_5);
 		removeButton.addSelectionListener(eventHandler);
 		removeButton.setEnabled(false);
-		
+
 		return preferencePane;
 	}
-	
-	/**
-	 * Fill in the list of service configurations
-	 */
-	private void populateServiceConfigurationList()
-	{
-		Object serviceConfigurations[];
 
-			// Get the service configurations set, sort by name and update the table with the list
-		serviceConfigurationComparator = new ServiceConfigurationComparator();
-		serviceConfigurations = ServiceModelManager.getInstance().getConfigurations().toArray();
-		Arrays.sort(serviceConfigurations, serviceConfigurationComparator);
-		for (Object config : serviceConfigurations) {
-			TableItem item;
-			
-			item = new TableItem(serviceConfigurationTable, 0);
-			item.setData(config);
-			item.setText(0, ((IServiceConfiguration) config).getName());
-		}
-	}
-
-	public void init(IWorkbench workbench) 
-	{
-	}
-	
-	/**
-	 * Record the selected service configuration and enable the edit and remove
-	 * service configuration buttons.
-	 */
-	private void setSelectedConfig()
-	{
-		TableItem selection[];
-		
-		selection = serviceConfigurationTable.getSelection();
-		if (selection.length > 0) {
-			selectedTableItem = selection[0];
-			selectedConfiguration = (IServiceConfiguration) selectedTableItem.getData();
-			showProjectsForConfiguration(selectedConfiguration);
-			editButton.setEnabled(true);
-			removeButton.setEnabled(true);
-		}
-	}
-	
-	/**
-	 * Add a service configuration to the set of service configurations
-	 */
-	private void addServiceConfiguration()
-	{
-		IServiceConfiguration config;
-		int status;
-		
-			// Create a new service configuration then invoke the service configuration wizard using
-			// this service configuration. If the user presses ok, then add a new service configuration to
-			// the list.
-		config = ServiceModelManager.getInstance().newServiceConfiguration(Messages.ServiceConfigurationPreferencePage_6);
-		ServiceConfigurationWizard wizard = new ServiceConfigurationWizard(config);
-		WizardDialog dialog = new WizardDialog(getShell(), wizard);
-		status = dialog.open();
-		if (status == Window.OK) {
-			TableItem item;
-			
-			item = new TableItem(serviceConfigurationTable, 0);
-			item.setData(config);
-			item.setText(0, config.getName());
-		}
-	}
-	
 	/**
 	 * Edit an existing service configuration
 	 */
-	private void editServiceConfiguration()
-	{
+	private void editServiceConfiguration() {
 		ServiceConfigurationWizard wizard;
 		WizardDialog dialog;
 		int status;
-				
+
 		if (selectedConfiguration != null) {
 			wizard = new ServiceConfigurationWizard(selectedConfiguration);
 			dialog = new WizardDialog(getShell(), wizard);
 			status = dialog.open();
 		}
 	}
-	
+
+	public void init(IWorkbench workbench) {
+	}
+
 	/**
-	 * Remove the selected service configuration from the set of service configurations
+	 * Fill in the list of service configurations
 	 */
-	private void removeServiceConfiguration()
-	{
+	private void populateServiceConfigurationList() {
+		Object serviceConfigurations[];
+
+		// Get the service configurations set, sort by name and update the table
+		// with the list
+		serviceConfigurationComparator = new ServiceConfigurationComparator();
+		serviceConfigurations = ServiceModelManager.getInstance()
+				.getConfigurations().toArray();
+		Arrays.sort(serviceConfigurations, serviceConfigurationComparator);
+		for (Object config : serviceConfigurations) {
+			TableItem item;
+
+			item = new TableItem(serviceConfigurationTable, 0);
+			item.setData(config);
+			item.setText(0, ((IServiceConfiguration) config).getName());
+		}
+	}
+
+	/**
+	 * Remove the selected service configuration from the set of service
+	 * configurations
+	 */
+	private void removeServiceConfiguration() {
 		int idx;
-		
+
 		idx = serviceConfigurationTable.indexOf(selectedTableItem);
 		if (idx != -1) {
 			serviceConfigurationTable.remove(idx);
 			ServiceModelManager.getInstance().remove(selectedConfiguration);
 		}
 	}
-	
+
 	/**
-	 * Build a list of projects using the selected service configuration, sort by project name then update the
-	 * project table with the list of projects
+	 * Record the selected service configuration and enable the edit and remove
+	 * service configuration buttons.
+	 */
+	private void setSelectedConfig() {
+		TableItem selection[];
+
+		selection = serviceConfigurationTable.getSelection();
+		if (selection.length > 0) {
+			selectedTableItem = selection[0];
+			selectedConfiguration = (IServiceConfiguration) selectedTableItem
+					.getData();
+			showProjectsForConfiguration(selectedConfiguration);
+			editButton.setEnabled(true);
+			removeButton.setEnabled(true);
+		}
+	}
+
+	/**
+	 * Build a list of projects using the selected service configuration, sort
+	 * by project name then update the project table with the list of projects
+	 * 
 	 * @param config
 	 */
-	private void showProjectsForConfiguration(IServiceConfiguration config)
-	{
+	private void showProjectsForConfiguration(IServiceConfiguration config) {
 		Object projects[];
 
 		projectComparator = new ProjectComparator();
-		projects = ServiceModelManager.getInstance().getProjectsForConfiguration(config).toArray();
+		projects = ServiceModelManager.getInstance()
+				.getProjectsForConfiguration(config).toArray();
 		Arrays.sort(projects, projectComparator);
 		projectTable.removeAll();
 		for (Object project : projects) {
 			TableItem item;
-			
+
 			item = new TableItem(projectTable, 0);
 			item.setText(((IProject) project).getName());
 		}
