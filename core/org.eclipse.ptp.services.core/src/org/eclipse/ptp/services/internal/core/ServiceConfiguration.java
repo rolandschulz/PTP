@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -35,7 +36,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @author crecoskie
  *
  */
-public class ServiceConfiguration implements IServiceConfiguration {
+public class ServiceConfiguration extends PlatformObject implements IServiceConfiguration {
 	
 	protected final String fId;
 	protected String fName;

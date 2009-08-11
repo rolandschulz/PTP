@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ptp.services.internal.core.Service;
@@ -57,7 +58,7 @@ import org.eclipse.ui.XMLMemento;
  * with the RDT team.
  * 
  */
-public class ServiceModelManager implements IServiceModelManager {
+public class ServiceModelManager extends PlatformObject implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "services"; //$NON-NLS-1$
 	private final static String PROVIDER_EXTENSION_ID = "providers"; //$NON-NLS-1$
 	private final static String SERVICE_ELEMENT_NAME = "service"; //$NON-NLS-1$

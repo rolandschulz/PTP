@@ -13,8 +13,9 @@ package org.eclipse.ptp.services.core;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
 
-public interface IServiceModelManager {
+public interface IServiceModelManager extends IAdaptable {
 	/**
 	 * Associate the service configuration with a project. A project can have multiple
 	 * service configurations. The service configuration will become the active
