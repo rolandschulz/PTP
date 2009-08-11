@@ -152,10 +152,38 @@ public class ServiceModelWidget {
 	
 	private Shell fShell;
 	
+	public ServiceModelWidget() {
+		fServiceIDToSelectedProviderID = new HashMap<String, String>();
+		fProviderIDToProviderMap = new HashMap<String, IServiceProvider>();
+	}
+	
 	public ServiceModelWidget(IServiceConfiguration serviceConfiguration) {
 		fServiceConfiguration = serviceConfiguration;
 		fServiceIDToSelectedProviderID = new HashMap<String, String>();
 		fProviderIDToProviderMap = new HashMap<String, IServiceProvider>();
+	}
+	
+	private void addTableRow(IService service, IServiceProvider provider) {
+		TableItem item = new TableItem (fTable, SWT.NONE);
+
+		// column 0 lists the name of the service
+		item.setText (0, service.getName());
+		item.setData(SERVICE_KEY, service);
+		
+		// column 1 holds a dropdown with a list of providers
+		// default entry is the first provider if there is one		
+		item.setText(1, provider.getName());
+		item.setData(PROVIDER_KEY, provider);
+		
+		// column 2 holds the status string
+		item.setText(2, provider.getConfigurationString());
+		
+		fServiceIDToSelectedProviderID.put(service.getId(), provider.getId());
+
+		// allow container page to check if configurations are set
+		if (fConfigChangeListener != null) {
+			fConfigChangeListener.handleEvent(null);
+		}
 	}
 	
 	public Control createContents(Composite parent) {
@@ -322,120 +350,6 @@ public class ServiceModelWidget {
 	}
 	
 	/**
-	 * @return the configuration change listener
-	 */
-	public Listener getConfigChangeListener() {
-		return fConfigChangeListener;
-	}
-	
-	public Map<String, IServiceProvider> getProviderIDToProviderMap() {
-		return fProviderIDToProviderMap;
-	}
-	
-	/**
-	 * Get the service configuration for this widget
-	 * 
-	 * @return service configuration
-	 */
-	public IServiceConfiguration getServiceConfiguration() {
-		return fServiceConfiguration;
-	}
-	
-	public Map<String, String> getServiceIDToSelectedProviderID() {
-		return fServiceIDToSelectedProviderID;
-	}
-	
-	public Table getTable() {
-		return fTable;
-	}
-	
-	/**
-	 * Sub-class may override behaviour
-	 * @return true if all available services have been configured
-	 */
-	public boolean isConfigured() {
-		return isConfigured(null, fServiceIDToSelectedProviderID, getProviderIDToProviderMap());
-	}
-	
-	/**
-	 * Listens for changes in service provider configuration
-	 * @param configChangeListener the configuration change listener to set
-	 */
-	public void setConfigChangeListener(Listener configChangeListener) {
-		fConfigChangeListener = configChangeListener;
-	}
-	
-	public void setProviderIDToProviderMap(
-			Map<String, IServiceProvider> providerIDToProviderMap) {
-		fProviderIDToProviderMap = providerIDToProviderMap;
-	}
-
-	/**
-	 * Set the service configuration for this widget
-	 * 
-	 * @param service configuration
-	 */
-	public void setServiceConfiguration(IServiceConfiguration config) {
-		fServiceConfiguration = config;
-		if (config != null) {
-			createTableContent();
-		}
-	}
-
-	public void setServiceIDToSelectedProviderID(
-			Map<String, String> serviceIDToSelectedProviderID) {
-		fServiceIDToSelectedProviderID = serviceIDToSelectedProviderID;
-	}
-
-	public void setTable(Table table) {
-		fTable = table;
-	}
-
-	private void addTableRow(IService service, IServiceProvider provider) {
-		TableItem item = new TableItem (fTable, SWT.NONE);
-
-		// column 0 lists the name of the service
-		item.setText (0, service.getName());
-		item.setData(SERVICE_KEY, service);
-		
-		// column 1 holds a dropdown with a list of providers
-		// default entry is the first provider if there is one		
-		item.setText(1, provider.getName());
-		item.setData(PROVIDER_KEY, provider);
-		
-		// column 2 holds the status string
-		item.setText(2, provider.getConfigurationString());
-		
-		fServiceIDToSelectedProviderID.put(service.getId(), provider.getId());
-
-		// allow container page to check if configurations are set
-		if (fConfigChangeListener != null) {
-			fConfigChangeListener.handleEvent(null);
-		}
-	}
-
-	/**
-	 * Get a the service provider for the descriptor. Keeps a cache of service providers.
-	 * 
-	 * @param descriptor descriptor for the service provider
-	 * @return service provider
-	 */
-	private IServiceProvider getServiceProvider(IServiceProviderDescriptor descriptor) {
-		IServiceProvider serviceProvider = getProviderIDToProviderMap().get(descriptor.getId());
-		
-		if (serviceProvider == null) {
-			serviceProvider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
-			getProviderIDToProviderMap().put(descriptor.getId(), serviceProvider);
-		}
-		
-		return serviceProvider;
-	}
-	
-	private Shell getShell() {
-		return fShell;
-	}
-
-	/**
 	 * Generate the services, providers and provider configuration available for
 	 * the given configuration in the table
 	 * 
@@ -455,6 +369,13 @@ public class ServiceModelWidget {
 	//sub class may override to change behaviour
 	protected Listener getAddListener() {
 		return new AddListener();		
+	}
+	
+	/**
+	 * @return the configuration change listener
+	 */
+	public Listener getConfigChangeListener() {
+		return fConfigChangeListener;
 	}
 	
 	//sub class may override to change behaviour
@@ -489,9 +410,59 @@ public class ServiceModelWidget {
 		return allApplicableServices;
 	}
 	
+	public Map<String, IServiceProvider> getProviderIDToProviderMap() {
+		return fProviderIDToProviderMap;
+	}
+	
 	//sub class may override to change behaviour
 	protected Listener getRemoveListener() {
 		return new RemoveListener();		
+	}
+
+	/**
+	 * Get the service configuration for this widget
+	 * 
+	 * @return service configuration
+	 */
+	public IServiceConfiguration getServiceConfiguration() {
+		return fServiceConfiguration;
+	}
+
+	public Map<String, String> getServiceIDToSelectedProviderID() {
+		return fServiceIDToSelectedProviderID;
+	}
+
+	/**
+	 * Get a the service provider for the descriptor. Keeps a cache of service providers.
+	 * 
+	 * @param descriptor descriptor for the service provider
+	 * @return service provider
+	 */
+	private IServiceProvider getServiceProvider(IServiceProviderDescriptor descriptor) {
+		IServiceProvider serviceProvider = getProviderIDToProviderMap().get(descriptor.getId());
+		
+		if (serviceProvider == null) {
+			serviceProvider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
+			getProviderIDToProviderMap().put(descriptor.getId(), serviceProvider);
+		}
+		
+		return serviceProvider;
+	}
+
+	private Shell getShell() {
+		return fShell;
+	}
+
+	public Table getTable() {
+		return fTable;
+	}
+	
+	/**
+	 * Sub-class may override behaviour
+	 * @return true if all available services have been configured
+	 */
+	public boolean isConfigured() {
+		return isConfigured(null, fServiceIDToSelectedProviderID, getProviderIDToProviderMap());
 	}
 
 	/**
@@ -518,6 +489,40 @@ public class ServiceModelWidget {
 			}
 		}
 		return configured;
+	}
+	
+	/**
+	 * Listens for changes in service provider configuration
+	 * @param configChangeListener the configuration change listener to set
+	 */
+	public void setConfigChangeListener(Listener configChangeListener) {
+		fConfigChangeListener = configChangeListener;
+	}
+	
+	public void setProviderIDToProviderMap(
+			Map<String, IServiceProvider> providerIDToProviderMap) {
+		fProviderIDToProviderMap = providerIDToProviderMap;
+	}
+	
+	/**
+	 * Set the service configuration for this widget
+	 * 
+	 * @param service configuration
+	 */
+	public void setServiceConfiguration(IServiceConfiguration config) {
+		fServiceConfiguration = config;
+		if (config != null) {
+			createTableContent();
+		}
+	}
+	
+	public void setServiceIDToSelectedProviderID(
+			Map<String, String> serviceIDToSelectedProviderID) {
+		fServiceIDToSelectedProviderID = serviceIDToSelectedProviderID;
+	}
+
+	public void setTable(Table table) {
+		fTable = table;
 	}
 		
 	protected void updateAddRemoveButtons() {
