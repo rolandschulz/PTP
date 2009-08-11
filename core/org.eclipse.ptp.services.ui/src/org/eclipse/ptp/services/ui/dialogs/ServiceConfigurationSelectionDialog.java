@@ -33,83 +33,101 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * Display a dialog prompting the user to select a service configuration to add to the project.
- * Only service configurations not currently used by the project are diplayed.
+ * Display a dialog prompting the user to select a service configuration to add
+ * to the project. Only service configurations not currently used by the project
+ * are diplayed.
+ * 
  * @author dave
- *
+ * 
  */
-public class ServiceConfigurationSelectionDialog extends TitleAreaDialog 
-{
-	private Table serviceConfigurationList;
-	private IServiceConfiguration selectedConfig;
-	private EventHandler eventHandler;
-	private ServiceConfigurationComparator serviceConfigurationComparator;
-	private Set<IServiceConfiguration> currentServiceConfigurations;
-	
-	/**
-	 * Comparator class used to sort service configurations in ascending order by name
-	 * @author dave
-	 *
-	 */
-	private class ServiceConfigurationComparator implements Comparator
-	{
-
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(Object o1, Object o2) {
-			return ((IServiceConfiguration) o1).getName().compareTo(((IServiceConfiguration) o2).getName());
-		}
-	}
-	
+public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
 	/**
 	 * Class to handle widget selection events for this dialog.
+	 * 
 	 * @author dave
-	 *
+	 * 
 	 */
-	private class EventHandler implements SelectionListener
-	{
+	private class EventHandler implements SelectionListener {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org
+		 * .eclipse.swt.events.SelectionEvent)
 		 */
-		public void widgetDefaultSelected(SelectionEvent e) 
-		{
+		public void widgetDefaultSelected(SelectionEvent e) {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse
+		 * .swt.events.SelectionEvent)
 		 */
-		public void widgetSelected(SelectionEvent e) 
-		{
+		public void widgetSelected(SelectionEvent e) {
 			TableItem selection[];
-			
+
 			selection = serviceConfigurationList.getSelection();
 			if (selection.length > 0) {
 				selectedConfig = (IServiceConfiguration) selection[0].getData();
 			}
 		}
 	}
-	
 	/**
-	 * Create a dialog listing the service configurations which can be selected for the project
-	 * @param parentShell Shell to use when displaying the dialog
-	 * @param currentConfigs Set of service configurations currently used by the project
+	 * Comparator class used to sort service configurations in ascending order
+	 * by name
+	 * 
+	 * @author dave
+	 * 
 	 */
-	public ServiceConfigurationSelectionDialog(Shell parentShell, Set<IServiceConfiguration> currentConfigs)
-	{
+	private class ServiceConfigurationComparator implements Comparator {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(Object o1, Object o2) {
+			return ((IServiceConfiguration) o1).getName().compareTo(
+					((IServiceConfiguration) o2).getName());
+		}
+	}
+	private Table serviceConfigurationList;
+	private IServiceConfiguration selectedConfig;
+	private EventHandler eventHandler;
+
+	private ServiceConfigurationComparator serviceConfigurationComparator;
+
+	private Set<IServiceConfiguration> currentServiceConfigurations;
+
+	/**
+	 * Create a dialog listing the service configurations which can be selected
+	 * for the project
+	 * 
+	 * @param parentShell
+	 *            Shell to use when displaying the dialog
+	 * @param currentConfigs
+	 *            Set of service configurations currently used by the project
+	 */
+	public ServiceConfigurationSelectionDialog(Shell parentShell,
+			Set<IServiceConfiguration> currentConfigs) {
 		super(parentShell);
 		serviceConfigurationComparator = new ServiceConfigurationComparator();
 		currentServiceConfigurations = currentConfigs;
 	}
-	
+
 	/**
-	 * Create the widgets used to display the list of available service configurations
-	 * @param parent - The composite widget that is parent to the client area
+	 * Create the widgets used to display the list of available service
+	 * configurations
+	 * 
+	 * @param parent
+	 *            - The composite widget that is parent to the client area
 	 * @return Top level control for client area
 	 */
-	protected Control createDialogArea(Composite parent)
-	{
+	@Override
+	protected Control createDialogArea(Composite parent) {
 		Composite serviceConfigurationPane;
 		GridLayout layout;
 		GridData layoutData;
@@ -121,41 +139,43 @@ public class ServiceConfigurationSelectionDialog extends TitleAreaDialog
 		layout = new GridLayout(1, true);
 		serviceConfigurationPane.setLayout(layout);
 		layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		serviceConfigurationList = new Table(serviceConfigurationPane, SWT.SINGLE);
+		serviceConfigurationList = new Table(serviceConfigurationPane,
+				SWT.SINGLE);
 		serviceConfigurationList.setLinesVisible(true);
 		serviceConfigurationList.addSelectionListener(eventHandler);
 		serviceConfigurationList.setLayoutData(layoutData);
 		populateList();
 		return serviceConfigurationPane;
 	}
-	
+
 	/**
-	 * Fill in the list of available service configurations. Check if each service
-	 * is already used by the project. If not, then add it to the list of available configurations.
+	 * Return the service configuration selected by the user
+	 * 
+	 * @return Selected service configuration
 	 */
-	private void populateList()
-	{
+	public IServiceConfiguration getSelectedConfiguration() {
+		return selectedConfig;
+	}
+
+	/**
+	 * Fill in the list of available service configurations. Check if each
+	 * service is already used by the project. If not, then add it to the list
+	 * of available configurations.
+	 */
+	private void populateList() {
 		Object serviceConfigurations[];
 
-		serviceConfigurations = ServiceModelManager.getInstance().getConfigurations().toArray();
+		serviceConfigurations = ServiceModelManager.getInstance()
+				.getConfigurations().toArray();
 		Arrays.sort(serviceConfigurations, serviceConfigurationComparator);
 		for (Object config : serviceConfigurations) {
 			TableItem item;
-			
-			if (! currentServiceConfigurations.contains(config)) {
+
+			if (!currentServiceConfigurations.contains(config)) {
 				item = new TableItem(serviceConfigurationList, 0);
 				item.setData(config);
 				item.setText(0, ((IServiceConfiguration) config).getName());
 			}
 		}
-	}
-	
-	/**
-	 * Return the service configuration selected by the user
-	 * @return Selected service configuration
-	 */
-	public IServiceConfiguration getSelectedConfiguration()
-	{
-		return selectedConfig;
 	}
 }
