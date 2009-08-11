@@ -22,7 +22,7 @@ import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.dialogs.ServiceConfigurationSelectionDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
-import org.eclipse.ptp.rdt.ui.wizards.ServiceModelWidget;
+import org.eclipse.ptp.services.ui.wizards.ServiceModelWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -56,6 +56,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	private EventHandler eventHandler;
 	private IServiceConfiguration currentConfig;
 	private ServiceConfigurationComparator serviceConfigurationComparator;
+	private ServiceModelWidget serviceModelWidget;
 	
 	/**
 	 * Comparator class used to sort service configurations in ascending order by name
@@ -128,7 +129,6 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		GridData layoutData;
 		Composite serviceConfigurationPane;
 		Composite buttonPane;
-		ServiceModelWidget serviceModelWidget;
 		Control serviceModelControl;
 	
 		eventHandler = new EventHandler();
@@ -281,6 +281,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			selectedConfig = (IServiceConfiguration) selection[0].getData();
 			if (selectedConfig != currentConfig) {
 				currentConfig = selectedConfig;
+				serviceModelWidget.setServiceConfiguration(selectedConfig);
 			}
 		}
 	}
