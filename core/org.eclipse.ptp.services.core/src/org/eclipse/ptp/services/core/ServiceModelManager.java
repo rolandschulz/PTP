@@ -410,7 +410,7 @@ public class ServiceModelManager implements IServiceModelManager {
 				fActiveConfigurations.remove(project);
 			}
 		}
-		fConfigurations.remove(conf);
+		fConfigurations.remove(conf.getId());
 		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
 	}
 
