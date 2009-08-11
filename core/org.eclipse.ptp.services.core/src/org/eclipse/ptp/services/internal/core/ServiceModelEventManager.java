@@ -22,7 +22,7 @@ public class ServiceModelEventManager {
 	private List<ListenerList> fEventListeners = new ArrayList<ListenerList>();
 	
 	public ServiceModelEventManager() {
-		for (int index = 1; index < IServiceModelEvent.ALL_EVENTS; index <<= 1) {
+		for (int index = 1; index <= IServiceModelEvent.ALL_EVENTS; index <<= 1) {
 			fEventListeners.add(new ListenerList());
 		}
 	}
@@ -45,9 +45,9 @@ public class ServiceModelEventManager {
 	 * @see #removeEventListener(IServiceModelEventListener)
 	 */
 	public void addEventListener(IServiceModelEventListener listener, int type) {
-		for (int index = 1; index < IServiceModelEvent.ALL_EVENTS; index <<= 1) {
+		for (int index = 1, pos = 0; index <= IServiceModelEvent.ALL_EVENTS; index <<= 1, pos++) {
 			if ((type & index) == index) {
-				ListenerList list = fEventListeners.get(index);
+				ListenerList list = fEventListeners.get(pos);
 				if (list != null) { // should never be null
 					list.add(listener);
 				}
@@ -62,9 +62,9 @@ public class ServiceModelEventManager {
 	 * @param event event to notify
 	 */
 	public void notifyListeners(IServiceModelEvent event) {
-		for (int index = 1; index < IServiceModelEvent.ALL_EVENTS; index <<= 1) {
+		for (int index = 1, pos = 0; index <= IServiceModelEvent.ALL_EVENTS; index <<= 1, pos++) {
 			if ((event.getType() & index) == index) {
-				ListenerList list = fEventListeners.get(index);
+				ListenerList list = fEventListeners.get(pos);
 				if (list != null) { // should never be null
 					for (Object obj : list.getListeners()) {
 						((IServiceModelEventListener)obj).handleEvent(event);
