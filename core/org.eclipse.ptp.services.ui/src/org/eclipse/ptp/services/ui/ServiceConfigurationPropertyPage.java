@@ -12,6 +12,9 @@ package org.eclipse.ptp.services.ui;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
@@ -84,6 +87,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			}
 		}
 	}
+
 	/**
 	 * Comparator class used to sort service configurations in ascending order
 	 * by name
@@ -103,18 +107,18 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 					((IServiceConfiguration) o2).getName());
 		}
 	}
-	private Composite widgetPane;
-	private Composite serviceModelPane;
-	private Composite propertiesPane;
-	private Table serviceConfigurationList;
+
 	private Button addButton;
-	private Button removeButton;
-	private EventHandler eventHandler;
 	private IServiceConfiguration currentConfig;
-
+	private Vector<IServiceConfiguration> deletedServiceConfigurations;
+	private EventHandler eventHandler;
+	private Composite propertiesPane;
+	private Button removeButton;
 	private ServiceConfigurationComparator serviceConfigurationComparator;
-
+	private Table serviceConfigurationList;
+	private Composite serviceModelPane;
 	private ServiceModelWidget serviceModelWidget;
+	private Composite widgetPane;
 
 	/**
 	 * Create the service configuration properties page
@@ -131,12 +135,17 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	private void addServiceConfiguration() {
 		ServiceConfigurationSelectionDialog dialog;
 		int status;
+		Set<IServiceConfiguration> configs;
 
 		// Display a dialog containing a list of available service
 		// configurations
-		dialog = new ServiceConfigurationSelectionDialog(getShell(),
-				ServiceModelManager.getInstance().getConfigurations(
-						getProject()));
+		try {
+			configs = ServiceModelManager.getInstance().getConfigurations(
+					getProject());
+		} catch (ProjectNotConfiguredException e) {
+			configs = new HashSet<IServiceConfiguration>();
+		}
+		dialog = new ServiceConfigurationSelectionDialog(getShell(), configs);
 		status = dialog.open();
 		if (status == Window.OK) {
 			IServiceConfiguration config;
@@ -225,6 +234,20 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	}
 
 	/**
+	 * Remove selected service configurations from the set of service
+	 * configurations known to the service model manager
+	 */
+	private void deleteServiceConfigurations() {
+		if (deletedServiceConfigurations != null) {
+			for (IServiceConfiguration config : deletedServiceConfigurations) {
+				ServiceModelManager.getInstance().removeConfiguration(
+						getProject(), config);
+			}
+			deletedServiceConfigurations.clear();
+		}
+	}
+
+	/**
 	 * Get the project Object
 	 * 
 	 * @return The project
@@ -265,6 +288,24 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	}
 
 	/**
+	 * Delete service configurations when Apply button is pressed
+	 */
+	protected void performApply() {
+		deleteServiceConfigurations();
+		super.performApply();
+	}
+
+	/**
+	 * Delete service configurations when Ok button is pressed
+	 * 
+	 * @return Status from superclass indicating if Ok processing is to continue
+	 */
+	public boolean performOk() {
+		deleteServiceConfigurations();
+		return super.performOk();
+	}
+
+	/**
 	 * Remove the selected service configuration from the project
 	 */
 	private void removeServiceConfiguration() {
@@ -274,10 +315,15 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		selection = serviceConfigurationList.getSelection();
 		if (selection.length > 0) {
 			selectedConfig = (IServiceConfiguration) selection[0].getData();
-			ServiceModelManager.getInstance().removeConfiguration(getProject(),
-					selectedConfig);
+			if (deletedServiceConfigurations == null) {
+				deletedServiceConfigurations = new Vector<IServiceConfiguration>();
+			}
+			// Selected service model is added to vector to be deleted during Ok
+			// or Apply button processing
+			deletedServiceConfigurations.add(selectedConfig);
 			serviceConfigurationList.remove(serviceConfigurationList
 					.getSelectionIndex());
+			serviceModelWidget.setServiceConfiguration(null);
 		}
 	}
 
