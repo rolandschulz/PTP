@@ -66,12 +66,13 @@ public class FortranModelBuilder implements IFortranModelBuilder
 //            SourceForm sourceForm = isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM;
 //            IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(translationUnit.getFile());
             
+        	// FIXME: Jeff - This does not handle non-local files
             IFile file = translationUnit.getFile();
             lexer = LexerFactory.createLexer(
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file,
-                file == null ? "" : file.getName(),
-                isFixedForm ? SourceForm.FIXED_FORM : SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject())), //SourceForm.UNPREPROCESSED_FREE_FORM,
+                determineFilename(file),
+                determineSourceForm(file),
                 false);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
@@ -122,6 +123,36 @@ public class FortranModelBuilder implements IFortranModelBuilder
         // From CDT: important to know if the unit has parse errors or not
         setIsStructureKnown(wasSuccessful);
     }
+
+	private String determineFilename(IFile file)
+	{
+		if (file == null)
+			return "";
+		else if (isLocal(file)) // C preprocessor requires absolute path
+			return file.getLocation().toFile().getAbsolutePath();
+		else
+			return file.getName();
+	}
+
+	private SourceForm determineSourceForm(IFile file)
+	{
+		if (isFixedForm)
+		{
+			return SourceForm.FIXED_FORM;
+		}
+		else
+		{
+			if (isLocal(file) && file.getProject() != null)
+				return SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject()));
+			else
+				return SourceForm.UNPREPROCESSED_FREE_FORM;
+		}
+	}
+	
+	private boolean isLocal(IFile file)
+	{
+		return file != null && file.getLocation() != null;
+	}
 
     public void setIsStructureKnown(boolean isStructureKnown)
     {
