@@ -21,12 +21,12 @@
    </extension>
 
    <!-- Commands, key bindings, and popup menu entries
-        
+
         Each command should have its ID declared as a constant in AbstractFortranEditor, and
         it must be set up in AbstractFortranEditor#createActions().
-        
+
         For menubarPath, see class ITextEditorActionConstants -->
-        
+
    <!--  win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
          carbon: M1=COMMAND, M2=SHIFT, M3=ALT, M4=CTRL -->
 
@@ -84,8 +84,8 @@
       </actionSetPartAssociation>
    </extension>
    <extension point="org.eclipse.ui.popupMenus">
-     <viewerContribution 
-        targetID="#FixedFormFortranEditorContextMenu" 
+     <viewerContribution
+        targetID="#FixedFormFortranEditorContextMenu"
         id="org.eclipse.photran.ui.FixedNavigationContribution">
        <action
             class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
@@ -94,8 +94,8 @@
             label="&amp;Open Declaration"
             menubarPath="group.open"/>
      </viewerContribution>
-     <viewerContribution 
-        targetID="#FreeFormFortranEditorContextMenu" 
+     <viewerContribution
+        targetID="#FreeFormFortranEditorContextMenu"
         id="org.eclipse.photran.ui.FreeNavigationContribution">
        <action
             class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
@@ -193,7 +193,7 @@
 	         	<separator name="occurencesActionsGroup"/> <!-- to be used by clients -->
 	         	<separator name="extraSearchGroup"/> <!-- to be used by clients -->
 	      	</menu>
-               
+
          <menu
                id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
                label="R&amp;eferences"
@@ -365,7 +365,7 @@
                id="org.eclipse.jdt.ui.refactoring.menu">
             <separator name="scriptGroup"/>
          </menu>
-         
+
          <menu
                label="(&amp;Debugging)"
                path="org.eclipse.jdt.ui.refactoring.menu/scriptGroup"
@@ -447,13 +447,13 @@
          <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
       </actionSetPartAssociation>
    </extension>
-   
+
    <!--==============-->
    <!-- Refactorings -->
    <!--==============-->
-   
+
    <!-- Please put the refactorings in the same order in each section -->
-   
+
    <!-- 1. Define a command -->
    <extension
          point="org.eclipse.ui.commands">
@@ -575,47 +575,47 @@
          </menu>
          <!-- Note that actions are listed in REVERSE order by group -->
          <action
-               label="Replace Obsolete &amp;Operators"
+               label="Replace Obsolete &amp;Operators..."
                definitionId="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranFormattingGroup"
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>        
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>
          <action
-               label="&amp;Unify Keyword Case"
+               label="&amp;Unify Keyword Case..."
                definitionId="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranFormattingGroup"
-               id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"/>       
+               id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"/>
          <!-- -->
          <action
-               label="Interchange L&amp;oops"
+               label="Interchange L&amp;oops..."
                definitionId="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranOptimizationGroup"
                id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
          <!-- -->
-         <!--action 
-               label="Extract Common Block to Mo&amp;dule"
-               definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand" 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup" 
+         <!--action
+               label="Extract Common Block to Mo&amp;dule..."
+               definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
                id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
          <action
                label="Move &amp;Saved Variables to Common Block..."
                definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>         
+               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
          <!-- -->
-         <action 
-               label="Encapsulate Variable"
+         <action
+               label="Encapsulate Variable..."
                definitionId="org.eclipse.photran.ui.EncapsulateVariableRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup2"
                id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
          <!-- -->
          <action
-               label="&amp;Introduce Implicit None"
+               label="&amp;Introduce Implicit None..."
                definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
@@ -659,8 +659,8 @@
    <!-- **** DO NOT list a refactoring here if it is listed in #5 below **** -->
    <!-- **** (i.e., it is added to the Package Explorer's context menu) **** -->
    <extension point="org.eclipse.ui.popupMenus">
-      <viewerContribution 
-            targetID="#FreeFormFortranEditorContextMenu" 
+      <viewerContribution
+            targetID="#FreeFormFortranEditorContextMenu"
             id="org.eclipse.photran.refactoring.refactoringEditorContribution">
          <menu
                id="org.eclipse.photran.ui.RefactoringMenu"
@@ -680,44 +680,44 @@
             <separator name="photranFormattingGroup"/>
             <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
          </menu>
-         <action 
-               label="Interchange L&amp;oops" 
-               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranOptimizationGroup" 
+         <action
+               label="Interchange L&amp;oops..."
+               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranOptimizationGroup"
                id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
          <!-- -->
-         <!--action 
-               label="Extract Common Block to Mo&amp;dule" 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup" 
+         <!--action
+               label="Extract Common Block to Mo&amp;dule"
+               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
                id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
-         <action 
-               label="Move &amp;Saved Variables to Global Common Block..." 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup" 
+         <action
+               label="Move &amp;Saved Variables to Global Common Block..."
+               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
          <!-- -->
-         <action 
-               label="Encapsulate Variable"
+         <action
+               label="Encapsulate Variable..."
                class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup2"
                id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
          <!-- -->
-         <action 
-               label="Extract &amp;Local Variable..." 
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
+         <action
+               label="Extract &amp;Local Variable..."
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup"
                id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
-         <action 
-               label="E&amp;xtract Procedure..." 
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
+         <action
+               label="E&amp;xtract Procedure..."
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup"
                id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
          <!-- -->
-         <action 
-               label="&amp;Rename..." 
-               class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
+         <action
+               label="&amp;Rename..."
+               class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
       </viewerContribution>
    </extension>
@@ -742,10 +742,10 @@
           </enablement-->
           <visibility>
            <!--objectState
-                name="contentTypeId" 
+                name="contentTypeId"
                 value="org.eclipse.photran.core.fortranSource"/-->
            <objectState
-                name="contentTypeId" 
+                name="contentTypeId"
                 value="org.eclipse.photran.core.freeFormFortranSource"/>
          </visibility>
          <menu
@@ -766,33 +766,33 @@
             <separator name="photranFormattingGroup"/>
             <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
          </menu>
-         <action 
-               label="Replace Obsolete &amp;Operators" 
-               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranFormattingGroup" 
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>      
          <action
-               label="&amp;Unify Keyword Case"
+               label="Replace Obsolete &amp;Operators..."
+               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranFormattingGroup"
+               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>
+         <action
+               label="&amp;Unify Keyword Case..."
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranFormattingGroup"
                class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
                id="org.eclipse.photran.ui.KeywordCaseFileRefactoringAction">
          </action>
          <!-- -->
-         <action 
-               label="&amp;Introduce Implicit None" 
-               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup" 
+         <action
+               label="&amp;Introduce Implicit None..."
+               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup"
                id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
    	</objectContribution>
    	</extension>
-   
+
    <!--==========================================-->
-   <!-- Experimental Editor with VPG Integration -->   
+   <!-- Experimental Editor with VPG Integration -->
    <!--==========================================-->
    <extension
          point="org.eclipse.ui.editors"
          id="org.eclipse.photran.ui.VPGFortranEditor">
-         
+
       <!-- Since freeFormFortranSource and fixedFormFortranSource are "sub-content types" of fortranSource,
            we will bind both editors to the fortranSource content type; however, whichever content type
            binding is given first will be "tighter" and used as the default.
@@ -812,15 +812,15 @@
               contentTypeId="org.eclipse.photran.core.fortranSource" />
       </editor-->
    </extension>
-   
+
    <!--==================-->
-   <!-- Declaration View -->   
+   <!-- Declaration View -->
    <!--==================-->
-   <!-- 
+   <!--
  		Added for the Declaration view Project
  		@author John Goode, Abe Hassan, Sean Kim
  		Group: Fennel-Garlic
- 		University of Illinois at Urbana-Champaign 
+ 		University of Illinois at Urbana-Champaign
  		CS 427 Fall 2007  -->
    <extension
          point="org.eclipse.ui.views">
@@ -835,7 +835,7 @@
             id="org.eclipse.photran.ui.DeclarationView"
             name="Fortran Declaration">
       </view>
-   
+
       <!--TODO: Need to find a better icon and come up with a better name for this view-->
       <view
             category="org.eclipse.photran.ui.views"
@@ -865,10 +865,10 @@
            </markerContentGenerator>
        </extension>
     -->
-   
-   
+
+
    <!--=================================-->
-   <!-- VPG Source Viewer Configuration -->   
+   <!-- VPG Source Viewer Configuration -->
    <!--=================================-->
    <extension
    	point="org.eclipse.photran.ui.sourceViewerConfig">
