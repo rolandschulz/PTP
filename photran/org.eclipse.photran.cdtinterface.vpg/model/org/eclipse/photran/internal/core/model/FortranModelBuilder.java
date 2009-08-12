@@ -63,10 +63,6 @@ public class FortranModelBuilder implements IFortranModelBuilder
         IAccumulatingLexer lexer = null;
         try
         {
-//            SourceForm sourceForm = isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM;
-//            IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(translationUnit.getFile());
-            
-        	// FIXME: Jeff - This does not handle non-local files
             IFile file = translationUnit.getFile();
             lexer = LexerFactory.createLexer(
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
