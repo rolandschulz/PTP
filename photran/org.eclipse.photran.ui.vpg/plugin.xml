@@ -835,8 +835,38 @@
             id="org.eclipse.photran.ui.DeclarationView"
             name="Fortran Declaration">
       </view>
+   
+      <!--TODO: Need to find a better icon and come up with a better name for this view-->
+      <view
+            category="org.eclipse.photran.ui.views"
+            class="org.eclipse.photran.internal.ui.views.vpgproblems.VGPProblemView"
+            icon="icons/full/eview16/source.gif"
+            id="org.eclipse.photran.ui.VGPProblemView"
+            name="VGP Problem View">
+      </view>
    </extension>
-    
+       <!--
+   <extension
+      point="org.eclipse.ui.ide.markerSupport">
+      <markerField
+               class="org.eclipse.photran.internal.ui.views.ProjectField"
+                   id="com.eclipse-tips.markers.projectField"
+                   name="Project">
+      </markerField>
+          <markerContentGenerator
+                id="org.eclipse.photran.ui.vpg.myCustomMarkerGenerator"
+                name="My Marker Generator">
+               <markerTypeReference
+                   id="org.eclipse.core.resources.marker"/>
+               <markerFieldReference
+                   id="org.eclipse.ui.ide.descriptionField"/>
+                       <markerFieldReference
+                       id="com.eclipse-tips.markers.projectField"/>
+           </markerContentGenerator>
+       </extension>
+    -->
+   
+   
    <!--=================================-->
    <!-- VPG Source Viewer Configuration -->   
    <!--=================================-->
