@@ -100,6 +100,14 @@ public interface IServiceModelManager extends IAdaptable {
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
 	
 	/**
+	 * Get the default service configuration. This can be used by tools that require
+	 * the notion of a global "default" service configuration.
+	 * 
+	 * @return default service configuration, or null if there is no default selected
+	 */
+	public IServiceConfiguration getDefaultConfiguration();
+	
+	/**
 	 * Get the set of projects which use the specified service configuration
 	 * 
 	 * @param serviceConfiguration Service configuration to query set of projects using it
@@ -155,6 +163,7 @@ public interface IServiceModelManager extends IAdaptable {
 	 */
 	public boolean isConfigured(IProject project);
 	
+	
 	/**
 	 * Obtain a new service configuration with name 'name'. The name
 	 * does not need to be unique.
@@ -164,7 +173,6 @@ public interface IServiceModelManager extends IAdaptable {
 	 */
 	public IServiceConfiguration newServiceConfiguration(String name);
 	
-	
 	/**
 	 * Removes all the configurations and services associated to the given project.
 	 * If the project has not been configured then this method does nothing.
@@ -172,7 +180,7 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws NullPointerException if project is null
 	 */
 	public void remove(IProject project);
-	
+
 	/**
 	 * Removes the service configuration.
 	 * 
@@ -195,7 +203,7 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public void removeConfiguration(IProject project, IServiceConfiguration conf);
-
+	
 	/**
 	 * Removes the given listener for service model events. Has no effect if the 
 	 * listener is not registered. 
@@ -219,4 +227,12 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws IllegalArgumentException if the configuration was not part of the project
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
+	
+	/**
+	 * Set the default service configuration. This can be used by tools that require
+	 * the notion of a global "default" service configuration.
+	 * 
+	 * @param config the service configuration to select as default
+	 */
+	public void setDefaultConfiguration(IServiceConfiguration config);
 }

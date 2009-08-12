@@ -77,29 +77,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final static String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
 	private final static String DEFAULT_SAVE_FILE_NAME = "service_model.xml";  //$NON-NLS-1$
 	
-	/** Default location to save service model configuration */
-	private final IPath defaultSaveFile; 
-	
-	private Map<String, IServiceConfiguration> fConfigurations = new HashMap<String, IServiceConfiguration>();
-	private Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
-	private Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
-	private Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
-
-	private Map<String, IService> fServices = null;
-	private Set<IService> fServiceSet = null;
-	private Map<String, Set<IService>> fNatureServices = null;
-	
-	private ServiceModelEventManager fEventManager = new ServiceModelEventManager();
-	
-	private static ServiceModelManager fInstance;
-	
-	public static synchronized ServiceModelManager getInstance() {
-		if(fInstance == null) {
-			fInstance = new ServiceModelManager();
-		}
-		return fInstance;
-	}
-	
 	private static <T> T getConf(Map<IProject, T> map, IProject project) {
 		if(project == null) {
 			throw new NullPointerException();
@@ -109,8 +86,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			throw new ProjectNotConfiguredException(); 
 		}
 		return value;
-	}
-
+	} 
+	
 	private static void saveModelConfiguration(Map<String, IServiceConfiguration> configs,
 			Map<IProject, Map<String, IServiceConfiguration>> projectConfigs,
 			Map<IProject, IServiceConfiguration> activeConfigs,
@@ -164,11 +141,35 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			
 		rootMemento.save(writer);
 	}
+	/** Default location to save service model configuration */
+	private final IPath defaultSaveFile;
+	private Map<String, IServiceConfiguration> fConfigurations = new HashMap<String, IServiceConfiguration>();
+	private Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
+
+	private Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
+	private Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
+	private Map<String, IService> fServices = null;
+	private Set<IService> fServiceSet = null;
+	
+	private Map<String, Set<IService>> fNatureServices = null;
+
+	private IServiceConfiguration fDefaultServiceConfiguration = null;
+
+	private ServiceModelEventManager fEventManager = new ServiceModelEventManager();
+	
+	private static ServiceModelManager fInstance;
+	
+	public static synchronized ServiceModelManager getInstance() {
+		if(fInstance == null) {
+			fInstance = new ServiceModelManager();
+		}
+		return fInstance;
+	}
 	
 	private ServiceModelManager() {
 		defaultSaveFile = Activator.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -197,7 +198,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener, int)
 	 */
@@ -211,7 +212,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public IServiceConfiguration getActiveConfiguration(IProject project) {
 		return getConf(fActiveConfigurations, project);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
 	 */
@@ -238,7 +239,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public Set<IServiceConfiguration> getConfigurations() {
 		return new HashSet<IServiceConfiguration>(fConfigurations.values());
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
 	 */
@@ -246,6 +247,13 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		return new HashSet<IServiceConfiguration>(getConf(fProjectConfigurations, project).values());
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getDefaultConfiguration()
+	 */
+	public IServiceConfiguration getDefaultConfiguration() {
+		return fDefaultServiceConfiguration;
+	}
+
 	/**
 	 * Get the set of projects which use the specified service configuration
 	 * 
@@ -273,7 +281,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		return projectsForConfig;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getService(java.lang.String)
 	 */
@@ -281,7 +289,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		loadServices();
 		return fServices.get(id);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
@@ -340,7 +348,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public boolean isConfigured(IProject project) {
 		return fProjectConfigurations.containsKey(project);
 	}
-
+	
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the default save file. If the file does not exist
@@ -365,7 +373,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_LOADED));
 	}
-	
+
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the given <code>file</code>.
@@ -454,7 +462,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public void notifyListeners(IServiceModelEvent event) {
 		fEventManager.notifyListeners(event);
 	}
-
+	
 	/**
 	 * Prints the current service model to the console, for debugging purposes.
 	 */
@@ -483,7 +491,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fActiveConfigurations.remove(project);
 		fProjectServices.remove(project);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -497,7 +505,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fConfigurations.remove(conf.getId());
 		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -507,7 +515,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			confs.remove(conf.getId());
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener)
 	 */
@@ -564,6 +572,14 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		
 		fActiveConfigurations.put(project, configuration);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setDefaultConfiguration(org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void setDefaultConfiguration(IServiceConfiguration config) {
+		fDefaultServiceConfiguration = config;
+		notifyListeners(new ServiceModelEvent(config, IServiceModelEvent.SERVICE_CONFIGURATION_SELECTED));
 	}
 	
 	/**
