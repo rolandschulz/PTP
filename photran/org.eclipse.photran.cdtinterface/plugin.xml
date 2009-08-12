@@ -322,4 +322,23 @@
 
    <extension-point id="domparser" name="DOM Parser" schema="schema/domparser.exsd"/>
    
+   <!--============================================-->
+   <!-- Convert C/C++ Projects to Photran Projects -->
+   <!--============================================-->
+   <extension point="org.eclipse.ui.popupMenus"> 
+      <viewerContribution
+         id="org.eclipse.photran.ui.ViewActions" 
+         targetID="org.eclipse.photran.ui.FortranView"> 
+         <visibility>
+            <objectState name="nature" value="org.eclipse.cdt.core.cnature" />
+         </visibility>
+         <action
+            id="org.eclipse.photran.cdtinterface.ui.ProjectConversionAction"
+            label="%ProjectConversionAction"
+            menubarPath="additions"
+            icon="icons/obj16/f_file_obj.gif"
+            class="org.eclipse.photran.cdtinterface.ui.ProjectConversionAction" />
+      </viewerContribution>
+   </extension>      
+   
 </plugin>
