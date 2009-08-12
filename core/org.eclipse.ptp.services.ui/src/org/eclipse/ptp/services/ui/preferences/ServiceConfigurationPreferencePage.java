@@ -12,6 +12,8 @@ package org.eclipse.ptp.services.ui.preferences;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.PreferencePage;
@@ -22,6 +24,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.ptp.services.ui.wizards.ServiceConfigurationWizard;
@@ -53,7 +56,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 		implements IWorkbenchPreferencePage {
 	/**
 	 * This class implements the ICellModifier required in order to make the
-	 * service configuration table editiable.
+	 * service configuration table editable.
 	 * 
 	 * @author dave
 	 * 
@@ -102,6 +105,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 			item.setText((String) value);
 		}
 	}
+
 	/**
 	 * Handle widget selection events for this page
 	 * 
@@ -135,6 +139,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 		}
 
 	}
+
 	/**
 	 * Comparator class used to sort projects in ascending order by name
 	 * 
@@ -153,6 +158,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 					((IProject) o2).getName());
 		}
 	}
+
 	/**
 	 * Comparator class used to sort service configurations in ascending order
 	 * by name
@@ -172,24 +178,22 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 					((IServiceConfiguration) o2).getName());
 		}
 	}
-	private Table serviceConfigurationTable;
-	private TableColumn serviceConfigurationColumn;
-	private TableViewer serviceConfigurationViewer;
-	private Table projectTable;
-	private TableColumn projectColumn;
+
 	private Button addButton;
-	private Button editButton;
-	private Button removeButton;
-	private EventHandler eventHandler;
-	private IServiceConfiguration selectedConfiguration;
-
-	private TableItem selectedTableItem;
-
 	private ConfigCellModifier configCellModifier;
-
-	private ServiceConfigurationComparator serviceConfigurationComparator;
-
+	private List<IServiceConfiguration> deletedServiceConfigurations;
+	private Button editButton;
+	private EventHandler eventHandler;
+	private TableColumn projectColumn;
 	private ProjectComparator projectComparator;
+	private Table projectTable;
+	private Button removeButton;
+	private IServiceConfiguration selectedConfiguration;
+	private TableItem selectedTableItem;
+	private TableColumn serviceConfigurationColumn;
+	private ServiceConfigurationComparator serviceConfigurationComparator;
+	private Table serviceConfigurationTable;
+	private TableViewer serviceConfigurationViewer;
 
 	public ServiceConfigurationPreferencePage() {
 		super();
@@ -328,6 +332,19 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 	}
 
 	/**
+	 * Remove selected service configurations from the set of service
+	 * configurations known to the service model manager
+	 */
+	private void deleteServiceConfigurations() {
+		if (deletedServiceConfigurations != null) {
+			for (IServiceConfiguration config : deletedServiceConfigurations) {
+				ServiceModelManager.getInstance().remove(config);
+			}
+			deletedServiceConfigurations.clear();
+		}
+	}
+
+	/**
 	 * Edit an existing service configuration
 	 */
 	private void editServiceConfiguration() {
@@ -343,6 +360,24 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 	}
 
 	public void init(IWorkbench workbench) {
+	}
+
+	/**
+	 * Delete service configurations when Apply button is pressed
+	 */
+	protected void performApply() {
+		deleteServiceConfigurations();
+		super.performApply();
+	}
+
+	/**
+	 * Delete service configurations when Ok button is pressed
+	 * 
+	 * @return Status from superclass indicating if Ok processing is to continue
+	 */
+	public boolean performOk() {
+		deleteServiceConfigurations();
+		return super.performOk();
 	}
 
 	/**
@@ -375,8 +410,19 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 
 		idx = serviceConfigurationTable.indexOf(selectedTableItem);
 		if (idx != -1) {
+			int itemCount;
+
 			serviceConfigurationTable.remove(idx);
-			ServiceModelManager.getInstance().remove(selectedConfiguration);
+			if (deletedServiceConfigurations == null) {
+				deletedServiceConfigurations = new Vector<IServiceConfiguration>();
+			}
+			// Add deleted service configuration to vector to be processed
+			// when Apply or Ok is pressed.
+			deletedServiceConfigurations.add(selectedConfiguration);
+			itemCount = projectTable.getItemCount();
+			if (itemCount > 0) {
+				projectTable.remove(0, itemCount - 1);
+			}
 		}
 	}
 
