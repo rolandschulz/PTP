@@ -27,16 +27,16 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 
 /**
- * 
+ *
  * @author Tim
  */
 public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
 {
-    
+
     private StatementSequence selection = null;
     private ASTProperLoopConstructNode outerLoop = null;
     private ASTProperLoopConstructNode innerLoop = null;
- 
+
     /**
      * @param file
      * @param selection
@@ -66,13 +66,15 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        
+
         // Ensure that partial loops won't be extracted
         LoopReplacer.replaceAllLoopsIn(this.astOfFileInEditor.getRoot());
         setLoops();
         //If there is only 1 loop, don't do anything
         if(outerLoop == null || innerLoop == null || outerLoop == innerLoop)
             fail("Please select nested loops to refactor.");
+
+        status.addWarning("WARNING: This is an UNCHECKED TRANSFORMATION and is NOT guaranteed to preserve behavior.  Proceed at your own risk.");
     }
 
     protected void setLoops()
@@ -82,7 +84,7 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
             innerLoop = getLoopNode(outerLoop.getBody().findFirstToken(),
                                     outerLoop.getBody().findLastToken());
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring#doCreateChange(org.eclipse.core.runtime.IProgressMonitor)
      */
@@ -93,47 +95,47 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         swapHeaders();
         swapEndDoStmt();
         swapComments();
-        
+
         Reindenter.reindent(outerLoop, this.astOfFileInEditor, Strategy.REINDENT_EACH_LINE);
         //Reindenter.reindent(innerLoop, this.astOfFileInEditor);
-        
+
         this.addChangeFromModifiedAST(this.fileInEditor, pm);
     }
-    
+
     protected void swapHeaders()
     {
         ASTLabelDoStmtNode outerHeader = outerLoop.getLoopHeader();
         ASTLabelDoStmtNode innerHeader = innerLoop.getLoopHeader();
-        
+
         /*innerLoop.replaceChild(innerHeader, outerHeader);
         outerLoop.replaceChild(outerHeader, innerHeader);
-        
+
         outerHeader.setParent(innerLoop);
         innerHeader.setParent(outerLoop);*/
         swap(outerHeader, innerHeader);
     }
-    
+
     protected void swapEndDoStmt()
     {
         ASTEndDoStmtNode outerEnd = outerLoop.getEndDoStmt();
         ASTEndDoStmtNode innerEnd = innerLoop.getEndDoStmt();
-        
+
         /*outerEnd.setParent(innerLoop);
         innerEnd.setParent(outerLoop);
-        
+
         innerLoop.replaceChild(innerEnd, outerEnd);
         outerLoop.replaceChild(outerEnd, innerEnd);*/
         swap(outerEnd, innerEnd);
     }
-    
+
     protected void swapComments()
     {
         Token outerLoopDoToken = outerLoop.getLoopHeader().findFirstToken();
         Token innerLoopDoToken = innerLoop.getLoopHeader().findFirstToken();
-        
+
         String outerLoopWhiteText = outerLoopDoToken.getWhiteBefore();
         String innerLoopWhiteText = innerLoopDoToken.getWhiteBefore();
-        
+
         innerLoopDoToken.setWhiteBefore(outerLoopWhiteText);
         outerLoopDoToken.setWhiteBefore(innerLoopWhiteText);
     }
@@ -142,11 +144,11 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
     {
         outerElement.setParent(innerLoop);
         innerElement.setParent(outerLoop);
-        
+
         innerLoop.replaceChild(innerElement, outerElement);
-        outerLoop.replaceChild(outerElement, innerElement); 
+        outerLoop.replaceChild(outerElement, innerElement);
     }
-    
+
 
     /* (non-Javadoc)
      * @see org.eclipse.ltk.core.refactoring.Refactoring#getName()
