@@ -25,4 +25,7 @@
        id="org.eclipse.photran.core.vpg.errorMarker">
        <super type="org.eclipse.photran.core.vpg.errorOrWarningMarker"/>
    </extension>
+
+   <!-- Source Form Extension Point -->
+   <extension-point id="sourceform" name="Source Form" schema="schema/sourceform.exsd"/>
 </plugin>

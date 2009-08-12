@@ -17,6 +17,7 @@ import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
+import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
@@ -70,7 +71,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file,
                 file == null ? "" : file.getName(),
-                isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM,
+                isFixedForm ? SourceForm.FIXED_FORM : SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject())), //SourceForm.UNPREPROCESSED_FREE_FORM,
                 false);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
