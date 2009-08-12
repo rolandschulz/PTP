@@ -21,7 +21,9 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelEvent;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
  * A named configuration which consists of a mapping of services to providers.
@@ -40,6 +42,7 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	
 	protected final String fId;
 	protected String fName;
+	protected ServiceModelManager fManager = ServiceModelManager.getInstance();
 	protected Map<IService, IServiceProvider> fServiceToProviderMap = new HashMap<IService, IServiceProvider>();
 
 	public ServiceConfiguration(String id, String name) {
@@ -103,6 +106,7 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 		if (fServiceToProviderMap.containsKey(service)) {
 			fServiceToProviderMap.remove(service);
 		}
+		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED));
 	}
 	
 	/* (non-Javadoc)
@@ -119,7 +123,7 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 		// Remove old mapping if one exists
 		fServiceToProviderMap.remove(service);
 		fServiceToProviderMap.put(service, provider);
-
+		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED));
 	}
 	
 	/* (non-Javadoc)
