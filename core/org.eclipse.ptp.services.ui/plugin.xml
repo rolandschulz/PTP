@@ -7,7 +7,7 @@
    <extension
 		point="org.eclipse.ui.views">
       <category
-		name="%ServicesViewsCategory.name"
+		name="%ServicesViewCategory.name"
 		id="org.eclipse.ptp.services.ui.views">
 	 </category>
   	 <view
@@ -71,5 +71,41 @@
                type="org.eclipse.ui.model.IWorkbenchAdapter2">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="org.eclipse.ptp.services.ui.serviceConfiguration.popupMenu"
+            objectClass="org.eclipse.ptp.services.core.IServiceConfiguration">
+         <action
+               class="org.eclipse.ptp.services.internal.ui.actions.EditServiceConfigurationAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.services.ui.actions.editServiceConfiguration"
+               label="%EditServiceConfiguration.label">
+         </action>
+         <action
+               class="org.eclipse.ptp.services.internal.ui.actions.RemoveServiceConfigurationAction"
+               enablesFor="+"
+               id="org.eclipse.ptp.services.ui.actions.removeServiceConfiguration"
+               label="%RemoveServiceConfiguration.label">
+         </action>
+         <action
+               class="org.eclipse.ptp.services.internal.ui.actions.SelectActiveServiceConfigurationAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.services.ui.actions.selectActiveServiceConfiguration"
+               label="%SetActiveServiceConfiguration.label">
+         </action>
+      </objectContribution>
+      <viewerContribution
+            id="org.eclipse.ptp.services.ui.serviceConfiguration.popupMenu2"
+            targetID="org.eclipse.ptp.services.ui.views.serviceConfigurationView">
+         <action
+               class="org.eclipse.ptp.services.internal.ui.actions.AddServiceConfigurationAction"
+               enablesFor="*"
+               id="org.eclipse.ptp.services.ui.actions.addServiceConfiguration"
+               label="%AddServiceConfiguration.label">
+         </action>
+      </viewerContribution>
    </extension>
 </plugin>

@@ -10,27 +10,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.internal.ui.adapters;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class ServiceProviderWorkbenchAdapter extends WorkbenchAdapter {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
-	 */
-	@Override
-	public ImageDescriptor getImageDescriptor(Object object) {
-//		IPMachine machine = (IPMachine) object;
-//		return new ImageImageDescriptor(ParallelImages.machineImages[machine.getState().ordinal()]);
-		return null;
-	}
+	private IServiceModelManager fManager = ServiceModelManager.getInstance();
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	@Override
 	public String getLabel(Object object) {
-		return ((IServiceProvider)object).getName();
+		IServiceProvider provider = (IServiceProvider)object;
+		return provider.getName() + " (" + fManager.getService(provider.getServiceId()).getName() + " Service)"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
