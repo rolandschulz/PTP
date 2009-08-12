@@ -48,6 +48,14 @@ public interface IServiceModelManager extends IAdaptable {
 	public void addEventListener(IServiceModelEventListener listener, int type);
 	
 	/**
+	 * Get the global "active" service configuration. The "active" configuration is an
+	 * arbitrary configuration can be used by tools that do not operate on a project basis.
+	 * 
+	 * @return active service configuration, or null if no active configuration has been set
+	 */
+	public IServiceConfiguration getActiveConfiguration();
+	
+	/**
 	 * Get the configuration that is currently active for the project. Each project has
 	 * exactly one active configuration, which describes the mapping from services to
 	 * service providers. By default, the first configuration created for a project will 
@@ -98,14 +106,6 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project);
-	
-	/**
-	 * Get the default service configuration. This can be used by tools that require
-	 * the notion of a global "default" service configuration.
-	 * 
-	 * @return default service configuration, or null if there is no default selected
-	 */
-	public IServiceConfiguration getDefaultConfiguration();
 	
 	/**
 	 * Get the set of projects which use the specified service configuration
@@ -229,10 +229,10 @@ public interface IServiceModelManager extends IAdaptable {
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration);
 	
 	/**
-	 * Set the default service configuration. This can be used by tools that require
-	 * the notion of a global "default" service configuration.
+	 * Set the global "active" service configuration. The "active" configuration is an
+	 * arbitrary configuration can be used by tools that do not operate on a project basis.
 	 * 
-	 * @param config the service configuration to select as default
+	 * @param config the service configuration to select as active
 	 */
-	public void setDefaultConfiguration(IServiceConfiguration config);
+	public void setActiveConfiguration(IServiceConfiguration config);
 }

@@ -250,7 +250,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getDefaultConfiguration()
 	 */
-	public IServiceConfiguration getDefaultConfiguration() {
+	public IServiceConfiguration getActiveConfiguration() {
 		return fDefaultServiceConfiguration;
 	}
 
@@ -577,7 +577,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setDefaultConfiguration(org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
-	public void setDefaultConfiguration(IServiceConfiguration config) {
+	public void setActiveConfiguration(IServiceConfiguration config) {
 		fDefaultServiceConfiguration = config;
 		notifyListeners(new ServiceModelEvent(config, IServiceModelEvent.SERVICE_CONFIGURATION_SELECTED));
 	}
