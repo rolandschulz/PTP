@@ -32,13 +32,13 @@ import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 /**
  * Phase 5 of name-binding analysis.
- * <p> 
+ * <p>
  * Visits USE statements in an AST, marking a dependency in the VPG,
  * locating the used module, and importing declarations from it.
  * <p>
  * The user may provide module paths (via the Eclipse
  * project properties), which are applied when locating the module.
- * 
+ *
  * @author Jeff Overbey
  * @see Binder
  */
@@ -52,7 +52,7 @@ public class ModuleLoader extends VisibilityCollector
     public void visitASTModuleNode(ASTModuleNode node)
     {
         traverseChildren(node);
-        
+
         // TODO: Apply module paths
         Token moduleName = node.getModuleStmt().getModuleName().getModuleName();
         List<Definition> moduleSymtab = node.getAllPublicDefinitions();
@@ -82,7 +82,7 @@ public class ModuleLoader extends VisibilityCollector
     // |                         <GenericSpec>
     // | T_IDENT T_EQGREATERTHAN <UseName>
     // |                         <UseName>
-	
+
 	private boolean shouldImportModules;
 	private IFile fileContainingUseStmt;
 	private IProgressMonitor progressMonitor;
@@ -99,7 +99,7 @@ public class ModuleLoader extends VisibilityCollector
 		this.fileContainingUseStmt = fileContainingUseStmt;
 		this.progressMonitor = new NullProgressMonitor(); //progressMonitor;
 	}
-	
+
     // # R1107
     // <UseStmt> ::=
     // <LblDef> T_USE <Name> T_EOS
@@ -109,7 +109,7 @@ public class ModuleLoader extends VisibilityCollector
     @Override public void visitASTUseStmtNode(ASTUseStmtNode node)
     {
         super.traverseChildren(node);
-        
+
         try
         {
         	vpg.markFileAsImportingModule(fileContainingUseStmt, node.getName().getText());
@@ -123,13 +123,13 @@ public class ModuleLoader extends VisibilityCollector
         }
     }
 
-	
+
 	private void loadModule(ASTUseStmtNode node) throws Exception
 	{
 		this.useStmt = node;
 		this.moduleNameToken = useStmt.getName();
 		this.moduleName = PhotranVPG.canonicalizeIdentifier(moduleNameToken.getText());
-		
+
 		progressMonitor.subTask("Loading module " + moduleName + "...");
 
 		if (moduleExistsInFileContainingUseStmt())
@@ -142,14 +142,14 @@ public class ModuleLoader extends VisibilityCollector
     {
 		return findModuleIn(fileContainingUseStmt) != null;
 	}
-    
+
     private ASTModuleNode findModuleIn(IFile file) throws Exception
     {
         ASTExecutableProgramNode fileAST = vpg.acquireTransientAST(file).getRoot();
         for (IProgramUnit pu : fileAST.getProgramUnitList())
             if (pu instanceof ASTModuleNode && isNamed(moduleName, (ASTModuleNode)pu))
                 return (ASTModuleNode)pu;
-        
+
         return null;
     }
 
@@ -176,7 +176,7 @@ public class ModuleLoader extends VisibilityCollector
             			+ " module path.", useStmt.getName().getTokenRef());
             return;
         }
-        
+
 		for (IFile file : files)
         	bindToSymbolsIn(file);
     }
@@ -186,7 +186,7 @@ public class ModuleLoader extends VisibilityCollector
         String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(fileContainingUseStmt,
                                                                                            SearchPathProperties.MODULE_PATHS_PROPERTY_NAME));
         if (paths.length == 0) return files; // Do not apply if property not set
-        
+
         List<IFile> result = new LinkedList<IFile>();
 
         // Check in the directory with the file containing the USE statement first
@@ -218,15 +218,15 @@ public class ModuleLoader extends VisibilityCollector
 //    {
 //        ASTModuleNode moduleNode = findModuleIn(file);
 //        if (moduleNode == null) return; // Shouldn't happen if VPG is up to date
-//        
+//
 //        bind(useStmt.getName(), moduleNode.getRepresentativeToken());
-//        
+//
 //        ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
-//        
+//
 //        for (Definition def : moduleNode.getAllPublicDefinitions())
 //            if (shouldImportDefinition(def))
 //                importDefinition(def, newScope);
-//        
+//
 //        bindIdentifiersInRenameList(useStmt.getRenameList(), moduleNode);
 //        bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleNode);
 //    }
@@ -235,11 +235,11 @@ public class ModuleLoader extends VisibilityCollector
     {
         PhotranTokenRef moduleToken = vpg.getModuleTokenRef(moduleName);
         if (moduleToken == null) return; // Shouldn't happen if VPG is up to date
-        
+
         bind(useStmt.getName(), moduleToken);
-        
+
         ScopingNode newScope = useStmt.getUseToken().getEnclosingScope();
-        
+
         List<Definition> moduleSymtab = vpg.getModuleSymbolTable(moduleName);
         if (moduleSymtab == null) // Just in case
         {
@@ -250,7 +250,7 @@ public class ModuleLoader extends VisibilityCollector
             for (Definition def : moduleSymtab)
                 if (shouldImportDefinition(def))
                     importDefinition(def, newScope);
-        
+
             bindIdentifiersInRenameList(useStmt.getRenameList(), moduleSymtab);
             bindIdentifiersInOnlyList(useStmt.getOnlyList(), moduleSymtab);
         }
@@ -260,7 +260,7 @@ public class ModuleLoader extends VisibilityCollector
 	{
 		IASTListNode<ASTRenameNode> renameList = useStmt.getRenameList();
 		IASTListNode<ASTOnlyNode> onlyList = useStmt.getOnlyList();
-		
+
 		if (renameList == null && onlyList == null)
 		{
 			return true;
@@ -273,7 +273,7 @@ public class ModuleLoader extends VisibilityCollector
 				if (def.matches(entityBeingRenamed))
 						return false;
 			}
-			
+
 			return true;
 		}
 		else // (onlyList != null)
@@ -283,25 +283,25 @@ public class ModuleLoader extends VisibilityCollector
 	        	Token useName = onlyList.get(i).getName();
 	        	String entityToImport = useName == null ? null : PhotranVPG.canonicalizeIdentifier(useName.getText());
 	        	boolean isRenamed = onlyList.get(i).isRenamed();
-	        	
+
 	            if (def.matches(entityToImport) && !isRenamed) return true;
 	        }
-	        
+
 	        return false;
 		}
 	}
-	
+
 	private void bindIdentifiersInRenameList(IASTListNode<ASTRenameNode> renameList, List<Definition> moduleSymtab) throws Exception
 	{
 		if (renameList == null) return;
-		
+
 		for (int i = 0; i < renameList.size(); i++)
         {
 		    if (!renameList.get(i).isOperator()) // TODO: User-defined operators
 		    {
                 Token newName = renameList.get(i).getNewName();
                 Token oldName = renameList.get(i).getName();
-                
+
                 bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
 		    }
         }
@@ -310,14 +310,14 @@ public class ModuleLoader extends VisibilityCollector
 	private void bindIdentifiersInOnlyList(IASTListNode<ASTOnlyNode> onlyList, List<Definition> moduleSymtab) throws Exception
 	{
 		if (onlyList == null) return;
-		
+
 		for (int i = 0; i < onlyList.size(); i++)
         {
 		    if (!onlyList.get(i).isOperator()) // TODO: User-defined operators
 		    {
                 Token newName = onlyList.get(i).getNewName();
                 Token oldName = onlyList.get(i).getName();
-                
+
                 if (oldName != null) bindPossiblyRenamedIdentifier(newName, oldName, moduleSymtab);
 		    }
         }
@@ -328,15 +328,15 @@ public class ModuleLoader extends VisibilityCollector
         List<PhotranTokenRef> definitionsInModule = new LinkedList<PhotranTokenRef>();
         String canonicalizedOldName = PhotranVPG.canonicalizeIdentifier(oldName.getText());
         for (Definition def : moduleSymtab)
-            if (def.matches(canonicalizedOldName))
+            if (def != null && def.matches(canonicalizedOldName))
                 definitionsInModule.add(def.getTokenRef());
-        
+
         for (PhotranTokenRef def : definitionsInModule)
         {
             bindRenamedEntity(newName, def);
             bind(oldName, def);
         }
-        
+
         Type type = definitionsInModule.size() == 1 ? vpg.getDefinitionFor(definitionsInModule.get(0)).getType() : Type.UNKNOWN;
         addDefinition(newName, Definition.Classification.RENAMED_MODULE_ENTITY, type);
     }
@@ -344,13 +344,13 @@ public class ModuleLoader extends VisibilityCollector
 //    private void bindPossiblyRenamedIdentifier(Token newName, Token oldName, ASTModuleNode moduleNode) throws Exception
 //    {
 //        List<PhotranTokenRef> definitionsInModule = moduleNode.manuallyResolve(oldName);
-//        
+//
 //        for (PhotranTokenRef def : definitionsInModule)
 //        {
 //            bindRenamedEntity(newName, def);
 //            bind(oldName, def);
 //        }
-//        
+//
 //        Type type = definitionsInModule.size() == 1 ? vpg.getDefinitionFor(definitionsInModule.get(0)).getType() : Type.UNKNOWN;
 //        addDefinition(newName, Definition.Classification.RENAMED_MODULE_ENTITY, type);
 //    }
