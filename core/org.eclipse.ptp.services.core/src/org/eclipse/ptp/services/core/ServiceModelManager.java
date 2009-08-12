@@ -347,7 +347,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * then this method does nothing.
 	 * 
 	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
+	 * 
 	 * @throws IOException
 	 * @throws CoreException 
 	 */
@@ -365,138 +366,13 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_LOADED));
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#newServiceConfiguration(java.lang.String)
-	 */
-	public IServiceConfiguration newServiceConfiguration(String name) {
-		return newServiceConfiguration(UUID.randomUUID().toString(), name);
-	}
-	
-	/**
-	 * Prints the current service model to the console, for debugging purposes.
-	 */
-	public void printServiceModel() {
-		System.out.println("Service Model: "); //$NON-NLS-1$
-		if(fProjectConfigurations.isEmpty())
-			System.out.println("  Service Model is empty"); //$NON-NLS-1$
-		
-		for(Entry<IProject, Map<String, IServiceConfiguration>> entry : fProjectConfigurations.entrySet()) {
-			IProject project = entry.getKey();
-			System.out.println("  Project: " + project.getName()); //$NON-NLS-1$
-			for(IServiceConfiguration conf : entry.getValue().values()) {
-				System.out.println("      " + conf); //$NON-NLS-1$
-			}
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.core.resources.IProject)
-	 */
-	public void remove(IProject project) {
-		if(project == null) {
-			throw new NullPointerException();
-		}
-		fProjectConfigurations.remove(project);
-		fActiveConfigurations.remove(project);
-		fProjectServices.remove(project);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void remove(IServiceConfiguration conf) {
-		for (IProject project : fProjectConfigurations.keySet()) {
-			removeConfiguration(project, conf);
-			if (conf.equals(getActiveConfiguration(project))) {
-				fActiveConfigurations.remove(project);
-			}
-		}
-		fConfigurations.remove(conf.getId());
-		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
-		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
-		if(confs != null) {
-			confs.remove(conf.getId());
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener)
-	 */
-	public void removeEventListener(IServiceModelEventListener listener) {
-		fEventManager.removeEventListener(listener);
-	}
-
-	/**
-	 * Saves the model configuration into the plugin's metadata area using
-	 * the default file name.
-	 * Will not save data for projects that do not exist.
-	 * 
-	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.services.core<code> plugin.
-	 * @throws IOException
-	 */
-	public void saveModelConfiguration() throws IOException {
-		File file = defaultSaveFile.toFile();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		try {
-			saveModelConfiguration(writer);
-		} finally {
-			writer.close();
-		}
-	}
-	
-	/**
-	 * Saves the service model configuration to the given <code>file</code>.
-	 * Will not save data for projects that do not exist.
-	 * 
-	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.services.core<code> plugin.
-	 * @param file
-	 * @throws IOException 
-	 * @throws NullPointerException if file is null
-	 */
-	public void saveModelConfiguration(Writer writer) throws IOException {
-		if(writer == null)
-			throw new NullPointerException();
-		saveModelConfiguration(fConfigurations, fProjectConfigurations, fActiveConfigurations, writer);
-		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_SAVED));
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
-	 */
-	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
-		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
-		
-		if(!confs.containsKey(configuration.getId())) {
-			throw new IllegalArgumentException();
-		}
-		
-		fActiveConfigurations.put(project, configuration);
-	}
-	
-	/**
-	 * Initialize model
-	 */
-	private void initialize() {
-		fActiveConfigurations.clear();
-		fProjectConfigurations.clear();
-		fProjectServices.clear();
-		fConfigurations.clear();
-	}
-	
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the given <code>file</code>.
 	 * 
 	 * This method is not meant to be called outside of the
-	 * <code>org.eclipse.ptp.rdt.services<code> plugin.
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
+	 * 
 	 * @throws IOException 
 	 */
 	public void loadModelConfiguration(Reader reader) throws IOException, CoreException {
@@ -560,6 +436,146 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#newServiceConfiguration(java.lang.String)
+	 */
+	public IServiceConfiguration newServiceConfiguration(String name) {
+		return newServiceConfiguration(UUID.randomUUID().toString(), name);
+	}
+	
+	/**
+	 * Notify listeners of an event occurrence.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
+	 * 
+	 * @param event event to notify
+	 */
+	public void notifyListeners(IServiceModelEvent event) {
+		fEventManager.notifyListeners(event);
+	}
+
+	/**
+	 * Prints the current service model to the console, for debugging purposes.
+	 */
+	public void printServiceModel() {
+		System.out.println("Service Model: "); //$NON-NLS-1$
+		if(fProjectConfigurations.isEmpty())
+			System.out.println("  Service Model is empty"); //$NON-NLS-1$
+		
+		for(Entry<IProject, Map<String, IServiceConfiguration>> entry : fProjectConfigurations.entrySet()) {
+			IProject project = entry.getKey();
+			System.out.println("  Project: " + project.getName()); //$NON-NLS-1$
+			for(IServiceConfiguration conf : entry.getValue().values()) {
+				System.out.println("      " + conf); //$NON-NLS-1$
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.core.resources.IProject)
+	 */
+	public void remove(IProject project) {
+		if(project == null) {
+			throw new NullPointerException();
+		}
+		fProjectConfigurations.remove(project);
+		fActiveConfigurations.remove(project);
+		fProjectServices.remove(project);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void remove(IServiceConfiguration conf) {
+		for (IProject project : fProjectConfigurations.keySet()) {
+			removeConfiguration(project, conf);
+			if (conf.equals(getActiveConfiguration(project))) {
+				fActiveConfigurations.remove(project);
+			}
+		}
+		fConfigurations.remove(conf.getId());
+		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
+		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
+		if(confs != null) {
+			confs.remove(conf.getId());
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener)
+	 */
+	public void removeEventListener(IServiceModelEventListener listener) {
+		fEventManager.removeEventListener(listener);
+	}
+	
+	/**
+	 * Saves the model configuration into the plugin's metadata area using
+	 * the default file name.
+	 * Will not save data for projects that do not exist.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
+	 * 
+	 * @throws IOException
+	 */
+	public void saveModelConfiguration() throws IOException {
+		File file = defaultSaveFile.toFile();
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		try {
+			saveModelConfiguration(writer);
+		} finally {
+			writer.close();
+		}
+	}
+	
+	/**
+	 * Saves the service model configuration to the given <code>file</code>.
+	 * Will not save data for projects that do not exist.
+	 * 
+	 * This method is not meant to be called outside of the
+	 * <code>org.eclipse.ptp.services.core<code> plugin.
+	 * 
+	 * @param file
+	 * @throws IOException 
+	 * @throws NullPointerException if file is null
+	 */
+	public void saveModelConfiguration(Writer writer) throws IOException {
+		if(writer == null)
+			throw new NullPointerException();
+		saveModelConfiguration(fConfigurations, fProjectConfigurations, fActiveConfigurations, writer);
+		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_SAVED));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
+	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
+		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
+		
+		if(!confs.containsKey(configuration.getId())) {
+			throw new IllegalArgumentException();
+		}
+		
+		fActiveConfigurations.put(project, configuration);
+	}
+	
+	/**
+	 * Initialize model
+	 */
+	private void initialize() {
+		fActiveConfigurations.clear();
+		fProjectConfigurations.clear();
+		fProjectServices.clear();
+		fConfigurations.clear();
+	}
+
 	/**
 	 * Locate and initialize service extensions.
 	 */
@@ -626,7 +642,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}	
 	}
-
+	
 	/**
 	 * Create a service configuration with the specified id and name. Used when
 	 * restoring saved state.
@@ -640,15 +656,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fConfigurations.put(id, config);
 		notifyListeners(new ServiceModelEvent(config, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED));
 		return config;
-	}
-	
-	/**
-	 * Notify listeners of an event occurrence.
-	 * 
-	 * @param event event to notify
-	 */
-	private void notifyListeners(IServiceModelEvent event) {
-		fEventManager.notifyListeners(event);
 	}
 	
 }
