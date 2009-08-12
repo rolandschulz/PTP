@@ -77,6 +77,14 @@
 
 #define PE_DUAL_POE_DEBUG				/* Include code for PE proxy support for the dual poe debugger.*/
 
+  /* #define DO_TIMING to obtain proxy timings */
+#ifdef DO_TIMING
+#define RUN_START_TIMING run_start_timing()
+#define RUN_GET_TIME(msg, base_time) run_get_time(msg, base_time)
+#else
+#define RUN_START_TIMING
+#define RUN_GET_TIME(msg, base_time)
+#endif
 #define DEFAULT_PROXY "tcp"
 #define DEFAULT_QUEUE_NAME "default"
 #define SKIPPING_SPACES			1
@@ -341,6 +349,7 @@ static int env_array_size;
 static char **env_array;
 static regex_t msgid_regex;
 static regex_t errormsg_regex;
+static struct timeval run_start_time;
 
 #ifdef __linux__
 static struct option longopts[] = {
@@ -496,7 +505,8 @@ static void refresh_cluster_list();
 #endif
 
 static proxy_svr_helper_funcs helper_funcs = { NULL, NULL };
-
+static void run_start_timing();
+static void run_get_time(char *msg, struct timeval *base_time);
 /*
  * Proxy infrastructure expects commands in exactly this sequence.
  * Be careful when adding or deleting commands
@@ -952,6 +962,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     char mp_buffer_mem_value[50];
 
     TRACE_ENTRY;
+    RUN_START_TIMING;
     print_message_args(nargs, args);
     jobid = NULL;
     execdir = NULL;
@@ -1579,6 +1590,7 @@ startup_monitor(void *job_ident)
      * this application
      */
     char tasklist_path[_POSIX_PATH_MAX + 1];
+    int base_taskid;
     char *cfginfo;
     FILE *cfgfile;
     int numtasks;
@@ -1597,6 +1609,8 @@ startup_monitor(void *job_ident)
     char jobid_str[30];
     char procid_str[12];
     char procname[20];
+    char task_range[15];
+    struct timeval current_time;
 
     TRACE_ENTRY;
     job = (jobinfo *) job_ident;
@@ -1633,6 +1647,8 @@ startup_monitor(void *job_ident)
     }
 #endif
     TRACE_DETAIL_V("+++ Have task config file %s\n", tasklist_path);
+    gettimeofday(&current_time, NULL);
+    RUN_GET_TIME("Start processing attach.cfg file, time from run command start", &run_start_time);
     done = 0;
     while (!done) {
         char *lineptr;
@@ -1695,6 +1711,10 @@ startup_monitor(void *job_ident)
                     tasknum = atoi(p);
                     taskp = &tasks[tasknum];
                     taskp->proxy_taskid = generate_id();
+                    if (tasknum == 0) {
+                    	base_taskid = taskp->proxy_taskid;
+                    }
+
                     /*
                      * There are two possible attach.cfg file formats now. In the old
                      * format, the first two tokens in the line are a task index and
@@ -1802,6 +1822,7 @@ startup_monitor(void *job_ident)
      * For each task in the application, send a new process event to the
      * GUI.
      */
+    RUN_GET_TIME("Completed processing attach.cfg file, elapsed time", &current_time);
     taskp = tasks;
     sprintf(jobid_str, "%d", ((jobinfo *) job_ident)->proxy_jobid);
     msg = proxy_new_process_event(start_events_transid, jobid_str, numtasks);
@@ -1880,6 +1901,8 @@ startup_monitor(void *job_ident)
 #endif
     }
     else {
+    	gettimeofday(&current_time, NULL);
+    	RUN_GET_TIME("Start sending new task list, elapsed time from run command start", &run_start_time);
         for (i = 0; i < numtasks; i++) {
             node_refcount *node;
 
@@ -1908,9 +1931,13 @@ startup_monitor(void *job_ident)
         }
     }
     enqueue_event(msg);
+    RUN_GET_TIME("Completed sending new task list, elapsed time", &current_time);
     /*
      * Notify front end that each task is started
      */
+    gettimeofday(&current_time, NULL);
+    RUN_GET_TIME("Start sending task running messages, elapsed time from run command start", &run_start_time);
+#if 0
     SetList(taskid_list);
     proxy_taskid = GetListElement(taskid_list);
     while (proxy_taskid != NULL) {
@@ -1923,11 +1950,17 @@ startup_monitor(void *job_ident)
         proxy_taskid = GetListElement(taskid_list);
     }
     DestroyList(taskid_list, NULL);
+#endif
+    sprintf(task_range, "%d-%d", base_taskid, base_taskid + numtasks - 1);
+    msg = proxy_process_change_event(start_events_transid, task_range, 1);
+    proxy_add_string_attribute(msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
+    enqueue_event(msg);
     /*
      * attach.cfg file is complete and has been parsed. Notify the
      * front end that the job is running
      */
     send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_RUNNING);
+    RUN_GET_TIME("Completed sending task running messages, elapsed time", &current_time);
     /*
      * Now that all task pids are known, I/O from the application can be
      * enabled since we can now map I/O to a specific pid. This is done
@@ -3471,8 +3504,11 @@ void update_nodes(int trans_id, FILE * hostlist)
     char *valstr;
     char hostname[256];
     List *new_nodes;
+    struct timeval current_time;
 
     TRACE_ENTRY;
+    RUN_GET_TIME("Start processing host list, time from run command start", &run_start_time);
+    gettimeofday(&current_time, NULL);
     valstr = NULL;
     res = fgets(hostname, sizeof(hostname), hostlist);
     new_nodes = NewList();
@@ -3497,6 +3533,7 @@ void update_nodes(int trans_id, FILE * hostlist)
     }
     send_new_node_list(start_events_transid, machine_id, new_nodes);
     DestroyList(new_nodes, NULL);
+    RUN_GET_TIME("End processing host list, elapsed time", &current_time);
     TRACE_EXIT;
 }
 
@@ -5962,6 +5999,23 @@ void print_message_args(int argc, char *optional_args[])
             print_message(TRACE_MESSAGE, " '%s'\n", optional_args[i]);
         }
     }
+}
+
+void run_start_timing()
+{
+	gettimeofday(&run_start_time, NULL);
+}
+
+void run_get_time(char *msg, struct timeval * base_time)
+{
+	struct timeval current_time;
+	double elapsed_time;
+
+	gettimeofday(&current_time, NULL);
+	elapsed_time = current_time.tv_sec * 1000000.0 + (double) current_time.tv_usec;
+	elapsed_time = elapsed_time - (base_time->tv_sec * 1000000.0 + (double) base_time->tv_usec);
+	elapsed_time = elapsed_time / 1000000.0;
+	printf("TIMING %s: %11.6f\n", msg, elapsed_time);
 }
 
 /*
