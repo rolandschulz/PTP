@@ -57,7 +57,7 @@ public abstract class FortranFindReferencesActionDelegate
 			
 			// This may be null if the user cancelled the selection dialog.
 			if (selectedDef != null)
-				ReferenceSearch.searchForReference(selectedDef, getSearchScope(), token.getFile());
+				ReferenceSearch.searchForReference(selectedDef, getSearchScope(), token.getIFile());
         }
         catch (Exception e)
         {

@@ -246,7 +246,7 @@ public abstract class ScopingNode extends ASTNode
 	    		{
 					@Override public void visitToken(Token token)
 					{
-						throw new Notification(token.getFile());
+						throw new Notification(token.getIFile());
 					}
 	    		});
     		}
@@ -678,7 +678,10 @@ public abstract class ScopingNode extends ASTNode
         	Token firstToken = findFirstTokenIn(this);
         	Token lastToken = findLastTokenIn(this);
         	
-        	if (firstToken == null || lastToken == null) return null;
+        	if (firstToken == null
+        	    || lastToken == null
+        	    || firstToken.getIFile() == null)
+        	    return null;
 
             int startOffset = firstToken.getFileOffset();
             startOffset -= firstToken.getWhiteBefore().length();
@@ -686,7 +689,7 @@ public abstract class ScopingNode extends ASTNode
             int endOffset = lastToken.getFileOffset()+lastToken.getLength();
             //endOffset += lastToken.getWhiteAfter().length();
 
-            IMarker marker = firstToken.getFile().createMarker(IMarker.TEXT);
+            IMarker marker = firstToken.getIFile().createMarker(IMarker.TEXT);
 			marker.setAttribute(IMarker.CHAR_START, startOffset);
 			marker.setAttribute(IMarker.CHAR_END, endOffset);
             return marker;

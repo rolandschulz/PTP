@@ -258,7 +258,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     "Variable you want to encapsulate is used as an argument in a function." + EOL + 
                     "Encapsulating this variable might change the expected behavior of that function." + EOL +
                     "Proceed at your own disgression." + EOL + 
-                    "File: "+t.getFile().getName()+" line: "+t.getLine()+EOL;
+                    "File: "+t.getFilenameToDisplayToUser()+" line: "+t.getLine()+EOL;
                 
                 RefactoringStatusContext context = createContext(t.getTokenRef()); // Highlights problematic definition in file
                 status.addWarning(message, context);
@@ -277,7 +277,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 setGetterAndSetter();
                 wereMethodsCreated = true;
             }
-            modifiedFiles.add(t.getFile());
+            modifiedFiles.add(t.getIFile());
         }
         else if(isTokenWrittenTo(t))
         {
@@ -287,13 +287,14 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 setGetterAndSetter();
                 wereMethodsCreated = true;
             }
-            modifiedFiles.add(t.getFile());
+            modifiedFiles.add(t.getIFile());
         }
         else //Neither written nor read (i.e. Access declaration (private,public))
         {
             String message = "!!!WARNING!!!" + EOL +
                              "The following reference to the selected variable will not be changed" + EOL +
-                             "since it is neither written nor read: " + t.getFile() + " line " + t.getLine();
+                             "since it is neither written nor read: " + t.getFilenameToDisplayToUser() +
+                             " line " + t.getLine();
             RefactoringStatusContext context = createContext(t.getTokenRef());
             status.addWarning(message, context);
         }
@@ -325,7 +326,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         {
             fail("Currently can only encapsulate variables that appear as "+
                 "expressions. This variable is used as a non-expression in " +
-                t.getFile().getName() + " line " + t.getLine());
+                t.getFilenameToDisplayToUser() + " line " + t.getLine());
         }
     }
     
@@ -368,15 +369,15 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     {
                         lst.insertAfter(newDeclNode, newAccessNode);
                         Reindenter.reindent(newDeclNode, 
-                            vpg.acquireTransientAST(varDefTok.getFile()), 
+                            vpg.acquireTransientAST(varDefTok.getIFile()), 
                             Strategy.REINDENT_EACH_LINE);
                     }
                     else
                         lst.insertAfter(possibleTypeDec, newAccessNode);
                     
-                    modifiedFiles.add(varDefTok.getFile());
+                    modifiedFiles.add(varDefTok.getIFile());
                     Reindenter.reindent(newAccessNode, 
-                                        vpg.acquireTransientAST(varDefTok.getFile()), 
+                                        vpg.acquireTransientAST(varDefTok.getIFile()), 
                                         Strategy.REINDENT_EACH_LINE);
                     break;
                 }

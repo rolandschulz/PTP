@@ -18,6 +18,7 @@ import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 
 /**
  * A collection of (static) factory methods for creating Fortran lexers.
@@ -40,6 +41,16 @@ public final class LexerFactory
     
     public static IAccumulatingLexer createLexer(IFile file, SourceForm sourceForm, boolean accumulateWhitetext) throws CoreException, IOException
     {
-        return createLexer(file.getContents(), file, file.getName(), sourceForm, accumulateWhitetext);
+        return createLexer(file.getContents(), file, determineFilename(file), sourceForm, accumulateWhitetext);
+    }
+
+    private static String determineFilename(IFile file)
+    {
+        if (file == null) return null;
+        
+        IPath location = file.getLocation();
+        if (location == null) return file.getFullPath().toOSString();
+        
+        return location.toOSString();
     }
 }

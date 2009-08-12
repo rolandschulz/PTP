@@ -34,7 +34,7 @@ public class SyntaxException extends Exception
         super("Syntax error: Unexpected "
             + lookahead.getTerminal().toString()
             + " ("
-            + (lookahead.getFile()==null ? "" : lookahead.getFile().getName() + ", ")
+            + lookahead.getFilenameToDisplayToUser() + ", "
             + "line " + lookahead.getLine()
             + ", column " + lookahead.getCol()
             + ")");
@@ -45,7 +45,7 @@ public class SyntaxException extends Exception
     /** May return <code>null</code> */
     public IFile getFile()
     {
-        return lookahead.getFile();
+        return lookahead.getIFile();
     }
     
     public int getTokenLine()

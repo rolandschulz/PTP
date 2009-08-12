@@ -11,6 +11,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 
 /**
  * A minimal implementation of <code>IToken</code>.
@@ -42,7 +43,8 @@ public class SimpleToken implements IToken
     // Additional Fields - Not updated when refactoring
     ///////////////////////////////////////////////////////////////////////////
     
-    protected IFile file = null;
+    protected IFile ifile = null;
+    protected java.io.File javaFile = null;
     
     protected int line = -1, col = -1, fileOffset = -1, streamOffset = -1, length = -1;
 
@@ -124,14 +126,38 @@ public class SimpleToken implements IToken
         this.col = col;
     }
 
-    public IFile getFile()
+    public String getFilenameToDisplayToUser()
     {
-        return file;
+        if (this.ifile != null)
+            return this.ifile.getFullPath().toOSString();
+        else if (this.javaFile != null)
+            return this.javaFile.getAbsolutePath();
+        else
+            return null;
+    }
+
+    public IFile getIFile()
+    {
+        return ifile;
+    }
+
+    public java.io.File getJavaFile()
+    {
+        return javaFile;
     }
 
     public void setFile(IFile file)
     {
-        this.file = file;
+        this.ifile = file;
+        
+        IPath location = file.getLocation();
+        this.javaFile = location == null ? null : location.toFile();
+    }
+
+    public void setFile(java.io.File file)
+    {
+        this.ifile = null;
+        this.javaFile = file;
     }
 
     public int getFileOffset()

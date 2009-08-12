@@ -70,8 +70,33 @@ public interface IToken
     public int getCol();
     public void setCol(int col);
 
-    public IFile getFile();
+    /**
+     * @return a filename that can be displayed to the user to indicate what
+     * file this token is located in.  This is not guaranteed to be a legal
+     * file path or even an actual filename.
+     * 
+     * @see #getIFile()
+     * @see #getJavaFile()
+     */
+    public String getFilenameToDisplayToUser();
+    /**
+     * @return the <code>IFile</code> in which this token occurs, or
+     * <code>null</code> if it is not located in a workspace file
+     * 
+     * @see #getFilenameToDisplayToUser()
+     * @see #getJavaFile()
+     */
+    public IFile getIFile();
+    /**
+     * @return the <code>java.io.File</code> in which this token occurs, or
+     * <code>null</code> if it is not located on the local filesystem
+     * 
+     * @see #getFilenameToDisplayToUser()
+     * @see #getJavaFile()
+     */
+    public java.io.File getJavaFile();
     public void setFile(IFile file);
+    public void setFile(java.io.File file);
     
     public int getFileOffset();
     public void setFileOffset(int fileOffset);

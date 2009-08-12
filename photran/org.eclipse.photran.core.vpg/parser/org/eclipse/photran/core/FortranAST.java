@@ -37,7 +37,7 @@ public class FortranAST implements IFortranAST
         this.tokenList = tokenList;
         
         for (Token token : new IterableWrapper<Token>(tokenList))
-        	if (token.getFile() == null)
+        	if (token.getIFile() == null)
         		token.setFile(file);
     }
 
@@ -105,10 +105,11 @@ public class FortranAST implements IFortranAST
         for (int i = 0; i < tokenList.size(); i++)
         {
             Token token = (Token)tokenList.get(i);
-            if (token.getFile().hashCode() == file.hashCode()  //    OPTIMIZATION: Profile indicates lots
-                            && token.getFile().equals(file)    // << of time spent in String#equals here
-                            && token.getFileOffset() == offset
-                            && token.getLength() == length)
+            if (token.getIFile() != null
+                && token.getIFile().hashCode() == file.hashCode()  //    OPTIMIZATION: Profile indicates lots
+                && token.getIFile().equals(file)                   // << of time spent in String#equals here
+                && token.getFileOffset() == offset
+                && token.getLength() == length)
                 return token;
         }
         return null;

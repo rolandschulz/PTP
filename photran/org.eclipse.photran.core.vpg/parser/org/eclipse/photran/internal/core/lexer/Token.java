@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
@@ -70,7 +71,8 @@ public class Token implements IToken, IASTNode
      */
     protected String preprocessorDirective = null;
     
-    protected IFile file = null;
+    protected IFile ifile = null;
+    protected java.io.File javaFile = null;
     
     protected int line = -1, col = -1, fileOffset = -1, streamOffset = -1, length = -1;
     
@@ -100,7 +102,8 @@ public class Token implements IToken, IASTNode
         this.text                  = copyFrom.text;
         this.whiteAfter            = copyFrom.whiteAfter;
         this.preprocessorDirective = copyFrom.preprocessorDirective;
-        this.file                  = copyFrom.file;
+        this.ifile                 = copyFrom.ifile;
+        this.javaFile              = copyFrom.javaFile;
         this.line                  = copyFrom.line;
         this.col                   = copyFrom.col;
         this.fileOffset            = copyFrom.fileOffset;
@@ -183,14 +186,38 @@ public class Token implements IToken, IASTNode
         this.col = col;
     }
 
-    public IFile getFile()
+    public String getFilenameToDisplayToUser()
     {
-        return file;
+        if (this.ifile != null)
+            return this.ifile.getFullPath().toOSString();
+        else if (this.javaFile != null)
+            return this.javaFile.getAbsolutePath();
+        else
+            return null;
+    }
+
+    public IFile getIFile()
+    {
+        return ifile;
+    }
+
+    public java.io.File getJavaFile()
+    {
+        return javaFile;
     }
 
     public void setFile(IFile file)
     {
-        this.file = file;
+        this.ifile = file;
+        
+        IPath location = file == null ? null : file.getLocation();
+        this.javaFile = location == null ? null : location.toFile();
+    }
+
+    public void setFile(java.io.File file)
+    {
+        this.ifile = null;
+        this.javaFile = file;
     }
 
     public int getFileOffset()
@@ -367,7 +394,7 @@ public class Token implements IToken, IASTNode
 
     public PhotranTokenRef getTokenRef()
     {
-    	if (tokenRef == null) tokenRef = new PhotranTokenRef(file, fileOffset, length);
+    	if (tokenRef == null) tokenRef = new PhotranTokenRef(ifile, fileOffset, length);
     	
     	return tokenRef;
     }
