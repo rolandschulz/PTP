@@ -18,6 +18,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.rse.core.messages.Messages;
 import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
@@ -112,8 +113,17 @@ public class RSEServices implements IRemoteServicesDelegate {
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
 	public void initialize() {
-		if (registry == null && RSECorePlugin.isTheSystemRegistryActive()) {
-			registry = RSECorePlugin.getTheSystemRegistry();
+		if (registry == null) {
+			try {
+				RSECorePlugin.waitForInitCompletion();
+			} catch (InterruptedException e) {
+				Activator.log(e);
+			}
+			if (RSECorePlugin.isTheSystemRegistryActive()) {
+				registry = RSECorePlugin.getTheSystemRegistry();
+			} else {
+				Activator.log(Messages.RSEServices_0);
+			}
 		}
 	}
 	
