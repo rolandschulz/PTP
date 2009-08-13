@@ -984,7 +984,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		IProject project = verifyProject(configuration);
 		String fileName = getProgramName(configuration);
 		if (fileName == null)
-			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
 					Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified));
 
 		IPath programPath = new Path(fileName);
@@ -1221,7 +1221,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		try {
 			verifyResource(dbgPath, configuration);
 		} catch (CoreException e) {
-			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
 					Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found,
 					new FileNotFoundException(e.getLocalizedMessage())));
 		}
@@ -1242,7 +1242,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 			try {
 				return verifyResource(exePath, configuration);
 			} catch (CoreException e) {
-				throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
 						Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
 						new FileNotFoundException(e.getLocalizedMessage())));
 			}
@@ -1275,13 +1275,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
     protected IProject verifyProject(ILaunchConfiguration configuration) throws CoreException {
         String proName = getProjectName(configuration);
         if (proName == null) {
-			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID, 
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
 					Messages.AbstractParallelLaunchConfigurationDelegate_Project_not_specified));
         }
 
         IProject project = getProject(proName);
         if (project == null || !project.exists() || !project.isOpen()) {
-			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID, 
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
 					Messages.AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project));
         }
 
