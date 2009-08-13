@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -246,6 +246,12 @@ public abstract class CElement implements ICElement, Serializable {
 				return false;
 			}
 		}
+		
+		ICElement parent = other.getParent();
+		if (fParent != null && !fParent.equals(parent)) {
+			return false;
+		}
+		
 		return true;
 	}
 	
