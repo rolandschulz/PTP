@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,15 +74,15 @@ public class IndexQueries {
 
 	public static IIndexBinding elementToBinding(IIndex index, ICElement element) throws CoreException {
 		if (element instanceof ISourceReference) {
-//			ISourceReference sf = ((ISourceReference)element);
-//			ISourceRange range= sf.getSourceRange();
-//			if (range.getIdLength() != 0) {
-//				IIndexName name= elementToName(index, element);
-//				if (name != null) {
-//					return index.findBinding(name);
-//				}
-//			}
-//			else {
+			ISourceReference sf = ((ISourceReference)element);
+			ISourceRange range= sf.getSourceRange();
+			if (range.getIdLength() != 0) {
+				IIndexName name= remoteElementToName(index, element);
+				if (name != null) {
+					return index.findBinding(name);
+				}
+			}
+			else {
 				String name= element.getElementName();
 				name= name.substring(name.lastIndexOf(':')+1);
 				IIndexBinding[] bindings= index.findBindings(name.toCharArray(), IndexFilter.ALL, new NullProgressMonitor());
@@ -92,7 +92,7 @@ public class IndexQueries {
 						return binding;
 					}
 				}
-//			}
+			}
 		}
 		return null;
 	}
