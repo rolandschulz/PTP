@@ -63,7 +63,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	
 	private IManagedBuildInfo buildInfo=null;
 	
-	private String outputLocation=null;
+	//private String outputLocation=null;
 	private Map<String,String> buildMods=null;
 	
 	private String newname=null;
@@ -85,11 +85,11 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		tool=btool;
 		initBuild(conf);
 	}
-	private String rootLocation=null;
+	//private String rootLocation=null;
 	private void initBuild(ILaunchConfiguration conf)throws CoreException{
 		//apppathattrib=apa;
-		outputLocation=projectLocation;
-		rootLocation=projectLocation;
+		//outputLocation=projectLocation;
+		//rootLocation=projectLocation;
 		buildConf=configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,(String)null);
 		
 		if(tool==null)return;
@@ -172,10 +172,10 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			}
 //TODO:  Make this work again (i.e. distinguish between all-compiler and discrete compiler systems)
 			BufferedWriter makeOut = new BufferedWriter(new FileWriter(compilerInclude));
-			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation, rootLocation);
-			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration, outputLocation, rootLocation)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration, outputLocation, rootLocation)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration, outputLocation, rootLocation)+" "+allargs+"\n");
+			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
+			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+"\n");
 			makeOut.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -270,6 +270,8 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		return true;
 	}
 	
+	public IConfiguration selectedconf=null;
+	
 	private boolean initMMBuild() throws CoreException{
 		if (buildInfo == null||!buildInfo.isValid()){
 			System.out.println("No info!!!");
@@ -288,7 +290,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		
 		//Make a list of the configurations already within the project
 		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
-		IConfiguration selectedconf = null;
+		//IConfiguration selectedconf = null;
 		for(int i=0;i<buildconfigs.length;i++){
 			if((buildconfigs[i].getName()).equals(buildConf))
 			{
@@ -310,8 +312,14 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
         //if(basename.indexOf(addname)<0)
         newname=basename+"_"+addname;
 
-        if(addname.equals(DEFAULT_TOOLCONFNAME))
-        	newname+="_"+tool.toolName;
+        if(addname.equals(DEFAULT_TOOLCONFNAME)){
+        	String nameMod=tool.toolName;
+        	if(nameMod==null){
+        		nameMod=tool.toolID;
+        	}
+        	newname+="_"+nameMod;
+        }
+        	
 
         
         progPath=newname+File.separator+binary;
@@ -357,7 +365,14 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 	public boolean initMMBuildConf() throws CoreException, FileNotFoundException
 	{	
 
-		newBuildConfig.setName(newname);
+		//boolean preconf=false;
+		if(newBuildConfig.getName().equals(newname))
+		{
+			//preconf=true;
+		}
+		else{
+			newBuildConfig.setName(newname);
+		}
 		
 		//TODO: Restore TAU build configuration adjustment
 //		if(useTau)
@@ -396,7 +411,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		String allargs="";
 		if(tool.getGlobalCompiler()!=null && !tool.getGlobalCompiler().equals(tool.getCcCompiler()))
 		{
-			allargs=getToolArguments(tool.getGlobalCompiler(),configuration, outputLocation, rootLocation);
+			allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
 		}
 		int numChanges=0;
 		for(int i =0;i<tools.length;i++){
@@ -428,15 +443,15 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			String toolid=tools[i].getId();
 			if(toolid.indexOf(".c.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration, outputLocation, rootLocation),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration),allargs,tool.replaceCompiler);
 			}
 			if(toolid.indexOf(".cpp.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration, outputLocation, rootLocation),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration),allargs,tool.replaceCompiler);
 			}
 			if(toolid.indexOf(".fortran.")>=0)
 			{
-				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration, outputLocation, rootLocation),allargs,tool.replaceCompiler);
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration),allargs,tool.replaceCompiler);
 			}
 		}
 		//System.out.println(tbpath+File.separator+"tau_xxx.sh"+tauCompilerArgs);
@@ -485,10 +500,11 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 
 	private static int modifyCommand(ITool tool, String command, String args, boolean replace){
 		int didChange=0;
+		String toolCommand = tool.getToolCommand();
 		if(replace)
 		{
 			String newcom=command+" "+args;
-			if(!newcom.equals(tool.getToolCommand()));
+			if(!newcom.equals(toolCommand))
 			{
 				tool.setToolCommand(command+" "+args);
 				didChange= 1;
@@ -496,8 +512,13 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		}
 		else
 		{
-			String newcom=command+" "+args+" "+tool.getToolCommand();
-			if(!newcom.equals(tool.getToolCommand()));
+			String oldcom=toolCommand.trim();
+			int lastspc=oldcom.lastIndexOf(' ');
+			if(lastspc>=0){
+				oldcom=toolCommand.substring(lastspc).trim();
+			}
+			String newcom=command+" "+args+" "+oldcom;
+			if(!newcom.equals(toolCommand))
 			{
 				tool.setToolCommand(newcom);
 				didChange= 1;

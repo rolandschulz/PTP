@@ -34,4 +34,8 @@ public class ToolsOptionsConstants {
 	
 	public static final String CONF_VALUE="%%REPLACE_WITH_CONFIGURATION_VALUE%%";
 	
+	public static final String PROJECT_BINARY="%%REPLACE_WITH_PROJECT_BINARY%%";
+	
+	public static final String PROJECT_NAME="%%REPLACE_WITH_PROJECT_NAME%%";
+	
 }

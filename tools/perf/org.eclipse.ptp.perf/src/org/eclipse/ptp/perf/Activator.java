@@ -36,7 +36,6 @@ import org.eclipse.ptp.perf.toolopts.ExecTool;
 import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.ptp.perf.toolopts.PerformanceTool;
 import org.eclipse.ptp.perf.toolopts.PostProcTool;
-import org.eclipse.ptp.perf.toolopts.ToolApp;
 import org.eclipse.ptp.perf.toolopts.ToolMaker;
 import org.eclipse.ptp.perf.toolopts.ToolPane;
 import org.eclipse.ptp.perf.ui.AbstractPerformanceConfigurationTab;
@@ -110,6 +109,23 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	/**
+	 * Inserts the tool panes located in the list panes into the List paneList
+	 * @param panes
+	 * @param paneList
+	 */
+	private static void insertPanes(List<ToolPane> panes, List<ToolPane> paneList)
+	{
+		if(panes!=null&&panes.size()>0)
+		{
+			for(int k=0;k<panes.size();k++)
+			{
+				if(!panes.get(k).virtual)
+					paneList.add(panes.get(k));
+			}
+		}
+	}
+	
+	/**
 	 * Returns an array of all of the non-virtual tool panes defined in available tool definition xml files
 	 * Panes are ordered by tool, and within each tool by compilation, execution and analysis step
 	 * @return
@@ -129,26 +145,33 @@ public class Activator extends AbstractUIPlugin {
 				if(t instanceof BuildTool)
 				{
 					BuildTool bt = (BuildTool)t;
-					ToolApp compApp=bt.getCcCompiler();
-					if(compApp!=null)
-					{
-						insertPanes(compApp.toolPanes,paneList);
-					}
-					compApp=bt.getCxxCompiler();
-					if(compApp!=null)
-					{
-						insertPanes(compApp.toolPanes,paneList);
-					}
-					compApp=bt.getF90Compiler();
-					if(compApp!=null)
-					{
-						insertPanes(compApp.toolPanes,paneList);
-					}
-					compApp=bt.getGlobalCompiler();
-					if(compApp!=null)
-					{
-						insertPanes(compApp.toolPanes,paneList);
-					}
+//					ToolApp lastApp=null;
+//					ToolApp compApp = bt.getCcCompiler();
+//					if(compApp!=null)
+//					{
+//						insertPanes(compApp.toolPanes,paneList);
+//					}
+//					compApp=null;
+//					compApp=bt.getCxxCompiler();
+//					if(compApp!=null)
+//					{
+//						insertPanes(compApp.toolPanes,paneList);
+//					}
+//					compApp=null;
+//					compApp=bt.getF90Compiler();
+//					if(compApp!=null)
+//					{
+//						insertPanes(compApp.toolPanes,paneList);
+//					}
+//					compApp=null;
+//					compApp=bt.getGlobalCompiler();
+//					if(compApp!=null)
+//					{
+//						insertPanes(compApp.toolPanes,paneList);
+//					}
+					
+					insertPanes(bt.getAllCompilerPanes(),paneList);
+					
 				}
 				else if(t instanceof ExecTool)  
 				{
@@ -323,6 +346,13 @@ public class Activator extends AbstractUIPlugin {
 //		{
 //			tools[i]=otherTools[i];
 //		}
+		
+		
+		for(int i=0;i<tools.length;i++)
+		{
+			BuildLaunchUtils.verifyEnvToolPath(tools[i]);
+		}
+		
 	}
 	
 	private static ArrayList<AbstractPerformanceConfigurationTab> perfConfTabs=null;

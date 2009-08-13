@@ -167,6 +167,36 @@ public class BuildLaunchUtils {
 			}
 	}
 	
+	
+	public static void verifyEnvToolPath(PerformanceProcess tool){
+		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+
+		Iterator<Map.Entry<String,String>> eIt = null;
+		Map.Entry<String,String> me = null;
+		String entry=null;
+		String toolBinID=null;
+		String curTool=null;
+		
+			eIt = tool.groupApp.entrySet().iterator();
+			while (eIt.hasNext()) 
+			{
+				me = eIt.next();
+				entry=me.getKey();
+				
+				if(entry.equals("internal"))
+					continue;
+				
+				toolBinID=IPerformanceLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry;
+				curTool=pstore.getString(toolBinID);
+				
+				if(curTool==null||curTool.equals("")||!(new File(curTool).exists()))
+				{
+					curTool=BuildLaunchUtils.checkToolEnvPath((String) me.getValue());
+					pstore.setValue(toolBinID,curTool);//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+				}
+			}
+	}
+	
 	/**
 	 * This locates name of the parent of the directory containing the given tool.
 	 * @param The name of the tool whose directory is being located

@@ -36,7 +36,7 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 	public PerfPostlaunch(ILaunchConfiguration conf, PostProcTool ppTool, String outLoc) throws CoreException{
 		super(conf,"Analysis");
 		tool=ppTool;
-		outputLocation=outLoc;
+		projectLocation=outputLocation=outLoc;
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 					//TODO: put internal in defined strings
 					if(tool.analysisCommands[i].toolGroup==null||!tool.analysisCommands[i].toolGroup.equals("internal"))
 					{
-						runTool=getToolCommandList(tool.analysisCommands[i],configuration,outputLocation,outputLocation);//tool.analysisCommands[i].toolCommand;
+						runTool=getToolCommandList(tool.analysisCommands[i],configuration);//tool.analysisCommands[i].toolCommand;
 						//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
 						if(tool.forAllLike!=null){
 							File getname = new File(currentFile);

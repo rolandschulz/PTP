@@ -106,12 +106,12 @@ public class ToolArgument implements IAppInput{
 		
 	}
 	
-	private String getArg(String buildDir, String rootDir){
-		String arg=getArg();
-		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
-		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
-		return arg;
-	}
+//	private String getArg(String buildDir, String rootDir){
+//		String arg=getArg();
+//		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
+//		arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
+//		return arg;
+//	}
 	
 	private String getArg(){
 		

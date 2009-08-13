@@ -23,6 +23,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -101,6 +102,18 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 
 	}
 
+	/**
+	 * Allow the user to choose a project
+	 */
+	protected void handleProjectButtonSelected() {
+		IProject project = chooseProject();
+		if (project == null)
+			return;
+
+		String projectName = project.getName();
+		projText.setText(projectName);
+		initConfCombo();
+	}
 
 	private void initializeConfCombo(ILaunchConfiguration configuration)
 	{
@@ -157,8 +170,8 @@ public class ParallelPerfRecompMainTab extends ApplicationTab{
 		buildConfCombo.removeAll();
 		ICProject project = getCProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Project_required"),
-					org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); 
+			//MessageDialog.openInformation(getShell(), org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Project_required"),
+				//	org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); 
 			return;
 		}
 

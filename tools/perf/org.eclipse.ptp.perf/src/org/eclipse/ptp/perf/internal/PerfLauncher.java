@@ -28,20 +28,11 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 	 * The location of the binary rebuilt with performance instrumentation
 	 */
 	private String progPath=null;
-	
-	
-	//private IConfiguration olddefbuildconf=null;
-	//private ICProject thisCProject=null;
-	//private boolean useTau=false;
 
 	/**
 	 * The name of the original application in the launch configuration
 	 */
 	private String application = null;
-
-	
-	//private String projectLocation=null;
-	//private String outputLocation=null;
 	
 	private String saveApp=null;
 	private String saveArgs=null;
@@ -161,12 +152,12 @@ public class PerfLauncher extends PerfStep implements IPerformanceLaunchConfigur
 			
 				confWC.setAttribute(appnameattrib, firstExecUtil);
 				
-				String otherUtils=getToolArguments(tool.execUtils[0],configuration, projectLocation, projectLocation);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
+				String otherUtils=getToolArguments(tool.execUtils[0],configuration);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
 				
 				for(int i=1;i<tool.execUtils.length;i++)
 				{
 					//TODO: Check paths of other tools
-					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration, projectLocation, projectLocation);//tool.execUtils[i].getCommand(configuration);
+					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration);//tool.execUtils[i].getCommand(configuration);
 				}
 				swappedArgs=true;
 				String toArgs=otherUtils+" "+prog+" "+arg;

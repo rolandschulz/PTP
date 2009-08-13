@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.perf.Activator;
 import org.eclipse.ptp.perf.IPerformanceLaunchConfigurationConstants;
-import org.eclipse.ptp.perf.internal.BuildLaunchUtils;
 import org.eclipse.ptp.perf.toolopts.PerformanceProcess;
 import org.eclipse.ptp.perf.toolopts.ToolPane;
 import org.eclipse.ptp.perf.toolopts.ToolPaneListener;
@@ -589,7 +588,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 //		else
 		if(tools!=null&&tools.length>=1)
 		{
-			BuildLaunchUtils.verifyRequestToolPath(tools[toolTypes.getSelectionIndex()],false);
+			//BuildLaunchUtils.verifyRequestToolPath(tools[toolTypes.getSelectionIndex()],false);
 			/*In theory his is moot!*/
 //			if(toolTypes.getSelectionIndex()==0)
 //				configuration.setAttribute(TAULAUNCH, true);
