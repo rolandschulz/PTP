@@ -1,68 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-	<description url="http://download.eclipse.org/tools/ptp/releases/3.0">
+	<description url="http://download.eclipse.org/tools/ptp/releases/galileo">
 		Parallel Tools Platform update site - Release 3.0
 	</description>
-	<feature url="features/org.eclipse.ptp_@buildVersion@.jar" id="org.eclipse.ptp" version="@buildVersion@">
+	<category-def name="Parallel Tools Platform 3.0" label="Parallel Tools Platform 3.0"/>
+	<feature id="org.eclipse.ptp" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.core_@buildVersion@.jar" id="org.eclipse.ptp.core" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.core" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.core_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.services_@buildVersion@.jar" id="org.eclipse.ptp.services" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.services" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.services_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.utils_@buildVersion@.jar" id="org.eclipse.ptp.utils" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.utils" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.utils_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.remotetools_@buildVersion@.jar" id="org.eclipse.ptp.remotetools" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.remotetools" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.remotetools_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.rm.ibm.ll_@buildVersion@.jar" id="org.eclipse.ptp.rm.ibm.ll" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.rm.ibm.ll" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.rm.ibm.ll_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.rm.ibm.pe_@buildVersion@.jar" id="org.eclipse.ptp.rm.ibm.pe" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.rm.ibm.pe" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.rm.ibm.pe_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.remote.remotetools_@buildVersion@.jar" id="org.eclipse.ptp.remote.remotetools" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.remote.remotetools" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.remote.remotetools_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.remote.rse_@buildVersion@.jar" id="org.eclipse.ptp.remote.rse" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.remote.rse" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.remote.rse_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.debug.sdm_@buildVersion@.jar" id="org.eclipse.ptp.debug.sdm" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.debug.sdm" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.debug.sdm_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.external_@buildVersion@.jar" id="org.eclipse.ptp.external" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.external" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.external_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.remote_@buildVersion@.jar" id="org.eclipse.ptp.remote" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.remote" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.remote_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.rm.mpich2_@buildVersion@.jar" id="org.eclipse.ptp.rm.mpich2" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.rm.mpich2" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.rm.mpich2_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.rm.openmpi_@buildVersion@.jar" id="org.eclipse.ptp.rm.openmpi" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.rm.openmpi" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.rm.openmpi_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.pldt_@buildVersion@.jar" id="org.eclipse.ptp.pldt" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.pldt" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.pldt_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.pldt.lapi_@buildVersion@.jar" id="org.eclipse.ptp.pldt.lapi" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.pldt.lapi" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.pldt.lapi_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.pldt.upc_@buildVersion@.jar" id="org.eclipse.ptp.pldt.upc" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.pldt.upc" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.pldt.upc_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.perf_@buildVersion@.jar" id="org.eclipse.ptp.perf" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.perf" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.perf_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature url="features/org.eclipse.ptp.perf.tau_@buildVersion@.jar" id="org.eclipse.ptp.perf.tau" version="@buildVersion@">
+	<feature id="org.eclipse.ptp.perf.tau" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.perf.tau_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
+	
+	<category-def name="Remote Development Tools" label="Remote Development Tools"/>
+	<feature id="org.eclipse.ptp.rdt" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.rdt_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
 		<category name="Remote Development Tools"/>
 	</feature>
-	<category-def name="Parallel Tools Platform 3.0" label="Parallel Tools Platform 3.0"/>
-	<category-def name="Remote Development Tools" label="Remote Development Tools"/>
-</site>
+	
+	<category-def name="Fortran Development Tools (Photran)" label="Fortran Development Tools (Photran)"/>
+	<feature id="org.eclipse.photran" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/photran/releases/galileo/features/org.eclipse.photran_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
+		<category name="Photran (Fortran Development Tools)"/>
+	</feature>
+	<feature id="org.eclipse.photran.intel" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/photran/releases/galileo/features/org.eclipse.photran.intel_@buildVersion@.jar&amp;r=1" version="@buildVersion@" os="linux">
+		<category name="Photran (Fortran Development Tools)"/>
+	</feature>
+	<feature id="org.eclipse.photran.xlf" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/photran/releases/galileo/features/org.eclipse.photran.xlf_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
+		<category name="Photran (Fortran Development Tools)"/>
+	</feature></site>
