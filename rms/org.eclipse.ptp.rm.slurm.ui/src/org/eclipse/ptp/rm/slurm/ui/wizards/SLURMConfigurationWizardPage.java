@@ -34,7 +34,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.ui.Activator;
 import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -95,7 +95,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	private Button defaultButton = null;
 	private WidgetListener listener = new WidgetListener();
 	
-	public SLURMConfigurationWizardPage(RMConfigurationWizard wizard) {
+	public SLURMConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.SLURMConfigurationWizardPage_name);
 		setTitle(Messages.SLURMConfigurationWizardPage_title);
 		setDescription(Messages.SLURMConfigurationWizardPage_description);
