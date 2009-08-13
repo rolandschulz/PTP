@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui.wizards;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
@@ -112,7 +111,7 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 	}
 
 	public MPICH2ConfigurationWizardPage(IRMConfigurationWizard wizard) {
-		super(wizard, MPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES, 
+		super(wizard, IMPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES, 
 				Messages.MPICH2ConfigurationWizardPage_Name, 
 				Messages.MPICH2ConfigurationWizardPage_Title, 
 				Messages.MPICH2ConfigurationWizardPage_Description);
