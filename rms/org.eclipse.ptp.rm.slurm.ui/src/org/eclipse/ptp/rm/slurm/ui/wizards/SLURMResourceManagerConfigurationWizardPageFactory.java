@@ -13,7 +13,7 @@
 package org.eclipse.ptp.rm.slurm.ui.wizards;
 
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
@@ -24,7 +24,7 @@ public class SLURMResourceManagerConfigurationWizardPageFactory extends
 		// no-op
 	}
 
-	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
+	public RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard) {
 		return new RMConfigurationWizardPage[]{
 				new SLURMResourceManagerConfigurationWizardPage(wizard),
 				//new SLURMConfigurationWizardPage(wizard)
