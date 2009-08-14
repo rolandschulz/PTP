@@ -90,7 +90,7 @@
 		<replace file="${buildDirectory}/site/eclipse/site.xml">
 			<replacefilter token="@timeStamp@" value="${timestamp}"/>
 		</replace>
-		<copy file="pack.properties" todir="${buildDirectory}/ptp_site/eclipse"/>
+		<copy file="pack.properties" todir="${buildDirectory}/site/eclipse"/>
 
 		<zip destfile="${zipsdir}/${ptpMasterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
@@ -105,7 +105,7 @@
 		<copy file="pack.properties" todir="${buildDirectory}/photran_site/eclipse"/>
 
 		<zip destfile="${zipsdir}/${photranMasterFile}"
-			basedir="${buildDirectory}/ptp_site/eclipse"/>
+			basedir="${buildDirectory}/photran_site/eclipse"/>
 
 	</target>
 
@@ -118,7 +118,7 @@
 		<waitfor maxwait="30" maxwaitunit="minute">
 			<available file="${buildDirectory}/signed/${ptpMasterFile}"/>
 		</waitfor>
-		<move file="${buildDirectory}/signed/${photranMasterFile}" todir="${zipsdir}"/>
+		<move file="${buildDirectory}/signed/${ptpMasterFile}" todir="${zipsdir}"/>
 		<exec executable="sign">
 			<arg value="${buildDirectory}/${buildType}.${buildId}/${photranMasterFile}"/>
 			<arg value="nomail"/>
