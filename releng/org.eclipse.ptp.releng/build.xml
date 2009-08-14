@@ -84,8 +84,8 @@
 		
 		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
 		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/>
-		<move file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
-		<move file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
+		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
+		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
 		<replace file="${buildDirectory}/site/eclipse/site.xml">
 			<replacefilter token="@timeStamp@" value="${timestamp}"/>
@@ -96,8 +96,8 @@
 			basedir="${buildDirectory}/site/eclipse"/>
 		
 		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/photran_site"/>
-		<move file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/photran_site/eclipse"/>
-		<move file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/photran_site/eclipse"/>
+		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/photran_site/eclipse"/>
+		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/photran_site/eclipse"/>
 		<copy file="photran_buildsite.xml" tofile="${buildDirectory}/photran_site/eclipse/site.xml"/>
 		<replace file="${buildDirectory}/photran_site/eclipse/site.xml">
 			<replacefilter token="@timeStamp@" value="${timestamp}"/>
