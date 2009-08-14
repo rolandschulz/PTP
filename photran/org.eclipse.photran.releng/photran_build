@@ -13,6 +13,7 @@
 # set up anything environment specific that needs to be done before
 # launching the build script in the releng project
 
+LANG=en_US
 TAG=HEAD
 
 # main staging directory
