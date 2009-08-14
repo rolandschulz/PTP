@@ -9,6 +9,10 @@
 		<property name="type" value="feature"/>
 		<property name="id" value="org.eclipse.ptp.master"/>
 	</ant>
+	<ant antfile="${genericTargets}" target="${target}">
+		<property name="type" value="feature"/>
+		<property name="id" value="org.eclipse.photran.master"/>
+	</ant>
 </target>
 
 <!-- ===================================================================== -->
@@ -20,7 +24,13 @@
 
 <target name="assemble.org.eclipse.ptp.master.group.group.group">
 	<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-		<property name="archiveName" value="ptp-master-${branchVersion}-${buildId}.zip"/>
+		<property name="archiveName" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
+	</ant>
+</target>
+	
+<target name="assemble.org.eclipse.photran.master.group.group.group">
+	<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+		<property name="archiveName" value="photran-master-${photranBranchVersion}-${buildId}.zip"/>
 	</ant>
 </target>
 	
@@ -32,6 +42,10 @@
 	<copy file="${builder}/../maps/ptp.map" todir="${buildDirectory}/maps"/>
 	<replace file="${buildDirectory}/maps/ptp.map">
 		<replacefilter token="@ptpTag@" value="${ptpTag}"/>
+	</replace>
+	<copy file="${builder}/../maps/photran.map" todir="${buildDirectory}/maps"/>
+	<replace file="${buildDirectory}/maps/photran.map">
+		<replacefilter token="@photranTag@" value="${photranTag}"/>
 	</replace>
 </target>
 
@@ -89,22 +103,22 @@
 	</replace>
 	<unzip src="${tauJars}" dest="${buildDirectory}/plugins/org.eclipse.ptp.perf.tau.jars"/>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc/BUILD">
-		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.linux.ppc/BUILD">
-		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.linux.x86/BUILD">
-		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.linux.x86_64/BUILD">
-		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.macosx.ppc/BUILD">
-		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.macosx.x86/BUILD">
-		<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 </target>
 
