@@ -16,12 +16,14 @@
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/galileo/mylyn-3.2.0.v20090617-0100-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.1-200906171400/RSE-SDK-3.1.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
-		<property name="branchVersion" value="3.0.0"/>
+		<property name="eclipseRelease" value="galileo"/>
+		<property name="ptpBranchVersion" value="3.0.0"/>
+		<property name="photranBranchVersion" value="5.0.0"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
 		<property name="buildDirectory" value="${basedir}/results"/>
-		<property name="copyToDir" value="/home/www/tools/ptp/builds/${branchVersion}"/>
+		<property name="copyToDir" value="/home/www/tools/ptp/builds/${eclipseRelease}"/>
 		<property name="testDirectory" value="${buildDirectory}/test"/>
 		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
 		<property name="pde.build.scripts" value="${eclipse.pdebuild.scripts}"/>
@@ -30,7 +32,8 @@
 		<property name="buildType" value="I" />
 		<property name="buildId" value="${buildType}${timestamp}"/>
 		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
-		<property name="masterFile" value="ptp-master-${branchVersion}-${buildId}.zip"/>
+		<property name="ptpMasterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
+		<property name="photranMasterFile" value="photran-master-${photranBranchVersion}-${buildId}.zip"/>
 		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
 		<property name="mailto" value="g.watson@computer.org"/>
 		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
@@ -76,30 +79,55 @@
 		<condition property="hasErrors">
 			<contains string="${compileLog}" substring=" ERROR"/>
 		</condition>
-		<move file="${zipsdir}/${masterFile}" todir="${buildDirectory}"/>
-		<unzip src="${buildDirectory}/${masterFile}" dest="${buildDirectory}/site"/>
+		<move file="${zipsdir}/${ptpMasterFile}" todir="${buildDirectory}"/>
+		<move file="${zipsdir}/${photranMasterFile}" todir="${buildDirectory}"/>
+		
+		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
+		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/>
 		<move file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<move file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
 		<replace file="${buildDirectory}/site/eclipse/site.xml">
-			<replacefilter token="@buildVersion@" value="${branchVersion}.${timestamp}"/>
+			<replacefilter token="@timeStamp@" value="${timestamp}"/>
 		</replace>
-		<copy file="pack.properties" todir="${buildDirectory}/site/eclipse"/>
+		<copy file="pack.properties" todir="${buildDirectory}/ptp_site/eclipse"/>
 
-		<zip destfile="${zipsdir}/${masterFile}"
+		<zip destfile="${zipsdir}/${ptpMasterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
+		
+		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/photran_site"/>
+		<move file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/photran_site/eclipse"/>
+		<move file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/photran_site/eclipse"/>
+		<copy file="photran_buildsite.xml" tofile="${buildDirectory}/photran_site/eclipse/site.xml"/>
+		<replace file="${buildDirectory}/photran_site/eclipse/site.xml">
+			<replacefilter token="@timeStamp@" value="${timestamp}"/>
+		</replace>
+		<copy file="pack.properties" todir="${buildDirectory}/photran_site/eclipse"/>
+
+		<zip destfile="${zipsdir}/${photranMasterFile}"
+			basedir="${buildDirectory}/ptp_site/eclipse"/>
+
 	</target>
 
 	<target name="sign" depends="init" unless="hasErrors">
 		<exec executable="sign">
-			<arg value="${buildDirectory}/${buildType}.${buildId}/${masterFile}"/>
+			<arg value="${buildDirectory}/${buildType}.${buildId}/${ptpMasterFile}"/>
 			<arg value="nomail"/>
 			<arg value="${buildDirectory}/signed"/>
 		</exec>
 		<waitfor maxwait="30" maxwaitunit="minute">
-			<available file="${buildDirectory}/signed/${masterFile}"/>
+			<available file="${buildDirectory}/signed/${ptpMasterFile}"/>
 		</waitfor>
-		<move file="${buildDirectory}/signed/${masterFile}" todir="${zipsdir}"/>
+		<move file="${buildDirectory}/signed/${photranMasterFile}" todir="${zipsdir}"/>
+		<exec executable="sign">
+			<arg value="${buildDirectory}/${buildType}.${buildId}/${photranMasterFile}"/>
+			<arg value="nomail"/>
+			<arg value="${buildDirectory}/signed"/>
+		</exec>
+		<waitfor maxwait="30" maxwaitunit="minute">
+			<available file="${buildDirectory}/signed/${photranMasterFile}"/>
+		</waitfor>
+		<move file="${buildDirectory}/signed/${photranMasterFile}" todir="${zipsdir}"/>
 	</target>
 	<target name="test" depends="init" unless="hasErrors"/>
 	<target name="copy" depends="init" unless="hasErrors">
@@ -110,8 +138,8 @@
 		<!-- Create symlink to latest build -->
 		<symlink action="delete" link="${copyToDir}/latest" failonerror="false"/>
 		<symlink link="${copyToDir}/latest" resource="${copyToDir}/${buildType}.${buildId}" overwrite="true"/>
-		<symlink action="delete" link="${copyToDir}/ptp-master-${branchVersion}-latest.zip" failonerror="false"/>
-		<symlink link="${copyToDir}/ptp-master-${branchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${masterFile}" overwrite="true"/>
+		<symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/>
+		<symlink link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${ptpMasterFile}" overwrite="true"/>
 		<symlink action="delete" link="${copyToDir}/rdt-server-unix-1.0-latest.tar" failonerror="false"/>
 		<symlink link="${copyToDir}/rdt-server-unix-1.0-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-1.0.tar" overwrite="true"/>
 	</target>
@@ -436,6 +464,54 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.services.ui"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
+		</antcall>	
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface"/>
+		</antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface.vpg"/>
+        </antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.intel"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.vpg"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.errorparsers.xlf"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.intel-feature"/>
+		</antcall>	
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.core"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.gnu.ui"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.intel.ui"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.ui"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.xlf.ui"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui.vpg"/>
+		</antcall>	
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature"/>
 		</antcall>
 	</target>
 </project>
