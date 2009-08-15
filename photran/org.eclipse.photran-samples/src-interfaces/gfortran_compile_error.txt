@@ -1,0 +1,59 @@
+!!
+!! Examples of using INTERFACE blocks in Fortran
+!!
+!! INTERFACE blocks have two different uses:
+!!
+!!     1. Declaring the interface of an external subprogram
+!!        (as an alternative to the EXTERNAL statement, which
+!!        declares that the subprogram is external but says nothing
+!!        about its signature)
+!!
+!!     2. Overloading
+!!
+!! J. Overbey 9/15/08
+!!
+module interface_example
+    implicit none
+
+    !! USAGE 1: Declaring the interface of an external subprogram
+    interface
+        integer function one()
+        end function
+
+        integer function two()
+        end function
+    end interface
+
+    ! Note that one and two are exported and can be made private
+    private :: two
+
+    !! USAGE 2: Overloading
+    interface description
+        character(len=*) function description_int(value)
+            integer, intent(in) :: value
+        end function description_int
+        module procedure description_real
+    end interface
+
+contains
+    character(len=50) function description_real(value)
+        real, intent(in) :: value
+        write (description_real, *) "REAL:", value
+    end function
+end module interface_example
+
+program program
+    use interface_example
+    integer :: one, two = 2  ! Note that "two" is hidden in the module
+    print *, one()
+    print *, description(2)
+    print *, description(3.0)
+end program program
+
+!! EXTERNAL SUBPROGRAMS
+integer function one(); one = 1; end function
+integer function two(); two = 2; end function
+character(len=50) function description_int(value)
+    integer, intent(in) :: value
+    write (description_real, *) "INTEGER:", value
+end function
