@@ -115,7 +115,7 @@
 			<arg value="nomail"/>
 			<arg value="${buildDirectory}/signed"/>
 		</exec>
-		<waitfor maxwait="30" maxwaitunit="minute">
+		<waitfor maxwait="60" maxwaitunit="minute">
 			<available file="${buildDirectory}/signed/${ptpMasterFile}"/>
 		</waitfor>
 		<move file="${buildDirectory}/signed/${ptpMasterFile}" todir="${zipsdir}"/>
