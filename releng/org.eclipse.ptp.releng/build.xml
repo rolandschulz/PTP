@@ -83,7 +83,7 @@
 		<move file="${zipsdir}/${photranMasterFile}" todir="${buildDirectory}"/>
 		
 		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
-		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/>
+		<!--unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/-->
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
@@ -95,6 +95,7 @@
 		<zip destfile="${zipsdir}/${ptpMasterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
 		
+		<!--
 		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/photran_site"/>
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/photran_site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/photran_site/eclipse"/>
@@ -106,6 +107,7 @@
 
 		<zip destfile="${zipsdir}/${photranMasterFile}"
 			basedir="${buildDirectory}/photran_site/eclipse"/>
+		-->
 
 	</target>
 
