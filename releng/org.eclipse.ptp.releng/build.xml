@@ -121,6 +121,7 @@
 			<available file="${buildDirectory}/signed/${ptpMasterFile}"/>
 		</waitfor>
 		<move file="${buildDirectory}/signed/${ptpMasterFile}" todir="${zipsdir}"/>
+		<!--
 		<exec executable="sign">
 			<arg value="${buildDirectory}/${buildType}.${buildId}/${photranMasterFile}"/>
 			<arg value="nomail"/>
@@ -130,6 +131,7 @@
 			<available file="${buildDirectory}/signed/${photranMasterFile}"/>
 		</waitfor>
 		<move file="${buildDirectory}/signed/${photranMasterFile}" todir="${zipsdir}"/>
+		-->
 	</target>
 	<target name="test" depends="init" unless="hasErrors"/>
 	<target name="copy" depends="init" unless="hasErrors">
