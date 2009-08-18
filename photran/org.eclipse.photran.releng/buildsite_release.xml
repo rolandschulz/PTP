@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+	<description>
+		Photran (Fortran Development Tools)
+	</description>
+   	<category-def name="Photran Base Distribution" label="Photran (Fortran Development Tools)"/>
+	<category-def name="Fortran Compiler Support" label="Fortran Compiler Support">
+		<description>
+			Optional features adding error parsers and managed build toolchains for various vendors&apos; Fortran compilers
+		</description>
+    </category-def>
+	<feature id="org.eclipse.photran" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/photran/releases/galileo/features/org.eclipse.photran_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
+		<category name="Photran Base Distribution"/>
+	</feature>
+	<feature id="org.eclipse.photran.intel" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/photran/releases/galileo/features/org.eclipse.photran.intel_@buildVersion@.jar&amp;r=1" version="@buildVersion@" os="linux">
+		<category name="Fortran Compiler Support"/>
+	</feature>
+	<feature id="org.eclipse.photran.xlf" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/photran/releases/galileo/features/org.eclipse.photran.xlf_@buildVersion@.jar&amp;r=1" version="@buildVersion@">
+		<category name="Fortran Compiler Support"/>
+	</feature>
+</site>
