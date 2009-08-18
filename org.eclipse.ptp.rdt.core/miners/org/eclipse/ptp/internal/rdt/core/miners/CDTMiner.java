@@ -1140,11 +1140,25 @@ public class CDTMiner extends Miner {
 
 	protected void handleRunQuery(String scopeName, RemoteSearchQuery query, String hostName, DataElement status) {
 		try {
+			
+			IIndex index;
+			ICProject[] projects = query.getProjects();
 			System.out.println("Searching for: \"" + query + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-			System.out.println("scope: " + scopeName); //$NON-NLS-1$
+			
+			if (projects == null)
+				System.out.println("scope: " + scopeName); //$NON-NLS-1$
+			else
+				System.out.println("scope: " + query.getScopeDescription()); //$NON-NLS-1$
+			
 			System.out.println("Getting index"); //$NON-NLS-1$
 			System.out.flush();
-			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+						
+			if (projects == null) {
+				index = RemoteIndexManager.getInstance().getIndexForScope(scopeName);
+			}
+			else{			
+				index = RemoteIndexManager.getInstance().getIndexForProjects(projects);
+			}
 
 			System.out.println("Acquiring read lock"); //$NON-NLS-1$
 			System.out.flush();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 QNX Software Systems and others.
+ * Copyright (c) 2006, 2009 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,11 @@ package org.eclipse.ptp.internal.rdt.core.search;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.core.browser.ITypeReference;
@@ -62,6 +64,22 @@ public abstract class RemoteSearchQuery implements Serializable {
 
 	protected RemoteSearchQuery(ICElement[] scope, int flags) {
 		this.flags = flags;
+		this.scope = scope;
+		
+		if (scope == null) {
+			// All CDT projects in workspace
+			// do nothing for now - see RemoteIndexManager.getIndexForProjects()
+		} else {
+			Map<String, ICProject> projectMap = new HashMap<String, ICProject>();
+			
+			for (int i = 0; i < scope.length; ++i) {
+				ICProject project = scope[i].getCProject();
+				if (project != null)
+					projectMap.put(project.getElementName(), project);
+			}
+			
+			projects = projectMap.values().toArray(new ICProject[projectMap.size()]);
+		}
 		
 		fMatches = new LinkedList<RemoteSearchMatch>();
 	}
