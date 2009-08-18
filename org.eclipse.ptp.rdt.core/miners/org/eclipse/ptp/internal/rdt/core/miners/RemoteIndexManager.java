@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.parser.DefaultLogService;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.internal.core.index.CIndex;
@@ -175,5 +176,32 @@ public class RemoteIndexManager {
 		System.out.flush();
 		
 		return indexFile.delete();
+	}
+
+	/**
+	 * Returns the index for the given projects.
+	 * @param projects the projects to get the index for
+	 * @return an index for the projects
+	 */
+	public IIndex getIndexForProjects(ICProject[] projects) {
+		if(projects == null) {
+			throw new IllegalArgumentException("Get index for projects - projects cannot be null."); //$NON-NLS-1$
+		}
+		
+		Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
+		
+		Set<String> allScopes = ScopeManager.getInstance().getAllScopes();
+				
+		for (int i = 0; i < projects.length; i++) {
+			String currentScope = projects[i].getElementName();
+			if (allScopes.contains(currentScope)) {
+				IIndexFragment fragment = getIndexerForScope(currentScope).getIndex().getWritableFragment();
+				
+				fragments.add(fragment);
+			}
+		}
+				
+		CIndex index = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
+		return index;
 	}
 }
