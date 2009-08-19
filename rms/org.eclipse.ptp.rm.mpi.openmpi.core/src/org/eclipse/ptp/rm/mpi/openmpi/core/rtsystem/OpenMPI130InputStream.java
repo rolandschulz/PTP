@@ -22,7 +22,7 @@ import java.io.InputStream;
  * We know the following:
  * - the XML is malformed because it doesn't include a root element
  * - XML between the <map> and </map> tags should be well formed
- * - The XML finishes after the </map> and there may be additonal output
+ * - The XML finishes after the </map> and there may be additional output
  * 
  * We need to:
  * - inject a root element
