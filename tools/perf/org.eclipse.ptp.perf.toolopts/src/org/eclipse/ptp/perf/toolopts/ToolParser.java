@@ -48,6 +48,7 @@ public class ToolParser extends DefaultHandler{
 	private static final String CC = "cc";
 	private static final String CXX = "cxx";
 	private static final String F90 = "f90";
+	private static final String UPC = "upc";
 	private static final String ALLCOMP = "allcompilers";
 	
 	/**
@@ -568,6 +569,13 @@ public class ToolParser extends DefaultHandler{
 			if(currentTool!=null&&buildTool!=null)
 			{
 				buildTool.f90Compiler=finishApp();
+			}
+		}
+		else if(name.equals(UPC)&&inCompilation)
+		{
+			if(currentTool!=null&&buildTool!=null)
+			{
+				buildTool.upcCompiler=finishApp();
 			}
 		}
 		else if(name.equals(PARAMETRIC)){

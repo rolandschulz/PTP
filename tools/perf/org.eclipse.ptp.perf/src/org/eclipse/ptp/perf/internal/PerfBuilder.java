@@ -176,6 +176,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+"\n");
 			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+"\n");
 			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getUPCCompiler(),configuration)+" "+allargs+"\n");
 			makeOut.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -452,6 +453,10 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 			if(toolid.indexOf(".fortran.")>=0)
 			{
 				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration),allargs,tool.replaceCompiler);
+			}
+			if(toolid.indexOf(".upc.")>=0)
+			{
+				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getUPCCompiler(),configuration),allargs,tool.replaceCompiler);
 			}
 		}
 		//System.out.println(tbpath+File.separator+"tau_xxx.sh"+tauCompilerArgs);
