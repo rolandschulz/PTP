@@ -43,7 +43,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  */
 public class OpenMPIProcessMapXml13Parser {
-	private final static String rootTag = "ompi"; //$NON-NLS-1$
+	private final static String rootTag = "mpirun"; //$NON-NLS-1$
 	private final static String mapTag = "map"; //$NON-NLS-1$
 	private final static String hostTag = "host"; //$NON-NLS-1$
 	private final static String processTag = "process"; //$NON-NLS-1$
@@ -220,13 +220,13 @@ public class OpenMPIProcessMapXml13Parser {
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
 			if (name.equalsIgnoreCase(rootTag)) {
-				return new OmpiHandler();
+				return new RootHandler();
 			}
 			return super.newElement(name);
 		}
 	}
 
-	public class OmpiHandler extends ContextHandler {
+	public class RootHandler extends ContextHandler {
 		@Override
 		public ContextHandler newElement(String name) throws SAXException {
 			if (name.equalsIgnoreCase(mapTag)) {

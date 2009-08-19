@@ -222,13 +222,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 						});
 					} else if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
 								|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
-						InputStream is;
-						if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)
-								|| configuration.getServiceVersion() > 0) {
-							is = new OpenMPI131InputStream(parserInputStream);
-						} else {
-							is = new OpenMPI130InputStream(parserInputStream);
-						}
+						InputStream is = new OpenMPI13xInputStream(parserInputStream);
 						OpenMPIProcessMapXml13Parser.parse(is, new IOpenMPIProcessMapParserListener() {
 							public void finish() {
 								/*
@@ -237,9 +231,6 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								 * get IOExceptions for closed stream.
 								 */
 								getParserListener().disable();
-								if (getStdoutObserver() != null) {
-									getStdoutObserver().removeListener(getParserListener());
-								}
 							}
 							
 							public void finishMap(AttributeManager manager) {
@@ -293,9 +284,6 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				} finally {
 					if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 						getParserListener().disable();
-						if (getStderrObserver() != null) {
-							getStderrObserver().removeListener(getParserListener());
-						}
 					}
 					setMapCompleted();
 				}
@@ -312,7 +300,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * are still sent separately.
 		 */
 		if ((configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13) && 
-				(configuration.getServiceVersion() > 0 || configuration.getServiceVersion() < 3))) {
+				(configuration.getServiceVersion() > 0 && configuration.getServiceVersion() < 3))) {
 			builder.redirectErrorStream(true);
 		}
 	}
@@ -366,13 +354,13 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
 		
 		/*
-		 * We only require procZero if we're using OMPI 1.2.x or 1.3.0. Other versions use XML
+		 * We only require procZero if we're using OMPI 1.2.x or 1.3.[0-3]. Other versions use XML
 		 * for stdout and stderr.
 		 */
 		final IPProcess procZero;
 		if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)
-				|| (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12) 
-						&& configuration.getServiceVersion() < 1)) {
+				|| (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13) 
+						&& configuration.getServiceVersion() < 4)) {
 			procZero = ipJob.getProcessByIndex(0);
 		} else {
 			procZero = null;
@@ -396,7 +384,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			}
 			
 			public void streamClosed() {
-				//
+				// No need to do anything
 			}
 			
 			public void streamError(Exception e) {
