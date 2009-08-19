@@ -47,16 +47,15 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		this.mergeOutput = mergeOutput;
 		hostShellInput = new PipedOutputStream();
 		if (mergeOutput) {
-			hostShellError = hostShellInput;
 			errorStream = new NullInputStream();
 		} else {
 			hostShellError = new PipedOutputStream();
 			errorStream = new PipedInputStream(hostShellError);
+			this.hostShell.getStandardErrorReader().addOutputListener(this);
 		}
 		inputStream = new PipedInputStream(hostShellInput);
 		outputStream = new HostShellOutputStream(hostShell);
 		this.hostShell.getStandardOutputReader().addOutputListener(this);
-		this.hostShell.getStandardErrorReader().addOutputListener(this);
 	}
 	
 	/* (non-Javadoc)
