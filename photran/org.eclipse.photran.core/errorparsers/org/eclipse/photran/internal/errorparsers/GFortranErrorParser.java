@@ -21,7 +21,7 @@ import org.eclipse.core.resources.IResource;
 
 /**
  * An error parser for GNU Fortran 4.x
- * 
+ *
  * @author Jeff Overbey
  */
 public class GFortranErrorParser implements IErrorParser
@@ -30,36 +30,36 @@ public class GFortranErrorParser implements IErrorParser
 
     /*================================================================================
     cray-pointers.f90:56.21:
-    
+
     subroutine example3()
                         1
     cray-pointers.f90:43.21:
-    
+
     subroutine example3()
                         2
     Error: Global name 'example3' at (1) is already being used as a SUBROUTINE at (2)
     cray-pointers.f90:58.22:
-    
+
         real    :: pointee
                          1
     Error: Array 'pointee' at (1) cannot have a deferred shape
     ================================================================================*/
-    
+
     //                                                                     Filename
     //                                                                     |    Line        Column
     //                                                                     |    |           |
     //                                    Regex group number    1          2    3       4   5
-    private static final Pattern startLine = Pattern.compile("^(In file )?(.+):([0-9]+)(\\.([0-9]+):)?$");
+    private static final Pattern startLine = Pattern.compile("^(In file )?(.+):([0-9]+)(\\.([0-9]+))?:$");
     private static final Pattern errorLine = Pattern.compile("^(Fatal )?Error: .*");
     private static final Pattern warningLine = Pattern.compile("^Warning: .*");
-    
+
     /*
-     * This error parser uses the GoF State pattern.  It starts in the first of two states: 
-     * 
+     * This error parser uses the GoF State pattern.  It starts in the first of two states:
+     *
      * (1) WaitForStartLine
      * (2) AccumulateErrorMessageLines
      */
-    
+
     private IErrorParser currentState = new WaitForStartLine();
 
     /*
@@ -101,7 +101,7 @@ public class GFortranErrorParser implements IErrorParser
             return false;
         }
 	}
-	
+
     /**
      * STATE 2: ACCUMULATING ERROR MESSAGE
      * <p>
@@ -123,25 +123,25 @@ public class GFortranErrorParser implements IErrorParser
 	    private String filename;
 	    private int lineNumber;
 	    private StringBuffer errorMessage = new StringBuffer();
-	    
+
 	    private int linesAccumulated = 1;
-	    
+
 	    public AccumulateErrorMessageLines(String filename, int lineNumber, String line)
 	    {
 	        this.filename = filename;
 	        this.lineNumber = lineNumber;
 	        errorMessage.append(line);
 	    }
-	    
+
         public boolean processLine(String line, ErrorParserManager eoParser)
         {
             //errorMessage.append("\n");
             //errorMessage.append(line);
             linesAccumulated++;
-            
+
             Matcher errorMatcher = errorLine.matcher(line);
             Matcher warningMatcher = warningLine.matcher(line);
-            
+
             if (errorMatcher.matches())
             {
                 // Matched "Error: Description" or "Fatal Error: Description"
@@ -186,15 +186,15 @@ public class GFortranErrorParser implements IErrorParser
         {
             IFile result = eoParser.findFileName(filename);
             if (result != null) return result;
-            
+
             // The managed build system prefixes ../ to filenames.
             // So (this is a hack) if the file can't be found and
             // it starts with ../ try removing that and hope that
             // maybe it will refer to a workspace location.
-            
+
             if (filename.startsWith("../") || filename.startsWith("..\\"))
                 return eoParser.findFileName(filename.substring(3));
-            
+
             return null;
         }
 	}
