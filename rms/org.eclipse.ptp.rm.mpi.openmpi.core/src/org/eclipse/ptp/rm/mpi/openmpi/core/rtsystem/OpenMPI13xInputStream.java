@@ -235,7 +235,8 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 				break;
 				
 			case XML:
-				if (ch >= 0) {
+				if (ch >= ' ') {
+					// Skip imbedded newlines (bug #287204)
 					buffer.append((char)ch);
 				}
 				if (buffer.length() == 0) {
@@ -265,11 +266,11 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 						break;
 					}
 						
-					// Not a known tag, so replace with escape sequence
+					// Not a known tag, so replace with escape sequence (bug #286671)
 					buffer.replace(0, 1, "&lt;"); //$NON-NLS-1$
 					ch = buffer.charAt(0);
 				} else if (ch == '>') {
-					// Invalid tag end, replace it with escape sequence
+					// Invalid tag end, replace it with escape sequence (bug #286671)
 					buffer.replace(0, 1, "&gt;"); //$NON-NLS-1$
 					ch = buffer.charAt(0);
 				}
@@ -278,7 +279,8 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 				
 			case SEEN_VALID:
 				// Process everything until we find the tag end
-				if (ch >= 0) {
+				if (ch >= ' ') {
+					// Skip imbedded newlines (bug #287204)
 					buffer.append((char)ch);
 				}
 				if (buffer.length() == 0) {
@@ -293,7 +295,8 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 				
 			case SEEN_FINAL:
 				// We've the final tag, insert root end tag if necessary
-				if (ch >= 0) {
+				if (ch >= ' ') {
+					// Skip imbedded newlines (bug #287204)
 					buffer.append((char)ch);
 				}
 				if (buffer.length() > 0) {
