@@ -18,8 +18,8 @@
    <!--==================-->
    <!-- CDT Launch Clone -->
    <!--==================-->
-   
-   <!-- Fortran Launch Configuration (visible in "Run..." dialog)--> 
+
+   <!-- Fortran Launch Configuration (visible in "Run..." dialog)-->
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
@@ -48,7 +48,7 @@
             id="org.eclipse.photran.launch.localRunLaunchTabGroup">
       </launchConfigurationTabGroup>
    </extension>
-   <!-- Fortran Application Launch Shortcut (Run As > Local Fortran Application) --> 
+   <!-- Fortran Application Launch Shortcut (Run As > Local Fortran Application) -->
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
@@ -157,9 +157,9 @@
       <category
             name="Fortran"
             id="org.eclipse.photran.ui.newFortranWizards" />
-            
+
       <!-- New Fortran Project Wizards -->
-      
+
       <!-- CDT 4.0 and later -->
        <wizard
              canFinishEarly="false"
@@ -175,7 +175,7 @@
              Create a new Fortran project
          </description>
       </wizard>
- 
+
       <!-- New File Wizards -->
       <wizard
             name="Source File"
@@ -263,11 +263,11 @@
                tooltip="New Compiled Language Project"/>
       </actionSet>
    </extension>
-   
+
    <!--====================-->
    <!-- New File Templates -->
    <!--====================-->
-   
+
    <extension
          point="org.eclipse.ui.editors.templates">
       <!--contextType
@@ -277,12 +277,13 @@
       </contextType-->
       <include file="templates/fortran-codetemplates.xml" />
    </extension>
-   
+
    <!--=======================-->
    <!-- New Project Templates -->
    <!--=======================-->
-   
+
    <extension point="org.eclipse.cdt.core.templates">
+      <!-- Templates -->
       <template
             filterPattern=".*"
             id="org.eclipse.photran.projects.MPIHelloWorldFortranProject"
@@ -296,8 +297,19 @@
             projectType="org.eclipse.cdt.build.makefile.projectType">
       </template>
    </extension>
+   <!-- Custom Process Runners (referenced in template.xml files) -->
+   <extension point="org.eclipse.cdt.core.templateProcessTypes">
+      <processType
+            name="addFortranErrorParsers"
+            processRunner="org.eclipse.photran.cdtinterface.templates.AddFortranErrorParsersProcessRunner">
+      </processType>
+      <processType
+            name="addAllBinaryParsers"
+            processRunner="org.eclipse.photran.cdtinterface.templates.AddAllBinaryParsersProcessRunner">
+      </processType>
+   </extension>
 
-   
+
    <!--=============================-->
    <!-- ActionSet-part associations -->
    <!--=============================-->
@@ -321,14 +333,14 @@
    <!--============================-->
 
    <extension-point id="domparser" name="DOM Parser" schema="schema/domparser.exsd"/>
-   
+
    <!--============================================-->
    <!-- Convert C/C++ Projects to Photran Projects -->
    <!--============================================-->
-   <extension point="org.eclipse.ui.popupMenus"> 
+   <extension point="org.eclipse.ui.popupMenus">
       <viewerContribution
-         id="org.eclipse.photran.ui.ViewActions" 
-         targetID="org.eclipse.photran.ui.FortranView"> 
+         id="org.eclipse.photran.ui.ViewActions"
+         targetID="org.eclipse.photran.ui.FortranView">
          <visibility>
             <objectState name="nature" value="org.eclipse.cdt.core.cnature" />
          </visibility>
@@ -339,6 +351,6 @@
             icon="icons/obj16/f_file_obj.gif"
             class="org.eclipse.photran.cdtinterface.ui.ProjectConversionAction" />
       </viewerContribution>
-   </extension>      
-   
+   </extension>
+
 </plugin>

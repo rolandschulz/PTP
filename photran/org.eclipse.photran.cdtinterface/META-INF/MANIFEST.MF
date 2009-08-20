@@ -12,6 +12,7 @@ Export-Package: org.eclipse.photran.cdtinterface,
  org.eclipse.photran.cdtinterface.dom,
  org.eclipse.photran.cdtinterface.launch,
  org.eclipse.photran.cdtinterface.natures,
+ org.eclipse.photran.cdtinterface.templates,
  org.eclipse.photran.cdtinterface.ui,
  org.eclipse.photran.cdtinterface.ui.editor,
  org.eclipse.photran.internal.core.model
@@ -36,6 +37,7 @@ Require-Bundle: org.eclipse.ui,
  com.ibm.icu,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
- org.eclipse.ui.views
+ org.eclipse.ui.views,
+ org.eclipse.cdt.managedbuilder.core;bundle-version="6.0.0"
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

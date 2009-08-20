@@ -61,16 +61,19 @@
 			</element>
 		</complex-array>
 	</process>
-	
+
 	<process type="org.eclipse.cdt.core.CreateFolder">
 		<simple name="projectName" value="$(projectName)"/>
 		<simple name="path" value="$(binDir)"/>
 	</process>
-	
+
 	<process type="org.eclipse.cdt.managedbuilder.gnu.ui.SimpleGNUMakefileGenerator">
 		<simple name="projectName" value="$(projectName)"/>
 	</process>
-    
+
+	<process type="org.eclipse.photran.cdtinterface.addFortranErrorParsers"/>
+	<process type="org.eclipse.photran.cdtinterface.addAllBinaryParsers"/>
+
     <!--process type="org.eclipse.ptp.pldt.wizards.mpiProjectProcess"-->
         <!-- no arguments as we go straight to the store (not recommended usage of template engine..) -->
     <!--/process-->
