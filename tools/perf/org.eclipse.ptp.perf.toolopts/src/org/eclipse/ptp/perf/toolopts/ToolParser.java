@@ -292,7 +292,7 @@ public class ToolParser extends DefaultHandler{
 			currentTool.para.mpiProcs=getAttribute(NUMPROCS,atts);
 			currentTool.para.compileropt=getAttribute(COMPILEROPT,atts);
 		}
-		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(ALLCOMP)||name.equals(UTILITY))
+		else if(name.equals(CC)||name.equals(CXX)||name.equals(F90)||name.equals(UPC)||name.equals(ALLCOMP)||name.equals(UTILITY))
 		{
 			if(inTool&&currentTool!=null)
 			{
