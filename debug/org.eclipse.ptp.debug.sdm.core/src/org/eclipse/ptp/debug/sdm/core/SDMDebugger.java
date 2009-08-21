@@ -79,23 +79,27 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
  *
  */
 public class SDMDebugger implements IPDebugger {
-	private IPDIDebugger pdiDebugger = null;
-	private IPDIModelFactory modelFactory = null;
-	private IPDIManagerFactory managerFactory = null;
-	private IPDIEventFactory eventFactory = null;
-	private IPDIRequestFactory requestFactory = null;
+	private IPDIDebugger fPdiDebugger = null;
+	private IPDIModelFactory fModelFactory = null;
+	private IPDIManagerFactory fManagerFactory = null;
+	private IPDIEventFactory fEventFactory = null;
+	private IPDIRequestFactory fRequestFactory = null;
 
-	IFileStore routingFileStore = null;
-	SDMRunner sdmRunner = null;
+	private IFileStore fRoutingFileStore = null;
+	private SDMRunner fSdmRunner = null;
+	private boolean fPreLaunchHelpNeeded = false;
 
-	public void cleanup(ILaunchConfiguration configuration, AttributeManager attrMgr, IPLaunch launch) {
-		if (sdmRunner != null) {
-			if (sdmRunner.getSdmState() == SDMMasterState.RUNNING) {
-				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: still running, cancel is to be issued soon"); //$NON-NLS-1$
-				new Thread("SDM master killer thread") {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core.launch.IPLaunch)
+	 */
+	public void cleanup(IPLaunch launch) {
+		if (fSdmRunner != null) {
+			if (fSdmRunner.getSdmState() == SDMMasterState.RUNNING) {
+				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_8); 
+				new Thread(Messages.SDMDebugger_7) {
 					@Override
 					public void run() {
-						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master killer: thread started"); //$NON-NLS-1$
+						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_9); 
 						synchronized (this) {
 							try {
 								wait(5000);
@@ -103,13 +107,13 @@ public class SDMDebugger implements IPDebugger {
 								// Ignore
 							}
 						}
-						if (sdmRunner.getSdmState() == SDMMasterState.RUNNING) {
-							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master killer: cancel SDM master now"); //$NON-NLS-1$
-							sdmRunner.cancel();
+						if (fSdmRunner.getSdmState() == SDMMasterState.RUNNING) {
+							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_11); 
+							fSdmRunner.cancel();
 						} else {
-							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master killer: do not cancel SDM master, since it finished by itself."); //$NON-NLS-1$
+							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_13); 
 						}
-						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master killer: thread finished"); //$NON-NLS-1$
+						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_14); 
 					}
 				}.start();
 			}
@@ -120,31 +124,33 @@ public class SDMDebugger implements IPDebugger {
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath)
 	 */
 	public IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile) throws CoreException {
-		if (modelFactory == null) {
-			modelFactory = new SDMModelFactory();
+		if (fModelFactory == null) {
+			fModelFactory = new SDMModelFactory();
 		}
-		if (managerFactory == null) {
-			managerFactory = new SDMManagerFactory();
+		if (fManagerFactory == null) {
+			fManagerFactory = new SDMManagerFactory();
 		}
-		if (eventFactory == null) {
-			eventFactory = new SDMEventFactory();
+		if (fEventFactory == null) {
+			fEventFactory = new SDMEventFactory();
 		}
-		if (requestFactory == null) {
-			requestFactory = new SDMRequestFactory();
+		if (fRequestFactory == null) {
+			fRequestFactory = new SDMRequestFactory();
 		}
 
-		/*
-		 * Writing the rounting file actually starts the SDM servers.
-		 */
-		writeRoutingFile(launch);
-
-		/*
-		 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions
-		 * are listening on the debugger socket.
-		 */
-		sdmRunner.setJob(launch.getPJob());
-		sdmRunner.schedule();
-
+		if (fPreLaunchHelpNeeded) {
+			/*
+			 * Writing the routing file actually starts the SDM servers.
+			 */
+			writeRoutingFile(launch);
+	
+			/*
+			 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions
+			 * are listening on the debugger socket.
+			 */
+			fSdmRunner.setJob(launch.getPJob());
+			fSdmRunner.schedule();
+		}
+		
 		IPDISession session = createSession(timeout, launch, corefile);
 
 		return session;
@@ -205,17 +211,32 @@ public class SDMDebugger implements IPDebugger {
 		 * Save SDM command line for future use.
 		 */
 		List<String> sdmCommand = new ArrayList<String>();
-		sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue());
-		sdmCommand.add("--master");
+		sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue()); //$NON-NLS-1$
+		sdmCommand.add("--master"); //$NON-NLS-1$
 		sdmCommand.addAll(dbgArgs);
-		sdmRunner.setCommand(sdmCommand);
-		sdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
+		fSdmRunner.setCommand(sdmCommand);
+		fSdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
+		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
+
+		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_MASTER_ENABLED)) {
+			int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_MASTER_LEVEL);
+			if ((level & SDMPreferenceConstants.DEBUG_MASTER_TRACING) == SDMPreferenceConstants.DEBUG_MASTER_TRACING) {
+				DebugUtil.SDM_MASTER_TRACING = true;
+			}
+			if ((level & SDMPreferenceConstants.DEBUG_MASTER_TRACING_MORE) == SDMPreferenceConstants.DEBUG_MASTER_TRACING_MORE) {
+				DebugUtil.SDM_MASTER_TRACING_MORE = true;
+			}
+			if ((level & SDMPreferenceConstants.DEBUG_MASTER_OUTPUT) == SDMPreferenceConstants.DEBUG_MASTER_OUTPUT) {
+				DebugUtil.SDM_MASTER_OUTPUT_TRACING = true;
+			}
+		}
+		
 		ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
 
 		if (dbgArgsAttr == null) {
@@ -226,22 +247,31 @@ public class SDMDebugger implements IPDebugger {
 		List<String> dbgArgs = dbgArgsAttr.getValue();
 
 		try {
-			getDebugger().initialize(configuration, dbgArgs, monitor);
+			getPDIDebugger().initialize(configuration, dbgArgs, monitor);
 		} catch (PDIException e) {
 			throw newCoreException(e);
 		}
 
-		/*
-		 * Store information to create routing file later.
-		 */
-		prepareRoutingFile(configuration, attrMgr, monitor);
-
-		/*
-		 * Prepare the Master SDM controller thread.
-		 */
-		IResourceManagerControl rm = null;
-		rm = (IResourceManagerControl) getResourceManager(configuration);
-		sdmRunner = new SDMRunner(rm);
+		if (fPreLaunchHelpNeeded) {
+			/*
+			 * Store information to create routing file later.
+			 */
+			prepareRoutingFile(configuration, attrMgr, monitor);
+	
+			/*
+			 * Prepare the Master SDM controller thread.
+			 */
+			IResourceManagerControl rm = null;
+			rm = (IResourceManagerControl) getResourceManager(configuration);
+			fSdmRunner = new SDMRunner(rm);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#setPreLaunchHelp(boolean)
+	 */
+	public void setPreLaunchHelp(boolean flag) {
+		fPreLaunchHelpNeeded = flag;
 	}
 
 	/**
@@ -295,18 +325,6 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Get the PDI debugger implementation. Creates the class if necessary.
-	 *
-	 * @return IPDIDebugger
-	 */
-	private IPDIDebugger getDebugger() {
-		if (pdiDebugger == null) {
-			pdiDebugger = new PDIDebugger();
-		}
-		return pdiDebugger;
-	}
-
-	/**
 	 * Work out the expected number of processes in the job. If it hasn't been
 	 * specified, assume one.
 	 *
@@ -319,6 +337,18 @@ public class SDMDebugger implements IPDebugger {
 			nprocs = 1;
 		}
 		return nprocs;
+	}
+
+	/**
+	 * Get the PDI debugger implementation. Creates the class if necessary.
+	 *
+	 * @return IPDIDebugger
+	 */
+	private IPDIDebugger getPDIDebugger() {
+		if (fPdiDebugger == null) {
+			fPdiDebugger = new PDIDebugger();
+		}
+		return fPdiDebugger;
 	}
 
 	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
@@ -341,7 +371,7 @@ public class SDMDebugger implements IPDebugger {
 	 * @return CoreException
 	 */
 	private CoreException newCoreException(Throwable exception) {
-		MultiStatus status = new MultiStatus(SDMDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, "Cannot start debugging", exception);
+		MultiStatus status = new MultiStatus(SDMDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, Messages.SDMDebugger_10, exception);
 		status.add(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, exception == null ? new String() : exception.getLocalizedMessage(), exception));
 		return new CoreException(status);
 	}
@@ -350,7 +380,7 @@ public class SDMDebugger implements IPDebugger {
 			AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
 		IPath routingFilePath = new Path(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
-		routingFilePath = routingFilePath.append("routing_file");
+		routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
 		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
 		IResourceManagerConfiguration conf = rm.getConfiguration();
@@ -360,35 +390,35 @@ public class SDMDebugger implements IPDebugger {
 		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
 
 		try {
-			this.routingFileStore = remoteFileManager.getResource(routingFilePath, monitor);
+			this.fRoutingFileStore = remoteFileManager.getResource(routingFilePath, monitor);
 		} catch (IOException e) {
 			throw newCoreException(e);
 		}
 
-		IFileInfo info = routingFileStore.fetchInfo();
+		IFileInfo info = fRoutingFileStore.fetchInfo();
 		if (info.exists()) {
 			try {
-				routingFileStore.delete(0, monitor);
+				fRoutingFileStore.delete(0, monitor);
 			} catch (CoreException e) {
 				throw newCoreException(e);
 			}
-			routingFileStore.fetchInfo();
+			fRoutingFileStore.fetchInfo();
 		}
 	}
 
 	private void writeRoutingFile(IPLaunch launch) throws CoreException {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "debug: Write routing file");
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_12);
 		IProgressMonitor monitor = new NullProgressMonitor();
 		OutputStream os = null;
 		try {
-			os = routingFileStore.openOutputStream(0, monitor);
+			os = fRoutingFileStore.openOutputStream(0, monitor);
 		} catch (CoreException e) {
 			throw newCoreException(e);
 		}
 		PrintWriter pw = new PrintWriter(os);
 		IPProcess processes[] = launch.getPJob().getProcesses();
-		pw.format("%d\n", processes.length);
-		int base = 10000;
+		pw.format("%d\n", processes.length); //$NON-NLS-1$
+		int base = 50000;
 		int range = 10000;
 		Random random = new Random();
 		for (IPProcess process : processes) {
@@ -396,7 +426,7 @@ public class SDMDebugger implements IPDebugger {
 			IPNode node = process.getNode();
 			String nodeName = node.getName();
 			int portNumber = base + random.nextInt(range);
-			pw.format("%s %s %d\n", index, nodeName, portNumber);
+			pw.format("%s %s %d\n", index, nodeName, portNumber); //$NON-NLS-1$
 		}
 		pw.close();
 		try {
@@ -420,8 +450,8 @@ public class SDMDebugger implements IPDebugger {
 		IPJob job = launch.getPJob();
 		int job_size = getJobSize(job);
 		try {
-			return new Session(managerFactory, requestFactory, eventFactory, modelFactory,
-					launch.getLaunchConfiguration(), timeout, getDebugger(), job.getID(), job_size);
+			return new Session(fManagerFactory, fRequestFactory, fEventFactory, fModelFactory,
+					launch.getLaunchConfiguration(), timeout, getPDIDebugger(), job.getID(), job_size);
 		}
 		catch (PDIException e) {
 			throw newCoreException(e);

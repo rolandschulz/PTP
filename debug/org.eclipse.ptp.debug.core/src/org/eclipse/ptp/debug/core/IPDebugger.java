@@ -36,16 +36,33 @@ import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
 public interface IPDebugger {
 	/**
+	 * Clean up the debug session. Does whatever is necessary to shut down any debugger activities
+	 * that were started as a result of calling initialize.
+	 * 
+	 * @param launch debugger launch configuration
+	 */
+	public void cleanup(IPLaunch launch);
+
+	/**
 	 * Create a new debugger session.
 	 *
 	 * @param timeout
-	 * @param launch
-	 * @param corefile
-	 * @param monitor
-	 * @return
+	 * @param launch debugger launch configuration
+	 * @param corefile path to core file (not used)
+	 * @return new debug session
 	 * @throws CoreException
 	 */
 	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException;
+
+	/**
+	 * Using the supplied ILaunchConfiguration, add the required attributes to attrMgr
+	 * need to be passed to the submitJob command to launch the application under debugger control.
+	 *
+	 * @param configuration launch configuration for the debug session
+	 * @param attrMgr attribute manager containing attributes for launch
+	 * @throws CoreException
+	 */
+	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * Initialize the debugger. This does whatever is necessary to get the debugger ready
@@ -58,16 +75,9 @@ public interface IPDebugger {
 	 * @throws CoreException if the debugger cannot be initialized
 	 */
 	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
-
+	
 	/**
-	 * Using the supplied ILaunchConfiguration, add the required attributes to attrMgr
-	 * need to be passed to the submitJob command to launch the application under debugger control.
-	 *
-	 * @param configuration launch configuration for the debug session
-	 * @param attrMgr attribute manager containing attributes for launch
-	 * @throws CoreException
+	 * 
 	 */
-	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
-
-	public void cleanup(ILaunchConfiguration configuration, AttributeManager attrMgr, IPLaunch launch);
+	public void setPreLaunchHelp(boolean flag);
 }
