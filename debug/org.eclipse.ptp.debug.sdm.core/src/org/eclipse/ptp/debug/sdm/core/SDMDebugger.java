@@ -87,7 +87,6 @@ public class SDMDebugger implements IPDebugger {
 
 	private IFileStore fRoutingFileStore = null;
 	private SDMRunner fSdmRunner = null;
-	private boolean fPreLaunchHelpNeeded = false;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core.launch.IPLaunch)
@@ -137,7 +136,7 @@ public class SDMDebugger implements IPDebugger {
 			fRequestFactory = new SDMRequestFactory();
 		}
 
-		if (fPreLaunchHelpNeeded) {
+		if (fSdmRunner != null) {
 			/*
 			 * Writing the routing file actually starts the SDM servers.
 			 */
@@ -154,58 +153,6 @@ public class SDMDebugger implements IPDebugger {
 		IPDISession session = createSession(timeout, launch, corefile);
 
 		return session;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPDebugger#getLaunchAttributes(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager)
-	 */
-	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException {
-		ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
-
-		if (dbgArgsAttr == null) {
-			dbgArgsAttr = JobAttributes.getDebuggerArgumentsAttributeDefinition().create();
-			attrMgr.addAttribute(dbgArgsAttr);
-		}
-
-		List<String> dbgArgs = dbgArgsAttr.getValue();
-
-		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-
-		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
-
-		dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-		dbgArgs.add("--debugger=" + store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
-
-		String dbgPath = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
-		if (dbgPath.length() > 0) {
-			dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
-		}
-
-		String dbgExtraArgs = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
-		if (dbgExtraArgs.length() > 0) {
-			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
-		}
-		
-		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
-			dbgArgs.add("--debug=" + store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
-		} 
-
-		// remote setting
-		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
-		IPath path = verifyResource(dbgExePath, configuration);
-		attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-		attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toString()));
-
-		String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
-		if (dbgWD != null) {
-			StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
-			if (wdAttr != null) {
-				wdAttr.setValueAsString(dbgWD);
-			} else {
-				attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
-			}
-			attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
-		}
 	}
 
 	/* (non-Javadoc)
@@ -242,8 +189,43 @@ public class SDMDebugger implements IPDebugger {
 			throw newCoreException(e);
 		}
 
+		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
+
+		dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
+		dbgArgs.add("--debugger=" + store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
+
+		String dbgPath = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
+		if (dbgPath.length() > 0) {
+			dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
+		}
+
+		String dbgExtraArgs = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
+		if (dbgExtraArgs.length() > 0) {
+			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
+		}
+		
+		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+			dbgArgs.add("--debug=" + store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
+		} 
+
+		// remote setting
+		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
+		IPath path = verifyResource(dbgExePath, configuration);
+		attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+		attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toString()));
+
+		String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
+		if (dbgWD != null) {
+			StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
+			if (wdAttr != null) {
+				wdAttr.setValueAsString(dbgWD);
+			} else {
+				attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
+			}
+		}
+		
 		/*
-		 * Prepare the Master SDM controller thread.
+		 * Prepare the Master SDM controller thread if required by the RM.
 		 */
 		IResourceManagerControl rm = null;
 		rm = (IResourceManagerControl) getResourceManager(configuration);
@@ -254,17 +236,22 @@ public class SDMDebugger implements IPDebugger {
 			 */
 			prepareRoutingFile(configuration, attrMgr, monitor);
 	
+			/*
+			 * Create SDM master thread
+			 */
 			fSdmRunner = new SDMRunner(rm);
 
 			/*
 			 * Set SDM command line.
 			 */
 			List<String> sdmCommand = new ArrayList<String>();
-			sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue()); //$NON-NLS-1$
+			sdmCommand.add(dbgExePath);
 			sdmCommand.add("--master"); //$NON-NLS-1$
 			sdmCommand.addAll(dbgArgs);
 			fSdmRunner.setCommand(sdmCommand);
-			fSdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
+			if (dbgWD != null) {
+				fSdmRunner.setWorkDir(dbgWD);
+			}
 		}
 	}
 	

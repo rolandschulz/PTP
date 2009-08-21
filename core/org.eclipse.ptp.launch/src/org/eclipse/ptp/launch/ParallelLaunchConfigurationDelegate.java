@@ -106,7 +106,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				if (monitor.isCanceled()) {
 					return;
 				}
-				debugger.getLaunchAttributes(configuration, attrManager);
 				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 				attrManager.addAttribute(JobAttributes.getDebuggerIdAttributeDefinition().create(debugConfig.getID()));
 			}
