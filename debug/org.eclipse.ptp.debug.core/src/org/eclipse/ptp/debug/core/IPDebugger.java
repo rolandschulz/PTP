@@ -55,19 +55,11 @@ public interface IPDebugger {
 	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException;
 
 	/**
-	 * Using the supplied ILaunchConfiguration, add the required attributes to attrMgr
-	 * need to be passed to the submitJob command to launch the application under debugger control.
-	 *
-	 * @param configuration launch configuration for the debug session
-	 * @param attrMgr attribute manager containing attributes for launch
-	 * @throws CoreException
-	 */
-	public void getLaunchAttributes(ILaunchConfiguration configuration, AttributeManager attrMgr) throws CoreException;
-
-	/**
 	 * Initialize the debugger. This does whatever is necessary to get the debugger ready
-	 * to start debugging the user application. The attrMgr argument can supply attributes
-	 * from a previously submitted job that may be used to initialize the debug session.
+	 * to start debugging the user application. The debugger should add the required attributes to attrMgr
+	 * that need to be passed to the submitJob command to launch the application under debugger control.
+	 * The attrMgr argument can also supply attributes from a previously submitted job that may be used to 
+	 * initialize the debug session.
 	 *
 	 * @param configuration debugger launch configuration
 	 * @param attrMgr attribute manager containing attributes for launch

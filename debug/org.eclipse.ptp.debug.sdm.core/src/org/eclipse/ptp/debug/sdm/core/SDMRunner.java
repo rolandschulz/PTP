@@ -16,6 +16,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -30,7 +31,7 @@ public class SDMRunner extends Job {
 	public enum SDMMasterState {UNKNOWN, STARTING, RUNNING, FINISHED, ERROR};
 
 	private List<String> command;
-	private String workDir;
+	private String workDir = null;
 	private SDMMasterState sdmState = SDMMasterState.STARTING;
 
 	private IPJob ipJob = null;
@@ -38,21 +39,21 @@ public class SDMRunner extends Job {
 	private IRemoteProcess sdmProcess;
 
 	public SDMRunner(IResourceManagerControl rmControl) {
-		super("Master SDM control");
+		super(Messages.SDMRunner_0);
 		this.setPriority(Job.LONG);
 		this.setSystem(true);
 		this.setSystem(false);
 		this.rmControl = rmControl;
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "Created sdm master runner."); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_4); 
 	}
 
 	public void setCommand(List<String> command) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master: command: {0}", command.toString()); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_5, command.toString()); 
 		this.command = command;
 	}
 
 	public void setWorkDir(String workDir) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master: workdir: {0}", workDir); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_6, workDir); 
 		this.workDir = workDir;
 	}
 
@@ -61,23 +62,22 @@ public class SDMRunner extends Job {
 	}
 
 	protected synchronized void setSdmState(SDMMasterState sdmState) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master: changed state to {0}", sdmState.toString()); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_7, sdmState.toString()); 
 		this.sdmState = sdmState;
 		this.notifyAll();
 	}
 
 	public void setJob(IPJob ipJob) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master: associated to job #{0}", ipJob.getID()); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_8, ipJob.getID()); 
 		this.ipJob = ipJob;
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		assert workDir != null;
 		assert command != null;
 		assert sdmProcess == null;
 
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: thread started."); //$NON-NLS-1$
+		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_9); 
 		/*
 		 * Catch all try...catch
 		 */
@@ -93,18 +93,22 @@ public class SDMRunner extends Job {
 			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 
 			IFileStore directory = null;
-			try {
-				directory = fileManager.getResource(new Path(workDir), monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), "Failed to determine working directory for master SDM.", e));
+			if (workDir != null) {
+				try {
+					directory = fileManager.getResource(new Path(workDir), monitor);
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), Messages.SDMRunner_1, e));
+				}
 			}
 			IRemoteProcessBuilder sdmProcessBuilder = remoteServices.getProcessBuilder(connection, command);
-			sdmProcessBuilder.directory(directory);
+			if (directory != null) {
+				sdmProcessBuilder.directory(directory);
+			}
 
 			/*
 			 * Wait some time to assure that SDM servers and front end have started.
 			 */
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: waiting for SDM servers and front end."); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_10); 
 			if (monitor.isCanceled()) throw new InterruptedException();
 			synchronized (this) {
 				wait(3000);
@@ -113,7 +117,7 @@ public class SDMRunner extends Job {
 			/*
 			 * Create process.
 			 */
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: create process"); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_11); 
 			if (monitor.isCanceled()) throw new InterruptedException();
 			synchronized (this) {
 				sdmProcess = sdmProcessBuilder.start();
@@ -127,13 +131,13 @@ public class SDMRunner extends Job {
 						try {
 							String output;
 							while ((output = out_reader.readLine()) != null) {
-								System.out.println("sdm master: " + output); //$NON-NLS-1$
+								System.out.println(Messages.SDMRunner_12 + output); 
 							}
 						} catch (IOException e) {
 							// Ignore
 						}
 					}
-				}, "sdm master standard output thread").start(); //$NON-NLS-1$
+				}, Messages.SDMRunner_13).start(); 
 			}
 
 			if (DebugUtil.SDM_MASTER_OUTPUT_TRACING) {
@@ -142,13 +146,13 @@ public class SDMRunner extends Job {
 						try {
 							String line;
 							while ((line = err_reader.readLine()) != null) {
-								System.err.println("sdm master: " + line); //$NON-NLS-1$
+								System.err.println(Messages.SDMRunner_14 + line); 
 							}
 						} catch (IOException e) {
 							// Ignore
 						}
 					}
-				}, "sdm master error output thread").start(); //$NON-NLS-1$
+				}, Messages.SDMRunner_15).start(); 
 			}
 
 
@@ -156,7 +160,7 @@ public class SDMRunner extends Job {
 			 * Wait while running but not canceled.
 			 */
 			setSdmState(SDMMasterState.RUNNING);
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, "sdm master: waiting to finish."); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_16); 
 			while (! sdmProcess.isCompleted()) {
 				synchronized (this) {
 					wait(500);
@@ -167,12 +171,12 @@ public class SDMRunner extends Job {
 			/*
 			 * Check if process terminated successfully (if not canceled).
 			 */
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: exit value {0}.", sdmProcess.exitValue()); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_17, sdmProcess.exitValue()); 
 			if (sdmProcess.exitValue() != 0) {
 				if (! monitor.isCanceled()) {
-					throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), NLS.bind("sdm master process finished with exit code {0}.", sdmProcess.exitValue())));
+					throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), NLS.bind(Messages.SDMRunner_2, sdmProcess.exitValue())));
 				} else {
-					DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: ignoring exit code since requested to terminate."); //$NON-NLS-1$
+					DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_18); 
 				}
 			}
 			setSdmState(SDMMasterState.FINISHED);
@@ -182,14 +186,14 @@ public class SDMRunner extends Job {
 			 * Terminate the job, handling the error.
 			 * Also terminates the ipjob since it does not make sense to the ipjob running without debugger.
 			 */
-			DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, "sdm master: exception: {0}", e); //$NON-NLS-1$
+			DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_19, e); 
 			setSdmState(SDMMasterState.ERROR);
 			synchronized (this) {
-				DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, "sdm master: destroy process", e); //$NON-NLS-1$
+				DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_20, e); 
 				sdmProcess.destroy();
 			}
 			try {
-				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: request job {0} to terminate.", ipJob.getID()); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_21, ipJob.getID()); 
 				rmControl.terminateJob(ipJob);
 			} catch (CoreException e1) {
 				PTPDebugCorePlugin.log(e1);
@@ -199,10 +203,10 @@ public class SDMRunner extends Job {
 			} else if (e instanceof CoreException) {
 				return ((CoreException) e).getStatus();
 			} else {
-				return new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), "Failed to launch sdm master process.", e);
+				return new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), Messages.SDMRunner_3, e);
 			}
 		} finally {
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, "sdm master: thread finished."); //$NON-NLS-1$
+			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_22); 
 			synchronized (this) {
 				sdmProcess = null;
 			}

@@ -31,6 +31,30 @@ public class Messages extends NLS {
 	public static String SDMDebugger_12;
 	public static String SDMDebugger_13;
 	public static String SDMDebugger_14;
+
+	public static String SDMRunner_0;
+	public static String SDMRunner_1;
+	public static String SDMRunner_2;
+	public static String SDMRunner_3;
+	public static String SDMRunner_4;
+	public static String SDMRunner_5;
+	public static String SDMRunner_6;
+	public static String SDMRunner_7;
+	public static String SDMRunner_8;
+	public static String SDMRunner_9;
+	public static String SDMRunner_10;
+	public static String SDMRunner_11;
+	public static String SDMRunner_12;
+	public static String SDMRunner_13;
+	public static String SDMRunner_14;
+	public static String SDMRunner_15;
+	public static String SDMRunner_16;
+	public static String SDMRunner_17;
+	public static String SDMRunner_18;
+	public static String SDMRunner_19;
+	public static String SDMRunner_20;
+	public static String SDMRunner_21;
+	public static String SDMRunner_22;
 	
 	static {
 		// initialize resource bundle
