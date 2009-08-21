@@ -62,7 +62,7 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	public IPDebugger getDebugger() throws CoreException {
 		if (fDebugger == null) {
 			Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
-			if (debugger instanceof IPDebugger) {
+			if (!(debugger instanceof IPDebugger)) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, Messages.PDebugConfiguration_1, null));
 			}
 			fDebugger = (IPDebugger)debugger;
