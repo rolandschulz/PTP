@@ -1,0 +1,37 @@
+# ============================================================================
+# Name        : Makefile
+# Author      : {{author}}
+# Version     :
+# Copyright   : {{copyright}}
+# Description : Makefile for Hello MPI World in Fortran
+# ============================================================================
+
+# List of all source files in the project
+SRC = $(subst {{sourceDir}}/,,$(wildcard {{sourceDir}}/*.f90))
+
+INCLUDES = -I. -I/usr/local/include
+
+LIBS = -L/usr/local/lib
+
+# Set up the command to run the Fortran compiler
+F90      = gfortran
+F90FLAGS = -O2 -g $(INCLUDES)
+
+# Pattern Rules ==============================================================
+
+{{binDir}}/%.o: {{sourceDir}}/%.f90
+	$(F90) $(F90FLAGS) -o $(addprefix {{binDir}}/, $(addsuffix .o, $(subst {{sourceDir}}/,,$(basename $<)))) -c $<
+
+# Make Targets ===============================================================
+
+.PHONY: all clean
+
+OBJ = $(addprefix {{binDir}}/, $(addsuffix .o, $(subst {{sourceDir}}/,,$(basename $(SRC)))))
+
+{{binDir}}/{{baseName}}{{exe}}: $(OBJ)
+	$(F90) $(F90FLAGS) -o $@ $(OBJ)
+
+all: {{binDir}}/{{baseName}}{{exe}}
+
+clean:
+	rm -f {{baseName}}{{exe}} *.mod *.o
