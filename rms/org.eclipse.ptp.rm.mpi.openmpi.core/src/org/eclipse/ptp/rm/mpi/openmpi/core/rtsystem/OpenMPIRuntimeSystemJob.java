@@ -51,7 +51,15 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfi
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 
 /**
- * Deal with output from the mpirun command.
+ * Master job that implements the Open MPI runtime system. This job must implement each of the
+ * various phases of the runtime system:
+ * 
+ * doPrepareExecution = do any debugger startup actions
+ * doBeforeExecution - merge streams if necessary
+ * doExecutionStarted - parse output from the mpirun command
+ * doWaitExectuion - wait until execution has completed
+ * doExecutionFinished - deal with any issues from program termination
+ * doExecutionCleanup - cleanup after execution
  * 
  * The type/format of output depends on a range of factors, including the OMPI version and the capabilities of the
  * remote service provider being used.
@@ -67,7 +75,9 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
  * 
  * OMPI 1.3.2 adds <noderesolve> elements to the XML map data.
  * 
- * OMPI 1.3.[1,2,3] malform the XML by dropping </stdout> tags on some lines.   
+ * OMPI 1.3.[1,2,3] malform the XML by dropping </stdout> tags on some lines. 
+ * 
+ * OMPI 1.3.4 and 1.4 add <mpirun> and </mpirun> root tags
  * 
  * @author Daniel Felix Ferber
  * @author Greg Watson
@@ -140,6 +150,12 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 	}
 	
+	/**
+	 * Add a process to the job
+	 * 
+	 * @param job
+	 * @param proc
+	 */
 	protected void addProcess(IPJob job, Process proc) {
 		OpenMPIRuntimeSystem rts = (OpenMPIRuntimeSystem)getRtSystem();
 		String nodename = proc.getNode().getResolvedName();
@@ -292,6 +308,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		};
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doBeforeExecution(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.remote.core.IRemoteProcessBuilder)
+	 */
 	@Override
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
 		final IOpenMPIResourceManagerConfiguration configuration = (IOpenMPIResourceManagerConfiguration) getRtSystem().getRmConfiguration();
@@ -305,6 +324,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doExecutionCleanUp(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected void doExecutionCleanUp(IProgressMonitor monitor) {
 		if (getProcess() != null) {
@@ -323,6 +345,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doExecutionFinished(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException {
 		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
@@ -340,6 +365,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		return JobAttributes.State.TERMINATED;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doExecutionStarted(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
 		mapCompleted = false;
@@ -483,17 +511,26 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}	
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doPrepareExecution(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected void doPrepareExecution(IProgressMonitor monitor) throws CoreException {
 		// Nothing to do
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doRetrieveToolBaseSubstitutionAttributes()
+	 */
 	@Override
 	protected IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException {
 		// TODO make macros available for environment variables and work directory.
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doRetrieveToolCommandSubstitutionAttributes(org.eclipse.ptp.core.attributes.AttributeManager, java.lang.String, java.util.Map)
+	 */
 	@Override
 	protected IAttribute<?, ?, ?>[] doRetrieveToolCommandSubstitutionAttributes(
 			AttributeManager baseSubstitutionAttributeManager,
@@ -527,11 +564,17 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doTerminateJob()
+	 */
 	@Override
 	protected void doTerminateJob() {
 		// Empty implementation.
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doWaitExecution(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected void doWaitExecution(IProgressMonitor monitor) throws CoreException {
 		try {
