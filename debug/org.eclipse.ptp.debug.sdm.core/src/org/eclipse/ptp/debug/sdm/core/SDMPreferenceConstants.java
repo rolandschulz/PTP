@@ -44,12 +44,22 @@ public interface SDMPreferenceConstants {
 	 */
 	public static final String SDM_DEBUG_ENABLED = PLUGIN_ID + ".debug_enabled"; //$NON-NLS-1$
 	public static final String SDM_DEBUG_LEVEL = PLUGIN_ID + ".debug_level"; //$NON-NLS-1$
+	
 	public static final int DEBUG_LEVEL_NONE = 0x00;
 	public static final int DEBUG_LEVEL_STARTUP = 0x01;
-	public static final int DEBUG_LEVEL_CLIENT = 0x02;
-	public static final int DEBUG_LEVEL_SERVER = 0x04;
-	public static final int DEBUG_LEVEL_BACKEND = 0x08;
-	public static final int DEBUG_LEVEL_PROTOCOL = 0x10;
+	public static final int DEBUG_LEVEL_MESSAGES = 0x02;
+	public static final int DEBUG_LEVEL_ROUTING = 0x04;
+	public static final int DEBUG_LEVEL_SERVER = 0x08;
+	public static final int DEBUG_LEVEL_BACKEND = 0x10;
+	public static final int DEBUG_LEVEL_PROTOCOL = 0x20;
+	
+	public static final String SDM_DEBUG_MASTER_ENABLED = PLUGIN_ID + ".debug_master_enabled"; //$NON-NLS-1$
+	public static final String SDM_DEBUG_MASTER_LEVEL = PLUGIN_ID + ".debug_master_level"; //$NON-NLS-1$
+
+	public static final int DEBUG_MASTER_NONE = 0x00;
+	public static final int DEBUG_MASTER_TRACING = 0x01;
+	public static final int DEBUG_MASTER_TRACING_MORE = 0x02;
+	public static final int DEBUG_MASTER_OUTPUT = 0x03;
 
 	/**
 	 * Debugger backend
