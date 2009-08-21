@@ -75,8 +75,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		monitor.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
 		if (monitor.isCanceled())
 			return;
+		
 		IPDebugger debugger = null;
-		IPJob job = null;
 
 		monitor.worked(10);
 		monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
@@ -108,6 +108,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				}
 				debugger.getLaunchAttributes(configuration, attrManager);
 				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
+				attrManager.addAttribute(JobAttributes.getDebuggerIdAttributeDefinition().create(debugConfig.getID()));
 			}
 
 			monitor.worked(10);
@@ -118,7 +119,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.worked(10);
 		} catch (CoreException e) {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
+				debugger.cleanup((IPLaunch)launch);
 			}
 			if (e.getStatus().getCode() != IStatus.CANCEL)
 				throw e;
@@ -143,14 +144,18 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCleanupLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.ptp.debug.core.IPDebugger, org.eclipse.ptp.core.elements.IPJob)
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#doCleanupLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch)
 	 */
 	@Override
-	protected void doCleanupLaunch(ILaunchConfiguration configuration,
-			String mode, IPLaunch launch, AttributeManager attrMgr,
-			IPDebugger debugger, IPJob job) {
-		if (debugger != null) {
-			debugger.cleanup(configuration, attrMgr, launch);
+	protected void doCleanupLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch) {
+		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+			try {
+				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				IPDebugger debugger = debugConfig.getDebugger();
+				debugger.cleanup(launch);
+			} catch (CoreException e) {
+				PTPLaunchPlugin.log(e);
+			}
 		}
 	}
 
@@ -186,6 +191,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 									session.connectToDebugger(monitor, app, path, cwd, args.toArray(new String[args.size()]));
 								} catch (CoreException e) {
+									PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 									throw new InvocationTargetException(e);
 								} finally {
 									monitor.done();
