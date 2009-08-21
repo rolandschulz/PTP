@@ -318,7 +318,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 								/*
 								 * Job has terminated, so clean up.
 								 */
-								doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
+								doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch());
 								jobSubmissions.remove(jobSub);
 								break;
 							}
@@ -776,16 +776,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	}
 
 	/**
-	 * @param configuration
+	 * Called to cleanup once the job terminates
+	 * 
+	 * @param config
 	 * @param mode
 	 * @param launch
-	 * @param attrMgr
-	 * @param debugger
-	 * @param job
 	 */
-	protected abstract void doCleanupLaunch(ILaunchConfiguration configuration,
-			String mode, IPLaunch launch, AttributeManager attrMgr,
-			IPDebugger debugger, IPJob job);
+	protected abstract void doCleanupLaunch(ILaunchConfiguration config, String mode, IPLaunch launch);
 
 	/**
 	 * This method is called when the job state changes to RUNNING. This allows the launcher to
