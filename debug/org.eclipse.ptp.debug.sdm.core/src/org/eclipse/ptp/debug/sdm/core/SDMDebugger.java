@@ -206,16 +206,6 @@ public class SDMDebugger implements IPDebugger {
 			}
 			attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(dbgWD + "/Debug")); //$NON-NLS-1$
 		}
-
-		/*
-		 * Save SDM command line for future use.
-		 */
-		List<String> sdmCommand = new ArrayList<String>();
-		sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue()); //$NON-NLS-1$
-		sdmCommand.add("--master"); //$NON-NLS-1$
-		sdmCommand.addAll(dbgArgs);
-		fSdmRunner.setCommand(sdmCommand);
-		fSdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
 	}
 
 	/* (non-Javadoc)
@@ -264,6 +254,16 @@ public class SDMDebugger implements IPDebugger {
 			IResourceManagerControl rm = null;
 			rm = (IResourceManagerControl) getResourceManager(configuration);
 			fSdmRunner = new SDMRunner(rm);
+
+			/*
+			 * Set SDM command line.
+			 */
+			List<String> sdmCommand = new ArrayList<String>();
+			sdmCommand.add(attrMgr.getAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition()).getValue()+"/"+attrMgr.getAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition()).getValue()); //$NON-NLS-1$
+			sdmCommand.add("--master"); //$NON-NLS-1$
+			sdmCommand.addAll(dbgArgs);
+			fSdmRunner.setCommand(sdmCommand);
+			fSdmRunner.setWorkDir(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
 		}
 	}
 	
