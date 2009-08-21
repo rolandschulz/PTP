@@ -20,7 +20,7 @@ import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvid
  */
 public abstract class AbstractToolRMServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IToolRMConfiguration {
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
+	
 	private static final String TAG_LAUNCH_CMD = "launchCmd"; //$NON-NLS-1$
 	private static final String TAG_DEBUG_CMD = "debugCmd"; //$NON-NLS-1$
 	private static final String TAG_DISCOVER_CMD = "discoverCmd"; //$NON-NLS-1$
@@ -48,11 +48,11 @@ public abstract class AbstractToolRMServiceProvider extends AbstractRemoteResour
 		setUseToolDefaults(provider.getUseToolDefaults());
 		fCapabilities = provider.getCapabilities();
 	}
-	
+
 	public AbstractToolRMServiceProvider(int capabilities) {
 		fCapabilities = capabilities;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration#getCapabilities()
 	 */
@@ -162,7 +162,7 @@ public abstract class AbstractToolRMServiceProvider extends AbstractRemoteResour
 		return (fCapabilities & CAP_LAUNCH) != 0 && getLaunchCmd() != null
 		&& !getLaunchCmd().trim().equals(EMPTY_STRING);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration#hasPeriodicMonitorCmd()
 	 */
@@ -170,6 +170,14 @@ public abstract class AbstractToolRMServiceProvider extends AbstractRemoteResour
 		return (fCapabilities & CAP_PERIODIC_MONITOR) != 0
 		&& getPeriodicMonitorCmd() != null
 		&& !getPeriodicMonitorCmd().trim().equals(EMPTY_STRING);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#needsDebuggerLaunchHelp()
+	 */
+	@Override
+	public boolean needsDebuggerLaunchHelp() {
+		return true;
 	}
 
 	/* (non-Javadoc)
