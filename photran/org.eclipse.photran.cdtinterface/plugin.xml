@@ -346,7 +346,7 @@
          </visibility>
          <action
             id="org.eclipse.photran.cdtinterface.ui.ProjectConversionAction"
-            label="%ProjectConversionAction"
+            label="Convert to Fortran Project"
             menubarPath="additions"
             icon="icons/obj16/f_file_obj.gif"
             class="org.eclipse.photran.cdtinterface.ui.ProjectConversionAction" />
