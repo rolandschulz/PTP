@@ -81,7 +81,7 @@ public class JobAttributes {
 
 	private final static StringAttributeDefinition debuggerIdAttrDef = 
 		new StringAttributeDefinition(DEBUGGER_ID_ATTR_ID, "Debugger ID", //$NON-NLS-1$
-				"ID of debugger", false, ""); //$NON-NLS-2$
+				"ID of debugger", false, ""); //$NON-NLS-1$
 
 	private final static ArrayAttributeDefinition<String> envAttrDef = 
 		new ArrayAttributeDefinition<String>(ENV_ATTR_ID, "Environment", //$NON-NLS-1$
