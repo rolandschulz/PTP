@@ -242,17 +242,18 @@ public class SDMDebugger implements IPDebugger {
 			throw newCoreException(e);
 		}
 
-		if (fPreLaunchHelpNeeded) {
+		/*
+		 * Prepare the Master SDM controller thread.
+		 */
+		IResourceManagerControl rm = null;
+		rm = (IResourceManagerControl) getResourceManager(configuration);
+		
+		if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
 			/*
 			 * Store information to create routing file later.
 			 */
 			prepareRoutingFile(configuration, attrMgr, monitor);
 	
-			/*
-			 * Prepare the Master SDM controller thread.
-			 */
-			IResourceManagerControl rm = null;
-			rm = (IResourceManagerControl) getResourceManager(configuration);
 			fSdmRunner = new SDMRunner(rm);
 
 			/*
@@ -267,13 +268,6 @@ public class SDMDebugger implements IPDebugger {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPDebugger#setPreLaunchHelp(boolean)
-	 */
-	public void setPreLaunchHelp(boolean flag) {
-		fPreLaunchHelpNeeded = flag;
-	}
-
 	/**
 	 * Verify that the resource "path" actually exists. This just checks
 	 * that the path references something real.

@@ -75,9 +75,4 @@ public interface IPDebugger {
 	 * @throws CoreException if the debugger cannot be initialized
 	 */
 	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
-	
-	/**
-	 * 
-	 */
-	public void setPreLaunchHelp(boolean flag);
 }
