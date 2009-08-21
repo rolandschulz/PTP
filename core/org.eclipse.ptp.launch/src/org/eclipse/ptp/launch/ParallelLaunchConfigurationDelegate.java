@@ -118,7 +118,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 			monitor.worked(10);
 		} catch (CoreException e) {
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+			if (debugger != null && mode.equals(ILaunchManager.DEBUG_MODE)) {
 				debugger.cleanup((IPLaunch)launch);
 			}
 			if (e.getStatus().getCode() != IStatus.CANCEL)
