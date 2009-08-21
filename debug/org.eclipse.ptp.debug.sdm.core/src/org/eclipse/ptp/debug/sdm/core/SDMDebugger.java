@@ -351,6 +351,13 @@ public class SDMDebugger implements IPDebugger {
 		return fPdiDebugger;
 	}
 
+	/**
+	 * Helper method to locate the resource manager used by the launch configuration
+	 * 
+	 * @param configuration launch configuration
+	 * @return resource manager or null if none specified
+	 * @throws CoreException
+	 */
 	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 		IResourceManager[] rms = universe.getResourceManagers();
@@ -376,6 +383,14 @@ public class SDMDebugger implements IPDebugger {
 		return new CoreException(status);
 	}
 
+	/**
+	 * Initialize the routing file for this debug session. 
+	 * 
+	 * @param configuration launch configuration
+	 * @param attrMgr attribute manager used to construct launch attributes
+	 * @param monitor progress monitor
+	 * @throws CoreException
+	 */
 	private void prepareRoutingFile(ILaunchConfiguration configuration,
 			AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
@@ -406,6 +421,16 @@ public class SDMDebugger implements IPDebugger {
 		}
 	}
 
+	/**
+	 * Generate the routing file once the debugger has launched.
+	 * 
+	 * NOTE: This currently assumes a shared filesystem that all debugger processes have
+	 * access to. The plan is to replace this with a routing distribution operation in
+	 * the debugger.
+	 * 
+	 * @param launch launch configuration
+	 * @throws CoreException
+	 */
 	private void writeRoutingFile(IPLaunch launch) throws CoreException {
 		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_12);
 		IProgressMonitor monitor = new NullProgressMonitor();
