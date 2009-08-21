@@ -43,6 +43,7 @@ public class JobAttributes {
 	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath"; //$NON-NLS-1$
 	private static final String DEBUG_FLAG_ATTR_ID = "debug"; //$NON-NLS-1$
 	private static final String DEBUG_STOP_IN_MAIN_ATTR_ID = "debugStopInMain"; //$NON-NLS-1$
+	private static final String DEBUGGER_ID_ATTR_ID = "debugerId"; //$NON-NLS-1$
 	private static final String ENV_ATTR_ID = "env"; //$NON-NLS-1$
 	private static final String EXEC_NAME_ATTR_ID = "execName"; //$NON-NLS-1$
 	private static final String EXEC_PATH_ATTR_ID = "execPath"; //$NON-NLS-1$
@@ -77,6 +78,10 @@ public class JobAttributes {
 	private final static BooleanAttributeDefinition debugStopInMainAttrDef = 
 		new BooleanAttributeDefinition(DEBUG_STOP_IN_MAIN_ATTR_ID, "Stop In Main",  //$NON-NLS-1$
 				Messages.JobAttributes_4, true, true);
+
+	private final static StringAttributeDefinition debuggerIdAttrDef = 
+		new StringAttributeDefinition(DEBUGGER_ID_ATTR_ID, "Debugger ID", //$NON-NLS-1$
+				"ID of debugger", false, ""); //$NON-NLS-2$
 
 	private final static ArrayAttributeDefinition<String> envAttrDef = 
 		new ArrayAttributeDefinition<String>(ENV_ATTR_ID, "Environment", //$NON-NLS-1$
@@ -155,6 +160,10 @@ public class JobAttributes {
 		return debugStopInMainAttrDef;
 	}
 	
+	public static StringAttributeDefinition getDebuggerIdAttributeDefinition() {
+		return debuggerIdAttrDef;
+	}
+	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				debugArgsAttrDef,
@@ -162,6 +171,7 @@ public class JobAttributes {
 				debugExecPathAttrDef,
 				debugFlagAttrDef,
 				debugStopInMainAttrDef,
+				debuggerIdAttrDef,
 				envAttrDef,
 				execNameAttrDef, 
 				execPathAttrDef,
