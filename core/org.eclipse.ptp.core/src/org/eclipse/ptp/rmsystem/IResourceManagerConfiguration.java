@@ -84,6 +84,16 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	public String getUniqueName();
 
 	/**
+	 * This resource manager needs the debugger to help with
+	 * a debug launch. What this means depends on the type
+	 * of the debugger. See the debugger implementation for
+	 * details.
+	 * 
+	 * @return true if help is required
+	 */
+	public boolean needsDebuggerLaunchHelp();
+	
+	/**
 	 * Save the state of the configuration.
 	 * 
 	 * @param memento
@@ -97,7 +107,7 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @param connectionName name of connection used by the resource manager
 	 */
 	public void setConnectionName(String connectionName);
-	
+
 	/**
 	 * The the name and description to default values.
 	 */
@@ -116,7 +126,7 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @param name
 	 */
 	public void setName(String name);
-
+	
 	/**
 	 * Set the remote service provider ID.
 	 * 
