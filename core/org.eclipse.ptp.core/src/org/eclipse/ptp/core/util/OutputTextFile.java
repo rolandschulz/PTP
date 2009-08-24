@@ -32,7 +32,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.messages.Messages;
 
 /**
  *
@@ -105,8 +104,9 @@ public class OutputTextFile implements PreferenceConstants {
 	}
 
 	public void delete() {
-		if (file.exists())
+		if (file != null && file.exists()) {
 			file.delete();
+		}
 
 		file = null;
 	}
