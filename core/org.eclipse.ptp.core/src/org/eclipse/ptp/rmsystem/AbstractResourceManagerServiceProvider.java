@@ -15,7 +15,7 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	
 	public AbstractResourceManagerServiceProvider() {
 	}
-
+	
 	public AbstractResourceManagerServiceProvider(AbstractResourceManagerServiceProvider provider) {
 		super(provider);
 		setConnectionName(provider.getConnectionName());
@@ -29,21 +29,21 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 
 	@Override
 	public abstract Object clone();
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getConnectionName()
 	 */
 	public String getConnectionName() {
 		return getString(TAG_CONNECTION_NAME, ""); //$NON-NLS-1$
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
 	 */
 	public String getDescription() {
 		return getString(TAG_DESCRIPTION, ""); //$NON-NLS-1$
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.ServiceProvider#getName()
 	 */
@@ -87,6 +87,13 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	
 	public boolean isConfigured() {
 		return !getConnectionName().equals("") && !getRemoteServicesId().equals(""); //$NON-NLS-1$//$NON-NLS-2$
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#needsDebuggerLaunchHelp()
+	 */
+	public boolean needsDebuggerLaunchHelp() {
+		return false;
 	}
 	
 	/* (non-Javadoc)

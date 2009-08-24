@@ -178,7 +178,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public IResourceManagerFactory getFactory() {
 		return factory;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getName()
 	 */
@@ -192,7 +192,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public String getRemoteServicesId() {
 		return remoteServicesID;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getResourceManagerId()
 	 */
@@ -212,6 +212,13 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	 */
 	public String getUniqueName() {
 		return uniqueName;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#needsDebuggerLaunchHelp()
+	 */
+	public boolean needsDebuggerLaunchHelp() {
+		return false;
 	}
 	
 	/**
