@@ -16,8 +16,8 @@
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
-	<property name="ptpVersion" value="3.0.0"/>
-	<property name="copyToDir" value="/home/www/tools/ptp/builds/${ptpVersion}/latest"/>
+	<property name="buildTarget" value="galileo"/>
+	<property name="copyToDir" value="/home/www/tools/ptp/builds/${buildTarget}/latest"/>
 	
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
