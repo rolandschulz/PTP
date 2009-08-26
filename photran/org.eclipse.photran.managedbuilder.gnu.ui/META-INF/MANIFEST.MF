@@ -5,4 +5,5 @@ Bundle-SymbolicName: org.eclipse.photran.managedbuilder.gnu.ui; singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.photran.managedbuilder.core
+Require-Bundle: org.eclipse.photran.managedbuilder.core,
+ org.eclipse.cdt.managedbuilder.core
