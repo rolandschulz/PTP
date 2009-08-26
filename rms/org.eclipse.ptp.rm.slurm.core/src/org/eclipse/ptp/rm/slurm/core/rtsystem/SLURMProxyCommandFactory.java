@@ -23,16 +23,16 @@ import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand;
 import org.eclipse.ptp.proxy.runtime.command.ProxyRuntimeCommandFactory;
-import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerConfiguration;
+import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 
 public class SLURMProxyCommandFactory implements IProxyRuntimeCommandFactory {
-	public final static String SLURMD_PATH_ATTR = "slurmdPath";
-	public final static String SLURMD_ARGS_ATTR = "slurmdArgs";
+	public final static String SLURMD_PATH_ATTR = "slurmdPath"; //$NON-NLS-1$
+	public final static String SLURMD_ARGS_ATTR = "slurmdArgs"; //$NON-NLS-1$
 	
 	private IProxyRuntimeCommandFactory factory;
-	private SLURMResourceManagerConfiguration config;
+	private ISLURMResourceManagerConfiguration config;
 	
-	public SLURMProxyCommandFactory(SLURMResourceManagerConfiguration config) {
+	public SLURMProxyCommandFactory(ISLURMResourceManagerConfiguration config) {
 		this.factory = new ProxyRuntimeCommandFactory();
 		this.config = config;
 	}
@@ -42,13 +42,13 @@ public class SLURMProxyCommandFactory implements IProxyRuntimeCommandFactory {
 	 */
 	public IProxyRuntimeInitCommand newProxyRuntimeInitCommand(int baseId) {
 		IProxyRuntimeInitCommand cmd = factory.newProxyRuntimeInitCommand(baseId);
-		if (!config.useDefaults()) {
-			if (!config.getSlurmdPath().equals("")) {
-				cmd.addArgument(SLURMD_PATH_ATTR + "=" + config.getSlurmdPath());
+		if (!config.getUseDefaults()) {
+			if (!config.getSlurmdPath().equals("")) { //$NON-NLS-1$
+				cmd.addArgument(SLURMD_PATH_ATTR + "=" + config.getSlurmdPath()); //$NON-NLS-1$
 			}
-			if (!config.getSlurmdArgs().equals("")) {
-				for (String arg : config.getSlurmdArgs().split(" ")) {
-					cmd.addArgument(SLURMD_ARGS_ATTR + "=" + arg);
+			if (!config.getSlurmdArgs().equals("")) { //$NON-NLS-1$
+				for (String arg : config.getSlurmdArgs().split(" ")) { //$NON-NLS-1$
+					cmd.addArgument(SLURMD_ARGS_ATTR + "=" + arg); //$NON-NLS-1$
 				}
 			}
 		}
