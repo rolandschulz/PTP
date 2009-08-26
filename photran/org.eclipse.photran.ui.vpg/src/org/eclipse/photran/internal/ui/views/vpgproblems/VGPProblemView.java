@@ -312,10 +312,21 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
                     TableItem[] selection = t.getSelection();
                     for(int i = 0; i < selection.length; i++)
                     {
-                        if(selection[i].getData() instanceof IMarker)
+                        if (selection[i].getData() instanceof IMarker)
                         {
-                            OpenMarkedFileAction openAction = new OpenMarkedFileAction(getViewSite());
-                            openAction.run((IMarker)(selection[i].getData()));
+                            IMarker marker = (IMarker)(selection[i].getData());
+                            if (marker.getResource() != null)
+                            {
+                                try
+                                {
+                                    OpenMarkedFileAction openAction = new OpenMarkedFileAction(getViewSite());
+                                    openAction.run(marker);
+                                }
+                                catch (Throwable x)
+                                {
+                                    ;
+                                }
+                            }
                         }
 
                     }
