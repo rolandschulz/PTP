@@ -1,6 +1,8 @@
 package org.eclipse.photran.internal.ui.views;
 
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.JFaceResources;
@@ -40,11 +42,11 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * Implements Photran's Declaration view
- * 
+ *
  * @author Jeff Overbey - modified to use MVC pattern, SourceViewer, caret listener, DefinitionMap; based on code by...
  * @author John Goode, Abe Hassan, Sean Kim
  *  Group: Fennel-Garlic
- *  University of Illinois at Urbana-Champaign 
+ *  University of Illinois at Urbana-Champaign
  *  CS 427 Fall 2007
  */
 public class DeclarationView extends ViewPart
@@ -57,7 +59,7 @@ public class DeclarationView extends ViewPart
     private HashMap<String, ASTExecutableProgramNode> activeAST = new HashMap<String, ASTExecutableProgramNode>();
     private HashMap<String, TokenList> activeTokenList = new HashMap<String, TokenList>();
     private HashMap<String, DefinitionMap<String>> activeDefinitions = new HashMap<String, DefinitionMap<String>>();
-    
+
     private SourceViewer viewer = null;
     private Document document = new Document();
 
@@ -69,7 +71,7 @@ public class DeclarationView extends ViewPart
      * existing objects in adapters or simply return
      * objects as-is. These objects may be sensitive
      * to the current input of the view, or ignore
-     * it and always show the same content 
+     * it and always show the same content
      * (like Task List, for example).
      */
 
@@ -83,7 +85,7 @@ public class DeclarationView extends ViewPart
 
         // Add this view as a selection listener to the workbench page
         getSite().getPage().addSelectionListener(this);
-        
+
         // Update the selection immediately
         try
         {
@@ -113,11 +115,11 @@ public class DeclarationView extends ViewPart
         IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), AbstractFortranEditor.PARTITION_TYPES);
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
-        
+
         viewer.getControl().setBackground(LIGHT_YELLOW);
         viewer.setEditable(false);
         viewer.getTextWidget().setFont(JFaceResources.getTextFont());
-        
+
         return viewer;
     }
 
@@ -126,8 +128,22 @@ public class DeclarationView extends ViewPart
      */
     public void update(String str)
     {
+        if (str.length() > 0)
+            str = trimBlankLines(str);
         document.set(str);
         viewer.refresh();
+    }
+
+    private static Pattern blankLine = Pattern.compile("(([ \\t]*[\\r\\n]+)+)[^\\00]*");
+    private String trimBlankLines(String str)
+    {
+        Matcher m = blankLine.matcher(str);
+        while (str.length() > 0 && m.matches())
+        {
+            str = str.substring(m.end(1));
+            m = blankLine.matcher(str);
+        }
+        return str;
     }
 
     /**
@@ -166,7 +182,7 @@ public class DeclarationView extends ViewPart
 
     /**
      * Registers this view to receive notifications of caret movement in <code>editor</code>
-     * 
+     *
      * See http://dev.eclipse.org/mhonarc/newsLists/news.eclipse.platform/msg44602.html
      */
     private AbstractFortranEditor startObserving(final AbstractFortranEditor editor)
@@ -182,7 +198,7 @@ public class DeclarationView extends ViewPart
                 FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
                 tasks.addASTTask(this);
                 tasks.addVPGTask(this);
-                
+
                 ((IPartService)getSite().getService(IPartService.class)).addPartListener(new IPartListener2()
                 {
                     public void partActivated(IWorkbenchPartReference partRef)
@@ -200,7 +216,7 @@ public class DeclarationView extends ViewPart
                             FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
                             tasks.removeASTTask(DeclarationView.this);
                             tasks.removeVPGTask(DeclarationView.this);
-                            
+
                             IFile ifile = editor.getIFile();
                             if (ifile != null)
                             {
@@ -233,12 +249,12 @@ public class DeclarationView extends ViewPart
                     {
                     }
                 });
-                
+
                 tasks.getRunner().runTasks(true);
                 return editor;
             }
         }
-        
+
         return null;
     }
 
@@ -273,7 +289,7 @@ public class DeclarationView extends ViewPart
     public synchronized void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap)
     {
         if (defMap == null) return;
-        
+
         activeDefinitions.put(file.getFullPath().toPortableString(), new DefinitionMap<String>(defMap)
         {
             @Override protected String map(String qualifiedName, Definition def)
@@ -306,14 +322,14 @@ public class DeclarationView extends ViewPart
     {
         if (activeEditor == null) return;
         String path = activeEditor.getIFile().getFullPath().toPortableString();
-        
+
         TokenList tokenList = activeTokenList.get(path);
         DefinitionMap<String> defMap = activeDefinitions.get(path);
         if (event.getSelection() instanceof TextSelection && tokenList != null && defMap != null)
         {
             String description = defMap.lookup((TextSelection)event.getSelection(), tokenList);
             update(description == null
-                ? "" 
+                ? ""
                 : description);
         }
         else

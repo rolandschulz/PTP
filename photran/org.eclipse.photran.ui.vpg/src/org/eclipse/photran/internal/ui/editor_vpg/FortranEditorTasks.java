@@ -35,7 +35,7 @@ public class FortranEditorTasks
     {
         if (editor.reconcilerTasks == null)
             editor.reconcilerTasks = new FortranEditorTasks(editor);
-        
+
         return (FortranEditorTasks)editor.reconcilerTasks;
     }
 
@@ -43,20 +43,20 @@ public class FortranEditorTasks
     {
         this.editor = editor;
         editor.reconcilerTasks = this;
-        
+
         this.runner = new Runner();
     }
-    
+
     private AbstractFortranEditor editor;
-    
+
     private Runner runner;
-    
+
     /**
      * These jobs will be run if the contents of the editor parses successfully.  The VPG will probably
      * <i>not</i> be up to date, but token positions will correspond to the contents of the editor.
      */
     private final Set<IFortranEditorASTTask> astTasks = new HashSet<IFortranEditorASTTask>();
-    
+
     /**
      * These jobs will be run when the VPG is more-or-less up-to-date and an AST is available for the
      * file in the editor.
@@ -67,48 +67,48 @@ public class FortranEditorTasks
     {
         astTasks.add(task);
     }
-    
+
     public synchronized void addVPGTask(IFortranEditorVPGTask task)
     {
         vpgTasks.add(task);
     }
-    
+
     public synchronized void removeASTTask(IFortranEditorASTTask task)
     {
         astTasks.remove(task);
     }
-    
+
     public synchronized void removeVPGTask(IFortranEditorVPGTask task)
     {
         vpgTasks.remove(task);
     }
-    
+
     public Runner getRunner()
     {
         return runner;
     }
-    
+
     public class Runner
     {
         protected DefinitionMap<Definition> defMap = null;
-        
+
         protected PhotranVPG vpg = PhotranVPG.getInstance();
         protected Job dispatchASTTasksJob = null;
         protected VPGJob<IFortranAST, Token> updateVPGJob = null;
         protected Job dispatchVPGTasksJob = null;
         protected IFortranAST vpgAST = null;
-        
+
         private Parser parser = new Parser();
-        
+
         public void runTasks()
         {
             runTasks(true);
         }
-        
+
         public void runTasks(boolean runVPGTasks)
         {
             if (editor == null) return;
-            
+
             String vpgEnabledProperty = SearchPathProperties.getProperty(editor.getIFile(),
                                                  SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
             if (vpgEnabledProperty != null && vpgEnabledProperty.equals("true"))
@@ -117,7 +117,7 @@ public class FortranEditorTasks
                 if (runVPGTasks) runVPGTasks();
             }
         }
-        
+
         private void runASTTasks()
         {
             if (dispatchASTTasksJob != null) return; // Already running an update
@@ -133,7 +133,7 @@ public class FortranEditorTasks
                         if (editor.getDocumentProvider() != null)
                         {
                             String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
-                            
+
                             SourceForm sourceForm =
                                 editor.getIFile() == null || editor.getIFile().getProject() == null
                                 ? SourceForm.UNPREPROCESSED_FREE_FORM
@@ -142,10 +142,10 @@ public class FortranEditorTasks
                                                                                 null,
                                                                                 null,
                                                                                 sourceForm,
-                                                                                false);
+                                                                                true /*false*/);
                             astRootNode = parser.parse(lexer);
                             if (astRootNode == null) return Status.OK_STATUS;
-                            
+
                             HashSet<IFortranEditorASTTask> tasksToRemove = new HashSet<IFortranEditorASTTask>();
                             synchronized (FortranEditorTasks.instance(editor))
                             {
@@ -160,7 +160,7 @@ public class FortranEditorTasks
                     {
                         ;
                     }
-                    
+
                     dispatchASTTasksJob = null;
                     return Status.OK_STATUS;
                 }
@@ -176,7 +176,7 @@ public class FortranEditorTasks
             //if (vpgAST == null || vpg.db.isOutOfDate(PhotranVPG.getFilenameForIFile(editor.getIFile())))
             {
                 vpg.queueJobToEnsureVPGIsUpToDate();
-                
+
                 vpgAST = null;
                 updateVPGJob = new VPGJob<IFortranAST, Token>("Updating Fortran editor with new analysis information")
                 {
@@ -186,14 +186,14 @@ public class FortranEditorTasks
                         vpgAST = vpg.acquireTransientAST(PhotranVPG.getFilenameForIFile(editor.getIFile()));
                         updateVPGJob = null;
                         //scheduleVPGTaskDispatchJob();
-                        
+
                         if (vpgAST != null)
                         {
                             defMap = createDefMap();
                             for (IFortranEditorVPGTask task : FortranEditorTasks.instance(editor).vpgTasks)
                                 task.handle(editor.getIFile(), vpgAST, defMap);
                         }
-                        
+
                         return Status.OK_STATUS;
                     }
                 };

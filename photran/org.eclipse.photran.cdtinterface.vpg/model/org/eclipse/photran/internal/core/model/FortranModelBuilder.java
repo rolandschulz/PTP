@@ -69,7 +69,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
                 file,
                 determineFilename(file),
                 determineSourceForm(file),
-                true);
+                true /*false*/);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
             IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());

@@ -46,7 +46,7 @@ import bz.over.vpg.VPGEdge;
 /**
  * The <code>PhotranVPGBuilder</code> provides methods for manipulating the
  * VPG database; these methods are used only when collecting bindings.
- * 
+ *
  * @author Jeff Overbey
  */
 public class PhotranVPGBuilder extends PhotranVPG
@@ -70,7 +70,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
     }
-	
+
 	public void markFileAsImportingModule(IFile file, String moduleName)
 	{
 	    db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "module:" + canonicalizeIdentifier(moduleName)));
@@ -80,38 +80,38 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "common:" + canonicalizeIdentifier(commonBlockName)));
     }
-	
+
 	public void setDefinitionFor(PhotranTokenRef tokenRef, Definition definition)
 	{
 	    db.setAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE, definition);
 	}
-    
+
     public void markDefinitionVisibilityInScope(PhotranTokenRef definitionTokenRef, ScopingNode scope, Visibility visibility)
     {
         //System.err.println("Marking " + definitionTokenRef.findToken().getText() + " " + visibility + " in " + scope.getRepresentativeToken().findTokenOrReturnNull());
-        
+
         VPGEdge<IFortranAST, Token, PhotranTokenRef> privateEdge = new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, definitionTokenRef, scope.getRepresentativeToken(), DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE);
         if (visibility.equals(Visibility.PRIVATE))
             db.ensure(privateEdge);
         else
             db.delete(privateEdge);
     }
-	
+
 	public void markScope(PhotranTokenRef identifier, ScopingNode scope)
 	{
 	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, identifier, scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
 	}
-	
+
 	public void markBinding(PhotranTokenRef reference, PhotranTokenRef definition)
 	{
 	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference, definition, BINDING_EDGE_TYPE));
 	}
-	
+
 	public void markRenamedBinding(PhotranTokenRef reference, PhotranTokenRef definition)
 	{
 	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference, definition, RENAMED_BINDING_EDGE_TYPE));
 	}
-	
+
 	public void setScopeImplicitSpec(ScopingNode scope, ImplicitSpec implicitSpec)
 	{
 		if (implicitSpec != null)
@@ -119,27 +119,27 @@ public class PhotranVPGBuilder extends PhotranVPG
 		else
 		    db.deleteAnnotation(scope.getRepresentativeToken(), SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
 	}
-    
+
     public void setDefaultScopeVisibilityToPrivate(ScopingNode scope)
     {
         db.setAnnotation(scope.getRepresentativeToken(), SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE, Boolean.TRUE);
     }
-    
+
     public void setModuleSymbolTable(Token moduleNameToken, List<Definition> symbolTable)
     {
         clearModuleSymbolTableEntries(moduleNameToken);
-        
+
         String filename = "module:" + canonicalizeIdentifier(moduleNameToken.getText());
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
         db.setAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE, moduleNameToken.getTokenRef());
-        
+
         int entries = 0;
         for (Definition def : symbolTable)
         {
             tokenRef = createTokenRef(filename, entries++, 0);
             db.setAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE, def);
         }
-        
+
         tokenRef = createTokenRef(filename, 0, 0);
         db.setAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE, Integer.valueOf(entries));
     }
@@ -147,20 +147,20 @@ public class PhotranVPGBuilder extends PhotranVPG
     private void clearModuleSymbolTableEntries(Token moduleNameToken)
     {
         String canonicalizedModuleName = canonicalizeIdentifier(moduleNameToken.getText());
-        
+
         moduleSymTabCache.remove(canonicalizedModuleName);
-        
+
         int entries = countModuleSymbolTableEntries(canonicalizedModuleName);
         if (entries > 0)
         {
             String filename = "module:" + canonicalizedModuleName;
-            
+
             for (int i = 0; i < entries; i++)
             {
                 PhotranTokenRef tokenRef = createTokenRef(filename, i, 0);
                 db.deleteAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE);
             }
-            
+
             PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
             db.setAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE, Integer.valueOf(0));
         }
@@ -170,7 +170,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         return filename.startsWith("module:") || filename.startsWith("common:") || filename.startsWith("subprogram:");
     }
-    
+
     @Override
     protected boolean shouldListFileInIndexerProgressMessages(String filename)
     {
@@ -198,7 +198,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             throw new Error(e);
         }
     }
-    
+
     @Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)
     {
         return new PhotranTokenRef(filename, offset, length);
@@ -208,11 +208,11 @@ public class PhotranVPGBuilder extends PhotranVPG
     protected void calculateDependencies(final String filename)
     {
         if (isVirtualFile(filename)) return;
-        
+
         SourceForm sourceForm = determineSourceForm(filename);
         try
         {
-            IAccumulatingLexer lexer = LexerFactory.createLexer(getIFileForFilename(filename), sourceForm, false);
+            IAccumulatingLexer lexer = LexerFactory.createLexer(getIFileForFilename(filename), sourceForm, true /*false*/);
             long start = System.currentTimeMillis();
             calculateDependencies(filename, lexer);
             debug("  - Elapsed time in calculateDependencies: " + (System.currentTimeMillis()-start) + " ms", filename);
@@ -243,11 +243,11 @@ public class PhotranVPGBuilder extends PhotranVPG
                 public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
                 {
                     // When we encounter an INCLUDE directive, set up a file dependency in the VPG
-                    
+
                     db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(PhotranVPGBuilder.this,
                                 filename,
                                 getFilenameForIFile(getIncludedFile(fileToInclude))));
-                    
+
                     return super.getIncludedFileAsStream(fileToInclude);
                 }
 
@@ -268,7 +268,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             db.deleteAllIncomingDependenciesFor(filename);
             db.deleteAllOutgoingDependenciesFor(filename);
         }
-        
+
         if (lexer == null) return;
 
         try
@@ -283,17 +283,17 @@ public class PhotranVPGBuilder extends PhotranVPG
 
     /**
      * Calculates what modules are imported or exported by a particular file and marks these dependencies in the VPG.
-     * 
+     *
      * Since the dependency calculation will be run on every file in the workspace, it is essential that this method
      * be fast (while remaining accurate).  This implementation uses the lexer to find the token sequences "USE x"
      * and "MODULE x", which is equivalent to but significantly faster than parsing the file and traversing the AST
-     * to find USE and MODULE statements.  
+     * to find USE and MODULE statements.
      */
     private void calculateFileDepsFromModuleAndUseStmts(String filename, IAccumulatingLexer lexer) throws Exception
     {
         IFile file = getIFileForFilename(filename);
         final int WAITING_FOR_TOKEN = 0, LAST_TOKEN_WAS_USE = 1, LAST_TOKEN_WAS_MODULE = 2;
-        
+
         int state = WAITING_FOR_TOKEN;
         for (Token tok = lexer.yylex(); tok != null && tok.getTerminal() != Terminal.END_OF_INPUT; tok = lexer.yylex())
         {
@@ -319,12 +319,12 @@ public class PhotranVPGBuilder extends PhotranVPG
             }
         }
     }
-    
+
     @Override
     protected IFortranAST parse(final String filename)
     {
         if (filename == null || isVirtualFile(filename)) return null;
-        
+
         IFile file = getIFileForFilename(filename); if (file == null) return null;
         SourceForm sourceForm = determineSourceForm(filename);
         try
@@ -382,7 +382,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bs));
         sb.append(bs);
-        
+
         if (file != null)
             log.logError(sb.toString(), new PhotranTokenRef(file, 0, 0));
         else
@@ -397,7 +397,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             db.deleteAllIncomingDependenciesFor(filename);
             db.deleteAllOutgoingDependenciesFor(filename);
         }
-        
+
         if (ast == null || isEmpty(ast.getRoot())) return;
 
         long start = System.currentTimeMillis();
