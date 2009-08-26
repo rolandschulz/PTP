@@ -24,15 +24,15 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 /**
  * The Fortran model builder calls a <code>FortranModelBuildingVisitor</code> to create the model
  * you see in the (normal) Outline view.
- * 
+ *
  * Editors can force the model builder to use fixed or free format for a given file by calling
  * {@link #setIsFixedForm(boolean)}.  Otherwise, the format is determined by content type (i.e., by the
  * filename extension and the user's workspace preferences).
- * 
+ *
  * All CDT extension languages are expected to supply a model builder.
- * 
+ *
  * @author joverbey
- * 
+ *
  * @see IContributedModelBuilder
  */
 @SuppressWarnings("restriction")
@@ -45,7 +45,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
     public void setTranslationUnit(ITranslationUnit tu)
     {
         if (!(tu instanceof TranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit");
-        
+
         this.translationUnit = (TranslationUnit)tu;
     }
 
@@ -69,13 +69,13 @@ public class FortranModelBuilder implements IFortranModelBuilder
                 file,
                 determineFilename(file),
                 determineSourceForm(file),
-                false);
+                true);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
             IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
-                        
+
             createSourceFormNode();
-            
+
             if (isParseTreeModelEnabled())
             {
             	 LoopReplacer.replaceAllLoopsIn(ast.getRoot());
@@ -85,7 +85,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
             {
                  ast.accept(new FortranModelBuildingVisitor(translationUnit, this));
             }
-            
+
             //FortranElement note = new FortranElement.UnknownNode(translationUnit, isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>");
             //this.addF90Element(note);
 
@@ -144,7 +144,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
 				return SourceForm.UNPREPROCESSED_FREE_FORM;
 		}
 	}
-	
+
 	private boolean isLocal(IFile file)
 	{
 		return file != null && file.getLocation() != null;
@@ -232,7 +232,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
     public FortranElement addF90Element(FortranElement element) throws CModelException
     {
         if (element.getParent() == null) element.setParent(translationUnit);
-            
+
         ICElement parent = element.getParent();
         if (parent instanceof Parent) ((Parent)parent).addChild(element);
 
