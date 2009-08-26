@@ -7,14 +7,14 @@
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
             class="org.eclipse.ptp.rm.slurm.ui.preferences.SLURMPreferencePage"
-            id="org.eclipse.ptp.slurm.ui.preferences.OMPIPreferencePage"
+            id="org.eclipse.ptp.slurm.ui.preferences.SLURMPreferencePage"
             name="SLURM">
       </page>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
-            class="org.eclipse.ptp.rm.slurm.ui.wizards.SLURMResourceManagerConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.slurm.ui.wizards.SLURMServiceProviderConfigurationWizardPageFactory"
             id="org.eclipse.ptp.slurm.ui.configurationWizard"/>
    </extension>
    <extension
@@ -23,5 +23,20 @@
             class="org.eclipse.ptp.rm.slurm.ui.rmLaunchConfiguration.SLURMRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.slurm.ui.launchConfiguration"/>
    </extension>
-
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.slurm.ui.SLURMServiceProvider"
+            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider"
+            name="SLURM"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.ui.providerContributors">
+      <providerContributor
+            class="org.eclipse.ptp.rm.slurm.ui.SLURMProviderContributor"
+            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider">
+      </providerContributor>
+   </extension>
 </plugin>

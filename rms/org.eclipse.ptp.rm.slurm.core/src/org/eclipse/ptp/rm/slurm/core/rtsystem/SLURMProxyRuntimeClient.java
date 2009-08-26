@@ -14,11 +14,11 @@
 package org.eclipse.ptp.rm.slurm.core.rtsystem;
 
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
-import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeClient;
+import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 
 public class SLURMProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
-	public SLURMProxyRuntimeClient(SLURMResourceManagerConfiguration config, 
+	public SLURMProxyRuntimeClient(ISLURMResourceManagerConfiguration config, 
 			int baseModelId) {
 		super(config, baseModelId, new SLURMProxyCommandFactory(config), new ProxyRuntimeEventFactory());
 	}

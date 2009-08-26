@@ -105,7 +105,7 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
-		SLURMResourceManagerConfiguration config = (SLURMResourceManagerConfiguration) getConfiguration();
+		ISLURMResourceManagerConfiguration config = (ISLURMResourceManagerConfiguration) getConfiguration();
 		/* load up the control and monitoring systems for OMPI */
 		SLURMProxyRuntimeClient runtimeProxy = new SLURMProxyRuntimeClient(config, SLURMRMID);
 		return new SLURMRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());

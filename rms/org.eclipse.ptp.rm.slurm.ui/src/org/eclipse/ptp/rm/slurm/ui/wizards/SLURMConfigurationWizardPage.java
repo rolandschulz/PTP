@@ -31,7 +31,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerConfiguration;
+import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.ui.Activator;
 import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
@@ -80,7 +80,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	private SLURMResourceManagerConfiguration config;
+	private ISLURMResourceManagerConfiguration config;
 	private String slurmdPath = EMPTY_STRING;
 	private String slurmdArgs = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
@@ -204,7 +204,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	private void initContents() {
 		loading = true;
-		config = (SLURMResourceManagerConfiguration)getConfigurationWizard().getConfiguration();
+		config = (ISLURMResourceManagerConfiguration)getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();
@@ -217,7 +217,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	private void loadSaved()
 	{
-		useDefaults = config.useDefaults();
+		useDefaults = config.getUseDefaults();
 		slurmdPath = config.getSlurmdPath();
 		slurmdArgs = config.getSlurmdArgs();
 	}

@@ -9,6 +9,8 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
+ org.eclipse.ptp.services.core;bundle-version="1.0.0",
+ org.eclipse.ptp.services.ui;bundle-version="1.0.0",
  org.eclipse.ptp.core,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.utils.ui;bundle-version="1.0.0",

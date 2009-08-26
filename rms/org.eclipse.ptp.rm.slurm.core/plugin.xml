@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
-            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
-            id="org.eclipse.ptp.slurm.core.resourcemanager"
+            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMServiceProviderFactory"
+            id="org.eclipse.ptp.rm.slurm.resourcemanager"
             name="SLURM"/>
    </extension>
 
