@@ -32,13 +32,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
- * 
+ *
  * @author tyuvash2
  */
 public class ShowFullMessageAction extends SelectionDispatchAction
 {
 
-    //private static final String SHOW_EVENT_IMAGE_PATH = "/Users/tyuvash2/workspace/org.eclipse.cdt.ui/icons/elcl16/segment_edit.gif";
     /**
      * @param site
      */
@@ -47,22 +46,21 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         super(site);
         setText("Event Details");
         setToolTipText("Show the entire message for selected event(s)");
-        // TODO Auto-generated constructor stub
     }
-    
+
     public ShowFullMessageAction(IWorkbenchSite site, String text, String toolTipText)
     {
         super(site);
         setText(text);
         setToolTipText(toolTipText);
     }
-    
+
     public ImageDescriptor getImageDescriptor()
     {
         Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
         return ImageDescriptor.createFromImage(img);
     }
-    
+
     //TODO: Make shell content automatically resize when the shell is re-sized
     protected void run(IMarker marker)
     {
@@ -70,20 +68,20 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         final Shell shell = new Shell(disp, SWT.RESIZE);
         shell.setText("Event Details");
         shell.setSize(800,600);
-        
+
         GridLayout gridLayout = new GridLayout(1, false);
         GridData gridData = new GridData(GridData.FILL_BOTH);
         gridData.grabExcessHorizontalSpace = true;
         gridData.grabExcessVerticalSpace = true;
-        
+
         shell.setLayout(gridLayout);
         shell.setLayoutData(gridData);
 
         Text message = new Text(shell, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         message.setSize(700, 500);
         message.setLayoutData(gridData);
-        message.setText(MarkerUtilities.getMessage(marker));    
-        
+        message.setText(MarkerUtilities.getMessage(marker));
+
         Button close = new Button(shell, SWT.PUSH);
         close.setText("Close");
         close.addSelectionListener(new SelectionAdapter()
@@ -93,8 +91,8 @@ public class ShowFullMessageAction extends SelectionDispatchAction
                     shell.close();
                 }
             });
-        
-        message.pack();        
+
+        message.pack();
         shell.pack();
         shell.open();
 
@@ -105,7 +103,7 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         }
         shell.dispose();
     }
-    
+
     /* (non-Javadoc)
      * Method declared on SelectionDispatchAction.
      */
@@ -113,7 +111,7 @@ public class ShowFullMessageAction extends SelectionDispatchAction
     public void selectionChanged(IStructuredSelection selection) {
         setEnabled(checkEnabled(selection));
     }
-    
+
     //Only enables if the selected type is an IMarker
     private boolean checkEnabled(IStructuredSelection selection) {
         if (selection.isEmpty())
@@ -126,17 +124,17 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         }
         return true;
     }
-    
+
     /* (non-Javadoc)
      * Method declared on SelectionDispatchAction.
      */
     @Override
-    public void run(IStructuredSelection selection) 
+    public void run(IStructuredSelection selection)
     {
         if (!checkEnabled(selection))
             return;
-        
-        for (Iterator<?> iter= selection.iterator(); iter.hasNext();) 
+
+        for (Iterator<?> iter= selection.iterator(); iter.hasNext();)
         {
             Object element= iter.next();
             if (element instanceof IMarker)
@@ -146,5 +144,5 @@ public class ShowFullMessageAction extends SelectionDispatchAction
             }
         }
     }
-    
+
 }

@@ -11,12 +11,8 @@
 
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -31,53 +27,30 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  *
  * @author Timofey Yuvashev
  */
+@SuppressWarnings("restriction")
 public class VGPProblemLabelProvider implements ITableLabelProvider
 {
     private static final int MAX_NUM_CHARS = 60;
-    //TODO: Possibly move images to the project's icon folder?
-    private final String WARNING_PIC_PATH = "/Users/tyuvash2/workspace/org.eclipse.cdt.ui/icons/obj16/warning_obj.gif";
-    private final String ERROR_PIC_PATH = "/Users/tyuvash2/workspace/org.eclipse.cdt.ui/icons/obj16/error_obj.gif";
-    private final String INFO_PIC_PATH = "/Users/tyuvash2/workspace/org.eclipse.cdt.ui/icons/obj16/info_obj.gif";
-
-    private final String[] IMAGE_PATHS = {INFO_PIC_PATH, WARNING_PIC_PATH, ERROR_PIC_PATH};
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
      */
     public Image getColumnImage(Object obj, int colIndex)
     {
-        //TODO: Re-locate images to this project's directory?
+        // Only put images in the first column
+        if (colIndex != 0) return null;
 
-        //Only add an image if we are in the first column
-        if(colIndex != 0)
-            return null;
-
-        IMarker m = (IMarker)obj;
-
-        File sourceFile = null;
-        int sev = MarkerUtilities.getSeverity(m);
-
-        if(sev == IMarker.SEVERITY_INFO     ||
-           sev == IMarker.SEVERITY_WARNING  ||
-           sev == IMarker.SEVERITY_ERROR)
-            sourceFile = new File(IMAGE_PATHS[sev]);
-
-        if(sourceFile == null)
-            return null;
-
-        URL url = null;
-        try
+        switch (MarkerUtilities.getSeverity((IMarker)obj))
         {
-            url = sourceFile.toURL();
+            case IMarker.SEVERITY_INFO:
+                return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_INFO);
+            case IMarker.SEVERITY_WARNING:
+                return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_WARNING);
+            case IMarker.SEVERITY_ERROR:
+                return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_ERROR);
+            default:
+                return null;
         }
-        catch (MalformedURLException e)
-        {
-            // TODO Auto-generated catch block
-            //TODO: Should we error out, or just skip the picture and return null?
-            e.printStackTrace();
-        }
-        ImageDescriptor imageDescr = ImageDescriptor.createFromURL(url);
-        return imageDescr.createImage();
     }
 
     /* (non-Javadoc)

@@ -11,11 +11,11 @@
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
 /*
- * Most of the code was copied from Eclipse JFace TableView Tutorial 
- * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html) and 
- * Java Developer's Guide to Eclipse, Chapter 18, 
+ * Most of the code was copied from Eclipse JFace TableView Tutorial
+ * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html) and
+ * Java Developer's Guide to Eclipse, Chapter 18,
  * (http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
- * 
+ *
  * Timofey Yuvashev
  */
 
@@ -60,24 +60,24 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
     private OpenMarkedFileAction openAction     = null;
     private ShowFullMessageAction showAction    = null;
     private RemoveMarkerAction remAction        = null;
-    
+
     private VPGViewFilterAction infosMarkerFilterAction     = null;
     private VPGViewFilterAction warningsMarkerFilterAction  = null;
     private VPGViewFilterAction errorsMarkerFilterAction    = null;
 
-    private static final String[] COLUMN_NAMES = {"ID", "Description", 
-                                                  "Resource", "Path", 
+    private static final String[] COLUMN_NAMES = {"ID", "Description",
+                                                  "Resource", "Path",
                                                   "Location"};
-    private static final int[] COLUMN_WIDTHS   = {4, 40, 
-                                                  10, 13, 
+    private static final int[] COLUMN_WIDTHS   = {4, 40,
+                                                  10, 13,
                                                   6};
 
-    //TODO: Depending on how we will handle updates to markers, we might need a 
+    //TODO: Depending on how we will handle updates to markers, we might need a
     // way to update this array. Currently, it is populated as Workbench's start-time
     // and remains unchaged since then
     public static int[] MARKER_COUNT = {0,0,0};  //Number of Infos, Warnings and Errors respectively
-    
-    
+
+
 //    /* (non-Javadoc)
 //     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 //     */
@@ -87,34 +87,34 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         GridLayout overallLayout = new GridLayout(1,false);
         parent.setLayout(overallLayout);
 
-        tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL 
+        tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.MULTI | SWT.FULL_SELECTION);
 
         tableSorter = new TableSorter();
-        tableViewer.setSorter(this.tableSorter);     
-    
+        tableViewer.setSorter(this.tableSorter);
+
         createTableColumns(tableViewer);
         setTableGridData();
 
         //Share Viewer Selection with other workbench parts
         getSite().setSelectionProvider(tableViewer);
-        
+
         //TODO: Change the default string
-        MenuManager manager = new VGPProblemContextMenu(getViewSite(), "Problems View Menu");   
-        tableViewer.getTable().setMenu(manager.createContextMenu(tableViewer.getTable()));  
-        
+        MenuManager manager = new VGPProblemContextMenu(getViewSite(), "Problems View Menu");
+        tableViewer.getTable().setMenu(manager.createContextMenu(tableViewer.getTable()));
+
         //Register Viewer ContextMenu with other workbench parts
         getSite().registerContextMenu(manager, tableViewer);
-        
+
         tableViewer.setContentProvider(new VGPProblemContentProvider());
         tableViewer.setLabelProvider(new VGPProblemLabelProvider());
-        
+
         PhotranVPG.getInstance().log.addLogListener(this);
- 
+
         createToolbarButtons();
         initEvents();
     }
-    
+
     public void onLogChange()
     {
         getSite().getShell().getDisplay().syncExec(new Runnable()
@@ -124,11 +124,11 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
                 Table t = tableViewer.getTable();
                 t.removeAll();
                 t.update();
-                tableViewer.setInput(PhotranVPG.getInstance().getErrorLogMarkers());
+                tableViewer.setInput(PhotranVPG.getInstance().recomputeErrorLogMarkers());
             }
         });
     }
-    
+
     private void setTableGridData()
     {
         GridData tableData = new GridData();
@@ -138,22 +138,22 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         tableData.verticalAlignment = GridData.FILL;
         tableViewer.getTable().setLayoutData(tableData);
     }
-    
+
     private void countMarkers()
     {
         try
         {
             //TODO: Possibly we want to filter which markers we are getting, since we
             // are only interested in VGP-problem markers
-            
+
             //Get all the markers in the workspace
             IMarker[] markers = ResourcesPlugin.getWorkspace().getRoot().findMarkers(null, true, IResource.DEPTH_INFINITE);
-            
+
             //HACK
             for(int i = 0; i < markers.length; i++)
             {
                 int sev = MarkerUtilities.getSeverity(markers[i]);
-                
+
                 if(sev == IMarker.SEVERITY_ERROR    ||
                    sev == IMarker.SEVERITY_WARNING  ||
                    sev == IMarker.SEVERITY_INFO)
@@ -163,41 +163,41 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         catch(CoreException e)
         {}
     }
-    
+
     private void createActions()
     {
         copyAction = new CopyMarkedFileAction(this, "Copy");
         openAction = new OpenMarkedFileAction(getSite());
         showAction = new ShowFullMessageAction(getSite());
         remAction  = new RemoveMarkerAction(getSite());
-        
+
         int sevInfo = IMarker.SEVERITY_INFO;
         int sevWarn = IMarker.SEVERITY_WARNING;
         int sevErr  = IMarker.SEVERITY_ERROR;
-        
+
         countMarkers();
-        
+
         String infoStr = String.valueOf(MARKER_COUNT[sevInfo]) + " Infos";
         String warnStr = String.valueOf(MARKER_COUNT[sevWarn]) + " Warnings";
-        String errStr  = String.valueOf(MARKER_COUNT[sevErr]) + " Errors";   
-        
-        infosMarkerFilterAction     = new VPGViewFilterAction(tableViewer, 
-                                                              infoStr, 
+        String errStr  = String.valueOf(MARKER_COUNT[sevErr]) + " Errors";
+
+        infosMarkerFilterAction     = new VPGViewFilterAction(tableViewer,
+                                                              infoStr,
                                                               sevInfo);
-        
-        warningsMarkerFilterAction  = new VPGViewFilterAction(tableViewer, 
-                                                              warnStr, 
+
+        warningsMarkerFilterAction  = new VPGViewFilterAction(tableViewer,
+                                                              warnStr,
                                                               sevWarn);
-        
-        errorsMarkerFilterAction    = new VPGViewFilterAction(tableViewer, 
-                                                              errStr, 
+
+        errorsMarkerFilterAction    = new VPGViewFilterAction(tableViewer,
+                                                              errStr,
                                                               sevErr);
     }
-    
+
     private void addActionsToToolbar()
     {
         IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-        
+
         toolBarManager.add(errorsMarkerFilterAction);
         toolBarManager.add(warningsMarkerFilterAction);
         toolBarManager.add(infosMarkerFilterAction);
@@ -207,7 +207,7 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         toolBarManager.add(new Separator());
         toolBarManager.add(showAction);
     }
-    
+
     private void addTableViewerSelectionChangeListener()
     {
         tableViewer.addSelectionChangedListener(new ISelectionChangedListener()
@@ -222,23 +222,23 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
             }
         });
     }
-    
+
     private void createToolbarButtons()
     {
         createActions();
-        
+
         openAction.setEnabled(false);
         copyAction.setEnabled(false);
         remAction.setEnabled(false);
         showAction.setEnabled(false);
-        
+
         addActionsToToolbar();
         addTableViewerSelectionChangeListener();
     }
-    
-    
+
+
     /*
-     * Creates layout for a table. Simply adds ColumnData to each column in the table, 
+     * Creates layout for a table. Simply adds ColumnData to each column in the table,
      * setting that column's width to pre-defined value
      */
     private TableLayout createTableLayout()
@@ -250,7 +250,7 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         }
         return layout;
     }
-    
+
     /*
      * Creates columns for the table contained in TableViewer.
      * Assigns them name, size, alignment and adds a selectionListener
@@ -261,7 +261,7 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         Table table = viewer.getTable();
         TableLayout layout = createTableLayout();
         table.setLayout(layout);
-        
+
         for(int i = 0; i < COLUMN_NAMES.length; i++)
         {
             //We need these variables to be final, b/c we want to use them later on in the
@@ -269,14 +269,14 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
             final int index = i;
             final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
             final TableColumn column = viewerColumn.getColumn();
-            
+
             //Create column and set its parameters
             column.setText(COLUMN_NAMES[i]);
             column.setToolTipText(COLUMN_NAMES[i]);
             column.setAlignment(SWT.LEFT);
             column.setResizable(true);
             column.setMoveable(true);
-            
+
             //Add an even listener to the column
             column.addSelectionListener(new SelectionAdapter()
                 {
@@ -294,17 +294,17 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
                     }
                 });
         }
-        
+
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
     }
-    
+
     /*
      * Initializes event Listeners and Actions for the Table
      */
     private void initEvents()
     {
-        tableViewer.getTable().addMouseListener(new MouseListener() 
+        tableViewer.getTable().addMouseListener(new MouseListener()
             {
                 public void mouseDoubleClick(MouseEvent dblClick)
                 {
@@ -317,7 +317,7 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
                             OpenMarkedFileAction openAction = new OpenMarkedFileAction(getViewSite());
                             openAction.run((IMarker)(selection[i].getData()));
                         }
-                        
+
                     }
                 }
 
@@ -326,17 +326,17 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
 
                 public void mouseUp(MouseEvent arg0)
                 {}
-    
+
             });
     }
-    
+
     public Clipboard getClipboard()
     {
         if(clipboard == null)
             clipboard = new Clipboard(getSite().getShell().getDisplay());
         return clipboard;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
@@ -344,8 +344,8 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
     public void setFocus()
     {
         tableViewer.getControl().setFocus();
-    }    
-    
+    }
+
     //TODO: Should we remove more stuff?
     @Override
     public void dispose()
