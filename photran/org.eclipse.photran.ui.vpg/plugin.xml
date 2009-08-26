@@ -836,13 +836,13 @@
             name="Fortran Declaration">
       </view>
 
-      <!--TODO: Need to find a better icon and come up with a better name for this view-->
+      <!--TODO: Need to find a better icon for this view-->
       <!--view
             category="org.eclipse.photran.ui.views"
             class="org.eclipse.photran.internal.ui.views.vpgproblems.VGPProblemView"
             icon="icons/full/eview16/source.gif"
             id="org.eclipse.photran.ui.VGPProblemView"
-            name="VGP Problem View">
+            name="Fortran Analysis/Refactoring Problems">
       </view-->
    </extension>
        <!--
