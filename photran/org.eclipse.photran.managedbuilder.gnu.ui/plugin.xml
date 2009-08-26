@@ -17,11 +17,11 @@
             outputFlag="-o"
             command="gfortran"
             id="photran.managedbuild.tool.gnu.fortran.linker">
-         <envVarBuildPath 
+         <envVarBuildPath
          	pathType="buildpathLibrary"
          	variableList="LIBRARY_PATH">
          </envVarBuildPath>
-         
+
          <optionCategory
                owner="photran.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.General"
@@ -178,11 +178,11 @@
             command="gfortran"
             commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}"
             id="photran.managedbuild.tool.macosx.fortran.linker">
-         <envVarBuildPath 
+         <envVarBuildPath
          	pathType="buildpathLibrary"
          	variableList="LIBRARY_PATH">
          </envVarBuildPath>
-         
+
          <optionCategory
                owner="photran.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.General"
@@ -318,7 +318,7 @@
 		  command="gfortran"
 		  natureFilter="both"
 		  outputFlag="-o">
-         <envVarBuildPath 
+         <envVarBuildPath
          	pathType="buildpathInclude"
          	variableList="CPATH,C_INCLUDE_PATH">
          </envVarBuildPath>
@@ -539,16 +539,16 @@
 			  id="gnu.fortran.compiler.option.misc.verbose"
 			  valueType="boolean">
 		  </option>
-		  
+
 <!-- CDT does not yet support multiple content types so comment out these inputType attributes for now
             sourceContentType="org.eclipse.photran.core.fortranSource"
             dependencyContentType="org.eclipse.cdt.core.fortranSource"
 -->
 
           <inputType
-		      sources="f,f90,f95,f03"
-              dependencyExtensions="f,f90,f95,f03"
-              dependencyCalculator="org.eclipse.photran.managedbuilder.core/org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
+              sources="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
+              dependencyExtensions="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
+              dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
               id="photran.managedbuild.tool.gnu.fortran.compiler.input">
           </inputType>
           <outputType
@@ -556,10 +556,10 @@
               buildVariable="OBJS"
               id="photran.managedbuild.tool.gnu.fortran.compiler.output">
           </outputType>
-	  </tool>  
+	  </tool>
 
-      <projectType      
-            isAbstract="false"     
+      <projectType
+            isAbstract="false"
             isTest="false"
             name="%TargetName.gnu.fortran.exe"
             id="photran.managedbuild.target.gnu.fortran.exe">
@@ -570,7 +570,7 @@
                errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.GFortranErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
                <toolChain
                      archList="all"
-                     osList="solaris,linux,hpux,aix,qnx"
+                     osList="win32,solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Dbg"
                      targetTool="photran.managedbuild.tool.gnu.fortran.linker.exe.debug"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
@@ -579,7 +579,7 @@
 		              id="photran.managedbuild.target.gnu.platform.exe.debug"
 		              name="%PlatformName.Dbg"
 		              binaryParser="org.eclipse.cdt.core.ELF"
-		              osList="solaris,linux,hpux,aix,qnx"
+		              osList="win32,solaris,linux,hpux,aix,qnx"
 		              archList="all">
 	              </targetPlatform>
 				  <builder
@@ -589,17 +589,17 @@
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
-		     	  </builder>               
+		     	  </builder>
                   <tool
                       id="photran.managedbuild.tool.gnu.c.compiler.exe.debug"
-                      superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                      superClass="cdt.managedbuild.tool.gnu.c.compiler">
 			  	      <option
 					      id="photran.gnu.c.compiler.exe.debug.option.optimization.level"
 						  defaultValue="gnu.c.optimization.level.none"
 						  superClass="gnu.c.compiler.option.optimization.level">
 					  </option>
-					  <option   
-					      id="photran.gnu.c.compiler.exe.debug.option.debugging.level"					     
+					  <option
+					      id="photran.gnu.c.compiler.exe.debug.option.debugging.level"
 						  defaultValue="gnu.c.debugging.level.max"
 					      superClass="gnu.c.compiler.option.debugging.level">
 					  </option>
@@ -625,7 +625,7 @@
 		  <tool
 		      id="photran.managedbuild.tool.gnu.assembler.exe.debug"
 		      superClass="cdt.managedbuild.tool.gnu.assembler">
-		  </tool>   
+		  </tool>
 	     </toolChain>
          </configuration>
          <configuration
@@ -635,29 +635,29 @@
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.GFortranErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
                <toolChain
                      archList="all"
-                     osList="solaris,linux,hpux,aix,qnx"
+                     osList="win32,solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Rel"
                      targetTool="photran.managedbuild.tool.gnu.fortran.linker.exe.release"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                      id="photran.managedbuild.toolchain.gnu.fortran.exe.release">
 		          <targetPlatform
 		              id="photran.managedbuild.target.gnu.platform.fortran.exe.release"
-		              name="%PlatformName.Rel"		             
+		              name="%PlatformName.Rel"
 		              binaryParser="org.eclipse.cdt.core.ELF"
-		              osList="solaris,linux,hpux,aix,qnx"
-		              archList="all">		              
+		              osList="win32,solaris,linux,hpux,aix,qnx"
+		              archList="all">
 		          </targetPlatform>
 				  <builder
 				  	  superClass="cdt.managedbuild.target.gnu.builder"
 				      id="photran.managedbuild.target.gnu.builder.exe.release"
-		              name="%BuilderName.Rel"		              
+		              name="%BuilderName.Rel"
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
-				  </builder> 
+				  </builder>
                   <tool
                       id="photran.managedbuild.tool.gnu.c.compiler.exe.release"
-                      superClass="cdt.managedbuild.tool.gnu.c.compiler">                          
+                      superClass="cdt.managedbuild.tool.gnu.c.compiler">
 					  <option
 						  id="photran.gnu.c.compiler.exe.release.option.optimization.level"
 						  defaultValue="gnu.c.optimization.level.most"
@@ -671,7 +671,7 @@
                   </tool>
                   <tool
                       id="photran.managedbuild.tool.gnu.fortran.compiler.exe.release"
-                      superClass="photran.managedbuild.tool.gnu.fortran.compiler">                     
+                      superClass="photran.managedbuild.tool.gnu.fortran.compiler">
 					  <option
 						  id="gnu.fortran.compiler.exe.release.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.most"
@@ -686,17 +686,17 @@
                   <tool
                       id="photran.managedbuild.tool.gnu.fortran.linker.exe.release"
                       superClass="photran.managedbuild.tool.gnu.fortran.linker">
-                  </tool> 
+                  </tool>
 		  <tool
 			id="photran.managedbuild.tool.gnu.assembler.exe.release"
 			superClass="cdt.managedbuild.tool.gnu.assembler">
-	          </tool>   
+	          </tool>
                </toolChain>
          </configuration>
-      </projectType>     
+      </projectType>
 
 
-      <projectType 
+      <projectType
             name="%TargetName.gnu.fortran.macosx.exe"
             id="photran.managedbuild.target.gnu.fortran.macosx.exe"
             isTest="false"
@@ -704,7 +704,7 @@
          <configuration
                name="%ConfigName.Dbg"
                cleanCommand="rm -rf"
-               errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.GFortranErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
+               errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.GFortranErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
                id="photran.managedbuild.config.gnu.fortran.macosx.exe.debug">
                <toolChain
                      archList="all"
@@ -717,7 +717,7 @@
 					  id="photran.managedbuild.target.gnu.platform.macosx.exe.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.MachO"
-					  osList="macosx"					  
+					  osList="macosx"
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
@@ -726,8 +726,8 @@
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
-					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
-			      </builder>               		         
+					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+			      </builder>
                   <tool
                       id="photran.managedbuild.tool.gnu.c.compiler.macosx.exe.debug"
                       superClass="cdt.managedbuild.tool.gnu.c.compiler">
@@ -763,12 +763,12 @@
 		  <tool
 			  id="photran.managedbuild.tool.gnu.assembler.macosx.exe.debug"
 			  superClass="cdt.managedbuild.tool.gnu.assembler">
-		  </tool>   
-               </toolChain>                    
+		  </tool>
+               </toolChain>
          </configuration>
          <configuration
                name="%ConfigName.Rel"
-               cleanCommand="rm -rf"               
+               cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.GFortranErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
                id="photran.managedbuild.config.gnu.fortran.macosx.exe.release">
                <toolChain
@@ -782,7 +782,7 @@
 					  id="photran.managedbuild.target.gnu.platform.fortran.macosx.exe.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.MachO"
-					  osList="macosx"					  
+					  osList="macosx"
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
@@ -791,8 +791,8 @@
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
-					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
-			      </builder>               		         
+					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
+			      </builder>
                   <tool
                       id="photran.managedbuild.tool.gnu.c.compiler.macosx.exe.release"
                       superClass="cdt.managedbuild.tool.gnu.c.compiler">
@@ -828,11 +828,11 @@
 				  <tool
 					  id="photran.managedbuild.tool.gnu.assembler.macosx.exe.release"
 					  superClass="cdt.managedbuild.tool.gnu.assembler">
-				  </tool>   
-               </toolChain>                             
+				  </tool>
+               </toolChain>
          </configuration>
 	  </projectType>
 
    </extension>
-           
+
 </plugin>
