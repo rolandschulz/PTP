@@ -48,11 +48,11 @@
    <includes
          id="org.eclipse.ptp.pldt.lapi"
          version="0.0.0"/>
-  
+
    <includes
          id="org.eclipse.ptp.pldt.upc"
          version="0.0.0"/>
-  
+
    <includes
          id="org.eclipse.ptp.rdt"
          version="0.0.0"/>
@@ -99,6 +99,10 @@
 
    <includes
          id="org.eclipse.ptp"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.slurm"
          version="0.0.0"/>
 
 </feature>
