@@ -4,16 +4,9 @@
    <extension
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
-            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory"
-            id="org.eclipse.ptp.mpich2.core.resourcemanager"
-            name="MPICH2"/>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
             class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2RMServiceProviderFactory"
             id="org.eclipse.ptp.rm.mpi.mpich2.resourcemanager"
-            name="MPICH2 (Service Model)">
+            name="MPICH2">
       </resourceManager>
    </extension>
    <extension
