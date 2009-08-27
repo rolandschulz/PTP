@@ -9,16 +9,9 @@
    <extension
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
-            class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory"
-            id="org.eclipse.ptp.ibmll.core.resourcemanager"
-            name="IBM LoadLeveler"/>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
             class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLServiceProviderFactory"
             id="org.eclipse.ptp.rm.ibm.ll.resourcemanager"
-            name="IBM LoadLeveler (Service Model)"/>
+            name="IBM LoadLeveler"/>
    </extension>
 
 </plugin>

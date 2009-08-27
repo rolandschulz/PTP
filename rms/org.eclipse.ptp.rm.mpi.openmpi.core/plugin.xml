@@ -4,16 +4,9 @@
    <extension
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
-            class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
-            id="org.eclipse.ptp.openmpi.core.resourcemanager"
-            name="Open MPI"/>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
             class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIRMServiceProviderFactory"
             id="org.eclipse.ptp.rm.mpi.openmpi.resourcemanager"
-            name="Open MPI (Service Model)">
+            name="Open MPI">
       </resourceManager>
    </extension>
    <extension
