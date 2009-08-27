@@ -23,13 +23,7 @@ import org.eclipse.ptp.internal.rdt.core.model.Scope;
  * scopes managed and the underlying indices that correspond to them.
  */
 public interface IIndexLifecycleService {
-	/**
-	 * Creates a new scope.
-	 * @param scope
-	 * @param elements the list of elements which comprise the scope.
-	 */
-	Scope createScope(String name, List<ICElement> elements, IProgressMonitor monitor);
-	
+
 	/**
 	 * Returns all of the scopes managed by this service.
 	 * @return all of the scopes managed by this service.
@@ -51,7 +45,7 @@ public interface IIndexLifecycleService {
 	 * @param monitor
 	 * @param task that this operation originates from
 	 */
-	void reindex(Scope scope, List<ICElement> elements, IProgressMonitor monitor, RemoteIndexerTask task);
+	void reindex(Scope scope, String indexLocation, List<ICElement> elements, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	/**
 	 * Re-indexes a scope in its entirety.
@@ -60,7 +54,7 @@ public interface IIndexLifecycleService {
 	 * @param monitor
 	 * @param task that this operation originates from
 	 */
-	void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task);
+	void reindex(Scope scope, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	/**
 	 * Updates the index identified by <code>scope</code>.  The elements
@@ -76,4 +70,15 @@ public interface IIndexLifecycleService {
 	 * @param task that this operation originates from
 	 */
 	void update(Scope scope, List<ICElement> newElements, List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task);
+
+	
+	/**
+	 * Moves the location of the pdom file for the given scope to the new location.
+	 * 
+	 * @param scopeName
+	 * @param newIndexLocation The path to the new location, must be a valid path on the remote system
+	 * @param monitor
+	 * @return The actual location of where the index file was moved.
+	 */
+	String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor);
 }

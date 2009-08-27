@@ -43,41 +43,20 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		super(host, connectorService);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#createScope(java.lang.String)
-	 */
-	public Scope createScope(String name, List<ICElement> elements, IProgressMonitor monitor) {
-		Scope scope = new Scope(name);
-		fStringToScopeMap.put(name, scope);
-		
-		ICIndexSubsystem indexSubsystem = getSubSystem();
-		
-		indexSubsystem.registerScope(scope, elements, monitor);
-		
-		return scope;
-	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#getScope(java.lang.String)
-	 */
 	public Scope getScope(String name) {
 		return fStringToScopeMap.get(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#getScopes()
-	 */
+
 	public Set<Scope> getScopes() {
 		Set<Scope> set = new TreeSet<Scope>();
 		set.addAll(fStringToScopeMap.values());
 		return set;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#reindex(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask)
-	 */
-	public void reindex(Scope scope, List<ICElement> changedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
+
+	public void reindex(Scope scope, String indexLocation, List<ICElement> changedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(changedElements);
 		
@@ -89,12 +68,10 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		}
 		
 		// TODO:  handle changedElements
-		indexSubsystem.reindexScope(scope, provider, monitor, task);
+		indexSubsystem.reindexScope(scope, provider, indexLocation, monitor, task);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#update(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, java.util.List, java.util.List)
-	 */
+
 	public void update(Scope scope, List<ICElement> newElements,
 			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		
@@ -106,11 +83,8 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		indexSubsystem.indexDelta(scope, provider, newElements, changedElements, deletedElements, monitor, task);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService#reindex(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask)
-	 */
-	public void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task) {
+
+	public void reindex(Scope scope, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task) {
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(scope.getName());
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		
@@ -121,7 +95,13 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 			indexSubsystem.checkProject(project, new NullProgressMonitor());
 		}
 		
-		indexSubsystem.reindexScope(scope, provider, monitor, task);
+		indexSubsystem.reindexScope(scope, provider, indexLocation, monitor, task);
+	}
+
+	
+	public String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor) {
+		ICIndexSubsystem indexSubsystem = getSubSystem();
+		return indexSubsystem.moveIndexFile(scopeName, newIndexLocation, monitor);
 	}
 
 }

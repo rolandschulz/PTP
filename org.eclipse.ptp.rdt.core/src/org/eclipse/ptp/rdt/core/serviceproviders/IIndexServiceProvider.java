@@ -41,4 +41,9 @@ public interface IIndexServiceProvider extends IServiceProvider {
 	public IIncludeBrowserService getIncludeBrowserService();
 	
 	public IModelBuilderService getModelBuilderService();
+	
+	
+	public void setIndexLocation(String path);
+	
+	public String getIndexLocation();
 }
