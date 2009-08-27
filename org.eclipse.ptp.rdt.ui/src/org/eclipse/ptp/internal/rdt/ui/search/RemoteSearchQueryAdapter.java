@@ -67,11 +67,11 @@ public class RemoteSearchQueryAdapter implements ISearchQuery {
 	public String getLabel() {
 		String type;
 		if ((fQuery.getFlags() & RemoteSearchQuery.FIND_REFERENCES) != 0)
-			type = CSearchMessages.PDOMSearchQuery_refs_label; 
+			type = CSearchMessages.PDOMSearch_query_refs_label; 
 		else if ((fQuery.getFlags() & RemoteSearchQuery.FIND_DECLARATIONS) != 0)
-			type = CSearchMessages.PDOMSearchQuery_decls_label; 
+			type = CSearchMessages.PDOMSearch_query_decls_label; 
 		else
- 			type = CSearchMessages.PDOMSearchQuery_defs_label; 
+ 			type = CSearchMessages.PDOMSearch_query_defs_label; 
 		return type;
 	}
 
