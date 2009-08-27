@@ -183,9 +183,6 @@ public class NullCIndexServiceProvider extends
 	public synchronized IIndexLifecycleService getIndexLifeCycleService() {
 		return new IIndexLifecycleService () {
 
-			public Scope createScope(String name, List<ICElement> elements, IProgressMonitor monitor) {
-				return null;
-			}
 
 			public Scope getScope(String name) {
 				return null;
@@ -195,12 +192,12 @@ public class NullCIndexServiceProvider extends
 				return Collections.emptySet();
 			}
 
-			public void reindex(Scope scope, List<ICElement> elements, IProgressMonitor monitor, RemoteIndexerTask task) {
+			public void reindex(Scope scope, String indexLocation, List<ICElement> elements, IProgressMonitor monitor, RemoteIndexerTask task) {
 				// do nothing
 				
 			}
 
-			public void reindex(Scope scope, IProgressMonitor monitor, RemoteIndexerTask task) {
+			public void reindex(Scope scope, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task) {
 				// do nothing
 				
 			}
@@ -210,6 +207,10 @@ public class NullCIndexServiceProvider extends
 					IProgressMonitor monitor, RemoteIndexerTask task) {
 				// do nothing
 				
+			}
+
+			public String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor) {
+				return null; // vacuously true
 			}
 			
 		};
@@ -322,5 +323,13 @@ public class NullCIndexServiceProvider extends
 	 */
 	public void saveState(IMemento memento) {
 		// does not save anything
+	}
+
+	public String getIndexLocation() {
+		return null;
+	}
+
+	public void setIndexLocation(String path) {
+		
 	}
 }
