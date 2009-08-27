@@ -61,7 +61,13 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeNameNode;
+import org.eclipse.photran.internal.core.parser.IBlockDataBodyConstruct;
+import org.eclipse.photran.internal.core.parser.IBodyConstruct;
+import org.eclipse.photran.internal.core.parser.IDerivedTypeBodyConstruct;
+import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
+import org.eclipse.photran.internal.core.parser.IModuleBodyConstruct;
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -71,7 +77,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
  * An AST node representing a scope.
  * <p>
  * (View the type hierarchy to see which nodes are scoping nodes.)
- * 
+ *
  * @author Jeff Overbey
  */
 public abstract class ScopingNode extends ASTNode
@@ -83,7 +89,7 @@ public abstract class ScopingNode extends ASTNode
             if (isScopingNode(candidate))
             {
                 ScopingNode scope = (ScopingNode)candidate;
-                
+
                 //if (node == scope.getRepresentativeToken().findToken())
                 if (shouldBeBoundToOuterScope(node))
                     return getEnclosingScope(scope);
@@ -91,7 +97,7 @@ public abstract class ScopingNode extends ASTNode
                     return scope;
             }
         }
-        
+
         return null;
     }
 
@@ -100,10 +106,10 @@ public abstract class ScopingNode extends ASTNode
         for (IASTNode candidate = node.getParent(); candidate != null; candidate = candidate.getParent())
             if (isScopingNode(candidate))
                 return (ScopingNode)candidate;
-        
+
         return null;
     }
-    
+
 	/**
 	 * In cases such as
 	 * <pre>
@@ -115,7 +121,7 @@ public abstract class ScopingNode extends ASTNode
 	 * ASTSubroutineSubprogram node in the AST, but they should actually be bound in the
 	 * <i>outer</i> scope.
 	 * <p>
-	 * In general, this is true for 
+	 * In general, this is true for
 	 * derived type names, program names, module names, block data names,
 	 * interface names, subroutine names, and function names in the beginning and ending
 	 * statements for their respective scoping nodes.
@@ -126,7 +132,7 @@ public abstract class ScopingNode extends ASTNode
     	if (parent == null) return false;
     	IASTNode grandparent = parent.getParent();
     	if (grandparent == null) return false;
-    	
+
     	if (isDeclStmtForScope(parent))
     	{
     	    if (parent instanceof ASTFunctionStmtNode && node == ((ASTFunctionStmtNode)parent).getName()) // result clause
@@ -189,7 +195,7 @@ public abstract class ScopingNode extends ASTNode
     		|| node instanceof ASTDerivedTypeDefNode
     		|| (node instanceof ASTInterfaceBlockNode && !isAnonymousInterface((ASTInterfaceBlockNode)node));
     }
-	
+
 	private static boolean isAnonymousInterface(ASTInterfaceBlockNode node)
 	{
 		return node.getInterfaceStmt().getGenericName() != null
@@ -200,14 +206,14 @@ public abstract class ScopingNode extends ASTNode
     {
     	return getEnclosingScope(this);
     }
-    
+
     public ScopingNode getGlobalScope()
     {
     	IASTNode result = this;
-    	
+
     	// Find root of AST (i.e., topmost ASTExecutableProgramNode)
     	while (result.getParent() != null) result = result.getParent();
-    	
+
     	return (ScopingNode)result;
     }
 
@@ -229,7 +235,7 @@ public abstract class ScopingNode extends ASTNode
     {
         if (cachedRepresentataiveToken == null)
             cachedRepresentataiveToken = internalGetRepresentativeToken();
-        
+
         return cachedRepresentataiveToken;
     }
 
@@ -237,7 +243,7 @@ public abstract class ScopingNode extends ASTNode
     {
     	// TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
     	// AND DYNAMICALLY DISPATCHED TO!
-    	
+
     	if (this instanceof ASTExecutableProgramNode)
     	{
     		try
@@ -316,7 +322,7 @@ public abstract class ScopingNode extends ASTNode
     {
         // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
         // AND DYNAMICALLY DISPATCHED TO!
-        
+
         if (this instanceof ASTExecutableProgramNode)
             return null;
         else if (this instanceof ASTMainProgramNode)
@@ -341,7 +347,7 @@ public abstract class ScopingNode extends ASTNode
     {
         // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
         // AND DYNAMICALLY DISPATCHED TO!
-        
+
         if (this instanceof ASTExecutableProgramNode)
             return null;
         else if (this instanceof ASTMainProgramNode)
@@ -362,6 +368,34 @@ public abstract class ScopingNode extends ASTNode
             throw new UnsupportedOperationException();
     }
 
+    public IASTListNode<? extends IASTNode /*IBodyConstruct*/> getOrCreateBody()
+    {
+        if (getBody() == null)
+        {
+            // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+            // AND DYNAMICALLY DISPATCHED TO!
+
+            if (this instanceof ASTMainProgramNode)
+                ((ASTMainProgramNode)this).setBody(new ASTListNode<IBodyConstruct>());
+            else if (this instanceof ASTFunctionSubprogramNode)
+                ((ASTFunctionSubprogramNode)this).setBody(new ASTListNode<IBodyConstruct>());
+            else if (this instanceof ASTSubroutineSubprogramNode)
+                ((ASTSubroutineSubprogramNode)this).setBody(new ASTListNode<IBodyConstruct>());
+            else if (this instanceof ASTModuleNode)
+                ((ASTModuleNode)this).setModuleBody(new ASTListNode<IModuleBodyConstruct>());
+            else if (this instanceof ASTBlockDataSubprogramNode)
+                ((ASTBlockDataSubprogramNode)this).setBlockDataBody(new ASTListNode<IBlockDataBodyConstruct>());
+            else if (this instanceof ASTDerivedTypeDefNode)
+                ((ASTDerivedTypeDefNode)this).setDerivedTypeBody(new ASTListNode<IDerivedTypeBodyConstruct>());
+            else if (this instanceof ASTInterfaceBlockNode)
+                ((ASTInterfaceBlockNode)this).setInterfaceBlockBody(new ASTListNode<IInterfaceSpecification>());
+            else
+                throw new UnsupportedOperationException();
+        }
+
+        return getBody();
+    }
+
     public boolean isSubprogram()
     {
         return this instanceof ASTFunctionSubprogramNode || this instanceof ASTSubroutineSubprogramNode;
@@ -376,28 +410,28 @@ public abstract class ScopingNode extends ASTNode
     {
     	return getParent() instanceof IInternalSubprogram;
     }
-    
+
     public ImplicitSpec getImplicitSpec()
     {
     	return (ImplicitSpec)PhotranVPG.getDatabase().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
     }
-    
+
     public boolean isImplicitNone()
     {
     	return getImplicitSpec() == null;
     }
-    
+
     public boolean isDefaultVisibilityPrivate()
     {
 		return PhotranVPG.getDatabase().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE) != null;
     }
-    
+
     public boolean isParentScopeOf(ScopingNode scope)
     {
     	for (IASTNode node = scope.getParent(); node != null; node = node.getParent())
     		if (node == this)
     			return true;
-    	
+
     	return false;
     }
 
@@ -418,12 +452,12 @@ public abstract class ScopingNode extends ASTNode
 
 	    return scopes;
     }
-    
+
     private static interface BindingResolutionCallback
     {
     	void foundDefinition(PhotranTokenRef definition, ScopingNode scope);
     }
-    
+
 	public ScopingNode findScopeDeclaringOrImporting(Token identifier)
 	{
 		try
@@ -435,7 +469,7 @@ public abstract class ScopingNode extends ASTNode
 					throw new Notification(scope);
 				}
 	    	});
-			
+
 			return null;
 		}
 		catch (Notification n)
@@ -443,17 +477,17 @@ public abstract class ScopingNode extends ASTNode
 			return (ScopingNode)n.getResult();
 		}
 	}
-	
+
 	public Iterable<ScopingNode> findImportingScopes()
 	{
 //		PhotranVPG vpg = PhotranVPG.getInstance();
-//		
+//
 //		Set<PhotranTokenRef> result = new HashSet<PhotranTokenRef>();
 //		for (Definition def : getAllDefinitions())
 //		    if (def != null) // TODO: Why are we getting null here?
 //		        for (TokenRef<Token> t : vpg.db.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
 //		            result.add((PhotranTokenRef)t);
-//	    	
+//
 //	    List<ScopingNode> scopes = new LinkedList<ScopingNode>();
 //	    for (PhotranTokenRef tokenRef : result)
 //	    	scopes.add(tokenRef.findToken().getEnclosingScope());
@@ -470,7 +504,7 @@ public abstract class ScopingNode extends ASTNode
         final Set<PhotranTokenRef> scopes = new HashSet<PhotranTokenRef>();
         for (PhotranTokenRef ref : allReferences)
             scopes.add(ref.findToken().findNearestAncestor(ScopingNode.class).getRepresentativeToken());
-        
+
         // And return an iterable that will parse files and change the representative tokens back into ScopingNodes
         return new Iterable<ScopingNode>()
         {
@@ -480,11 +514,11 @@ public abstract class ScopingNode extends ASTNode
             }
         };
 	}
-	
+
 	private static class TokenRefToScopeIterator implements Iterator<ScopingNode>
 	{
         private Iterator<PhotranTokenRef> it;
-        
+
         public TokenRefToScopeIterator(Set<PhotranTokenRef> scopes)
         {
             this.it = scopes.iterator();
@@ -505,17 +539,17 @@ public abstract class ScopingNode extends ASTNode
             throw new UnsupportedOperationException();
         }
 	}
-	
+
 	public static ScopingNode findScopingNodeForRepresentativeToken(PhotranTokenRef tr)
 	{
 	    PhotranVPG vpg = PhotranVPG.getInstance();
-	    
+
 	    if (tr.getOffset() < 0)
 	        return vpg.acquireTransientAST(tr.getFilename()).getRoot();
 	    else
 	        return vpg.findToken(tr).findNearestAncestor(ScopingNode.class);
 	}
-    
+
 	private HashMap<String, List<PhotranTokenRef>> definitionCache = new HashMap<String, List<PhotranTokenRef>>();
 
     public List<PhotranTokenRef> manuallyResolve(Token identifier)
@@ -527,9 +561,9 @@ public abstract class ScopingNode extends ASTNode
             if (definitionCache.containsKey(canonicalizedIdentifier))
                 return definitionCache.get(canonicalizedIdentifier);
         }
-        
+
     	final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
-    	
+
     	manuallyResolve(identifier, new BindingResolutionCallback()
     	{
 			public void foundDefinition(PhotranTokenRef definition, ScopingNode scope)
@@ -547,7 +581,7 @@ public abstract class ScopingNode extends ASTNode
     public List<PhotranTokenRef> manuallyResolveInLocalScope(Token identifier)
     {
     	final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
-    	
+
     	manuallyResolveInLocalScope(identifier, new BindingResolutionCallback()
     	{
 			public void foundDefinition(PhotranTokenRef definition, ScopingNode scope)
@@ -555,7 +589,7 @@ public abstract class ScopingNode extends ASTNode
 				bindings.add(definition);
 			}
     	});
-    	
+
     	return bindings;
     }
 
@@ -570,7 +604,7 @@ public abstract class ScopingNode extends ASTNode
     public List<PhotranTokenRef> manuallyResolveNoImplicits(Token identifier)
     {
         final List<PhotranTokenRef> bindings = new LinkedList<PhotranTokenRef>();
-        
+
         manuallyResolveNoImplicits(identifier, new BindingResolutionCallback()
         {
             public void foundDefinition(PhotranTokenRef definition, ScopingNode scope)
@@ -578,7 +612,7 @@ public abstract class ScopingNode extends ASTNode
                 bindings.add(definition);
             }
         });
-        
+
         return bindings;
     }
 
@@ -588,7 +622,7 @@ public abstract class ScopingNode extends ASTNode
             if (!manuallyResolveInParentScopes(identifier, result))
                 manuallyResolveIntrinsic(identifier, result);
     }
-    
+
 	private boolean manuallyResolveInLocalScope(Token identifier, BindingResolutionCallback bindings)
 	{
     	String name = PhotranVPG.canonicalizeIdentifier(identifier.getText());
@@ -602,16 +636,16 @@ public abstract class ScopingNode extends ASTNode
     			wasSuccessful = true;
     		}
     	}
-    	
+
 		return wasSuccessful;
 	}
-	
+
 	private boolean manuallyResolveInParentScopes(Token identifier, BindingResolutionCallback bindings)
 	{
 		for (ScopingNode scope = getEnclosingScope(); scope != null; scope = scope.getEnclosingScope())
 			if (scope.manuallyResolveInLocalScope(identifier, bindings))
 				return true;
-		
+
 		return false;
 	}
 
@@ -619,7 +653,7 @@ public abstract class ScopingNode extends ASTNode
 	{
     	Definition def = Intrinsics.resolveIntrinsic(identifier);
 		if (def == null) return false;
-    	
+
 		((PhotranVPGBuilder)PhotranVPG.getInstance()).setDefinitionFor(identifier.getTokenRef(), def);
 		return true;
 	}
@@ -628,17 +662,17 @@ public abstract class ScopingNode extends ASTNode
 	{
 		PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
 		ImplicitSpec implicitSpec = getImplicitSpec();
-		
+
 		if (implicitSpec == null) return; // Implicit None
-		
+
 		if (identifier instanceof FakeToken) return; // Not a real token; used to test bindings only
-		
+
     	String name = PhotranVPG.canonicalizeIdentifier(identifier.getText());
-    	
+
     	PhotranTokenRef tokenRef = identifier.getTokenRef();
 		Type type = implicitSpec.getType(name.charAt(0));
 		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, /*Visibility.PUBLIC,*/ type);
-		
+
     	vpg.setDefinitionFor(tokenRef, def);
     	vpg.markScope(tokenRef, this);
     	vpg.markDefinitionVisibilityInScope(tokenRef, this, Visibility.PUBLIC);
@@ -649,13 +683,13 @@ public abstract class ScopingNode extends ASTNode
 	{
 		PhotranVPG vpg = PhotranVPG.getInstance();
 		List<Definition> result = new LinkedList<Definition>();
-		
+
     	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.DEFINED_IN_SCOPE_EDGE_TYPE))
     		result.add(vpg.getDefinitionFor(t));
-		
+
     	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
     		result.add(vpg.getDefinitionFor(t));
-    	
+
     	return result;
 	}
 
@@ -663,11 +697,11 @@ public abstract class ScopingNode extends ASTNode
 	{
         PhotranVPG vpg = PhotranVPG.getInstance();
 		List<Definition> result = new LinkedList<Definition>();
-		
+
     	for (Definition def : getAllDefinitions())
     		if (def != null && vpg.getVisibilityFor(def, this).equals(Visibility.PUBLIC))
     			result.add(def);
-    	
+
     	return result;
 	}
 
@@ -677,7 +711,7 @@ public abstract class ScopingNode extends ASTNode
         {
         	Token firstToken = findFirstTokenIn(this);
         	Token lastToken = findLastTokenIn(this);
-        	
+
         	if (firstToken == null
         	    || lastToken == null
         	    || firstToken.getIFile() == null)
@@ -685,7 +719,7 @@ public abstract class ScopingNode extends ASTNode
 
             int startOffset = firstToken.getFileOffset();
             startOffset -= firstToken.getWhiteBefore().length();
-            
+
             int endOffset = lastToken.getFileOffset()+lastToken.getLength();
             //endOffset += lastToken.getWhiteAfter().length();
 
@@ -702,7 +736,7 @@ public abstract class ScopingNode extends ASTNode
 
     // TODO: This was copied from FortranRefactoring.java
     // Parse Tree Searching ///////////////////////////////////////////////////
-    
+
     protected Token findFirstTokenIn(ASTNode node)
     {
         try
@@ -714,7 +748,7 @@ public abstract class ScopingNode extends ASTNode
                 {
                     throw new Notification(token);
                 }
-                
+
             });
         }
         catch (Notification n)
@@ -723,17 +757,17 @@ public abstract class ScopingNode extends ASTNode
         }
         return null;
     }
-    
+
     private final static class LastTokenVisitor extends ASTVisitor
     {
         private Token lastToken;
-        
+
         @Override
         public void visitToken(Token token)
         {
             lastToken = token;
         }
-        
+
         public Token getLastToken() { return lastToken; }
     }
 
@@ -748,7 +782,7 @@ public abstract class ScopingNode extends ASTNode
     {
         String name = getName();
         if (name == null) return false;
-        
+
         String actualName = PhotranVPG.canonicalizeIdentifier(name);
         String expectedName = PhotranVPG.canonicalizeIdentifier(targetName);
         return actualName.equals(expectedName);
@@ -759,7 +793,7 @@ public abstract class ScopingNode extends ASTNode
         Token nameToken = getNameToken();
         return nameToken == null ? null : nameToken.getText();
     }
-    
+
     public Token getNameToken()
     {
         Token repToken = getRepresentativeToken().findTokenOrReturnNull();

@@ -36,7 +36,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 /**
  * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all implicitly-declared variables
  * into a scope and all nested scopes (where needed).
- * 
+ *
  * @author Jeff Overbey, Timofey Yuvashev
  */
 public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
@@ -45,7 +45,7 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     {
         super(myFiles);
     }
-    
+
     @Override
     public String getName()
     {
@@ -58,11 +58,11 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     		? "the selected scope..."
     		: "\n" + SourcePrinter.getSourceCodeFromASTNode(selectedScope.getHeaderStmt());
     }*/
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
@@ -73,12 +73,12 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
     // Final Preconditions & Change Creation
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         logVPGErrors(status);
-        
+
         try
         {
             for(IFile f : this.selectedFiles)
@@ -95,17 +95,17 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
             vpg.releaseAllASTs();
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    private void introduceImplicitNoneInFile(IProgressMonitor progressMonitor, 
-                                             ScopingNode scopeNode, 
-                                             IFortranAST ast, 
+    private void introduceImplicitNoneInFile(IProgressMonitor progressMonitor,
+                                             ScopingNode scopeNode,
+                                             IFortranAST ast,
                                              IFile file)
     {
         assert scopeNode != null;
         //Get all scopes contained in the file
         List<ScopingNode> nodeList = scopeNode.getAllContainedScopes();
-        
+
         for (ScopingNode scope : nodeList)
         {
             if (!(scope instanceof ASTExecutableProgramNode)
@@ -114,14 +114,14 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
             {
                 ASTImplicitStmtNode implicitStmt = findExistingImplicitStatement(scope);
                 if (implicitStmt != null) implicitStmt.removeFromTree();
-                
+
                 IASTListNode<IBodyConstruct> newDeclarations = constructDeclarations(scope);
-                IASTListNode<IASTNode> body = (IASTListNode<IASTNode>)scope.getBody();
+                IASTListNode<IASTNode> body = (IASTListNode<IASTNode>)scope.getOrCreateBody();
                 body.addAll(0, newDeclarations);
                 Reindenter.reindent(newDeclarations, ast);
             }
         }
-            
+
         this.addChangeFromModifiedAST(file, progressMonitor);
     }
 
@@ -145,15 +145,15 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
         }
         return null;
     }
-    
+
     private IASTListNode<IBodyConstruct> constructDeclarations(final ScopingNode scope)
     {
         final ArrayList<Definition> definitions = new ArrayList<Definition>(16);
-        
+
         for (Definition def : scope.getAllDefinitions())
         	if (def != null && def.isImplicit())
         		definitions.add(def);
-        
+
         StringBuilder newStmts = new StringBuilder();
         newStmts.append("implicit none" + EOL);
         for (Definition def : sort(definitions))
@@ -179,7 +179,7 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
         for (int beforeIndex = 0; beforeIndex < indexOfElementToInsert; beforeIndex++)
             if (array.get(indexOfElementToInsert).getCanonicalizedName().compareTo(array.get(beforeIndex).getCanonicalizedName()) < 0)
                 return beforeIndex;
-        
+
         return indexOfElementToInsert;
     }
 
