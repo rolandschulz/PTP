@@ -11,8 +11,10 @@
 package org.eclipse.ptp.remote.remotetools.core;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,8 +126,14 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
+		String authority = connection.getName();
 		try {
-			return new URI("remotetools", connection.getName(), path.toPortableString(), null, null); //$NON-NLS-1$
+			authority = URLEncoder.encode(authority, "UTF-8"); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			// Should not happen
+		}
+		try {
+			return new URI("remotetools", authority, path.makeAbsolute().toPortableString(), null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}
@@ -135,10 +143,6 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
 	 */
 	public URI toURI(String path) {
-		try {
-			return new URI("remotetools", connection.getName(), path, null, null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			return null;
-		}
+		return toURI(new Path(path));
 	}
 }

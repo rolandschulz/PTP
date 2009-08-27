@@ -11,8 +11,10 @@
 package org.eclipse.ptp.remote.rse.core;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
@@ -52,8 +54,14 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
+		String authority = connection.getHost().getAliasName();
 		try {
-			return new URI("rse", connection.getHost().getHostName(), path.toPortableString(), null); //$NON-NLS-1$
+			authority = URLEncoder.encode(authority, "UTF-8"); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			// Should not happen
+		}
+		try {
+			return new URI("rse", authority, path.makeAbsolute().toPortableString(), null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}
@@ -63,10 +71,6 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
 	 */
 	public URI toURI(String path) {
-		try {
-			return new URI("rse", connection.getHost().getHostName(), path, null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			return null;
-		}
+		return toURI(new Path(path));
 	}
 }
