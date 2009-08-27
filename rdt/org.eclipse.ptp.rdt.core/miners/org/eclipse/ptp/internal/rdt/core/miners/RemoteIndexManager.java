@@ -6,11 +6,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * IBM - Initial API and implementation
+ *     IBM - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.miners;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,37 +36,41 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
-/**
- * @author crecoskie
- *
- */
+
 public class RemoteIndexManager {
 	
 	public static final String PDOM_EXTENSION = ".pdom"; //$NON-NLS-1$
+	
+	private static RemoteIndexManager theInstance = null;
+	
 	private static final IParserLogService LOG = new DefaultLogService();
-	static private RemoteIndexManager theInstance = null;
-	private Map<String,StandaloneIndexer> scopeToIndexerMap = null;
 	private static final PDOMCLinkageFactory cLinkageFactory = new PDOMCLinkageFactory();
 	private static final PDOMCPPLinkageFactory cppLinkageFactory = new PDOMCPPLinkageFactory();
 	private static final IIndexLocationConverter locationConverter = new RemoteLocationConverter();;
 	
 	private static final Map<String, IPDOMLinkageFactory> linkageFactoryMap = new HashMap<String, IPDOMLinkageFactory>();
-	
 	static {
 		linkageFactoryMap.put(ILinkage.C_LINKAGE_NAME, cLinkageFactory);
 		linkageFactoryMap.put(ILinkage.CPP_LINKAGE_NAME, cppLinkageFactory);
 	}
 	
+	private final Map<String,StandaloneIndexer> scopeToIndexerMap;
+	private final Map<String,String> scopeToIndexLocationMap;
+	
+	
 	private RemoteIndexManager() {
 		scopeToIndexerMap = new HashMap<String,StandaloneIndexer>();
+		scopeToIndexLocationMap = new HashMap<String,String>();
 	}
 
-	static public synchronized RemoteIndexManager getInstance() {
+	public static synchronized RemoteIndexManager getInstance() {
 		if(theInstance == null)
 			theInstance = new RemoteIndexManager();
 		
 		return theInstance;
 	}
+	
+	
 	
 	public IIndex getIndexForScope(String scope) {
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
@@ -129,6 +134,21 @@ public class RemoteIndexManager {
 	}
 	
 	
+	/**
+	 * Creates the given directory if it doesn't already exist.
+	 */
+	private boolean createIndexDirectory(String path) {
+		if(path == null)
+			return false;
+		
+		File dir = new File(path);
+		if(dir.exists())
+			return dir.canWrite();
+		
+		return dir.mkdirs();
+	}
+
+	
 	public StandaloneFastIndexer getIndexerForScope(String scope) {
 		
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
@@ -136,11 +156,28 @@ public class RemoteIndexManager {
 		}
 		
 		StandaloneFastIndexer indexer = (StandaloneFastIndexer) scopeToIndexerMap.get(scope);
-
 		if (indexer != null)
 			return indexer;
 
-		File indexFile = new File(scope + PDOM_EXTENSION);
+		String path = scopeToIndexLocationMap.get(scope);
+		File indexFile = null;
+		
+		if(path != null) {
+			indexFile = new File(path, scope + PDOM_EXTENSION);
+			try {
+				if(!indexFile.exists() && !indexFile.createNewFile()) {
+					indexFile = null;
+				}
+			} catch (IOException e) {
+				indexFile = null;
+			}
+		}
+		
+		if(indexFile == null) {
+			indexFile = new File(scope + PDOM_EXTENSION); // creates a file object located in the server working directory
+			System.err.printf("Can't create index file at %s, attempting to use %s instead\n", path, indexFile.getParent()); //$NON-NLS-1$
+			scopeToIndexLocationMap.put(scope, indexFile.getParent());
+		}
 		
 		System.out.println("Index at location: " + indexFile.getAbsolutePath()); //$NON-NLS-1$
 		System.out.flush();
@@ -157,6 +194,8 @@ public class RemoteIndexManager {
 		return indexer;
 	}
 	
+
+	
 	/**
 	 * Deletes the index file associated with the given scope name.
 	 * @param scope
@@ -169,8 +208,13 @@ public class RemoteIndexManager {
 		}
 		
 		scopeToIndexerMap.remove(scope);
+		String loc = scopeToIndexLocationMap.remove(scope);
 		
-		File indexFile = new File(scope + PDOM_EXTENSION);
+		File indexFile;
+		if(loc == null)
+			indexFile = new File(scope + PDOM_EXTENSION);
+		else
+			indexFile = new File(loc, scope + PDOM_EXTENSION);
 		
 		System.out.println("Remove index at location: " + indexFile.getAbsolutePath()); //$NON-NLS-1$
 		System.out.flush();
@@ -203,5 +247,66 @@ public class RemoteIndexManager {
 				
 		CIndex index = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
 		return index;
+	}
+
+	
+	public String setIndexFileLocation(String scope, String configLocation) {
+		String oldLocation = scopeToIndexLocationMap.get(scope); 
+		if(configLocation.equals(oldLocation))
+			return configLocation;
+		
+		scopeToIndexerMap.remove(scope); // invalidates the indexer object that uses the old location
+		
+		if(createIndexDirectory(configLocation)) {
+			scopeToIndexLocationMap.put(scope, configLocation);
+			return configLocation;
+		}
+		else {
+			String serverDir = System.getProperty("user.dir"); //$NON-NLS-1$
+			scopeToIndexLocationMap.put(scope, serverDir);
+			return serverDir;
+			
+		}
+	}
+	
+	
+	/**
+	 * Attempts to move the pdom file to the given path. If that path
+	 * is not writable it attempt to move the pdom to the server installation
+	 * path instead.
+	 * 
+	 * @return The actual path to where the file was moved.
+	 */
+	public String moveIndexFile(String scope, String path) {
+		String oldLocation = scopeToIndexLocationMap.get(scope); 
+		String newLocation = setIndexFileLocation(scope, path);
+		if(!newLocation.equals(path)) {
+			System.out.printf("Can't move index file to %s, using %s instead\n", path, newLocation); //$NON-NLS-1$ 
+		}
+		
+		if(newLocation.equals(oldLocation)) {
+			System.out.println("Index file not moved because source and destination are the same"); //$NON-NLS-1$ 
+			return oldLocation;
+		}
+		
+		System.out.printf("Moving index file %s%s from %s to %s\n", scope, PDOM_EXTENSION, oldLocation, newLocation);//$NON-NLS-1$ 
+		
+		String fileName = scope + PDOM_EXTENSION;
+		File pdomFile = new File(oldLocation, fileName);
+		
+		if(!pdomFile.exists()) {
+			System.out.println("Can't find index file at " + oldLocation); //$NON-NLS-1$
+			return oldLocation;
+		}
+			
+		boolean success = pdomFile.renameTo(new File(newLocation, fileName));
+		if(success) {
+			System.out.printf("Index file moved from %s to %s\n", oldLocation, newLocation); //$NON-NLS-1$
+			return newLocation;
+		}
+		else {
+			System.out.println("Index file could not be moved"); //$NON-NLS-1$
+			return oldLocation;
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,10 @@ import org.eclipse.ui.IMemento;
 public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
 
 	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"; //$NON-NLS-1$
+	
 	private static final String HOST_NAME_KEY = "host-name"; //$NON-NLS-1$
+	private static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
+	
 	private RemoteSearchService fSearchService;
 	private IContentAssistService fContentAssistService;
 	
@@ -57,10 +60,12 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 
 	public void restoreState(IMemento providerMemento) {
 		fHostName = providerMemento.getString(HOST_NAME_KEY);
+		indexLocation = providerMemento.getString(INDEX_LOCATION_KEY);
 	}
 
 	public void saveState(IMemento providerMemento) {
 		providerMemento.putString(HOST_NAME_KEY, fHostName);
+		providerMemento.putString(INDEX_LOCATION_KEY, indexLocation);
 	}
 
 	public synchronized ISearchService getSearchService() {

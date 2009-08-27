@@ -77,7 +77,7 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 		if (fUpdate)
 			service.update(new Scope(name), Arrays.<ICElement>asList(fAdded), Arrays.<ICElement>asList(fChanged), Arrays.<ICElement>asList(fRemoved), monitor, this);
 		else
-			service.reindex(new Scope(name), Arrays.<ICElement>asList(fAdded), monitor, this);
+			service.reindex(new Scope(name), fIndexServiceProvider.getIndexLocation(), Arrays.<ICElement>asList(fAdded), monitor, this);
 	}
 
 }
