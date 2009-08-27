@@ -588,7 +588,7 @@
                id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"/>
          <!-- -->
          <action
-               label="Interchange L&amp;oops..."
+               label="Interchange L&amp;oops (Unchecked)..."
                definitionId="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranOptimizationGroup"
@@ -681,7 +681,7 @@
             <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
          </menu>
          <action
-               label="Interchange L&amp;oops..."
+               label="Interchange L&amp;oops (Unchecked)..."
                class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranOptimizationGroup"
                id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
@@ -837,13 +837,13 @@
       </view>
 
       <!--TODO: Need to find a better icon for this view-->
-      <!--view
+      <view
             category="org.eclipse.photran.ui.views"
             class="org.eclipse.photran.internal.ui.views.vpgproblems.VGPProblemView"
             icon="icons/full/eview16/source.gif"
             id="org.eclipse.photran.ui.VGPProblemView"
             name="Fortran Analysis/Refactoring Problems">
-      </view-->
+      </view>
    </extension>
        <!--
    <extension
