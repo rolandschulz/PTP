@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,6 +57,7 @@ public class HostSelectionDialog extends Dialog {
 	private Map<Integer, IHost> fHostComboIndexToHostMap = new HashMap<Integer, IHost>();
 	
 	private IHost fSelectedHost;
+	private String configPath;
 
 	public HostSelectionDialog(IServiceProvider provider, Shell parentShell) {
 		super(parentShell);
@@ -72,7 +73,6 @@ public class HostSelectionDialog extends Dialog {
      */
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
-
         getShell().setText(Messages.getString("HostSelectionDialog.1")); //$NON-NLS-1$
 		
         GridLayout layout = new GridLayout();
@@ -85,8 +85,7 @@ public class HostSelectionDialog extends Dialog {
         
         // combo for hosts
         final Combo hostCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-        // set layout to grab horizontal space
-        hostCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        hostCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false)); // set layout to grab horizontal space
         
         //attempt to restore settings from saved state
         IHost hostSelected = fProvider.getHost();
@@ -109,19 +108,6 @@ public class HostSelectionDialog extends Dialog {
         fSelectedHost = fHostComboIndexToHostMap.get(toSelect);
         
         
-        hostCombo.addSelectionListener(new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				int selectionIndex = hostCombo.getSelectionIndex();
-				fSelectedHost = fHostComboIndexToHostMap.get(selectionIndex);
-				
-			}
-        	
-        });
         
         // button for creating new connections
         Button newConnectionButton = new Button(container, SWT.PUSH);
@@ -152,6 +138,33 @@ public class HostSelectionDialog extends Dialog {
         	
         });
         
+        configPath = fProvider.getIndexLocation();
+        if(fProvider.isConfigured() && configPath == null) // happens if the project was created before the index location feature was added
+        	configPath = ""; //$NON-NLS-1$
+      
+        final IndexFileLocationWidget scopeWidget = new IndexFileLocationWidget(container, SWT.NONE, fSelectedHost, configPath);
+        GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+        data.horizontalSpan = 3;
+        scopeWidget.setLayoutData(data); // set layout to grab horizontal space
+        scopeWidget.addPathListener(new IIndexFilePathChangeListener() {
+			public void pathChanged(String newPath) {
+				configPath = newPath;
+			}
+		});
+        
+        
+        hostCombo.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				int selectionIndex = hostCombo.getSelectionIndex();
+				fSelectedHost = fHostComboIndexToHostMap.get(selectionIndex);
+				scopeWidget.setHost(fSelectedHost);
+			}
+        });
+        
         return container;
     }
     
@@ -159,17 +172,15 @@ public class HostSelectionDialog extends Dialog {
      * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
      */
     protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.OK_ID,
-            IDialogConstants.OK_LABEL, true);
-        createButton(parent, IDialogConstants.CANCEL_ID,
-            IDialogConstants.CANCEL_LABEL, false);
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+        createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#getInitialSize()
      */
     protected Point getInitialSize() {
-        return new Point(500, 125);
+        return new Point(500,300);
     }
 
 	/* (non-Javadoc)
@@ -181,6 +192,7 @@ public class HostSelectionDialog extends Dialog {
 		
 		// set the host for the service provider
 		fProvider.setConnection(fSelectedHost, getDStoreConnectorService(fSelectedHost));
+		fProvider.setIndexLocation(configPath);
 		fProvider.setConfigured(true);
 	}
 
