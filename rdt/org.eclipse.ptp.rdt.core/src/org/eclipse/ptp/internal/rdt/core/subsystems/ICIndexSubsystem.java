@@ -75,12 +75,16 @@ public interface ICIndexSubsystem {
 	/**
 	 * Re-indexes the given scope.
 	 * 
+	 * As a precaution the index location is taken as a parameter to ensure
+	 * that the index file is always generated in the correct location.
+	 * 
 	 * @param scope
 	 * @param monitor
+	 * @param indexLocation Path to the location of the index file.
 	 * @param task that this operation originates from
 	 * @return IStatus indicating success or failure
 	 */
-	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor, RemoteIndexerTask task);
+	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task);
 	
 	/**
 	 * Incrementally indexes based on a delta of added, changed, and removed elements.  Valid elements can be
@@ -104,10 +108,11 @@ public interface ICIndexSubsystem {
 	 * 
 	 * @param scope
 	 * @param elements The elements which comprise the scope.  Valid element types are ITranslationUnit, ICContainer, and ICProject
+	 * @param indexLocation The path of the directory that contains the index file.
 	 * @param monitor
 	 * @return IStatus indicating success or failure.
 	 */
-	public IStatus registerScope(Scope scope, List<ICElement> elements, IProgressMonitor monitor);
+	public IStatus registerScope(Scope scope, List<ICElement> elements, String indexLocation, IProgressMonitor monitor);
 	
 	/**
 	 * Unregisters a scope.  Effectively, the scope manager will remove it from its list of managed scopes.
@@ -262,5 +267,7 @@ public interface ICIndexSubsystem {
 	 * @return
 	 */
 	public ITranslationUnit getModel(ITranslationUnit unit, IProgressMonitor monitor);
+
+	public String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor);
 
 }
