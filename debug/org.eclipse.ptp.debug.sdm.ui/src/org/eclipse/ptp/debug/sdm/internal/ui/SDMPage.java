@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
-import java.io.IOException;
-
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,7 +53,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	private IResourceManagerControl resourceManager = null;
 	private IRemoteServices remoteServices = null;
-	private String errMsg = null;
 	private boolean pathIsDirty = true;
 	private boolean pathIsValid = false;
 	
@@ -222,8 +219,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					if (res.fetchInfo().exists()) {
 						return true;
 					}
-				}
-				catch (IOException e) {
+				} catch (Exception e) {
+					// Any exception means the verify failed
 				}
 			}
 			return false;
