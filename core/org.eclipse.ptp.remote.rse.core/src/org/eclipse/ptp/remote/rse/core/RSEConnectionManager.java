@@ -25,7 +25,7 @@ import org.eclipse.rse.core.model.ISystemRegistry;
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private IFileSystem fileSystem = null;
 	private ISystemRegistry registry;
-	private Map<IHost, IRemoteConnection> connections = new HashMap<IHost,IRemoteConnection>();
+	private Map<String, RSEConnection> connections = new HashMap<String, RSEConnection>();
 	
 	public RSEConnectionManager(ISystemRegistry registry) {
 		this.registry = registry;
@@ -41,12 +41,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 */
 	public IRemoteConnection getConnection(String name) {
 		if (name != null) {
-			for (IRemoteConnection conn : getConnections()) {
-				IHost host = ((RSEConnection)conn).getHost();
-				if (host.getName().equals(name)) {
-					return conn;
-				}
-			}
+			return connections.get(name);
 		}
 		return null;
 	}
@@ -64,15 +59,19 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 */
 	public void refreshConnections() {
 		if (fileSystem != null) {
+			Map<String, RSEConnection> newConns = new HashMap<String, RSEConnection>();
 			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
 			for (IHost host : hosts) {
-				if (!connections.containsKey(host)) {
-					RSEConnection conn = new RSEConnection(host, fileSystem);
-					if (conn.initialize()) {
-						connections.put(host, conn);
+				RSEConnection conn = connections.get(host);
+				if (conn == null) {
+					conn = new RSEConnection(host, fileSystem);
+					if (!conn.initialize()) {
+						continue;
 					}
 				}
+				newConns.put(host.getAliasName(), conn);
 			}
+			connections = newConns;
 		}
 	}
 
@@ -83,6 +82,6 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		if (conn instanceof RSEConnection) {
 			((RSEConnection)conn).dispose();
 		}
-		connections.remove(conn);
+		connections.remove(conn.getName());
 	}
 }
