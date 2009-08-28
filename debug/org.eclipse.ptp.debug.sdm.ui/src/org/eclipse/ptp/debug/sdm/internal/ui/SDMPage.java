@@ -52,7 +52,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private IResourceManagerControl resourceManager = null;
-	private IRemoteServices remoteServices = null;
 	private boolean pathIsDirty = true;
 	private boolean pathIsValid = false;
 	
@@ -373,15 +372,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return remote services
 	 */
 	private IRemoteServices getRemoteServices() {
-		if (resourceManager == null) {
-			return null;
-		}
-
-		if (remoteServices == null) {
+		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId());
+			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId());
 		}
-		return remoteServices;
+		return null;
 	}
 	
 	/**
