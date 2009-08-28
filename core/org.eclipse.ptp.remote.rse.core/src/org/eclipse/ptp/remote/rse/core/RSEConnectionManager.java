@@ -40,6 +40,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
+		refreshConnections();
 		if (name != null) {
 			return connections.get(name);
 		}
