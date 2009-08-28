@@ -90,17 +90,19 @@ public class CommonPlugin extends AbstractUIPlugin {
 		super.start(context);
 		// there's probably a better place to put this, but...
 		getPreferenceStore().setDefault(IDs.SHOW_ANALYSIS_CONFIRMATION, true);
-		
+/*		
+        // project re-reqs should keep this from being necessary, so omit the print and check.
 		Bundle cdtBundle=Platform.getBundle("org.eclipse.cdt.core");
 		String version = (String) cdtBundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
-		System.out.println("CDT version: "+version);
+		//System.out.println("CDT version: "+version);
 		boolean versOK = version.startsWith("4.0.2")|| version.startsWith("4.0.3") || version.startsWith("5");
 		if(!versOK){
 			System.out.println("**Warning, wrong version of CDT.  Version 4.0.2 or higher is required with PLDT 2.0");
 			String msg="This is PLDT 2.0 which requires CDT Version 4.0.2 or higher.";
 				msg+="\nThis eclipse installation contains CDT version "+version;
 			MessageDialog.openError(null, "Version mismatch", msg);
-		}		
+		}
+		*/		
 	}
 
 	/**
