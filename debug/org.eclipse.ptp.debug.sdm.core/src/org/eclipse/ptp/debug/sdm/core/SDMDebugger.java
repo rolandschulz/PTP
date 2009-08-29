@@ -136,6 +136,8 @@ public class SDMDebugger implements IPDebugger {
 			fRequestFactory = new SDMRequestFactory();
 		}
 
+		IPDISession session = createSession(timeout, launch, corefile);
+
 		if (fSdmRunner != null) {
 			/*
 			 * Writing the routing file actually starts the SDM servers.
@@ -150,8 +152,6 @@ public class SDMDebugger implements IPDebugger {
 			fSdmRunner.schedule();
 		}
 		
-		IPDISession session = createSession(timeout, launch, corefile);
-
 		return session;
 	}
 
@@ -214,13 +214,14 @@ public class SDMDebugger implements IPDebugger {
 		attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
 		attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toString()));
 
+		StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
 		String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
 		if (dbgWD != null) {
-			StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
 			if (wdAttr != null) {
 				wdAttr.setValueAsString(dbgWD);
 			} else {
-				attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
+				wdAttr = JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD);
+				attrMgr.addAttribute(wdAttr);
 			}
 		}
 		
@@ -249,8 +250,8 @@ public class SDMDebugger implements IPDebugger {
 			sdmCommand.add("--master"); //$NON-NLS-1$
 			sdmCommand.addAll(dbgArgs);
 			fSdmRunner.setCommand(sdmCommand);
-			if (dbgWD != null) {
-				fSdmRunner.setWorkDir(dbgWD);
+			if (wdAttr != null) {
+				fSdmRunner.setWorkDir(wdAttr.getValue());
 			}
 		}
 	}
