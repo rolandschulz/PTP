@@ -48,6 +48,7 @@ extern int	svr_init(dbg_backend *, void (*)(dbg_event *, int));
 extern int	svr_dispatch(dbg_backend *, char *, int, int);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_isshutdown(void);
+extern int	svr_shutdown(dbg_backend *);
 
 static dbg_backend *	backend;
 
@@ -163,7 +164,9 @@ server(dbg_backend *dbgr)
 	svr_init(dbgr, event_callback);
 
 	while (!svr_isshutdown()) {
-		sdm_progress();
+		if (sdm_progress() < 0) {
+			svr_shutdown(dbgr);
+		}
 		svr_progress(dbgr);
 	}
 }
