@@ -439,7 +439,7 @@ sdm_get_active_sock_desc()
 	int selrv;
 	sdm_id_sockd_map_p p;
 
-	struct timeval time = {0, 0};
+	struct timeval time = {0, 10000};
 
 	// Add all valid sockets to the FD_SET
 	FD_ZERO(&rfdset);
