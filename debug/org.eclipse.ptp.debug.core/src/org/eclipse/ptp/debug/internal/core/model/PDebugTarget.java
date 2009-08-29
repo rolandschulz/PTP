@@ -662,7 +662,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener(this);
 		disposeSignalManager();
 		disposeRegisterManager();
-		saveMemoryBlocks();
 		disposeMemoryManager();
 		disposeSourceManager();
 		disposeSourceLookupPath();
@@ -976,7 +975,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * 
 	 */
 	protected void disposeRegisterManager() {
-		fSession.getMemoryManager().save(getTasks());
+		fSession.getMemoryManager().dispose(getTasks());
 	}
 
 	/**
