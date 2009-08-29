@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
-import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -508,10 +507,9 @@ public class OpenMPIProcessMapXml13Parser {
 			parser.addListener(listener);
 		}
 		try {
-			BufferedInputStream bis = new BufferedInputStream(is);
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			saxParser.parse(bis, parser.handler);
+			saxParser.parse(is, parser.handler);
 		} catch (ParseInterruptedException e) {
 			// this is ok and expected
 		} catch (SAXException e) {
