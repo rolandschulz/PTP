@@ -36,7 +36,7 @@ extern sdm_id	SDM_MASTER;
 extern int sdm_init(int argc, char *argv[]);
 extern int sdm_connect(const sdm_idset ids);
 extern void sdm_finalize(void);
-extern void sdm_progress(void);
+extern int sdm_progress(void);
 
 /*
  * Communication
