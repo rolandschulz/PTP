@@ -65,11 +65,14 @@ sdm_finalize(void)
 /*
  * Progress messages and the aggregation layer
  */
-void
+int
 sdm_progress(void)
 {
-	sdm_message_progress();
+	if (sdm_message_progress() < 0) {
+		return -1;
+	}
 	sdm_aggregate_progress();
+	return 0;
 }
 
 /*
