@@ -83,12 +83,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		super();
 		this.factory = new ProxyDebugEventFactory();
 		super.setEventFactory(factory);
-		super.addProxyEventListener(this);
-		state = DebugProxyState.DISCONNECTED;
-	}
-	
-	public void finalize() {
-		super.removeProxyEventListener(this);
 	}
 	
 	/**
@@ -97,6 +91,8 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	 * @throws IOException
 	 */
 	public void doInitialize(int port) throws IOException {
+		state = DebugProxyState.DISCONNECTED;
+		addProxyEventListener(this);
 		sessionCreate(port, 0);
 		state = DebugProxyState.CONNECTING;
 	}
@@ -127,6 +123,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			waitLock.unlock();
 			state = DebugProxyState.DISCONNECTED;
 		}
+		removeProxyEventListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -151,7 +148,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		try {
 			state = DebugProxyState.CONNECTED;
 			if (waiting) {
-				waitCondition.signal();
+				waitCondition.signalAll();
 				waiting = false;
 			}
 		} finally {
@@ -168,7 +165,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			if (state == DebugProxyState.DISCONNECTING) {
 				state = DebugProxyState.DISCONNECTED;
 				if (waiting) {
-					waitCondition.signal();
+					waitCondition.signalAll();
 					waiting = false;
 				}
 			}
@@ -193,7 +190,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			if (state == DebugProxyState.DISCONNECTING) {
 				state = DebugProxyState.DISCONNECTED;
 				if (waiting) {
-					waitCondition.signal();
+					waitCondition.signalAll();
 					waiting = false;
 				}
 			}
@@ -217,7 +214,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		try {
 			timeout = true;
 			if (waiting) {
-				waitCondition.signal();
+				waitCondition.signalAll();
 				waiting = false;
 			}
 		} finally {

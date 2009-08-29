@@ -117,6 +117,14 @@ public class SDMDebugger implements IPDebugger {
 				}.start();
 			}
 		}
+		
+		fModelFactory = null;
+		fManagerFactory = null;
+		fEventFactory = null;
+		fRequestFactory = null;
+		fPdiDebugger = null;
+		fSdmRunner = null;
+		fRoutingFileStore = null;
 	}
 
 	/* (non-Javadoc)

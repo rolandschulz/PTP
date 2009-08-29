@@ -648,7 +648,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			throw new PDIException(null, "Error on stopping debugger: " + e.getMessage()); //$NON-NLS-1$
 		} finally {
 			proxyNotifier.deleteObservers();
-			finalize();
 		}
 	}
 
