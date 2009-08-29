@@ -36,71 +36,71 @@
 
 typedef int (*svr_cmd)(dbg_backend *, int, char **);
 
-static int svr_start_session(dbg_backend *, int, char **);
-static int svr_setlinebreakpoint(dbg_backend *, int, char **);
-static int svr_setfuncbreakpoint(dbg_backend *, int, char **);
-static int svr_deletebreakpoint(dbg_backend *, int, char **);
-static int svr_enablebreakpoint(dbg_backend *, int, char **);
-static int svr_disablebreakpoint(dbg_backend *, int, char **);
-static int svr_conditionbreakpoint(dbg_backend *, int, char **);
-static int svr_breakpointafter(dbg_backend *, int, char **);
-static int svr_setwatchpoint(dbg_backend *, int, char **);
-static int svr_go(dbg_backend *, int, char **);
-static int svr_step(dbg_backend *, int, char **);
-static int svr_terminate(dbg_backend *, int, char **);
-static int svr_suspend(dbg_backend *, int, char **);
-static int svr_liststackframes(dbg_backend *, int, char **);
-static int svr_setcurrentstackframe(dbg_backend *, int, char **);
-static int svr_evaluateexpression(dbg_backend *, int, char **);
-static int svr_gettype(dbg_backend *, int, char **);
-static int svr_listlocalvariables(dbg_backend *, int, char **);
-static int svr_listarguments(dbg_backend *, int, char **);
-static int svr_listglobalvariables(dbg_backend *, int, char **);
-static int svr_listinfothreads(dbg_backend *, int, char **);
-static int svr_setthreadselect(dbg_backend *, int, char **);
-static int svr_stackinfodepth(dbg_backend *, int, char **);
-static int svr_datareadmemory(dbg_backend *, int, char **);
-static int svr_datawritememory(dbg_backend *, int, char **);
-static int svr_listsignals(dbg_backend *, int, char **);
-static int svr_clihandle(dbg_backend *, int, char **);
-static int svr_quit(dbg_backend *, int, char **);
-static int svr_evaluatepartialexpression(dbg_backend *, int, char **);
-static int svr_deletepartialexpression(dbg_backend *, int, char **);
+static int svr_cmd_start_session(dbg_backend *, int, char **);
+static int svr_cmd_setlinebreakpoint(dbg_backend *, int, char **);
+static int svr_cmd_setfuncbreakpoint(dbg_backend *, int, char **);
+static int svr_cmd_deletebreakpoint(dbg_backend *, int, char **);
+static int svr_cmd_enablebreakpoint(dbg_backend *, int, char **);
+static int svr_cmd_disablebreakpoint(dbg_backend *, int, char **);
+static int svr_cmd_conditionbreakpoint(dbg_backend *, int, char **);
+static int svr_cmd_breakpointafter(dbg_backend *, int, char **);
+static int svr_cmd_setwatchpoint(dbg_backend *, int, char **);
+static int svr_cmd_go(dbg_backend *, int, char **);
+static int svr_cmd_step(dbg_backend *, int, char **);
+static int svr_cmd_terminate(dbg_backend *, int, char **);
+static int svr_cmd_suspend(dbg_backend *, int, char **);
+static int svr_cmd_liststackframes(dbg_backend *, int, char **);
+static int svr_cmd_setcurrentstackframe(dbg_backend *, int, char **);
+static int svr_cmd_evaluateexpression(dbg_backend *, int, char **);
+static int svr_cmd_gettype(dbg_backend *, int, char **);
+static int svr_cmd_listlocalvariables(dbg_backend *, int, char **);
+static int svr_cmd_listarguments(dbg_backend *, int, char **);
+static int svr_cmd_listglobalvariables(dbg_backend *, int, char **);
+static int svr_cmd_listinfothreads(dbg_backend *, int, char **);
+static int svr_cmd_setthreadselect(dbg_backend *, int, char **);
+static int svr_cmd_stackinfodepth(dbg_backend *, int, char **);
+static int svr_cmd_datareadmemory(dbg_backend *, int, char **);
+static int svr_cmd_datawritememory(dbg_backend *, int, char **);
+static int svr_cmd_listsignals(dbg_backend *, int, char **);
+static int svr_cmd_clihandle(dbg_backend *, int, char **);
+static int svr_cmd_quit(dbg_backend *, int, char **);
+static int svr_cmd_evaluatepartialexpression(dbg_backend *, int, char **);
+static int svr_cmd_deletepartialexpression(dbg_backend *, int, char **);
 
 static svr_cmd svr_cmd_tab[] =
 {
-	/* DBG_QUIT_CMD */						svr_quit,
-	/* DBG_STARTSESSION_CMD */				svr_start_session,
-	/* DBG_SETLINEBREAKPOINT_CMD */			svr_setlinebreakpoint,
-	/* DBG_SETFUNCBREAKPOINT_CMD */			svr_setfuncbreakpoint,
-	/* DBG_DELETEBREAKPOINT_CMD */			svr_deletebreakpoint,
-	/* DBG_ENABLEBREAKPOINT_CMD */			svr_enablebreakpoint,
-	/* DBG_DISABLEBREAKPOINT_CMD */			svr_disablebreakpoint,
-	/* DBG_CONDITIONBREAKPOINT_CMD */		svr_conditionbreakpoint,
-	/* DBG_BREAKPOINTAFTER_CMD */			svr_breakpointafter,
-	/* DBG_SETWATCHPOINT_CMD */				svr_setwatchpoint,
-	/* DBG_GO_CMD */						svr_go,
-	/* DBG_STEP_CMD */						svr_step,
-	/* DBG_TERMINATE_CMD */					svr_terminate,
-	/* DBG_SUSPEND_CMD */					svr_suspend,
-	/* DBG_LISTSTACKFRAMES_CMD */			svr_liststackframes,
-	/* DBG_SETCURRENTSTACKFRAME_CMD */		svr_setcurrentstackframe,
-	/* DBG_EVALUATEEXPRESSION_CMD */		svr_evaluateexpression,
-	/* DBG_GETTYPE_CMD */					svr_gettype,
-	/* DBG_LISTLOCALVARIABLES_CMD */		svr_listlocalvariables,
-	/* DBG_LISTARGUMENTS_CMD */				svr_listarguments,
-	/* DBG_LISTGLOBALVARIABLES_CMD */		svr_listglobalvariables,
-	/* DBG_LISTINFOTHREADS_CMD */			svr_listinfothreads,
-	/* DBG_SETTHREADSELECT_CMD */			svr_setthreadselect,
-	/* DBG_STACKINFODEPTH_CMD */			svr_stackinfodepth,
-	/* DBG_DATAREADMEMORY_CMD */			svr_datareadmemory,
-	/* DBG_DATAWRITEMEMORY_CMD */			svr_datawritememory,
-	/* DBG_LISTSIGNALS_CMD */				svr_listsignals,
+	/* DBG_QUIT_CMD */						svr_cmd_quit,
+	/* DBG_STARTSESSION_CMD */				svr_cmd_start_session,
+	/* DBG_SETLINEBREAKPOINT_CMD */			svr_cmd_setlinebreakpoint,
+	/* DBG_SETFUNCBREAKPOINT_CMD */			svr_cmd_setfuncbreakpoint,
+	/* DBG_DELETEBREAKPOINT_CMD */			svr_cmd_deletebreakpoint,
+	/* DBG_ENABLEBREAKPOINT_CMD */			svr_cmd_enablebreakpoint,
+	/* DBG_DISABLEBREAKPOINT_CMD */			svr_cmd_disablebreakpoint,
+	/* DBG_CONDITIONBREAKPOINT_CMD */		svr_cmd_conditionbreakpoint,
+	/* DBG_BREAKPOINTAFTER_CMD */			svr_cmd_breakpointafter,
+	/* DBG_SETWATCHPOINT_CMD */				svr_cmd_setwatchpoint,
+	/* DBG_GO_CMD */						svr_cmd_go,
+	/* DBG_STEP_CMD */						svr_cmd_step,
+	/* DBG_TERMINATE_CMD */					svr_cmd_terminate,
+	/* DBG_SUSPEND_CMD */					svr_cmd_suspend,
+	/* DBG_LISTSTACKFRAMES_CMD */			svr_cmd_liststackframes,
+	/* DBG_SETCURRENTSTACKFRAME_CMD */		svr_cmd_setcurrentstackframe,
+	/* DBG_EVALUATEEXPRESSION_CMD */		svr_cmd_evaluateexpression,
+	/* DBG_GETTYPE_CMD */					svr_cmd_gettype,
+	/* DBG_LISTLOCALVARIABLES_CMD */		svr_cmd_listlocalvariables,
+	/* DBG_LISTARGUMENTS_CMD */				svr_cmd_listarguments,
+	/* DBG_LISTGLOBALVARIABLES_CMD */		svr_cmd_listglobalvariables,
+	/* DBG_LISTINFOTHREADS_CMD */			svr_cmd_listinfothreads,
+	/* DBG_SETTHREADSELECT_CMD */			svr_cmd_setthreadselect,
+	/* DBG_STACKINFODEPTH_CMD */			svr_cmd_stackinfodepth,
+	/* DBG_DATAREADMEMORY_CMD */			svr_cmd_datareadmemory,
+	/* DBG_DATAWRITEMEMORY_CMD */			svr_cmd_datawritememory,
+	/* DBG_LISTSIGNALS_CMD */				svr_cmd_listsignals,
 	/* DBG_SIGNALINFO_CMD */				NULL,
-	/* DBG_CLIHANDLE_CMD */					svr_clihandle,
+	/* DBG_CLIHANDLE_CMD */					svr_cmd_clihandle,
 	/* DBG_DATAEVALUATEEXPRESSION_CMD */	NULL,
-	/* DBG_EVALUATEPARTIALEXPRESSION_CMD */	svr_evaluatepartialexpression,
-	/* DBG_DELETEPARTIALEXPRESSION_CMD */	svr_deletepartialexpression,
+	/* DBG_EVALUATEPARTIALEXPRESSION_CMD */	svr_cmd_evaluatepartialexpression,
+	/* DBG_DELETEPARTIALEXPRESSION_CMD */	svr_cmd_deletepartialexpression,
 };
 
 static int			svr_res;
@@ -136,6 +136,16 @@ svr_init(dbg_backend *db, void (*cb)(dbg_event *, int))
 	svr_last_tid = 0;
 	svr_state = SVR_RUNNING;
 	return db->db_funcs->init(svr_event_callback);
+}
+
+int
+svr_shutdown(dbg_backend *db)
+{
+	if (svr_state == SVR_RUNNING) {
+		svr_state = SVR_SHUTDOWN_STARTED;
+		return db->db_funcs->quit();
+	}
+	return 0;
 }
 
 int
@@ -192,13 +202,13 @@ svr_progress(dbg_backend *db)
 }
 
 int
-svr_suspend(dbg_backend *db, int nargs, char **args)
+svr_cmd_suspend(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->interrupt();
 }
 
 static int
-svr_start_session(dbg_backend *db, int nargs, char **args)
+svr_cmd_start_session(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 4) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -209,7 +219,7 @@ svr_start_session(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_setlinebreakpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_setlinebreakpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 8) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -220,7 +230,7 @@ svr_setlinebreakpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_setfuncbreakpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_setfuncbreakpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 8) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -231,7 +241,7 @@ svr_setfuncbreakpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_deletebreakpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_deletebreakpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -242,7 +252,7 @@ svr_deletebreakpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_enablebreakpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_enablebreakpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -253,7 +263,7 @@ svr_enablebreakpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_disablebreakpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_disablebreakpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -264,7 +274,7 @@ svr_disablebreakpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_conditionbreakpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_conditionbreakpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 2) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -275,7 +285,7 @@ svr_conditionbreakpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_breakpointafter(dbg_backend *db, int nargs, char **args)
+svr_cmd_breakpointafter(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 2) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -286,7 +296,7 @@ svr_breakpointafter(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_setwatchpoint(dbg_backend *db, int nargs, char **args)
+svr_cmd_setwatchpoint(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 6) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -297,13 +307,13 @@ svr_setwatchpoint(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_go(dbg_backend *db, int nargs, char **args)
+svr_cmd_go(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->go();
 }
 
 static int
-svr_step(dbg_backend *db, int nargs, char **args)
+svr_cmd_step(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 2) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -314,13 +324,13 @@ svr_step(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_terminate(dbg_backend *db, int nargs, char **args)
+svr_cmd_terminate(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->terminate();
 }
 
 static int
-svr_liststackframes(dbg_backend *db, int nargs, char **args)
+svr_cmd_liststackframes(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 2) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -331,7 +341,7 @@ svr_liststackframes(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_setcurrentstackframe(dbg_backend *db, int nargs, char **args)
+svr_cmd_setcurrentstackframe(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -342,7 +352,7 @@ svr_setcurrentstackframe(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_evaluateexpression(dbg_backend *db, int nargs, char **args)
+svr_cmd_evaluateexpression(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -353,7 +363,7 @@ svr_evaluateexpression(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_gettype(dbg_backend *db, int nargs, char **args)
+svr_cmd_gettype(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -364,13 +374,13 @@ svr_gettype(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_listlocalvariables(dbg_backend *db, int nargs, char **args)
+svr_cmd_listlocalvariables(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->listlocalvariables();
 }
 
 static int
-svr_listarguments(dbg_backend *db, int nargs, char **args)
+svr_cmd_listarguments(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 2) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -381,19 +391,19 @@ svr_listarguments(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_listglobalvariables(dbg_backend *db, int nargs, char **args)
+svr_cmd_listglobalvariables(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->listglobalvariables();
 }
 
 static int
-svr_listinfothreads(dbg_backend *db, int nargs, char **args)
+svr_cmd_listinfothreads(dbg_backend *db, int nargs, char **args)
 {
 	return db->db_funcs->listinfothreads();
 }
 
 static int
-svr_setthreadselect(dbg_backend *db, int nargs, char **args)
+svr_cmd_setthreadselect(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -404,12 +414,12 @@ svr_setthreadselect(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_stackinfodepth(dbg_backend *db, int nargs, char **args) {
+svr_cmd_stackinfodepth(dbg_backend *db, int nargs, char **args) {
 	return db->db_funcs->stackinfodepth();
 }
 
 static int
-svr_datareadmemory(dbg_backend *db, int nargs, char **args)  {
+svr_cmd_datareadmemory(dbg_backend *db, int nargs, char **args)  {
 	if (nargs < 7) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
 		return DBGRES_ERR;
@@ -419,7 +429,7 @@ svr_datareadmemory(dbg_backend *db, int nargs, char **args)  {
 }
 
 static int
-svr_datawritememory(dbg_backend *db, int nargs, char **args) {
+svr_cmd_datawritememory(dbg_backend *db, int nargs, char **args) {
 	if (nargs < 5) {
 	}
 
@@ -427,15 +437,17 @@ svr_datawritememory(dbg_backend *db, int nargs, char **args) {
 }
 
 static int
-svr_listsignals(dbg_backend *db, int nargs, char **args)
+svr_cmd_listsignals(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 	}
 
 	return db->db_funcs->listsignals(args[0]);
 }
+
+#if 0
 static int
-svr_signalinfo(dbg_backend *db, int nargs, char **args)
+svr_cmd_signalinfo(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -444,9 +456,10 @@ svr_signalinfo(dbg_backend *db, int nargs, char **args)
 
 	return db->db_funcs->signalinfo(args[0]);
 }
+#endif
 
 static int
-svr_clihandle(dbg_backend *db, int nargs, char **args)
+svr_cmd_clihandle(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -457,14 +470,13 @@ svr_clihandle(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_quit(dbg_backend *db, int nargs, char **args)
+svr_cmd_quit(dbg_backend *db, int nargs, char **args)
 {
-	svr_state = SVR_SHUTDOWN_STARTED;
-	return db->db_funcs->quit();
+	return svr_shutdown(db);
 }
 
 static int
-svr_evaluatepartialexpression(dbg_backend *db, int nargs, char **args)
+svr_cmd_evaluatepartialexpression(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 4) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
@@ -475,7 +487,7 @@ svr_evaluatepartialexpression(dbg_backend *db, int nargs, char **args)
 }
 
 static int
-svr_deletepartialexpression(dbg_backend *db, int nargs, char **args)
+svr_cmd_deletepartialexpression(dbg_backend *db, int nargs, char **args)
 {
 	if (nargs < 1) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
