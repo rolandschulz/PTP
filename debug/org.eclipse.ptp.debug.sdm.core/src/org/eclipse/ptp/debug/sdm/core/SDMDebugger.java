@@ -109,10 +109,16 @@ public class SDMDebugger implements IPDebugger {
 						if (fSdmRunner.getSdmState() == SDMMasterState.RUNNING) {
 							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_11); 
 							fSdmRunner.cancel();
+							try {
+								fSdmRunner.join();
+							} catch (InterruptedException e) {
+								// Not much we can do at this point
+							}
 						} else {
 							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_13); 
 						}
-						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_14); 
+						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_14);
+						fSdmRunner = null;
 					}
 				}.start();
 			}
@@ -123,7 +129,6 @@ public class SDMDebugger implements IPDebugger {
 		fEventFactory = null;
 		fRequestFactory = null;
 		fPdiDebugger = null;
-		fSdmRunner = null;
 		fRoutingFileStore = null;
 	}
 
