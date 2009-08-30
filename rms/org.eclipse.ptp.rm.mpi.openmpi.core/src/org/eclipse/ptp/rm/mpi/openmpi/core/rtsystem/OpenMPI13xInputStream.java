@@ -14,8 +14,9 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Attempt to clean up quasi-XML output by 1.3.x
@@ -37,14 +38,14 @@ import java.util.Map;
  */
 public class OpenMPI13xInputStream extends FilterInputStream {
 	protected class TagItem {
-		private final String tag;
+		private final Pattern pattern;
 		
-		public TagItem(String tag) {
-			this.tag = tag;
+		public TagItem(String pattern) {
+			this.pattern = Pattern.compile(pattern);
 		}
 		
-		public String tag() {
-			return tag;
+		public boolean match(String tag) {
+			return pattern.matcher(tag).matches();
 		}
 	}
 	
@@ -76,26 +77,18 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 	
 	protected class TagList {
 		private int longest = 0;
-		private final HashMap<Integer, TagSet> tags = new HashMap<Integer, TagSet>();
+		private int shortest = 0;
+		private final ArrayList<TagItem> tags = new ArrayList<TagItem>();
 		
-		public TagItem add(String tag) {
-			Integer len = Integer.valueOf(tag.length());
-			TagSet set = tags.get(len);
-			if (set == null) {
-				set = new TagSet(len.intValue());
-				tags.put(len, set);
-			}
-			TagItem item = set.add(tag);
-			if (len.intValue() > longest) {
-				longest = len.intValue();
-			}
+		public TagItem add(String pattern) {
+			TagItem item = new TagItem(pattern);
+			tags.add(item);
 			return item;
 		}
 		
 		public TagItem match(String str) {
-			for (Map.Entry<Integer, TagSet> entry : tags.entrySet()) {
-				TagItem item = entry.getValue().match(str);
-				if (item != null) {
+			for (TagItem item : tags) {
+				if (item.match(str)) {
 					return item;
 				}
 			}
@@ -105,10 +98,16 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 		public int longest() {
 			return longest;
 		}
+		
+		public int shortest() {
+			return shortest;
+		}
 	}
 	
 	private final static String rootStartTagString = "<mpirun>"; //$NON-NLS-1$
 	private final static String rootEndTagString = "</mpirun>"; //$NON-NLS-1$
+	private final static String mapStartTagString = "<map>"; //$NON-NLS-1$
+	private final static String mapEndTagString = "</map>"; //$NON-NLS-1$
 	
 	private final TagItem rootStartTag;
 	private final TagList validStartTags = new TagList();
@@ -119,7 +118,9 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 		PROLOG, 
 		START_TAG,
 		XML,
-		SEEN_VALID,
+		SEEN_TAG_START,
+		SEEN_TAG_END,
+		FINISHED_TAG,
 		SEEN_FINAL,
 		EPILOG
 	}
@@ -131,18 +132,18 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 	protected OpenMPI13xInputStream(InputStream in) {
 		super(in);
 		rootStartTag = validStartTags.add(rootStartTagString);
-		validStartTags.add("<map>"); //$NON-NLS-1$
-		validTags.add("<map>"); //$NON-NLS-1$
-		validTags.add("</map>"); //$NON-NLS-1$
-		validTags.add("<host"); //$NON-NLS-1$
+		validStartTags.add(mapStartTagString);
+		validTags.add(mapStartTagString);
+		validTags.add(mapEndTagString);
+		validTags.add("<host.*>"); //$NON-NLS-1$
 		validTags.add("</host>"); //$NON-NLS-1$
-		validTags.add("<process"); //$NON-NLS-1$
+		validTags.add("<process.*>"); //$NON-NLS-1$
 		validTags.add("</process>"); //$NON-NLS-1$
-		validTags.add("<stdout"); //$NON-NLS-1$
+		validTags.add("<stdout.*>"); //$NON-NLS-1$
 		validTags.add("</stdout>"); //$NON-NLS-1$
-		validTags.add("<stderr"); //$NON-NLS-1$
+		validTags.add("<stderr.*>"); //$NON-NLS-1$
 		validTags.add("</stderr>"); //$NON-NLS-1$
-		validTags.add("<stddiag"); //$NON-NLS-1$
+		validTags.add("<stddiag.*>"); //$NON-NLS-1$
 		validTags.add("</stddiag>"); //$NON-NLS-1$
 	}
 	
@@ -162,14 +163,10 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 			available = super.available();
 			break;
 			
-		case XML:
-		case SEEN_VALID:
-		case SEEN_FINAL:
-		case EPILOG:
+		default:
 			available = buffer.length() + super.available();
 			break;
 		}
-		
 		return available;
 	}
 
@@ -186,12 +183,12 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 	 */
 	@Override
 	public int read() throws IOException {
+		int ch;
 		while (state != State.EPILOG) {
-			int ch = super.read();
-			
 			switch (state) {
 			case PROLOG:
 				// Ignore anything except a less-than
+				ch = super.read();
 				if (ch < 0) {
 					return -1;
 				}
@@ -205,6 +202,7 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 				// Find first valid tag. If we find another '<' then
 				// assume the first '<' was bogus. If we find a '>'
 				// then check the tag is valid. If not, start again.
+				ch = super.read();
 				if (ch < 0) {
 					return -1;
 				}
@@ -221,11 +219,11 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 						if (item == rootStartTag) {
 							finalTags.add(rootEndTagString);
 						} else {
-							finalTags.add("</map>"); //$NON-NLS-1$
+							finalTags.add(mapEndTagString);
 							buffer.insert(0, rootStartTagString);
 							rootTag = false;
 						}
-						state = State.SEEN_VALID;
+						state = State.SEEN_TAG_END;
 					} else {
 						buffer.delete(0, buffer.length());
 						state = State.PROLOG;
@@ -235,17 +233,53 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 				break;
 				
 			case XML:
-				if (ch >= ' ') {
-					// Skip imbedded newlines (bug #287204)
-					buffer.append((char)ch);
-				}
-				if (buffer.length() == 0) {
+				ch = super.read();
+				if (ch < 0) {
 					return -1;
 				}
-				ch = buffer.charAt(0);
-				if (ch == '<') {
-					String val = buffer.toString();
+				if (ch < ' ') {
+					// Skip embedded newlines (bug #287204)
+					break;
+				}
+				
+				switch (ch) {
+				case '<':
+					buffer.append((char)ch);
+					state = State.SEEN_TAG_START;
+					break;
 					
+				case '>':
+					// Invalid tag end, replace it with escape sequence (bug #286671)
+					buffer.append("&gt;"); //$NON-NLS-1$
+					break;
+					
+				default:
+					return ch;
+				}
+				break;
+				
+			case SEEN_TAG_START:
+				// Process everything until we find the tag end
+				ch = super.read();
+				if (ch < 0) {
+					return -1;
+				}
+				if (ch < ' ') {
+					// Skip embedded newlines (bug #287204)
+					break;
+				}
+				
+				switch (ch) {
+				case '<':
+					// Not a known tag, so replace with escape sequence (bug #286671)
+					buffer.append("&lt;"); //$NON-NLS-1$
+					state = State.XML;
+					break;
+					
+				case '>':
+					buffer.append((char)ch);
+					String val = buffer.toString();
+
 					// If tag is a possible final tag, need to check
 					// following characters to determine if we're at 
 					// end of XML
@@ -254,50 +288,44 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 						break;
 					}
 					
-					// If tag is valid, just return the first saved char
+					// If tag is valid go back to processing XML
 					if (validTags.match(val) != null) {
-						state = State.SEEN_VALID;
-						break;
+						state = State.SEEN_TAG_END;
 					}
+					break;
 					
-					// If tag could still match one of the above, continue
-					// to save characters.
-					if (buffer.length() <= Math.max(validTags.longest(), finalTags.longest())) {
-						break;
-					}
-						
-					// Not a known tag, so replace with escape sequence (bug #286671)
-					buffer.replace(0, 1, "&lt;"); //$NON-NLS-1$
-					ch = buffer.charAt(0);
-				} else if (ch == '>') {
-					// Invalid tag end, replace it with escape sequence (bug #286671)
-					buffer.replace(0, 1, "&gt;"); //$NON-NLS-1$
-					ch = buffer.charAt(0);
-				}
-				buffer.deleteCharAt(0);
-				return ch;
-				
-			case SEEN_VALID:
-				// Process everything until we find the tag end
-				if (ch >= ' ') {
-					// Skip imbedded newlines (bug #287204)
+				default:
 					buffer.append((char)ch);
+					break;
 				}
-				if (buffer.length() == 0) {
-					return -1;
-				}
+				break;
+			
+			case SEEN_TAG_END:
 				ch = buffer.charAt(0);
 				buffer.deleteCharAt(0);
-				if (ch == '>') {
-					state = State.XML;
+				if (buffer.length() == 0) {
+					state = State.FINISHED_TAG;
 				}
 				return ch;
 				
+			case FINISHED_TAG:
+				state = State.XML;
+				break;
+				
 			case SEEN_FINAL:
-				// We've the final tag, insert root end tag if necessary
-				if (ch >= ' ') {
-					// Skip imbedded newlines (bug #287204)
-					buffer.append((char)ch);
+				if (buffer.length() > 0) {
+					ch = buffer.charAt(0);
+					buffer.deleteCharAt(0);
+					return ch;
+				}
+				
+				ch = super.read();
+				if (ch < 0) {
+					return -1;
+				}
+				if (ch < ' ') {
+					// Skip embedded newlines (bug #287204)
+					break;
 				}
 				if (buffer.length() > 0) {
 					ch = buffer.charAt(0);
@@ -321,7 +349,7 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 		if (buffer.length() == 0) {
 			return -1;
 		}
-		int ch = buffer.charAt(0);
+		ch = buffer.charAt(0);
 		buffer.deleteCharAt(0);
 		return ch;
 	}
@@ -352,6 +380,10 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 			avail = 1;
 		}
 		
+		/*
+		 * Read up to the end of a tag. This is needed so that we return after
+		 * the </map> tag in order to let the XML parsing proceed.
+		 */
 		for (int i = 0; i < avail; i++) {
 			int ch = read();
 			if (ch < 0) {
@@ -362,8 +394,11 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 				return -1;
 			}
 			b[pos++] = (byte) (ch & 0xff);
+			if (state == State.FINISHED_TAG) {
+				break;
+			}
 		}
-	
+		
 		return pos - off;
 	}
 }
