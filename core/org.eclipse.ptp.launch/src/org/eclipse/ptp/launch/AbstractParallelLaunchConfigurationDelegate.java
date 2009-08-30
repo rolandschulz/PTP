@@ -72,6 +72,7 @@ import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.INewQueueEvent;
@@ -81,6 +82,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
@@ -245,6 +247,57 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		}
 	}
 
+	private final class JobListener implements IJobListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobChangeEvent)
+		 */
+		public void handleEvent(IJobChangeEvent e) {
+			IPJob job = e.getSource();
+			AttributeManager attrMgr = e.getAttributes();
+			StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+			if (subIdAttr != null) {
+				EnumeratedAttribute<JobAttributes.State> stateAttr = attrMgr.getAttribute(JobAttributes.getStateAttributeDefinition());
+				if (stateAttr != null) {
+					JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
+					if (jobSub != null) {
+						switch (stateAttr.getValue()) {
+						case RUNNING:
+							/*
+							 * When the job starts running call back to notify that job submission is completed.
+							 */
+							jobSub.setStatus(JobSubStatus.COMPLETED);
+							doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
+							break;
+							
+						case TERMINATED:
+							/*
+							 * When the job terminates, do any post launch data synchronization.
+							 */
+							ILaunchConfiguration lconf = jobSub.getConfiguration();
+							// If needed, copy data back.
+							try {
+								// Get the list of paths to be copied back.
+								doPostLaunchSynchronization(lconf);
+							} catch (CoreException e1) {
+								PTPLaunchPlugin.log(e1);
+							}
+							/* Drop through */
+							
+						case ERROR:
+							/*
+							 * Job has terminated, so clean up.
+							 */
+							doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch());
+							jobSubmissions.remove(jobSub);
+							break;
+						}
+					}
+					PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
+				}
+			}
+		}
+	}
+
 	private final class MMChildListener implements IModelManagerChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
@@ -278,57 +331,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	        rm.removeElementListener(resourceManagerListener);
 		}
 	}
-
+	
 	private final class QueueChildListener implements IQueueChildListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
 		 */
 		public void handleEvent(IChangedJobEvent e) {
-			for (IPJob job : e.getJobs()) {
-				StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-				if (subIdAttr != null) {
-					EnumeratedAttribute<JobAttributes.State> stateAttr = job.getAttribute(JobAttributes.getStateAttributeDefinition());
-					if (stateAttr != null) {
-						JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
-						if (jobSub != null) {
-							switch (stateAttr.getValue()) {
-							case RUNNING:
-								/*
-								 * When the job starts running call back to notify that job submission is completed.
-								 */
-								jobSub.setStatus(JobSubStatus.COMPLETED);
-								doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
-								break;
-								
-							case TERMINATED:
-								/*
-								 * When the job terminates, do any post launch data synchronization.
-								 */
-								ILaunchConfiguration lconf = jobSub.getConfiguration();
-								// If needed, copy data back.
-								try {
-									// Get the list of paths to be copied back.
-									doPostLaunchSynchronization(lconf);
-								} catch (CoreException e1) {
-									PTPLaunchPlugin.log(e1);
-								}
-								/* Drop through */
-								
-							case ERROR:
-								/*
-								 * Job has terminated, so clean up.
-								 */
-								doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch());
-								jobSubmissions.remove(jobSub);
-								break;
-							}
-						}
-					}
-					PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
-				}
-			}
+			// Handled by IJobListener
 		}
-
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
@@ -345,6 +355,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 						PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
 					}
 				}
+				job.addElementListener(jobListener);
 			}
 		}
 
@@ -352,6 +363,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
+			for (IPJob job : e.getJobs()) {
+				job.removeElementListener(jobListener);
+			}
 		}
 	}
 
@@ -588,6 +602,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
 	private final IResourceManagerListener resourceManagerListener = new RMListener();
 	private final IQueueChildListener queueChildListener = new QueueChildListener();
+	private final IJobListener jobListener = new JobListener();
 	/*
 	 * HashMap used to keep track of job submissions
 	 */
