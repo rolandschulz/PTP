@@ -63,9 +63,13 @@ public class TargetEnvironmentManager {
 	
 	private Map<String, Set<String>> storedCypherEnvToKeyMap;
 	
+	
 	public TargetEnvironmentManager() {
 		
 		super();
+		
+		new TargetEnvironmentEventManager(this);
+		
 		Map<String, ITargetTypeExtension> targets = EnvironmentPlugin.getDefault().getControls();
 		ISecurePreferences cypherEnvTypeMap = SecurePreferencesFactory.getDefault();
 		
