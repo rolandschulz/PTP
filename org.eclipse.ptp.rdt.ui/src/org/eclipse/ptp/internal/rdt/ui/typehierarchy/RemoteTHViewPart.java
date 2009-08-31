@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,6 @@ import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
-import org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.cdt.internal.ui.typehierarchy.ITHModelPresenter;
 import org.eclipse.cdt.internal.ui.typehierarchy.Messages;
 import org.eclipse.cdt.internal.ui.typehierarchy.THNode;
@@ -45,7 +44,6 @@ import org.eclipse.cdt.internal.ui.viewsupport.SelectionProviderMediator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.actions.CdtActionConstants;
-import org.eclipse.cdt.ui.refactoring.actions.CRefactoringActionGroup;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -71,6 +69,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
+import org.eclipse.ptp.internal.rdt.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -192,7 +191,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	// action groups
 	private OpenViewActionGroup fOpenViewActionGroup;
 	private SelectionSearchGroup fSelectionSearchGroup;
-	private CRefactoringActionGroup fRefactoringActionGroup;
+//	private CRefactoringActionGroup fRefactoringActionGroup;
 	private IContextActivation fContextActivation;
     
     @Override
@@ -266,10 +265,10 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 			fSelectionSearchGroup.dispose();
 			fSelectionSearchGroup= null;
 		}
-		if (fRefactoringActionGroup != null) {
-			fRefactoringActionGroup.dispose();
-			fRefactoringActionGroup= null;
-		}
+//		if (fRefactoringActionGroup != null) {
+//			fRefactoringActionGroup.dispose();
+//			fRefactoringActionGroup= null;
+//		}
 		if (fWorkingSetFilterUI != null) {
 			fWorkingSetFilterUI.dispose();
 			fWorkingSetFilterUI= null;
@@ -420,7 +419,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 		if (SelectionSearchGroup.canActionBeAdded(selection)){
 			fSelectionSearchGroup.fillContextMenu(menu);
 		}
-		fRefactoringActionGroup.fillContextMenu(menu);
+//		fRefactoringActionGroup.fillContextMenu(menu);
 	}
 
 	private void createViewerPage() {
@@ -569,7 +568,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
     	fOpenViewActionGroup.setSuppressProperties(true);
     	fOpenViewActionGroup.setEnableIncludeBrowser(true);
     	fSelectionSearchGroup= new SelectionSearchGroup(getSite());
-    	fRefactoringActionGroup= new CRefactoringActionGroup(this);
+//    	fRefactoringActionGroup= new CRefactoringActionGroup(this);
     	
     	fWorkingSetFilterUI= new WorkingSetFilterUI(this, fMemento, KEY_WORKING_SET_FILTER) {
             @Override
@@ -784,7 +783,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
         // setup action bar
         // global action hooks
         IActionBars actionBars = getViewSite().getActionBars();
-        fRefactoringActionGroup.fillActionBars(actionBars);
+//        fRefactoringActionGroup.fillActionBars(actionBars);
         fOpenViewActionGroup.fillActionBars(actionBars);
         fSelectionSearchGroup.fillActionBars(actionBars);
         
