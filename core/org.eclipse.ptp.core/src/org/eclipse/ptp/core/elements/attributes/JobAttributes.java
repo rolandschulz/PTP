@@ -61,23 +61,23 @@ public class JobAttributes {
 
 	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
-				Messages.JobAttributes_0, true, null);
+				Messages.JobAttributes_0, false, null);
 
 	private final static StringAttributeDefinition debugExecNameAttrDef = 
 		new StringAttributeDefinition(DEBUG_EXEC_NAME_ATTR_ID, "Debugger Executable Name", //$NON-NLS-1$
-				Messages.JobAttributes_1, true, ""); //$NON-NLS-1$
+				Messages.JobAttributes_1, false, ""); //$NON-NLS-1$
 
 	private final static StringAttributeDefinition debugExecPathAttrDef = 
 		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable Path", //$NON-NLS-1$
-				Messages.JobAttributes_2, true, ""); //$NON-NLS-1$
+				Messages.JobAttributes_2, false, ""); //$NON-NLS-1$
 
 	private final static BooleanAttributeDefinition debugFlagAttrDef = 
 		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, 
-				Messages.JobAttributes_3, true, false);
+				Messages.JobAttributes_3, false, false);
 
 	private final static BooleanAttributeDefinition debugStopInMainAttrDef = 
 		new BooleanAttributeDefinition(DEBUG_STOP_IN_MAIN_ATTR_ID, "Stop In Main",  //$NON-NLS-1$
-				Messages.JobAttributes_4, true, true);
+				Messages.JobAttributes_4, false, true);
 
 	private final static StringAttributeDefinition debuggerIdAttrDef = 
 		new StringAttributeDefinition(DEBUGGER_ID_ATTR_ID, "Debugger ID", //$NON-NLS-1$
@@ -101,23 +101,23 @@ public class JobAttributes {
 
 	private final static BooleanAttributeDefinition launchedByPTPFlagAttrDef = 
 		new BooleanAttributeDefinition(LAUNCHED_BY_PTP_FLAG_ATTR_ID, "Launched By PTP",  //$NON-NLS-1$
-				Messages.JobAttributes_9, true, false);
+				Messages.JobAttributes_9, false, false);
 
 	private final static StringAttributeDefinition jobIdAttrDef = 
 		new StringAttributeDefinition(JOB_ID_ATTR_ID, "Job ID", //$NON-NLS-1$
-				Messages.JobAttributes_10, true, ""); //$NON-NLS-1$
+				Messages.JobAttributes_10, false, ""); //$NON-NLS-1$
 
 	private final static IntegerAttributeDefinition numProcsAttrDef = 
 		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Procs",  //$NON-NLS-1$
 				Messages.JobAttributes_11, true, 1);
 
 	private final static ArrayAttributeDefinition<String> progArgsAttrDef = 
-		new ArrayAttributeDefinition<String>(PROG_ARGS_ATTR_ID, "Program Arguments", //$NON-NLS-1$
+		new ArrayAttributeDefinition<String>(PROG_ARGS_ATTR_ID, "Arguments", //$NON-NLS-1$
 				Messages.JobAttributes_12, true, null);
 
 	private final static StringAttributeDefinition queueIdAttrDef = 
 		new StringAttributeDefinition(QUEUEID_ATTR_ID, QUEUEID_ATTR_ID, 
-				Messages.JobAttributes_13, true, ""); //$NON-NLS-1$
+				Messages.JobAttributes_13, false, ""); //$NON-NLS-1$
 	
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State", Messages.JobAttributes_14,  //$NON-NLS-1$
