@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,6 @@ import org.eclipse.cdt.internal.ui.callhierarchy.CHMultiDefNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHReferenceInfo;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
-import org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.cdt.internal.ui.util.CoreUtility;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.viewsupport.AdaptingSelectionProvider;
@@ -68,6 +67,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
+import org.eclipse.ptp.internal.rdt.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -146,7 +146,7 @@ public class RemoteCHViewPart extends ViewPart {
 	// action groups
 	private OpenViewActionGroup fOpenViewActionGroup;
 	private SelectionSearchGroup fSelectionSearchGroup;
-	private CRefactoringActionGroup fRefactoringActionGroup;
+//	private CRefactoringActionGroup fRefactoringActionGroup;
 	private IContextActivation fContextActivation;
 
     
@@ -248,10 +248,10 @@ public class RemoteCHViewPart extends ViewPart {
 			fSelectionSearchGroup.dispose();
 			fSelectionSearchGroup= null;
 		}
-		if (fRefactoringActionGroup != null) {
-			fRefactoringActionGroup.dispose();
-			fRefactoringActionGroup= null;
-		}
+//		if (fRefactoringActionGroup != null) {
+//			fRefactoringActionGroup.dispose();
+//			fRefactoringActionGroup= null;
+//		}
 		if (fWorkingSetFilterUI != null) {
 			fWorkingSetFilterUI.dispose();
 			fWorkingSetFilterUI= null;
@@ -358,7 +358,7 @@ public class RemoteCHViewPart extends ViewPart {
     	fOpenViewActionGroup.setSuppressProperties(true);
     	fOpenViewActionGroup.setEnableIncludeBrowser(true);
     	fSelectionSearchGroup= new SelectionSearchGroup(getSite());
-    	fRefactoringActionGroup= new CRefactoringActionGroup(this);
+//    	fRefactoringActionGroup= new CRefactoringActionGroup(this);
     	
     	fWorkingSetFilterUI= new WorkingSetFilterUI(this, fMemento, KEY_WORKING_SET_FILTER) {
             @Override
@@ -502,7 +502,7 @@ public class RemoteCHViewPart extends ViewPart {
         // setup action bar
         // global action hooks
         IActionBars actionBars = getViewSite().getActionBars();
-        fRefactoringActionGroup.fillActionBars(actionBars);
+//        fRefactoringActionGroup.fillActionBars(actionBars);
         fOpenViewActionGroup.fillActionBars(actionBars);
         fSelectionSearchGroup.fillActionBars(actionBars);
         
@@ -737,7 +737,7 @@ public class RemoteCHViewPart extends ViewPart {
 		if (SelectionSearchGroup.canActionBeAdded(selection)){
 			fSelectionSearchGroup.fillContextMenu(menu);
 		}
-		fRefactoringActionGroup.fillContextMenu(menu);
+//		fRefactoringActionGroup.fillContextMenu(menu);
     }
     	    
     private void showReference() {
