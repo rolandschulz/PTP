@@ -802,4 +802,14 @@ public abstract class ScopingNode extends ASTNode
         else
             return repToken;
     }
+
+    /** @return a human-readable description of this scope */
+    public String describe()
+    {
+        Token nameToken = getNameToken();
+        if (nameToken == null)
+            return "(anonymous)";
+        else
+            return nameToken.getText();
+    }
 }
