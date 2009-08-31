@@ -87,7 +87,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		 * There they are implicitly "discovered".
 		 */
 		IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
-		String machineID = rts.createMachine(rm.getName());
+		String machineID = rts.createMachine(connection.getName());
 		rts.setMachineID(machineID);
 		String queueID = rts.createQueue(Messages.OpenMPIDiscoverJob_defaultQueueName);
 		rts.setQueueID(queueID);
