@@ -106,9 +106,9 @@ public class OpenMPIProcessMap {
 			return attributeManager;
 		}
 
-		//		public void addProcessor(Process process) {
-		//			processes.add(process);
-		//		}
+		public void addProcess(Process process) {
+			processes.add(process);
+		}
 
 		public List<Process> getProcesses() {
 			return Collections.unmodifiableList(processes);
@@ -195,6 +195,6 @@ public class OpenMPIProcessMap {
 
 	public void addProcess(Process process) {
 		processes.add(process);
-		process.node.processes.add(process);
+		process.getNode().addProcess(process);
 	}
 }
