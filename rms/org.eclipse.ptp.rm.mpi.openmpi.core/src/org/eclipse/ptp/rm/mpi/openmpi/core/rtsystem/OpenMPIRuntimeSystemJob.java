@@ -215,8 +215,10 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								/*
 								 * Copy job attributes from map.
 								 */
-								DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", getJobID()); //$NON-NLS-1$
-								getRtSystem().changeJob(getJobID(), manager);
+								if (manager.getAttributes().length > 0) {
+									DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", getJobID()); //$NON-NLS-1$
+									getRtSystem().changeJob(getJobID(), manager);
+								}
 								setMapCompleted();
 							}
 
@@ -253,8 +255,10 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								/*
 								 * Copy job attributes from map.
 								 */
-								DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", getJobID()); //$NON-NLS-1$
-								getRtSystem().changeJob(getJobID(), manager);
+								if (manager.getAttributes().length > 0) {
+									DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: updating model with display-map information", getJobID()); //$NON-NLS-1$
+									getRtSystem().changeJob(getJobID(), manager);
+								}
 								setMapCompleted();
 							}
 							
