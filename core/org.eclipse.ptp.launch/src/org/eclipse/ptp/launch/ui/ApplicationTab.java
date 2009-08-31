@@ -109,6 +109,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	protected Button localAppButton = null;
 	protected Button consoleButton = null;
 	protected WidgetListener listener = new WidgetListener();
+	
+	protected final boolean combinedOutputDefault = true;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
@@ -167,7 +169,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		createVerticalSpacer(mainComp, 2);
 
 		consoleButton = createCheckButton(mainComp, Messages.ApplicationTab_Console);
-		consoleButton.setSelection(false);
+		consoleButton.setSelection(combinedOutputDefault);
 		consoleButton.addSelectionListener(listener);
 	}
 
