@@ -30,7 +30,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 
 /**
  * Refactoring to rename identifiers in Fortran programs.
- * 
+ *
  * @author Jeff Overbey
  */
 public class RenameRefactoring extends SingleFileFortranRefactoring
@@ -44,7 +44,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     {
         super(file, selection);
     }
-    
+
     @Override
     public String getName()
     {
@@ -58,17 +58,17 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     public String getOldNameOfIdentifier()
     {
     	assert oldName != null;
-    	
+
     	return oldName;
     }
 
     public void setNewNameForIdentifier(String newName)
     {
         assert newName != null;
-        
+
         this.newName = newName;
     }
-    
+
     public void setShouldBindInterfacesAndExternals(boolean value)
     {
         this.shouldBindInterfacesAndExternals = value;
@@ -77,22 +77,22 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        
+
         oldName = findEnclosingToken().getText();
         definitionToRename = findDeclarationToRename();
-        
+
         checkIfDefinitionCanBeRenamed();
     }
 
 	private Token findEnclosingToken() throws PreconditionFailure
 	{
 		Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
-        if (selectedToken == null || !isIdentifier(selectedToken)) 
+        if (selectedToken == null || !isIdentifier(selectedToken))
             fail("Please select an identifier to rename.");
 		return selectedToken;
 	}
@@ -100,12 +100,12 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
 	private Definition findDeclarationToRename() throws PreconditionFailure
 	{
 		List<Definition> declarations = findEnclosingToken().resolveBinding();
-		
+
         if (declarations.size() == 0)
         	fail("No declaration was found for " + oldName);
         else if (declarations.size() > 1)
         	fail("Multiple declarations were found for " + oldName);
-        
+
         return declarations.get(0);
 	}
 
@@ -113,11 +113,11 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
 	{
 		if (definitionToRename.isSubprogramArgument())
         	fail("Subprogram arguments cannot be renamed.");
-		
+
 		// F03
 		if (definitionToRename.isTypeBoundProcedure() && !definitionToRename.isRenamedTypeBoundProcedure())
 		    fail("Type-bound procedures cannot be renamed.");
-        
+
         if (!definitionToRename.isLocalVariable()
                && !definitionToRename.isSubprogram()
                && !definitionToRename.isExternal()
@@ -135,10 +135,10 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
             		+ "common blocks, and block data subprograms can be renamed.  Derived type components and subprogram "
             		+ "arguments cannot be renamed.");
         }
-        
+
         if (definitionToRename.isIntrinsic())
                fail(oldName + " cannot be renamed: It is an intrinsic procedure.");
-        
+
         if (isPreprocessed(definitionToRename.getTokenRef().findToken()))
                fail(oldName + " cannot be renamed: It is declared in an INCLUDE file.");
 	}
@@ -146,29 +146,31 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
     // Final Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckFinalConditions(final RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         assert definitionToRename != null;
         assert allReferences != null;
         assert newName != null;
-        
+
         if (newName.equals(oldName)) fail("The new name (" + newName + ") is exactly the same as the old name!");
         // OK if capitalization is different
-        
+
         if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
 
         allReferences = definitionToRename.findAllReferences(shouldBindInterfacesAndExternals);
         removeFixedFormReferences(status);
-        checkIfReferencesCanBeRenamed();
-        
-        checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
+        checkIfReferencesCanBeRenamed(pm);
+
+        checkForConflictingBindings(
+            pm,
+            new ConflictingBindingErrorHandler(status),
             definitionToRename,
             allReferences,
             newName);
     }
-    
+
     private final class ConflictingBindingErrorHandler implements IConflictingBindingCallback
     {
         private final RefactoringStatus status;
@@ -208,11 +210,11 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         HashSet<IFile> fixedFormFiles = new HashSet<IFile>();
         HashSet<IFile> freeFormFiles = new HashSet<IFile>();
         HashSet<PhotranTokenRef> referencesToRemove = new HashSet<PhotranTokenRef>();
-        
+
         for (PhotranTokenRef reference : allReferences)
         {
             IFile file = reference.getFile();
-            
+
             if (fixedFormFiles.contains(file))
             {
                 referencesToRemove.add(reference);
@@ -232,34 +234,36 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
                 freeFormFiles.add(file);
             }
         }
-        
+
         allReferences.removeAll(referencesToRemove);
     }
 
-    private void checkIfReferencesCanBeRenamed() throws PreconditionFailure
+    private void checkIfReferencesCanBeRenamed(IProgressMonitor pm) throws PreconditionFailure
     {
         for (PhotranTokenRef ref : allReferences)
         {
+            pm.subTask("Checking if references in " + ref.getFilename() + " can be renamed");
+
             Token reference = ref.findToken();
-            
+
             if (reference.resolveBinding().size() > 1)
                 fail(oldName + " cannot be renamed: " + describeToken(reference) + " is an ambiguous reference "
                      + " (it refers to " + oldName + " but may refer to another entity as well).");
-            
+
             if (isPreprocessed(reference))
                 fail(oldName + " cannot be renamed: It would require modifying an INCLUDE file "
                      + " (" + describeToken(reference) + ").");
         }
     }
 
-    
 
-    
+
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Change
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
@@ -267,27 +271,31 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
         assert allReferences != null;
         assert newName != null;
 
+        Set<IFile> filesToChange = determineFilesToChange();
+        pm.beginTask("Renaming", filesToChange.size());
+
         try
         {
-	        for (IFile file : determineFilesToChange())
+            for (IFile file : filesToChange)
 	            makeChangesTo(file, pm);
         }
         finally
         {
         	vpg.releaseAllASTs();
+            pm.done();
         }
     }
 
     private Set<IFile> determineFilesToChange()
     {
         Set<IFile> files = new HashSet<IFile>(allReferences.size() + 2);
-        
+
         files.add(fileInEditor); // File in the editor (containing the reference)
         files.add(definitionToRename.getTokenRef().getFile());
-        
+
         for (PhotranTokenRef ref : allReferences)
             files.add(ref.getFile());
-        
+
         return files;
     }
 
@@ -295,17 +303,20 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     {
         try
         {
+            pm.subTask("Modifying " + file.getName());
+            pm.worked(1);
+
             vpg.acquirePermanentAST(file);
-            
+
             if (definitionToRename.getTokenRef().getFile().equals(file))
                 definitionToRename.getTokenRef().findToken().setText(newName);
-            
+
             for (PhotranTokenRef ref : allReferences)
                 if (ref.getFile().equals(file))
                     ref.findToken().setText(newName);
-            
+
             addChangeFromModifiedAST(file, pm);
-            
+
             vpg.releaseAST(file);
         }
         catch (Exception e)

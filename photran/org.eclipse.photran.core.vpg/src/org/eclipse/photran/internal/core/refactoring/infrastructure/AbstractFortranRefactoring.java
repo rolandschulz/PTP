@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Region;
@@ -121,16 +122,16 @@ public abstract class AbstractFortranRefactoring extends Refactoring
        	if(status.hasFatalError())
        	    return status;
 
-        pm.beginTask("Checking initial preconditions", IProgressMonitor.UNKNOWN);
+        //pm.beginTask("Checking initial preconditions", IProgressMonitor.UNKNOWN);
         try
         {
-        	doCheckInitialConditions(status, pm);
+        	doCheckInitialConditions(status, new ForwardingProgressMonitor(pm));
         }
         catch (PreconditionFailure f)
         {
         	status.addFatalError(f.getMessage());
         }
-        pm.done();
+        //pm.done();
 
         return status;
     }
@@ -156,30 +157,63 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         allChanges = new CompositeChange(getName());
 
 		RefactoringStatus status = new RefactoringStatus();
-		pm.beginTask("Checking final preconditions; please wait...", IProgressMonitor.UNKNOWN);
+		//pm.beginTask("Checking final preconditions; please wait...", IProgressMonitor.UNKNOWN);
         try
         {
-        	doCheckFinalConditions(status, pm);
+        	doCheckFinalConditions(status, new ForwardingProgressMonitor(pm));
         }
         catch (PreconditionFailure f)
         {
         	status.addFatalError(f.getMessage());
         }
-        pm.done();
+        //pm.done();
         return status;
     }
 
 	protected abstract void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure;
+
+	/**
+	 * To get text to display in the GUI, the precondition checking methods
+	 * must call {@link IProgressMonitor#setTaskName(String)} rather than
+	 * {@link IProgressMonitor#subTask(String)}.  However, the change creation
+	 * method <i>can</i> call {@link IProgressMonitor#subTask(String)}.  This
+	 * &quot;forwards&quot; calls to {@link #subTask(String)} to
+	 * {@link #setTaskName(String)}.
+	 *
+	 * @author Jeff Overbey
+	 */
+	protected static class ForwardingProgressMonitor implements IProgressMonitor
+	{
+	    private IProgressMonitor pm;
+
+        public ForwardingProgressMonitor(IProgressMonitor pm)
+        {
+            this.pm = pm;
+        }
+
+        public void beginTask(String name, int totalWork) { pm.beginTask(name, totalWork); }
+        public void done() { pm.done(); }
+        public void internalWorked(double work) { pm.internalWorked(work); }
+        public boolean isCanceled() { return pm.isCanceled(); }
+        public void setCanceled(boolean value) { pm.setCanceled(value); }
+        public void setTaskName(String name) { pm.setTaskName(name); }
+        public void worked(int work) { pm.worked(work); }
+
+        public void subTask(String name)
+        {
+            pm.setTaskName(name);
+        }
+    }
 
     @Override
     public final Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
     	assert pm != null;
 
-        pm.beginTask("Constructing workspace transformation; please wait...", IProgressMonitor.UNKNOWN);
+        //pm.beginTask("Constructing workspace transformation; please wait...", IProgressMonitor.UNKNOWN);
         // allChanges constructed above in #checkFinalConditions
         doCreateChange(pm);
-        pm.done();
+        //pm.done();
         return allChanges;
     }
 
@@ -764,7 +798,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         Collection<PhotranTokenRef> allReferences,
         String... newNames)
     {
-        checkForConflictingBindings(callback, definitionToCheck, allReferences, Arrays.asList(newNames));
+        checkForConflictingBindings(new NullProgressMonitor(), callback, definitionToCheck, allReferences, newNames);
     }
 
     /**
@@ -777,24 +811,47 @@ public abstract class AbstractFortranRefactoring extends Refactoring
      * This is the fundamental precondition check for {@link RenameRefactoring}.
      */
     protected void checkForConflictingBindings(
+        IProgressMonitor pm,
+        IConflictingBindingCallback callback,
+        Definition definitionToCheck,
+        Collection<PhotranTokenRef> allReferences,
+        String... newNames)
+    {
+        checkForConflictingBindings(pm, callback, definitionToCheck, allReferences, Arrays.asList(newNames));
+    }
+
+    /**
+     * Given a {@link Definition} and a list of references to that Definition
+     * (see {@link Definition#findAllReferences(boolean)}), checks if any of
+     * the <code>newNames</code> will conflict in the scope of any of the given
+     * references; if so, the given callback is invoked to record an error or
+     * warning.
+     * <p>
+     * This is the fundamental precondition check for {@link RenameRefactoring}.
+     */
+    protected void checkForConflictingBindings(
+        IProgressMonitor pm,
         IConflictingBindingCallback callback,
         Definition definitionToCheck,
         Collection<PhotranTokenRef> allReferences,
         Collection<String> newNames)
     {
-        new CheckForConflictBindings().check(callback, definitionToCheck, allReferences, newNames);
+        new CheckForConflictBindings().check(pm, callback, definitionToCheck, allReferences, newNames);
     }
 
     private final class CheckForConflictBindings
     {
+        private IProgressMonitor pm = null;
         private Definition definitionToCheck = null;
         private Collection<String> newNames = null;
 
-        public void check(IConflictingBindingCallback callback,
+        public void check(IProgressMonitor pm,
+                          IConflictingBindingCallback callback,
                           Definition definitionToCheck,
                           Collection<PhotranTokenRef> allReferences,
                           Collection<String> newNames)
         {
+            this.pm = pm;
             this.definitionToCheck = definitionToCheck;
             this.newNames = newNames;
 
@@ -832,7 +889,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                     conflicts.add(new Conflict(newName, scopeContainingInternalSubprogram().getNameToken().getTokenRef()));
 
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
+            {
+                pm.subTask("Checking for conflicting definitions in " + importingScope.describe());
                 findAllPotentiallyConflictingDefinitionsInScope(conflicts, importingScope, true);
+            }
 
             return conflicts;
         }
@@ -907,7 +967,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                 List<PhotranTokenRef> shadowedDefinitions = scopeOfDefinitionToCheck().manuallyResolve(token);
                 // TODO: Does not consider rename or only lists (need to tell if this SPECIFIC definition will be imported)
                 for (ScopingNode importingScope : scopeOfDefinitionToCheck().findImportingScopes())
+                {
+                    pm.subTask("Checking for references to " + newName + " in " + importingScope.describe());
                     shadowedDefinitions.addAll(importingScope.manuallyResolve(token));
+                }
 
                 for (PhotranTokenRef def : shadowedDefinitions)
                     referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences(false));
@@ -918,6 +981,8 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 
         private void checkIfReferenceBindingWillChange(IConflictingBindingCallback callback, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
         {
+            pm.subTask("Checking for binding conflicts in " + ref.getFilename());
+
             Token reference = ref.findToken();
 
             ScopingNode scopeOfDefinitionToRename = reference.findScopeDeclaringOrImporting(definitionToCheck);
@@ -942,6 +1007,8 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
             {
+                pm.subTask("Checking for subprogram binding conflicts in " + importingScope.describe());
+
                 importingScope.accept(new GenericASTVisitor()
                 {
                     @Override public void visitASTVarOrFnRefNode(ASTVarOrFnRefNode node)
