@@ -80,27 +80,27 @@ import bz.over.vpg.VPGLog;
  * <p>
  * In addition to implementing the LTK refactoring interface, this class provides a number of methods to subclasses,
  * including methods to display error messages, find enclosing nodes in an AST, check identifier tokens, etc.
- * 
+ *
  * @author Jeff Overbey, Timofey Yuvashev
  */
 public abstract class AbstractFortranRefactoring extends Refactoring
 {
     // Preconditions toward bottom of file
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // Constants
     ///////////////////////////////////////////////////////////////////////////
-    
+
 	/** The OS-dependent end-of-line sequence (\n or \r\n) */
 	protected static final String EOL = System.getProperty("line.separator");
-	
+
     ///////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////
-    
+
     protected PhotranVPG vpg;
     protected CompositeChange allChanges = null;
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // LTK Refactoring Implementation
     ///////////////////////////////////////////////////////////////////////////
@@ -109,18 +109,18 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     public final RefactoringStatus checkInitialConditions(IProgressMonitor pm)
     {
         RefactoringStatus status = new RefactoringStatus();
-        
+
         status.addWarning("C preprocessor directives are IGNORED by the refactoring engine.  Use at your own risk.");
-        
+
         pm.beginTask("Ensuring virtual program graph is up-to-date", IProgressMonitor.UNKNOWN);
         vpg.ensureVPGIsUpToDate(pm);
        	pm.done();
-        
+
        	status = getAbstractSyntaxTree(status);
-       	
+
        	if(status.hasFatalError())
        	    return status;
-        
+
         pm.beginTask("Checking initial preconditions", IProgressMonitor.UNKNOWN);
         try
         {
@@ -131,12 +131,12 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         	status.addFatalError(f.getMessage());
         }
         pm.done();
-        
+
         return status;
     }
 
     protected abstract RefactoringStatus getAbstractSyntaxTree(RefactoringStatus status);
-  
+
     protected abstract void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure;
 
     protected void logVPGErrors(RefactoringStatus status)
@@ -154,7 +154,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     public final RefactoringStatus checkFinalConditions(IProgressMonitor pm)
     {
         allChanges = new CompositeChange(getName());
-        
+
 		RefactoringStatus status = new RefactoringStatus();
 		pm.beginTask("Checking final preconditions; please wait...", IProgressMonitor.UNKNOWN);
         try
@@ -175,7 +175,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     public final Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
     	assert pm != null;
-    	
+
         pm.beginTask("Constructing workspace transformation; please wait...", IProgressMonitor.UNKNOWN);
         // allChanges constructed above in #checkFinalConditions
         doCreateChange(pm);
@@ -202,20 +202,20 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     		super(message);
     	}
     }
-    
+
     /**
      * Throws a <code>PreconditionFailure</code>, indicating an error severe enough
      * that the refactoring cannot be completed.
-     * 
+     *
      * @param message an error message to display to the user
      */
     protected void fail(String message) throws PreconditionFailure
     {
     	throw new PreconditionFailure(message);
     }
-    
+
     // CODE EXTRACTION ////////////////////////////////////////////////////////
-    
+
     /**
      * Parses the given Fortran statement.
      * <p>
@@ -234,11 +234,11 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         return parseLiteralStatementSequence(string).get(0);
     }
-    
+
     /**
      * Parses the given Fortran statement, or returns <code>null</code> if the
      * statement cannot be parsed.
-     * 
+     *
      * @see #parseLiteralStatement(String)
      */
     protected IBodyConstruct parseLiteralStatementNoFail(String string)
@@ -271,7 +271,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         return ((ASTAssignmentStmtNode)parseLiteralStatement("x = " + string)).getRhs();
     }
-    
+
     /**
      * Parses the given list of Fortran statements.
      * <p>
@@ -304,7 +304,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                 new ByteArrayInputStream(string.getBytes()), null, "(none)",
                 SourceForm.UNPREPROCESSED_FREE_FORM, true);
             if (parser == null) parser = new Parser();
-            
+
             FortranAST ast = new FortranAST(null, parser.parse(lexer), lexer.getTokenList());
             return ast.getRoot().getProgramUnitList().get(0);
         }
@@ -316,12 +316,12 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     private Parser parser = null;
 
     // USER INTERACTION ///////////////////////////////////////////////////////
-    
+
     protected String describeToken(Token token)
     {
         return "\"" + token.getText() + "\" " + this.describeTokenPos(token);
     }
-    
+
     protected String describeTokenPos(Token token)
     {
         return "(line " + token.getLine() + ", column " + token.getCol() + ")";
@@ -332,10 +332,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 	protected RefactoringStatusContext createContext(TokenRef<Token> tokenRef)
 	{
 		if (tokenRef == null) return null;
-		
+
 		IFile file = PhotranVPG.getIFileForFilename(tokenRef.getFilename());
 		if (file == null) return null;
-		
+
 		return new FileStatusContext(file,
 		                             new Region(tokenRef.getOffset(), tokenRef.getLength()));
 	}
@@ -376,20 +376,20 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             size++;
         return size;
     }
-    
+
     // TEXT<->TREE MAPPING ////////////////////////////////////////////////////
-    
+
     protected Definition findUnambiguousTokenDefinition(Token t)
     {
         if(t == null)
             return null;
-        
+
         List<Definition> defs = t.resolveBinding();
         if(defs.size() <= 0 || defs.size() > 1)
             return null;
         return defs.get(0);
     }
-    
+
     protected Token findEnclosingToken(IFortranAST ast, final ITextSelection selection)
     {
         Token prevToken = null;
@@ -412,7 +412,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         }
         return null;
     }
-    
+
     protected IASTNode findEnclosingNode(IFortranAST ast, ITextSelection selection)
     {
         Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
@@ -422,23 +422,23 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         for (IASTNode parent = lastToken.getParent(); parent != null; parent = parent.getParent())
             if (contains(parent, firstToken))
                 return parent;
-        
+
         return null;
     }
-    
+
     protected boolean nodeExactlyEnclosesRegion(IASTNode parent, Token firstToken, Token lastToken)
     {
         return parent.findFirstToken() == firstToken && parent.findLastToken() == lastToken;
     }
-    
+
     protected boolean nodeExactlyEnclosesRegion(IASTNode node, IFortranAST ast, ITextSelection selection)
     {
         Token firstInNode = node.findFirstToken();
         Token lastInNode = node.findLastToken();
-        
+
         Token firstInSel = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastInSel = this.findLastTokenBefore(ast, OffsetLength.getPositionPastEnd(selection.getOffset(), selection.getLength()));
-        
+
         return firstInNode != null
             && lastInNode != null
             && firstInSel != null
@@ -451,7 +451,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 //    {
 //        IASTNode smallestEnclosure = findEnclosingNode(ast, selection);
 //        if (smallestEnclosure == null) return null;
-//        
+//
 //        for (IASTNode n = smallestEnclosure; n != null; n = n.getParent())
 //        {
 //            if (n.getNonterminal() == nodeType)
@@ -466,10 +466,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
 //                    continue;
 //            }
 //        }
-//        
+//
 //        return null;
 //    }
-    
+
     private boolean contains(IASTNode target, Token token)
     {
         for (IASTNode node = token.getParent(); node != null; node = node.getParent())
@@ -485,7 +485,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                 return token;
         return null;
     }
-    
+
     private Token findLastTokenBefore(IFortranAST ast, final int targetFileOffset)
     {
         Token previousToken = null;
@@ -513,15 +513,16 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             this.listContainingStmts = body;
             this.startIndex = startIndex;
             this.endIndex = endIndex;
-            
+
 //            this.precedingStmts = new ArrayList<IASTNode>();
 //            for (int i = 1; i < startIndex; i++)
 //                this.precedingStmts.add(body.get(i));
-            
+
             this.selectedStmts = new ArrayList<IASTNode>();
             for (int i = startIndex; i <= endIndex; i++)
-                this.selectedStmts.add(body.get(i));
-            
+                if (body.get(i) != null)
+                    this.selectedStmts.add(body.get(i));
+
 //            this.followingStmts = new ArrayList<IASTNode>();
 //            for (int i = endIndex + 1; i < body.size(); i++)
 //                this.followingStmts.add(body.get(i));
@@ -547,27 +548,27 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             return lastStmt().findLastToken();
         }
     }
-    
+
     protected ASTProperLoopConstructNode getLoopNode(IFortranAST ast, ITextSelection selection)
     {
         /*Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
-        if (firstToken == null || lastToken == null) 
+        if (firstToken == null || lastToken == null)
             return null;
 
         return getLoopNode(firstToken, lastToken);*/
         return (ASTProperLoopConstructNode)getNode(ast, selection, ASTProperLoopConstructNode.class);
     }
-    
+
     protected ASTNode getNode(IFortranAST ast, ITextSelection selection, Class<? extends Parser.ASTNode> node)
     {
         Token firstToken = this.findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = this.findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
-        if (firstToken == null || lastToken == null) 
+        if (firstToken == null || lastToken == null)
             return null;
         return getNode(firstToken, lastToken, node);
     }
-    
+
     protected ASTNode getNode(Token firstToken, Token lastToken, Class<? extends Parser.ASTNode> node)
     {
         assert(firstToken != null);
@@ -579,20 +580,20 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         return firstTokenNode;
         //return null;
     }
-    
+
     protected ASTProperLoopConstructNode getLoopNode(Token firstToken, Token lastToken)
     {
         /*assert(firstToken != null);
         assert(lastToken  != null);
         ASTProperLoopConstructNode loopContainingFirstToken = firstToken.findNearestAncestor(ASTProperLoopConstructNode.class);
         ASTProperLoopConstructNode loopContainingLastToken = lastToken.findNearestAncestor(ASTProperLoopConstructNode.class);
-        if (loopContainingFirstToken == null || loopContainingLastToken == null || loopContainingFirstToken != loopContainingLastToken) 
+        if (loopContainingFirstToken == null || loopContainingLastToken == null || loopContainingFirstToken != loopContainingLastToken)
             return null;
-        
+
         return loopContainingFirstToken;*/
         return (ASTProperLoopConstructNode)getNode(firstToken, lastToken, ASTProperLoopConstructNode.class);
     }
-    
+
     @SuppressWarnings("unchecked")
     protected StatementSequence findEnclosingStatementSequence(IFortranAST ast, ITextSelection selection)
     {
@@ -617,7 +618,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         }
         if (startIndex < 0 || endIndex < 0 || endIndex < startIndex)
             throw new Error("INTERNAL ERROR: Unable to locate selected statements in IASTListNode");
-        
+
         return new StatementSequence(
             listContainingStmts.findNearestAncestor(ScopingNode.class),
             listContainingStmts,
@@ -658,10 +659,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         //If there are no other nodes besides use statements and implicit none, then increment the index
         if (node instanceof ASTUseStmtNode || node instanceof ASTImplicitStmtNode)
         {
-            return body.indexOf(node) + 1; 
+            return body.indexOf(node) + 1;
         }else
         {
-            return body.indexOf(node);            
+            return body.indexOf(node);
         }
     }
 
@@ -677,14 +678,14 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                 break;
             }
         }
-        //If there are no other nodes besides those that implement ISpecificationPartConstruct, 
+        //If there are no other nodes besides those that implement ISpecificationPartConstruct,
         //then increment the index
         if (node instanceof ISpecificationPartConstruct)
         {
-            return body.indexOf(node) + 1; 
+            return body.indexOf(node) + 1;
         }else
         {
-            return body.indexOf(node);            
+            return body.indexOf(node);
         }
     }
 
@@ -696,9 +697,9 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     //
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
-    
+
     protected abstract void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure;
-    
+
     protected boolean isIdentifier(Token token)
     {
         return token != null && token.getTerminal() == Terminal.T_IDENT;
@@ -713,12 +714,12 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         return Pattern.matches("[A-Za-z][A-Za-z0-9_]*", name);
     }
-    
+
     protected boolean isBoundIdentifier(Token t)
     {
         return isIdentifier(t) && !t.resolveBinding().isEmpty();
     }
-    
+
     protected boolean isUniquelyDefinedIdentifer(Token t)
     {
         return isBoundIdentifier(t) && t.resolveBinding().size() == 1;
@@ -732,14 +733,14 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         public final String name;
         public final PhotranTokenRef tokenRef;
-        
+
         public Conflict(String name, PhotranTokenRef tokenRef)
         {
             this.name = name;
             this.tokenRef = tokenRef;
         }
     }
-    
+
 
     public static interface IConflictingBindingCallback
     {
@@ -747,7 +748,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
         void addConflictWarning(List<Conflict> conflictingDef);
         void addReferenceWillChangeError(String newName, Token reference);
     }
-    
+
     /**
      * Given a {@link Definition} and a list of references to that Definition
      * (see {@link Definition#findAllReferences(boolean)}), checks if any of
@@ -765,7 +766,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         checkForConflictingBindings(callback, definitionToCheck, allReferences, Arrays.asList(newNames));
     }
-    
+
     /**
      * Given a {@link Definition} and a list of references to that Definition
      * (see {@link Definition#findAllReferences(boolean)}), checks if any of
@@ -783,45 +784,45 @@ public abstract class AbstractFortranRefactoring extends Refactoring
     {
         new CheckForConflictBindings().check(callback, definitionToCheck, allReferences, newNames);
     }
-    
+
     private final class CheckForConflictBindings
     {
         private Definition definitionToCheck = null;
         private Collection<String> newNames = null;
-        
+
         public void check(IConflictingBindingCallback callback,
-                          Definition definitionToCheck, 
-                          Collection<PhotranTokenRef> allReferences, 
+                          Definition definitionToCheck,
+                          Collection<PhotranTokenRef> allReferences,
                           Collection<String> newNames)
         {
             this.definitionToCheck = definitionToCheck;
             this.newNames = newNames;
-            
+
             checkForConflictingDefinitionOrShadowing(callback);
-            
+
             for (PhotranTokenRef ref : findReferencesToShadowedDefinitions())
                 checkIfReferenceBindingWillChange(callback, ref, false);
-            
+
             for (PhotranTokenRef ref : allReferences)
                 checkIfReferenceBindingWillChange(callback, ref, true);
         }
-        
+
         /** Check whether the new definition will either conflict with or shadow an existing definition */
         private void checkForConflictingDefinitionOrShadowing(IConflictingBindingCallback callback)
         {
             List<Conflict> conflictingDef = findAllPotentiallyConflictingDefinitions();
             if (!conflictingDef.isEmpty())
                 callback.addConflictError(conflictingDef);
-            
+
             conflictingDef = findAllPotentiallyConflictingUnboundSubprogramCalls();
             if (!conflictingDef.isEmpty())
                 callback.addConflictWarning(conflictingDef);
         }
-    
+
         private List<Conflict> findAllPotentiallyConflictingDefinitions()
         {
             List<Conflict> conflicts = new ArrayList<Conflict>();
-    
+
             // Cannot call a main program (or function, etc.) X if it has an internal subprogram named X,
             // even if that subprogram is never used (in which case it wouldn't be caught below)
             if (definitionToCheck.isMainProgram() || definitionToCheck.isSubprogram() || definitionToCheck.isModule())
@@ -829,18 +830,18 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             for (String newName : newNames)
                 if (definitionToCheck.isInternalSubprogramDefinition() && scopeContainingInternalSubprogram().isNamed(newName))
                     conflicts.add(new Conflict(newName, scopeContainingInternalSubprogram().getNameToken().getTokenRef()));
-    
+
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
                 findAllPotentiallyConflictingDefinitionsInScope(conflicts, importingScope, true);
-            
+
             return conflicts;
         }
-    
+
         private ScopingNode scopeContainingInternalSubprogram()
         {
             return definitionToCheck.getTokenRef().findToken().getEnclosingScope();
         }
-    
+
         /**
          * Cannot call a function X if it is defined in or imported into a scope with a function X already defined
          * <p>
@@ -852,9 +853,9 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             for (String newName : newNames)
             {
                 Token newNameToken = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
-                
+
                 List<PhotranTokenRef> definitionsLocalToScope = collectLocalDefinitions(importingScope);
-        
+
                 if (isProgramOrSubprogramOrModuleScope(importingScope) && shouldCheckIfDefinitionImportedIntoScope)
                 {
                     // Cannot call a variable X inside a function named X
@@ -874,7 +875,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                         }
                     }
                 }
-        
+
                 // Cannot call a function X if it is defined in or imported into a scope with a function X already defined
                 for (PhotranTokenRef conflict : importingScope.manuallyResolveInLocalScope(newNameToken))
                 {
@@ -893,7 +894,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                 }
             }
         }
-        
+
         /** Check whether the new definition will either conflict with or shadow an existing definition */
         private List<PhotranTokenRef> findReferencesToShadowedDefinitions()
         {
@@ -902,43 +903,43 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             for (String newName : newNames)
             {
                 Token token = new FakeToken(definitionToCheck.getTokenRef().findToken(), newName);
-                
+
                 List<PhotranTokenRef> shadowedDefinitions = scopeOfDefinitionToCheck().manuallyResolve(token);
                 // TODO: Does not consider rename or only lists (need to tell if this SPECIFIC definition will be imported)
                 for (ScopingNode importingScope : scopeOfDefinitionToCheck().findImportingScopes())
                     shadowedDefinitions.addAll(importingScope.manuallyResolve(token));
-        
+
                 for (PhotranTokenRef def : shadowedDefinitions)
                     referencesToShadowedDefinitions.addAll(vpg.getDefinitionFor(def).findAllReferences(false));
             }
-            
+
             return referencesToShadowedDefinitions;
         }
-    
+
         private void checkIfReferenceBindingWillChange(IConflictingBindingCallback callback, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
         {
             Token reference = ref.findToken();
-            
+
             ScopingNode scopeOfDefinitionToRename = reference.findScopeDeclaringOrImporting(definitionToCheck);
             if (scopeOfDefinitionToRename == null) return;
-            
+
             for (String newName : newNames)
             {
                 for (PhotranTokenRef existingBinding : new FakeToken(reference, newName).manuallyResolveBinding())
                 {
                     ScopingNode scopeOfExistingBinding = existingBinding.findToken().getEnclosingScope();
-                    
+
                     boolean willReferenceRenamedDefinition = scopeOfExistingBinding.isParentScopeOf(scopeOfDefinitionToRename);
                     if (shouldReferenceRenamedDefinition != willReferenceRenamedDefinition)
                         callback.addReferenceWillChangeError(newName, reference);
                 }
             }
         }
-        
+
         private List<Conflict> findAllPotentiallyConflictingUnboundSubprogramCalls()
         {
             final List<Conflict> conflictingDef = new ArrayList<Conflict>();
-            
+
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck()))
             {
                 importingScope.accept(new GenericASTVisitor()
@@ -948,13 +949,13 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                         if (node.getName() != null)
                             checkForConflict(node.getName().getName());
                     }
-                    
+
                     @Override public void visitASTCallStmtNode(ASTCallStmtNode node)
                     {
                         if (node.getSubroutineName() != null)
                             checkForConflict(node.getSubroutineName());
                     }
-    
+
                     private void checkForConflict(Token name)
                     {
                         for (String newName : newNames)
@@ -963,19 +964,19 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                     }
                 });
             }
-            
+
             return conflictingDef;
         }
-        
+
         private ScopingNode scopeOfDefinitionToCheck()
         {
             return definitionToCheck.getTokenRef().findToken().getEnclosingScope();
         }
-        
+
         private Iterable<ScopingNode> scopeItselfAndAllScopesThatImport(final ScopingNode scope)
         {
             if (scope == null) return Collections.emptySet();
-    
+
             return new Iterable<ScopingNode>()
             {
                 public Iterator<ScopingNode> iterator()
@@ -984,7 +985,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                     {
                         private ScopingNode first = scope;
                         private Iterator<ScopingNode> rest = scope.findImportingScopes().iterator();
-                       
+
                         public boolean hasNext()
                         {
                             if (first != null)
@@ -992,7 +993,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                             else
                                 return rest.hasNext();
                         }
-                        
+
                         public ScopingNode next()
                         {
                             if (first != null)
@@ -1003,13 +1004,13 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                             }
                             else return rest.next();
                         }
-                        
+
                         public void remove() { throw new UnsupportedOperationException(); }
                     };
                 }
             };
         }
-        
+
         private List<PhotranTokenRef> collectLocalDefinitions(ScopingNode importingScope)
         {
             List<PhotranTokenRef> definitionsLocalToScope = new ArrayList<PhotranTokenRef>();
@@ -1018,7 +1019,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                     definitionsLocalToScope.add(def.getTokenRef());
             return definitionsLocalToScope;
         }
-    
+
         private boolean isProgramOrSubprogramOrModuleScope(ScopingNode scope)
         {
             return scope instanceof ASTMainProgramNode
