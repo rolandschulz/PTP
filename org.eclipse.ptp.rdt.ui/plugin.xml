@@ -73,7 +73,7 @@
             contributorClass="org.eclipse.cdt.internal.ui.editor.CEditorActionContributor"
             default="true"
             icon="icons/view16/remoteccppeditortab.gif"
-            id="org.eclipse.pdt.rdt.ui.editor.CEditor"
+            id="org.eclipse.ptp.rdt.ui.editor.CEditor"
             name="%remoteEditor.name"
             symbolicFontName="org.eclipse.cdt.ui.editors.textfont">
             <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
@@ -578,5 +578,43 @@
               </objectState>
            </visibility>
         </objectContribution>
+        <viewerContribution
+            targetID="#RemoteCEditorRulerContext"
+            id="org.eclipse.ptp.rdt.debug.ui.RemoteCEditorRulerActions">
+         <action
+               class="org.eclipse.ptp.internal.rdt.ui.actions.CBreakpointPropertiesRulerActionDelegate"
+               id="org.eclipse.ptp.rdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate"
+               label="%BreakpointProperties.label"
+               menubarPath="debug"
+               overrideActionId="org.eclipse.cdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate">
+         </action>
+         <action
+               class="org.eclipse.ptp.internal.rdt.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               id="org.eclipse.ptp.rdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               label="%EnableBreakpoint.label"
+               menubarPath="debug"
+               overrideActionId="org.eclipse.cdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
+         </action>
+         <action
+               class="org.eclipse.ptp.internal.rdt.ui.actions.ManageBreakpointRulerActionDelegate"
+               id="org.eclipse.ptp.rdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               label="%AddBreakpoint.label"
+               menubarPath="debug"
+               overrideActionId="org.eclipse.cdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
+         </action>
+      </viewerContribution>
      </extension>
+     <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.eclipse.ptp.rdt.ui.editor.CEditor"
+            id="org.eclipse.ptp.rdt.debug.ui.CEditor.BreakpointRulerActions">
+         <action
+               label="%Dummy.label"
+               class="org.eclipse.ptp.internal.rdt.ui.actions.ManageBreakpointRulerActionDelegate"
+               actionID="RulerDoubleClick"
+               id="org.eclipse.ptp.rdt.debug.ui.CEditor.ManageBreakpointRulerAction">
+         </action>
+      </editorContribution>
+   </extension>
 </plugin>
