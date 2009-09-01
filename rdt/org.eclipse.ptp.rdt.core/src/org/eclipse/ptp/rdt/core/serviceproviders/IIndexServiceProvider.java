@@ -16,7 +16,7 @@ import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.model.IModelBuilderService;
 import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
  * Interface for providers of C Indexing based services.

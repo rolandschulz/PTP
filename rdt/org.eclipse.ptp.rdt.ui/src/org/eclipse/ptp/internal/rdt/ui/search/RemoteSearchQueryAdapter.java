@@ -17,19 +17,16 @@
 
 package org.eclipse.ptp.internal.rdt.ui.search;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -67,11 +64,11 @@ public class RemoteSearchQueryAdapter implements ISearchQuery {
 	public String getLabel() {
 		String type;
 		if ((fQuery.getFlags() & RemoteSearchQuery.FIND_REFERENCES) != 0)
-			type = CSearchMessages.PDOMSearch_query_refs_label; 
+			type = CSearchMessages.PDOMSearchQuery_refs_label; 
 		else if ((fQuery.getFlags() & RemoteSearchQuery.FIND_DECLARATIONS) != 0)
-			type = CSearchMessages.PDOMSearch_query_decls_label; 
+			type = CSearchMessages.PDOMSearchQuery_decls_label; 
 		else
- 			type = CSearchMessages.PDOMSearch_query_defs_label; 
+ 			type = CSearchMessages.PDOMSearchQuery_defs_label; 
 		return type;
 	}
 

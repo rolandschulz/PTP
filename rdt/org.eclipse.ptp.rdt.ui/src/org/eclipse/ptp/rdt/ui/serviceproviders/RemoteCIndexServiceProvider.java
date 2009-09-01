@@ -19,7 +19,6 @@ import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.SystemStartHere;
 import org.eclipse.rse.core.subsystems.IConnectorService;
-import org.eclipse.ui.IMemento;
 
 /**
  * An RSE-based provider of C/C++ indexing services.
@@ -34,39 +33,11 @@ import org.eclipse.ui.IMemento;
 public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
 
 	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"; //$NON-NLS-1$
-	
-	private static final String HOST_NAME_KEY = "host-name"; //$NON-NLS-1$
-	private static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
+
 	
 	private RemoteSearchService fSearchService;
 	private IContentAssistService fContentAssistService;
 	
-	
-	/**
-	 * @param id
-	 * @param name
-	 * @param serviceId
-	 */
-	public RemoteCIndexServiceProvider(String id, String name, String serviceId) {
-		super(id, name, serviceId);
-	}
-
-	/**
-	 * 
-	 */
-	public RemoteCIndexServiceProvider() {
-		this(ID, NAME, SERVICE_ID);
-	}
-
-	public void restoreState(IMemento providerMemento) {
-		fHostName = providerMemento.getString(HOST_NAME_KEY);
-		indexLocation = providerMemento.getString(INDEX_LOCATION_KEY);
-	}
-
-	public void saveState(IMemento providerMemento) {
-		providerMemento.putString(HOST_NAME_KEY, fHostName);
-		providerMemento.putString(INDEX_LOCATION_KEY, indexLocation);
-	}
 
 	public synchronized ISearchService getSearchService() {
 		if(!isConfigured())
@@ -88,12 +59,11 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 		return fContentAssistService;
 	}
 	
-	@Override
 	public boolean isConfigured() {
-		if (fHost == null && fHostName != null) {
+		if (fHost == null && getHostName() != null) {
 			IHost[] hosts = SystemStartHere.getConnections();
 			for (IHost host : hosts) {
-				if (host.getAliasName().equals(fHostName)) {
+				if (host.getAliasName().equals(getHostName())) {
 					setConnection(host, getDStoreConnectorService(host));
 				}
 			}
@@ -112,9 +82,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#getConfigurationString()
-	 */
+
 	public String getConfigurationString() {
 		if (isConfigured()) {
 			return fHost.getName();
@@ -123,6 +91,6 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	}
 	
 	public String toString() {
-		return "RemoteCIndexServiceProvider(" + fHostName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "RemoteCIndexServiceProvider(" + getHostName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
