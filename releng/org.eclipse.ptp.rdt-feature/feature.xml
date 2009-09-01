@@ -29,7 +29,6 @@
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.core" version="5.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.dstore.core" version="3.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rdt.services" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.make.core" version="5.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
@@ -50,13 +49,13 @@
       <import plugin="org.eclipse.rse.connectorservice.dstore" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.services" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.managedbuilder.ui" version="5.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rdt.services" version="1.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.services.dstore" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.subsystems.files.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.console" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.files.ui"/>
       <import feature="org.eclipse.ptp.remote.rse" version="2.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.services.core"/>
    </requires>
 
    <plugin
