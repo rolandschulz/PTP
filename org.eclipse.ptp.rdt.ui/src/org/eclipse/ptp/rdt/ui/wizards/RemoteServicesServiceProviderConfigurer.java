@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,8 @@
 package org.eclipse.ptp.rdt.ui.wizards;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
-import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.ui.IServiceProviderConfiguration;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -29,18 +29,10 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class RemoteServicesServiceProviderConfigurer implements IServiceProviderConfiguration {
 
-	public RemoteServicesServiceProviderConfigurer() {
-	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration#configureServiceProvider(org.eclipse.ptp.rdt.services.core.IServiceProvider, org.eclipse.swt.widgets.Shell)
-	 */
 	public void configureServiceProvider(IServiceProvider provider, Shell parentShell) {
 		Dialog configDialog = new RemoteServicesProviderSelectionDialog(provider, parentShell);
 		configDialog.open();
-
 	}
 	
-	
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,13 +16,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.ptp.rdt.services.core.IService;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
-import org.eclipse.ptp.rdt.services.core.ServiceConfiguration;
-import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.wizards.ConfigureRemoteServices;
 import org.eclipse.ptp.rdt.ui.wizards.ServiceModelWidget;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -63,7 +63,7 @@ public class PropertyPageServiceModelWidget extends ServiceModelWidget {
 			//read the project's configuration and restore
 			final ServiceModelManager serviceModelManager = ServiceModelManager.getInstance();
 	
-			ServiceConfiguration config = (ServiceConfiguration) serviceModelManager.getConfiguration(project, ConfigureRemoteServices.DEFAULT_CONFIG);
+			IServiceConfiguration config = (IServiceConfiguration) serviceModelManager.getConfiguration(project, ConfigureRemoteServices.DEFAULT_CONFIG);
 	
 			Set<IService> services = config.getServices();
 			Iterator<IService> iterator = services.iterator();
