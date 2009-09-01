@@ -91,7 +91,7 @@ public class NavigationTests extends CPPSelectionTestsAnyIndexer {
 	
 	@Override
 	protected String getEditorID() {
-		return "org.eclipse.pdt.rdt.ui.editor.CEditor";
+		return "org.eclipse.ptp.rdt.ui.editor.CEditor";
 	}
 
 	@Override
