@@ -154,8 +154,8 @@
 			<pathelement path="../../../eclipse/eclipse_3.4/plugins/org.eclipse.ltk.core.refactoring_3.4.0.v20080603-2000.jar"/>
 			<pathelement path="../org.eclipse.ptp.rdt.core/build/"/>
 			<pathelement path="../org.eclipse.ptp.rdt.core/@dot"/>
-			<pathelement path="../org.eclipse.ptp.rdt.services/bin/"/>
-			<pathelement path="../org.eclipse.ptp.rdt.services/@dot"/>
+			<pathelement path="../org.eclipse.ptp.services.core/bin/"/>
+			<pathelement path="../org.eclipse.ptp.services.core/@dot"/>
 			<pathelement path="../org.eclipse.cdt.make.core/bin"/>
 			<pathelement path="../org.eclipse.cdt.make.core/@dot"/>
 			<pathelement path="../org.eclipse.cdt.managedbuilder.core/bin"/>

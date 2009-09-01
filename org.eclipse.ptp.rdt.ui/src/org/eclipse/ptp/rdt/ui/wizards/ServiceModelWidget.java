@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,14 +26,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.ptp.rdt.core.RDTLog;
-import org.eclipse.ptp.rdt.services.core.IService;
-import org.eclipse.ptp.rdt.services.core.IServiceProvider;
-import org.eclipse.ptp.rdt.services.core.IServiceProviderDescriptor;
-import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
-import org.eclipse.ptp.rdt.services.ui.IServiceProviderConfiguration;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.NullBuildServiceProvider;
 import org.eclipse.ptp.rdt.ui.serviceproviders.NullCIndexServiceProvider;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
+import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.ui.IServiceProviderConfiguration;
+import org.eclipse.ptp.services.ui.IServiceProviderContributor;
+import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
@@ -55,6 +57,8 @@ import org.eclipse.swt.widgets.TableItem;
  * that it will remain the same. Please do not use this API without consulting
  * with the RDT team.
  * 
+ * @deprecated
+ * @see org.eclipse.ptp.services.ui.wizards.ServiceModelWidget
  */
 public class ServiceModelWidget{
 	
@@ -240,7 +244,7 @@ public class ServiceModelWidget{
 				fProviderIDToProviderMap.put(descriptor.getId(), serviceProvider);
 			}
 
-			IServiceProviderConfiguration configUI = manager.getServiceProviderConfigurationUI(serviceProvider);
+			IServiceProviderConfiguration configUI = ServiceModelUIManager.getInstance().getServiceProviderConfigurationUI(serviceProvider);
 			configUI.configureServiceProvider(serviceProvider, fConfigureButton.getShell());
 			
 			String configString = serviceProvider.getConfigurationString();
