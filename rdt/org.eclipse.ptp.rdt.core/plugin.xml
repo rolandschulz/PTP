@@ -10,7 +10,7 @@
       </run>
    </extension>
    <extension
-         point="org.eclipse.ptp.rdt.services.services">
+         point="org.eclipse.ptp.services.core.services">
       <service
             id="org.eclipse.ptp.rdt.core.CIndexingService"
             name="%CIndexingService.name">

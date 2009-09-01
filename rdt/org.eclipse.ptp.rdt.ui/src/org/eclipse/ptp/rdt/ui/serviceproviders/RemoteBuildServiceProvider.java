@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,12 @@
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
-import org.eclipse.ptp.rdt.services.core.ServiceProviderDescriptor;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ui.IMemento;
+import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
  * A build service provider that uses the Remote Tools API to provide execution services.
@@ -28,7 +28,7 @@ import org.eclipse.ui.IMemento;
  * 
  * @author crecoskie
  */
-public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implements IRemoteExecutionServiceProvider {
+public class RemoteBuildServiceProvider extends ServiceProvider implements IRemoteExecutionServiceProvider {
 	
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID = "RemoteBuildServiceProvider.remoteToolsProviderID"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME = "RemoteBuildServiceProvider.remoteToolsConnectionName"; //$NON-NLS-1$
@@ -37,63 +37,62 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
 	public static final String NAME = Messages.getString("RemoteBuildServiceProvider.0"); //$NON-NLS-1$
 
-	private String fRemoteToolsProviderID;
-	private IRemoteConnection fRemoteConnection;
-	private String fConnectionName;
+	private IRemoteConnection fRemoteConnection = null;
 
-	public RemoteBuildServiceProvider(String id, String name, String serviceId) {
-		super(id, name, serviceId);
-	}
-	
-	public RemoteBuildServiceProvider() {
-		this(ID, NAME, SERVICE_ID);
-	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#isConfigured()
-	 */
-	public boolean isConfigured() {
-		return (fRemoteToolsProviderID != null && fConnectionName != null);
+	public String getConfigurationString() {
+		if (isConfigured()) {
+			return getRemoteServices().getName() + ": " + getRemoteConnectionName(); //$NON-NLS-1$
+		}
+		return null;
 	}
 		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		if(fRemoteConnection == null && getRemoteConnectionName() != null) {
+			IRemoteServices services = getRemoteServices();
+			if (services != null) {
+				IRemoteConnectionManager manager = services.getConnectionManager();
+				if (manager != null) {
+					fRemoteConnection = manager.getConnection(getRemoteConnectionName());
+				}
+			}
+		}
+		return fRemoteConnection;
+	}
+	
 	/**
-	 * Sets the ID of the Remote Tools provider that this provider should use for its execution services.
+	 * Get the remote connection name
 	 * 
-	 * @param id
+	 * @return remote connection name or null if provider has not been configured
 	 */
-	public void setRemoteToolsProviderID(String id) {
-		fRemoteToolsProviderID = id;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#restoreState(org.eclipse.ui.IMemento)
-	 */
-	public void restoreState(IMemento memento) {
-		/// restore the tools provider
-		fRemoteToolsProviderID = memento.getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID);
-	
-		// restore the connection name
-		fConnectionName = memento.getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#saveState(org.eclipse.ui.IMemento)
-	 */
-	public void saveState(IMemento memento) {
-		/// store the tools provider ID
-		memento.putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, fRemoteToolsProviderID);
-		
-		// store the connection name
-		memento.putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, fConnectionName);
+	public String getRemoteConnectionName() {
+		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, null);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getRemoteServices()
 	 */
 	public IRemoteServices getRemoteServices() {
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(fRemoteToolsProviderID);
+		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteToolsProviderID());
 	}
 
+	/**
+	 * Gets the ID of the Remote Tools provider that this provider uses for its execution services.
+	 * 
+	 * @return remote tools provider ID
+	 */
+	public String getRemoteToolsProviderID() {
+		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, null);
+	}
+
+	
+	public boolean isConfigured() {
+		return (getRemoteToolsProviderID() != null && getRemoteConnectionName() != null);
+	}
+	
 	/**
 	 * Sets the connection that this provider should use for its execution services.
 	 * 
@@ -101,33 +100,21 @@ public class RemoteBuildServiceProvider extends ServiceProviderDescriptor implem
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		fRemoteConnection = connection;
-		fConnectionName = connection.getName();
-		
+		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, connection.getName());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+	/**
+	 * Sets the ID of the Remote Tools provider that this provider should use for its execution services.
+	 * 
+	 * @param id
 	 */
-	public IRemoteConnection getConnection() {
-		if(fRemoteConnection == null && fConnectionName != null) {
-			fRemoteConnection = getRemoteServices().getConnectionManager().getConnection(fConnectionName);
-		}
-		return fRemoteConnection;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.services.core.IServiceProvider#getConfigurationString()
-	 */
-	public String getConfigurationString() {
-		if (isConfigured()) {
-			return getRemoteServices().getName() + ": " + fConnectionName; //$NON-NLS-1$
-		}
-		return null;
+	public void setRemoteToolsProviderID(String id) {
+		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, id);
 	}
 	
 	
 	public String toString() {
-		return "RemoteBuildServiceProvider(" + fConnectionName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "RemoteBuildServiceProvider(" + getRemoteConnectionName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }
