@@ -30,7 +30,7 @@ import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.OpenDeclarationsAction;
 import org.eclipse.ptp.rdt.core.tests.ConnectionManager;
 import org.eclipse.ptp.rdt.core.tests.RemoteTestProject;
-import org.eclipse.ptp.rdt.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
