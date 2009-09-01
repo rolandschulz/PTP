@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
+            class="org.eclipse.ptp.rm.pbs.ui.preferences.PBSPreferencePage"
+            id="org.eclipse.ptp.pbs.ui.preferences.PBSPreferencePage"
+            name="PBS">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.pbs.ui.wizards.PBSServiceProviderConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.pbs.ui.configurationWizard"/>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
+      <launchConfiguration
+            class="org.eclipse.ptp.rm.pbs.ui.rmLaunchConfiguration.PBSRMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.pbs.ui.launchConfiguration"/>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.pbs.ui.PBSServiceProvider"
+            id="org.eclipse.ptp.rm.pbs.PBSServiceProvider"
+            name="PBS"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.ui.providerContributors">
+      <providerContributor
+            class="org.eclipse.ptp.rm.pbs.ui.PBSProviderContributor"
+            id="org.eclipse.ptp.rm.pbs.PBSServiceProvider">
+      </providerContributor>
+   </extension>
+</plugin>
