@@ -31,6 +31,7 @@ import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRMChangeEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveAllEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveJobEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveMachineEvent;
@@ -315,6 +316,10 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements IProx
 
 		case IProxyRuntimeEvent.REMOVE_QUEUE:
 			evt = new ProxyRuntimeRemoveQueueEvent(packet.getTransID(), packet.getArgs());
+			break;
+
+		case IProxyRuntimeEvent.RM_CHANGE:
+			evt = new ProxyRuntimeRMChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.SUBMITJOB_ERROR:

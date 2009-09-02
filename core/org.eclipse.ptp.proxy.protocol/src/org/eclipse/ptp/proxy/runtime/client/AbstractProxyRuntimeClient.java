@@ -61,6 +61,7 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveAllEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveJobEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveMachineEvent;
@@ -456,6 +457,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				fireProxyRuntimeRemoveProcessEvent((IProxyRuntimeRemoveProcessEvent) event);
 			} else if (event instanceof IProxyRuntimeRemoveQueueEvent) {
 				fireProxyRuntimeRemoveQueueEvent((IProxyRuntimeRemoveQueueEvent) event);
+			} else if (event instanceof IProxyRuntimeRMChangeEvent) {
+				fireProxyRuntimeRMChangeEvent((IProxyRuntimeRMChangeEvent) event);
 			} else if (event instanceof IProxyErrorEvent) {
 				fireProxyRuntimeErrorStateEvent(eventFactory
 						.newProxyRuntimeErrorStateEvent());
@@ -734,6 +737,18 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	protected void fireProxyRuntimeRemoveQueueEvent(
 			IProxyRuntimeRemoveQueueEvent event) {
+		for (Object listener : listeners) {
+			((IProxyRuntimeEventListener) listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Forward event to listeners
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyRuntimeRMChangeEvent(
+			IProxyRuntimeRMChangeEvent event) {
 		for (Object listener : listeners) {
 			((IProxyRuntimeEventListener) listener).handleEvent(event);
 		}

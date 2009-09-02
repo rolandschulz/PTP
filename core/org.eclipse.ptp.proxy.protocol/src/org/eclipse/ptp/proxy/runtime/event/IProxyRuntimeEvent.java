@@ -61,6 +61,7 @@ public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	public static final int NODE_CHANGE = EVENT_OFFSET + 32;
 	public static final int PROCESS_CHANGE = EVENT_OFFSET + 33;
 	public static final int QUEUE_CHANGE = EVENT_OFFSET + 34;
+	public static final int RM_CHANGE = EVENT_OFFSET + 35;
 
 	/*
 	 * Remove model element events
