@@ -33,6 +33,7 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveAllEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveJobEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveMachineEvent;
@@ -145,6 +146,11 @@ public interface IProxyRuntimeEventListener {
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveQueueEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRMChangeEvent e);
 	
 	/**
 	 * @param e
