@@ -29,6 +29,7 @@ import org.eclipse.ptp.internal.rtsystem.events.RuntimeNewProcessEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeNewQueueEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeNodeChangeEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeProcessChangeEvent;
+import org.eclipse.ptp.internal.rtsystem.events.RuntimeRMChangeEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeRemoveAllEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeRemoveJobEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeRemoveMachineEvent;
@@ -191,6 +192,13 @@ public class RuntimeEventFactory implements IRuntimeEventFactory {
 		return new RuntimeRemoveQueueEvent(ids);
 	}	
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRMChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	 */
+	public IRuntimeRMChangeEvent newRuntimeRMChangeEvent(ElementAttributeManager attrs) {
+		return new RuntimeRMChangeEvent(attrs);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRunningStateEvent()
 	 */

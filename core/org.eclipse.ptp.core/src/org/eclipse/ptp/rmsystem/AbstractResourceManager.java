@@ -1301,4 +1301,16 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		addQueueAttributes(queues, attrs.getAttributes());
 		return true;
 	}
+	
+	/**
+	 * Update attributes for this RM
+	 * 
+	 * @param attrs
+	 *            attributes to update
+	 * @return true if updated
+	 */
+	protected boolean updateRM(AttributeManager attrs) {
+		addAttributes(attrs.getAttributes());
+		return true;
+	}
 }
