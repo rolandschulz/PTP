@@ -61,6 +61,7 @@ import org.eclipse.ptp.internal.rtsystem.events.RuntimeNewQueueEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeNodeChangeEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeProcessChangeEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeQueueChangeEvent;
+import org.eclipse.ptp.internal.rtsystem.events.RuntimeRMChangeEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeRemoveAllEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeRemoveJobEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeRemoveMachineEvent;
@@ -88,6 +89,7 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveAllEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveJobEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveMachineEvent;
@@ -548,6 +550,25 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeEventListener#handleEvent(org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent)
+	 */
+	public void handleEvent(IProxyRuntimeRMChangeEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
+			return;
+		}
+		
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {			
+			fireRuntimeRMChangeEvent(new RuntimeRMChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+		}
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRunningStateEvent e) {
@@ -712,17 +733,21 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			int sep = kv.indexOf('=');
 			if (sep > 0) {
 				try {
-					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(kv.substring(0, sep));
-					if(attrDef != null) {
-						String value = ""; //$NON-NLS-1$
-						if (sep < kv.length() - 1) {
-							value = kv.substring(sep+1);
-						}
-						IAttribute<?,?,?> attr = attrDef.create(value);
-						mgr.addAttribute(attr);
-					} else {
-						PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_13);
+					String id = kv.substring(0, sep);
+					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(id);
+					if (attrDef == null) {
+						/*
+						 * Treat this as a string attribute. This allows the proxy to send unsolicited
+						 * attributes when their type is not important.
+						 */
+						attrDef = attrDefManager.createStringAttributeDefinition(id, id, id, true, ""); //$NON-NLS-1$
 					}
+					String value = ""; //$NON-NLS-1$
+					if (sep < kv.length() - 1) {
+						value = kv.substring(sep+1);
+					}
+					IAttribute<?,?,?> attr = attrDef.create(value);
+					mgr.addAttribute(attr);
 				} catch (IllegalValueException e1) {
 					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14);
 				}

@@ -35,6 +35,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRMChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent;
@@ -253,6 +254,14 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 		}
 	}
 	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRMChangeEvent(IRuntimeRMChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleEvent(event);
+		}
+	}	
 	/**
 	 * @param event
 	 */

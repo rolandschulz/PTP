@@ -32,6 +32,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRMChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent;
@@ -148,8 +149,13 @@ public interface IRuntimeEventListener {
 	/**
 	 * @param e
 	 */
-	public void handleEvent(IRuntimeRunningStateEvent e);
+	public void handleEvent(IRuntimeRMChangeEvent e);
 	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRunningStateEvent e);
+
 	/**
 	 * @param e
 	 */

@@ -149,6 +149,12 @@ public interface IRuntimeEventFactory {
 	public IRuntimeRemoveQueueEvent newRuntimeRemoveQueueEvent(RangeSet ids);
 
 	/**
+	 * @param attrs
+	 * @return
+	 */
+	public IRuntimeRMChangeEvent newRuntimeRMChangeEvent(ElementAttributeManager attrs);
+
+	/**
 	 * @return
 	 */
 	public IRuntimeRunningStateEvent newRuntimeRunningStateEvent();

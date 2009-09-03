@@ -69,6 +69,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRMChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent;
@@ -687,6 +688,22 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 	}
 
+	public void handleEvent(IRuntimeRMChangeEvent e) {
+		ElementAttributeManager eMgr = e.getElementAttributeManager();
+
+		for (Map.Entry<RangeSet, AttributeManager> mgrEntry : eMgr.getEntrySet()) {
+			AttributeManager attrs = mgrEntry.getValue();
+			RangeSet rmIds = mgrEntry.getKey();
+			List<IPProcessControl> changedProcesses;
+			
+			for (String elementId : rmIds) {
+				if (getID().equals(elementId)) {
+					doUpdateRM(attrs);
+				}
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
@@ -1015,6 +1032,15 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @return changes were made
 	 */
 	protected abstract boolean doUpdateQueues(Collection<IPQueueControl> queues, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually update the queues.
+	 * 
+	 * @param queue
+	 * @param attrs
+	 * @return changes were made
+	 */
+	protected abstract boolean doUpdateRM(AttributeManager attrs);
 
 	/**
 	 * @return the runtimeSystem

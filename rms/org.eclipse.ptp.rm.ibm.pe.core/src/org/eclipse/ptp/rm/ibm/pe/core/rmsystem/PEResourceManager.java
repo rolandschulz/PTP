@@ -167,5 +167,12 @@ public class PEResourceManager extends AbstractRuntimeResourceManager {
 			AttributeManager attrs) {
 		return updateQueues(queues, attrs);
 	}
-
+ 	
+ 	/* (non-Javadoc)
+ 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateRM(org.eclipse.ptp.core.attributes.AttributeManager)
+ 	 */
+ 	@Override
+ 	protected boolean doUpdateRM(AttributeManager attrs) {
+ 		return updateRM(attrs);
+ 	}
 }
