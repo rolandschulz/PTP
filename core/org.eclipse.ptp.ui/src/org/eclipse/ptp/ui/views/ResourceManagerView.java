@@ -226,7 +226,8 @@ public class ResourceManagerView extends ViewPart {
 		@Override
 		public Font getFont(Object element) {
 			IResourceManager rm = getResourceManager(element);
-			if (rm != null && rm == PTPUIPlugin.getDefault().getRMManager().getSelected()) {
+			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
+			if (rm != null && rmManager != null && rm == rmManager.getSelected()) {
 				return selectedFont;
 			}
 			return unSelectedFont;
@@ -370,7 +371,8 @@ public class ResourceManagerView extends ViewPart {
 		public void handleEvent(IResourceManagerChangeEvent e) {
 			IResourceManager rm = e.getSource();
 			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
-			if (rm.getState() == ResourceManagerAttributes.State.STOPPED && 
+			if (rmManager != null &&
+					rm.getState() == ResourceManagerAttributes.State.STOPPED && 
 					rm == rmManager.getSelected()) {
 				rmManager.fireRMSelectedEvent(null);
 			}

@@ -14,6 +14,7 @@ package org.eclipse.ptp.ui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.views.ResourceManagerView;
 
@@ -28,7 +29,10 @@ public class SelectDefaultResourceManagerAction extends Action {
 	}
 
 	public void run() {
-		PTPUIPlugin.getDefault().getRMManager().fireRMSelectedEvent(resourceManager);
+		RMManager rm = PTPUIPlugin.getDefault().getRMManager();
+		if (rm != null) {
+			rm.fireRMSelectedEvent(resourceManager);
+		}
 		view.refreshViewer();
 	}
 
