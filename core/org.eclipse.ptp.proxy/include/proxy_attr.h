@@ -61,12 +61,6 @@
 #define 	NODE_STATE_ERROR			"ERROR"
 #define 	NODE_STATE_UNKNOWN			"UNKNOWN"
 #define NODE_NUMBER_ATTR			"nodeNumber"
-#ifdef HAVE_SYS_BPROC_H
-#define NODE_GROUP_ATTR				"nodeGroup"
-#define NODE_USER_ATTR				"nodeUser"
-#define NODE_MODE_ATTR				"nodeMode"
-#define 	DEFAULT_NODE_MODE		0111
-#endif /* HAVE_SYS_BPROC_H */
 
 /*
  * Queue attributes
