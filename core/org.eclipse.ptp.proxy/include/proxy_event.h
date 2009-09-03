@@ -77,6 +77,7 @@
 #define PROXY_EV_RT_NODE_CHANGE			PROXY_EV_RT_OFFSET + 32
 #define PROXY_EV_RT_PROCESS_CHANGE		PROXY_EV_RT_OFFSET + 33
 #define PROXY_EV_RT_QUEUE_CHANGE		PROXY_EV_RT_OFFSET + 34
+#define PROXY_EV_RT_RM_CHANGE			PROXY_EV_RT_OFFSET + 35
 /*
  * Remove model element events
  */
@@ -108,12 +109,13 @@ proxy_msg *	proxy_new_node_event(int trans_id, char *mach_id, int num_nodes);
 void		proxy_add_node(proxy_msg *m, char *node_id, char *name, char *state, int extra_attrs);
 proxy_msg *	proxy_new_process_event(int trans_id, char *job_id, int num_procs);
 void		proxy_add_process(proxy_msg *m, char *proc_id, char *name, char *state, int extra_attrs);
-proxy_msg *	proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, char *state);
+proxy_msg *	proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, char *state, int num_attrs);
 proxy_msg *	proxy_job_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_machine_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_node_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_process_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_queue_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_rm_change_event(int trans_id, char *id, int num_attrs);
 proxy_msg *	proxy_remove_all_event(int trans_id);
 proxy_msg *	proxy_remove_job_event(int trans_id, char *id_range);
 proxy_msg *	proxy_remove_machine_event(int trans_id, char *id_range);
