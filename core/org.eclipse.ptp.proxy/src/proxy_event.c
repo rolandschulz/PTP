@@ -296,14 +296,14 @@ proxy_add_process(proxy_msg *m, char *proc_id, char *name, char *state, int extr
  * NEW QUEUE EVENT. Used to create a new queue model element.
  */
 proxy_msg *
-proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, char *state)
+proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, char *state, int num_attrs)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_QUEUE, trans_id);
 
 	proxy_msg_add_string(m, rm_id);
 	proxy_msg_add_int(m, 1); /* 1 new queue */
 	proxy_msg_add_string(m, queue_id);
-	proxy_msg_add_int(m, 2); /* 2 attributes */
+	proxy_msg_add_int(m, num_attrs + 2); /* at least 2 attributes */
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_msg_add_keyval_string(m, QUEUE_STATE_ATTR, state);
 
@@ -380,6 +380,21 @@ proxy_queue_change_event(int trans_id, char *id_range, int num_attrs)
 
 	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
+	proxy_msg_add_int(m, num_attrs);
+
+	return m;
+}
+
+/*
+ * RM CHANGE EVENT. Used to change attributes on a resource manager.
+ */
+proxy_msg *
+proxy_rm_change_event(int trans_id, char *id, int num_attrs)
+{
+	proxy_msg *m = new_proxy_msg(PROXY_EV_RT_RM_CHANGE, trans_id);
+
+	proxy_msg_add_int(m, 1); /* 1 id range */
+	proxy_msg_add_string(m, id);
 	proxy_msg_add_int(m, num_attrs);
 
 	return m;
