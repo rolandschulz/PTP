@@ -104,7 +104,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		IPBSResourceManagerConfiguration config = (IPBSResourceManagerConfiguration) getConfiguration();
-		/* load up the control and monitoring systems for OMPI */
+		/* load up the control and monitoring systems for PBS */
 		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config, PBSRMID);
 		return new PBSRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}

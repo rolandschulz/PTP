@@ -12,18 +12,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.services.core;bundle-version="1.0.0",
  org.eclipse.ptp.services.ui;bundle-version="1.0.0",
  org.eclipse.ptp.core,
+ org.eclipse.ptp.remote.core;bundle-version="3.0.0",
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.utils.ui;bundle-version="1.0.0",
- org.eclipse.ptp.rm.slurm.core
+ org.eclipse.ptp.rm.slurm.core,
+ org.eclipse.ptp.launch;bundle-version="3.0.0",
+ org.eclipse.ptp.ui;bundle-version="3.0.0",
+ org.eclipse.ptp.rm.remote;bundle-version="3.0.0"
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.slurm.ui,
  org.eclipse.ptp.rm.slurm.ui.preferences
-Import-Package: org.eclipse.ptp.core.attributes,
- org.eclipse.ptp.core.elements,
- org.eclipse.ptp.core.elements.attributes,
- org.eclipse.ptp.launch.ui.extensions,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.remote.core.exception,
- org.eclipse.ptp.rm.remote.ui.preferences,
- org.eclipse.ptp.rm.remote.ui.wizards,
- org.eclipse.ptp.ui.wizards

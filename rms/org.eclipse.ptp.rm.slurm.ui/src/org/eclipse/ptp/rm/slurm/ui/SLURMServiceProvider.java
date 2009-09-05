@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
+import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMServiceProviderFactory;
 
 
 /**
@@ -52,26 +53,34 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
+	 */
+	@Override
+	public String getResourceManagerId() {
+		return SLURMServiceProviderFactory.RM_FACTORY_ID;
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration#getSlurmdArgs()
 	 */
 	public String getSlurmdArgs() {
 		return getString(TAG_SLURMD_ARGS, preferences.getString(EMPTY_STRING));
 	}
 	
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration#getSlurmdPath()
 	 */
 	public String getSlurmdPath() {
 		return getString(TAG_SLURMD_PATH, preferences.getString(EMPTY_STRING));
 	}
-	
-    /* (non-Javadoc)
+    
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration#getUseDefaults()
 	 */
 	public boolean getUseDefaults() {
 		return getBoolean(TAG_SLURMD_DEFAULTS, true);
 	}
-    
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
