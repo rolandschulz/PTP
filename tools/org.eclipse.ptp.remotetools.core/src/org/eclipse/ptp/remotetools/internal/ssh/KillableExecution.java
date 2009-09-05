@@ -99,7 +99,7 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 
 	protected void setCommandLine(String commandLine) {
 		PIID = getExecutionManager().getConnection().createNextPIID();
-		String newCommandLine = getExecutionManager().getConnection().getKillablePrefix(this) + "; " + commandLine; //$NON-NLS-1$
+		String newCommandLine = "(" + getExecutionManager().getConnection().getKillablePrefix(this) + "); " + commandLine; //$NON-NLS-1$ //$NON-NLS-2$
 		Debug.println2(Messages.KillableExecution_Debug_1 + newCommandLine);
 		channel.setCommand(newCommandLine);
 	}
