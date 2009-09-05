@@ -884,7 +884,7 @@ int PE_start_events(int trans_id, int nargs, char *args[])
         sprintf(id_str, "%d", machine_id);
         enqueue_event(proxy_new_machine_event(trans_id, base_id_str, id_str, "default", MACHINE_STATE_UP));
         sprintf(id_str, "%d", queue_id);
-        enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str, "default", QUEUE_STATE_NORMAL));
+        enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str, "default", QUEUE_STATE_NORMAL, 0));
         /*
          * Look for poe jobs already running on system
          */
@@ -4329,7 +4329,7 @@ sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
     msg =
     proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string,
             proxy_generated_queue_id_string, cluster_object->cluster_name,
-            queue_state_to_report);
+            queue_state_to_report, 0);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;

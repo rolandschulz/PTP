@@ -2103,7 +2103,7 @@ static int sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_ob
       break;
   }
 
-  msg = proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string, proxy_generated_queue_id_string, cluster_object->cluster_name, queue_state_to_report);
+  msg = proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string, proxy_generated_queue_id_string, cluster_object->cluster_name, queue_state_to_report, 0);
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return 0;
