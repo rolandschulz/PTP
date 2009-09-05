@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.pbs.ui;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.pbs.core.PBSPreferenceManager;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSServiceProviderFactory;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 
 
@@ -66,12 +67,20 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	}
 	
     /* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
+	 */
+	@Override
+	public String getResourceManagerId() {
+		return PBSServiceProviderFactory.RM_FACTORY_ID;
+	}
+    
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration#getUseDefaults()
 	 */
 	public boolean getUseDefaults() {
 		return getBoolean(TAG_PBSD_DEFAULTS, true);
 	}
-    
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
