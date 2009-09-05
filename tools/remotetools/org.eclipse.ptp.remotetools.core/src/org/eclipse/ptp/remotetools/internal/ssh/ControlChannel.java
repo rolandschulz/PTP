@@ -30,10 +30,10 @@ public class ControlChannel implements ILineStreamListener {
 	/*
 	 * Patterns recognized by the observer.
 	 */
-	final static String markerPID = "<pid value=\\\""; //$NON-NLS-1$
-	final static String markerPIID = "<piid value=\\\""; //$NON-NLS-1$
-	final static String markerSSH = "<ssh_tty value=\\\""; //$NON-NLS-1$
-	final static String endMarker = "\\\"/>"; //$NON-NLS-1$
+	final static String markerPID = "<pid value=\""; //$NON-NLS-1$
+	final static String markerPIID = "<piid value=\""; //$NON-NLS-1$
+	final static String markerSSH = "<ssh_tty value=\""; //$NON-NLS-1$
+	final static String endMarker = "\"/>"; //$NON-NLS-1$
 	final Pattern pidPattern = Pattern.compile(markerPID + "(\\p{Digit}+)" + endMarker + markerPIID //$NON-NLS-1$
 			+ "(\\p{Digit}+)" + endMarker); //$NON-NLS-1$
 	final Pattern terminalPathPattern = Pattern.compile(markerSSH + "(.+)" + endMarker); //$NON-NLS-1$
@@ -65,7 +65,7 @@ public class ControlChannel implements ILineStreamListener {
 			// Open exec channel and alloc terminal
 			shell = connection.createExecChannel(false);
 			shell.setPty(true);
-			shell.setCommand("/bin/ksh"); //$NON-NLS-1$
+			shell.setCommand("/bin/sh"); //$NON-NLS-1$
 			inputFromControlTerminalOutput = shell.getInputStream();
 			outputToControlTerminalInput = shell.getOutputStream();
 			shell.connect();
@@ -86,7 +86,7 @@ public class ControlChannel implements ILineStreamListener {
 			outputToControlTerminalInput.write("export PS1=\n".getBytes()); //$NON-NLS-1$
 			
 			// Write terminal path on control channel, to be read by the observer
-			outputToControlTerminalInput.write(new String("echo \"" + markerSSH + "$SSH_TTY" + endMarker + "\"\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			outputToControlTerminalInput.write(new String("echo '" + markerSSH + "'$SSH_TTY'" + endMarker + "'\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			outputToControlTerminalInput.flush();
 		} catch (IOException e) {
 			throw new RemoteConnectionException(Messages.ControlChannel_Open_FailedSendInitCommands, e);
@@ -145,17 +145,19 @@ public class ControlChannel implements ILineStreamListener {
 	}
 
 	public void killRemoteProcess(int pid) {
-		try {
-			outputToControlTerminalInput.write(new String("kill -9 " + pid + "\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
-			outputToControlTerminalInput.flush();
-		} catch (IOException e) {
+		if (pid > 0) {
+			try {
+				outputToControlTerminalInput.write(new String("kill -9 " + pid + "\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
+				outputToControlTerminalInput.flush();
+			} catch (IOException e) {
+			}
 		}
 	}
 
 	public synchronized String getKillablePrefix(int internaID) {
-		return "echo \"" + markerPID + "$$" + endMarker //$NON-NLS-1$ //$NON-NLS-2$
-				+ markerPIID + Integer.toString(internaID) + endMarker 
-				+ "\" > " + controlTerminalPath; //$NON-NLS-1$
+		return "echo '" + markerPID + "'$$'" + endMarker //$NON-NLS-1$ //$NON-NLS-2$
+				+ markerPIID + "'" + Integer.toString(internaID) + "'" + endMarker  //$NON-NLS-1$ //$NON-NLS-2$
+				+ "' > " + controlTerminalPath; //$NON-NLS-1$
 	}
 
 	public void close() {
