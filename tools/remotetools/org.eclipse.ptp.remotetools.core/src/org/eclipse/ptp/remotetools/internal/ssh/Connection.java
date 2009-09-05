@@ -149,12 +149,12 @@ public class Connection implements IRemoteConnection {
 
 		// Convert information for the UserInfo class used by JSch
 		if(authToken instanceof PasswdAuthToken) {
-			sshuserinfo.isPasswdBased = true;
-			sshuserinfo.password = ((PasswdAuthToken)authToken).getPassword();
+			sshuserinfo.setUsePassword(true);
+			sshuserinfo.setPassword(((PasswdAuthToken)authToken).getPassword());
 		} else if(authToken instanceof KeyAuthToken) {
 			KeyAuthToken token = (KeyAuthToken)authToken;
-			sshuserinfo.isPasswdBased = false;
-			sshuserinfo.passphrase = token.getPassphrase();
+			sshuserinfo.setUsePassword(false);
+			sshuserinfo.setPassphrase(token.getPassphrase());
 		} else {
 			throw new RuntimeException(Messages.Connection_AuthenticationTypeNotSupported);
 		}
@@ -376,14 +376,18 @@ public class Connection implements IRemoteConnection {
 	 *
 	 */
 	private class SSHUserInfo implements UserInfo, UIKeyboardInteractive {
-		public String password;
-		public String passphrase;
-		public boolean isPasswdBased;
+		private String password;
+		private String passphrase;
+		private boolean isPasswdBased;
 
 		private SSHUserInfo() { }
 
 		public String getPassword() {
 			return password;
+		}
+		
+		public void setPassword(String password) {
+			this.password = password;
 		}
 
 		public boolean promptYesNo(String str) {
@@ -394,6 +398,10 @@ public class Connection implements IRemoteConnection {
 		public String getPassphrase() {
 			return passphrase;
 		}
+		
+		public void setPassphrase(String passphrase) {
+			this.passphrase = passphrase;
+		}
 
 		public boolean promptPassphrase(String message) {
 			return !isPasswdBased;
@@ -401,6 +409,10 @@ public class Connection implements IRemoteConnection {
 
 		public boolean promptPassword(String message) {
 			return isPasswdBased;
+		}
+		
+		public void setUsePassword(boolean usePassword) {
+			this.isPasswdBased = usePassword;
 		}
 
 		public void showMessage(String message) {
