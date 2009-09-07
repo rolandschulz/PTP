@@ -22,7 +22,6 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 		setDescription(provider.getDescription());
 		setRemoteServicesId(provider.getRemoteServicesId());
 		setResourceManagerId(provider.getResourceManagerId());
-		setResourceManagerId(provider.getResourceManagerId());
 		setName(provider.getName());
 		setUniqueName(provider.getUniqueName());
 	}
