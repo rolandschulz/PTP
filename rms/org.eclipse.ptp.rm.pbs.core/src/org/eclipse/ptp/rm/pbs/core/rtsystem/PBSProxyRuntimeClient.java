@@ -11,13 +11,12 @@
 
 package org.eclipse.ptp.rm.pbs.core.rtsystem;
 
-import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeClient;
 
 public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 	public PBSProxyRuntimeClient(IPBSResourceManagerConfiguration config, 
 			int baseModelId) {
-		super(config, baseModelId, new PBSProxyCommandFactory(config), new ProxyRuntimeEventFactory());
+		super(config, baseModelId);
 	}
 }
