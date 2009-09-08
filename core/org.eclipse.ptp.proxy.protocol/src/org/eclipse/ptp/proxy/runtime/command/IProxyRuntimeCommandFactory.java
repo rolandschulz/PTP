@@ -15,6 +15,12 @@ import org.eclipse.ptp.proxy.command.IProxyCommandFactory;
 
 public interface IProxyRuntimeCommandFactory extends IProxyCommandFactory {
 	/**
+	 * @param attrs
+	 * @return
+	 */
+	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(String[] attrs);
+	
+	/**
 	 * @param baseID
 	 * @return
 	 */
@@ -36,10 +42,10 @@ public interface IProxyRuntimeCommandFactory extends IProxyCommandFactory {
 	public IProxyRuntimeStopEventsCommand newProxyRuntimeStopEventsCommand();
 	
 	/**
-	 * @param args
+	 * @param attrs
 	 * @return
 	 */
-	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(String[] args);
+	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(String[] attrs);
 	
 	/**
 	 * @param jobID

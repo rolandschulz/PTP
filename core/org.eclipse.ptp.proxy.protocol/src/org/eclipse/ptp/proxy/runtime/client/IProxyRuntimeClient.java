@@ -31,6 +31,14 @@ public interface IProxyRuntimeClient {
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
 	
 	/**
+	 * Filter events coming from the proxy
+	 * 
+	 * @param attrs attributes to filter
+	 * @throws IOException
+	 */
+	public void filterEvents(String[] attrs) throws IOException;
+	
+	/**
 	 * Unregister for events
 	 * 
 	 * @param listener
@@ -68,10 +76,10 @@ public interface IProxyRuntimeClient {
 	/**
 	 * Submit a job for execution
 	 * 
-	 * @param args
+	 * @param args attributes required for job submission
 	 * @throws IOException
 	 */
-	public void submitJob(String[] args) throws IOException;
+	public void submitJob(String[] attrs) throws IOException;
 	
 	/**
 	 * Terminate a job

@@ -40,7 +40,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.remote.messages.Messages;
 
-public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
+public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
 	private IRemoteConnection connection = null;
 	private IProgressMonitor startupMonitor = null;

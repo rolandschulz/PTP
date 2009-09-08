@@ -17,6 +17,7 @@
 
 package org.eclipse.ptp.proxy.runtime.command;
 
+import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeFilterEventsCommand;
 import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeInitCommand;
 import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeStartEventsCommand;
@@ -28,6 +29,13 @@ import org.eclipse.ptp.proxy.command.ProxyCommandFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements IProxyRuntimeCommandFactory {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeFilterEventsCommand(java.lang.String[])
+	 */
+	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(String[] attrs) {
+		return new ProxyRuntimeFilterEventsCommand(attrs);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeInitCommand(int)
 	 */
@@ -60,8 +68,8 @@ public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements I
 	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeSubmitJobCommand(java.lang.String[])
 	 */
 	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(
-			String[] args) {
-		return new ProxyRuntimeSubmitJobCommand(args);
+			String[] attrs) {
+		return new ProxyRuntimeSubmitJobCommand(attrs);
 	}
 
 	/* (non-Javadoc)
@@ -106,6 +114,10 @@ public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements I
 
 		case IProxyRuntimeCommand.TERMINATE_JOB:
 			cmd = new ProxyRuntimeTerminateJobCommand(packet.getTransID(), packet.getArgs());
+			break;
+
+		case IProxyRuntimeCommand.FILTER_EVENTS:
+			cmd = new ProxyRuntimeFilterEventsCommand(packet.getTransID(), packet.getArgs());
 			break;
 		}
 
