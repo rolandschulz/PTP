@@ -16,6 +16,7 @@ package org.eclipse.ptp.rm.slurm.core.rtsystem;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeFilterEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
@@ -28,13 +29,20 @@ import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration
 public class SLURMProxyCommandFactory implements IProxyRuntimeCommandFactory {
 	public final static String SLURMD_PATH_ATTR = "slurmdPath"; //$NON-NLS-1$
 	public final static String SLURMD_ARGS_ATTR = "slurmdArgs"; //$NON-NLS-1$
-	
+
 	private IProxyRuntimeCommandFactory factory;
 	private ISLURMResourceManagerConfiguration config;
-	
+
 	public SLURMProxyCommandFactory(ISLURMResourceManagerConfiguration config) {
 		this.factory = new ProxyRuntimeCommandFactory();
 		this.config = config;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeFilterEventsCommand(java.lang.String[])
+	 */
+	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(String[] args) {
+		return factory.newProxyRuntimeFilterEventsCommand(args);
 	}
 	
 	/* (non-Javadoc)

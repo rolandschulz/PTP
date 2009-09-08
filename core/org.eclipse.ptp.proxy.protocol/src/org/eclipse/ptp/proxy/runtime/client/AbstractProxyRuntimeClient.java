@@ -41,6 +41,7 @@ import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeFilterEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStopEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
@@ -141,6 +142,10 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	protected final IProxyRuntimeCommandFactory cmdFactory;
 
+	public AbstractProxyRuntimeClient(String name, int baseModelId) {
+		this(name, baseModelId, new ProxyRuntimeCommandFactory(), new ProxyRuntimeEventFactory());
+	}
+
 	public AbstractProxyRuntimeClient(String name, int baseModelId,
 			IProxyRuntimeCommandFactory cmdFactory,
 			IProxyRuntimeEventFactory eventFactory) {
@@ -157,21 +162,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		}
 	}
 
-	public AbstractProxyRuntimeClient(String name, int baseModelId) {
-		this(name, baseModelId, new ProxyRuntimeCommandFactory(), new ProxyRuntimeEventFactory());
-	}
-
-	/**
-	 * Add a command to the list of commands that have been sent to the proxy
-	 * 
-	 * @param command
-	 */
-	private void addCommand(IProxyCommand command) {
-		synchronized (commands) {
-			commands.add(command);
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -180,6 +170,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener) {
 		listeners.add(listener);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#filterEvents(java.lang.String[])
+	 */
+	public void filterEvents(String[] attrs) throws IOException {
+		if (state != ProxyState.RUNNING) {
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
+		}
+		IProxyCommand command = cmdFactory.newProxyRuntimeFilterEventsCommand(attrs);
+		addCommand(command);
+		sendCommand(command);	}
 
 	/*
 	 * (non-Javadoc)
@@ -358,12 +359,12 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 * 
 	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#submitJob(java.lang.String[])
 	 */
-	public void submitJob(String[] args) throws IOException {
+	public void submitJob(String[] attrs) throws IOException {
 		if (state != ProxyState.RUNNING) {
 			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
 		}
 		IProxyCommand command = cmdFactory
-				.newProxyRuntimeSubmitJobCommand(args);
+				.newProxyRuntimeSubmitJobCommand(attrs);
 		addCommand(command);
 		sendCommand(command);
 	}
@@ -390,6 +391,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 */
 	public String toString() {
 		return proxyName + "ProxyRuntimeClient"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Add a command to the list of commands that have been sent to the proxy
+	 * 
+	 * @param command
+	 */
+	private void addCommand(IProxyCommand command) {
+		synchronized (commands) {
+			commands.add(command);
+		}
 	}
 
 	/**
@@ -466,9 +478,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				removeCommand(command);
 			}
 		} else if (command instanceof IProxyRuntimeStopEventsCommand) {
-			if (event instanceof IProxyOKEvent) {
-				removeCommand(command);
-			}
+			removeCommand(command);
+		} else if (command instanceof IProxyRuntimeFilterEventsCommand) {
+			removeCommand(command);
 		} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
 			if (event instanceof IProxyRuntimeSubmitJobErrorEvent) {
 				fireProxyRuntimeSubmitJobErrorEvent(eventFactory
