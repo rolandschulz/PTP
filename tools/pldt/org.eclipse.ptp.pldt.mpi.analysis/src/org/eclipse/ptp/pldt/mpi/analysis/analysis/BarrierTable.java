@@ -17,6 +17,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.cdt.core.dom.ast.IASTCastExpression;
 import org.eclipse.cdt.core.dom.ast.IASTExpression;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
@@ -36,6 +37,7 @@ public class BarrierTable {
 	 */
 	protected Hashtable<String,List<BarrierInfo>> table_; 
 	protected int commCounter = 0;
+	private static boolean dbg_barrier=false;
 	
 	public BarrierTable(){
 		table_ = new Hashtable<String,List<BarrierInfo>>();
@@ -49,6 +51,7 @@ public class BarrierTable {
 	public BarrierInfo addBarrier(IASTFunctionCallExpression barE, 
 			int id, IResource res, String func){
 		BarrierInfo bar = new BarrierInfo(barE, id, res, func);
+		if(dbg_barrier)System.out.println("addBarrier(): Found barrier for comm: "+bar.getComm()+" id="+id);
 		if(table_.containsKey(bar.getComm())){
 			List<BarrierInfo> list = table_.get(bar.getComm());
 			list.add(bar);
@@ -62,6 +65,7 @@ public class BarrierTable {
 	
 	/*
 	 * @return: barrier ID if it is a barrier; -1 otherwise
+	 * BRT barrier ids may not match with OpenMPI 1.3.3 headers?? see setComm()
 	 */ 
 	public int isBarrier(IASTFunctionCallExpression funcE){
 		IASTExpression funcname = funcE.getFunctionNameExpression();
@@ -131,30 +135,60 @@ public class BarrierTable {
 		 * the returned object from getOperand() depends on how the header file
 		 * defines it (In windows, it is IASTLiteralExpression, and in Linux, it
 		 * becomes IASTIdExpression). So we account for that here.
+		 * 
+		 * BRT clarification: 09/09/09
+		 * OpenMPI < 1.3? defines MPI_COMM_WORLD as:
+		 *   #define MPI_COMM_WORLD (&ompi_mpi_comm_world)
+		 * OpenMPI 1.3.3 defines MPI_COMM_WORLD as:
+		 *   #define MPI_COMM_WORLD OMPI_PREDEFINED_GLOBAL( MPI_Comm, ompi_mpi_comm_world)
+		 * which makes the CDT objects for the barrier/communicator show up differently when it gets here.
+		 *   It shows up as a CASTCastExpression, so we recognize that and get its name,
+		 *   instead of relying on the default fallback plan here, which seems to always
+		 *   make each barrier/communicator found be unique, in which case no barriers match, because their
+		 *   communicators all look different.
 		 */
 		protected void setComm() { 
-			IASTExpression parameter = barrier_.getParameterExpression();
+			IASTExpression parameter = barrier_.getParameterExpression(); 
 
-			if (parameter instanceof IASTUnaryExpression) {
+			if (parameter instanceof IASTUnaryExpression) {  
 				IASTUnaryExpression commExpr = (IASTUnaryExpression) parameter;
-				if (commExpr.getOperand() instanceof IASTUnaryExpression) {
-					IASTUnaryExpression commOprd = (IASTUnaryExpression) commExpr
-							.getOperand();
-					if (commOprd.getOperand() instanceof IASTLiteralExpression) {
-						IASTLiteralExpression comm = (IASTLiteralExpression) commOprd.getOperand();
+				IASTExpression commOp=commExpr.getOperand();
+				if (commOp instanceof IASTUnaryExpression) {  
+					if(dbg_barrier)System.out.println("setComm(): communicator is IASTUnaryExpression");
+					//IASTUnaryExpression commOprd = (IASTUnaryExpression) commOp;
+					if (commOp instanceof IASTLiteralExpression) {//Yuan says windows
+						if(dbg_barrier)System.out.println();
+						IASTLiteralExpression comm = (IASTLiteralExpression) commOp;
 						comm_ = comm.toString();
-					} else if (commOprd.getOperand() instanceof IASTIdExpression) {
-						IASTIdExpression comm = (IASTIdExpression) commOprd.getOperand();
+					} else if (commOp instanceof IASTIdExpression) { //Yuan says linux
+						IASTIdExpression comm = (IASTIdExpression) commOp;
 						comm_ = comm.getName().toString();
-					} else if (commOprd.getOperand() instanceof IASTName) {
-						comm_ = commOprd.getOperand().toString();
+					} else if (commOp instanceof IASTName) {//?
+						comm_ = commOp.toString();
 					} else {
+						
+						if(commOp instanceof IASTUnaryExpression) {// Mac OSX Openmpi < 1.3 (/usr/include/mpi.h)
+							IASTUnaryExpression iastUnaryExpression = (IASTUnaryExpression) commOp;
+							if(dbg_barrier)System.out.println("bdbg: communicator is IASTUnaryExpression");
+							comm_= iastUnaryExpression.getRawSignature();
+							
+						} else {
+							// last resort: use a unique name, but it won't
+							// match anything??
+							comm_ = "COMM_" + commCounter;
+							commCounter++;
+						}
+					}
+				} else {
+					if(commOp instanceof IASTCastExpression) {//MAC OSX Openmpi 1.3.3 
+						IASTCastExpression iastCastExpression = (IASTCastExpression) commOp;
+						comm_ = iastCastExpression.getRawSignature();
+					}
+					else{
 						comm_ = "COMM_" + commCounter;
 						commCounter++;
 					}
-				} else {
-					comm_ = "COMM_" + commCounter;
-					commCounter++;
+					
 				}
 			} else if (parameter instanceof IASTIdExpression) {
 				IASTIdExpression idE = (IASTIdExpression) parameter;
@@ -167,6 +201,7 @@ public class BarrierTable {
 				comm_ = "COMM_" + commCounter;
 				commCounter++;
 			}
+			if(dbg_barrier)System.out.println("setComm(): communicator: "+comm_);
 		}
 	
 		
