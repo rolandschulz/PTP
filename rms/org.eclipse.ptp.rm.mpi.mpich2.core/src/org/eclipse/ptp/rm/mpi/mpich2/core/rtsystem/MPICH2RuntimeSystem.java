@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
@@ -45,28 +46,68 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		super(rmid, config, attrDefMgr);
 	}
 
-	protected void setMachineID(String machineID) {
-		this.machineID = machineID;
-	}
-
-	protected void setQueueID(String queueID) {
-		this.queueID = queueID;
+	@Override
+	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
+		return new MPICH2RuntimeSystemJob(jobID, queueID, Messages.MPICH2RuntimeSystem_JobName, this, attrMgr);
 	}
 
 	public String getMachineID() {
 		return machineID;
 	}
 
-	public String getQueueID() {
-		return queueID;
-	}
-
 	public String getNodeIDforName(String hostname) {
 		return nodeNameToIDMap.get(hostname);
 	}
 
+	public String getQueueID() {
+		return queueID;
+	}
+
+	@Override
+	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
+		return new EffectiveMPICH2ResourceManagerConfiguration(getRmConfiguration());
+	}
+
 	public void setNodeIDForName(String hostname, String nodeID) {
 		nodeNameToIDMap.put(hostname, nodeID);
+	}
+
+	@Override
+	protected Job createContinuousMonitorJob() {
+		return null;
+	}
+
+	@Override
+	protected Job createDiscoverJob() {
+		if (!rmConfiguration.hasDiscoverCmd()) {
+			return null;
+		}
+		Job job = new MPICH2DiscoverJob(this);
+		job.setPriority(Job.INTERACTIVE);
+		job.setSystem(false);
+		job.setUser(false);
+		return job;
+	}
+
+	@Override
+	protected Job createPeriodicMonitorJob() {
+		if (!rmConfiguration.hasPeriodicMonitorCmd()) {
+			return null;
+		}
+		Job job = new MPICH2PeriodicJob(this);
+		job.setPriority(Job.INTERACTIVE);
+		job.setSystem(false);
+		job.setUser(false);
+		return job;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents(org.eclipse.ptp.core.elements.IPElement, boolean, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
+	@Override
+	protected void doFilterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes)
+			throws CoreException {
+		// Not implemented yet
 	}
 
 	/*
@@ -105,43 +146,12 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		// Nothing to do
 	}
 
-	@Override
-	protected Job createDiscoverJob() {
-		if (!rmConfiguration.hasDiscoverCmd()) {
-			return null;
-		}
-		Job job = new MPICH2DiscoverJob(this);
-		job.setPriority(Job.INTERACTIVE);
-		job.setSystem(false);
-		job.setUser(false);
-		return job;
-	}
-
-	@Override
-	protected Job createPeriodicMonitorJob() {
-		if (!rmConfiguration.hasPeriodicMonitorCmd()) {
-			return null;
-		}
-		Job job = new MPICH2PeriodicJob(this);
-		job.setPriority(Job.INTERACTIVE);
-		job.setSystem(false);
-		job.setUser(false);
-		return job;
-	}
-
-	@Override
-	protected Job createContinuousMonitorJob() {
-		return null;
-	}
-
-	@Override
-	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new MPICH2RuntimeSystemJob(jobID, queueID, Messages.MPICH2RuntimeSystem_JobName, this, attrMgr);
+	protected void setMachineID(String machineID) {
+		this.machineID = machineID;
 	}
 
 
-	@Override
-	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
-		return new EffectiveMPICH2ResourceManagerConfiguration(getRmConfiguration());
+	protected void setQueueID(String queueID) {
+		this.queueID = queueID;
 	}
 }

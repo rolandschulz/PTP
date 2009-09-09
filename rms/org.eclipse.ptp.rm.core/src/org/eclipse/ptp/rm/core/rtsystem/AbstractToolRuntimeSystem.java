@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -284,6 +285,22 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	protected abstract void doShutdown() throws CoreException;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp.core.elements.IPElement, boolean, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
+	public void filterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes) throws CoreException {
+		doFilterEvents(element, filterChildren, filterAttributes);
+	}
+	
+	/**
+	 * Template method to extend the filterEvents procedure.
+	 * @param element The element to filter
+	 * @param filterChildren filter children
+	 * @param filterAttributes attributes to filter
+	 * @throws CoreException
+	 */
+	protected abstract void doFilterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes) throws CoreException;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
