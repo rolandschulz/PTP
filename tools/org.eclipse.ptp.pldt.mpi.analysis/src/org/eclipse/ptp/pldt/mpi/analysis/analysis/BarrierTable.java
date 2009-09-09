@@ -37,7 +37,7 @@ public class BarrierTable {
 	 */
 	protected Hashtable<String,List<BarrierInfo>> table_; 
 	protected int commCounter = 0;
-	private static boolean dbg_barrier=false;
+	private static boolean dbg_barrier=true;
 	
 	public BarrierTable(){
 		table_ = new Hashtable<String,List<BarrierInfo>>();
@@ -51,7 +51,6 @@ public class BarrierTable {
 	public BarrierInfo addBarrier(IASTFunctionCallExpression barE, 
 			int id, IResource res, String func){
 		BarrierInfo bar = new BarrierInfo(barE, id, res, func);
-		if(dbg_barrier)System.out.println("addBarrier(): Found barrier for comm: "+bar.getComm()+" id="+id);
 		if(table_.containsKey(bar.getComm())){
 			List<BarrierInfo> list = table_.get(bar.getComm());
 			list.add(bar);
@@ -142,14 +141,18 @@ public class BarrierTable {
 		 * OpenMPI 1.3.3 defines MPI_COMM_WORLD as:
 		 *   #define MPI_COMM_WORLD OMPI_PREDEFINED_GLOBAL( MPI_Comm, ompi_mpi_comm_world)
 		 * which makes the CDT objects for the barrier/communicator show up differently when it gets here.
-		 *   It shows up as a CASTCastExpression, so we recognize that and get its name,
+		 *   It shows up as an IASTCastExpression, so we recognize that and get its name,
 		 *   instead of relying on the default fallback plan here, which seems to always
 		 *   make each barrier/communicator found be unique, in which case no barriers match, because their
 		 *   communicators all look different.
+		 *   
+		 *   Problem: for the case of #define newcomm MPI_COMM_WORLD
+		 *   I don't want the getRawSignature() on the communicator arg, i want the
+		 *   pre-processed value.  How to get that?
 		 */
 		protected void setComm() { 
 			IASTExpression parameter = barrier_.getParameterExpression(); 
-
+			
 			if (parameter instanceof IASTUnaryExpression) {  
 				IASTUnaryExpression commExpr = (IASTUnaryExpression) parameter;
 				IASTExpression commOp=commExpr.getOperand();
@@ -180,7 +183,7 @@ public class BarrierTable {
 						}
 					}
 				} else {
-					if(commOp instanceof IASTCastExpression) {//MAC OSX Openmpi 1.3.3 
+					if(commOp instanceof IASTCastExpression) {//MAC OSX Openmpi 1.3.3 ;mpich2
 						IASTCastExpression iastCastExpression = (IASTCastExpression) commOp;
 						comm_ = iastCastExpression.getRawSignature();
 					}
@@ -190,14 +193,23 @@ public class BarrierTable {
 					}
 					
 				}
-			} else if (parameter instanceof IASTIdExpression) {
+			} else if (parameter instanceof IASTIdExpression) {//windows mpich 1.2
 				IASTIdExpression idE = (IASTIdExpression) parameter;
 				comm_ = idE.getName().toString();
+				
+				/* BRT 9/9/09: why hide the actual name? no non-mpi-comm-world comms will match!
 				if (!comm_.equals("MPI_COMM_WORLD")) {
 					comm_ = "COMM_" + commCounter;
 					commCounter++;
 				}
-			} else {
+				*/
+			} else if (parameter instanceof IASTLiteralExpression){// added 9/9/09 for windows/mpich
+				IASTLiteralExpression iastLiteralExpression = (IASTLiteralExpression) parameter;
+				
+				String str=iastLiteralExpression.getRawSignature();
+				comm_=iastLiteralExpression.getRawSignature();
+			}
+			else {
 				comm_ = "COMM_" + commCounter;
 				commCounter++;
 			}
