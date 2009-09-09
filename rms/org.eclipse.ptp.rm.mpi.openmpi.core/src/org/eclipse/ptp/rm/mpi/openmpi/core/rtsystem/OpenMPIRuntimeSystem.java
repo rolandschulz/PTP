@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
@@ -37,43 +38,75 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/** The machine where open mpi is running on. */
 	private String machineID;
+
 	/** The queue that dispatches jobs to mpi. */
 	private String queueID;
 	/** Mapping of discovered hosts and their ID for IPNode elements. */
 	private Map<String,String> nodeToIDMap = new HashMap<String, String>();
-
 	public OpenMPIRuntimeSystem(Integer openmpi_rmid,
 			IOpenMPIResourceManagerConfiguration config,
 			AttributeDefinitionManager attrDefMgr) {
 		super(openmpi_rmid, config, attrDefMgr);
 	}
 
-	protected void setMachineID(String machineID) {
-		this.machineID = machineID;
-	}
-
-	protected void setQueueID(String queueID) {
-		this.queueID = queueID;
+	@Override
+	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
+		return new OpenMPIRuntimeSystemJob(jobID, queueID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
 	}
 
 	public String getMachineID() {
 		return machineID;
 	}
 
-	public String getQueueID() {
-		return queueID;
+	public String getNodeIDforName(String hostname) {
+		return nodeToIDMap.get(hostname);
 	}
 
 	public OmpiInfo getOmpiInfo() {
 		return info;
 	}
 
-	public String getNodeIDforName(String hostname) {
-		return nodeToIDMap.get(hostname);
+	public String getQueueID() {
+		return queueID;
+	}
+
+	@Override
+	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
+		return new EffectiveOpenMPIResourceManagerConfiguration(getRmConfiguration());
 	}
 
 	public void setNodeIDForName(String name, String id) {
 		nodeToIDMap.put(name, id);
+	}
+
+	@Override
+	protected Job createContinuousMonitorJob() {
+		return null;
+	}
+
+	@Override
+	protected Job createDiscoverJob() {
+		if (! rmConfiguration.hasDiscoverCmd())
+			return null;
+		Job job = new OpenMPIDiscoverJob(this);
+		job.setPriority(Job.INTERACTIVE);
+		job.setSystem(false);
+		job.setUser(false);
+		return job;
+	}
+
+	@Override
+	protected Job createPeriodicMonitorJob() {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents(org.eclipse.ptp.core.elements.IPElement, boolean, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
+	@Override
+	protected void doFilterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes)
+			throws CoreException {
+		// Not implemented yet
 	}
 
 	/*
@@ -112,35 +145,12 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		// Nothing to do
 	}
 
-	@Override
-	protected Job createDiscoverJob() {
-		if (! rmConfiguration.hasDiscoverCmd())
-			return null;
-		Job job = new OpenMPIDiscoverJob(this);
-		job.setPriority(Job.INTERACTIVE);
-		job.setSystem(false);
-		job.setUser(false);
-		return job;
-	}
-
-	@Override
-	protected Job createPeriodicMonitorJob() {
-		return null;
-	}
-
-	@Override
-	protected Job createContinuousMonitorJob() {
-		return null;
-	}
-
-	@Override
-	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new OpenMPIRuntimeSystemJob(jobID, queueID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
+	protected void setMachineID(String machineID) {
+		this.machineID = machineID;
 	}
 
 
-	@Override
-	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
-		return new EffectiveOpenMPIResourceManagerConfiguration(getRmConfiguration());
+	protected void setQueueID(String queueID) {
+		this.queueID = queueID;
 	}
 }

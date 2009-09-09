@@ -41,9 +41,12 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
+import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
 import org.eclipse.ptp.core.messages.Messages;
@@ -689,6 +692,20 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp.core.elements.IPElement, boolean, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
+	public void filterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes) throws CoreException {
+		try {
+			filterAttributes.addAttribute(ElementAttributes.getIdAttributeDefinition().create(element.getID()));
+			filterAttributes.addAttribute(FilterAttributes.getFilterChildrenAttributeDefinition().create(filterChildren));
+			proxy.filterEvents(filterAttributes.toStringArray());
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+					e.getMessage(), e));
+		}		
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
 	 */
