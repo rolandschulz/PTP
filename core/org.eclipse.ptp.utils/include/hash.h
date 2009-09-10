@@ -44,6 +44,7 @@ typedef struct Hash	Hash;
 extern Hash *		HashCreate(int);
 extern void			HashDestroy(Hash *, void (*)(void *));
 extern void *		HashSearch(Hash *, unsigned int);
+extern void *		HashFind(Hash *, char *);
 extern unsigned int	HashCompute(char *, int);
 extern HashEntry *	HashInsert(Hash *, unsigned int, void *);
 extern void			HashRemove(Hash *, unsigned int);

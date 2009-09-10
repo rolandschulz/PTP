@@ -260,6 +260,12 @@ HashSearch(Hash *htab, unsigned int idx)
 	return NULL;
 }
 
+void *
+HashFind(Hash *htab, char *key)
+{
+	return HashSearch(htab, HashCompute(key, strlen(key)));
+}
+
 HashEntry *
 HashInsert(Hash *htab, unsigned int idx, void *data)
 {
