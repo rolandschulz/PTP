@@ -595,7 +595,7 @@ static bool
 match_filter_str(int id, bool is_child, struct attrl *attrs)
 {
 	struct attrl *	attr;
-	ptp_filter *	f = (ptp_filter *)HashFind(gFilters, id);
+	ptp_filter *	f = (ptp_filter *)HashSearch(gFilters, id);
 
 	if (f != NULL && (f->children | !is_child)) {
 		for (attr = attrs; attr != NULL; attr = attr->next) {
@@ -610,17 +610,16 @@ match_filter_str(int id, bool is_child, struct attrl *attrs)
 }
 
 void
-update_filter(char *id, ptp_filter *nf)
+update_filter(int id, ptp_filter *nf)
 {
-	int				idx = HashCompute(id, strlen(id));
-	ptp_filter *	f = (ptp_filter *)HashSearch(gFilters, idx);
+	ptp_filter *	f = (ptp_filter *)HashSearch(gFilters, id);
 
 	if (f != NULL) {
 		/*
 		 * If no attributes specified, remove existing filter otherwise
 		 * remove current filter and replace with new
 		 */
-		HashRemove(gFilters, idx);
+		HashRemove(gFilters, id);
 		free_filter(f);
 
 		if (nf->num_attrs == 0) {
@@ -629,7 +628,7 @@ update_filter(char *id, ptp_filter *nf)
 		}
 	}
 
-	HashInsert(gFilters, idx, (void *)nf);
+	HashInsert(gFilters, id, (void *)nf);
 }
 
 static void
