@@ -23,6 +23,10 @@
 #define ELEMENT_NAME_ATTR			"name"
 
 /*
+ * Filter attributes
+ */
+#define FILTER_CHILDREN_ATTR		"filterChildren"
+/*
  * Machine attributes
  */
 #define MACHINE_STATE_ATTR			"machineState"
@@ -114,6 +118,8 @@
 #define BASE_ID_ATTR				"baseId"
 
 extern int		proxy_test_attribute(char *key, char *attr_str);
+extern char *	proxy_copy_attribute_name(char *attr_str);
+extern char *	proxy_copy_attribute_name_filter(char *attr_str);
 extern char *	proxy_get_attribute_value_str(char *attr_str);
 extern int		proxy_get_attribute_value_int(char *attr_str);
 extern int		proxy_get_attribute_value_bool(char *attr_str);
