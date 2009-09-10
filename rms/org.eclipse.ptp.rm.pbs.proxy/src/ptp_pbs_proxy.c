@@ -31,6 +31,117 @@
 #define WIRE_PROTOCOL_VERSION	"2.0"
 
 /*
+ * PBS Resources
+ *
+ * arch			string		System architecture
+ * cput			time		Maximum, aggregate CPU time required by all processes
+ * file			size		Maximum disk space requirements for any single file to be created
+ * host			string		Name of requested host/node
+ * mem			size		Maximum amount of physical memory (RAM)
+ * mpiprocs		int			Number of MPI processes for this chunk
+ * ncpus		int			Number of CPUs (processors)
+ * nice			int			Requested job priority
+ * nodes		string		Number and/or type of nodes
+ * nodect		int			Number of chunks in resource request from selection directive, or number of vnodes requested from node specification
+ * ompthreads	int			Number of OpenMP threads for this chunk.
+ * pcput		time		Per-process maximum CPU time
+ * pmem			size		Per-process maximum amount of physical memory
+ * pvmem		size		Per-process maximum amount of virtual memory
+ * resc			string		Single-node variable resource specification string
+ * vmem			size		Maximum, aggregate amount of virtual memory used by all concurrent processes
+ * walltime		time		Maximum amount of real time (wall-clock elapsed time)
+ * mppe			int			The number of processing elements used by a single process
+ * mppt			time		Maximum wallclock time used on the MPP.
+ * pf			size		Maximum number of file system blocks that can be used by all process
+ * pmppt		time		Maximum amount of wall clock time used on the MPP by a single process
+ * pncpus		int			Maximum number of processors used by any single process
+ * ppf			size		Maximum number of file system blocks that can be used by a single process
+ * procs		int			Maximum number of processes
+ * psds			size		Maximum number of data blocks on the SDS (secondary data storage) for any process
+ * sds			size		Maximum number of data blocks on the SDS (secondary data storage)
+ *
+ * Job Attributes
+ *
+ * Account_Name
+ * Checkpoint
+ * depend
+ * Error_Path
+ * Execution_Time
+ * group_list
+ * Hold_Types
+ * Job_Name
+ * Join_Path
+ * Keep_Files
+ * Mail_Points
+ * Mail_Users
+ * no_stdio_sockets
+ * Output_Path
+ * Priority
+ * Rerunnable
+ * Resource_List[.resource]
+ * Shell_Path_List
+ * stagein
+ * stageout
+ * umask
+ * User_List
+ * Variable_List
+ * comment
+ *
+ * Read-only Job Attributes
+ *
+ * accounting_id
+ * alt_id
+ * array
+ * array_id
+ * array_index
+ * array_indices_remaining
+ * array_indices_submitted
+ * array_state_count
+ * ctime
+ * etime
+ * exec_host
+ * egroup
+ * euser
+ * hashname
+ * interactive
+ * Job_Owner
+ * job_state
+ * mtime
+ * qtime
+ * queue
+ * resources_used
+ * run_count
+ * schedselect
+ * server
+ * session_id
+ *
+ * Queue Attributes
+ * acl_groups			string	""		The list of groups which may submit jobs to the queue
+ * acl_group_enable 	boolean	false	Only allow jobs submitted from groups specified by the acl_groups parameter
+ * acl_group_sloppy		boolean	false	acl_groups will be checked against all groups of which the job user is a member
+ * acl_hosts			string	""		List of hosts that may submit jobs to the queue
+ * acl_host_enable		boolean	false	Only allow jobs submitted from hosts specified by the acl_hosts parameter
+ * acl_logic_or			boolean	false	User and group acls are logically OR'd together
+ * acl_users			string	""		The list of users who may submit jobs to the queue
+ * acl_user_enable		boolean	false	Only allow jobs submitted from users specified by the acl_users parameter
+ * disallowed_types		string	""		List of job "types" that are not allowed in this queue
+ * enabled				boolean	false 	The queue accepts new job submissions
+ * keep_completed		integer	0		The number of seconds jobs should be held in the Completed state after exiting
+ * kill_delay			integer	2		The number of seconds between sending a SIGTERM and a SIGKILL to a job being cancelled
+ * max_queuable			integer	+INF	The maximum number of jobs allowed in the queue at any given time
+ * max_running			integer	+INF	The maximum number of jobs in the queue allowed to run at any given time
+ * max_user_queuable	integer	+INF	The maximum number of jobs, per user, allowed in the queue at any given time
+ * max_user_run			integer	+INF	The maximum number of jobs, per user, in the queue allowed to run at any given time
+ * priority				integer	+INF	The priority value associated with the queue.  DEFAULT: 0	qmgr -c "set queue batch priority=20"
+ * queue_type			enum	e	 	The queue type (e=execution, r=route)
+ * resources_available	string	""		The cumulative resources available to all jobs running in the queue
+ * resources_default	string	""		Default resource requirements for jobs submitted to the queue
+ * resources_max		string	""		The maximum resource limits for jobs submitted to the queue
+ * resources_min		string	""		The minimum resource limits for jobs submitted to the queue
+ * route_destinations	string	""		The potential destination queues for jobs submitted to the associated routing queue
+ * started				boolean	false	Jobs in the queue are allowed to execute
+ */
+/*
  * Proxy server states. The SHUTTING_DOWN state is used to
  * give the proxy a chance to send any pending events once
  * a QUIT command has been received.
@@ -874,6 +985,27 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 
+	/*
+	 * Create the server machine
+	 */
+	mach = new_machine();
+
+	/*
+	 * Get queues and queue attributes
+	 */
+	status = pbs_statque(stream, NULL, NULL, NULL);
+	if (status == NULL) {
+		sendErrorEvent(trans_id, RTEV_ERROR_INIT, pbs_geterrmsg(stream));
+		return PROXY_RES_OK;
+	}
+
+	for (s=status; s != NULL; s = s->next) {
+		ptp_queue * q = new_queue(s->name, s->attribs);
+		initialize_queue_filter(q);
+	}
+
+	pbs_statfree(status);
+
 	proxy_state = STATE_RUNNING;
 		
 	sendOKEvent(trans_id);
@@ -891,6 +1023,12 @@ PBS_ModelDef(int trans_id, int nargs, char **args)
 		fprintf(stderr, "PBS_ModelDef (%d):\n", trans_id); fflush(stderr);
 	}
 	
+	/*
+	 * Send attribute definitions
+	 */
+	/*
+	 * Send default filters
+	 */
 	sendOKEvent(trans_id);
 	return PROXY_RES_OK;
 }
@@ -921,7 +1059,6 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 {
 	int						i;
 	int						a;
-	int						num_procs = 1;
 	int						debug = false;
 	int						num_args = 0;
 	int						num_env = 0;
@@ -956,8 +1093,6 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 			pgm_name = proxy_get_attribute_value_str(args[i]);
 		} else if (proxy_test_attribute(JOB_EXEC_PATH_ATTR, args[i])) {
 			exec_path = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(JOB_NUM_PROCS_ATTR, args[i])) {
-			num_procs = proxy_get_attribute_value_int(args[i]);
 		} else if (proxy_test_attribute(JOB_WORKING_DIR_ATTR, args[i])) {
 			cwd = proxy_get_attribute_value_str(args[i]);
 		} else if (proxy_test_attribute(JOB_PROG_ARGS_ATTR, args[i])) {
@@ -1009,11 +1144,6 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 	
-	if (num_procs <= 0) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify number of processes to launch");
-		return PROXY_RES_OK;
-	}
-		
 	/*
 	 * Get supplied environment. It is used to locate executable if necessary.
 	 */
@@ -1157,7 +1287,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	gTransID = trans_id;
 	
 	/*
-	 * Get server attributes
+	 * Send the RM attributes
 	 */
 	status = pbs_statserver(stream, NULL, NULL);
 	if (status == NULL) {
@@ -1168,15 +1298,14 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	sendRMAttributesEvent(trans_id, status->attribs);
 
 	/*
-	 * Create the server machine
+	 * Send the machine
 	 */
-	mach = new_machine();
 	sendNewMachineEvent(trans_id, mach->id, status->name);
 
 	pbs_statfree(status);
 
 	/*
-	 * Get queues and queue attributes
+	 * Send queues and queue attributes
 	 */
 	status = pbs_statque(stream, NULL, NULL, NULL);
 	if (status == NULL) {
@@ -1185,9 +1314,10 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	}
 
 	for (s=status; s != NULL; s = s->next) {
-		ptp_queue * q = new_queue(s->name);
-		initialize_queue_filter(q);
-		sendNewQueueEvent(trans_id, q->id, q->name, s->attribs);
+		ptp_queue * q = find_queue_by_name(s->name);
+		if (q != NULL) {
+			sendNewQueueEvent(trans_id, q->id, q->name, s->attribs);
+		}
 	}
 
 	pbs_statfree(status);
