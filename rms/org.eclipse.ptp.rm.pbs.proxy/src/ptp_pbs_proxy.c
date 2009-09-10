@@ -131,9 +131,9 @@ struct ptp_job {
 typedef struct ptp_job ptp_job;
 
 struct ptp_filter {
-	Hash *	hash;
-	int		num_attrs;
-	bool	children;
+	Hash *	hash;		/* attributes to filter */
+	int		num_attrs;	/* number of attributes in hash */
+	bool	children;	/* apply filter to children */
 };
 typedef struct ptp_filter	ptp_filter;
 
@@ -592,7 +592,7 @@ free_filter(ptp_filter *f)
 }
 
 static bool
-match_filter_str(char *id, bool is_child, struct attrl *attrs)
+match_filter_str(int id, bool is_child, struct attrl *attrs)
 {
 	struct attrl *	attr;
 	ptp_filter *	f = (ptp_filter *)HashFind(gFilters, id);
@@ -1187,7 +1187,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 
 	for (s=status; s != NULL; s = s->next) {
 		ptp_queue * q = new_queue(s->name);
-		initalize_queue_filter(q);
+		initialize_queue_filter(q);
 		sendNewQueueEvent(trans_id, q->id, q->name, s->attribs);
 	}
 
@@ -1224,8 +1224,8 @@ int
 PBS_FilterEvents(int trans_id, int nargs, char **args)
 {
 	int				i;
+	int				id = 0;
 	bool			filter_children = false;
-	char *			id = NULL;
 	ptp_filter *	f;
 
 	if (debug_level > 0) {
@@ -1236,7 +1236,7 @@ PBS_FilterEvents(int trans_id, int nargs, char **args)
 
 	for (i = 0; i < nargs; i++) {
 		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
-			id = proxy_get_attribute_value_str(args[i]);
+			id = atoi(proxy_get_attribute_value_str(args[i]));
 		} else if (proxy_test_attribute(FILTER_CHILDREN_ATTR, args[i])) {
 			filter_children = proxy_get_attribute_value_bool(args[i]);
 		} else {
@@ -1244,7 +1244,7 @@ PBS_FilterEvents(int trans_id, int nargs, char **args)
 		}
 	}
 
-	if (id == NULL) {
+	if (id == 0) {
 		sendErrorEvent(trans_id, RTEV_ERROR_FILTER, "no element ID specified");
 		return PROXY_RES_OK;
 	}
