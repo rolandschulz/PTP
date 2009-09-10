@@ -167,6 +167,7 @@
 #define RTEV_ERROR_NATTR		RTEV_OFFSET + 1007
 #define RTEV_ERROR_SIGNAL		RTEV_OFFSET + 1009
 #define RTEV_ERROR_FILTER		RTEV_OFFSET + 1010
+#define RTEV_ERROR_START_EVENTS	RTEV_OFFSET + 1011
 
 #define JOB_NAME_FMT			"job%02d"
 #define PBS_QUEUE_ATTR			"queue"
@@ -198,6 +199,7 @@ typedef enum job_state	job_state;
 
 struct ptp_machine {
 	int		id;
+	char *	name;
 	List *	nodes;
 };
 typedef struct ptp_machine	ptp_machine;
@@ -311,13 +313,22 @@ generate_id(void)
  * Create a new machine.
  */
 static ptp_machine *
-new_machine()
+new_machine(char *name)
 {
 	ptp_machine *	m = (ptp_machine *)malloc(sizeof(ptp_machine));
 	m->id = generate_id();
+	m->name = strdup(name);
 	m->nodes = NewList();
     AddToList(gMachineList, (void *)m);
     return m;
+}
+
+static void
+free_machine(ptp_machine *m)
+{
+	RemoveFromList(gMachineList, (void *)m);
+	free(m->name);
+	free(m);
 }
 
 /*
@@ -488,6 +499,8 @@ free_job(ptp_job *j)
 {
 	int	i;
 	
+	RemoveFromList(gJobList, (void *)j);
+	HashRemove(gJobHash, HashCompute(j->pbs_jobid, strlen(j->pbs_jobid)));
 	free(j->pbs_jobid);
 	free(j->jobsubid);
 	for (i = 0; i < j->num_procs; i++) {
@@ -499,18 +512,6 @@ free_job(ptp_job *j)
 	}
 	free_rangeset(j->set);
 	free(j);
-}
-
-/*
- * Remove job from the list when it terminates. If debug is true, 
- * lookup the job using the debug jobid.
- */
-static void
-remove_job(ptp_job *j)
-{
-	RemoveFromList(gJobList, (void *)j);
-	HashRemove(gJobHash, HashCompute(j->pbs_jobid, strlen(j->pbs_jobid)));
-	free_job(j);
 }
 
 /*
@@ -946,7 +947,10 @@ initialize_queue_filter(ptp_queue *q)
 int
 PBS_Initialize(int trans_id, int nargs, char **args)
 {
-	int				i;
+	int						i;
+	ptp_machine *			mach;
+	struct batch_status *	s;
+	struct batch_status *	status;
 	
 	if (debug_level > 0) {
 		fprintf(stderr, "PBS_Initialize (%d):\n", trans_id); fflush(stderr);
@@ -985,10 +989,18 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 
+	status = pbs_statserver(stream, NULL, NULL);
+	if (status == NULL) {
+		sendErrorEvent(trans_id, RTEV_ERROR_INIT, pbs_geterrmsg(stream));
+		return PROXY_RES_OK;
+	}
+
 	/*
 	 * Create the server machine
 	 */
-	mach = new_machine();
+	mach = new_machine(status->name);
+
+	pbs_statfree(status);
 
 	/*
 	 * Get queues and queue attributes
@@ -1000,7 +1012,7 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 	}
 
 	for (s=status; s != NULL; s = s->next) {
-		ptp_queue * q = new_queue(s->name, s->attribs);
+		ptp_queue * q = new_queue(s->name);
 		initialize_queue_filter(q);
 	}
 
@@ -1280,7 +1292,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	}
 
 	if (proxy_state != STATE_RUNNING) {
-		sendErrorEvent(trans_id, RTEV_ERROR_INIT, "must call INIT first");
+		sendErrorEvent(trans_id, RTEV_ERROR_START_EVENTS, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 
@@ -1291,16 +1303,18 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	 */
 	status = pbs_statserver(stream, NULL, NULL);
 	if (status == NULL) {
-		sendErrorEvent(trans_id, RTEV_ERROR_INIT, pbs_geterrmsg(stream));
+		sendErrorEvent(trans_id, RTEV_ERROR_START_EVENTS, pbs_geterrmsg(stream));
 		return PROXY_RES_OK;
 	}
 
 	sendRMAttributesEvent(trans_id, status->attribs);
 
 	/*
-	 * Send the machine
+	 * Send the machines
 	 */
-	sendNewMachineEvent(trans_id, mach->id, status->name);
+	for (SetList(gMachineList); (mach = (ptp_machine *)GetListElement(gMachineList)) != NULL; ) {
+		sendNewMachineEvent(trans_id, mach->id, mach->name);
+	}
 
 	pbs_statfree(status);
 
@@ -1309,7 +1323,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	 */
 	status = pbs_statque(stream, NULL, NULL, NULL);
 	if (status == NULL) {
-		sendErrorEvent(trans_id, RTEV_ERROR_INIT, pbs_geterrmsg(stream));
+		sendErrorEvent(trans_id, RTEV_ERROR_START_EVENTS, pbs_geterrmsg(stream));
 		return PROXY_RES_OK;
 	}
 
