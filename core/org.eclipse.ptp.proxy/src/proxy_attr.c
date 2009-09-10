@@ -49,6 +49,47 @@ proxy_test_attribute(char *key, char *attr_str)
 }
 
 /*
+ * Find the attribute name (key).
+ * Caller must free the return string.
+ */
+char *
+proxy_copy_attribute_name(char *attr_str)
+{
+	char *	s = strchr(attr_str, '=');
+
+	if (s != NULL) {
+		int 	len = s - attr_str;
+		char *	res = (char *)malloc(len+1);
+		memcpy(res, attr_str, len);
+		*(res+len) = '\0';
+		return res;
+	}
+
+	return NULL;
+}
+
+/*
+ * Find the attribute that corresponds to the filter attribute name.
+ * Caller must free the return string.
+ */
+char *
+proxy_copy_attribute_name_filter(char *attr_str)
+{
+	int 	len;
+	char *	s = proxy_copy_attribute_name(attr_str);
+
+	if (s != NULL) {
+		len = strlen(s);
+		if (len > 6 && strcmp(s + len - 6, "Filter") == 0) {
+			s[len-6] = '\0';
+			return s;
+		}
+	}
+
+	return NULL;
+}
+
+/*
  * Return attribute value as a string. If we have tested for the attribute key
  * before calling this, then it is guaranteed to return a non-NULL string.
  */
