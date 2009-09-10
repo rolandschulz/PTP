@@ -151,7 +151,7 @@ static int			ptp_signal_exit;
 static int			debug_level = 0; /* 0 is off */
 static RETSIGTYPE	(*saved_signals[NSIG])(int);
 static int			stream;
-static int			gUserName;
+static char *		gUserName;
 
 extern char *		pbs_server;
 
