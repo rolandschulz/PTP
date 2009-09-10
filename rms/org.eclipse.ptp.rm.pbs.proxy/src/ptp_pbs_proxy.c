@@ -46,7 +46,7 @@
 #define RTEV_OFFSET						200
 
 /*
- * RTEV_ERROR codes are used internally in the ORTE specific plugin
+ * RTEV_ERROR codes are used internally in the PBS specific plugin
  */
 #define RTEV_ERROR_INIT			RTEV_OFFSET + 1000
 #define RTEV_ERROR_FINALIZE		RTEV_OFFSET + 1001
@@ -55,6 +55,7 @@
 #define RTEV_ERROR_SERVER		RTEV_OFFSET + 1004
 #define RTEV_ERROR_NATTR		RTEV_OFFSET + 1007
 #define RTEV_ERROR_SIGNAL		RTEV_OFFSET + 1009
+#define RTEV_ERROR_FILTER		RTEV_OFFSET + 1010
 
 #define JOB_NAME_FMT			"job%02d"
 #define PBS_QUEUE_ATTR			"queue"
@@ -599,7 +600,7 @@ match_filter_str(char *id, bool is_child, struct attrl *attrs)
 	if (f != NULL && (f->children | !is_child)) {
 		for (attr = attrs; attr != NULL; attr = attr->next) {
 			regex_t	*	reg = (regex_t *)HashFind(f->hash, attr->name);
-			if (reg != NULL && regexec(reg, attr->value, 0, NULL, 0) == 0)
+			if (reg != NULL && regexec(reg, attr->value, 0, NULL, 0) == 0) {
 				return true;
 			}
 		}
@@ -816,14 +817,14 @@ sendProcessOutputEvent(int trans_id, int procid, char *output)
 /*
  * Set initial filter on queues
  */
-void
+static void
 initialize_queue_filter(ptp_queue *q)
 {
 	char *			attr;
 	ptp_filter *	f = new_filter();
 
 	f->children = true;
-	asprintf(&attr, "Job_OwnerFilter=%s@.*", gUserName;
+	asprintf(&attr, "Job_OwnerFilter=%s@.*", gUserName);
 	add_filter_attribute(f, attr);
 	update_filter(q->id, f);
 	free(attr);
@@ -1225,13 +1226,13 @@ PBS_FilterEvents(int trans_id, int nargs, char **args)
 	int				i;
 	bool			filter_children = false;
 	char *			id = NULL;
-	ptp_filter *	nf;
+	ptp_filter *	f;
 
 	if (debug_level > 0) {
 		fprintf(stderr, "  PBS_FilterEvents (%d):\n", trans_id); fflush(stderr);
 	}
 
-	nf = new_filter();
+	f = new_filter();
 
 	for (i = 0; i < nargs; i++) {
 		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
@@ -1248,9 +1249,9 @@ PBS_FilterEvents(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 
-	nf->children = filter_children;
+	f->children = filter_children;
 
-	update_filter(id, nf);
+	update_filter(id, f);
 
 	return PROXY_RES_OK;
 }
@@ -1323,7 +1324,7 @@ poll_pbs()
 			/*
 			 * Check for queue filters
 			 */
-			if (match_filter(queue->id, true, s->attribs)) {
+			if (match_filter_str(queue->id, true, s->attribs)) {
 				j = new_job(0, false, queue, NULL, s->name);
 
 				if (debug_level > 0) {
@@ -1350,7 +1351,7 @@ poll_pbs()
 	return 0;
 }
 
-void
+static void
 initialize()
 {
 	struct passwd *	pw;
@@ -1367,14 +1368,14 @@ initialize()
 	}
 }
 
-int
+static int
 server(char *name, char *host, int port)
 {
 	int				rc = 0;
 	int				poll_timeout = 0;
 	struct timeval	timeout = {0, PROXY_TIMEOUT};
 	
-	initalize();
+	initialize();
 	
 	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &conn) != PROXY_RES_OK) {
 		if (debug_level > 0) {
