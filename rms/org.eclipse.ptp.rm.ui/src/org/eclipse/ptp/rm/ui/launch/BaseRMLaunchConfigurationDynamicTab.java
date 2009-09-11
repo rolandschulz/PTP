@@ -21,7 +21,7 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 
-public abstract class AbstractRMLaunchConfigurationDynamicTab implements
+public abstract class BaseRMLaunchConfigurationDynamicTab implements
 IRMLaunchConfigurationDynamicTab {
 
 	private final ListenerList listenerList = new ListenerList();

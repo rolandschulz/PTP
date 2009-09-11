@@ -36,16 +36,16 @@ extends
 org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
 implements IRMLaunchConfigurationContentsChangedListener {
 
-	private final List<AbstractRMLaunchConfigurationDynamicTab> tabControllers = new ArrayList<AbstractRMLaunchConfigurationDynamicTab>();
+	private final List<BaseRMLaunchConfigurationDynamicTab> tabControllers = new ArrayList<BaseRMLaunchConfigurationDynamicTab>();
 	private Composite control;
 
-	protected void addDynamicTab(AbstractRMLaunchConfigurationDynamicTab tabController) {
+	protected void addDynamicTab(BaseRMLaunchConfigurationDynamicTab tabController) {
 		tabControllers.add(tabController);
 		tabController.addContentsChangedListener(this);
 	}
 
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
 			if (! validation.isSuccess())
 				return validation;
@@ -54,7 +54,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 	}
 
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
 			if (! validation.isSuccess())
 				return validation;
@@ -71,7 +71,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 		final TabFolder tabFolder = new TabFolder(control, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
 			tabControl.createControl(tabFolder, rm, queue);
 			simpleTabItem.setText(tabControl.getText());
@@ -87,7 +87,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
 			if (! validation.isSuccess()) {
 				resultValidation = validation;
@@ -98,7 +98,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);
 			if (! validation.isSuccess()) {
 				resultValidation = validation;
@@ -109,7 +109,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm, queue);
 			if (! validation.isSuccess()) {
 				resultValidation = validation;
@@ -121,7 +121,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration,
 			String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			IAttribute<?, ?, ?> attributeArray[] = tabControl.getAttributes(rm, queue, configuration, mode);
 			if (attributeArray != null) {
 				List<IAttribute<?, ?, ?>> attributesList = Arrays.asList(attributeArray);
@@ -132,7 +132,7 @@ implements IRMLaunchConfigurationContentsChangedListener {
 	}
 
 	public void updateControls() {
-		for (AbstractRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			tabControl.updateControls();
 		}
 	}

@@ -42,7 +42,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters.Parameter;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
-import org.eclipse.ptp.rm.ui.launch.AbstractRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.swt.SWT;
@@ -70,7 +70,7 @@ import org.eclipse.swt.widgets.Text;
  *
  */
 public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
-AbstractRMLaunchConfigurationDynamicTab {
+BaseRMLaunchConfigurationDynamicTab {
 
 	protected Composite control;
 	protected Button useArgsDefaultsButton;
@@ -87,7 +87,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 
 	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener
 	implements ICheckStateListener {
-		public WidgetListener(AbstractRMLaunchConfigurationDynamicTab dynamicTab) {
+		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
 
@@ -117,7 +117,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		private boolean useDefParams;
 		private Map<String, String> params;
 
-		protected DataSource(AbstractRMLaunchConfigurationDynamicTab page) {
+		protected DataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
 		}
 
