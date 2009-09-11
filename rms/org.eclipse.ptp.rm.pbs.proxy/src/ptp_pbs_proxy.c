@@ -712,13 +712,13 @@ match_filter_str(int id, bool is_child, struct attrl *attrs)
 	if (f != NULL && (f->children | !is_child)) {
 		for (attr = attrs; attr != NULL; attr = attr->next) {
 			regex_t	*	reg = (regex_t *)HashFind(f->hash, attr->name);
-			if (reg != NULL && regexec(reg, attr->value, 0, NULL, 0) == 0) {
-				return true;
+			if (reg != NULL && regexec(reg, attr->value, 0, NULL, 0) != 0) {
+				return false;
 			}
 		}
 	}
 
-	return false;
+	return true;
 }
 
 void
