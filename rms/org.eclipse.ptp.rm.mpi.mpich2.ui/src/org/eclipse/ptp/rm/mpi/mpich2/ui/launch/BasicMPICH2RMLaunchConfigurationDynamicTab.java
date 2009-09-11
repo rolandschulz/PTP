@@ -28,7 +28,7 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2UIPlugin;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
-import org.eclipse.ptp.rm.ui.launch.AbstractRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.utils.ui.PixelConverter;
@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Text;
  * @author Daniel Felix Ferber
  *
  */
-public class BasicMPICH2RMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigurationDynamicTab {
+public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
 
 	Composite control;
 	Spinner numProcsSpinner;
@@ -65,7 +65,7 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends AbstractRMLaunch
 	Button browseButton;
 
 	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
-		public WidgetListener(AbstractRMLaunchConfigurationDynamicTab dynamicTab) {
+		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
 
@@ -102,7 +102,7 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends AbstractRMLaunch
 		private boolean useHostList;
 		private String hostList;
 
-		protected DataSource(AbstractRMLaunchConfigurationDynamicTab page) {
+		protected DataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
 		}
 

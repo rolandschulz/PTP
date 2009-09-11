@@ -28,7 +28,7 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
-import org.eclipse.ptp.rm.ui.launch.AbstractRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.utils.ui.PixelConverter;
@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Text;
  *
  */
 public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
-AbstractRMLaunchConfigurationDynamicTab {
+BaseRMLaunchConfigurationDynamicTab {
 
 	Composite control;
 	Spinner numProcsSpinner;
@@ -69,7 +69,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 	Button browseButton;
 
 	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
-		public WidgetListener(AbstractRMLaunchConfigurationDynamicTab dynamicTab) {
+		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
 
@@ -118,7 +118,7 @@ AbstractRMLaunchConfigurationDynamicTab {
 		private boolean useHostList;
 		private String hostList;
 
-		protected DataSource(AbstractRMLaunchConfigurationDynamicTab page) {
+		protected DataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
 		}
 

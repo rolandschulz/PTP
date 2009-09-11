@@ -17,13 +17,13 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rm.ui.utils.DataSource;
 
 public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSource {
-	private final AbstractRMLaunchConfigurationDynamicTab page;
+	private final BaseRMLaunchConfigurationDynamicTab page;
 	private IPQueue queue;
 	private IResourceManager resourceManager;
 	private ILaunchConfiguration configuration;
 	private ILaunchConfigurationWorkingCopy configurationWorkingCopy;
 
-	protected RMLaunchConfigurationDynamicTabDataSource(AbstractRMLaunchConfigurationDynamicTab page) {
+	protected RMLaunchConfigurationDynamicTabDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 		this.page = page;
 	}
 

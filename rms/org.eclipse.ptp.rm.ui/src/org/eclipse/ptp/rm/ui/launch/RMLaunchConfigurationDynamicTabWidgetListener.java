@@ -15,10 +15,10 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 
 public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends WidgetListener {
-	private final AbstractRMLaunchConfigurationDynamicTab dynamicTab;
+	private final BaseRMLaunchConfigurationDynamicTab dynamicTab;
 
 	public RMLaunchConfigurationDynamicTabWidgetListener(
-			AbstractRMLaunchConfigurationDynamicTab dynamicTab) {
+			BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 		super();
 		this.dynamicTab = dynamicTab;
 	}
