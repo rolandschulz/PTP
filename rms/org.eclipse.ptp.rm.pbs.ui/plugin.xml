@@ -20,7 +20,7 @@
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
-            class="org.eclipse.ptp.rm.pbs.ui.rmLaunchConfiguration.PBSRMLaunchConfigurationFactory"
+            class="org.eclipse.ptp.rm.pbs.ui.launch.PBSRMLaunchConfigurationFactory"
             id="org.eclipse.ptp.pbs.ui.launchConfiguration"/>
    </extension>
    <extension
