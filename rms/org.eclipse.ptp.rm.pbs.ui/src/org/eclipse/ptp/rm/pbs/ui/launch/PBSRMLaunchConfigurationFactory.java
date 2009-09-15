@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.rmLaunchConfiguration;
+package org.eclipse.ptp.rm.pbs.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elements.IResourceManager;
