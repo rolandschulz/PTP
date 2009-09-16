@@ -31,16 +31,16 @@ under Tools $>$ PTP by selecting one of the ``Photran'' components.
 
 This document explains the design of Photran so that interested contributors
 could fix a bug or add a refactoring. Contributors should know how to use
-Photran and how CDT works. There is a short
-\href{http://www.eclipse.org/photran/documentation.php}{\emph{Getting Started
-Guide}} on the Photran website.
-
-Contributors also need to understand Eclipse and how to build Eclipse plug-ins
-before they read this document. We recommend reading
+Photran; user's guides and introductory tutorials are available from the
+\href{http://www.eclipse.org/photran/documentation.php}{\emph{Documentation}}
+section of Photran's website.  Contributors also need to understand how to build
+Eclipse plug-ins before they read this document. Two good books on Eclipse
+plug-in development are
 \href{http://www.amazon.com/Eclipse-Building-Commercial-Quality-Plug-Ins/dp/0321228472}{\emph{Building
 Commercial-Quality Plug-ins}} and
 \href{http://www.amazon.com/Java-Developers-Guide-Eclipse-2nd/dp/0321305027/}{\emph{The
-Java Developer's Guide to Eclipse}} for Eclipse newcomers.
+Java Developer's Guide to Eclipse.}}  Like almost all Eclipse plug-ins, Photran
+is written in Java, so knowing Java is also a prerequisite.
 
 This is a \emph{duplex} guide. The main chapters provide general descriptions of
 the various components and how they interact. The appendix describes concrete

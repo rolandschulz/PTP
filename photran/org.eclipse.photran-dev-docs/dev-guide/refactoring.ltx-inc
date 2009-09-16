@@ -32,7 +32,9 @@ analysis tools provided by the VPG.
 \section{Structure of a Fortran Refactoring}
 \label{sec:structure_of_a_fortran_refactoring}
 
-Refactorings in Photran are subclassed from \texttt{FortranRefactoring}, which
+Refactorings in Photran are subclassed from either
+\texttt{SingleFileFortranRefactoring} or \texttt{MultipleFileFortranRefactoring}.
+Both of these are subclasses of \texttt{AbstractFortranRefactoring}, which
 is in turn a subclass of the \texttt{Refactoring} class provided by the Eclipse
 Language ToolKit (LTK)\footnote{See
 \href{http://www.eclipse.org/articles/Article-LTK/ltk.html}{The Language
@@ -66,7 +68,7 @@ protected abstract void doCheckFinalConditions(RefactoringStatus status,
 protected abstract void doCreateChange(IProgressMonitor pm) throws
 	CoreException, OperationCanceledException;
 \end{lstlisting}
-\caption{Abstract methods of \texttt{FortranRefactoring} class}
+\caption{Abstract methods of \texttt{AbstractFortranRefactoring} class}
 \label{lst:FortranRefactoring_API}
 \end{code}
 
@@ -86,12 +88,12 @@ identifier.
 The actual transformation is done in the \texttt{doCreateChange} method, which
 will be called only after the final preconditions are checked. For more information, see Section~\ref{sec:ast_rewriting}.
 
-The \texttt{FortranRefactoring} class provides a large number of
+The \texttt{AbstractFortranRefactoring} class provides a large number of
 \texttt{protected} utility methods common among refactorings, such as a method
 to determine if a token is a uniquely-bound identifier, a method to parse
 fragments of code that are not complete programs, and a \texttt{fail} method
 which is simply shorthand for throwing a \texttt{PreconditionFailure}. It is
-worth reading through the source code for \texttt{FortranRefactoring} before
+worth reading through the source code for \texttt{AbstractFortranRefactoring} before
 writing your own utility methods.
 
 \section{Creating Changes: AST Rewriting}
@@ -190,7 +192,7 @@ There are \emph{three} steps involved in inserting a new AST node:
 	\item Re-indenting the new AST node to fit within the current file.
 \end{enumerate}
 
-\paragraph{Constructing the new AST node} The \texttt{FortranRefactoring} class
+\paragraph{Constructing the new AST node} The \texttt{AbstractFortranRefactoring} class
 provides convenience methods for constructing new AST nodes. These methods
 should be treated as part of the API for Fortran refactorings . For instance,
 the \texttt{parseLiteralStatement} methods constructs a list of AST nodes for 
@@ -322,7 +324,7 @@ you are looking for.
 \noindent \textbf{How would I create a new AST node from a string?} 
 \\ Call the \texttt{parseLiteralStatement(String string)} or
 \texttt{parseLiteralStatementSequence(String string)} method in
-\texttt{FortranRefactoring}. The former takes a \texttt{String} that represents
+\texttt{AbstractFortranRefactoring}. The former takes a \texttt{String} that represents
 a single statement while the latter takes a \texttt{String} that represents a
 sequence of statements.
 

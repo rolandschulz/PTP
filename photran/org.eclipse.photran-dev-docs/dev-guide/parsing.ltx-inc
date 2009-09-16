@@ -6,11 +6,11 @@ Before any program analysis can be done, the source code of the Fortran program
 has to be parsed. Photran provides support for both fixed-form (Fortran 77) and
 free-form Fortran (Fortran 90 \& 95) source code. The parser in Photran is
 generated using the Ludwig parser/AST generator by Jeff Overbey. It is based on
-the \emph{fortran95.bnf} grammar file.
+the \emph{fortran2003.bnf} grammar file.
 
 Figure~\ref{fig:images_parser_chain} shows the lexer \& parser tool chain in
-Photran. Preliminary support for the preprocessor (\texttt{INCLUDE} directives)
-has also been implemented in the current version of the tool chain.
+Photran. Preliminary support for (\texttt{INCLUDE} directives) has also been
+implemented.
 
 \begin{image}
 	\centering
@@ -156,7 +156,7 @@ tokens in the AST e.g. \\ \lstinline!for (Token token : new IterableWrapper<Toke
 
 Photran's (rewritable) AST is generated along with the parser, so the structure
 of an AST is determined by the structure of the parsing grammar (see the
-\emph{fortran95.bnf} file). The generated classes are located in the
+\emph{fortran2003.bnf} file). The generated classes are located in the
 \texttt{org.eclipse.photran.internal.core.parser} package in the
 \texttt{org.eclipse.photran.core.vpg} project. The easiest way to visualize the
 structure of a particular file's AST is to view it in the Outline view (see
@@ -171,7 +171,7 @@ Generally speaking, there is one AST node for each nonterminal in the grammar
 and one accessor method for each symbol on its right-hand side (unless the
 symbol name is prefixed with a hyphen, in which case it is omitted). For
 example, the following specification\footnote{All grammar
-specifications are taken from the \emph{fortran95.bnf} file. The \# RXXX number
+specifications are taken from the \emph{fortran2003.bnf} file. The \# RXXX number
 provides a reference to the actual specification in the grammar file.}
 
 {\footnotesize\begin{verbatim}
@@ -449,9 +449,8 @@ Most of the remaining fields are used internally for refactoring.
 The previous sections describe the conventions and additional annotations that
 are used to construct the AST nodes. While the conventions and annotations
 themselves are simple, the Fortran grammar is extremely complicated and contains
-hundreds of grammar specifications. Essentially, even the simplest Fortran
-program might contain a very complicated AST. For instance this simple Fortran
-program: \\
+hundreds of rules. Even the simplest Fortran program might contain a very
+complicated AST. For instance this simple Fortran program: \\
 
 \begin{lstlisting}[language=Fortran, frame=lines]
 program main
@@ -461,22 +460,22 @@ end
 
 generates the AST shown in Figure~\ref{fig:simple_fortran_ast}. As an exercise,
 the reader is encouraged to derive the structure of the AST from the grammar
-specifications in the \emph{fortran.bnf} file beginning with \# R201,
+specifications in the \emph{fortran2003.bnf} file beginning with \# R201,
 \verb!<ExecutableProgram>!.
 
-Moreover, modifying our previous program slightly to contain an array as shown
-below, causes the AST structure to become extremely complicated. The reader is
-encouraged to create a file containing this program and view the resulting AST
-in the Outline View in Photran. Notice how the \verb!(5)! expression for
-specifying the dimension of the array requires building up an entire hierarchy
-of \texttt{ASTLevel5ExprNode}, \texttt{ASTLevel4ExprNode},
-\texttt{ASTLevel3ExprNode}, \ldots \\
-
-\begin{lstlisting}[language=Fortran, frame=lines]
-program main
-  	integer a(5) ! This declares an array of 5 integers
-end	
-\end{lstlisting}
+%Moreover, modifying our previous program slightly to contain an array as shown
+%below, causes the AST structure to become extremely complicated. The reader is
+%encouraged to create a file containing this program and view the resulting AST
+%in the Outline View in Photran. Notice how the \verb!(5)! expression for
+%specifying the dimension of the array requires building up an entire hierarchy
+%of \texttt{ASTLevel5ExprNode}, \texttt{ASTLevel4ExprNode},
+%\texttt{ASTLevel3ExprNode}, \ldots \\
+%
+%\begin{lstlisting}[language=Fortran, frame=lines]
+%program main
+%  	integer a(5) ! This declares an array of 5 integers
+%end	
+%\end{lstlisting}
 
 
 \begin{image}
@@ -491,6 +490,22 @@ most refactoring and program analysis tasks, it is sufficient to rely on the
 information that the VPG provides. If that is insufficient, then it is usually
 enough to construct a Visitor to visit \emph{only} the nodes of interest and
 ``collect'' the information that is required.
+
+\section{AST Structure for DO-Loops}
+
+Due to a deficiency in the parser, DO-constructs are not recognized as a single
+construct; DO and END DO statements are recognized as ordinary statements
+alongside the statements comprising their body.  There is a package in the
+core.vpg plug-in called org.eclipse.photran.internal.core.analysis.loops which
+provides machinery to fix this, giving DO-loops a ``proper'' AST structure.
+
+If you call \texttt{LoopReplacer.replaceAllLoopsIn(ast)}, it will identify all
+of the new-style DO-loops and change them to \texttt{ASTProperLoopConstructNode}s,
+which a more natural structure, with a loop header, body, and END DO statement.
+Once this is done, visitors must be implemented by subclassing one of the
+Visitor classes \emph{in the org.eclipse.photran.internal.core.analysis.loops
+package;} these have a callback method to handle
+\texttt{ASTProperLoopConstructNode}s.
 
 \section{Scope and Binding Analysis}
 
@@ -610,7 +625,7 @@ The following subclasses of \texttt{FortranEditorASTActionDelegate} all contain 
 \label{sec:how_to_get_acquainted_with_the_program_representation}
 
 \emph{All these features work on \textbf{Fortran projects}. A new Fortran
-project can be created via File $>$ New $>$ Fortran $>$ Fortran Project. These
+project can be created via File $>$ New $>$ Project\dots $>$ Fortran $>$ Fortran Project. These
 features do not work on individual Fortran source files.}
 
 \subsection{Visualizing ASTs}
@@ -619,7 +634,7 @@ Photran can display ASTs in place of the ordinary Outline view.
 This behavior can be enabled from the Fortran workspace preferences:
 
 \begin{itemize}
-	\item Click on Window $>$ Preferences in Windows/Linux, orEclipse $>$ Preferences in Mac OS X.
+	\item Click on Window $>$ Preferences in Windows/Linux, or Eclipse $>$ Preferences in Mac OS X.
 	\item Select ``Fortran'' on the left hand side of the preference dialog (do not expand it).
 	\item Select ``(Debugging) Show entire parse tree rather than Outline view''
 \end{itemize}

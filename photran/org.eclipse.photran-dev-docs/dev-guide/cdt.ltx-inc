@@ -69,6 +69,8 @@ Alain Magloire (CDT) describes the model, A.K.A. the \texttt{ICElement}
 hierarchy, in the thread ``Patch to create ICoreModel interface'' on the cdt-dev
 mailing list:
 
+{\footnotesize
+\begin{quote}
 \begin{verbatim}
 So I'll explain a little about the ICElement and what we get out of it for
 C/C++.
@@ -109,11 +111,15 @@ example, we do not drill down in blocks, there are no statements(if/else
 conditions) etc .... For a complete interface/view of the language, clients
 should use the __AST__ interface.
 \end{verbatim}
+\end{quote}
+}
 
 \pagebreak
 
 From another of Alain's posts in that thread:
 
+{\footnotesize
+\begin{quote}
 \begin{verbatim}
 Lets make sure we are on the same length about the ICElement hierarchy.
 It was created for a few reasons:
@@ -137,6 +143,8 @@ The CoreModel uses information taken from:
 
 to build the hierarchy.
 \end{verbatim}
+\end{quote}
+}
 
 \shabox{The CDT model should \textbf{not} be confused with the Abstract Syntax
 Tree (AST) model that is discussed in Section~\ref{sec:ast_structure}. They are

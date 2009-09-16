@@ -11,21 +11,24 @@ related Eclipse plug-ins that the user can install as a whole.
 
 \section{Base Photran Feature: \\org.eclipse.photran-feature}
 
-The following projects comprise the ``base'' of Photran. All sources in these projects are Java 4.
+The following projects comprise the ``base'' of Photran.
 
 \begin{itemize}
 
 \item \textbf{org.eclipse.photran.cdtinterface}
 
-This contains all of the components (core and user interface) related
+This contains most of the components (core and user interface) related
 to integration with the CDT.  It includes:
 \begin{itemize}
-\item FortranLanguage for Fortran (i.e., the means of adding Fortran to the list
-of languages recognized by the CDT)
-\item Fortran model elements, and icons for the Outline and Projects Views
-\item \emph{Simple} lexical analyzer-based model builder and an extension
-point for contributing more sophisticated model builders
-\item Fortran perspective, Fortran Projects view, and new project wizards
+\item The FortranLanguage class, which adds Fortran to the list of languages
+      recognized by CDT
+\item Fortran model elements and icons for the Outline and Fortran Projects views
+\item An extension point for contributing Fortran model builders, and a
+      simple lexical analyzer-based model builder (which, generally speaking,
+      is not used)
+\item The Fortran perspective, Fortran Projects view, and other CDT-based
+      parts of the user interface
+\item New Project wizards and Fortran project templates
 \end{itemize}
 
 For more information about CDT, see Chapter~\ref{cha:cdt}.
@@ -67,7 +70,7 @@ more detail in Chapter~\ref{cha:parsing}.
 
 \begin{itemize}
 
-\item \textbf{org.eclipse.photran.vpg.core}
+\item \textbf{org.eclipse.photran.core.vpg}
 
 This contains the parsing, analysis, and refactoring infrastructure.
 \begin{itemize}
@@ -100,10 +103,16 @@ run in the background and interfere with testing.)
 \item \textbf{org.eclipse.photran.ui.vpg}
 
 UI contributions that depend on the \texttt{org.eclipse.photran.core.vpg}
-plug-in. Currently, this includes (1) the Open Declaration action, a project
+plug-in. Currently, this includes the Open Declaration action, a project
 property page where the user can customize the search path for Fortran modules
-and include files, and (2) all of the actions in the Refactoring menu. Search
-and other VPG-dependent features will be placed here in the future.
+and include files, Fortran Search support, and all of the actions in the
+Refactor menu.
+
+\item \textbf{org.eclipse.photran.cdtinterface.vpg}
+
+This contributes the Fortran model builder which constructs the model seen in
+the Outline view and Fortran Projects view.  It uses the Fortran parser
+contained in the org.eclipse.photran.core.vpg plug-in.
 
 \end{itemize}
 

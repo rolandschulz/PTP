@@ -1,11 +1,11 @@
 % Getting the Photran Sources from CVS
 
-\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.4} (Ganymede)
+\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.5} (Galileo)
 and a \textbf{Java 5} or later JVM. We recommend the 
 \href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.}
 
 \newcounter{running_counter}
-\textbf{Part~I.  Check out the CDT 5.0 sources from CVS}
+\textbf{Part~I.  Check out the CDT 6.0 sources from CVS}
 
 \begin{enumerate}
 	\item  In Eclipse, switch to the CVS Repository Exploring perspective.
@@ -28,15 +28,15 @@ and a \textbf{Java 5} or later JVM. We recommend the
 	\item  Under ``Browse files for tags'', expand ``all'', then expand 	
 	       ``org.eclipse.cdt'', then click on the .project file
 	\item  Under ``New tags found in the selected files'', click on the Deselect 
-	       All button, then check cdt\_5\_0 in the list above it
+	       All button, then check cdt\_6\_0 in the list above it
   \item	 Click Add Checked Tags
 	\item	 Click OK
 	\item  Now, in the CVS Repositories view
 				 \begin{itemize}
 				 \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
 		     \item  Then expand ``Branches''
-				 \item  Then expand ``cdt\_5\_0''
-		     \item  Then expand ``org.eclipse.cdt cdt\_5\_0\_0''
+				 \item  Then expand ``cdt\_6\_0''
+		     \item  Then expand ``org.eclipse.cdt cdt\_6\_0''
 		     \item  Then expand ``all''
 			  \end{itemize}
 	\item  Click on the first entry under ``all''
