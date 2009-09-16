@@ -297,7 +297,7 @@
       <tab
             class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteIncludeTab"
             icon="icons/obj16/hfolder_obj.gif"
-            name="Remote Includes"
+            name="%RemoteIncludeTab.name"
             parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
             tooltip="%Includes.tooltip"
             weight="001">
@@ -305,8 +305,9 @@
       <tab
             class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteSymbolTab"
             icon="icons/obj16/define_obj.gif"
-            name="Symbols"
-            parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage">
+            name="%SymbolTab.name"
+            parent="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
+            weight="002">
       </tab>
    </extension>
    <extension
