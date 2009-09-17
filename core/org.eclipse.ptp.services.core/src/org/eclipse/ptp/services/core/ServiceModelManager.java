@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.messages.Messages;
 import org.eclipse.ptp.services.internal.core.Service;
+import org.eclipse.ptp.services.internal.core.ServiceCategory;
 import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 import org.eclipse.ptp.services.internal.core.ServiceModelEvent;
 import org.eclipse.ptp.services.internal.core.ServiceModelEventManager;
@@ -61,13 +62,18 @@ import org.eclipse.ui.XMLMemento;
 public class ServiceModelManager extends PlatformObject implements IServiceModelManager {
 	private final static String SERVICE_EXTENSION_ID = "services"; //$NON-NLS-1$
 	private final static String PROVIDER_EXTENSION_ID = "providers"; //$NON-NLS-1$
+	private final static String CATEGORY_EXTENSION_ID = "serviceCategories"; //$NON-NLS-1$
 	private final static String SERVICE_ELEMENT_NAME = "service"; //$NON-NLS-1$
 	private final static String NATURE_ELEMENT_NAME = "nature"; //$NON-NLS-1$
 	private final static String PROVIDER_ELEMENT_NAME = "provider"; //$NON-NLS-1$
+	private final static String CATEGORY_ELEMENT_NAME = "category"; //$NON-NLS-1$
+	private final static String DISABLED_PROVIDERS_ELEMENT_NAME = "disabledProviders"; //$NON-NLS-1$
 	private final static String ATTR_ID = "id"; //$NON-NLS-1$
 	private final static String ATTR_NAME = "name"; //$NON-NLS-1$
 	private final static String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
 	private final static String ATTR_SERVICE_ID = "serviceId"; //$NON-NLS-1$
+	private final static String ATTR_CATEGORY_ID = "categoryId"; //$NON-NLS-1$
+	private final static String ATTR_NULL_PROVIDER_CLASS = "nullProviderClass"; //$NON-NLS-1$
 	private final static String ATTR_CLASS = "class"; //$NON-NLS-1$
 	private final static String ATTR_ACTIVE = "active"; //$NON-NLS-1$
 	private final static String SERVICE_MODEL_ELEMENT_NAME = "service-model"; //$NON-NLS-1$
@@ -76,6 +82,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final static String PROVIDER_CONFIGURATION_ELEMENT_NAME = "provider-configuration"; //$NON-NLS-1$
 	private final static String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
 	private final static String DEFAULT_SAVE_FILE_NAME = "service_model.xml";  //$NON-NLS-1$
+	
 	
 	private static <T> T getConf(Map<IProject, T> map, IProject project) {
 		if(project == null) {
@@ -92,6 +99,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			Map<IProject, Map<String, IServiceConfiguration>> projectConfigs,
 			Map<IProject, IServiceConfiguration> activeConfigs,
 			Writer writer) throws IOException {
+		
 		XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
 		
 		for (IServiceConfiguration config : configs.values()) {
@@ -104,15 +112,24 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			
 			Set<IService> services = config.getServices();
 			for (IService service : services) {
-				IServiceProvider provider = config.getServiceProvider(service);
-				if(provider != null) {
+				if(!config.isDisabled(service)) {
+					IServiceProvider provider = config.getServiceProvider(service);
 					IMemento serviceMemento = configMemento.createChild(SERVICE_ELEMENT_NAME);
 					serviceMemento.putString(ATTR_ID, service.getId());
 					serviceMemento.putString(ATTR_PROVIDER_ID, provider.getId());
+					saveProviderState(provider, serviceMemento);
+				}
 				
-					if (provider instanceof ServiceProvider) {
-						IMemento providerMemento = serviceMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-						((ServiceProvider)provider).saveState(providerMemento);
+				if(config instanceof ServiceConfiguration) {
+					Set<IServiceProvider> disabledProviders = ((ServiceConfiguration)config).getFormerServiceProviders(service);
+					if(!disabledProviders.isEmpty()) {
+						IMemento disabledMemento = configMemento.createChild(DISABLED_PROVIDERS_ELEMENT_NAME);
+						disabledMemento.putString(ATTR_ID, service.getId());
+						for(IServiceProvider disabledProvider : disabledProviders) {
+							IMemento providerMemento = disabledMemento.createChild(PROVIDER_ELEMENT_NAME);
+							providerMemento.putString(ATTR_PROVIDER_ID, disabledProvider.getId());
+							saveProviderState(disabledProvider, providerMemento);
+						}
 					}
 				}
 			}
@@ -141,6 +158,15 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			
 		rootMemento.save(writer);
 	}
+	
+	
+	private static void saveProviderState(IServiceProvider provider, IMemento parentMemento) {
+		if (provider instanceof ServiceProvider) {
+			IMemento providerConfigMemento = parentMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+			((ServiceProvider)provider).saveState(providerConfigMemento);
+		}
+	}
+	
 	/** Default location to save service model configuration */
 	private final IPath defaultSaveFile;
 	private Map<String, IServiceConfiguration> fConfigurations = new HashMap<String, IServiceConfiguration>();
@@ -148,7 +174,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 
 	private Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
-	private Map<String, IService> fServices = null;
+	private Map<String, Service> fServices = null;
+	private Map<String,ServiceCategory> fCategories;
 	private Set<IService> fServiceSet = null;
 	
 	private Map<String, Set<IService>> fNatureServices = null;
@@ -197,7 +224,16 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 				services.add(service);
 			}
 		}
+		
+		addConfiguration(conf);
 	}
+	
+	
+	public void addConfiguration(IServiceConfiguration conf) {
+		if(fConfigurations.put(conf.getId(), conf) == null)
+			notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED));
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener, int)
@@ -286,7 +322,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getService(java.lang.String)
 	 */
 	public IService getService(String id) {
-		loadServices();
+		loadServicesFromExtensionRegistry();
 		return fServices.get(id);
 	}
 
@@ -323,7 +359,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices()
 	 */
 	public Set<IService> getServices() {
-		loadServices();
+		loadServicesFromExtensionRegistry();
 		return fServiceSet;
 	}
 	
@@ -338,7 +374,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
 	 */
 	public Set<IService> getServices(String natureId) {
-		loadServices();
+		loadServicesFromExtensionRegistry();
 		return fNatureServices.get(natureId);
 	}
 	
@@ -361,7 +397,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @throws CoreException 
 	 */
 	public void loadModelConfiguration() throws IOException, CoreException {
-		loadServices();
+		loadServicesFromExtensionRegistry();
 		File file = defaultSaveFile.toFile();
 		if(file.exists()) {
 			Reader reader = new BufferedReader(new FileReader(file));
@@ -374,6 +410,32 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_LOADED));
 	}
 
+	
+	private IServiceProvider loadServiceProvider(IMemento providerMemento, IService service) {
+		if(service == null)
+			return null;
+		
+		String providerId = providerMemento.getString(ATTR_PROVIDER_ID);
+		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+		if (descriptor != null) {
+			IServiceProvider provider = getServiceProvider(descriptor);
+			if (provider != null) {
+				if (provider instanceof ServiceProvider) {
+					IMemento providerConfigMemento = providerMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+					((ServiceProvider)provider).restoreState(providerConfigMemento);
+				}
+				return provider;
+			} 
+			else {
+				Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
+			}
+		}
+		else {
+			Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
+		}
+		return null;
+	}
+	
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the given <code>file</code>.
@@ -392,30 +454,21 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		for (IMemento configMemento : rootMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
 			String configId = configMemento.getString(ATTR_ID);
 			String configName = configMemento.getString(ATTR_NAME);
-			IServiceConfiguration config = newServiceConfiguration(configId, configName);
+			ServiceConfiguration config = newServiceConfiguration(configId, configName);
+			
 			for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
 				String serviceId = serviceMemento.getString(ATTR_ID);
-				String providerId = serviceMemento.getString(ATTR_PROVIDER_ID);
-				
 				IService service = getService(serviceId);
-				if (service != null) {
-					IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
-					if (descriptor != null) {
-						IServiceProvider provider = getServiceProvider(descriptor);
-						if (provider != null) {
-							if (provider instanceof ServiceProvider) {
-								IMemento providerMemento = serviceMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-								((ServiceProvider)provider).restoreState(providerMemento);
-							}
-							config.setServiceProvider(service, provider);
-						} else {
-							Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
-						}
-					} else {
-						Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
-					}
-				} else {
-					Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_1 + serviceId);
+				IServiceProvider provider = loadServiceProvider(serviceMemento, service);
+				config.setServiceProvider(service, provider);
+			}
+			
+			for (IMemento disabledMemento : configMemento.getChildren(DISABLED_PROVIDERS_ELEMENT_NAME)) {
+				String serviceId = disabledMemento.getString(ATTR_ID);
+				IService service = getService(serviceId);
+				for(IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
+					IServiceProvider provider = loadServiceProvider(providerMemento, service);
+					config.addFormerServiceProvider(service, provider);
 				}
 			}
 			
@@ -595,15 +648,31 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	/**
 	 * Locate and initialize service extensions.
 	 */
-	private void loadServices() {
+	private void loadServicesFromExtensionRegistry() {
 		if (fServices != null) {
 			return;
 		}
-		fServices = new HashMap<String, IService>();
+		fServices = new HashMap<String, Service>();
+		fCategories = new HashMap<String, ServiceCategory>();
 		fServiceSet = new HashSet<IService>();
 		fNatureServices = new HashMap<String, Set<IService>>();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, SERVICE_EXTENSION_ID);
+		
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, CATEGORY_EXTENSION_ID);
+		if(extensionPoint != null) {
+			for (IExtension extension : extensionPoint.getExtensions()) {
+				for (IConfigurationElement element : extension.getConfigurationElements()) {
+					if (element.getName().equals(CATEGORY_ELEMENT_NAME)) {
+						String id = element.getAttribute(ATTR_ID);
+						String name = element.getAttribute(ATTR_NAME);
+						ServiceCategory category = new ServiceCategory(id, name);
+						fCategories.put(id, category);
+					}
+				}
+			}
+		}
+		
+        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, SERVICE_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -611,6 +680,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 						String id = element.getAttribute(ATTR_ID);
 						String name = element.getAttribute(ATTR_NAME);
 						String priority = element.getAttribute(ATTR_PRIORITY);
+						String categoryId = element.getAttribute(ATTR_CATEGORY_ID);
 						IConfigurationElement[] natureConf = element.getChildren(NATURE_ELEMENT_NAME);
 						Set<String> natures = new HashSet<String>();
 						if (natureConf != null) {
@@ -621,7 +691,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 								}
 							}
 						}
-						IService service = new Service(id, name, priority, natures);
+						Service service = new Service(id, name, priority, natures);
 						fServiceSet.add(service);
 						fServices.put(id, service);
 						for (String nature : natures) {
@@ -631,6 +701,21 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 								fNatureServices.put(nature, svcs);
 							}
 							svcs.add(service);
+						}
+						
+						if(element.getAttribute(ATTR_NULL_PROVIDER_CLASS) != null) {
+							try {
+								IServiceProvider nullProvider = (IServiceProvider) element.createExecutableExtension(ATTR_NULL_PROVIDER_CLASS);
+								service.setNullServiceProvider(nullProvider);
+							} catch (CoreException e) {
+								Activator.getDefault().log(e);
+							}
+						}
+						
+						ServiceCategory category = fCategories.get(categoryId);
+						if(category != null) {
+							category.addService(service);
+							service.setCategory(category);
 						}
 					}
 				}
@@ -646,7 +731,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 						String priority = element.getAttribute(ATTR_PRIORITY);
 						String serviceId = element.getAttribute(ATTR_SERVICE_ID);
 						IServiceProviderDescriptor desc = new ServiceProviderDescriptor(id, name, serviceId, priority);
-						IService service = fServices.get(serviceId);
+						Service service = fServices.get(serviceId);
 						if (service != null) {
 							service.addServiceProvider(desc);
 						} else {
@@ -667,11 +752,12 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @param name name of service configuration
 	 * @return service configuration
 	 */
-	private IServiceConfiguration newServiceConfiguration(String id, String name) {
-		IServiceConfiguration config = new ServiceConfiguration(id, name);
-		fConfigurations.put(id, config);
-		notifyListeners(new ServiceModelEvent(config, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED));
-		return config;
+	private ServiceConfiguration newServiceConfiguration(String id, String name) {
+		return new ServiceConfiguration(id, name);
+	}
+
+	public Set<IServiceCategory> getCategories() {
+		return new HashSet<IServiceCategory>(fCategories.values());
 	}
 	
 }

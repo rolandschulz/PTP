@@ -34,6 +34,8 @@ import org.eclipse.swt.widgets.TableItem;
  * part of a work in progress. There is no guarantee that this API will work or
  * that it will remain the same. Please do not use this API without consulting
  * with the RDT team.
+ * 
+ * @deprecated
  */
 public class PropertyPageServiceModelWidget extends ServiceModelWidget {
 	

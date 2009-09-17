@@ -4,37 +4,57 @@
    <extension
          point="org.eclipse.ptp.services.core.services">
       <service
-            id="TestService1"
-            name="Test Service 1">
+            categoryId="Category1"
+            id="ServiceA"
+            name="ServiceA">
       </service>
       <service
-            id="TestService2"
-            name="Test Service 2">
+            id="ServiceB"
+            name="ServiceB"
+            nullProviderClass="org.eclipse.ptp.services.test.TestServiceProvider">
       </service>
    </extension>
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
             class="org.eclipse.ptp.services.test.TestServiceProvider"
-            id="TestProvider1"
-            name="Test Provider 1"
+            id="ProviderA_1"
+            name="ProviderA_1"
             priority="100"
-            serviceId="TestService1">
+            serviceId="ServiceA">
       </provider>
       <provider
-            class="org.eclipse.ptp.services.test.TestServiceProvider2"
-            id="TestProvider2"
-            name="Test Provider 2"
+            class="org.eclipse.ptp.services.test.TestServiceProvider"
+            id="ProviderA_2"
+            name="ProviderA_2"
             priority="1"
-            serviceId="TestService1">
+            serviceId="ServiceA">
       </provider>
       <provider
-            class="org.eclipse.ptp.services.test.TestServiceProvider3"
-            id="TestProvider3"
-            name="Test Provider 3"
+            class="org.eclipse.ptp.services.test.TestServiceProvider"
+            id="ProviderA_3"
+            name="ProviderA_3"
             priority="1"
-            serviceId="TestService2">
+            serviceId="ServiceA">
       </provider>
+      <provider
+            class="org.eclipse.ptp.services.test.TestServiceProvider"
+            id="ProviderB_1"
+            name="ProviderB_1"
+            priority="1"
+            serviceId="ServiceB">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.serviceCategories">
+      <category
+            id="Category1"
+            name="Category1">
+      </category>
+      <category
+            id="Category2"
+            name="Category2">
+      </category>
    </extension>
 
 

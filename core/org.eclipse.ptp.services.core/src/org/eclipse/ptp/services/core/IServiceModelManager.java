@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,18 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws NullPointerException if project or conf is null
 	 */
 	public void addConfiguration(IProject project, IServiceConfiguration conf);
+	
+	/**
+	 * Adds the given service configuration to the model without explicitly
+	 * associating it with a particular project. It may be associated with a project
+	 * later using the addConfiguration(IProject, IServiceConfiguration) method.
+	 * 
+	 * @param project the project
+	 * @param conf the configuration
+	 * 
+	 * @throws NullPointerException if conf is null
+	 */
+	public void addConfiguration(IServiceConfiguration conf);
 	
 	/**
 	 * Adds the given listener for service model events. Has no effect if an 
@@ -158,6 +170,13 @@ public interface IServiceModelManager extends IAdaptable {
 	public Set<IService> getServices(String natureID);
 	
 	/**
+	 * Returns all the service categories that have been registered with
+	 * the system.
+	 * @return
+	 */
+	public Set<IServiceCategory> getCategories();
+	
+	/**
 	 * Returns true if the given project has a configuration.
 	 * 
 	 */
@@ -166,7 +185,9 @@ public interface IServiceModelManager extends IAdaptable {
 	
 	/**
 	 * Obtain a new service configuration with name 'name'. The name
-	 * does not need to be unique.
+	 * does not need to be unique. This service configuration will not
+	 * become part of the service model until it is passed to 
+	 * one of the addConfiguration() methods.
 	 * 
 	 * @param name name of service configuration
 	 * @return new service configuration

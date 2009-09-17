@@ -10,13 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.ui;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -24,11 +27,10 @@ import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.dialogs.ServiceConfigurationSelectionDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
-import org.eclipse.ptp.services.ui.wizards.ServiceModelWidget;
+import org.eclipse.ptp.services.ui.wizards.NewServiceModelWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -117,8 +119,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	private ServiceConfigurationComparator serviceConfigurationComparator;
 	private Table serviceConfigurationList;
 	private Composite serviceModelPane;
-	private ServiceModelWidget serviceModelWidget;
-	private Composite widgetPane;
+	private NewServiceModelWidget serviceModelWidget;
 
 	/**
 	 * Create the service configuration properties page
@@ -167,17 +168,11 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		GridLayout parentPaneLayout;
 		GridLayout propertiesPaneLayout;
 		GridLayout serviceConfigLayout;
-		FillLayout fillLayout;
 		RowLayout buttonLayout;
-		GridData layoutData;
 		Composite serviceConfigurationPane;
 		Composite buttonPane;
-		Control serviceModelControl;
 
 		eventHandler = new EventHandler();
-
-		fillLayout = new FillLayout();
-		layoutData = new GridData(SWT.LEFT, SWT.FILL, false, true);
 
 		// Create a top level composite for the widgets in this panel
 		parentPaneLayout = new GridLayout(1, true);
@@ -190,27 +185,28 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		propertiesPaneLayout = new GridLayout(2, true);
 		propertiesPaneLayout.makeColumnsEqualWidth = false;
 		propertiesPane.setLayout(propertiesPaneLayout);
+		propertiesPane.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// Create the pane for the service configuration list and then create
 		// the service configuration list
 		serviceConfigurationPane = new Composite(propertiesPane, SWT.NONE);
 		serviceConfigLayout = new GridLayout(1, true);
 		serviceConfigurationPane.setLayout(serviceConfigLayout);
-		serviceConfigurationPane.setLayoutData(layoutData);
+		serviceConfigurationPane.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		serviceConfigurationList = new Table(serviceConfigurationPane,
-				SWT.SINGLE);
-		serviceConfigurationList.setLayoutData(layoutData);
+		serviceConfigurationList = new Table(serviceConfigurationPane, SWT.SINGLE);
+		serviceConfigurationList.setLayoutData(new GridData(GridData.FILL_BOTH));
 		serviceConfigurationList.setLinesVisible(true);
 		serviceConfigurationList.addSelectionListener(eventHandler);
 
 		// Create the pane which will contain the current service model
 		serviceModelPane = new Composite(propertiesPane, SWT.NONE);
-		;
-		serviceModelPane.setLayout(fillLayout);
-		serviceModelWidget = new ServiceModelWidget();
-		serviceModelControl = serviceModelWidget
-				.createContents(serviceModelPane);
+		serviceModelPane.setLayout(new GridLayout(1, false));
+		serviceModelPane.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		serviceModelWidget = new NewServiceModelWidget(serviceModelPane, SWT.NONE);
+		serviceModelWidget.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
 
 		// Create the pane and buttons to add and remove service configurations
 		buttonPane = new Composite(serviceConfigurationPane, SWT.NONE);
@@ -226,7 +222,6 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		removeButton.setText(Messages.ServiceConfigurationPropertyPage_1);
 		removeButton.addSelectionListener(eventHandler);
 
-		widgetPane = propertiesPane;
 		// Fill in the list of service configurations currently used by this
 		// project
 		getProjectConfigurations();
@@ -288,20 +283,18 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	}
 
 	/**
-	 * Delete service configurations when Apply button is pressed
-	 */
-	protected void performApply() {
-		deleteServiceConfigurations();
-		super.performApply();
-	}
-
-	/**
-	 * Delete service configurations when Ok button is pressed
+	 * Delete service configurations when Ok or Apply button is pressed
 	 * 
 	 * @return Status from superclass indicating if Ok processing is to continue
 	 */
 	public boolean performOk() {
 		deleteServiceConfigurations();
+		serviceModelWidget.applyChangesToConfiguration();
+		try {
+			ServiceModelManager.getInstance().saveModelConfiguration();
+		} catch (IOException e) {
+			Activator.getDefault().log(e);
+		}
 		return super.performOk();
 	}
 
@@ -321,8 +314,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			// Selected service model is added to vector to be deleted during Ok
 			// or Apply button processing
 			deletedServiceConfigurations.add(selectedConfig);
-			serviceConfigurationList.remove(serviceConfigurationList
-					.getSelectionIndex());
+			serviceConfigurationList.remove(serviceConfigurationList.getSelectionIndex());
 			serviceModelWidget.setServiceConfiguration(null);
 		}
 	}
@@ -339,7 +331,17 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			selectedConfig = (IServiceConfiguration) selection[0].getData();
 			if (selectedConfig != currentConfig) {
 				currentConfig = selectedConfig;
-				serviceModelWidget.setServiceConfiguration(selectedConfig);
+				
+				Set<String> natures = Collections.emptySet();
+				IProject project = (IProject) getElement().getAdapter(IProject.class);
+				if(project != null) {
+					try {
+						natures = new HashSet<String>(Arrays.asList(project.getDescription().getNatureIds()));
+					} catch (CoreException e) {
+						Activator.getDefault().log(e);
+					}
+				}
+				serviceModelWidget.setServiceConfiguration(selectedConfig, natures);
 			}
 		}
 	}

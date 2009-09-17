@@ -59,7 +59,17 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 		return fContentAssistService;
 	}
 	
+	public IHost getHost() {
+		initializeHost();
+		return super.getHost();
+	}
+	
 	public boolean isConfigured() {
+		initializeHost();
+		return super.isConfigured();
+	}
+	
+	private void initializeHost() {
 		if (fHost == null && getHostName() != null) {
 			IHost[] hosts = SystemStartHere.getConnections();
 			for (IHost host : hosts) {
@@ -68,7 +78,6 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 				}
 			}
 		}
-		return super.isConfigured();
 	}
 	
 	public static IConnectorService getDStoreConnectorService(IHost host) {
@@ -91,6 +100,6 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	}
 	
 	public String toString() {
-		return "RemoteCIndexServiceProvider(" + getHostName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "RemoteCIndexServiceProvider(" + getHostName() + "," + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

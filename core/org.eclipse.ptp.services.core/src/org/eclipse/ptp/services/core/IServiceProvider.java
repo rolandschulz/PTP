@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
+
+import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
 
@@ -28,6 +30,7 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	 * Returns provider specific information for the current configuration.
 	 * 
 	 * @return information on current configuration for this provider
+	 * @deprecated
 	 */
 	public String getConfigurationString();
 
@@ -88,4 +91,12 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	 * @param value the value
 	 */
 	public void putString(String key, String value);
+	
+	
+	/**
+	 * Returns a set of all the property keys that apply to this
+	 * service provider.
+	 */
+	public Set<String> keySet();
+	
 }

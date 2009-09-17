@@ -3,5 +3,6 @@
 <plugin>
    <extension-point id="providers" name="Service Providers" schema="schema/providers.exsd"/>
    <extension-point id="services" name="Services" schema="schema/services.exsd"/>
+   <extension-point id="serviceCategories" name="Service Categories" schema="schema/serviceCategories.exsd"/>
 
 </plugin>

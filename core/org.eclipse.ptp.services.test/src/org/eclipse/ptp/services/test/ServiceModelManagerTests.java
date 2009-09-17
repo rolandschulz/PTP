@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -28,16 +28,39 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceCategory;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Note, you need to run this without any other plugins that
+ * contribute to the service model.
+ *
+ */
 public class ServiceModelManagerTests {
+	
+	private static final String
+		SERVICE_A = "ServiceA",
+		SERVICE_B = "ServiceB";
+	
+	private static final String
+		PROVIDER_A_1 = "ProviderA_1",
+		PROVIDER_A_2 = "ProviderA_2",
+		PROVIDER_A_3 = "ProviderA_3",
+		PROVIDER_B_1 = "ProviderB_1";
+	
+	private static final String
+		CATEGORY_1 = "Category1",
+		CATEGORY_2 = "Category2";
+	
+	
 	IProject fProject;
 	IServiceConfiguration fConfig;
 	IService fService1;
@@ -63,11 +86,12 @@ public class ServiceModelManagerTests {
 		}
 	}
 	
-	void addProvider(String providerId, IService service, IServiceConfiguration config) {
+	IServiceProvider addProvider(String providerId, IService service, IServiceConfiguration config) {
 		IServiceModelManager manager = ServiceModelManager.getInstance();
 		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
 		IServiceProvider provider = manager.getServiceProvider(descriptor);
 		config.setServiceProvider(service, provider);
+		return provider;
 	}
 	
 	@Before
@@ -87,11 +111,10 @@ public class ServiceModelManagerTests {
 	public void testMultipleServices() throws Exception {
 		IServiceModelManager manager = ServiceModelManager.getInstance();
 		
-		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
-		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
-
-		fService2 = manager.getService("TestService2"); //$NON-NLS-1$
-		addProvider("TestProvider3", fService2, fConfig); //$NON-NLS-1$
+		fService1 = manager.getService(SERVICE_A); 
+		addProvider(PROVIDER_A_1, fService1, fConfig); 
+		fService2 = manager.getService(SERVICE_B); 
+		addProvider(PROVIDER_B_1, fService2, fConfig); 
 
 		manager.addConfiguration(fProject, fConfig);
 		
@@ -121,8 +144,8 @@ public class ServiceModelManagerTests {
 	public void testOneProvider() throws Exception {
 		IServiceModelManager manager = ServiceModelManager.getInstance();
 		
-		fService1 = manager.getService("TestService1"); //$NON-NLS-1$
-		addProvider("TestProvider2", fService1, fConfig); //$NON-NLS-1$
+		fService1 = manager.getService(SERVICE_A); 
+		addProvider(PROVIDER_A_2, fService1, fConfig); 
 		manager.addConfiguration(fProject, fConfig);
 		
 		persistAndReplaceModel();
@@ -134,4 +157,91 @@ public class ServiceModelManagerTests {
 		IService service = services.iterator().next();
 		assertServicesEquals(fService1, service, fConfig, config);
 	}
+	
+	@Test
+	public void testFormerProviders() throws Exception {
+		IServiceModelManager smm = ServiceModelManager.getInstance();
+		ServiceConfiguration config = (ServiceConfiguration) smm.newServiceConfiguration("blah");
+		
+		fService1 = smm.getService(SERVICE_A); 
+		IServiceProvider provider1 = addProvider(PROVIDER_A_1, fService1, config); 
+		provider1.putString("key1", "val1");
+		provider1.putString("key2", "val2");
+		
+		IServiceProvider provider2 = addProvider(PROVIDER_A_2, fService1, config); 
+		provider2.putString("key1", "val1_2");
+		
+		IServiceProvider provider3 = addProvider(PROVIDER_A_3, fService1, config); 
+		provider3.putString("key1", "provider3");
+		
+		
+		persistAndReplaceModel();
+		
+		
+		Set<IServiceProvider> providers = config.getFormerServiceProviders(fService1);
+		assertNotNull(providers);
+		assertEquals(2, providers.size());
+		Iterator<IServiceProvider> iter = providers.iterator();
+		
+		IServiceProvider disabledProvider = iter.next();
+		assertEquals(PROVIDER_A_1, disabledProvider.getId());
+		assertEquals("val1", disabledProvider.getString("key1", null));
+		assertEquals("val2", disabledProvider.getString("key2", null));
+		
+		disabledProvider = iter.next();
+		assertEquals(PROVIDER_A_2, disabledProvider.getId());
+		assertEquals("val1_2", disabledProvider.getString("key1", null));
+		
+		IServiceProvider provider = config.getServiceProvider(fService1);
+		assertEquals(PROVIDER_A_3, provider.getId());
+		assertEquals("provider3", provider.getString("key1", null));
+		
+		
+		addProvider(PROVIDER_A_1, fService1, config);
+		
+		
+		providers = config.getFormerServiceProviders(fService1);
+		assertNotNull(providers);
+		assertEquals(2, providers.size());
+		iter = providers.iterator();
+		
+		disabledProvider = iter.next();
+		assertEquals(PROVIDER_A_2, disabledProvider.getId());
+		assertEquals("val1_2", disabledProvider.getString("key1", null));
+		
+		disabledProvider = iter.next();
+		assertEquals(PROVIDER_A_3, disabledProvider.getId());
+		assertEquals("provider3", disabledProvider.getString("key1", null));
+		
+		
+		config.disable(fService1);
+		assertEquals(0, config.getServices().size());
+		
+		// should still remember the former providers even if the service is disabled
+		providers = config.getFormerServiceProviders(fService1);
+		assertNotNull(providers);
+		assertEquals(3, providers.size());
+	}
+	
+	@Test
+	public void testServiceCategories() {
+		Set<IServiceCategory> categories = ServiceModelManager.getInstance().getCategories();
+		assertNotNull(categories);
+		assertEquals(2, categories.size());
+	}
+	
+	@Test
+	public void testNullProvider() {
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IService serviceA = smm.getService(SERVICE_A);
+		IService serviceB = smm.getService(SERVICE_B);
+		IServiceConfiguration config = smm.newServiceConfiguration("blah");
+		config.setServiceProvider(serviceA, null);
+		config.setServiceProvider(serviceB, null);
+		
+		assertNull(config.getServiceProvider(serviceA));
+		assertNotNull(config.getServiceProvider(serviceB));
+	}
 }
+
+
