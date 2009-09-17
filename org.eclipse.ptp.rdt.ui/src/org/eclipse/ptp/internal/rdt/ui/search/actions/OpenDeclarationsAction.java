@@ -156,7 +156,6 @@ public class OpenDeclarationsAction extends SelectionParseAction {
 				open(path, project);
 				break;
 			case FAILURE_SYMBOL_LOOKUP:
-				System.out.println("SYMBOL LOOKUP FAILURE"); //$NON-NLS-1$
 				String symbol = (String) result.getResult();
 				reportSymbolLookupFailure(symbol);
 				break;

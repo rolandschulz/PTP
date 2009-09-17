@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
  * 
  * @author crecoskie
  * @see org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider
- *
+ * @deprecated
  */
 public class RemoteServicesServiceProviderConfigurer implements IServiceProviderConfiguration {
 

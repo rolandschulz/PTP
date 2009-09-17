@@ -291,11 +291,11 @@ public class ServiceModelWidget{
 			// column 1 holds a dropdown with a list of providers
 			// default entry is the null provider if there is one			
 			IServiceProviderDescriptor descriptor;
-			if (service.getId().compareTo(NullBuildServiceProvider.SERVICE_ID) == 0)
-				descriptor = service.getProviderDescriptor(NullBuildServiceProvider.ID);
-			else if (service.getId().compareTo(NullCIndexServiceProvider.SERVICE_ID) == 0)
-				descriptor = service.getProviderDescriptor(NullCIndexServiceProvider.ID);
-			else
+//			if (service.getId().compareTo(NullBuildServiceProvider.SERVICE_ID) == 0)
+//				descriptor = service.getProviderDescriptor(NullBuildServiceProvider.ID);
+//			else if (service.getId().compareTo(NullCIndexServiceProvider.SERVICE_ID) == 0)
+//				descriptor = service.getProviderDescriptor(NullCIndexServiceProvider.ID);
+//			else
 				descriptor = service.getProviders().iterator().next();
 			item.setText(1, descriptor.getName());
 			item.setData(PROVIDER_KEY, descriptor);

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
  * with the RDT team.
  * 
  * @author crecoskie
- *
+ * @deprecated
  */
 public class RemoteCIndexServiceProviderConfigurer implements IServiceProviderConfiguration {
 
