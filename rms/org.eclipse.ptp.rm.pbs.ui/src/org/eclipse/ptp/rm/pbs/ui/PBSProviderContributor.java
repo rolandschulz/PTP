@@ -18,16 +18,17 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMServiceProviderConfigurationWizard;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Composite;
 
 public class PBSProviderContributor implements IServiceProviderContributor 
 {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#configureServiceProvider(org.eclipse.ptp.services.core.IServiceProvider, org.eclipse.swt.widgets.Shell)
+	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#configureServiceProvider(org.eclipse.ptp.services.core.IServiceProvider, org.eclipse.swt.widgets.Composite)
 	 */
-	public void configureServiceProvider(IServiceProvider provider, Shell parentShell) 
+	public void configureServiceProvider(IServiceProvider provider, Composite comp) 
 	{
+		// Nothing
 	}
 
 	/* (non-Javadoc)
