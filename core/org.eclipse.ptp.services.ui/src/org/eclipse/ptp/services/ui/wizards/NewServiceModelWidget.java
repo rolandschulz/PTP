@@ -232,6 +232,10 @@ public class NewServiceModelWidget extends Composite {
 		
 		// populate the provider combo
 		Set<IServiceProviderDescriptor> providers = service.getProviders();
+		// it's possible there are no providers
+		if (providers.size() == 0) {
+			return;
+		}
 		IServiceProviderDescriptor[] descriptors = providers.toArray(new IServiceProviderDescriptor[0]);
 		Arrays.sort(descriptors, PROVIDER_COMPARATOR);
 		
@@ -373,7 +377,7 @@ public class NewServiceModelWidget extends Composite {
 	private static boolean filterOut(Set<String> serviceIds, Set<String> filterIds) {
 		if(serviceIds.isEmpty() || filterIds.isEmpty())
 			return false;
-		
+
 		for(String id : serviceIds) {
 			if(filterIds.contains(id)) {
 				return false;
@@ -447,6 +451,9 @@ public class NewServiceModelWidget extends Composite {
 			return -1;
 		if(p2 == null)
 			return 1;
+		if (p1.equals(p2)) {
+			return name1.compareTo(name2);
+		}
 		return p1.compareTo(p2);
 	}
 }
