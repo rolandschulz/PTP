@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceCategory;
+import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 
 /**
@@ -32,6 +34,10 @@ public class Service implements IService {
 	private Set<String> fServiceNatures;
 	private Set<IServiceProviderDescriptor> fServiceProviderDescriptors = new HashSet<IServiceProviderDescriptor>();
 	private Map<String, IServiceProviderDescriptor> fIdToServiceProviderDescriptorMap = new HashMap<String, IServiceProviderDescriptor>();
+	private IServiceCategory category;
+	
+	private IServiceProvider nullProvider;
+	
 	
 	public Service(String id, String name, String priority, Set<String>natures) {
 		fServiceId = id;
@@ -54,6 +60,15 @@ public class Service implements IService {
 		fIdToServiceProviderDescriptorMap.put(provider.getId(), provider);
 	}
 
+	public void setNullServiceProvider(IServiceProvider nullProvider) {
+		this.nullProvider = nullProvider;
+	}
+	
+	public IServiceProvider getNullProvider() {
+		return nullProvider;
+	}
+	
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof IService) {
@@ -141,4 +156,14 @@ public class Service implements IService {
 	public String toString() {
 		return "Service(" + fServiceId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	public void setCategory(IServiceCategory category) {
+		this.category = category;
+	}
+	
+	public IServiceCategory getCategory() {
+		return category;
+	}
+
+	
 }

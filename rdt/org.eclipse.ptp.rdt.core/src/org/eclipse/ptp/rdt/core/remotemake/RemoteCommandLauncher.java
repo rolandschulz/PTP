@@ -39,6 +39,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
@@ -90,7 +91,14 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 		}
 		
 		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
+		IServiceConfiguration serviceConfig;
+		
+		try {
+			serviceConfig = smm.getActiveConfiguration(getProject());
+		} catch (ProjectNotConfiguredException e) {
+			return null;
+		}
+		
 		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 		IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
 		IRemoteExecutionServiceProvider executionProvider = null;

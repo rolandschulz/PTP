@@ -29,7 +29,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class IndexFileLocationWidget extends Composite {
@@ -53,7 +52,10 @@ public class IndexFileLocationWidget extends Composite {
 	public IndexFileLocationWidget(Composite parent, int style, IHost initialHost, String defaultPath) {
 		super(parent, style);
 		
-		this.setLayout(new GridLayout(1, false));
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		this.setLayout(layout);
 		this.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Group group = new Group(this, SWT.NONE);
@@ -68,8 +70,9 @@ public class IndexFileLocationWidget extends Composite {
 //		label.setLayoutData(data);
 		
 		text = new Text(group, SWT.BORDER);
-		GridData data = new GridData();
-		data.widthHint = 300;
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		//data.widthHint = 300;
+		data.horizontalSpan = 2;
 		text.setLayoutData(data);
 		text.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -92,7 +95,7 @@ public class IndexFileLocationWidget extends Composite {
 			}
 		});
 		
-		new Label(group, SWT.NONE).setText(""); //$NON-NLS-1$
+//		new Label(group, SWT.NONE).setText(""); //$NON-NLS-1$
 		
 //		validateButton = new Button(group, SWT.NONE);
 //		validateButton.setText("Validate...");  //$NON-NLS-1$

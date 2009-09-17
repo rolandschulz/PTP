@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,13 +25,7 @@ import java.util.SortedSet;
  * @see IServiceProvider
  */
 public interface IService {
-	/**
-	 * Add service provider to list of providers for this service.
-	 * 
-	 * @param provider provider to add
-	 */
-	public void addServiceProvider(IServiceProviderDescriptor provider);
-	
+
 	/**
 	 * Get the ID of this service provider.
 	 * 
@@ -91,4 +85,16 @@ public interface IService {
 	 * @param provider provider to remove
 	 */
 	public void removeServiceProvider(IServiceProviderDescriptor provider);
+	
+	/**
+	 * Returns the service category that contains this service or
+	 * null if the service is not associated with a category.
+	 */
+	public IServiceCategory getCategory();
+	
+	
+	/**
+	 * Returns the special null "no-op" service provider, or null if there is none.
+	 */
+	public IServiceProvider getNullProvider();
 }

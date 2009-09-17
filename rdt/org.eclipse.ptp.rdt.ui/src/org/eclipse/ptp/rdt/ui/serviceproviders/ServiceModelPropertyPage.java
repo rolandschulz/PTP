@@ -42,6 +42,7 @@ import org.eclipse.ui.progress.UIJob;
  * that it will remain the same. Please do not use this API without consulting
  * with the RDT team.
  * 
+ * @deprecated
  */
 public class ServiceModelPropertyPage extends PropertyPage {
 	

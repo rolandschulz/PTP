@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
 
@@ -58,6 +68,13 @@ public interface IServiceModelEvent {
 	 * @see java.util.EventObject
 	 */
 	public Object getSource();
+	
+	/**
+	 * For events of type SERVICE_CONFIGURATION_CHANGED this will return
+	 * the service provider instance that was replaced or removed.
+	 * @see IServiceModelEvent#SERVICE_CONFIGURATION_CHANGED
+	 */
+	public IServiceProvider getOldProvider();
 	
 	/**
 	 * Returns the type of event being reported.

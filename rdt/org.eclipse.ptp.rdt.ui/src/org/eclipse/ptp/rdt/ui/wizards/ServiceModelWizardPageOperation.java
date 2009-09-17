@@ -10,17 +10,25 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import static org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPage.SERVICE_MODEL_WIDGET_PROPERTY;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.ui.wizards.NewServiceModelWidget;
+import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
  * An operation which handles configuring the remote portions of the Remote C/C++ Project
@@ -45,36 +53,33 @@ public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@SuppressWarnings("unchecked")
-	public void run(IProgressMonitor monitor) throws InvocationTargetException,
-			InterruptedException {
-		
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		monitor.beginTask("configure model services", 100); //$NON-NLS-1$
 	
-		IProject project = null;
+		IWizard wizard = MBSCustomPageManager.getPageData(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID).getWizardPage().getWizard();
+		IProject project = ((CDTCommonProjectWizard) wizard).getLastProject();
 		
-		// go through the mappings of services and set the service model to match
-		Object obj = MBSCustomPageManager.getPageProperty(
-				ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID,
-				ServiceModelWizardPage.SELECTED_PROVIDERS_MAP_PROPERTY);
+		NewServiceModelWidget widget = (NewServiceModelWidget)getMBSProperty(SERVICE_MODEL_WIDGET_PROPERTY);
+		widget.applyChangesToConfiguration();
+		IServiceConfiguration config = widget.getServiceConfiguration();
 		
-		if(obj instanceof Map) {
-			Map<String, String> serviceIDToProviderIDMap = (Map<String, String>) obj;
-			
-			IWizard wizard = MBSCustomPageManager.getPageData(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID).getWizardPage().getWizard();
-			
-			if(wizard instanceof CDTCommonProjectWizard)
-				project = ((CDTCommonProjectWizard) wizard).getLastProject();
-			
-			Object obj2 = MBSCustomPageManager.getPageProperty(
-					ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID,
-					ServiceModelWizardPage.ID_TO_PROVIDERS_MAP_PROPERTY);
-			monitor.worked(10);
-			if (obj2 instanceof Map) {
-				Map<String, IServiceProvider> providerIDToProviderMap = (Map<String, IServiceProvider>) obj2;				
-				ConfigureRemoteServices.configure(project, serviceIDToProviderIDMap, providerIDToProviderMap, new SubProgressMonitor(monitor,90));
-			}
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		smm.addConfiguration(project, config);
+		
+		try {
+			smm.saveModelConfiguration();
+		} catch (IOException e) {
+			Activator.logError(e.toString(), e);
 		}
-		monitor.done();
+		
+		ICProject cProject = CModelManager.getDefault().getCModel().getCProject(project);
+		CCorePlugin.getIndexManager().setIndexerId(cProject, RemoteFastIndexer.ID);
+
+		monitor.done();		
+	}
+	
+	
+	private static Object getMBSProperty(String propertyId) {
+		return MBSCustomPageManager.getPageProperty(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID, propertyId);
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * Interface that supplies a UI which can be launched to configure a service provider.
@@ -27,15 +27,16 @@ import org.eclipse.swt.widgets.Shell;
  * @see IServiceProvider
  */
 public interface IServiceProviderContributor {
+
+
 	/**
-	 * Configure the service provider, which typically launches a dialog/wizard to allow the 
-	 * service provider to be configured (may include setting up and associating any required connections)
+	 * Creates a section on the service model properties page to configure the service provider.
+	 * The composite does not have a layout manager attached.
 	 * 
 	 * @param provider
-	 * @param parentShell parent SWT shell of the UI that is to be launched
-	 * @deprecated
+	 * @param composite
 	 */
-	public void configureServiceProvider(IServiceProvider provider, Shell parentShell);
+	public void configureServiceProvider(IServiceProvider provider, Composite composite);
 	
 	/**
 	 * Retrieve the wizard pages for a service provider

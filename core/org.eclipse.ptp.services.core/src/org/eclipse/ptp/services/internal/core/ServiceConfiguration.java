@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ptp.services.internal.core;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -44,6 +45,7 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	protected String fName;
 	protected ServiceModelManager fManager = ServiceModelManager.getInstance();
 	protected Map<IService, IServiceProvider> fServiceToProviderMap = new HashMap<IService, IServiceProvider>();
+	protected Map<IService, LinkedHashSet<IServiceProvider>> fFormerServiceProviders = new HashMap<IService, LinkedHashSet<IServiceProvider>>();
 
 	public ServiceConfiguration(String id, String name) {
 		fId = id;
@@ -68,8 +70,31 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getServiceProvider(org.eclipse.ptp.services.core.IService)
 	 */
 	public IServiceProvider getServiceProvider(IService service) {
-		return fServiceToProviderMap.get(service);
+		IServiceProvider activeProvider = fServiceToProviderMap.get(service);
+		return activeProvider == null ? service.getNullProvider() : activeProvider;
 	}
+	
+	
+	/**
+	 * Returns service providers that used to be associated with the given
+	 * service. 
+	 *
+	 * This method is here mainly for use by the NewServiceModelWidget.
+	 * The service configuration will automatically remember old service
+	 * providers and their state. That way if a user switches back to an
+	 * old provider the state can be restored and the user doesn't have
+	 * to set up the provider again.
+	 * 
+	 * @param service the service
+	 * @return set of old service providers
+	 * 
+	 * @see NewServiceModelWidget in the services.ui plugin
+	 */
+	public Set<IServiceProvider> getFormerServiceProviders(IService service) {
+		Set<IServiceProvider> disabledProviders = fFormerServiceProviders.get(service);
+		return disabledProviders == null ? Collections.<IServiceProvider>emptySet() : disabledProviders;
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#getServices()
@@ -92,9 +117,8 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 					return o1.getId().compareTo(o2.getId());
 				}
 			});
-		for (IService s : getServices()) {
-			sortedServices.add(s);
-		}
+		
+		sortedServices.addAll(getServices());
 		
 		return sortedServices;
 	}
@@ -103,10 +127,10 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#removeService(org.eclipse.ptp.services.core.IService)
 	 */
 	public void removeService(IService service) {
-		if (fServiceToProviderMap.containsKey(service)) {
-			fServiceToProviderMap.remove(service);
-		}
-		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED));
+		IServiceProvider oldProvider = fServiceToProviderMap.remove(service);
+		fFormerServiceProviders.remove(service);
+
+		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED, oldProvider));
 	}
 	
 	/* (non-Javadoc)
@@ -120,11 +144,36 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#setServiceProvider(org.eclipse.ptp.services.core.IService, org.eclipse.ptp.services.core.IServiceProvider)
 	 */
 	public void setServiceProvider(IService service, IServiceProvider provider) {
-		// Remove old mapping if one exists
-		fServiceToProviderMap.remove(service);
-		fServiceToProviderMap.put(service, provider);
-		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED));
+		if(provider != null && provider.equals(service.getNullProvider()))
+			provider = null;
+		
+		IServiceProvider oldProvider;
+		if(provider == null)
+			oldProvider = fServiceToProviderMap.remove(service);
+		else
+			oldProvider = fServiceToProviderMap.put(service, provider);
+		
+		if(oldProvider != null) {
+			addFormerServiceProvider(service, oldProvider);
+			fFormerServiceProviders.get(service).remove(provider);
+		}
+	
+		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED, oldProvider));
 	}
+	
+	
+	public void addFormerServiceProvider(IService service, IServiceProvider disabledProvider) {
+		if(disabledProvider == null)
+			return;
+		
+		LinkedHashSet<IServiceProvider> disabledServices = fFormerServiceProviders.get(service);
+		if(disabledServices == null) {
+			disabledServices = new LinkedHashSet<IServiceProvider>(); // very important to maintain insertion order
+			fFormerServiceProviders.put(service, disabledServices);
+		}
+		disabledServices.add(disabledProvider);
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -132,4 +181,14 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	public String toString() {
 		return "ServiceConfiguration: " + fName + " -> " + fServiceToProviderMap; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	
+	public void disable(IService service) {
+		setServiceProvider(service, null);
+	}
+
+	public boolean isDisabled(IService service) {
+		return !fServiceToProviderMap.containsKey(service);
+	}
+
 }

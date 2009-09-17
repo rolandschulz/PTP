@@ -131,7 +131,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 			for (TableItem item : items) {
 				IService service = (IService) item.getData(SERVICE_KEY);
 				if (service != null) {
-					getServiceConfiguration().removeService(service);
+					getServiceConfiguration().disable(service);
 				}
 				fTable.remove(fTable.indexOf(item));
 			}

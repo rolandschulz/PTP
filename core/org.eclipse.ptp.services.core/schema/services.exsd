@@ -73,6 +73,23 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="categoryId" type="string">
+            <annotation>
+               <documentation>
+                  ID of the serviceCategory that the service should belong to. Optional, if not specified the service will fall into the &quot;Additional Services&quot; category.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="nullProviderClass" type="string">
+            <annotation>
+               <documentation>
+                  The null service provider for this service. A service may have a null provider that acts as a &quot;no-op&quot; provider and will be returned by IServiceConfiguration.getServiceProvider() when a service is disabled, if there is no null provider then null will be returned instead.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.services.core.IServiceProvider"/>
+               </appInfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ptp.services.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.ptp.services.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.services.ui" id="providerConfigurations" name="Service Provider Configuration UIs"/>
+         <meta.schema plugin="org.eclipse.ptp.services.core" id="serviceCategories" name="Service Categories"/>
       </appInfo>
       <documentation>
-         Extension point to specify configuration UIs for service providers.
+         [Enter description of this extension point.]
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="providerContributor"/>
+            <element ref="category"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,32 +47,22 @@
       </complexType>
    </element>
 
-   <element name="providerContributor">
+   <element name="category">
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  the ID of the service provider making this contribution.
+                  
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="class" type="string">
-            <annotation>
-               <documentation>
-                  a fully qualified name of the Java class implementing &lt;samp&gt;org.eclipse.ptp.services.ui.IServiceProviderContributor&lt;/samp&gt;.
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.services.ui.IServiceProviderContributor"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="configurationUIClass" type="string">
+         <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.services.ui.IServiceProviderConfiguration"/>
+                  <meta.attribute translatable="true"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -84,7 +74,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         3.0
+         [Enter the first release in which this extension point appears.]
       </documentation>
    </annotation>
 
@@ -99,7 +89,7 @@
 
    <annotation>
       <appInfo>
-         <meta.section type="apiInfo"/>
+         <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
          [Enter API information here.]
