@@ -111,6 +111,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	 */
 	@Override
 	public void initializeSubSystem(IProgressMonitor monitor) {
+		
 		try {
 			super.initializeSubSystem(monitor);
 		} catch (SystemMessageException e) {
@@ -127,6 +128,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	@Override
 	public void uninitializeSubSystem(IProgressMonitor monitor) {
 		super.uninitializeSubSystem(monitor);
+		
 		
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectOpenListener);
 		fInitializedProjects = null;
@@ -917,41 +919,41 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		// is the indexing service associated with our service provider?
 		IService service = serviceModelManager.getService(RemoteCIndexServiceProvider.SERVICE_ID);
 		IServiceProvider provider = config.getServiceProvider(service);
-		if (provider.getId().equals(RemoteCIndexServiceProvider.ID)) {
 
-			// if so, initialize a scope for the project consisting of all
-			// its translation units
-			final List<ICElement> cElements = new LinkedList<ICElement>();
 
-			IResourceVisitor fileCollector = new IResourceVisitor() {
+		// if so, initialize a scope for the project consisting of all
+		// its translation units
+		final List<ICElement> cElements = new LinkedList<ICElement>();
 
-				public boolean visit(IResource resource) throws CoreException {
-					if (resource instanceof IFile) {
-						// add the path
-						ITranslationUnit tu = CoreModelUtil.findTranslationUnit((IFile) resource);
-						if (tu != null) {
-							cElements.add(tu);
-							return false;
-						}
+		IResourceVisitor fileCollector = new IResourceVisitor() {
+
+			public boolean visit(IResource resource) throws CoreException {
+				if (resource instanceof IFile) {
+					// add the path
+					ITranslationUnit tu = CoreModelUtil.findTranslationUnit((IFile) resource);
+					if (tu != null) {
+						cElements.add(tu);
+						return false;
 					}
-					return true;
 				}
-			};
+				return true;
+			}
+		};
 
-			// collect the translation units
-			project.accept(fileCollector);
+		// collect the translation units
+		project.accept(fileCollector);
 
-			String configLocation = ((IIndexServiceProvider)provider).getIndexLocation();
-			Scope scope = new Scope(project.getName());
+		String configLocation = ((IIndexServiceProvider)provider).getIndexLocation();
+		Scope scope = new Scope(project.getName());
 
-			// unregister the scope if there already is one
-			unregisterScope(scope, monitor);
+		// unregister the scope if there already is one
+		unregisterScope(scope, monitor);
 
-			// register the new scope
-			registerScope(scope, cElements, configLocation, monitor);
-			
-			fInitializedProjects.add(project);
-		}
+		// register the new scope
+		registerScope(scope, cElements, configLocation, monitor);
+		
+		fInitializedProjects.add(project);
+
 	}
 
 

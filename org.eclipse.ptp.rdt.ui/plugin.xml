@@ -159,13 +159,43 @@
             class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
             id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
             name="%RDTRemoteCIndexingService.name"
+            priority="1"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
       </provider>
       <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.NullCIndexServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.NullCIndexServiceProvider"
-            name="%NullCIndexingService.name"
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"
+            name="%RDTRemoteBuildService.name"
+            priority="1"
+            serviceId="org.eclipse.ptp.rdt.core.BuildService">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2"
+            name="RDT Remote C/C++ Indexing Service 2"
+            priority="2"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider3"
+            name="RDT Remote C/C++ Indexing Service 3"
+            priority="3"
+            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider2"
+            name="RDT Remote Build Service 2"
+            priority="2"
+            serviceId="org.eclipse.ptp.rdt.core.BuildService">
+      </provider>
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider3"
+            name="RDT Remote Build Service 3"
+            priority="3"
+            serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
    </extension>
    <extension
@@ -184,21 +214,6 @@
             class="org.eclipse.ptp.rdt.ui.wizards.RemoteMakefileWizard"
             name="Remote Makefile Project">
       </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"
-            name="%RDTRemoteBuildService.name"
-            serviceId="org.eclipse.ptp.rdt.core.BuildService">
-      </provider>
-      <provider
-	        class="org.eclipse.ptp.rdt.ui.serviceproviders.NullBuildServiceProvider"
-	        id="org.eclipse.ptp.rdt.ui.NullBuildServiceProvider"
-	        name="%NullBuildService.name"
-	        serviceId="org.eclipse.ptp.rdt.core.BuildService">
-      </provider>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -617,15 +632,70 @@
         <extension
            point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderContributer"
               configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
               id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider">
         </providerContributor>
-     </extension>
-     <extension
-           point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
               configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
               id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider">
         </providerContributor>
+        <providerContributor
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
+              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
+              id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider2">
+        </providerContributor>
+        <providerContributor
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
+              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
+              id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider3">
+        </providerContributor>
+        <providerContributor
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderContributer"
+              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
+              id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2">
+        </providerContributor>
+        <providerContributor
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderContributer"
+              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
+              id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider3">
+        </providerContributor>
+     </extension>
+     <extension
+           point="org.eclipse.ptp.services.core.serviceCategories">
+        <category
+              id="org.eclipse.ptp.rdt.core.category.cDevelopment"
+              name="C/C++ Development">
+        </category>
+     </extension>
+     <extension
+           point="org.eclipse.ptp.services.core.services">
+        <service
+              categoryId="org.eclipse.ptp.rdt.core.category.cDevelopment"
+              id="org.eclipse.ptp.rdt.core.CIndexingService"
+              name="%CIndexingService.name"
+              nullProviderClass="org.eclipse.ptp.rdt.ui.serviceproviders.NullCIndexServiceProvider"
+              priority="1">
+           <nature
+                 id="org.eclipse.cdt.core.cnature">
+           </nature>
+           <nature
+                 id="org.eclipse.cdt.core.ccnature">
+           </nature>
+        </service>
+        <service
+              categoryId="org.eclipse.ptp.rdt.core.category.cDevelopment"
+              id="org.eclipse.ptp.rdt.core.BuildService"
+              name="%BuildService.name"
+              nullProviderClass="org.eclipse.ptp.rdt.ui.serviceproviders.NullBuildServiceProvider"
+              priority="2">
+           <nature
+                 id="org.eclipse.cdt.core.cnature">
+           </nature>
+           <nature
+                 id="org.eclipse.cdt.core.ccnature">
+           </nature>
+        </service>
      </extension>
 </plugin>

@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rdt.ui.serviceproviders.IndexLocationChangeListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.osgi.framework.BundleContext;
@@ -61,9 +62,21 @@ public class UIPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
+		IndexLocationChangeListener.startListening();
 		turnOffIndexerAnnotations();
 	}
 	
+	
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		try {
+			IndexLocationChangeListener.stopListening();
+		}
+		finally {
+			super.stop(context);
+		}
+	}
+
 	public static UIPlugin getDefault() {
 		return fInstance;
 	}
