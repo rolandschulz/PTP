@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <!--Intro Overview page addition -->
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            content="intro/overviewContent.xml"
+            configId="org.eclipse.ui.intro.universalConfig">
+      </configExtension>
+   </extension>
+   
    <!--==========================================-->
    <!-- Free Form and Fixed Form Fortran Editors -->   
    <!--==========================================-->
