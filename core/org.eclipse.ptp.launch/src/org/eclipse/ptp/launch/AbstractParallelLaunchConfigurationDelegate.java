@@ -269,7 +269,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 							doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
 							break;
 							
-						case TERMINATED:
+						case COMPLETED:
 							/*
 							 * When the job terminates, do any post launch data synchronization.
 							 */
@@ -281,9 +281,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 							} catch (CoreException e1) {
 								PTPLaunchPlugin.log(e1);
 							}
-							/* Drop through */
-							
-						case ERROR:
+
 							/*
 							 * Job has terminated, so clean up.
 							 */
