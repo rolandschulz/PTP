@@ -29,9 +29,10 @@ public class Element extends PlatformObject implements IElement {
 	protected String id = "0"; //$NON-NLS-1$
 	protected String name = ""; //$NON-NLS-1$
 	protected boolean registered = false;
+	protected boolean selected = false;
 	protected IElement parent = null;
 	protected IPElement pElement = null;
-	
+
 	/** 
 	 * Constructor
 	 * @param parent Parent element
@@ -44,7 +45,6 @@ public class Element extends PlatformObject implements IElement {
 		this.name = name;
 		this.pElement = pElement;
 	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#cloneElement()
 	 */
@@ -94,11 +94,25 @@ public class Element extends PlatformObject implements IElement {
 	public boolean isRegistered() {
 		return registered;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#isSelected()
+	 */
+	public boolean isSelected() {
+		return selected;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#setRegistered(boolean)
 	 */
 	public void setRegistered(boolean registered) {
 		this.registered = registered;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#setSelected(boolean)
+	 */
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 }

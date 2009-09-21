@@ -57,14 +57,26 @@ public interface IElement extends Cloneable, Comparable<IElement>, IAdaptable {
 	public IPElement getPElement();
 	
 	/** 
-	 * Is element registered
+	 * Test if element is registered
 	 * @return true if element is registered
 	 */
 	public boolean isRegistered();
+	
+	/** 
+	 * Test if element is selected
+	 * @return true if element is selected
+	 */
+	public boolean isSelected();
 	
 	/** 
 	 * Set element to register or not
 	 * @param registered is register
 	 */
 	public void setRegistered(boolean registered);
+	
+	/** 
+	 * Set element state to selected
+	 * @param selected 
+	 */
+	public void setSelected(boolean selected);
 }
