@@ -313,7 +313,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/**
 	 * Returns the resource managers attribute definition manager
 	 * 
-	 * @return attribute definiton manager for this resource manager
+	 * @return attribute definition manager for this resource manager
 	 */
 	public AttributeDefinitionManager getAttributeDefinitionManager() {
 		return attrDefManager;
