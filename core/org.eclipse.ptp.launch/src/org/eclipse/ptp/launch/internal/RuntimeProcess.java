@@ -36,7 +36,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		this.job = job;	
 		job.addElementListener(this);
 		initializeAttributes(attributes);
-		fTerminated = job.isTerminated();
+		fTerminated = job.getState() == JobAttributes.State.COMPLETED;
 		launch.addProcess(this);
 		fireCreationEvent();
 	}
@@ -144,7 +144,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		EnumeratedAttribute<JobAttributes.State> attr = e.getAttributes().getAttribute(JobAttributes.getStateAttributeDefinition());
 		if (attr != null) {
 			JobAttributes.State state = attr.getValue();
-			if (state == State.TERMINATED || state == State.ERROR) {
+			if (state == State.COMPLETED) {
 				terminated();
 			}
 		} 
