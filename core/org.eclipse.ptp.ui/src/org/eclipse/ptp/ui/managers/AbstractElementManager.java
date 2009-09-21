@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
@@ -25,54 +28,56 @@ import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.ElementSet;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class AbstractUIManager implements IManager {
+public abstract class AbstractElementManager implements IElementManager {
 	protected IModelPresentation modelPresentation = null;
 	protected String cur_set_id = EMPTY_ID;
 	protected ListenerList setListeners = new ListenerList();
 	protected ListenerList jListeners = new ListenerList();
+	protected Map<String, IElementHandler> elementHandlers = new HashMap<String, IElementHandler>();
 
 	/** 
 	 * Constructor 
 	 */
-	public AbstractUIManager() {
+	public AbstractElementManager() {
 		modelPresentation = PTPCorePlugin.getDefault().getModelPresentation();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#addJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
+	 * @see org.eclipse.ptp.ui.IElementManager#addJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
 	 */
 	public void addJobChangedListener(IJobChangedListener jobListener) {
 		jListeners.add(jobListener);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
+	 * @see org.eclipse.ptp.ui.IElementManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
 	 */
 	public void addSetListener(ISetListener setListener) {
 		setListeners.add(setListener);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet)
+	 * @see org.eclipse.ptp.ui.IElementManager#addToSet(org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public void addToSet(IElement[] elements, IElementSet set) {
 		set.addElements(elements);
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 * @see org.eclipse.ptp.ui.IElementManager#addToSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public void addToSet(IElement[] elements, String setID,
 			IElementHandler elementHandler) {
@@ -80,9 +85,16 @@ public abstract class AbstractUIManager implements IManager {
 		addToSet(elements, set);
 		fireSetEvent(ADD_ELEMENT_TYPE, elements, set, null);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IElementManager#clear()
+	 */
+	public void clear() {
+		elementHandlers.clear();
+	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#createSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 * @see org.eclipse.ptp.ui.IElementManager#createSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public String createSet(IElement[] elements, String setID, String setName,
 			IElementHandler elementHandler) {
@@ -94,7 +106,7 @@ public abstract class AbstractUIManager implements IManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#fireJobListener(int, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.ui.IElementManager#fireJobListener(int, java.lang.String, java.lang.String)
 	 */
 	public void fireJobChangedEvent(final int type, final String cur_job_id,
 			final String pre_job_id) {
@@ -110,7 +122,7 @@ public abstract class AbstractUIManager implements IManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#fireEvent(int, org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
+	 * @see org.eclipse.ptp.ui.IElementManager#fireEvent(int, org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public void fireSetEvent(final int eventType, final IElement[] elements,
 			final IElementSet cur_set, final IElementSet pre_set) {
@@ -140,6 +152,29 @@ public abstract class AbstractUIManager implements IManager {
 			});
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IElementManager#getCurrentSetId()
+	 */
+	public String getCurrentSetId() {
+		return cur_set_id;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IElementManager#getElementHandler(java.lang.String)
+	 */
+	public IElementHandler getElementHandler(String id) {
+		return elementHandlers.get(id);
+	}
+	
+	public void removeElementHandler(String id) {
+		elementHandlers.remove(id);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IElementManager#getImage(org.eclipse.ptp.ui.model.IElement)
+	 */
+	public abstract Image getImage(IElement element);
 
 	/** 
 	 * Get Resource Managers
@@ -154,33 +189,27 @@ public abstract class AbstractUIManager implements IManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#getStatus(org.eclipse.ptp.ui.model.IElement)
-	 */
-	public int getStatus(IElement element, int index) {
-		return getStatus(element.getID());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeFromSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 * @see org.eclipse.ptp.ui.IElementManager#removeFromSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public void removeFromSet(IElement[] elements, String setID,
 			IElementHandler elementHandler) {
 		IElementSet set = (IElementSet) elementHandler.getElementByID(setID);
 		set.removeElements(elements);
 		fireSetEvent(REMOVE_ELEMENT_TYPE, elements, set, null);
-		if (set.size() == 0)
+		if (set.size() == 0) {
 			removeSet(setID, elementHandler);
+		}
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
+	 * @see org.eclipse.ptp.ui.IElementManager#removeJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
 	 */
 	public void removeJobChangedListener(IJobChangedListener jobListener) {
 		jListeners.remove(jobListener);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeSet(java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 * @see org.eclipse.ptp.ui.IElementManager#removeSet(java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
 	 */
 	public void removeSet(String setID, IElementHandler elementHandler) {
 		IElementSet set = (IElementSet) elementHandler.getElementByID(setID);
@@ -189,19 +218,24 @@ public abstract class AbstractUIManager implements IManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
+	 * @see org.eclipse.ptp.ui.IElementManager#removeSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
 	 */
 	public void removeSetListener(ISetListener setListener) {
 		setListeners.remove(setListener);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	 * @see org.eclipse.ptp.ui.IElementManager#setElementHandler(java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 */
+	public void setElementHandler(String id, IElementHandler handler) {
+		elementHandlers.put(id, handler);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IElementManager#shutdown()
 	 */
 	public void shutdown() {
 		setListeners.clear();
 		jListeners.clear();
-		//setListeners = null;
-		//jListeners = null;
 	}
 }
