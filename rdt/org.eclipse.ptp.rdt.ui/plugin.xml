@@ -169,34 +169,6 @@
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
-      <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2"
-            name="RDT Remote C/C++ Indexing Service 2"
-            priority="2"
-            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
-      </provider>
-      <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider3"
-            name="RDT Remote C/C++ Indexing Service 3"
-            priority="3"
-            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
-      </provider>
-      <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider2"
-            name="RDT Remote Build Service 2"
-            priority="2"
-            serviceId="org.eclipse.ptp.rdt.core.BuildService">
-      </provider>
-      <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider3"
-            name="RDT Remote Build Service 3"
-            priority="3"
-            serviceId="org.eclipse.ptp.rdt.core.BuildService">
-      </provider>
    </extension>
    <extension
          id="org.eclipse.ptp.rdt.core.remoteNature"
