@@ -20,7 +20,6 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
@@ -223,10 +222,9 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	public void handleEvent(final IProcessChangeEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				EnumeratedAttribute<ProcessAttributes.State> stateAttr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
-				if (stateAttr != null) {
-					ProcessAttributes.State state = stateAttr.getValue();
-					statusLabel.setText(Messages.ParallelProcessView_6 + state.toString());
+				StringAttribute statusAttr = e.getAttributes().getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+				if (statusAttr != null) {
+					statusLabel.setText(Messages.ParallelProcessView_6 + statusAttr.getValue());
 				} 
 				
 				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
