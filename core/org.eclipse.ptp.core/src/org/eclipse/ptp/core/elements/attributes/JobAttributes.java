@@ -24,14 +24,11 @@ import org.eclipse.ptp.core.messages.Messages;
  */
 public class JobAttributes {
 	public enum State {
-		PENDING,
-		STARTED,
+		STARTING,
 		RUNNING,
-		TERMINATED,
 		SUSPENDED,
-		ERROR,
-		UNKNOWN
-	};
+		COMPLETED
+	}
 	
 	public static final int IO_FORWARDING_NONE = 0x0;
 	public static final int IO_FORWARDING_STDIN = 0x01;
@@ -54,6 +51,7 @@ public class JobAttributes {
 	private static final String PROG_ARGS_ATTR_ID = "progArgs"; //$NON-NLS-1$
 	private static final String QUEUEID_ATTR_ID = "queueId"; //$NON-NLS-1$
 	private static final String STATE_ATTR_ID = "jobState"; //$NON-NLS-1$
+	private static final String STATUS_ATTR_ID = "jobStatus"; //$NON-NLS-1$
 	private static final String STATUS_MESSAGE_ATTR_ID = "jobStatusMessage"; //$NON-NLS-1$
 	private static final String SUBID_ATTR_ID = "jobSubId"; //$NON-NLS-1$
 	private static final String USERID_ATTR_ID = "userId"; //$NON-NLS-1$
@@ -120,8 +118,12 @@ public class JobAttributes {
 				Messages.JobAttributes_13, false, ""); //$NON-NLS-1$
 	
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State", Messages.JobAttributes_14,  //$NON-NLS-1$
-				true, State.STARTED);
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State", Messages.JobAttributes_14, //$NON-NLS-1$
+				false, State.STARTING);
+
+	private final static StringAttributeDefinition statusAttrDef = 
+		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", "Status of a job", //$NON-NLS-1$
+				true, ""); //$NON-NLS-1$
 
 	private final static StringAttributeDefinition statusMessageAttrDef = 
 		new StringAttributeDefinition(STATUS_MESSAGE_ATTR_ID, "Status Message", //$NON-NLS-1$
@@ -182,6 +184,7 @@ public class JobAttributes {
 				progArgsAttrDef,
 				queueIdAttrDef,
 				stateAttrDef, 
+				statusAttrDef,
 				statusMessageAttrDef,
 				subIdAttrDef, 
 				userIdAttrDef,
@@ -227,6 +230,10 @@ public class JobAttributes {
 
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
+	}
+
+	public static StringAttributeDefinition getStatusAttributeDefinition() {
+		return statusAttrDef;
 	}
 
 	public static StringAttributeDefinition getStatusMessageAttributeDefinition() {

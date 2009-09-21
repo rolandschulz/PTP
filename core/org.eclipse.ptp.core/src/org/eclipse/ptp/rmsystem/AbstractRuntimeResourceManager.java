@@ -875,7 +875,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		if (queue != null) {
 			for (IPJobControl job : queue.getJobControls()) {
-				if (job.isTerminated()) {
+				if (job.getState() == JobAttributes.State.COMPLETED) {
 					terminatedJobs.add(job);
 				}
 			}

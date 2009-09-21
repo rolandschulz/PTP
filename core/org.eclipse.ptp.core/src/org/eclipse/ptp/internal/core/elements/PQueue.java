@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -32,8 +31,6 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
@@ -51,14 +48,6 @@ public class PQueue extends Parent implements IPQueueControl {
 	
 	public PQueue(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_QUEUE, attrs);
-		/*
-		 * Create required attributes.
-		 */
-		EnumeratedAttribute<State> queueState = getAttribute(QueueAttributes.getStateAttributeDefinition());
-		if (queueState == null) {
-			queueState = QueueAttributes.getStateAttributeDefinition().create();
-			addAttribute(queueState);
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -148,13 +137,6 @@ public class PQueue extends Parent implements IPQueueControl {
 	 */
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#getState()
-	 */
-	public State getState() {
-		return getAttribute(QueueAttributes.getStateAttributeDefinition()).getValue();
 	}
 	
 	/* (non-Javadoc)

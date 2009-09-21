@@ -75,6 +75,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 			addAttribute(debugFlag);
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)
 	 */
@@ -213,17 +214,6 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	 */
 	public boolean isDebug() {
 		return getAttribute(JobAttributes.getDebugFlagAttributeDefinition()).getValue();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPJob#isTerminated()
-	 */
-	public boolean isTerminated() {
-		State state = getState();
-		if (state == State.TERMINATED || state == State.ERROR) {
-			return true;
-		}
-		return false;
 	}
 
 	/* (non-Javadoc)
