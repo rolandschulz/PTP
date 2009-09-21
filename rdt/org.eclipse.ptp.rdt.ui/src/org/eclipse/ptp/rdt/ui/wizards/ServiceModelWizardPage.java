@@ -61,18 +61,6 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 
 	public ServiceModelWizardPage(String pageID) {
 		super(pageID);
-		
-		String configName = DEFAULT_CONFIG;
-		IWizardPage page = getWizard().getStartingPage();
-		if(page instanceof CDTMainWizardPage) {
-			CDTMainWizardPage cdtPage = (CDTMainWizardPage) page;
-			configName = cdtPage.getProjectName();
-		}
-		
-		fConfig = ServiceModelManager.getInstance().newServiceConfiguration(configName);
-		for(IService service : getContributedServices()) {
-			fConfig.setServiceProvider(service, null);
-		}
 	}
 
 	/**
@@ -122,6 +110,15 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 		fModelWidget = new NewServiceModelWidget(parent, SWT.NONE);
 		
 		MBSCustomPageManager.addPageProperty(pageID, SERVICE_MODEL_WIDGET_PROPERTY, fModelWidget);
+		
+		String configName = DEFAULT_CONFIG;
+		IWizardPage page = getWizard().getStartingPage();
+		if(page instanceof CDTMainWizardPage) {
+			CDTMainWizardPage cdtPage = (CDTMainWizardPage) page;
+			configName = cdtPage.getProjectName();
+		}
+		
+		fConfig = ServiceModelManager.getInstance().newServiceConfiguration(configName);
 		
 		fModelWidget.setServiceConfiguration(fConfig);
 		

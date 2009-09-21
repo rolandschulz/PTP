@@ -194,6 +194,7 @@ public class NewServiceModelWidget extends Composite {
 	public void setServiceConfiguration(IServiceConfiguration configuration, Set<String> natureIds) {
 		this.configuration = configuration;
 		createTreeContent(natureIds);
+		displayService(null);
 	}
 	
 	
@@ -208,9 +209,11 @@ public class NewServiceModelWidget extends Composite {
 	}
 	
 	
-	protected void displayService(TreeItem serviceTreeItem) {
+	private void displayService(TreeItem serviceTreeItem) {
 		// Each tree item represents a service
-		IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
+		IService service = null;
+		if(serviceTreeItem != null)
+			service = (IService) serviceTreeItem.getData(SERVICE_KEY);
 		
 		// clear everything out
 		providerCombo.removeAll();
@@ -404,6 +407,9 @@ public class NewServiceModelWidget extends Composite {
 	
 	
 	public void applyChangesToConfiguration() {
+		if(configuration == null)
+			return;
+		
 		for(TreeItem categoryTreeItem : servicesTree.getItems()) {
 			for(TreeItem serviceTreeItem : categoryTreeItem.getItems()) {
 				IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
