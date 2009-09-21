@@ -98,7 +98,9 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	public IElement getElement(int index) {
 		if (cur_element_set == null)
 			return null;
-		return cur_element_set.getElement(index);
+		IElement element = cur_element_set.getElement(index);
+		element.setSelected(selectedElements.get(index));
+		return element;
 	}
 	/** Get elements
 	 * @param indexes Element indexes
@@ -107,11 +109,13 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	public IElement[] getElements(int[] indexes) {
 		if (cur_element_set == null)
 			return new IElement[0];
-		List<IElement> selectedElements = new ArrayList<IElement>();
+		List<IElement> elements = new ArrayList<IElement>();
 		for (int index : indexes) {
-			selectedElements.add(cur_element_set.getElement(index));
+			IElement element = cur_element_set.getElement(index);
+			element.setSelected(selectedElements.get(index));
+			elements.add(element);
 		}
-		return (IElement[]) selectedElements.toArray(new IElement[0]);
+		return (IElement[]) elements.toArray(new IElement[0]);
 	}
 	/** Get selected elements
 	 * @return selected elements
@@ -121,10 +125,9 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 			return new IElement[0];
 		IElement[] elements = new IElement[selectedElements.cardinality()];
 		for (int i = selectedElements.nextSetBit(0), j = 0; i >= 0; i = selectedElements.nextSetBit(i + 1), j++) {
-			elements[j] = cur_element_set.getElement(i);
+			elements[j] = getElement(i);
 		}
 		return elements;
-		//return getElements(getSelectedIndexes());
 	}
 	
     public ISelection getSelection() {
