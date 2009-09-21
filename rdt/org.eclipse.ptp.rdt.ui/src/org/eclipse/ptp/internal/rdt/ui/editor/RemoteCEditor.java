@@ -52,8 +52,10 @@ public class RemoteCEditor extends CEditor {
 	 * Default constructor.
 	 */
 	public RemoteCEditor() {
-		super();		
+		super();
+		setEditorContextMenuId("#RemoteCEditorContext"); //$NON-NLS-1$
 		setRulerContextMenuId("#RemoteCEditorRulerContext"); //$NON-NLS-1$
+		setOutlinerContextMenuId("#RemoteCEditorOutlinerContext"); //$NON-NLS-1$
 	}
 	
 	/**
