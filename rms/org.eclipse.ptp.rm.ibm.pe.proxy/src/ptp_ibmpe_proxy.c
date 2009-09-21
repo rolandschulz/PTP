@@ -884,7 +884,7 @@ int PE_start_events(int trans_id, int nargs, char *args[])
         sprintf(id_str, "%d", machine_id);
         enqueue_event(proxy_new_machine_event(trans_id, base_id_str, id_str, "default", MACHINE_STATE_UP));
         sprintf(id_str, "%d", queue_id);
-        enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str, "default", QUEUE_STATE_NORMAL, 0));
+        enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str, "default", 0));
         /*
          * Look for poe jobs already running on system
          */
@@ -1572,7 +1572,7 @@ void job_enqueue(jobinfo *job, pid_t pid)
     jobname[sizeof jobname - 1] = '\0';
     sprintf(queue_id_str, "%d", queue_id);
     sprintf(jobid_str, "%d", job->proxy_jobid);
-    enqueue_event(proxy_new_job_event(start_events_transid, queue_id_str, jobid_str, jobname, JOB_STATE_INIT,
+    enqueue_event(proxy_new_job_event(start_events_transid, queue_id_str, jobid_str, jobname, JOB_STATE_STARTING,
             job->submit_jobid));
 }
 
@@ -2057,8 +2057,8 @@ zombie_reaper(void *arg)
         while (job != NULL) {
             if ((job->discovered_job) && (kill(job->poe_pid, 0) != 0)) {
                 TRACE_DETAIL_V("+++ poe process %d Exited with unknown status\n", job->poe_pid);
-                send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_TERMINATED);
-                send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED);
+                send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_COMPLETED);
+                send_process_state_change_event(start_events_transid, job, PROC_STATE_COMPLETED);
                 if (job->tasks != NULL) {
                     if (!use_load_leveler) {
                         update_node_refcounts(job->numtasks, job->tasks);
@@ -2097,14 +2097,14 @@ zombie_reaper(void *arg)
                  */
                 if (status <= 128) {
                     TRACE_DETAIL_V("+++ %d Exited with status %08x\n", terminated_pmd, status);
-                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_TERMINATED);
-                    send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED);
+                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_COMPLETED);
+                    send_process_state_change_event(start_events_transid, job, PROC_STATE_COMPLETED);
                 }
                 else {
                     TRACE_DETAIL_V("+++ %d signalled with status %08x\n", terminated_pmd,
                             status - 128);
-                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_ERROR);
-                    send_process_state_change_event(start_events_transid, job, PROC_STATE_EXITED_SIGNALLED);
+                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_COMPLETED);
+                    send_process_state_change_event(start_events_transid, job, PROC_STATE_COMPLETED);
                 }
                 /*
                  * Since the job is terminated, the stdio file descriptor
@@ -4044,7 +4044,7 @@ sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObje
     char proxy_generated_job_id_string[256];
     char proxy_generated_queue_id_string[256];
     char job_name_string[256];
-    char *job_state_to_report = JOB_STATE_INIT;
+    char *job_state_to_report = JOB_STATE_STARTING;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
             __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
@@ -4057,19 +4057,19 @@ sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObje
 
     switch (job_object->job_state) {
         case MY_STATE_IDLE:
-        job_state_to_report = JOB_STATE_INIT;
+        job_state_to_report = JOB_STATE_STARTING;
         break;
         case MY_STATE_RUNNING:
         job_state_to_report = JOB_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        job_state_to_report = JOB_STATE_INIT;
+        job_state_to_report = JOB_STATE_STARTING;
         break;
         case MY_STATE_TERMINATED:
-        job_state_to_report = JOB_STATE_TERMINATED;
+        job_state_to_report = JOB_STATE_COMPLETED;
         break;
         default:
-        job_state_to_report = JOB_STATE_INIT;
+        job_state_to_report = JOB_STATE_STARTING;
         break;
     }
 
@@ -4093,7 +4093,7 @@ sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
     proxy_msg *msg;
     char proxy_generated_job_id_string[256];
     char job_state_string[256];
-    char *job_state_to_report = JOB_STATE_INIT;
+    char *job_state_to_report = JOB_STATE_STARTING;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
             __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
@@ -4104,19 +4104,19 @@ sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
 
     switch (job_object->job_state) {
         case MY_STATE_IDLE:
-        job_state_to_report = JOB_STATE_INIT;
+        job_state_to_report = JOB_STATE_STARTING;
         break;
         case MY_STATE_RUNNING:
         job_state_to_report = JOB_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        job_state_to_report = JOB_STATE_INIT;
+        job_state_to_report = JOB_STATE_STARTING;
         break;
         case MY_STATE_TERMINATED:
-        job_state_to_report = JOB_STATE_TERMINATED;
+        job_state_to_report = JOB_STATE_COMPLETED;
         break;
         default:
-        job_state_to_report = JOB_STATE_INIT;
+        job_state_to_report = JOB_STATE_STARTING;
         break;
     }
 
@@ -4160,7 +4160,7 @@ sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObj
     char proxy_generated_job_id_string[256];
     char proxy_generated_task_id_string[256];
     char ll_task_id_string[256];
-    char *task_state_to_report = PROC_STATE_STOPPED;
+    char *task_state_to_report = PROC_STATE_STARTING;
     NodeObject *node_object = NULL;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. node=%s. task=%d.\n",
@@ -4183,10 +4183,10 @@ sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObj
         task_state_to_report = PROC_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        task_state_to_report = PROC_STATE_STOPPED;
+        task_state_to_report = PROC_STATE_SUSPENDED;
         break;
         case MY_STATE_TERMINATED:
-        task_state_to_report = PROC_STATE_EXITED;
+        task_state_to_report = PROC_STATE_COMPLETED;
         break;
         default:
         task_state_to_report = PROC_STATE_STARTING;
@@ -4212,7 +4212,7 @@ sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
 {
     proxy_msg *msg;
     char proxy_generated_task_id_string[256];
-    char *task_state_to_report = PROC_STATE_STOPPED;
+    char *task_state_to_report = PROC_STATE_STARTING;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
     memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string));
@@ -4227,10 +4227,10 @@ sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
         task_state_to_report = PROC_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        task_state_to_report = PROC_STATE_STOPPED;
+        task_state_to_report = PROC_STATE_SUSPENDED;
         break;
         case MY_STATE_TERMINATED:
-        task_state_to_report = PROC_STATE_EXITED;
+        task_state_to_report = PROC_STATE_COMPLETED;
         break;
         default:
         task_state_to_report = PROC_STATE_STARTING;
@@ -4308,7 +4308,6 @@ sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
 {
     proxy_msg *msg;
     char proxy_generated_queue_id_string[256];
-    char *queue_state_to_report = QUEUE_STATE_STOPPED;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. queue=%s. state=%d.\n", __FUNCTION__,
             __LINE__, cluster_object->cluster_name, cluster_object->queue_state);
@@ -4319,17 +4318,15 @@ sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
     queue_id = cluster_object->proxy_generated_queue_id;
     switch (cluster_object->cluster_state) {
         case MY_STATE_UP:
-        queue_state_to_report = QUEUE_STATE_NORMAL;
         break;
         default:
-        queue_state_to_report = QUEUE_STATE_STOPPED;
         break;
     }
 
     msg =
     proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string,
             proxy_generated_queue_id_string, cluster_object->cluster_name,
-            queue_state_to_report, 0);
+            0);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
@@ -5065,7 +5062,7 @@ void add_discovered_job(char *pid)
     snprintf(jobname, sizeof jobname, "%s.run_%s", userinfo->pw_name, pid);
     jobname[sizeof jobname - 1] = '\0';
     AddToList(jobs, job);
-    enqueue_event(proxy_new_job_event(start_events_transid, queueid_str, jobid_str, jobname, JOB_STATE_INIT,
+    enqueue_event(proxy_new_job_event(start_events_transid, queueid_str, jobid_str, jobname, JOB_STATE_STARTING,
             job->submit_jobid));
     /*
      * Start a thread to watch for the attach.cfg file for this job
