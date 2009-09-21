@@ -549,43 +549,36 @@
         </objectContribution>
         <viewerContribution
             targetID="#RemoteCEditorRulerContext"
-            id="org.eclipse.ptp.rdt.debug.ui.RemoteCEditorRulerActions">
+            id="org.eclipse.ptp.rdt.ui.RemoteCEditorRulerActions">
          <action
-               class="org.eclipse.ptp.internal.rdt.ui.actions.CBreakpointPropertiesRulerActionDelegate"
-               id="org.eclipse.ptp.rdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate"
-               label="%BreakpointProperties.label"
-               menubarPath="debug"
-               overrideActionId="org.eclipse.cdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate">
+               label="%AddTask.label"
+               helpContextId="org.eclipse.ui.AddTask_action_context"
+               class="org.eclipse.ui.texteditor.TaskRulerAction"
+               tooltip="%AddTask.tooltip"
+               menubarPath="add"
+               id="org.eclipse.ui.texteditor.TaskRulerAction">
          </action>
          <action
-               class="org.eclipse.ptp.internal.rdt.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-               id="org.eclipse.ptp.rdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-               label="%EnableBreakpoint.label"
-               menubarPath="debug"
-               overrideActionId="org.eclipse.cdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
+               label="%AddBookmark.label"
+               helpContextId="org.eclipse.ui.bookmark_action_context"
+               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               tooltip="%AddBookmark.tooltip"
+               menubarPath="add"
+               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
          </action>
+         <!-- requires org.eclipse.cdt.internal.ui.text.correction package
          <action
-               class="org.eclipse.ptp.internal.rdt.ui.actions.ManageBreakpointRulerActionDelegate"
-               id="org.eclipse.ptp.rdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-               label="%AddBreakpoint.label"
-               menubarPath="debug"
-               overrideActionId="org.eclipse.cdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
+               class="org.eclipse.cdt.internal.ui.text.correction.CSelectRulerAction"
+               definitionId="org.eclipse.jdt.ui.edit.text.java.correction.assist.proposals"
+               id="org.eclipse.cdt.internal.ui.text.correction.CSelectRulerAction"
+               label="%QuickFix.label"
+               menubarPath="additions"
+               tooltip="%QuickFix.tooltip">
          </action>
+         -->
       </viewerContribution>
      </extension>
-     <extension
-         point="org.eclipse.ui.editorActions">
-      <editorContribution
-            targetID="org.eclipse.ptp.rdt.ui.editor.CEditor"
-            id="org.eclipse.ptp.rdt.debug.ui.CEditor.BreakpointRulerActions">
-         <action
-               label="%Dummy.label"
-               class="org.eclipse.ptp.internal.rdt.ui.actions.ManageBreakpointRulerActionDelegate"
-               actionID="RulerDoubleClick"
-               id="org.eclipse.ptp.rdt.debug.ui.CEditor.ManageBreakpointRulerAction">
-         </action>
-      </editorContribution>
-   </extension>
+     
         <extension
            point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
