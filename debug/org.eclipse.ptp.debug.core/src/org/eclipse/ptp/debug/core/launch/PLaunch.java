@@ -6,6 +6,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
@@ -39,7 +40,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	}
 	public boolean isTerminated() {
 		if (pJob != null)
-			return pJob.isTerminated();
+			return pJob.getState() == JobAttributes.State.COMPLETED;
 		return super.isTerminated();
 	}
 }

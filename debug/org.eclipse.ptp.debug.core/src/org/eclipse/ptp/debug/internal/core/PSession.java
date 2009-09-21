@@ -29,12 +29,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
 import org.eclipse.ptp.debug.core.IPMemoryManager;
@@ -51,6 +53,7 @@ import org.eclipse.ptp.debug.core.event.PDebugExitInfo;
 import org.eclipse.ptp.debug.core.event.PDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugSuspendInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
@@ -120,7 +123,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param force
 	 */
 	private void dispose(final boolean force) {
-		WorkspaceJob aJob = new WorkspaceJob("Disposing session...") {
+		WorkspaceJob aJob = new WorkspaceJob(Messages.PSession_0) {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				signalMgr.dispose(monitor);
 				bptMgr.dispose(monitor);
@@ -243,7 +246,7 @@ public class PSession implements IPSession, IPDIEventListener {
 					getPDISession().setStatus(IPDISession.STARTED);
 					PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.CHANGE, IPDebugEvent.PROCESS_SPECIFIC, getDebugInfo(event.getTasks())));
 				} catch (PDIException e) {
-					IPDebugInfo errInfo = new PDebugErrorInfo(getDebugInfo(event.getTasks()), "Starting processes error!", e.getMessage(), PTPDebugCorePlugin.INTERNAL_ERROR);
+					IPDebugInfo errInfo = new PDebugErrorInfo(getDebugInfo(event.getTasks()), Messages.PSession_1, e.getMessage(), PTPDebugCorePlugin.INTERNAL_ERROR);
 					PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.ERROR, IPDebugEvent.UNSPECIFIED, errInfo));		
 				}
 			} else if (event instanceof IPDIDisconnectedEvent) {
@@ -275,20 +278,22 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#forceStoppedDebugger(org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State)
+	 * @see org.eclipse.ptp.debug.core.IPSession#forceStoppedDebugger(boolean)
 	 */
-	public void forceStoppedDebugger(ProcessAttributes.State state) {
+	public void forceStoppedDebugger(boolean isError) {
 		BitList tasks = getTasks();
-		changeProcessState(tasks, state);
+		changeProcessState(tasks, ProcessAttributes.State.COMPLETED);
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.TERMINATE, IPDebugEvent.DEBUGGER, getDebugInfo(tasks)));
 		dispose(true);
 	}
 	
 	/**
+	 * Set the state of all processes in the bitlist
+	 * 
 	 * @param tasks
 	 * @param state
 	 */
-	private void changeProcessState(BitList tasks, ProcessAttributes.State state) {
+	private void changeProcessState(BitList tasks, State state) {
 		IPJob job = getJob();
 		List<IPProcessControl> processes = new ArrayList<IPProcessControl>();
 		for (int task : tasks.toArray()) {
@@ -297,29 +302,21 @@ public class PSession implements IPSession, IPDIEventListener {
 				processes.add((IPProcessControl)p);
 			}
 		}
-		((IPJobControl)job).addProcessAttributes(processes, new IAttribute[] { ProcessAttributes.getStateAttributeDefinition().create(state) });
+		EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
+		((IPJobControl)job).addProcessAttributes(processes, new IAttribute<?,?,?>[] {attr});
 	}
 	
 	/**
 	 * @param event
 	 */
 	public void fireSuspendEvent(IPDISuspendedEvent event) {
-		/*
-		try {
-			getPDISession().validateStepReturn(event.getTasks().copy());
-		}
-		catch (PDIException e) {
-			IPDebugInfo errInfo = new PDebugErrorInfo(getDebugInfo(e.getTasks()), "Check step return error!", e.getMessage(), PTPDebugCorePlugin.INTERNAL_ERROR);
-			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.ERROR, IPDebugEvent.UNSPECIFIED, errInfo));		
-		}
-		*/
 		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
 		int detail = IPDebugEvent.UNSPECIFIED;
 		
 		int lineNumber = 0;
 		int level = event.getLevel();
 		int depth = event.getDepth();
-		String fileName = "";
+		String fileName = ""; //$NON-NLS-1$
 		IPDISessionObject reason = event.getReason();
 		if (reason instanceof IPDIBreakpointInfo) {
 			IPDIBreakpoint bpt = ((IPDIBreakpointInfo)reason).getBreakpoint();
@@ -404,17 +401,17 @@ public class PSession implements IPSession, IPDIEventListener {
 			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
 			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo)reason).getMessage(), ((IPDIErrorInfo)reason).getDetailMessage(), ((IPDIErrorInfo)reason).getCode());
 			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.ERROR, errInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.ERROR);
+			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
 		} else if (reason instanceof IPDIExitInfo) {
 			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
-			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, ((IPDIExitInfo)reason).getCode(), "Exited", "Exited");
+			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, ((IPDIExitInfo)reason).getCode(), Messages.PSession_2, Messages.PSession_3);
 			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.EXITED);
+			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
 		} else if (reason instanceof IPDISignalInfo) {
 			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
 			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, 0, ((IPDISignalInfo)reason).getDescription(), ((IPDISignalInfo)reason).getName());
 			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.EXITED_SIGNALLED);
+			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
 		} else if (reason instanceof IPDISharedLibraryInfo) {
 			//TODO
 		} else if (reason instanceof IPDIThreadInfo) {
@@ -440,7 +437,7 @@ public class PSession implements IPSession, IPDIEventListener {
 			case IPDIErrorInfo.DBG_FATAL:
 				detail = IPDebugEvent.ERR_FATAL;
 				//only fatal error reports process error
-				changeProcessState(event.getTasks(), ProcessAttributes.State.ERROR);
+				changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED); // TODO: how to report error?
 				break;
 			case IPDIErrorInfo.DBG_WARNING:
 				detail = IPDebugEvent.ERR_WARNING;
@@ -453,7 +450,7 @@ public class PSession implements IPSession, IPDIEventListener {
 			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo)reason).getMessage(), ((IPDIErrorInfo)reason).getDetailMessage(), ((IPDIErrorInfo)reason).getCode());			
 			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.ERROR, detail, errInfo));
 		} else {
-			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, "Internal Error!", "Unknown", PTPDebugCorePlugin.INTERNAL_ERROR);
+			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, Messages.PSession_4, Messages.PSession_5, PTPDebugCorePlugin.INTERNAL_ERROR);
 			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.ERROR, IPDebugEvent.UNSPECIFIED, errInfo));		
 		}
 	}

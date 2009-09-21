@@ -23,11 +23,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
@@ -51,7 +49,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
     }
     public void addInput(String buffer) {
     	synchronized(buffers) {
-    		buffers.add(buffer==null?"":buffer);
+    		buffers.add(buffer==null?"":buffer); //$NON-NLS-1$
 	    	buffers.notifyAll();
     	}
     }
@@ -62,7 +60,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 				try {
 					buffers.wait();
 		    	} catch (InterruptedException e) {
-		    		buffer = "";
+		    		buffer = ""; //$NON-NLS-1$
 		    	}
 			}
 			buffer = (String)buffers.remove(0);
@@ -74,7 +72,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
     	process.addElementListener(this);
     }
     public void close() {
-    	addInput("");
+    	addInput(""); //$NON-NLS-1$
     	process.addElementListener(this);
     }
     public int read() {
@@ -120,17 +118,13 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
      * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
      */
     public void handleEvent(IProcessChangeEvent e) {
-		EnumeratedAttribute<ProcessAttributes.State> stateAttr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		if (stateAttr != null) {
-			ProcessAttributes.State state = stateAttr.getValue();
-			if (state == State.EXITED || state == State.EXITED_SIGNALLED || state == State.ERROR) {
-				close();
-			}
-		} 
+		if (e.getSource().getState() == ProcessAttributes.State.COMPLETED) {
+			close();
+		}
 		
 		StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
 		if (stdoutAttr != null) {
-			addInput(stdoutAttr.getValue() + "\n");
+			addInput(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
 		}
 
     }

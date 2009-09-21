@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
@@ -165,7 +166,7 @@ public class PDebugModel {
 	public static IPLineBreakpoint createLineBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, IPJob job) throws CoreException {
 		String job_id = IPBreakpoint.GLOBAL;
 		String jobName = IPBreakpoint.GLOBAL;
-		if (job != null && !job.isTerminated()) {
+		if (job != null && job.getState() != JobAttributes.State.COMPLETED) {
 			IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
 			if (session != null) {
 				job_id = job.getID();
