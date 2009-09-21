@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
@@ -74,11 +75,11 @@ import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.JobFocusAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
+import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -394,7 +395,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	private ListenerList listeners = new ListenerList();
 	private Action jobFocusAction = null;
 
-	protected String cur_selected_element_id = IManager.EMPTY_ID;
+	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
 	/*
 	 * UI components
 	 */
@@ -413,7 +414,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		this(PTPUIPlugin.getDefault().getJobManager());
 	}
 	
-	public ParallelJobsView(IManager manager) {
+	public ParallelJobsView(IElementManager manager) {
 		super(manager);
 	}
 	
@@ -498,7 +499,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * @param job_id
 	 */
 	public void doChangeJob(String job_id) {
-		doChangeJob(((JobManager)manager).findJobById(job_id));
+		doChangeJob(((IJobManager)manager).findJobById(job_id));
 	}
 	
 	/* (non-Javadoc)
@@ -516,14 +517,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (job != null) {
 			return job.getID();
 		}
-		return IManager.EMPTY_ID;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getImage(int, int)
-	 */
-	public Image getImage(int index1, int index2) {
-		return ParallelImages.procImages[index1][index2];
+		return IElementManager.EMPTY_ID;
 	}
 	
 	/**
@@ -545,7 +539,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (queue != null) {
 			return queue.getID();
 		}
-		return IManager.EMPTY_ID;
+		return IElementManager.EMPTY_ID;
 	}
 	
 	/* (non-Javadoc)
@@ -673,7 +667,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				terminateAllAction.setEnabled(false);
 			} else {
 				IPJob job = (IPJob) ((IStructuredSelection) selection).getFirstElement();
-				terminateAllAction.setEnabled(!(job.isDebug() || job.isTerminated()));
+				terminateAllAction.setEnabled(!(job.isDebug() || job.getState() == JobAttributes.State.COMPLETED));
 			}
 		}
 	}
@@ -754,8 +748,9 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		jobTableViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof JobManager)
-					return ((JobManager) inputElement).getJobs();
+				if (inputElement instanceof IJobManager) {
+					return ((IJobManager) inputElement).getJobs();
+				}
 				return new Object[0];
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
@@ -835,8 +830,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/**
 	 * @return
 	 */
-	protected JobManager getJobManager() {
-		return ((JobManager) manager);
+	protected IJobManager getJobManager() {
+		return ((IJobManager) manager);
 	}
 	
 	/* (non-Javadoc)
