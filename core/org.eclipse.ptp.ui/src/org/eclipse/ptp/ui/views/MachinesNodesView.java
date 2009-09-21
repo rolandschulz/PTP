@@ -721,8 +721,8 @@ public class MachinesNodesView extends ViewPart {
 		public void handleEvent(IChangedJobEvent e) {
 			boolean needRefresh = false;
 			for (IPJob job : e.getJobs()) {
-				if ( (job.getState() ==   JobAttributes.State.STARTED) || ( job.getState() == JobAttributes.State.RUNNING) || 
-						(job.getState() == JobAttributes.State.PENDING ) )  {
+				if ( (job.getState() == JobAttributes.State.STARTING) || 
+						job.getState() == JobAttributes.State.RUNNING) {
 					/*
 					 * Add job to the graphical representation of its node
 					 */
@@ -748,8 +748,9 @@ public class MachinesNodesView extends ViewPart {
 						}
 					}
 				}
-				if (needRefresh)
+				if (needRefresh) {
 					refreshView();
+				}
 			}
 		}
 		
