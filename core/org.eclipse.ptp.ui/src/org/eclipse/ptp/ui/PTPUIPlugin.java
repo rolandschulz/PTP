@@ -38,7 +38,6 @@ import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
 import org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.consoles.ConsoleManager;
-import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.managers.RMManager;
@@ -59,6 +58,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
     public static final String RM_EXTENSION_POINT_ID = "rmConfigurationWizards"; //$NON-NLS-1$
     public static final String RMEXT_EXTENSION_POINT_ID = "rmConfigurationWizardExtensions"; //$NON-NLS-1$
+    public static final String RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID = "runtimeModelPresentations"; //$NON-NLS-1$
     
 	//The shared instance.
 	private static PTPUIPlugin plugin;
@@ -149,8 +149,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		new HashMap<String, RMConfigurationWizardPageFactory>();
 	private final HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extensionWizardPageFactories = 
 		new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
-	private AbstractUIManager machineManager = null;	
-	private AbstractUIManager jobManager = null;
+	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations =
+		new HashMap<String, IRuntimeModelPresentation>();
+	private IMachineManager machineManager = null;	
+	private IJobManager jobManager = null;
 	private ConsoleManager consoleManager = null;
 	private RMManager rmManager = null;
 	
@@ -173,7 +175,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return job manager
 	 */
-	public AbstractUIManager getJobManager() {
+	public IJobManager getJobManager() {
 		return jobManager;
 	}
 	
@@ -182,27 +184,8 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return machine manager
 	 */
-	public AbstractUIManager getMachineManager() {
+	public IMachineManager getMachineManager() {
 		return machineManager;
-	}
-	
-	/**
-	 * Get the RM manager instance
-	 * 
-	 * @return RM manager
-	 */
-	public RMManager getRMManager() {
-		return rmManager;
-	}
-	
-	/**
-	 * Get the wizard page factory associated with a resource manager factory
-	 * 
-	 * @param factory resource manager factory
-	 * @return factory for creating wizard pages for this resource manager
-	 */
-	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
-		return configurationWizardPageFactories.get(factory.getClass().getName());
 	}
 	
 	/**
@@ -219,6 +202,35 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		return new RMConfigurationExtensionWizardPageFactory[0];
 	}
 	
+	/**
+	 * Get the wizard page factory associated with a resource manager factory
+	 * 
+	 * @param factory resource manager factory
+	 * @return factory for creating wizard pages for this resource manager
+	 */
+	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
+		return configurationWizardPageFactories.get(factory.getClass().getName());
+	}
+	
+	/**
+	 * Get the RM manager instance
+	 * 
+	 * @return RM manager
+	 */
+	public RMManager getRMManager() {
+		return rmManager;
+	}
+	
+	/**
+	 * Get the runtime model presentation for the given resource manager
+	 * 
+	 * @param id resource manager ID
+	 * @return runtime model presentation
+	 */
+	public IRuntimeModelPresentation getRuntimeModelPresentation(String id) {
+		return runtimeModelPresentations.get(id);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
@@ -227,6 +239,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		DebugUtil.configurePluginDebugOptions();
 		registerAdapterFactories();
 		retrieveConfigurationWizardPageFactories();
+		retrieveRuntimeModelPresentations();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 		consoleManager = new ConsoleManager();
@@ -283,8 +296,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		for (IExtension ext : extWizardExtensions) {
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
 		
-			for (IConfigurationElement ce : elements)
-			{
+			for (IConfigurationElement ce : elements) {
 				try {
 					RMConfigurationExtensionWizardPageFactory factory = (RMConfigurationExtensionWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					String id = ce.getAttribute("id"); //$NON-NLS-1$
@@ -309,8 +321,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		for (IExtension ext : confWizardExtensions) {
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
 		
-			for (IConfigurationElement ce : elements)
-			{
+			for (IConfigurationElement ce : elements) {
 				try {
 					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					Class rmFactoryClass = factory.getRMFactoryClass();
@@ -323,4 +334,29 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		}
     }
 
+
+	/**
+	 * Locate and load runtime model presentation extensions
+	 */
+	private void retrieveRuntimeModelPresentations() {
+    	runtimeModelPresentations.clear();
+    	
+    	IExtensionRegistry registry = Platform.getExtensionRegistry();
+    	IExtensionPoint extWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID);
+		final IExtension[] extWizardExtensions = extWizardPoint.getExtensions();
+		
+		for (IExtension ext : extWizardExtensions) {
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+		
+			for (IConfigurationElement ce : elements) {
+				try {
+					IRuntimeModelPresentation presentation = (IRuntimeModelPresentation) ce.createExecutableExtension("class"); //$NON-NLS-1$
+					String id = ce.getAttribute("id"); //$NON-NLS-1$
+					runtimeModelPresentations.put(id, presentation);
+				} catch (CoreException e) {
+					log(e);
+				}
+			}
+		}
+	}
 }

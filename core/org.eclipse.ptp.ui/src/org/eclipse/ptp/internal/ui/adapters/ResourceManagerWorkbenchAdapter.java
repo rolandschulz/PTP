@@ -29,8 +29,11 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.ui.IRuntimeModelPresentation;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 import org.eclipse.ui.model.WorkbenchAdapter;
@@ -119,8 +122,15 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-		ResourceManagerAttributes.State status = ((IResourceManager) object).getState();
-		return new ImageImageDescriptor(ParallelImages.rmImages[status.ordinal()]);
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(((IResourceManager)object).getResourceManagerId());
+		if (presentation != null) {
+			final Image image = presentation.getImage(object);
+			if (image != null) {
+				return new ImageImageDescriptor(image);
+			}
+		}
+		final ResourceManagerAttributes.State state = ((IResourceManager) object).getState();
+		return new ImageImageDescriptor(ParallelImages.rmImages[state.ordinal()]);
 	}
 
 	/* (non-Javadoc)
@@ -128,6 +138,13 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public String getLabel(Object object) {
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(((IResourceManager)object).getResourceManagerId());
+		if (presentation != null) {
+			final String label = presentation.getText(object);
+			if (label != null) {
+				return label;
+			}
+		}
 		final IResourceManagerControl resourceManager = (IResourceManagerControl) object;
 		final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		final String resourceManagerId = resourceManager.getConfiguration().getResourceManagerId();
