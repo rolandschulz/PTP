@@ -641,32 +641,12 @@
               configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
               id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider">
         </providerContributor>
-        <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
-              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
-              id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider2">
-        </providerContributor>
-        <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
-              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
-              id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider3">
-        </providerContributor>
-        <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderContributer"
-              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
-              id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2">
-        </providerContributor>
-        <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderContributer"
-              configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
-              id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider3">
-        </providerContributor>
      </extension>
      <extension
            point="org.eclipse.ptp.services.core.serviceCategories">
         <category
               id="org.eclipse.ptp.rdt.core.category.cDevelopment"
-              name="C/C++ Development">
+              name="%CDevelopment.name">
         </category>
      </extension>
      <extension
