@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.views.JobsListView;
@@ -56,7 +57,7 @@ public class TerminateJobFromListAction extends Action {
 						for(int i=0; i < selJobs.length; i++) {
 								IPJob job = (IPJob)selJobs[i];
 								
-								if(!job.isTerminated())
+								if(job.getState() != JobAttributes.State.COMPLETED)
 									running = true;
 						}
 						
@@ -87,7 +88,7 @@ public class TerminateJobFromListAction extends Action {
 				for(int i=0; i < selJobs.length; i++) {
 						IPJob job = (IPJob)selJobs[i];
 						
-						if(!job.isTerminated())
+						if(job.getState() != JobAttributes.State.COMPLETED)
 							running = true;
 				}
 				
@@ -126,8 +127,9 @@ public class TerminateJobFromListAction extends Action {
 					IPJob job = (IPJob)selJobs[i];
 					
 					IResourceManager rm = job.getQueue().getResourceManager();
-					if(!job.isTerminated())
+					if(job.getState() != JobAttributes.State.COMPLETED) {
 						rm.terminateJob(job);
+					}
 					// TODO: Look for job change event to wait for jobs to be finished.
 					viewer.update(selJobs[i], null);
 					

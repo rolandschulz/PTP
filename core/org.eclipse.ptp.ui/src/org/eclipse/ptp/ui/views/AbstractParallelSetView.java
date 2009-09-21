@@ -36,7 +36,7 @@ import org.eclipse.ptp.internal.ui.actions.DisplayRulerAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.internal.ui.actions.ZoomInAction;
 import org.eclipse.ptp.internal.ui.actions.ZoomOutAction;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
@@ -57,7 +57,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected List<IElement[]> clipboard = new ArrayList<IElement[]>();
 	
 	// selected element
-	protected String cur_selected_element_id = IManager.EMPTY_ID;
+	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
 	// default actions
 	protected ParallelAction createSetAction = null;
 	protected ParallelAction deleteSetAction = null;
@@ -74,7 +74,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected int last_action = -1;
 	protected IElementSet last_element_set = null;
 	
-	public AbstractParallelSetView(IManager manager) {
+	public AbstractParallelSetView(IElementManager manager) {
 		super(manager);
 	}
 	/* (non-Javadoc)

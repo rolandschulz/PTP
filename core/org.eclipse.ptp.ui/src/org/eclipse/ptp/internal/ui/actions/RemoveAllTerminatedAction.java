@@ -19,8 +19,8 @@
 package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
@@ -49,6 +49,6 @@ public class RemoveAllTerminatedAction extends ParallelAction {
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
 	public void run() {
-		((JobManager) view.getUIManager()).removeAllStoppedJobs();
+		((IJobManager) view.getUIManager()).removeAllStoppedJobs();
 	}
 }
