@@ -39,10 +39,11 @@
  * Job attributes
  */
 #define JOB_STATE_ATTR				"jobState"
-#define 	JOB_STATE_INIT				"STARTED"
+#define 	JOB_STATE_STARTED			"STARTED"
 #define 	JOB_STATE_RUNNING			"RUNNING"
-#define 	JOB_STATE_TERMINATED		"TERMINATED"
-#define 	JOB_STATE_ERROR				"ERROR"
+#define 	JOB_STATE_SUSPENDED			"SUSPENDED"
+#define 	JOB_STATE_COMPLETED			"COMPLETED"
+#define JOB_STATUS_ATTR				"jobStatus"
 #define JOB_SUB_ID_ATTR				"jobSubId"
 #define JOB_ID_ATTR					"jobId"
 #define JOB_NUM_PROCS_ATTR			"jobNumProcs"
@@ -69,11 +70,7 @@
 /*
  * Queue attributes
  */
-#define QUEUE_STATE_ATTR			"queueState"
-#define		QUEUE_STATE_NORMAL			"NORMAL"
-#define		QUEUE_STATE_COLLECTING		"COLLECTING"
-#define		QUEUE_STATE_DRAINING		"DRAINING"
-#define		QUEUE_STATE_STOPPED			"STOPPED"
+#define QUEUE_STATUS_ATTR			"queueStatus"
 #define QUEUE_ID_ATTR				"queueId"
 
 /*
@@ -82,10 +79,9 @@
 #define PROC_STATE_ATTR				"processState"
 #define		PROC_STATE_STARTING			"STARTING"
 #define 	PROC_STATE_RUNNING			"RUNNING"
-#define		PROC_STATE_EXITED			"EXITED"
-#define		PROC_STATE_EXITED_SIGNALLED	"EXITED_SIGNALLED"
-#define		PROC_STATE_STOPPED			"STOPPED"
-#define		PROC_STATE_ERROR			"ERROR"
+#define		PROC_STATE_SUSPENDED		"SUSPENDED"
+#define		PROC_STATE_COMPLETED		"COMPLETED"
+#define PROC_STATUS_ATTR			"processStatus"
 #define PROC_NODEID_ATTR			"processNodeId"
 #define PROC_PID_ATTR				"processPID"
 #define PROC_INDEX_ATTR				"processIndex"

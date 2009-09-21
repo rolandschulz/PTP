@@ -296,16 +296,15 @@ proxy_add_process(proxy_msg *m, char *proc_id, char *name, char *state, int extr
  * NEW QUEUE EVENT. Used to create a new queue model element.
  */
 proxy_msg *
-proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, char *state, int num_attrs)
+proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, int num_attrs)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_QUEUE, trans_id);
 
 	proxy_msg_add_string(m, rm_id);
 	proxy_msg_add_int(m, 1); /* 1 new queue */
 	proxy_msg_add_string(m, queue_id);
-	proxy_msg_add_int(m, num_attrs + 2); /* at least 2 attributes */
+	proxy_msg_add_int(m, num_attrs + 1); /* at least 1 attributes */
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
-	proxy_msg_add_keyval_string(m, QUEUE_STATE_ATTR, state);
 
 	return m;
 }
