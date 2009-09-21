@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -55,7 +55,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		IToolTipProvider, IImageProvider, IContentProvider, ISelectionChangedListener {
 
 	protected final String DEFAULT_TITLE = Messages.AbstractParallelElementView_0;
-	protected IManager manager = null;
+	protected IElementManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
 	protected int cur_set_size = 0;
@@ -102,7 +102,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 	};
 	
-	public AbstractParallelElementView(IManager manager) {
+	public AbstractParallelElementView(IElementManager manager) {
 		this.manager = manager;
 	}
 
@@ -128,10 +128,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected void createView(Composite parent) {
 		createElementView(parent);
 	}
-	/** Get IManager
-	 * @return IManager
+	/** Get IElementManager
+	 * @return IElementManager
 	 */
-	public IManager getUIManager() {
+	public IElementManager getUIManager() {
 		return manager;
 	}
 	public IElementHandler getElementHandler(String id) {
@@ -207,7 +207,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param pre_set previous set
 	 */
 	public void fireSetChangeEvent(IElementSet cur_set, IElementSet pre_set) {
-		manager.fireSetEvent(IManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
+		manager.fireSetEvent(IElementManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
 	/** Select set
 	 * @param set Target set
@@ -274,12 +274,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param element Target element
 	 */
 	protected abstract void doubleClick(IElement element);
-	/** Get element image
-	 * @param index1 first array index
-	 * @param index2 second array index
-	 * @return image
-	 */
-	protected abstract Image getImage(int index1, int index2);
 	/** Get tooltip text
 	 * @param obj Selected element
 	 * @return text of tooltip
@@ -328,8 +322,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 */
 	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
 		if (cur_element_set != null && obj instanceof IElement) {
-			int status = manager.getStatus((IElement)obj, index);
-			return getImage(status, isSelected ? 1 : 0);
+			return manager.getImage((IElement)obj);
 		}
 		return null;
 	}
