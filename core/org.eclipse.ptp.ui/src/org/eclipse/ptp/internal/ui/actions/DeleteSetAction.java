@@ -20,7 +20,7 @@ package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -59,7 +59,7 @@ public class DeleteSetAction extends ParallelAction {
 				return;
 
 			if (UIUtils.showQuestionDialog(NLS.bind(Messages.DeleteSetAction_1, set.getID()), Messages.DeleteSetAction_2)) {
-				IManager uiManager = view.getUIManager();
+				IElementManager uiManager = view.getUIManager();
 				uiManager.removeSet(set.getID(), setManager);
 						
 				IElement[] sets = setManager.getElements();

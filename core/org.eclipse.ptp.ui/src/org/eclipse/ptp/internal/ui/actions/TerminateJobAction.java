@@ -23,10 +23,9 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
+import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.managers.AbstractUIManager;
-import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
@@ -56,14 +55,14 @@ public class TerminateJobAction extends ParallelAction {
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
 	public void run() {
-		IManager manager = view.getUIManager();
-		if (manager instanceof AbstractUIManager) {
+		IElementManager manager = view.getUIManager();
+		if (manager instanceof IJobManager) {
 			boolean terminate = MessageDialog.openConfirm(getShell(),
 					Messages.TerminateJobAction_1,
-					NLS.bind(Messages.TerminateJobAction_2, ((JobManager)manager).getJob().getName()));
+					NLS.bind(Messages.TerminateJobAction_2, ((IJobManager)manager).getJob().getName()));
 			if (terminate) {
 				try {
-					((JobManager)manager).terminateJob();
+					((IJobManager)manager).terminateJob();
 				} catch (CoreException e) {
 					ErrorDialog.openError(getShell(), Messages.TerminateJobAction_3, Messages.TerminateJobAction_4, e.getStatus());
 				}

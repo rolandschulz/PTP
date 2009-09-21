@@ -12,8 +12,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
@@ -43,7 +43,7 @@ public class RemoveSelectedJobAction extends ParallelAction {
 		if (!selection.isEmpty()) {
 			selectedJob = (IPJob) ((IStructuredSelection) selection)
 					.getFirstElement();
-			((JobManager) view.getUIManager()).removeJob(selectedJob);
+			((IJobManager) view.getUIManager()).removeJob(selectedJob);
 			((ParallelJobsView) view).changeJobRefresh(null);
 		}
 	}
