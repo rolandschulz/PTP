@@ -21,7 +21,10 @@ package org.eclipse.ptp.internal.ui.adapters;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.IRuntimeModelPresentation;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
@@ -32,6 +35,13 @@ public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		IPMachine machine = (IPMachine) object;
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(machine.getResourceManager().getResourceManagerId());
+		if (presentation != null) {
+			final Image image = presentation.getImage(object);
+			if (image != null) {
+				return new ImageImageDescriptor(image);
+			}
+		}
 		return new ImageImageDescriptor(ParallelImages.machineImages[machine.getState().ordinal()]);
 	}
 
