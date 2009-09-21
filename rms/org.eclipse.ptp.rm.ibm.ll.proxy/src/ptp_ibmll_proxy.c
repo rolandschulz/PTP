@@ -2088,7 +2088,6 @@ static int sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_ob
 {
   proxy_msg *msg;
   char proxy_generated_queue_id_string[256];
-  char *queue_state_to_report = QUEUE_STATE_STOPPED;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. queue=%s. state=%d.\n", __FUNCTION__, __LINE__, cluster_object->cluster_name, cluster_object->queue_state);
   memset(proxy_generated_queue_id_string, '\0', sizeof(proxy_generated_queue_id_string));       /* zero the area */
@@ -2096,14 +2095,12 @@ static int sendQueueAddEvent(int gui_transmission_id, ClusterObject * cluster_ob
 
   switch (cluster_object->cluster_state) {
     case MY_STATE_UP:
-      queue_state_to_report = QUEUE_STATE_NORMAL;
       break;
     default:
-      queue_state_to_report = QUEUE_STATE_STOPPED;
       break;
   }
 
-  msg = proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string, proxy_generated_queue_id_string, cluster_object->cluster_name, queue_state_to_report, 0);
+  msg = proxy_new_queue_event(gui_transmission_id, ibmll_proxy_base_id_string, proxy_generated_queue_id_string, cluster_object->cluster_name, 0);
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return 0;
@@ -2245,7 +2242,7 @@ static int sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
   proxy_msg *msg;
   char proxy_generated_job_id_string[256];
   char job_state_string[256];
-  char *job_state_to_report = JOB_STATE_INIT;
+  char *job_state_to_report = JOB_STATE_STARTING;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, job_object->job_state);
   memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));   /* zero the area */
@@ -2254,19 +2251,16 @@ static int sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
 
   switch (job_object->job_state) {
     case MY_STATE_IDLE:
-      job_state_to_report = JOB_STATE_INIT;
+      job_state_to_report = JOB_STATE_STARTING;
       break;
     case MY_STATE_RUNNING:
       job_state_to_report = JOB_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      job_state_to_report = JOB_STATE_INIT;
+      job_state_to_report = JOB_STATE_SUSPENDED;
       break;
     case MY_STATE_TERMINATED:
-      job_state_to_report = JOB_STATE_TERMINATED;
-      break;
-    default:
-      job_state_to_report = JOB_STATE_INIT;
+      job_state_to_report = JOB_STATE_COMPLETED;
       break;
   }
 
@@ -2354,7 +2348,7 @@ static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, 
 {
   proxy_msg *msg;
   char proxy_generated_task_id_string[256];
-  char *task_state_to_report = PROC_STATE_STOPPED;
+  char *task_state_to_report = PROC_STATE_STARTING;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
   memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string)); /* zero the area */
@@ -2369,13 +2363,10 @@ static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, 
       task_state_to_report = PROC_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      task_state_to_report = PROC_STATE_STOPPED;
+      task_state_to_report = PROC_STATE_SUSPENDED;
       break;
     case MY_STATE_TERMINATED:
-      task_state_to_report = PROC_STATE_EXITED;
-      break;
-    default:
-      task_state_to_report = PROC_STATE_STARTING;
+      task_state_to_report = PROC_STATE_COMPLETED;
       break;
   }
 
