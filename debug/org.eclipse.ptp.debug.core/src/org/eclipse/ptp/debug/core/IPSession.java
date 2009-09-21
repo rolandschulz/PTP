@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -79,9 +78,12 @@ public interface IPSession extends IAdaptable {
 	public void fireDebugEvent(int change, int breakpoint, IPDebugInfo info);
 
 	/**
-	 * @param state
+	 * Force processes to terminated state. The flag isError indicates if
+	 * this was as the result of an error.
+	 * 
+	 * @param isError
 	 */
-	public void forceStoppedDebugger(ProcessAttributes.State state);
+	public void forceStoppedDebugger(boolean isError);
 
 	/**
 	 * @return
