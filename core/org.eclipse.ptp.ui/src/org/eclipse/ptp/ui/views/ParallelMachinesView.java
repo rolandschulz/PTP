@@ -71,13 +71,12 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
+import org.eclipse.ptp.ui.IMachineManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.managers.AbstractUIManager;
-import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -364,7 +363,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	private ISelection selection = null;
 	
 	// selected element
-	protected String cur_selected_element_id = IManager.EMPTY_ID;
+	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
 	
 	protected Menu jobPopupMenu = null;
 	
@@ -383,7 +382,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		this(PTPUIPlugin.getDefault().getMachineManager());
 	}
 	
-	public ParallelMachinesView(IManager manager) {
+	public ParallelMachinesView(IElementManager manager) {
 		super(manager);
 	}
 	
@@ -399,7 +398,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	 * @param id Machine ID
 	 */
 	public void changeMachine(final String id) {
-		IPMachine machine = ((MachineManager)manager).findMachineById(id);
+		IPMachine machine = ((IMachineManager)manager).findMachineById(id);
 		changeMachineRefresh(machine);
 	}
 	
@@ -481,7 +480,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		if (machine != null) {
 			return machine.getID();
 		}
-		return IManager.EMPTY_ID;
+		return IElementManager.EMPTY_ID;
 	}
 	
 	/** 
@@ -498,13 +497,6 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	 */
 	public String getCurrentView() {
 		return current_view;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getImage(int, int)
-	 */
-	public Image getImage(int index1, int index2) {
-		return ParallelImages.nodeImages[index1][index2];
 	}
 	
 	/* (non-Javadoc)
@@ -636,8 +628,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/**
 	 * @return
 	 */
-	private MachineManager getMachineManager() {
-		return ((MachineManager) manager);
+	private IMachineManager getMachineManager() {
+		return ((IMachineManager) manager);
 	}
 	
 	private IPNode getRegisteredNode() {
@@ -763,7 +755,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		nodeAttrTableViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof AbstractUIManager) {
+				if (inputElement instanceof IElementManager) {
 					IPNode node = getRegisteredNode();
 					if (node != null) {
 						return node.getDisplayAttributes();
@@ -831,7 +823,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		processTableViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof AbstractUIManager) {
+				if (inputElement instanceof IElementManager) {
 					IPNode node = getRegisteredNode();
 					if (node != null) {
 						return node.getProcesses();
@@ -913,8 +905,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		machineTableViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof AbstractUIManager)
-					return ((MachineManager) inputElement).getMachines();
+				if (inputElement instanceof IMachineManager)
+					return ((IMachineManager) inputElement).getMachines();
 				return new Object[0];
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
