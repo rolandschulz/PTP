@@ -206,17 +206,6 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPProcess#isTerminated()
-	 */
-	public boolean isTerminated() {
-		State state = getState();
-		if (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED) {
-			return true;
-		}
-		return false;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#removeElementListener(org.eclipse.ptp.core.elements.listeners.IProcessListener)
 	 */
 	public void removeElementListener(IProcessListener listener) {
@@ -230,24 +219,6 @@ public class PProcess extends Parent implements IPProcessControl {
 		node = null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPProcess#setState(org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State)
-	 */
-	public void setState(State state) {
-		EnumeratedAttribute<State> procState = getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		procState.setValue(state);
-		AttributeManager attrs = new AttributeManager();
-		attrs.addAttribute(procState);
-		fireChangedProcess(attrs);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPProcess#setTerminated(boolean)
-	 */
-	public void setTerminated(boolean isTerminated) {
-		setState(State.EXITED);
-	}
-
 	/**
 	 * Cache output from process to local file.
 	 * 
@@ -256,7 +227,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	private void addOutput(String output) {
 		outputFile.write(output);
 	}
-
+	
 	/**
 	 * Notify listeners of changed attributes.
 	 * 
@@ -287,6 +258,20 @@ public class PProcess extends Parent implements IPProcessControl {
 		if (!outputDirectory.exists()) {
 			outputDirectory.mkdir();
 		}
+	}
+
+	/**
+	 * Set the state of the process to the specified state. Fires a changed
+	 * process event to notify listeners that the state has changed.
+	 * 
+	 * @param state
+	 */
+	public void setState(State state) {
+		EnumeratedAttribute<State> attr = getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		attr.setValue(state);
+		AttributeManager attrMgr = new AttributeManager();
+		attrMgr.addAttribute(attr);
+		fireChangedProcess(attrMgr);
 	}
 	
 	/* (non-Javadoc)

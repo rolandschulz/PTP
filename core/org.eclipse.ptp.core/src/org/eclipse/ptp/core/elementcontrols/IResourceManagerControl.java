@@ -53,7 +53,7 @@ public interface IResourceManagerControl extends IResourceManager, IPElementCont
 	public void dispose();
 
 	/**
-	 * Enable event processing. The RM state will be set to STARTED.
+	 * Enable event processing. The RM state will be set to STARTING.
 	 * 
 	 * @throws CoreException
 	 */

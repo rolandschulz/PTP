@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
 public interface IPProcess extends IPElement {
@@ -88,18 +88,11 @@ public interface IPProcess extends IPElement {
 	public String getSignalName();
 	
 	/**
-	 * Get the state of the process
+	 * Get the internal state of the process.
 	 * 
 	 * @return process state
 	 */
-	public ProcessAttributes.State getState();
-	
-	/**
-	 * Check if process is terminated
-	 * 
-	 * @return true if process terminated
-	 */
-	public boolean isTerminated();
+	public State getState();
 	
 	/**
 	 * Remove listener for element events.
@@ -107,18 +100,4 @@ public interface IPProcess extends IPElement {
 	 * @param listener
 	 */
 	public void removeElementListener(IProcessListener listener);
-	
-	/**
-	 * Set the state attribute on the process
-	 * 
-	 * @param state of the process
-	 */
-	public void setState(ProcessAttributes.State state);
-	
-	/**
-	 * Set the value of the terminated attribute on the process
-	 * 
-	 * @param boolean representing termination status of the process
-	 */
-	public void setTerminated(boolean isTerminate);
 }

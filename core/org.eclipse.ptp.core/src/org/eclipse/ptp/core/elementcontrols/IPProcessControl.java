@@ -20,6 +20,7 @@ package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 
 public interface IPProcessControl extends IPElementControl, IPProcess {
 
@@ -40,4 +41,10 @@ public interface IPProcessControl extends IPElementControl, IPProcess {
 	 */
 	public void removeNode();
 	
+	/**
+	 * Set the internal state of the process
+	 * 
+	 * @param state
+	 */
+	public void setState(State state);
 }

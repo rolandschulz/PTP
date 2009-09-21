@@ -120,13 +120,6 @@ public interface IPJob extends IPElement {
 	public boolean isDebug();
 
 	/**
-	 * Returns true if all processes in the job have terminated
-	 * 
-	 * @return 
-	 */
-	public boolean isTerminated();
-	
-	/**
 	 * Remove a listener for child events.
 	 * 
 	 * @param listener
