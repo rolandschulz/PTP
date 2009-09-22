@@ -44,7 +44,7 @@ public class ProcessAttributes {
 	
 	private final static StringAttributeDefinition statusAttrDef = 
 		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
-				"Status of process", true, ""); //$NON-NLS-1$
+				Messages.ProcessAttributes_8, true, ""); //$NON-NLS-1$
 
 	private final static IntegerAttributeDefinition pidAttrDef = 
 		new IntegerAttributeDefinition(PID_ATTR_ID, "PID",  //$NON-NLS-1$

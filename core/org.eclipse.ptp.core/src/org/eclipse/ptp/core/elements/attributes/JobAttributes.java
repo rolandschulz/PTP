@@ -122,7 +122,7 @@ public class JobAttributes {
 				false, State.STARTING);
 
 	private final static StringAttributeDefinition statusAttrDef = 
-		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", "Status of a job", //$NON-NLS-1$
+		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", Messages.JobAttributes_19, //$NON-NLS-1$
 				true, ""); //$NON-NLS-1$
 
 	private final static StringAttributeDefinition statusMessageAttrDef = 
