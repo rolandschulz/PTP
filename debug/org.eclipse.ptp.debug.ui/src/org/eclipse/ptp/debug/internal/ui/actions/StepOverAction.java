@@ -23,7 +23,7 @@ import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.model.IElement;
 
 /**
@@ -51,7 +51,7 @@ public class StepOverAction extends StepAction {
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
 	public void run() {
-		IManager manager = view.getUIManager();
+		IElementManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {
 			try {
 				setEnabled(false);
