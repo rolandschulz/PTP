@@ -41,7 +41,6 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -49,6 +48,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.core.MPIJobAttributes;
 import org.eclipse.ptp.rm.core.ToolsRMPlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
@@ -443,7 +443,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String jobID = generateID().toString();
 		jobAttrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobID));
 		jobAttrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(parentID));
-		jobAttrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.PENDING));
+		jobAttrMgr.addAttribute(JobAttributes.getStatusAttributeDefinition().create(MPIJobAttributes.Status.NORMAL.toString()));
 		jobAttrMgr.addAttribute(JobAttributes.getUserIdAttributeDefinition().create(System.getenv("USER"))); //$NON-NLS-1$
 		jobAttrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(generateJobName()));
 
@@ -546,7 +546,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		String id = generateID();
 		ElementAttributeManager mgr = new ElementAttributeManager();
 		AttributeManager attrMgr = new AttributeManager();
-		attrMgr.addAttribute(QueueAttributes.getStateAttributeDefinition().create(QueueAttributes.State.NORMAL));
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
 		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(rmID, mgr));
