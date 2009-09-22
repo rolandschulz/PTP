@@ -13,6 +13,7 @@ package org.eclipse.ptp.core.elements.attributes;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.messages.Messages;
 
 
@@ -26,28 +27,18 @@ public class NodeAttributes {
 		ERROR,
 		UNKNOWN,
 	};
-	
-	public enum ExtraState {
-		USER_ALLOC_EXCL,
-		USER_ALLOC_SHARED,
-		OTHER_ALLOC_EXCL,
-		OTHER_ALLOC_SHARED,
-		RUNNING_PROCESS,
-		EXITED_PROCESS,
-		NONE,
-	};
 
 	private static final String STATE_ATTR_ID = "nodeState"; //$NON-NLS-1$
-	private static final String EXTRA_STATE_ATTR_ID = "nodeExtraState"; //$NON-NLS-1$
+	private static final String STATUS_ATTR_ID = "nodeStatus"; //$NON-NLS-1$
 	private static final String NUMBER_ATTR_ID = "nodeNumber"; //$NON-NLS-1$
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Node State", Messages.NodeAttributes_0, //$NON-NLS-1$
-				true, State.UNKNOWN);
+				false, State.UNKNOWN);
 	
-	private final static EnumeratedAttributeDefinition<ExtraState> extraStateAttrDef = 
-		new EnumeratedAttributeDefinition<ExtraState>(EXTRA_STATE_ATTR_ID, "Extra Node State", //$NON-NLS-1$
-				Messages.NodeAttributes_1, true, ExtraState.NONE);
+	private final static StringAttributeDefinition statusAttrDef = 
+		new StringAttributeDefinition(STATUS_ATTR_ID, "Node Status", //$NON-NLS-1$
+				Messages.NodeAttributes_1, true, ""); //$NON-NLS-1$
 	
 	private final static IntegerAttributeDefinition numAttrDef = 
 		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number",  //$NON-NLS-1$
@@ -57,8 +48,8 @@ public class NodeAttributes {
 		return stateAttrDef;
 	}
 	
-	public static EnumeratedAttributeDefinition<ExtraState> getExtraStateAttributeDefinition() {
-		return extraStateAttrDef;
+	public static StringAttributeDefinition getStatusAttributeDefinition() {
+		return statusAttrDef;
 	}
 
 	public static IntegerAttributeDefinition getNumberAttributeDefinition() {
@@ -66,6 +57,6 @@ public class NodeAttributes {
 	}
 	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef, extraStateAttrDef, numAttrDef};
+		return new IAttributeDefinition[]{stateAttrDef, statusAttrDef, numAttrDef};
 	}
 }
