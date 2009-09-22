@@ -14,7 +14,6 @@ package org.eclipse.ptp.rm.core;
 public class MPIProcessAttributes {
 	public enum Status {
 		ERROR,
-		EXITED,
 		EXITED_SIGNAL
 	}
 }

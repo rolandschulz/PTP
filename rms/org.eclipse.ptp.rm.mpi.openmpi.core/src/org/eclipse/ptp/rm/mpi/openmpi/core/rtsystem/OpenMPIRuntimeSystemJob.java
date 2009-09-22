@@ -38,7 +38,6 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.MPIJobAttributes;
-import org.eclipse.ptp.rm.core.MPIProcessAttributes;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
@@ -132,7 +131,6 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			
 					AttributeManager attrMrg = new AttributeManager();
 					attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
-					attrMrg.addAttribute(ProcessAttributes.getStatusAttributeDefinition().create(MPIProcessAttributes.Status.EXITED.toString()));
 					for (String processId : ids) {
 						rtSystem.changeProcess(processId, attrMrg);
 					}
