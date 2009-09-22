@@ -23,14 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
@@ -164,8 +162,6 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	 * 	- if the node is up:
 	 * 		- if there are *any* running processes on the node: NODE_RUNNING
 	 * 		- if there are no running processes, but one or more exited processes on the node: NODE_EXITED
-	 *  	- if there is extraState: extraState
-	 *  	- if there is no extraState: NODE_UP
 	 *  - if the node is down: NODE_DOWN
 	 *  - if the node is error: NODE_ERROR
 	 *  
@@ -175,28 +171,19 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	 * @param node
 	 * @return
 	 */
-	public int getNodeStatus(IPNode node) {
+	private int getNodeState(IPNode node) {
 		if (node != null) {
 			NodeAttributes.State nodeState = node.getState();
-			
-			EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr = 
-				node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
-			
-			if (extraStateAttr != null) {
-				return NodeAttributes.State.values().length + extraStateAttr.getValueIndex();
-			}
-			
-			// FIXME: this should be provided by the proxy
 			
 			if (nodeState == NodeAttributes.State.UP) {
 				IPProcess[] procs = node.getProcesses();
 				if (procs.length > 0) {
 					for (IPProcess proc : procs) {
 						if (proc.getState() != ProcessAttributes.State.COMPLETED) {
-							return NodeAttributes.State.values().length + NodeAttributes.ExtraState.RUNNING_PROCESS.ordinal();
+							return NodeAttributes.State.values().length;
 						}
 					}
-					return NodeAttributes.State.values().length + NodeAttributes.ExtraState.EXITED_PROCESS.ordinal();
+					return NodeAttributes.State.values().length + 1;
 				}
 				
 			}
@@ -204,43 +191,6 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 			return nodeState.ordinal();
 		}
 		return NodeAttributes.State.UNKNOWN.ordinal();
-	}
-	
-	/** Get node status text
-	 * @param node
-	 * @return status text
-	 */
-	public String getNodeStatusText(IPNode node) {
-		if (node == null) {
-			return Messages.MachineManager_2;
-		}
-		EnumeratedAttribute<NodeAttributes.State> nodeStateAttr =
-			node.getAttribute(NodeAttributes.getStateAttributeDefinition());
-		if(nodeStateAttr == null) {
-			return Messages.MachineManager_2;
-		}
-		NodeAttributes.State nodeState = nodeStateAttr.getValue();
-		
-		if (nodeState == NodeAttributes.State.UP) {
-			if (node.getProcesses().length > 0) {
-				if (node.getProcesses()[0].getJob().getState() == JobAttributes.State.COMPLETED) {
-					return Messages.MachineManager_3;
-				}
-				return Messages.MachineManager_4;
-			}
-
-			EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
-				node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
-			NodeAttributes.ExtraState extraState = NodeAttributes.ExtraState.NONE;
-			if (extraStateAttr != null) {
-				extraState = extraStateAttr.getValue();
-			}
-			
-			if (extraState != NodeAttributes.ExtraState.NONE) {
-				return extraState.toString();
-			}
-		}
-		return nodeState.toString();
 	}
 	
 	/* (non-Javadoc)
@@ -257,8 +207,8 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 					return image;
 				}
 			}
-			int index = getNodeStatus(machine.getNodeById(element.getID()));
-			return ParallelImages.nodeImages[index][element.isSelected() ? 1 : 0];
+			IPNode node = machine.getNodeById(element.getID());
+			return ParallelImages.nodeImages[getNodeState(node)][element.isSelected() ? 1 : 0];
 		}
 		return null;
 	}
