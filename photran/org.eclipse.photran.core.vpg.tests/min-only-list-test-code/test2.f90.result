@@ -1,0 +1,5 @@
+program test2
+    use module, only: helper
+    implicit none
+    call helper
+end program test2

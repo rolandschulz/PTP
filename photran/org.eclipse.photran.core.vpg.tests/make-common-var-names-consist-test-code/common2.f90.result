@@ -1,0 +1,11 @@
+module common2
+    implicit none
+
+    contains
+    subroutine help_common2
+        common /block/ a_common, b_common, c_common
+        integer :: a_common
+        real :: b_common
+        double precision :: c_common
+    end subroutine help_common2
+end module common2

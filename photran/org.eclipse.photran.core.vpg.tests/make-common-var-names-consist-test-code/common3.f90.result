@@ -1,0 +1,14 @@
+module common3
+    implicit none
+
+    contains
+    subroutine help_common3
+        common /block/ a_common, b_common, c_common
+        integer :: a_common
+        real :: b_common
+        double precision :: c_common
+
+        common /mem/ a, b, c
+        integer :: a, b, c
+    end subroutine help_common3
+end module common3

@@ -1,0 +1,27 @@
+program common1
+!use common2
+!use common3
+!use common4
+implicit none
+
+common /block/ a_common, b_common, c_common, /mem/ r, f, t
+integer :: a_common
+real :: b_common
+double precision :: c_common
+
+integer :: r, f, t
+
+a_common = 5
+b_common = 4.6
+c_common = 2.345
+
+call helper
+end program common1
+
+subroutine helper
+implicit none
+common /block/ a_common, b_common, c_common
+integer :: a_common
+real :: b_common
+double precision :: c_common
+end subroutine helper

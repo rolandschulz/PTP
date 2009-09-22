@@ -1,0 +1,5 @@
+program test4
+    implicit none
+    real, private :: hi
+    real, public :: blah
+end program test4

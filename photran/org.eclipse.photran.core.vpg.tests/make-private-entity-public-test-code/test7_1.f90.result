@@ -1,0 +1,8 @@
+program test7_1
+    implicit none
+    private
+    real :: r
+    integer five
+    real, optional :: ok
+    real, public, optional :: blah
+end program test7_1

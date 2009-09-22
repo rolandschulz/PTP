@@ -1,0 +1,6 @@
+program priv1
+    implicit none
+    integer a, b, c
+    private c
+    public a
+end program priv1
