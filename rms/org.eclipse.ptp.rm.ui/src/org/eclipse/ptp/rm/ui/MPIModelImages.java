@@ -40,8 +40,6 @@ public class MPIModelImages {
 
 	public static final String IMG_PROC_ERROR = "proc_error.gif"; //$NON-NLS-1$
 	public static final String IMG_PROC_ERROR_SEL = "proc_error_sel.gif";  //$NON-NLS-1$
-	public static final String IMG_PROC_EXITED = "proc_exited.gif"; //$NON-NLS-1$
-	public static final String IMG_PROC_EXITED_SEL = "proc_exited_sel.gif"; //$NON-NLS-1$
 	public static final String IMG_PROC_EXITED_SIGNAL = "proc_exited_signal.gif"; //$NON-NLS-1$
 	public static final String IMG_PROC_EXITED_SIGNAL_SEL = "proc_exited_signal_sel.gif"; //$NON-NLS-1$
 	
@@ -56,8 +54,6 @@ public class MPIModelImages {
 	static {
 		ImageManager.createImageDescriptor(PROCESS_URL, IMG_PROC_ERROR, IMG_PROC_ERROR);
 		ImageManager.createImageDescriptor(PROCESS_URL, IMG_PROC_ERROR_SEL, IMG_PROC_ERROR_SEL);
-		ImageManager.createImageDescriptor(PROCESS_URL, IMG_PROC_EXITED, IMG_PROC_EXITED);
-		ImageManager.createImageDescriptor(PROCESS_URL, IMG_PROC_EXITED_SEL, IMG_PROC_EXITED_SEL);
 		ImageManager.createImageDescriptor(PROCESS_URL, IMG_PROC_EXITED_SIGNAL, IMG_PROC_EXITED_SIGNAL);
 		ImageManager.createImageDescriptor(PROCESS_URL, IMG_PROC_EXITED_SIGNAL_SEL, IMG_PROC_EXITED_SIGNAL_SEL);
 	
@@ -65,11 +61,9 @@ public class MPIModelImages {
 		ImageManager.createImageDescriptor(JOB_URL, IMG_DEBUG_JOB_ERROR, IMG_DEBUG_JOB_ERROR);
 
 		procImages.put(MPIProcessAttributes.Status.ERROR.toString(), ImageManager.getImage(IMG_PROC_ERROR));
-		procImages.put(MPIProcessAttributes.Status.EXITED.toString(), ImageManager.getImage(IMG_PROC_EXITED));
 		procImages.put(MPIProcessAttributes.Status.EXITED_SIGNAL.toString(), ImageManager.getImage(IMG_PROC_EXITED_SIGNAL));
 		
 		procSelImages.put(MPIProcessAttributes.Status.ERROR.toString(), ImageManager.getImage(IMG_PROC_ERROR_SEL));
-		procSelImages.put(MPIProcessAttributes.Status.EXITED.toString(), ImageManager.getImage(IMG_PROC_EXITED_SEL));
 		procSelImages.put(MPIProcessAttributes.Status.EXITED_SIGNAL.toString(), ImageManager.getImage(IMG_PROC_EXITED_SIGNAL_SEL));
 		
 		jobImages.put(MPIJobAttributes.Status.ERROR.toString(), ImageManager.getImage(IMG_JOB_ERROR));
