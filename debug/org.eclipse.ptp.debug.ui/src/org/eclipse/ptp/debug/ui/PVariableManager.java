@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
@@ -27,6 +28,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.views.IToolTipProvider;
 
 /**
@@ -72,13 +74,13 @@ public class PVariableManager {
 	public void updateVariableStatus(IPJob job, String varname, boolean enabled) throws CoreException {
 		PVariableInfo info = findVariableInfo(job, varname);
 		if (info == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable " + varname + " is not existed.", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, NLS.bind(Messages.PVariableManager_0, varname), null));
 
 		updateVariableStatus(info, enabled);
 	}
 	public void addVariable(IPJob job, String varname, boolean enabled) throws CoreException {
 		if (findVariableInfo(job, varname) != null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable " + varname + " is already existed.", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, NLS.bind(Messages.PVariableManager_1, varname), null));
 		
 		List<PVariableInfo> infoList = jobVariableMap.get(job.getID());
 		if (infoList == null) {
@@ -98,7 +100,7 @@ public class PVariableManager {
 	public void removeVariable(IPJob job, String varname) throws CoreException {
 		PVariableInfo info = findVariableInfo(job, varname);
 		if (info == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable " + varname + " is not existed.", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, NLS.bind(Messages.PVariableManager_0, varname), null));
 
 		jobVariableMap.get(job.getID()).remove(info);
 		getSession(job).getPDISession().getExpressionManager().removeMutliExpressions(varname);
@@ -152,18 +154,18 @@ public class PVariableManager {
 			IPSession session = getSession(job);
 			IPDIExpression[] expressions = session.getPDISession().getExpressionManager().getMultiExpressions(task);
 			if (expressions == null || expressions.length == 0)
-				return "";
+				return ""; //$NON-NLS-1$
 
 			IPProcess p = job.getProcessByIndex(task);
-			if (p == null || p.getState() != ProcessAttributes.State.SUSPENDED)
-				return "";
+			if (p == null || p.getState() == ProcessAttributes.State.SUSPENDED)
+				return ""; //$NON-NLS-1$
 			
 			StringBuffer display = new StringBuffer();
 			for (IPDIExpression expression : expressions) {
-				display.append("<i>");
+				display.append("<i>"); //$NON-NLS-1$
 				display.append(expression.getExpressionText());
-				display.append("</i>");
-				display.append(" = ");
+				display.append("</i>"); //$NON-NLS-1$
+				display.append(" = "); //$NON-NLS-1$
 				try {
 					IAIF aif = expression.getAIF();
 					if (aif == null) {
@@ -184,7 +186,7 @@ public class PVariableManager {
 							  }
 						};
 						queueRunnable(runnable);
-						display.append("Pending...");
+						display.append(Messages.PVariableManager_2);
 					}
 					else {
 						display.append(aif.getValue().getValueString());
@@ -196,7 +198,7 @@ public class PVariableManager {
 				catch (AIFException ae) {
 					display.append(ae.getMessage());
 				}
-				display.append("<br>");
+				display.append("<br>"); //$NON-NLS-1$
 			}
 			return display.toString();
 		}
@@ -254,7 +256,7 @@ public class PVariableManager {
 	private IPSession getSession(IPJob job) throws CoreException {
 		IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found.", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.PVariableManager_3, null));
 		
 		return session;
 	}
@@ -291,7 +293,7 @@ public class PVariableManager {
 	private class UpdateVariableJob extends Job {
 		private Vector<IRunnableWithProgress> fRunnables;
 		public UpdateVariableJob() {
-			super("PTP Variable Job");
+			super(Messages.PVariableManager_4);
 			setSystem(true);
 			fRunnables = new Vector<IRunnableWithProgress>(10);
 		}
@@ -322,8 +324,8 @@ public class PVariableManager {
 				}
 				catch (Exception e) {
 					if (failed == null)
-						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, "Event notify error", null);
-					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, "Event notify error", e));
+						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, Messages.PVariableManager_5, null);
+					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, Messages.PVariableManager_5, e));
 				}
 				monitor.worked(1);
 			}
