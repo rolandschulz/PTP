@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -42,6 +43,8 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.rm.core.MPIJobAttributes;
+import org.eclipse.ptp.rm.core.MPIProcessAttributes;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
@@ -73,8 +76,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
 		 */
 		public void handleEvent(IProcessChangeEvent e) {
-			if (e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition()) != null
-					&& e.getSource().getState() == ProcessAttributes.State.RUNNING) {
+			EnumeratedAttribute<State> attr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
+			if (attr != null && attr.getValue() == ProcessAttributes.State.RUNNING) {
 				procsLock.lock();
 				try {
 					numRunningProcs++;
@@ -116,8 +119,11 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	public MPICH2RuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
-
-	private void changeAllProcessesStatus(State newState) {
+	
+	/**
+	 * Terminate all processes.
+	 */
+	private void terminateProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
 
@@ -126,23 +132,15 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		List<String> ids = new ArrayList<String>();
 		for (IPProcess ipProcess : ipJob.getProcesses()) {
-			switch (ipProcess.getState()) {
-			case EXITED:
-			case ERROR:
-			case EXITED_SIGNALLED:
-				break;
-			case RUNNING:
-			case STARTING:
-			case SUSPENDED:
-			case UNKNOWN:
+			if (ipProcess.getState() != ProcessAttributes.State.COMPLETED) {
 				ids.add(ipProcess.getID());
-				break;
 			}
 		}
 
 		AttributeManager attrMrg = new AttributeManager();
-		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(newState));
-		for (String processId : ids) {
+		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
+		attrMrg.addAttribute(ProcessAttributes.getStatusAttributeDefinition().create(MPIProcessAttributes.Status.EXITED.toString()));
+	for (String processId : ids) {
 			rtSystem.changeProcess(processId, attrMrg);
 		}
 	}
@@ -168,21 +166,20 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			stdoutObserver = null;
 		}
 		// TODO: more cleanup?
-		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+		terminateProcesses();
 	}
 
 	@Override
-	protected JobAttributes.State doExecutionFinished(IProgressMonitor monitor) throws CoreException {
-		changeAllProcessesStatus(ProcessAttributes.State.EXITED);
+	protected void doExecutionFinished(IProgressMonitor monitor) throws CoreException {
+		terminateProcesses();
 		if (getProcess().exitValue() != 0) {
 			if (!terminateJobFlag) {
 				changeJobStatusMessage(NLS.bind(Messages.MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(getProcess().exitValue())));
-				return JobAttributes.State.ERROR;
+				changeJobStatus(MPIJobAttributes.Status.ERROR);
 			}
 			
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", getJobID(), new Integer(getProcess().exitValue())); //$NON-NLS-1$
 		}
-		return JobAttributes.State.TERMINATED;
 	}
 
 	@Override
