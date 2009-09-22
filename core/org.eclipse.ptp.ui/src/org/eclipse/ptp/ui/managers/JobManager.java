@@ -261,7 +261,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 			}
 			IPProcess proc = job.getProcessById(element.getID());
 			if (proc != null) {
-				return ParallelImages.procImages[0][element.isSelected() ? 1 : 0];
+				return ParallelImages.procImages[proc.getState().ordinal()][element.isSelected() ? 1 : 0];
 			}
 		}
 		return null;
