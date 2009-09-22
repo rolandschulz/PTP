@@ -42,19 +42,7 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 				return new ImageImageDescriptor(image);
 			}
 		}
-		final Image image = getImage(job);
-		if (image != null) {
-			return new ImageImageDescriptor(image);
-		}
-		return null;
-	}
-
-	/**
-	 * @param job
-	 * @return
-	 */
-	private Image getImage(IPJob job) {
-		return ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0];
+		return new ImageImageDescriptor(ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0]);
 	}
 
 }
