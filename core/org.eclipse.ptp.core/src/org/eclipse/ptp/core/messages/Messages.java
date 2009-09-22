@@ -106,6 +106,7 @@ public class Messages extends NLS {
 	public static String JobAttributes_16;
 	public static String JobAttributes_17;
 	public static String JobAttributes_18;
+	public static String JobAttributes_19;
 	public static String JobAttributes_2;
 	public static String JobAttributes_3;
 	public static String JobAttributes_4;
@@ -134,6 +135,7 @@ public class Messages extends NLS {
 	public static String ProcessAttributes_5;
 	public static String ProcessAttributes_6;
 	public static String ProcessAttributes_7;
+	public static String ProcessAttributes_8;
 	public static String PTPCorePlugin_0;
 	public static String QueueAttributes_0;
 	public static String ResourceManagerAttributes_0;
