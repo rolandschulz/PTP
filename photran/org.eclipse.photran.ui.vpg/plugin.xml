@@ -588,6 +588,7 @@
             <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
             <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
             <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
+            <separator name="photranUseStmtGroup"/>
             <separator name="photranCommonBlockGroup"/>
             <separator name="photranOptimizationGroup"/>
             <separator name="photranFormattingGroup"/>
@@ -627,11 +628,24 @@
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
          <action
-         	   label="Make COMMON Variable Names Consistent"
+         	   label="Make COMMON Variable Names Consistent..."
          	   definitionId="org.eclipse.photran.ui.CommonVarNamesRefactoringCommand"
          	   class="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesAction"
          	   menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
          	   id="org.eclipse.photran.ui.CommonVarNamesRefactoringAction"/>          
+         <!-- -->
+         <action
+               label="Minimize ONLY List for Selected Module..."
+               definitionId="org.eclipse.photran.uui.MinOnlyListRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranUseStmtGroup"
+               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
+         <action
+               label="Add ONLY clause to USE statement..."
+               definitionId="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranUseStmtGroup"
+               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
          <!-- -->
          <action
                label="Encapsulate Variable..."
@@ -641,17 +655,17 @@
                id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
          <!-- -->
          <action
+               label="Make Private Entity Public..."
+               definitionId="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
+               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
+         <action
                label="&amp;Introduce Implicit None..."
                definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
                class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
                id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
-         <action
-               label="Make Private Entity Public"
-               definitionId="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
-               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
          <!-- -->
          <action
                label="Extract &amp;Local Variable..."
@@ -672,18 +686,6 @@
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-         <action
-               label="Add ONLY clause to USE statement"
-               definitionId="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
-               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
-         <action
-               label="Minimize ONLY List for Selected Module"
-               definitionId="org.eclipse.photran.uui.MinOnlyListRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
-               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
       </actionSet>
    </extension>
    <!--extension
@@ -719,6 +721,7 @@
             <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
             <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
             <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
+            <separator name="photranUseStmtGroup"/>
             <separator name="photranCommonBlockGroup"/>
             <separator name="photranOptimizationGroup"/>
             <separator name="photranFormattingGroup"/>
@@ -741,10 +744,21 @@
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
                id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
          <action
-         	   label="&amp;Make COMMON Variable Names Consistent"
+         	   label="&amp;Make COMMON Variable Names Consistent..."
          	   class="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesAction"
          	   menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
          	   id="org.eclipse.photran.ui.CommonVarNamesRefactoringAction"/>
+         <!-- -->
+         <action
+               label="&amp;Minimize ONLY List for Selected Module..."
+               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranUseStmtGroup"
+               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
+         <action
+               label="&amp;Add ONLY clause to USE Statement..."
+               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranUseStmtGroup"
+               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
          <!-- -->
          <action
                label="Encapsulate Variable..."
@@ -763,110 +777,17 @@
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
                id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
          <!-- -->
+         <action
+               label="&amp;Make Private Entity Public..."
+               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup"
+               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
+         <!-- -->
          <action 
                label="&amp;Rename..." 
                class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
                menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-         <action
-               label="&amp;Add ONLY clause to USE Statement"
-               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup"
-               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
-         <action
-               label="&amp;Minimize ONLY List for Selected Module"
-               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup"
-               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
-         <!-- -->
-         <action
-               label="&amp;Make Private Entity Public"
-               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup"
-               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
-      </viewerContribution>
-      <!--Add second viewer Contribution for the FIXED form editor-->
-      <viewerContribution 
-            targetID="#FixedFormFortranEditorContextMenu" 
-            id="org.eclipse.photran.refactoring.refactoringEditorContribution">
-         <menu
-               id="org.eclipse.photran.ui.RefactoringMenu"
-               label="Refac&amp;tor"
-               path="group.reorganize"><!-- See IContextMenuConstants -->
-                                                          <!-- JAVA REFACTORINGS IN THIS GROUP: -->
-                                                          <!-- ================================ -->
-            <separator name="reorgGroup"/>                <!-- Rename, Move -->
-            <separator name="codingGroup"/>               <!-- Change Signature, Extract Var/Method, Inline -->
-            <separator name="reorgGroup2"/>               <!-- Convert -->
-            <separator name="typeGroup"/>                 <!-- Extract Superclass, Pull Up, Push Down -->
-            <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
-            <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
-            <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
-            <separator name="photranCommonBlockGroup"/>
-            <separator name="photranOptimizationGroup"/>
-            <separator name="photranFormattingGroup"/>
-            <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
-         </menu>
-         <action 
-               label="Interchange L&amp;oops" 
-               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranOptimizationGroup" 
-               id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
-         <!-- -->
-         <!--action 
-               label="Extract Common Block to Mo&amp;dule" 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup" 
-               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
-         <action 
-               label="Move &amp;Saved Variables to Global Common Block..." 
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup" 
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
-         <action
-               label="&amp;Make COMMON Variable Names Consistent"
-               class="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
-               id="org.eclipse.photran.ui.CommonVarNamesRefactoringAction"/>
-         <!-- -->
-         <action
-               label="Encapsulate Variable..."
-               class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup2"
-               id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
-         <!-- -->
-         <action
-               label="Extract &amp;Local Variable..."
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup"
-               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
-         <action
-               label="E&amp;xtract Procedure..."
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup"
-               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
-         <!-- -->
-         <action
-               label="&amp;Rename..."
-               class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup"
-               id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-         <action
-               label="&amp;Add ONLY clause to USE Statement"
-               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup"
-               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
-         <action
-               label="&amp;Minimize ONLY List for Selected Module"
-               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup"
-               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
-         <!-- -->
-         <action
-               label="&amp;Make Private Entity Public"
-               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup"
-               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
       </viewerContribution>
    </extension>
    <!-- 5. Add multi-file refactorings to the context menu for files selected in the Package Explorer or elsewhere -->
@@ -909,6 +830,7 @@
             <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
             <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
             <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
+            <separator name="photranUseStmtGroup"/>
             <separator name="photranCommonBlockGroup"/>
             <separator name="photranOptimizationGroup"/>
             <separator name="photranFormattingGroup"/>
