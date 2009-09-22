@@ -106,7 +106,9 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 					String processID = rts.createProcess(job.getJobAlias(), job.getRank(), nodeID);
 					
 					process = (IPProcessControl)pJob.getProcessById(processID);
-					process.setState(ProcessAttributes.State.RUNNING);
+					if (process != null) {
+						process.setState(ProcessAttributes.State.RUNNING);
+					}
 				}
 			}
 		} catch (CoreException e) {
