@@ -27,4 +27,11 @@
             id="org.eclipse.ptp.rm.mpi.mpich2.ui.configurationWizard">
       </configurationWizard>
    </extension>
+   <extension
+         point="org.eclipse.ptp.ui.runtimeModelPresentations">
+      <runtimeModelPresentation
+            class="org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2RuntimeModelPresentation"
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourcemanager">
+      </runtimeModelPresentation>
+   </extension>
 </plugin>
