@@ -69,7 +69,7 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -815,7 +815,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		uiJob.schedule();
 	}
 	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
-		if (type == IJobChangedListener.REMOVED || (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID))) {
+		if (type == IJobChangedListener.REMOVED || (pre_job_id != null && !pre_job_id.equals(IElementManager.EMPTY_ID))) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
 			if (preAnnotationGroup != null) {
 				preAnnotationGroup.throwAllAnnotations();

@@ -35,6 +35,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.DebugJobStorage;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -45,7 +46,7 @@ import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.internal.ui.PAnnotationManager;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.OutputConsole;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -187,7 +188,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.managers.AbstractUIManager#fireJobChangedEvent(int, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.ui.managers.AbstractElementManager#fireJobChangedEvent(int, java.lang.String, java.lang.String)
 	 */
 	public void fireJobChangedEvent(int type, String cur_jid, String pre_jid) {
 		//TODO ?? updateBreakpointMarker
@@ -238,7 +239,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (job != null) {
 			return job.getID();
 		}
-		return IManager.EMPTY_ID;
+		return IElementManager.EMPTY_ID;
 	}
 	
 	/**
@@ -396,7 +397,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @return true if job is running
 	 */
 	public boolean isRunning(IPJob job) {
-		return (job != null && !job.isTerminated());
+		return (job != null && job.getState() != JobAttributes.State.COMPLETED);
 	}
 	
 	/**
@@ -475,7 +476,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 * @see org.eclipse.ptp.ui.IElementManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
