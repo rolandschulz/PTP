@@ -25,7 +25,8 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 
 
 /**
- * Node attributes.
+ * MPICH2 job attributes.
+ * 
  * @author Daniel Felix Ferber
  *
  */
