@@ -16,6 +16,18 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.ui.messages.messages"; //$NON-NLS-1$
 	
+	public static String PVariableManager_0;
+
+	public static String PVariableManager_1;
+
+	public static String PVariableManager_2;
+
+	public static String PVariableManager_3;
+
+	public static String PVariableManager_4;
+
+	public static String PVariableManager_5;
+
 	public static String ResumeAction_0;
 
 	public static String StepIntoAction_0;
