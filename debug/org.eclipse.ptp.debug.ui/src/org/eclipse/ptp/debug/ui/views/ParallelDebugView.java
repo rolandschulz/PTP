@@ -44,7 +44,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
@@ -61,7 +61,7 @@ import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -130,7 +130,7 @@ public class ParallelDebugView extends ParallelJobsView {
 		}
 	};
 	*/
-	public ParallelDebugView(IManager manager) {
+	public ParallelDebugView(IElementManager manager) {
 		super(manager);
 	}
 	public ParallelDebugView() {
@@ -636,12 +636,12 @@ public class ParallelDebugView extends ParallelJobsView {
 	 * @see org.eclipse.ptp.ui.views.ParallelJobsView#changeJobRefresh(org.eclipse.ptp.core.elements.IPJob, boolean)
 	 */
 	public void changeJobRefresh(IPJob job, boolean force) {
-		if (job != null && job.isTerminated()) {
+		if (job != null && job.getState() == JobAttributes.State.COMPLETED) {
 			IPSession session = ((UIDebugManager) manager).getDebugSession(job);
 			if (session != null) {
 				BitList tasks = session.getTasks();
 				if (!session.getPDISession().getTaskManager().isAllTerminated(tasks)) {
-					session.forceStoppedDebugger(ProcessAttributes.State.ERROR);
+					session.forceStoppedDebugger(true);
 				}
 			}
 		}
