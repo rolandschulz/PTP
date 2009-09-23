@@ -138,7 +138,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		AttributeManager attrMrg = new AttributeManager();
 		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
-	for (String processId : ids) {
+		for (String processId : ids) {
 			rtSystem.changeProcess(processId, attrMrg);
 		}
 	}
