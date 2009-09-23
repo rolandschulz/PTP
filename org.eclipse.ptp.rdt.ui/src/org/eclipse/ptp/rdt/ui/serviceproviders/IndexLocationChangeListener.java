@@ -62,25 +62,26 @@ public class IndexLocationChangeListener implements IServiceModelEventListener {
 	public void handleEvent(IServiceModelEvent event) {
 		if(event.getType() != IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED)
 			return;
-		IServiceProvider oldProvider = event.getOldProvider();
-		if(!(oldProvider instanceof IIndexServiceProvider))
-			return;
-		String oldIndexLocation = ((IIndexServiceProvider)oldProvider).getIndexLocation();
-		if(oldIndexLocation == null)
-			return;
-		
+
 		final ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService service = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 		IServiceConfiguration config = (IServiceConfiguration) event.getSource();
+		if(config.isDisabled(service))
+			return;
 		IServiceProvider sp = config.getServiceProvider(service);
 		if(!(sp instanceof IIndexServiceProvider))
 			return;
 		final IIndexServiceProvider provider = (IIndexServiceProvider) sp;
 		
 		
-		
+		String oldIndexLocation = null;
+		IServiceProvider oldProvider = event.getOldProvider();
+		if(oldProvider instanceof IIndexServiceProvider) {
+			oldIndexLocation = ((IIndexServiceProvider)oldProvider).getIndexLocation();
+		}
+			
 		// if the index location has changed
-		if(!oldIndexLocation.equals(provider.getIndexLocation())) {
+		if(oldIndexLocation == null || !oldIndexLocation.equals(provider.getIndexLocation())) {
 			final IIndexLifecycleService indexService = provider.getIndexLifeCycleService();
 			Set<IProject> scopes = smm.getProjectsForConfiguration(config);
 			for(IProject project : scopes) {
