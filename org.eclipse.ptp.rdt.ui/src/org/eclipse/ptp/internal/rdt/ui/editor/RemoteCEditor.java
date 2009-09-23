@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.internal.rdt.ui.editor;
 
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.text.CTextTools;
@@ -121,13 +122,17 @@ public class RemoteCEditor extends CEditor {
 	protected void setPreferenceStore(IPreferenceStore store) {
 		super.setPreferenceStore(store);
 		
-		IProject project = EditorUtility.getCProject(input).getProject();
-		if (RemoteNature.hasRemoteNature(project)) {
-			//use remote source viewer configuration
-			SourceViewerConfiguration sourceViewerConfiguration= getSourceViewerConfiguration();
-			if (!(sourceViewerConfiguration instanceof RemoteCSourceViewerConfiguration)) {
-				CTextTools textTools= CUIPlugin.getDefault().getTextTools();
-				setSourceViewerConfiguration(new RemoteCSourceViewerConfiguration(textTools.getColorManager(), store, this, ICPartitions.C_PARTITIONING));
+		ICProject cproject = EditorUtility.getCProject(input);
+		
+		if (cproject != null){		
+			IProject project = cproject.getProject();
+			if (RemoteNature.hasRemoteNature(project)) {
+				//use remote source viewer configuration
+				SourceViewerConfiguration sourceViewerConfiguration= getSourceViewerConfiguration();
+				if (!(sourceViewerConfiguration instanceof RemoteCSourceViewerConfiguration)) {
+					CTextTools textTools= CUIPlugin.getDefault().getTextTools();
+					setSourceViewerConfiguration(new RemoteCSourceViewerConfiguration(textTools.getColorManager(), store, this, ICPartitions.C_PARTITIONING));
+				}
 			}
 		}
 	}
