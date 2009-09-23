@@ -17,3 +17,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core.parser.upc;bundle-version="5.0.0"
 Eclipse-AutoStart: true
 Bundle-ClassPath: .
+Export-Package: org.eclipse.ptp.pldt.upc,
+ org.eclipse.ptp.pldt.upc.actions,
+ org.eclipse.ptp.pldt.upc.analysis,
+ org.eclipse.ptp.pldt.upc.editorHelp,
+ org.eclipse.ptp.pldt.upc.prefs,
+ org.eclipse.ptp.pldt.upc.views
