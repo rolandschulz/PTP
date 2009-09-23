@@ -17,4 +17,5 @@ Export-Package: org.eclipse.ptp.services.ui,
  org.eclipse.ptp.services.ui.dialogs,
  org.eclipse.ptp.services.ui.handlers,
  org.eclipse.ptp.services.ui.messages,
+ org.eclipse.ptp.services.ui.widgets,
  org.eclipse.ptp.services.ui.wizards
