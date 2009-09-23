@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.internal.ui.adapters;
 
+import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
@@ -24,6 +25,11 @@ public class ServiceProviderWorkbenchAdapter extends WorkbenchAdapter {
 	@Override
 	public String getLabel(Object object) {
 		IServiceProvider provider = (IServiceProvider)object;
-		return provider.getName() + " (" + fManager.getService(provider.getServiceId()).getName() + " Service)"; //$NON-NLS-1$ //$NON-NLS-2$
+		String name = provider.getName();
+		IService service = fManager.getService(provider.getServiceId());
+		if (service != null) {
+			name += " (" + service.getName() + " Service)"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return name;
 	}
 }
