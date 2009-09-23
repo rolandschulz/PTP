@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.ui.preferences;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
@@ -24,7 +27,6 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.ptp.services.ui.wizards.ServiceConfigurationWizard;
@@ -181,7 +183,8 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 
 	private Button addButton;
 	private ConfigCellModifier configCellModifier;
-	private List<IServiceConfiguration> deletedServiceConfigurations;
+	private List<IServiceConfiguration> deletedServiceConfigurations = new ArrayList<IServiceConfiguration>();
+	private Map<String, IServiceConfiguration> addedServiceConfigurations = new HashMap<String, IServiceConfiguration>();
 	private Button editButton;
 	private EventHandler eventHandler;
 	private TableColumn projectColumn;
@@ -232,6 +235,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 			item = new TableItem(serviceConfigurationTable, 0);
 			item.setData(config);
 			item.setText(0, config.getName());
+			addedServiceConfigurations.put(config.getId(), config);
 		}
 	}
 
@@ -332,15 +336,20 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 	}
 
 	/**
-	 * Remove selected service configurations from the set of service
+	 * Add/remove selected service configurations from the set of service
 	 * configurations known to the service model manager
 	 */
-	private void deleteServiceConfigurations() {
-		if (deletedServiceConfigurations != null) {
-			for (IServiceConfiguration config : deletedServiceConfigurations) {
+	private void updateServiceConfigurations() {
+		for (IServiceConfiguration config : deletedServiceConfigurations) {
+			if (addedServiceConfigurations.containsKey(config.getId())) {
+				addedServiceConfigurations.remove(config.getId());
+			} else {
 				ServiceModelManager.getInstance().remove(config);
 			}
-			deletedServiceConfigurations.clear();
+		}
+		deletedServiceConfigurations.clear();
+		for (IServiceConfiguration config : addedServiceConfigurations.values()) {
+			ServiceModelManager.getInstance().addConfiguration(config);
 		}
 	}
 
@@ -366,7 +375,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 	 * Delete service configurations when Apply button is pressed
 	 */
 	protected void performApply() {
-		deleteServiceConfigurations();
+		updateServiceConfigurations();
 		super.performApply();
 	}
 
@@ -376,7 +385,7 @@ public class ServiceConfigurationPreferencePage extends PreferencePage
 	 * @return Status from superclass indicating if Ok processing is to continue
 	 */
 	public boolean performOk() {
-		deleteServiceConfigurations();
+		updateServiceConfigurations();
 		return super.performOk();
 	}
 
