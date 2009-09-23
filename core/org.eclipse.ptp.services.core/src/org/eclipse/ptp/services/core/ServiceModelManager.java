@@ -706,6 +706,11 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 						if(element.getAttribute(ATTR_NULL_PROVIDER_CLASS) != null) {
 							try {
 								IServiceProvider nullProvider = (IServiceProvider) element.createExecutableExtension(ATTR_NULL_PROVIDER_CLASS);
+								if(nullProvider instanceof ServiceProvider) {
+									String providerId = service.getId() + ".nullProvider";
+									ServiceProviderDescriptor descriptor = new ServiceProviderDescriptor(providerId, "Null Provider", service.getId(), "0");
+									((ServiceProvider)nullProvider).setDescriptor(descriptor);
+								}
 								service.setNullServiceProvider(nullProvider);
 							} catch (CoreException e) {
 								Activator.getDefault().log(e);
