@@ -39,7 +39,7 @@
  * Job attributes
  */
 #define JOB_STATE_ATTR				"jobState"
-#define 	JOB_STATE_STARTED			"STARTED"
+#define 	JOB_STATE_STARTING			"STARTING"
 #define 	JOB_STATE_RUNNING			"RUNNING"
 #define 	JOB_STATE_SUSPENDED			"SUSPENDED"
 #define 	JOB_STATE_COMPLETED			"COMPLETED"
