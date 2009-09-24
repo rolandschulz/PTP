@@ -486,6 +486,13 @@
 			</or>
           </enablement>
        </actionProvider>
+       <commonWizard
+	         associatedExtensionId="org.eclipse.ptp.rdt.ui.navigator.content"
+	         menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
+	         type="new"
+	         wizardId="org.eclipse.ptp.rdt.ui.newRemoteProjectWizard">
+		 <enablement/>
+	   </commonWizard>
       </navigatorContent>
    </extension>
      <extension
