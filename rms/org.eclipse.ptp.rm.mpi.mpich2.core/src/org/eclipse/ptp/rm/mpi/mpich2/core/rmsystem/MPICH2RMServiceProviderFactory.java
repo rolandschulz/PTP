@@ -72,11 +72,11 @@ public class MPICH2RMServiceProviderFactory extends AbstractResourceManagerFacto
 				if (provider instanceof AbstractResourceManagerServiceProvider) {
 					((AbstractResourceManagerServiceProvider)provider).setUniqueName(config.getId());
 					config.setServiceProvider(service, provider);
+					fServiceManager.addConfiguration(config);
 					return (AbstractResourceManagerServiceProvider)provider;
 				}
 			}
 		}
-		fServiceManager.remove(config);
 		return null;
 	}
 
