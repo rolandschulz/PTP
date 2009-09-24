@@ -117,17 +117,36 @@
             canFinishEarly="false"
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
             class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteCppProjectWizard"
+            finalPerspective="org.eclipse.ptp.rdt.ui.remoteCPerspective"
             hasPages="true"
             icon="icons/etool16/newremote_c_proj.gif"
             id="org.eclipse.ptp.rdt.ui.newRemoteProjectWizard"
             name="%wizard.name.0"
             project="true">
+            <description>
+             	%remoteCCPPproject.desc
+         	</description>
       </wizard>
+      
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.cdt.ui.newCWizards"
+            class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteCppProjectWizard"
+            finalPerspective="org.eclipse.ptp.rdt.ui.remoteCPerspective"
+            hasPages="true"
+            icon="icons/etool16/newremote_c_proj.gif"
+            id="org.eclipse.ptp.rdt.ui.newCRemoteProjectWizard"
+            name="%wizard.name.0"
+            project="true">
+            <description>
+             	%remoteCCPPproject.desc
+         	</description>
+      </wizard>     
       
       <wizard
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
             class="org.eclipse.ptp.rdt.ui.wizards.ConvertToRemoteWizard"
-            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            finalPerspective="org.eclipse.ptp.rdt.ui.remoteCPerspective"
             hasPages="true"
             icon="icons/obj16/convert-normal.gif"
             id="org.eclipse.ptp.rdt.ui.wizards.ConvertToMakeWizard"
