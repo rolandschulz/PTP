@@ -71,10 +71,8 @@ public abstract class ServiceProvider extends PlatformObject implements IService
 		return isConfigured() ? Messages.ServiceProvider_0 : Messages.ServiceProvider_1;
 	}
 	
-	/**
-	 * Get the descriptor for this service provider
-	 * 
-	 * @return service provider descriptor
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#getDescriptor()
 	 */
 	public IServiceProviderDescriptor getDescriptor() {
 		return fDescriptor;
@@ -208,10 +206,8 @@ public abstract class ServiceProvider extends PlatformObject implements IService
 		}
 	}
 
-	/**
-	 * Set the descriptor for this provider.
-	 * 
-	 * @param descriptor descriptor to set
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#setDescriptor(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public void setDescriptor(IServiceProviderDescriptor descriptor) {
 		this.fDescriptor = descriptor;

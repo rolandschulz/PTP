@@ -11,7 +11,10 @@
 package org.eclipse.ptp.services.core;
 
 /**
- * A description (but not an instance) of a service provider.
+ * An IServiceProviderDescriptor represents the description (but not an
+ * instance of) of a service provider. IServiceProviderDescriptors contain
+ * the immutable information about a service provider.
+ * 
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is no guarantee that this API will work or
  * that it will remain the same. Please do not use this API without consulting

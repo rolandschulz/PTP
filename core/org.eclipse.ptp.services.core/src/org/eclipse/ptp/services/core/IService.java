@@ -15,7 +15,7 @@ import java.util.SortedSet;
 
 /**
  * An interface for arbitrary services.  Services can be implemented by one or more
- * providers.
+ * providers. 
  *
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is no guarantee that this API will work or
