@@ -95,6 +95,15 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		return value;
 	} 
 	
+	/**
+	 * Save the model configuration to persistent storage
+	 * 
+	 * @param configs
+	 * @param projectConfigs
+	 * @param activeConfigs
+	 * @param writer
+	 * @throws IOException
+	 */
 	private static void saveModelConfiguration(Map<String, IServiceConfiguration> configs,
 			Map<IProject, Map<String, IServiceConfiguration>> projectConfigs,
 			Map<IProject, IServiceConfiguration> activeConfigs,
@@ -159,7 +168,12 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		rootMemento.save(writer);
 	}
 	
-	
+	/**
+	 * Save the state of a service provider
+	 * 
+	 * @param provider
+	 * @param parentMemento
+	 */
 	private static void saveProviderState(IServiceProvider provider, IMemento parentMemento) {
 		if (provider instanceof ServiceProvider) {
 			IMemento providerConfigMemento = parentMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
@@ -171,18 +185,15 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final IPath defaultSaveFile;
 	private Map<String, IServiceConfiguration> fConfigurations = new HashMap<String, IServiceConfiguration>();
 	private Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
-
 	private Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
 	private Map<String, Service> fServices = null;
 	private Map<String,ServiceCategory> fCategories;
 	private Set<IService> fServiceSet = null;
-	
 	private Map<String, Set<IService>> fNatureServices = null;
-
 	private IServiceConfiguration fDefaultServiceConfiguration = null;
-
 	private ServiceModelEventManager fEventManager = new ServiceModelEventManager();
+	private boolean fModelLoaded = false;
 	
 	private static ServiceModelManager fInstance;
 	
@@ -194,13 +205,15 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	}
 	
 	private ServiceModelManager() {
-		defaultSaveFile = Activator.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+		defaultSaveFile = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
 	public void addConfiguration(IProject project, IServiceConfiguration conf) {
+		checkAndLoadModel();
+		
 		if(project == null || conf == null)
 			throw new NullPointerException();
 		
@@ -228,10 +241,14 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		addConfiguration(conf);
 	}
 	
-	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.ptp.services.core.IServiceConfiguration)
+	 */
 	public void addConfiguration(IServiceConfiguration conf) {
-		if(fConfigurations.put(conf.getId(), conf) == null)
+		checkAndLoadModel(); 
+		if(fConfigurations.put(conf.getId(), conf) == null) {
 			notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED));
+		}
 	}
 	
 	
@@ -243,16 +260,34 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getDefaultConfiguration()
+	 */
+	public IServiceConfiguration getActiveConfiguration() {
+		checkAndLoadModel();
+		return fDefaultServiceConfiguration;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
 	 */
 	public IServiceConfiguration getActiveConfiguration(IProject project) {
+		checkAndLoadModel();
 		return getConf(fActiveConfigurations, project);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getCategories()
+	 */
+	public Set<IServiceCategory> getCategories() {
+		checkAndLoadModel();
+		return new HashSet<IServiceCategory>(fCategories.values());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(org.eclipse.core.resources.IProject, java.lang.String)
 	 */
 	public IServiceConfiguration getConfiguration(IProject project, String name) {
+		checkAndLoadModel();
 		Map<String, IServiceConfiguration> confMap = getConf(fProjectConfigurations, project);
 		for (IServiceConfiguration conf : confMap.values()) {
 			if (conf.getName().equals(name)) {
@@ -266,6 +301,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(java.lang.String)
 	 */
 	public IServiceConfiguration getConfiguration(String id) {
+		checkAndLoadModel();
 		return fConfigurations.get(id);
 	}
 	
@@ -273,23 +309,18 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations()
 	 */
 	public Set<IServiceConfiguration> getConfigurations() {
+		checkAndLoadModel();
 		return new HashSet<IServiceConfiguration>(fConfigurations.values());
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfigurations(org.eclipse.core.resources.IProject)
 	 */
 	public Set<IServiceConfiguration> getConfigurations(IProject project) {
+		checkAndLoadModel();
 		return new HashSet<IServiceConfiguration>(getConf(fProjectConfigurations, project).values());
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getDefaultConfiguration()
-	 */
-	public IServiceConfiguration getActiveConfiguration() {
-		return fDefaultServiceConfiguration;
-	}
-
 	/**
 	 * Get the set of projects which use the specified service configuration
 	 * 
@@ -297,6 +328,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @return Set of projects which use the service configuration
 	 */
 	public Set<IProject> getProjectsForConfiguration(IServiceConfiguration serviceConfiguration) {
+		checkAndLoadModel();
+
 		Set<IProject> projects;
 		Set<IProject> projectsForConfig;
 		
@@ -317,7 +350,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		return projectsForConfig;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getService(java.lang.String)
 	 */
@@ -325,12 +358,12 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		loadServicesFromExtensionRegistry();
 		return fServices.get(id);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -338,12 +371,10 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 						if (element.getAttribute(ATTR_ID).equals(desc.getId())) {
 							try {
 								IServiceProvider provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
-								if (provider instanceof ServiceProvider) {
-									((ServiceProvider)provider).setDescriptor(desc);
-								}
+								provider.setDescriptor(desc);
 								return provider;
 							} catch (Exception e) {
-								Activator.getDefault().log(e);
+								ServicesCorePlugin.getDefault().log(e);
 								return null;
 							}
 						}
@@ -367,6 +398,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(org.eclipse.core.resources.IProject)
 	 */
 	public Set<IService> getServices(IProject project) {
+		checkAndLoadModel();
 		return getConf(fProjectServices, project);
 	}
 	
@@ -382,9 +414,10 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#isConfigured(org.eclipse.core.resources.IProject)
 	 */
 	public boolean isConfigured(IProject project) {
+		checkAndLoadModel();
 		return fProjectConfigurations.containsKey(project);
 	}
-	
+
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the default save file. If the file does not exist
@@ -409,32 +442,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_LOADED));
 	}
-
-	
-	private IServiceProvider loadServiceProvider(IMemento providerMemento, IService service) {
-		if(service == null)
-			return null;
-		
-		String providerId = providerMemento.getString(ATTR_PROVIDER_ID);
-		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
-		if (descriptor != null) {
-			IServiceProvider provider = getServiceProvider(descriptor);
-			if (provider != null) {
-				if (provider instanceof ServiceProvider) {
-					IMemento providerConfigMemento = providerMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-					((ServiceProvider)provider).restoreState(providerConfigMemento);
-				}
-				return provider;
-			} 
-			else {
-				Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
-			}
-		}
-		else {
-			Activator.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
-		}
-		return null;
-	}
 	
 	/**
 	 * Replaces the current service model configuration with what is
@@ -446,6 +453,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @throws IOException 
 	 */
 	public void loadModelConfiguration(Reader reader) throws IOException, CoreException {
+		fModelLoaded = true; // avoid re-entry
+
 		initialize(); // Clear out the existing model
 		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -466,7 +475,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			for (IMemento disabledMemento : configMemento.getChildren(DISABLED_PROVIDERS_ELEMENT_NAME)) {
 				String serviceId = disabledMemento.getString(ATTR_ID);
 				IService service = getService(serviceId);
-				for(IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
+				for (IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
 					IServiceProvider provider = loadServiceProvider(providerMemento, service);
 					config.addFormerServiceProvider(service, provider);
 				}
@@ -537,6 +546,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.core.resources.IProject)
 	 */
 	public void remove(IProject project) {
+		checkAndLoadModel();
 		if(project == null) {
 			throw new NullPointerException();
 		}
@@ -549,6 +559,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
 	public void remove(IServiceConfiguration conf) {
+		checkAndLoadModel();
 		for (IProject project : fProjectConfigurations.keySet()) {
 			removeConfiguration(project, conf);
 			if (conf.equals(getActiveConfiguration(project))) {
@@ -563,6 +574,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
 	public void removeConfiguration(IProject project, IServiceConfiguration conf) {
+		checkAndLoadModel();
 		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
 		if(confs != null) {
 			confs.remove(conf.getId());
@@ -587,6 +599,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @throws IOException
 	 */
 	public void saveModelConfiguration() throws IOException {
+		checkAndLoadModel();
 		File file = defaultSaveFile.toFile();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		try {
@@ -618,6 +631,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#setActiveConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
 	public void setActiveConfiguration(IProject project, IServiceConfiguration configuration) {
+		checkAndLoadModel();
+
 		Map<String, IServiceConfiguration> confs = getConf(fProjectConfigurations, project);
 		
 		if(!confs.containsKey(configuration.getId())) {
@@ -636,6 +651,21 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	}
 	
 	/**
+	 * Check if the model is already loaded. If not, load it.
+	 * 
+	 * This is used to ensure that the model is loaded prior to accessing it.
+	 */
+	private void checkAndLoadModel() {
+		if (!fModelLoaded) {
+			try {
+				loadModelConfiguration();
+			} catch (Exception e) {
+				ServicesCorePlugin.getDefault().log(e);
+			}
+		}
+	}
+
+	/**
 	 * Initialize model
 	 */
 	private void initialize() {
@@ -643,6 +673,38 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fProjectConfigurations.clear();
 		fProjectServices.clear();
 		fConfigurations.clear();
+	}
+	
+	/**
+	 * Load a service provider from persistent state
+	 * 
+	 * @param providerMemento
+	 * @param service
+	 * @return
+	 */
+	private IServiceProvider loadServiceProvider(IMemento providerMemento, IService service) {
+		if(service == null)
+			return null;
+		
+		String providerId = providerMemento.getString(ATTR_PROVIDER_ID);
+		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+		if (descriptor != null) {
+			IServiceProvider provider = getServiceProvider(descriptor);
+			if (provider != null) {
+				if (provider instanceof ServiceProvider) {
+					IMemento providerConfigMemento = providerMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+					((ServiceProvider)provider).restoreState(providerConfigMemento);
+				}
+				return provider;
+			} 
+			else {
+				ServicesCorePlugin.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
+			}
+		}
+		else {
+			ServicesCorePlugin.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
+		}
+		return null;
 	}
 
 	/**
@@ -658,7 +720,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fNatureServices = new HashMap<String, Set<IService>>();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, CATEGORY_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID, CATEGORY_EXTENSION_ID);
 		if(extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -672,7 +734,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}
 		
-        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, SERVICE_EXTENSION_ID);
+        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID, SERVICE_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -713,7 +775,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 								}
 								service.setNullServiceProvider(nullProvider);
 							} catch (CoreException e) {
-								Activator.getDefault().log(e);
+								ServicesCorePlugin.getDefault().log(e);
 							}
 						}
 						
@@ -726,7 +788,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 				}
 			}
 		}
-        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, PROVIDER_EXTENSION_ID);
+        extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID, PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -740,7 +802,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 						if (service != null) {
 							service.addServiceProvider(desc);
 						} else {
-							Activator.getDefault().logErrorMessage(
+							ServicesCorePlugin.getDefault().logErrorMessage(
 									NLS.bind(Messages.Services_invalidServiceId, serviceId));
 						}
 					}
@@ -760,9 +822,4 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private ServiceConfiguration newServiceConfiguration(String id, String name) {
 		return new ServiceConfiguration(id, name);
 	}
-
-	public Set<IServiceCategory> getCategories() {
-		return new HashSet<IServiceCategory>(fCategories.values());
-	}
-	
 }

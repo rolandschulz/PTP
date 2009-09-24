@@ -42,7 +42,7 @@ public class ProjectDeletionListener implements IResourceChangeListener {
 		try {
 			manager.saveModelConfiguration();
 		} catch (IOException e) {
-			Activator.getDefault().log(e);
+			ServicesCorePlugin.getDefault().log(e);
 		}
 	}
 

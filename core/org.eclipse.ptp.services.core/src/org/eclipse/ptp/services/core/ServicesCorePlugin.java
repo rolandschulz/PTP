@@ -23,33 +23,25 @@ import org.osgi.framework.BundleContext;
  * 
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin {
+public class ServicesCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.services.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static ServicesCorePlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public ServicesCorePlugin() {
 	}
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		
-		// If the plugin fails to activate because of an exception in the ServiceModelManager
-		// then we need to know what happened, so log it.
-		try {
-			ServiceModelManager.getInstance().loadModelConfiguration();
-		} catch (Exception e) {
-			log(e);
-		}
-		
+
 		ProjectDeletionListener.startListening();
 	}
 
@@ -74,7 +66,7 @@ public class Activator extends Plugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static ServicesCorePlugin getDefault() {
 		return plugin;
 	}
 
