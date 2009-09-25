@@ -13,6 +13,8 @@ package org.eclipse.ptp.services.core;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.eclipse.core.runtime.IAdaptable;
+
 /**
  * An interface for arbitrary services.  Services can be implemented by one or more
  * providers. 
@@ -24,7 +26,7 @@ import java.util.SortedSet;
  *
  * @see IServiceProvider
  */
-public interface IService {
+public interface IService extends IAdaptable {
 
 	/**
 	 * Get the ID of this service provider.

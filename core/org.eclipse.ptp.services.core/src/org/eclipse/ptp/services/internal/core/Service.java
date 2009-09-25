@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceCategory;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -27,7 +28,7 @@ import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
  * @author greg
  *
  */
-public class Service implements IService {
+public class Service extends PlatformObject implements IService {
 	private String fServiceId;
 	private String fServiceName;
 	private Integer fServicePriority = Integer.MAX_VALUE;
