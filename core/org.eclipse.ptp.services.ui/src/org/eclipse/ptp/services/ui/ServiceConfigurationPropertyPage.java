@@ -293,7 +293,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		try {
 			ServiceModelManager.getInstance().saveModelConfiguration();
 		} catch (IOException e) {
-			Activator.getDefault().log(e);
+			ServicesUIPlugin.getDefault().log(e);
 		}
 		return super.performOk();
 	}
@@ -338,7 +338,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 					try {
 						natures = new HashSet<String>(Arrays.asList(project.getDescription().getNatureIds()));
 					} catch (CoreException e) {
-						Activator.getDefault().log(e);
+						ServicesUIPlugin.getDefault().log(e);
 					}
 				}
 				serviceModelWidget.setServiceConfiguration(selectedConfig, natures);

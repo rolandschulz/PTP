@@ -54,7 +54,7 @@ public class ServiceModelUIManager {
 	 * @return class implementing IServiceContributor
 	 */
 	public IServiceContributor getServiceContributor(IService service) {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	SERVICE_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesUIPlugin.PLUGIN_ID,	SERVICE_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -62,7 +62,7 @@ public class ServiceModelUIManager {
 						try {
 							return (IServiceContributor) element.createExecutableExtension(ATTR_CLASS);
 						} catch (Exception e) {
-							Activator.getDefault().log(e);
+							ServicesUIPlugin.getDefault().log(e);
 							return null;
 						}
 					}
@@ -79,7 +79,7 @@ public class ServiceModelUIManager {
 	 * @return class implementing IServiceProviderContributor
 	 */
 	public IServiceProviderContributor getServiceProviderContributor(IServiceProviderDescriptor desc) {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesUIPlugin.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -88,7 +88,7 @@ public class ServiceModelUIManager {
 							try {
 								return (IServiceProviderContributor) element.createExecutableExtension(ATTR_CLASS);
 							} catch (Exception e) {
-								Activator.getDefault().log(e);
+								ServicesUIPlugin.getDefault().log(e);
 								return null;
 							}
 						}
@@ -105,14 +105,14 @@ public class ServiceModelUIManager {
 	 * @return IWizard providing a wizard extension
 	 */
 	public IWizard getWizardExtensions() {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	WIZARD_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesUIPlugin.PLUGIN_ID,	WIZARD_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
 					try {
 						return (IWizard) element.createExecutableExtension(ATTR_CLASS);
 					} catch (Exception e) {
-						Activator.getDefault().log(e);
+						ServicesUIPlugin.getDefault().log(e);
 						return null;
 					}
 				}
@@ -128,7 +128,7 @@ public class ServiceModelUIManager {
 	 */
 	public IServiceProviderConfiguration getServiceProviderConfigurationUI(IServiceProviderDescriptor desc) {
 		IServiceProviderConfiguration config = null;
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesUIPlugin.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {

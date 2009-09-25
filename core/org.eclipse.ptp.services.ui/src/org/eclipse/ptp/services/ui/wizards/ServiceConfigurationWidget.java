@@ -36,7 +36,7 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.Activator;
+import org.eclipse.ptp.services.ui.ServicesUIPlugin;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.ptp.services.ui.dialogs.ServicesDialog;
@@ -85,7 +85,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 //						addTableRow(service, provider);
 						getServiceConfiguration().setServiceProvider(service, provider);
 					} else {
-						Activator.getDefault().log(NLS.bind(Messages.ServiceModelWidget_8, service.getId()));
+						ServicesUIPlugin.getDefault().log(NLS.bind(Messages.ServiceModelWidget_8, service.getId()));
 					}
 				}
 				updateAddRemoveButtons();
