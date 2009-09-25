@@ -43,6 +43,7 @@ import org.eclipse.ptp.services.internal.core.ServiceCategory;
 import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 import org.eclipse.ptp.services.internal.core.ServiceModelEvent;
 import org.eclipse.ptp.services.internal.core.ServiceModelEventManager;
+import org.eclipse.ptp.services.internal.core.ServiceProviderDescriptor;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 

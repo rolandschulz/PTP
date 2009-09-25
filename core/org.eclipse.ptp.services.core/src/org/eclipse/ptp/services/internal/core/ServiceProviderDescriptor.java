@@ -8,7 +8,9 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.services.core;
+package org.eclipse.ptp.services.internal.core;
+
+import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 
 
 /**
