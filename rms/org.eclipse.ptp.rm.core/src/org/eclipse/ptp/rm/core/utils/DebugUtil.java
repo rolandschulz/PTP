@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.core.utils;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 
 /**
  * 
@@ -42,7 +42,7 @@ public class DebugUtil {
 	public static boolean RTS_JOB_OUTPUT_TRACING = false;
 
 	public static void configurePluginDebugOptions() {
-		if (ToolsRMPlugin.getDefault().isDebugging()) {
+		if (RMCorePlugin.getDefault().isDebugging()) {
 			String option = Platform.getDebugOption(COMMAND_TRACING_OPTION);
 			if (option != null) {
 				COMMAND_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$

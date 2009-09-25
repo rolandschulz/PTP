@@ -26,7 +26,7 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
@@ -97,7 +97,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 					if (process != null && process.getNode() == null) {
 						String nodeID = rts.getNodeIDforName(job.getHost());
 						if (nodeID == null) {
-							throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null));
+							throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null));
 						}
 						AttributeManager attrMrg = new AttributeManager();
 						attrMrg.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));

@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.launch.MPICH2LaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -74,7 +74,7 @@ public class MPICH2UIPlugin extends AbstractUIPlugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message) {
-		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message));
+		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class MPICH2UIPlugin extends AbstractUIPlugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
-		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message, t));
+		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));
 	}
 
 	/**

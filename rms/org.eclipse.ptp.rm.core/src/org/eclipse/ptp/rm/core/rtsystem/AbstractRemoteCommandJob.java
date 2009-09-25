@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.utils.core.linux.ArgumentParser;
@@ -119,7 +119,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 					jobProcess = cmdBuilder.start();
 				}
 			} catch (IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, processErrorMessage, e));
+				throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, processErrorMessage, e));
 			}
 
 			checkCancel(monitor);
@@ -141,7 +141,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 				DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: waiting to finish."); //$NON-NLS-1$
 				jobProcess.waitFor();
 			} catch (InterruptedException e) {
-				throw new CoreException(new Status(IStatus.INFO, ToolsRMPlugin.PLUGIN_ID, interruptedErrorMessage, e));
+				throw new CoreException(new Status(IStatus.INFO, RMCorePlugin.PLUGIN_ID, interruptedErrorMessage, e));
 			}
 
 			DebugUtil.trace(DebugUtil.COMMAND_TRACING_MORE, "Command: exit value {0}.", jobProcess.exitValue()); //$NON-NLS-1$
@@ -154,10 +154,10 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			return parseStatus;
 		} catch (CoreException e) {
 			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
-			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractRemoteCommandJob_Exception_CommandFailed, e);
+			return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractRemoteCommandJob_Exception_CommandFailed, e);
 		} catch (Exception e) {
 			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
-			return new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractRemoteCommandJob_Exception_InternalError, e);
+			return new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, Messages.AbstractRemoteCommandJob_Exception_InternalError, e);
 		} finally {
 			synchronized (this) {
 				if (jobProcess != null) {
@@ -170,7 +170,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 
 	private void checkCancel(IProgressMonitor monitor) throws CoreException {
 		if (monitor.isCanceled())
-			throw new CoreException(new Status(IStatus.INFO, ToolsRMPlugin.PLUGIN_ID, interruptedErrorMessage, null));
+			throw new CoreException(new Status(IStatus.INFO, RMCorePlugin.PLUGIN_ID, interruptedErrorMessage, null));
 	}
 
 	@Override
