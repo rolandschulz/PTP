@@ -61,13 +61,13 @@ public class ParallelImages {
 	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif"; //$NON-NLS-1$
 
 	// JOB
-	public static final String IMG_JOB_STARTING = "job_pending.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_STARTING = "job_starting.gif"; //$NON-NLS-1$
 	public static final String IMG_JOB_RUNNING = "job_running.gif"; //$NON-NLS-1$
-	public static final String IMG_JOB_COMPLETED = "job_terminated.gif"; //$NON-NLS-1$
+	public static final String IMG_JOB_COMPLETED = "job_completed.gif"; //$NON-NLS-1$
 	public static final String IMG_JOB_SUSPENDED = "job_suspended.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_JOB_STARTING = "debug_job_pending.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_JOB_RUNNING = "debug_job_running.gif"; //$NON-NLS-1$
-	public static final String IMG_DEBUG_JOB_COMPLETED = "debug_job_terminated.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_COMPLETED = "debug_job_completed.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_JOB_SUSPENDED = "debug_job_suspended.gif"; //$NON-NLS-1$
 	
 	// NODE
@@ -85,8 +85,8 @@ public class ParallelImages {
 	public static final String IMG_NODE_UP_SEL = "node_up_sel.gif"; //$NON-NLS-1$
 	
 	// PROCESS
-	public static final String IMG_PROC_COMPLETED = "proc_exited.gif"; //$NON-NLS-1$
-	public static final String IMG_PROC_COMPLETED_SEL = "proc_exited_sel.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_COMPLETED = "proc_completed.gif"; //$NON-NLS-1$
+	public static final String IMG_PROC_COMPLETED_SEL = "proc_completed_sel.gif"; //$NON-NLS-1$
 	public static final String IMG_PROC_RUNNING = "proc_running.gif"; //$NON-NLS-1$
 	public static final String IMG_PROC_RUNNING_SEL = "proc_running_sel.gif"; //$NON-NLS-1$
 	public static final String IMG_PROC_STARTING = "proc_starting.gif"; //$NON-NLS-1$
