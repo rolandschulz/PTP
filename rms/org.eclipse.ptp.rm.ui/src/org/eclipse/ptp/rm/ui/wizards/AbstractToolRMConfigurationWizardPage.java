@@ -28,7 +28,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ui.ToolsRMUIPlugin;
+import org.eclipse.ptp.rm.ui.RMUIPlugin;
 import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
@@ -556,7 +556,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 						} catch (RemoteConnectionException e) {
 							ErrorDialog.openError(getShell(), Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionError,
 									Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription,
-									new Status(IStatus.ERROR, ToolsRMUIPlugin.PLUGIN_ID, e.getMessage()));
+									new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID, e.getMessage()));
 						}
 					}
 
@@ -566,11 +566,11 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 				} catch (InvocationTargetException e) {
 					ErrorDialog.openError(getShell(), Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionError,
 							Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription,
-							new Status(IStatus.ERROR, ToolsRMUIPlugin.PLUGIN_ID, e.getMessage()));
+							new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID, e.getMessage()));
 				} catch (InterruptedException e) {
 					ErrorDialog.openError(getShell(), Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionError,
 							Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription,
-							new Status(IStatus.ERROR, ToolsRMUIPlugin.PLUGIN_ID, e.getMessage()));
+							new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID, e.getMessage()));
 				}
 			}
 			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
