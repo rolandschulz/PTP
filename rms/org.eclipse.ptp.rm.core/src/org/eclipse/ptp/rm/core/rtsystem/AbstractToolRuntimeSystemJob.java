@@ -46,7 +46,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.MPIJobAttributes;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
@@ -428,7 +428,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				try {
 					newAttributeManager.addAttribute(attributeDefinition.create());
 				} catch (IllegalValueException e) {
-					throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Exception_DefaultAttributeValue, attributeDefinition.getName()), e));
+					throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Exception_DefaultAttributeValue, attributeDefinition.getName()), e));
 				}
 			}
 		}
@@ -615,12 +615,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		} catch (CoreException e) {
 			changeJobState(JobAttributes.State.COMPLETED);
 			changeJobStatus(MPIJobAttributes.Status.ERROR);
-			return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_PrepareExecution, e);
+			return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_PrepareExecution, e);
 		}
 		
 		if (monitor.isCanceled()) {
 			changeJobState(JobAttributes.State.COMPLETED);
-			return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
+			return new Status(IStatus.OK, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 		}
 
 		try {
@@ -662,7 +662,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_CreateCommand, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_CreateCommand, e);
 			}
 
 			IRemoteProcessBuilder processBuilder;
@@ -671,7 +671,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
 			}
 			processBuilder.environment().putAll(environment);
 			
@@ -681,12 +681,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
 			}
 
 			if (monitor.isCanceled()) {
 				changeJobState(JobAttributes.State.COMPLETED);
-				return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
+				return new Status(IStatus.OK, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 			}
 
 			/*
@@ -698,7 +698,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecuteCommand, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecuteCommand, e);
 			}
 
 			try {
@@ -707,12 +707,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionStarted, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionStarted, e);
 			}
 
 			if (monitor.isCanceled()) {
 				changeJobState(JobAttributes.State.COMPLETED);
-				return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
+				return new Status(IStatus.OK, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 			}
 
 			changeJobState(JobAttributes.State.RUNNING);
@@ -723,12 +723,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			} catch (CoreException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_WaitExecution, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_WaitExecution, e);
 			}
 
 			if (monitor.isCanceled()) {
 				changeJobState(JobAttributes.State.COMPLETED);
-				return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
+				return new Status(IStatus.OK, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_UserCanceled);
 			}
 
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
@@ -738,12 +738,12 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				doExecutionFinished(monitor);
 			} catch (CoreException e) {
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionFinished, e);
+				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_ExecutionFinished, e);
 			}
 
 			changeJobState(JobAttributes.State.COMPLETED);
 
-			return new Status(IStatus.OK, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Success, new Integer(process.exitValue())));
+			return new Status(IStatus.OK, RMCorePlugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.AbstractToolRuntimeSystemJob_Success, new Integer(process.exitValue())));
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", getJobID()); //$NON-NLS-1$

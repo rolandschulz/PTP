@@ -49,7 +49,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.MPIJobAttributes;
-import org.eclipse.ptp.rm.core.ToolsRMPlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
@@ -93,7 +93,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 				// Ignore
 			} catch (Exception e) {
 				DebugUtil.error(DebugUtil.JOB_TRACING, "RTS {0}: {1}", rmConfiguration.getName(), e); //$NON-NLS-1$
-				ToolsRMPlugin.log(e);
+				RMCorePlugin.log(e);
 			}
 			DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminated job thread", rmConfiguration.getName()); //$NON-NLS-1$
 		}
@@ -166,7 +166,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
 			if (remoteServices == null) {
-				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoRemoteServices));
+				throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoRemoteServices));
 			}
 			IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
 			Assert.isNotNull(connectionManager);
@@ -176,14 +176,14 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	
 			connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
 			if (connection == null) {
-				throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoConnection));
+				throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_NoConnection));
 			}
 	
 			if (!connection.isOpen()) {
 				try {
 					connection.open(subMon.newChild(50));
 				} catch (RemoteConnectionException e) {
-					throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, e.getMessage()));
+					throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, e.getMessage()));
 				}
 			}
 	
@@ -384,7 +384,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
 		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_ResourceManagerNotInitialized));
+			throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, Messages.AbstractToolRuntimeSystem_Exception_ResourceManagerNotInitialized));
 		}
 
 		/*
@@ -409,7 +409,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			pendingJobQueue.put(job);
 		} catch (InterruptedException e) {
-			throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.PLUGIN_ID, e.getMessage()));
+			throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, e.getMessage()));
 		}
 	}
 
@@ -468,7 +468,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		try {
 			jobAttrMgr.addAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition().create(numProcs));
 		} catch (IllegalValueException e) {
-			ToolsRMPlugin.log(e);
+			RMCorePlugin.log(e);
 		}
 		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgs.toArray(new String[0])));
 		if (debugAttr != null) {
@@ -524,7 +524,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			/*
 			 * This exception is not possible, since number is always valid.
 			 */
-			ToolsRMPlugin.log(e);
+			RMCorePlugin.log(e);
 			assert false;
 		}
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));

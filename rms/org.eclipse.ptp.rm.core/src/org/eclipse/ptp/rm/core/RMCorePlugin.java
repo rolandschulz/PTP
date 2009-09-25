@@ -22,18 +22,18 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle.
  * @author Daniel Felix Ferber
  */
-public class ToolsRMPlugin extends Plugin {
+public class RMCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static ToolsRMPlugin plugin;
+	private static RMCorePlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public ToolsRMPlugin() {
+	public RMCorePlugin() {
 		super();
 		plugin = this;
 	}
@@ -62,7 +62,7 @@ public class ToolsRMPlugin extends Plugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static ToolsRMPlugin getDefault() {
+	public static RMCorePlugin getDefault() {
 		return plugin;
 	}
 
@@ -72,7 +72,7 @@ public class ToolsRMPlugin extends Plugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message) {
-		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message));
+		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class ToolsRMPlugin extends Plugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
-		return new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), message, t));
+		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));
 	}
 
 	/**
