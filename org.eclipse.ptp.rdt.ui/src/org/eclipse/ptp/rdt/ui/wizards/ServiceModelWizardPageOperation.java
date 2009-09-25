@@ -27,7 +27,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.wizards.NewServiceModelWidget;
+import org.eclipse.ptp.services.ui.widgets.NewServiceModelWidget;
 import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
