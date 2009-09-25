@@ -9,7 +9,7 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.services.ui.wizards;
+package org.eclipse.ptp.services.ui.widgets;
 
 import java.util.HashMap;
 import java.util.HashSet;
