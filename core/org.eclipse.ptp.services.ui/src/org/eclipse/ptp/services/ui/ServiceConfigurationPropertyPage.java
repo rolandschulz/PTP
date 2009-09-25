@@ -27,7 +27,7 @@ import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.dialogs.ServiceConfigurationSelectionDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
-import org.eclipse.ptp.services.ui.wizards.NewServiceModelWidget;
+import org.eclipse.ptp.services.ui.widgets.NewServiceModelWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;

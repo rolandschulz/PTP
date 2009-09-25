@@ -33,6 +33,7 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.ui.IServiceContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
+import org.eclipse.ptp.services.ui.widgets.ServiceModelWidget;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.INewWizard;
