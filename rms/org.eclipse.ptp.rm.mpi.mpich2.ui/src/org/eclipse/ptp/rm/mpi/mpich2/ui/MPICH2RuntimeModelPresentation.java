@@ -15,7 +15,7 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.rm.ui.MPIModelImages;
+import org.eclipse.ptp.rm.ui.RMModelImages;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.swt.graphics.Image;
@@ -33,17 +33,17 @@ public class MPICH2RuntimeModelPresentation implements IRuntimeModelPresentation
 				StringAttribute status = pElement.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
 				if (status != null) {
 					if (element.isSelected()) {
-						return MPIModelImages.procSelImages.get(status.getValue());
+						return RMModelImages.procSelImages.get(status.getValue());
 					}
-					return MPIModelImages.procImages.get(status.getValue());
+					return RMModelImages.procImages.get(status.getValue());
 				}
 			} else if (pElement instanceof IPJob) {
 				StringAttribute status = pElement.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
 				if (status != null) {
 					if (((IPJob)pElement).isDebug()) {
-						return MPIModelImages.jobDebugImages.get(status.getValue());
+						return RMModelImages.jobDebugImages.get(status.getValue());
 					}
-					return MPIModelImages.jobImages.get(status.getValue());
+					return RMModelImages.jobImages.get(status.getValue());
 				}
 			}
 		}
