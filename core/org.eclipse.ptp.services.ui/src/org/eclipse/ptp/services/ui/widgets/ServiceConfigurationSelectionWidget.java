@@ -13,26 +13,24 @@
  */
 package org.eclipse.ptp.services.ui.widgets;
 
-import java.util.Set;
-
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
@@ -44,38 +42,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * 
  */
 public class ServiceConfigurationSelectionWidget extends Composite {
-	/**
-	 * Class to handle widget selection events for this dialog.
-	 * 
-	 */
-	private class EventHandler implements SelectionListener {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org
-		 * .eclipse.swt.events.SelectionEvent)
-		 */
-		public void widgetDefaultSelected(SelectionEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse
-		 * .swt.events.SelectionEvent)
-		 */
-		public void widgetSelected(SelectionEvent e) {
-			TableItem selection[];
-
-			selection = serviceConfigurationList.getSelection();
-			if (selection.length > 0) {
-				selectedConfig = (IServiceConfiguration) selection[0].getData();
-			}
-		}
-	}
 	/**
 	 * Comparator class used to sort service configurations in ascending order
 	 * by name
@@ -101,11 +67,7 @@ public class ServiceConfigurationSelectionWidget extends Composite {
 
 	private IServiceModelManager fManager = ServiceModelManager.getInstance();
 	
-	private Table serviceConfigurationList;
-	private IServiceConfiguration selectedConfig;
-	private EventHandler eventHandler = new EventHandler();
-
-	private Set<IServiceConfiguration> currentServiceConfigurations;
+	private IServiceConfiguration fSelectedConfig;
 
 	public ServiceConfigurationSelectionWidget(Composite parent, int style) {
 		super(parent, style);
@@ -127,6 +89,18 @@ public class ServiceConfigurationSelectionWidget extends Composite {
 		fViewer.setComparator(new ServiceConfigurationComparator());
 		fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		fViewer.getTree().setLinesVisible(true);
+		fViewer.getTree().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent evt) {
+				boolean enable = (fViewer.getTree().getSelectionCount() > 0);
+				fRemoveButton.setEnabled(enable);
+				fRenameButton.setEnabled(enable);
+				if (enable) {
+					fSelectedConfig = (IServiceConfiguration)fViewer.getTree().getSelection()[0];
+				} else {
+					fSelectedConfig = null;
+				}
+			}
+		});
 		fViewer.setInput(ServiceModelManager.getInstance());
 		
 		Composite buttonsComp = new Composite(this, SWT.NONE);
@@ -140,25 +114,51 @@ public class ServiceConfigurationSelectionWidget extends Composite {
 		fAddButton.setText("Add...");
 		fAddButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
+				InputDialog dialog = new InputDialog(fAddButton.getShell(), "Add Service Configuration", 
+						"Enter a name for the new service configuration:", null, null);
+				if (dialog.open() == InputDialog.OK) {
+					IServiceConfiguration config = fManager.newServiceConfiguration(dialog.getValue());
+					fManager.addConfiguration(config);
+					fViewer.refresh();
+				}
 			}
 		});
+		
 		fRemoveButton = new Button(buttonsComp, SWT.PUSH);
 		fRemoveButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		fRemoveButton.setText("Remove");
+		fRemoveButton.setEnabled(false);
 		fRemoveButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
 				ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
 				if (!selection.isEmpty()) {
 					IServiceConfiguration config = (IServiceConfiguration)selection.getFirstElement();
-					
+					boolean doRemove = MessageDialog.openConfirm(fRemoveButton.getShell(), "Remove Service Configuration",
+							NLS.bind("Are you sure you want to remove the service configuration \"{0}\"?", config.getName()));
+					if (doRemove) {
+						fManager.remove(config);
+						fViewer.refresh();
+					}
 				}
 			}
 		});
+		
 		fRenameButton = new Button(buttonsComp, SWT.PUSH);
 		fRenameButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		fRenameButton.setText("Rename");
+		fRenameButton.setEnabled(false);
 		fRenameButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
+				ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
+				if (!selection.isEmpty()) {
+					InputDialog dialog = new InputDialog(fAddButton.getShell(), "Rename Service Configuration", 
+							"Enter a new name for the new service configuration:", null, null);
+					if (dialog.open() == InputDialog.OK) {
+						IServiceConfiguration config = (IServiceConfiguration)selection.getFirstElement();
+						config.setName(dialog.getValue());
+						fViewer.update(config, null);
+					}
+				}
 			}
 		});
 	}
@@ -169,6 +169,6 @@ public class ServiceConfigurationSelectionWidget extends Composite {
 	 * @return Selected service configuration
 	 */
 	public IServiceConfiguration getSelectedConfiguration() {
-		return selectedConfig;
+		return fSelectedConfig;
 	}
 }
