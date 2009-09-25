@@ -19,29 +19,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
-import org.eclipse.ptp.core.elements.events.INewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
-import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.MPIJobAttributes;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
@@ -66,57 +55,24 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
-	protected final ReentrantLock procsLock = new ReentrantLock();
-	protected final Condition procsCondition = procsLock.newCondition();
-	protected int numRunningProcs = 0;
-
-	protected IProcessListener processListener = new IProcessListener() {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
-		 */
-		public void handleEvent(IProcessChangeEvent e) {
-			EnumeratedAttribute<State> attr = e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
-			if (attr != null && attr.getValue() == ProcessAttributes.State.RUNNING) {
-				procsLock.lock();
-				try {
-					numRunningProcs++;
-					procsCondition.signalAll();
-				} finally {
-					procsLock.unlock();
-				}
-			}
-		}
-	};
-	
-	protected IJobChildListener jobChildListener = new IJobChildListener() {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
-		 */
-		public void handleEvent(IChangedProcessEvent e) {
-			// ignore
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
-		 */
-		public void handleEvent(INewProcessEvent e) {
-			for (IPProcess process : e.getProcesses()) {
-				process.addElementListener(processListener);
-			}
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
-		 */
-		public void handleEvent(IRemoveProcessEvent e) {
-			for (IPProcess process : e.getProcesses()) {
-				process.removeElementListener(processListener);
-			}
-		}
-	};
-	
 	public MPICH2RuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
+	}
+
+	/**
+	 * Initialize all processes to running state.
+	 */
+	private void initializeProcesses() {
+		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
+		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
+		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
+		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
+
+		AttributeManager attrMrg = new AttributeManager();
+		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
+		for (IPProcess process : ipJob.getProcesses()) {
+			rtSystem.changeProcess(process.getID(), attrMrg);
+		}
 	}
 	
 	/**
@@ -147,7 +103,6 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
-		ipJob.addChildListener(jobChildListener);
 	}
 
 	@Override
@@ -184,6 +139,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
 		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getQueueById(getQueueID()).getJobById(getJobID());
+
+		initializeProcesses();
 
 		/*
 		 * Listener that saves stdout.
@@ -297,34 +254,6 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		stderrObserver.start();
 		stdoutObserver.start();
-		
-		/*
-		 * At this point we need to pause until all processes have started. This is because
-		 * the model semantics are such that the job state must not be set to RUNNING until
-		 * all the job's processes (if there are any) have been created and also set to RUNNING.
-		 */
-		
-		/*
-		 * We know that a MPICH2 job has a number of processes attribute
-		 */
-		int numProcs = 1;
-		IntegerAttribute numProcsAttr = getAttrMgr().getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
-		if (numProcsAttr != null) {
-			numProcs = numProcsAttr.getValue().intValue();
-		}
-		
-		procsLock.lock();
-		try {
-			while (!monitor.isCanceled() && numRunningProcs < numProcs) {
-				try {
-					procsCondition.await(500, TimeUnit.MILLISECONDS);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-			}
-		} finally {
-			procsLock.unlock();
-		}
 	}
 
 	@Override

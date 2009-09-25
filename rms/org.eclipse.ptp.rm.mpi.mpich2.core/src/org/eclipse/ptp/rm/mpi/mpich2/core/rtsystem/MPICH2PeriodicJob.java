@@ -94,20 +94,14 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 						continue;
 					}
 					IPProcessControl process = (IPProcessControl)pJob.getProcessByIndex(job.getRank());
-					if (process != null) {
-						// process already exists, don't need to do anything
-						continue;
-					}
-					String nodeID = rts.getNodeIDforName(job.getHost());
-					if (nodeID == null) {
-						throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null));
-					}
-	
-					String processID = rts.createProcess(job.getJobAlias(), job.getRank(), nodeID);
-					
-					process = (IPProcessControl)pJob.getProcessById(processID);
-					if (process != null) {
-						process.setState(ProcessAttributes.State.RUNNING);
+					if (process != null && process.getNode() == null) {
+						String nodeID = rts.getNodeIDforName(job.getHost());
+						if (nodeID == null) {
+							throw new CoreException(new Status(IStatus.ERROR, ToolsRMPlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null));
+						}
+						AttributeManager attrMrg = new AttributeManager();
+						attrMrg.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
+						rts.changeProcess(process.getID(), attrMrg);
 					}
 				}
 			}
