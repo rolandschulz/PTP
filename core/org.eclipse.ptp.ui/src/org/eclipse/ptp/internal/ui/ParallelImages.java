@@ -65,7 +65,7 @@ public class ParallelImages {
 	public static final String IMG_JOB_RUNNING = "job_running.gif"; //$NON-NLS-1$
 	public static final String IMG_JOB_COMPLETED = "job_completed.gif"; //$NON-NLS-1$
 	public static final String IMG_JOB_SUSPENDED = "job_suspended.gif"; //$NON-NLS-1$
-	public static final String IMG_DEBUG_JOB_STARTING = "debug_job_pending.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUG_JOB_STARTING = "debug_job_starting.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_JOB_RUNNING = "debug_job_running.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_JOB_COMPLETED = "debug_job_completed.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_JOB_SUSPENDED = "debug_job_suspended.gif"; //$NON-NLS-1$
