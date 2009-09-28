@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
 import org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage;
@@ -147,7 +146,10 @@ AbstractToolRMConfigurationWizardPage {
 	}
 
 	public OpenMPIConfigurationWizardPage(IRMConfigurationWizard wizard) {
-		super(wizard, OpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , Messages.OpenMPIConfigurationWizardPage_Name, Messages.OpenMPIConfigurationWizardPage_Title, Messages.OpenMPIConfigurationWizardPage_Description);
+		super(wizard, IOpenMPIResourceManagerConfiguration.OPENMPI_CAPABILITIES , 
+				Messages.OpenMPIConfigurationWizardPage_Name, 
+				Messages.OpenMPIConfigurationWizardPage_Title, 
+				Messages.OpenMPIConfigurationWizardPage_Description);
 	}
 
 	@Override
