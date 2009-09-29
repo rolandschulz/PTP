@@ -11,6 +11,7 @@
 package org.eclipse.ptp.services.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -25,6 +26,8 @@ public class ServiceModelWorkbenchAdapterFactory implements IAdapterFactory {
 		new ServiceConfigurationWorkbenchAdapter();
 	private static final ServiceProviderWorkbenchAdapter SERVICE_PROVIDER_WORKBENCH_ADAPTER =
 		new ServiceProviderWorkbenchAdapter();
+	private static final ServiceWorkbenchAdapter SERVICE_WORKBENCH_ADAPTER =
+		new ServiceWorkbenchAdapter();
 
 	public Object getAdapter(Object adaptableObject, 
 			@SuppressWarnings("unchecked") Class adapterType) {
@@ -37,6 +40,9 @@ public class ServiceModelWorkbenchAdapterFactory implements IAdapterFactory {
 			}
 			if (adaptableObject instanceof IServiceProvider) {
 				return SERVICE_PROVIDER_WORKBENCH_ADAPTER;
+			}
+			if (adaptableObject instanceof IService) {
+				return SERVICE_WORKBENCH_ADAPTER;
 			}
 		}
 		return null;

@@ -71,6 +71,16 @@
                type="org.eclipse.ui.model.IWorkbenchAdapter2">
          </adapter>
       </factory>
+      <factory
+            adaptableType="org.eclipse.ptp.services.core.IService"
+            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter2">
+         </adapter>
+      </factory>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
