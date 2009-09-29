@@ -40,6 +40,17 @@ public class Messages extends NLS {
 	
 	public static String ServiceConfigurationSelectionDialog_0;
 	public static String ServiceConfigurationSelectionDialog_1;
+
+	public static String ServiceConfigurationSelectionWidget_0;
+	public static String ServiceConfigurationSelectionWidget_1;
+	public static String ServiceConfigurationSelectionWidget_2;
+	public static String ServiceConfigurationSelectionWidget_3;
+	public static String ServiceConfigurationSelectionWidget_4;
+	public static String ServiceConfigurationSelectionWidget_9;
+	public static String ServiceConfigurationSelectionWidget_10;
+	public static String ServiceConfigurationSelectionWidget_11;
+	public static String ServiceConfigurationSelectionWidget_12;
+	public static String ServiceConfigurationSelectionWidget_13;
 	
 	public static String ServiceConfigurationWizard_0;
 	public static String ServiceConfigurationWizard_1;
