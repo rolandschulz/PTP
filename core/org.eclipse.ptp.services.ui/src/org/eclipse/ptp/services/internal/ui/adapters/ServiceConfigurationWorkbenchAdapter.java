@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -49,16 +48,6 @@ public class ServiceConfigurationWorkbenchAdapter extends WorkbenchAdapter {
 			conf = (IServiceConfiguration) ((IAdaptable) parentElement).getAdapter(IServiceConfiguration.class);
 		}
 		return conf;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
-	 */
-	@Override
-	public ImageDescriptor getImageDescriptor(Object object) {
-//		ResourceManagerAttributes.State status = ((IResourceManager) object).getState();
-//		return new ImageImageDescriptor(ParallelImages.rmImages[status.ordinal()]);
-		return null;
 	}
 
 	/* (non-Javadoc)
