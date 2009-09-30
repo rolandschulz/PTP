@@ -11,6 +11,9 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
@@ -37,7 +40,7 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 		setPeriodicMonitorTime(prefs.getInt(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME));
 		setRemoteInstallPath(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 	}
-
+	
 	public MPICH2ServiceProvider(MPICH2ServiceProvider provider) {
 		super(provider);
 		provider.setLaunchCmd(getLaunchCmd());
@@ -56,11 +59,20 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	 */
+	@Override
+	public IResourceManagerControl createResourceManager() {
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+		return new MPICH2ResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
 	 */
 	@Override
 	public String getResourceManagerId() {
-		return MPICH2RMServiceProviderFactory.RM_FACTORY_ID;
+		return getId();
 	}
 
 	/* (non-Javadoc)

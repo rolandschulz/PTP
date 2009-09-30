@@ -12,12 +12,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.pbs.ui.wizards.PBSServiceProviderConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.pbs.ui.configurationWizard"/>
-   </extension>
-   <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.pbs.ui.launch.PBSRMLaunchConfigurationFactory"

@@ -14,6 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
@@ -29,9 +32,9 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	 * only persists while the RM is running.
 	 */
 	private int majorVersion = 0;
-
 	private int minorVersion = 0;
 	private int serviceVersion = 0;
+	
 	public OpenMPIServiceProvider() {
 		super(OPENMPI_CAPABILITIES);
 		
@@ -49,7 +52,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		setCommandsEnabled(false);
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
-
+	
 	public OpenMPIServiceProvider(OpenMPIServiceProvider provider) {
 		super(provider);
 		provider.setLaunchCmd(getLaunchCmd());
@@ -66,6 +69,15 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	@Override
 	public Object clone() {
 		return new OpenMPIServiceProvider(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	 */
+	@Override
+	public IResourceManagerControl createResourceManager() {
+		IPUniverseControl universe = (IPUniverseControl)PTPCorePlugin.getDefault().getUniverse();
+		return new OpenMPIResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 	
 	/**
@@ -84,7 +96,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	 */
 	@Override
 	public String getResourceManagerId() {
-		return OpenMPIRMServiceProviderFactory.RM_FACTORY_ID;
+		return getId();
 	}
 
 	/**

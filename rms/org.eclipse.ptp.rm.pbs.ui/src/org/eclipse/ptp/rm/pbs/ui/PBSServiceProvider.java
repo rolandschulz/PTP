@@ -11,9 +11,12 @@
 package org.eclipse.ptp.rm.pbs.ui;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.pbs.core.PBSPreferenceManager;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSServiceProviderFactory;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 
 
@@ -25,7 +28,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	private static final String TAG_PBSD_ARGS = "pbsdArgs"; //$NON-NLS-1$
 	private static final String TAG_PBSD_DEFAULTS = "pbsdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
+	
 	private Preferences preferences;
 
 	public PBSServiceProvider() 
@@ -34,7 +37,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		preferences = PBSPreferenceManager.getPreferences();
 		setDescription("PBS Resource Manager"); //$NON-NLS-1$
 	}
-	
+
 	public PBSServiceProvider(PBSServiceProvider provider)
 	{
 		super(provider);
@@ -50,6 +53,15 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	@Override
 	public Object clone() {
 		return new PBSServiceProvider(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	 */
+	@Override
+	public IResourceManagerControl createResourceManager() {
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+		return new PBSResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 	
 	/* (non-Javadoc)
@@ -71,7 +83,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 */
 	@Override
 	public String getResourceManagerId() {
-		return PBSServiceProviderFactory.RM_FACTORY_ID;
+		return getId();
 	}
     
 	/* (non-Javadoc)

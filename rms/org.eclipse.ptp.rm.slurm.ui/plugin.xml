@@ -12,12 +12,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.slurm.ui.wizards.SLURMServiceProviderConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.slurm.ui.configurationWizard"/>
-   </extension>
-   <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.slurm.ui.rmLaunchConfiguration.SLURMRMLaunchConfigurationFactory"

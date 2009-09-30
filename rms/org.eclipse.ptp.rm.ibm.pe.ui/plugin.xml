@@ -16,12 +16,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.ibm.pe.ui.wizards.PEResourceManagerConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.ibmpe.ui.configurationWizard"/>
-   </extension>
-   <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.ibm.pe.ui.rmLaunchConfiguration.PERMLaunchConfigurationFactory"
@@ -42,12 +36,6 @@
             class="org.eclipse.ptp.rm.ibm.pe.ui.PEProviderContributor"
             id="org.eclipse.ptp.rm.ibm.pe.PEServiceProvider">
       </providerContributor>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.ibm.pe.ui.wizards.PERMServiceProviderConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.ibmpe.ui.configurationWizard"/>
    </extension>
 
 </plugin>
