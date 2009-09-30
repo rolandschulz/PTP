@@ -69,7 +69,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		public NameAndDescPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
-			setDescription(Messages.RMConfigurationWizard_0);
+			setDescription(Messages.RMServicesConfigurationWizard_2);
 		}
 
 		public void createControl(Composite parent) {
@@ -96,7 +96,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 			final Button useDefaultsButton = new Button(nameGroup,
 					SWT.TOGGLE | SWT.CHECK);
-			useDefaultsButton.setText(Messages.RMConfigurationWizard_1);
+			useDefaultsButton.setText(Messages.RMServicesConfigurationWizard_3);
 			useDefaultsButton.setSelection(fUseDefaultNameAndDesc);
 			GridData buttonData = new GridData();
 			buttonData.horizontalSpan = 2;
@@ -119,7 +119,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			});
 			
 			Label nameLabel = new Label(nameGroup, SWT.NONE);
-			nameLabel.setText(Messages.RMConfigurationWizard_2);
+			nameLabel.setText(Messages.RMServicesConfigurationWizard_4);
 			nameText = new Text(nameGroup, SWT.BORDER);
 			nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			nameText.setText(""); //$NON-NLS-1$
@@ -128,12 +128,12 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 					fRMConfiguration.setName(nameText.getText());
 					if (nameText.getText().equals(EMPTY_STRING)) {
 						setPageComplete(false);
-						setErrorMessage(Messages.RMConfigurationWizard_3);
+						setErrorMessage(Messages.RMServicesConfigurationWizard_5);
 					}
 				}});
 
 			Label descLabel = new Label(nameGroup, SWT.NONE);
-			descLabel.setText(Messages.RMConfigurationWizard_4);
+			descLabel.setText(Messages.RMServicesConfigurationWizard_6);
 			descText = new Text(nameGroup, SWT.BORDER);
 			descText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			descText.setText(""); //$NON-NLS-1$
@@ -165,7 +165,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		public SelectServiceProviderPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
-			setDescription(Messages.RMConfigurationWizard_5);
+			setDescription(Messages.RMServicesConfigurationWizard_7);
 		}
 
 		public void createControl(Composite parent) {
@@ -207,7 +207,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			}
 
 			Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.RMConfigurationWizard_6);
+			label.setText(Messages.RMServicesConfigurationWizard_8);
 			fServiceProviderList = new List(container, SWT.SINGLE | SWT.BORDER
 					| SWT.V_SCROLL);
 			fServiceProviderList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -296,9 +296,9 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		fSelectServiceConfigurationPage = new SelectServiceConfigurationPage(
 				Messages.RMServicesConfigurationWizard_1);
 		fSelectServiceProviderPage = new SelectServiceProviderPage(
-				Messages.RMConfigurationWizard_7);
+				Messages.RMServicesConfigurationWizard_9);
 		fNameAndDescPage = new NameAndDescPage(
-				Messages.RMConfigurationWizard_8);
+				Messages.RMServicesConfigurationWizard_10);
 		fUseDefaultNameAndDesc = true;
 		fLaunchService = fModelManager.getService(IServiceConstants.LAUNCH_SERVICE);
 		setWizardPages(null);

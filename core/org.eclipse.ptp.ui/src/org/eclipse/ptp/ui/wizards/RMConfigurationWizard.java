@@ -43,6 +43,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * @deprecated RM configuration now handled by {@link RMServicesConfigurationWizard} and
+ * service contributor wizard pages.
+ */
 public class RMConfigurationWizard extends Wizard implements IRMConfigurationWizard {
 
 	public final static String EMPTY_STRING = ""; //$NON-NLS-1$
