@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ui.IMemento;
 
 public interface IResourceManagerConfiguration extends Cloneable {
@@ -68,7 +69,15 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @return the id of the factory that created the resource manager
 	 */
 	public String getResourceManagerId();
-
+	
+	/**
+	 * Get the last known state of the resource manager. This is primarily used to persist
+	 * the the state of the resource manager, and so that it can be restored on startup.
+	 * 
+	 * @return state of the resource manager
+	 */
+	public ResourceManagerAttributes.State getState();
+	
 	/**
 	 * Returns the type of the resource manager. This is the name of the resource manager factory.
 	 *
@@ -92,7 +101,7 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @return true if help is required
 	 */
 	public boolean needsDebuggerLaunchHelp();
-	
+
 	/**
 	 * Save the state of the configuration.
 	 * 
@@ -107,7 +116,7 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @param connectionName name of connection used by the resource manager
 	 */
 	public void setConnectionName(String connectionName);
-
+	
 	/**
 	 * The the name and description to default values.
 	 */
@@ -126,11 +135,18 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @param name
 	 */
 	public void setName(String name);
-	
+
 	/**
 	 * Set the remote service provider ID.
 	 * 
 	 * @param id remote service provider extension ID
 	 */
 	public void setRemoteServicesId(String id);
+	
+	/**
+	 * Set the last known state of the resource manager
+	 * 
+	 * @param state state of the resource manager
+	 */
+	public void setState(ResourceManagerAttributes.State state);
 }
