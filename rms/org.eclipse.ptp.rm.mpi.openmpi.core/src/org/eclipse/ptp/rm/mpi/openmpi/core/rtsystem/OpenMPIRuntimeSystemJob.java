@@ -265,7 +265,11 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 										&& configuration.getServiceVersion() < 4) {
 									stderr += "\n"; //$NON-NLS-1$
 								}
-								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(proc.getIndex());
+								int index = 0;
+								if (proc != null) {
+									index = proc.getIndex();
+								}
+								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(index);
 								if (process != null) {
 									process.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(stderr));
 								}
@@ -277,7 +281,11 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 										&& configuration.getServiceVersion() < 4) {
 									stdout += "\n"; //$NON-NLS-1$
 								}
-								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(proc.getIndex());
+								int index = 0;
+								if (proc != null) {
+									index = proc.getIndex();
+								}
+								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(index);
 								if (process != null) {
 									process.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(stdout));
 								}
