@@ -20,15 +20,12 @@ package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -146,13 +143,11 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 			}
 		}
 		final IResourceManagerControl resourceManager = (IResourceManagerControl) object;
-		final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
-		final String resourceManagerId = resourceManager.getConfiguration().getResourceManagerId();
-		if (resourceManagerId == null)
+		final String type = resourceManager.getConfiguration().getType();
+		if (type == null) {
 			return resourceManager.getName();
-		IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
-				resourceManagerId);
-		return resourceManager.getName() + " (" + factory.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return resourceManager.getName() + " (" + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	/* (non-Javadoc)
