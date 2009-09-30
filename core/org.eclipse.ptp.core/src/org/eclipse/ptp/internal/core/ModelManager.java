@@ -20,6 +20,8 @@ package org.eclipse.ptp.internal.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -51,9 +53,10 @@ import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
-import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public class ModelManager implements IModelManager {
 	public final static String EXTENSION_POINT_ID = "resourceManagers"; //$NON-NLS-1$
@@ -95,6 +98,8 @@ public class ModelManager implements IModelManager {
 
 	protected IPUniverseControl universe = new PUniverse();
 	protected ILaunchConfiguration config = null;
+	
+	protected final IServiceModelManager fManager = ServiceModelManager.getInstance();
 	
 	public ModelManager() {
 	}
@@ -227,13 +232,22 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
 	 */
 	public void loadResourceManagers() throws CoreException {
-        ResourceManagerPersistence rmp = new ResourceManagerPersistence();
-        rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
-        IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
-        addResourceManagers(resourceManagers);
+		Set<IResourceManagerControl> rmsNeedStarting = new HashSet<IResourceManagerControl>();
+		
+		/*
+		 * Need to force service model to load so that the resource managers are
+		 * created.
+		 */
+		ServiceModelManager.getInstance().getActiveConfiguration();
+		
+		for (IResourceManager rm : getUniverse().getResourceManagers()) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+				rmsNeedStarting.add((IResourceManagerControl)rm);
+			}
+		}
+		
         if (PTPCorePlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.PREFS_AUTO_START_RMS)) {
-            IResourceManagerControl[] rmsNeedStarting = rmp.getResourceManagerControlsNeedStarting();
-        	startResourceManagers(rmsNeedStarting);
+        	startResourceManagers(rmsNeedStarting.toArray(new IResourceManagerControl[0]));
         }
 	}
 
@@ -265,8 +279,7 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#saveResourceManagers()
 	 */
 	public void saveResourceManagers() {
-		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
-				universe.getResourceManagerControls());
+		// No longer needed
 	}
 
 	/* (non-Javadoc)
