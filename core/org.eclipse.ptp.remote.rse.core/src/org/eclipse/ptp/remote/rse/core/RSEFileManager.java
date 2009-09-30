@@ -54,7 +54,7 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
-		String authority = connection.getHost().getAliasName();
+		String authority = connection.getHost().getHostName();
 		try {
 			authority = URLEncoder.encode(authority, "UTF-8"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException e) {
