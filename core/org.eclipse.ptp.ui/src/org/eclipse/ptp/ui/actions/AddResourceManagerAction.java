@@ -23,12 +23,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public class AddResourceManagerAction extends Action {
@@ -44,16 +40,7 @@ public class AddResourceManagerAction extends Action {
 	}
 
 	public void run() {
-		final IResourceManagerFactory[] resourceManagerFactories = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFactories();
-		if (resourceManagerFactories.length == 0) {
-			MessageBox dialog = new MessageBox(shell, SWT.OK | SWT.ICON_INFORMATION);
-			dialog.setText(Messages.AddResourceManagerAction_1);
-			dialog.setMessage(Messages.AddResourceManagerAction_2);
-			dialog.open();
-			return;
-		}
-
-		final RMConfigurationWizard wizard = new RMConfigurationWizard(resourceManagerFactories);
+		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard();
 		
 		final WizardDialog dialog = new WizardDialog(shell, wizard);
 		int status = dialog.open();

@@ -23,12 +23,9 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public class EditResourceManagerAction extends Action {
@@ -45,20 +42,12 @@ public class EditResourceManagerAction extends Action {
 	}
 
 	public void run() {
-		final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
-		final String resourceManagerId = selectedRMManager.getConfiguration().getResourceManagerId();
+		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard(selectedRMManager);
 		
-		if (resourceManagerId != null) {
-			IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
-					resourceManagerId);
-
-			final RMConfigurationWizard wizard = new RMConfigurationWizard(factory, selectedRMManager);
-			
-			final WizardDialog dialog = new WizardDialog(shell, wizard);
-			int status = dialog.open();
-			if (status != Dialog.OK) {
-				return;
-			}
+		final WizardDialog dialog = new WizardDialog(shell, wizard);
+		int status = dialog.open();
+		if (status != Dialog.OK) {
+			return;
 		}
 	}
 
