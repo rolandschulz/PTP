@@ -24,6 +24,8 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
 	/**
@@ -52,6 +54,7 @@ public interface IModelManager extends IModelPresentation {
 	 * extensions.
 	 * 
 	 * @return array of resource manager factories
+	 * @deprecated Replaced with {@link IServiceProvider}
 	 */
 	public IResourceManagerFactory[] getResourceManagerFactories();
 	
@@ -60,6 +63,7 @@ public interface IModelManager extends IModelPresentation {
 	 * 
 	 * @param id
 	 * @return the requested resource manager factory
+	 * @deprecated Replaced with {@link IServiceProvider}
 	 */
 	public IResourceManagerFactory getResourceManagerFactory(String id);
 
@@ -80,7 +84,9 @@ public interface IModelManager extends IModelPresentation {
 	public IResourceManager[] getStartedResourceManagers(IPUniverse universe);
 
 	/**
-	 * Loads saved resource managers.
+	 * Loads saved resource managers. Loading of resource manager configuration is
+	 * now handled by the {@link ServiceModelManager}. This method now just starts
+	 * any resource managers that require autostart.
 	 * 
 	 * @throws CoreException
 	 */
@@ -109,6 +115,7 @@ public interface IModelManager extends IModelPresentation {
 	
 	/**
 	 * Save the resource manager configurations
+	 * @deprecated Resource manager persistence is handled by {@link ServiceModelManager}
 	 */
 	public void saveResourceManagers();
 

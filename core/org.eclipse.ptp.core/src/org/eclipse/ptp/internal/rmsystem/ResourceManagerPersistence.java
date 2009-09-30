@@ -40,6 +40,9 @@ import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
+/**
+ * @deprecated persistence is now handled by service configurations
+ */
 public class ResourceManagerPersistence {
 
 	private static final String TAG_RESOURCEMANAGER_INDEX = "ResourceManagerIndex"; //$NON-NLS-1$
