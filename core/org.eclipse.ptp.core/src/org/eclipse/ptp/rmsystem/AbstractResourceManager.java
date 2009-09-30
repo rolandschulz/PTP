@@ -128,7 +128,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 
 	private final ListenerList listeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-
 	private final IQueueChildListener queueJobListener;
 	private final IJobChildListener jobProcessListener;
 	private final IMachineChildListener machineNodeListener;
@@ -387,6 +386,14 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 */
 	public IPMachine[] getMachines() {
 		return getMachineControls().toArray(new IPMachineControl[0]);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#getName()
+	 */
+	@Override
+	public String getName() {
+		return getConfiguration().getName();
 	}
 
 	/*
@@ -804,6 +811,14 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
+		/*
+		 * The resource manager name is stored in the configuration so that
+		 * it persists. Map name attributes to the configuration.
+		 */
+		StringAttribute nameAttr = attrs.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		if (nameAttr != null) {
+			getConfiguration().setName(nameAttr.getValue());
+		}
 		fireResourceManagerChanged(attrs);
 	}
 
@@ -913,19 +928,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	}
 	
 	/**
-	 * Propagate IResourceManagerSubmitJobErrorEvent to listeners
-	 * 
-	 * @param id job submission id
-	 */
-	protected void fireSubmitJobError(String id, String message) {
-		IResourceManagerSubmitJobErrorEvent e = new ResourceManagerSubmitJobErrorEvent(this, id, message);
-
-		for (Object listener : listeners.getListeners()) {
-			((IResourceManagerListener) listener).handleEvent(e);
-		}
-	}
-
-	/**
 	 * Propagate a IResourceManagerNewMachinesEvent to listeners.
 	 * 
 	 * @param machines
@@ -969,6 +971,19 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 
 		for (Object listener : childListeners.getListeners()) {
 			((IResourceManagerChildListener) listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Propagate IResourceManagerSubmitJobErrorEvent to listeners
+	 * 
+	 * @param id job submission id
+	 */
+	protected void fireSubmitJobError(String id, String message) {
+		IResourceManagerSubmitJobErrorEvent e = new ResourceManagerSubmitJobErrorEvent(this, id, message);
+
+		for (Object listener : listeners.getListeners()) {
+			((IResourceManagerListener) listener).handleEvent(e);
 		}
 	}
 
@@ -1165,6 +1180,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @param state
 	 */
 	protected synchronized void setState(ResourceManagerAttributes.State state) {
+		getConfiguration().setState(state);
 		EnumeratedAttribute<State> stateAttr = getStateAttribute();
 		if (stateAttr.getValue() != state) {
 			stateAttr.setValue(state);
