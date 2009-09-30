@@ -48,7 +48,7 @@ public class ServiceModelEventManager {
 		for (int index = 1, pos = 0; index <= IServiceModelEvent.ALL_EVENTS; index <<= 1, pos++) {
 			if ((type & index) == index) {
 				ListenerList list = fEventListeners.get(pos);
-				if (list != null) { // should never be null
+				if (list != null) { 
 					list.add(listener);
 				}
 			}
@@ -63,13 +63,14 @@ public class ServiceModelEventManager {
 	 */
 	public void notifyListeners(IServiceModelEvent event) {
 		for (int index = 1, pos = 0; index <= IServiceModelEvent.ALL_EVENTS; index <<= 1, pos++) {
-			if ((event.getType() & index) == index) {
+			if (event.getType() == index) {
 				ListenerList list = fEventListeners.get(pos);
-				if (list != null) { // should never be null
+				if (list != null) {
 					for (Object obj : list.getListeners()) {
 						((IServiceModelEventListener)obj).handleEvent(event);
 					}
 				}
+				return;
 			}
 		}
 	}
