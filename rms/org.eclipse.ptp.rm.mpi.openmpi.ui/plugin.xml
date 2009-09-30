@@ -2,12 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.openmpi.ui.configurationWizard"/>
-   </extension>
-   <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.launch.OpenMPIRMLaunchConfigurationFactory"
@@ -17,21 +11,14 @@
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIProviderContributor"
-            id="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIServiceProvider">
+            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
       </providerContributor>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMServiceProviderConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.mpi.openmpi.ui.configurationWizard">
-      </configurationWizard>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.runtimeModelPresentations">
       <runtimeModelPresentation
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIRuntimeModelPresentation"
-            id="org.eclipse.ptp.rm.mpi.openmpi.resourcemanager">
+            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
       </runtimeModelPresentation>
    </extension>
 </plugin>

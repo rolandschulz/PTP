@@ -11,9 +11,12 @@
 package org.eclipse.ptp.rm.ibm.ll.ui;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
-import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLServiceProviderFactory;
+import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 
@@ -83,19 +86,20 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return IBMLLServiceProviderFactory.RM_FACTORY_ID;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#clone()
 	 */
 	@Override
 	public Object clone() {
 		return new LLServiceProvider(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	 */
+	@Override
+	public IResourceManagerControl createResourceManager() {
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+		return new IBMLLResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 	
 	/* (non-Javadoc)
@@ -222,6 +226,14 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 */
 	public int getMinNodePolling() {
 		return getInt(TAG_MIN_NODE_POLL, preferences.getInt(IBMLLPreferenceConstants.PROXY_MIN_NODE_POLLING));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
+	 */
+	@Override
+	public String getResourceManagerId() {
+		return getId();
 	}
 	
 	/* (non-Javadoc)

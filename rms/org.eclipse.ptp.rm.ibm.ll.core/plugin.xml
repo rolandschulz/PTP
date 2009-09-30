@@ -6,12 +6,5 @@
 <!-- which accompanies this distribution, and is available at                -->
 <!-- http://www.eclipse.org/legal/epl-v10.html                               -->
 <plugin>
-   <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
-            class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLServiceProviderFactory"
-            id="org.eclipse.ptp.rm.ibm.ll.resourcemanager"
-            name="IBM LoadLeveler"/>
-   </extension>
 
 </plugin>

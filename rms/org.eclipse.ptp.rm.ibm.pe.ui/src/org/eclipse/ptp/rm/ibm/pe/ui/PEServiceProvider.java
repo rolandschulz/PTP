@@ -11,10 +11,13 @@
 package org.eclipse.ptp.rm.ibm.pe.ui;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEServiceProviderFactory;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManager;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 
 
@@ -31,15 +34,16 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
     private static final String TAG_MAX_NODE_POLL_INTERVAL = "PE_NodeMaxPollInterval"; //$NON-NLS-1$
     private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
     private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
-    private Preferences preferences;
     
+    private Preferences preferences;
+
 	public PEServiceProvider() 
 	{
 		super();
 		preferences = PEPreferenceManager.getPreferences();
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
 	}
-	
+    
 	public PEServiceProvider(PEServiceProvider provider)
 	{
 		super(provider);
@@ -61,6 +65,15 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	@Override
 	public Object clone() {
 		return new PEServiceProvider(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	 */
+	@Override
+	public IResourceManagerControl createResourceManager() {
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+		return new PEResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 	
     /* (non-Javadoc)
@@ -116,7 +129,7 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 */
 	@Override
 	public String getResourceManagerId() {
-		return PEServiceProviderFactory.RM_FACTORY_ID;
+		return getId();
 	}
 	
 	/* (non-Javadoc)

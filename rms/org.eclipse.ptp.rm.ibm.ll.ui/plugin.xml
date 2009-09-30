@@ -12,12 +12,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.ibm.ll.ui.wizards.IBMLLResourceManagerConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.ibmll.ui.configurationWizard"/>
-   </extension>
-   <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration.IBMLLRMLaunchConfigurationFactory"
@@ -38,11 +32,5 @@
             class="org.eclipse.ptp.rm.ibm.ll.ui.LLProviderContributor"
             id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider">
       </providerContributor>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.ibm.ll.ui.wizards.IBMLLRMServiceProviderConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.ibm.ll.configurationWizard"/>
    </extension>
 </plugin>

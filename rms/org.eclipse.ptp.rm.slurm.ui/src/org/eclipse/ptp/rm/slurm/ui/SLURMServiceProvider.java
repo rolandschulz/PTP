@@ -11,10 +11,13 @@
 package org.eclipse.ptp.rm.slurm.ui;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
-import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMServiceProviderFactory;
+import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManager;
 
 
 /**
@@ -25,7 +28,7 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	private static final String TAG_SLURMD_ARGS = "slurmdArgs"; //$NON-NLS-1$
 	private static final String TAG_SLURMD_DEFAULTS = "slurmdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
+	
 	private Preferences preferences;
 
 	public SLURMServiceProvider() 
@@ -34,7 +37,7 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 		preferences = SLURMPreferenceManager.getPreferences();
 		setDescription("SLURM Resource Manager"); //$NON-NLS-1$
 	}
-	
+
 	public SLURMServiceProvider(SLURMServiceProvider provider)
 	{
 		super(provider);
@@ -53,11 +56,20 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	 */
+	@Override
+	public IResourceManagerControl createResourceManager() {
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+		return new SLURMResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
 	 */
 	@Override
 	public String getResourceManagerId() {
-		return SLURMServiceProviderFactory.RM_FACTORY_ID;
+		return getId();
 	}
 	
 	/* (non-Javadoc)

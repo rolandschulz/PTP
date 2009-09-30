@@ -6,12 +6,5 @@
 <!-- which accompanies this distribution, and is available at                -->
 <!-- http://www.eclipse.org/legal/epl-v10.html                               -->
 <plugin>
-   <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
-            class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEServiceProviderFactory"
-            id="org.eclipse.ptp.rm.ibm.pe.resourcemanager"
-            name="IBM Parallel Environment"/>
-   </extension>
 
 </plugin>

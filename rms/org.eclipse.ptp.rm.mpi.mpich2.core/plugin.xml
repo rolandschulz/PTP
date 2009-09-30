@@ -2,14 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
-            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2RMServiceProviderFactory"
-            id="org.eclipse.ptp.rm.mpi.mpich2.resourcemanager"
-            name="MPICH2">
-      </resourceManager>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
             class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ServiceProvider"
