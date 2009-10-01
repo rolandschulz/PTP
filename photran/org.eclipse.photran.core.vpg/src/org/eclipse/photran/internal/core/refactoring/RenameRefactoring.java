@@ -151,8 +151,8 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     protected void doCheckFinalConditions(final RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         assert definitionToRename != null;
-        assert allReferences != null;
         assert newName != null;
+        assert allReferences == null;
 
         if (newName.equals(oldName)) fail("The new name (" + newName + ") is exactly the same as the old name!");
         // OK if capitalization is different
