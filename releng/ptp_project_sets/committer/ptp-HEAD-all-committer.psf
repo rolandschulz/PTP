@@ -29,6 +29,10 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.openmpi-feature,org.eclipse.ptp.rm.openmpi-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature,org.eclipse.ptp.sdm-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.utils-feature,org.eclipse.ptp.utils-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.pldt.upc-feature,org.eclipse.ptp.pldt.upc-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.pbs-feature,org.eclipse.ptp.rm.pbs-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.slurm-feature,org.eclipse.ptp.rm.slurm-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.services-feature,org.eclipse.ptp.services-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.remote.core,org.eclipse.ptp.remote.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.remote.remotetools.core,org.eclipse.ptp.remote.remotetools.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.remote.remotetools.ui,org.eclipse.ptp.remote.remotetools.ui"/>
@@ -72,6 +76,7 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.analysis,org.eclipse.ptp.pldt.openmp.analysis"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.core,org.eclipse.ptp.pldt.openmp.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv,org.eclipse.ptp.pldt.openmp.ui.pv"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.upc,org.eclipse.ptp.pldt.upc"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards,org.eclipse.ptp.pldt.wizards"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.core,org.eclipse.ptp.remotetools.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.core,org.eclipse.ptp.remotetools.environment.core"/>
@@ -85,7 +90,7 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs,org.eclipse.ptp.rdt.core.stubs"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests,org.eclipse.ptp.rdt.core.tests"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user,org.eclipse.ptp.rdt.doc.user"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui.eclipse.ptp.rdt.managedbuilder.xlc.ui"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui,org.eclipse.ptp.rdt.managedbuilder.xlc.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.releng,org.eclipse.ptp.rdt.releng"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui,org.eclipse.ptp.rdt.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.core,org.eclipse.ptp.rm.core"/>
