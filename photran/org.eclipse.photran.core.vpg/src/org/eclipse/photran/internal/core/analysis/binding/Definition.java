@@ -62,7 +62,7 @@ import bz.over.vpg.TokenRef;
  * <p>
  * When applicable, the Definition's <b>type</b> gives the type of that entity (integer, real, etc.); its
  * <b>array spec</b> may give an array specification (e.g., one-dimensional, indexed from 3 to 5).
- * 
+ *
  * @author Jeff Overbey
  */
 public class Definition implements IPhotranSerializable, Comparable<Definition>
@@ -98,7 +98,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         WHERE,
         ENUMERATOR, // F03
         ;
-        
+
         @Override public String toString()
         {
         	String name = super.toString().replaceAll("_", " ");
@@ -114,7 +114,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         PUBLIC,
         PRIVATE;
         //INHERIT_FROM_SCOPE;
-        
+
         @Override public String toString()
         {
         	String name = super.toString().replaceAll("_", " ");
@@ -123,14 +123,14 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     }
 
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
-    
+
     protected Classification classification;
     protected PhotranTokenRef tokenRef;
     protected String declaredName, canonicalizedName;
     //protected Visibility visibility;
     protected Type type;
     protected ArraySpec arraySpec;
-    
+
     private boolean subprogramArgument = false;
     private boolean parameter = false;
     private boolean typeBoundProcedure = false;
@@ -146,7 +146,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
 
     protected Definition() {}
-    
+
     /** Creates a definition and binds it to the given token */
     public Definition(String declaredName, PhotranTokenRef tokenRef, Classification classification, /*Visibility visibility,*/ Type type)
     {
@@ -163,7 +163,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
     	return identifier.toLowerCase();
     }
-    
+
     public boolean matches(String canonicalizedName)
     {
         return canonicalizedName != null &&
@@ -174,42 +174,42 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         this.subprogramArgument = true;
     }
-    
+
     public boolean isSubprogramArgument()
     {
         return subprogramArgument;
     }
-    
+
     private boolean isInternal()
     {
         IASTNode startFrom = tokenRef.findToken();
         if (this.isSubprogram()) startFrom = startFrom.findNearestAncestor(ScopingNode.class); // Look upward from this function/subroutine
-        
+
         for (IASTNode parent = startFrom.getParent(); parent != null; parent = parent.getParent())
             if (parent instanceof ASTModuleNode
                 || parent instanceof ASTSubroutineSubprogramNode
                 || parent instanceof ASTFunctionSubprogramNode
                 || parent instanceof ASTMainProgramNode)
                 return true;
-        
+
         return false;
     }
-    
+
     public boolean isInternalSubprogramDefinition()
     {
         return isInternal() && isSubprogram();
     }
-    
+
     public boolean isExternallyVisibleSubprogramDefinition()
     {
         return !isInternal() && isSubprogram();
     }
-    
+
     public boolean isModuleReference()
     {
         return false;
     }
-    
+
     public boolean isLocalVariable()
     {
         return classification == Classification.IMPLICIT_LOCAL_VARIABLE
@@ -217,7 +217,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             ;//|| classification == Classification.IMPLIED_FUNCTION_RESULT_VARIABLE;
         // TODO: More?
     }
-    
+
     public boolean isDerivedType()
     {
         return classification == Classification.DERIVED_TYPE;
@@ -243,17 +243,17 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         return classification == Classification.INTERFACE;
     }
-    
+
     public boolean isRenamedModuleEntity()
     {
         return classification == Classification.RENAMED_MODULE_ENTITY;
     }
-    
+
     public boolean isModuleEntityBeforeRename()
     {
         return classification == Classification.MODULE_ENTITY_BEFORE_RENAME;
     }
-    
+
     public boolean isMainProgram()
     {
         return classification == Classification.MAIN_PROGRAM;
@@ -284,82 +284,82 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         return classification == Classification.BLOCK_DATA;
     }
-    
+
     /** @return the classification */
     public Classification getClassification()
     {
         return classification;
     }
-    
+
     /** Sets the type of this definition (integer, real, etc.) according to the given TypeSpec node */
     void setType(ASTTypeSpecNode typeSpecNode)
     {
         this.type = Type.parse(typeSpecNode);
     }
-    
+
     /** Sets the type of this definition (integer, real, etc.) */
     void setType(Type type)
     {
         this.type = type;
     }
-    
+
     /** @return the type of this node (integer, real, etc.) */
     public Type getType()
     {
         return type;
     }
-    
+
     /** @return the name of the entity this defines, cased according to its declaration */
     public String getDeclaredName()
     {
         return declaredName;
     }
-    
+
     /** @return the name of the entity this defines, canonicalized by <code>PhotranVPG.canonicalizeIdentifier</code> */
     public String getCanonicalizedName()
     {
         return canonicalizedName;
     }
-    
+
     /** @return a description of the type of entity being defined */
     public String describeClassification()
     {
     	StringBuilder result = new StringBuilder();
-    	
+
         result.append(classification.toString());
-        
+
         if (!type.equals(Type.VOID))
         {
         	result.append(" - ");
         	result.append(type);
         	if (arraySpec != null) result.append(arraySpec);
         }
-        
+
 //        if (visibility != Visibility.INHERIT_FROM_SCOPE)
 //        	result.append(" (" + visibility + ")");
-        
+
         return result.toString();
     }
-    
+
     /** @return the location of the token containing this definition */
     public PhotranTokenRef getTokenRef()
     {
     	return tokenRef;
     }
-    
+
     /** Sets the array spec for this definition */
     void setArraySpec(ASTArraySpecNode arraySpecNode)
     {
         if (arraySpecNode != null)
             this.arraySpec = new ArraySpec(arraySpecNode);
     }
-    
+
     /** @return the array spec for this definition */
     public ArraySpec getArraySpec()
     {
         return arraySpec;
     }
-    
+
     /** @return true iff this is the definition of an array */
     public boolean isArray()
     {
@@ -369,12 +369,12 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     // <AttrSpecSeq> ::=
     //   T_COMMA <AttrSpec>
     // | @:<AttrSpecSeq> T_COMMA <AttrSpec>
-    
+
     /** Sets the attributes according to an AttrSpecSeq node */
     void setAttributes(IASTListNode<ASTAttrSpecSeqNode> listNode, ScopingNode setInScope)
     {
         if (listNode == null) return;
-        
+
         for (int i = 0; i < listNode.size(); i++)
             setAttribute(listNode.get(i).getAttrSpec(), setInScope);
     }
@@ -397,7 +397,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         ASTArraySpecNode arraySpec = attrSpec.getArraySpec();
         ASTAccessSpecNode accessSpec = attrSpec.getAccessSpec();
-        
+
         if (arraySpec != null)
             setArraySpec(arraySpec);
         else if (accessSpec != null)
@@ -429,37 +429,37 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 //            this.visibility = Visibility.PUBLIC;
 //        else if (accessSpec.isPrivate())
 //            this.visibility = Visibility.PRIVATE;
-        
+
         ((PhotranVPGBuilder)PhotranVPG.getInstance()).markDefinitionVisibilityInScope(
             tokenRef,
             setInScope,
             accessSpec.isPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC);
     }
-    
+
     /** @return true iff this entity was declared as a PARAMETER (i.e., it a constant variable) */
     public boolean isParameter() { return parameter; }
     void setParameter() { this.parameter = true; }
-    
+
     /** @return true iff this entity was declared as a POINTER */
     public boolean isPointer() { return pointer; }
     void setPointer() { this.pointer = true; }
-    
+
     /** @return true iff this entity was declared as a POINTER */
     public boolean isTarget() { return target; }
     void setTarget() { this.target = true; }
-    
+
     /** @return true iff this entity was declared as ALLOCATABLE */
     public boolean isAllocatable() { return allocatable; }
     void setAllocatable() { this.allocatable = true; }
-    
+
     /** @return true iff this entity was declared as OPTIONAL */
     public boolean isOptional() { return optional; }
     void setOptional() { this.optional = true; }
-    
+
     /** @return true iff this entity was declared as SAVE */
     public boolean isSave() { return save; }
     void setSave() { this.save = true; }
-    
+
     /** @return true iff this entity was declared with INTENT(IN) */
     public boolean isIntentIn() { return intent_in; }
     /** @return true iff this entity was declared with INTENT(OUT) */
@@ -471,7 +471,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         if (intent.isIntentOut() || intent.isIntentInOut())
             this.intent_out = true;
     }
-    
+
 //    boolean isPublic()
 //    {
 //        // TODO: Can interface blocks contain PRIVATE statements or can their members have visibilities specified?
@@ -484,12 +484,12 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         this.typeBoundProcedure = true;
         this.renamedTypeBoundProcedure = renamed;
     }
-    
+
     public boolean isTypeBoundProcedure()
     {
         return this.typeBoundProcedure;
     }
-    
+
     public boolean isRenamedTypeBoundProcedure()
     {
         return this.renamedTypeBoundProcedure;
@@ -509,7 +509,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             return null;
         }
     }
-    
+
     /** @return all workspace references to this definition, not including renamed references */
     public Set<PhotranTokenRef> findAllReferences(boolean shouldBindInterfacesAndExternals)
     {
@@ -531,7 +531,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     private boolean isImpliedFunctionResultVar()
     {
         if (!this.isLocalVariable()) return false;
-        
+
         ASTFunctionSubprogramNode fn = findEnclosingFunction();
         if (fn != null && !fn.getFunctionStmt().hasResultClause())
         {
@@ -559,7 +559,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 		else
 		    return findAllImmediateReferences();
     }
-    
+
     private Set<PhotranTokenRef> findAllImmediateReferences()
     {
         Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
@@ -576,7 +576,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         {
             ASTFunctionSubprogramNode fn = findEnclosingFunction();
             if (fn == null || fn.getFunctionStmt().hasResultClause()) return;
-            
+
             for (Definition def : fn.getAllDefinitions())
             {
                 if (def.getCanonicalizedName().equals(this.getCanonicalizedName()))
@@ -600,15 +600,15 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     private void addImmediateBindings(Collection<PhotranTokenRef> result)
     {
         result.add(this.getTokenRef());
-        
+
         for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
             result.add((PhotranTokenRef)r);
     }
 
     private Set<PhotranTokenRef> internalFindAllReferencesToSubprogramAggressively()
     {
-        assert this.isSubprogram();
-        
+        assert this.isSubprogram() || this.isExternal();
+
         Collection<Definition> subprogramDefinitions;
         if (this.isInInterfaceBlock())
             subprogramDefinitions = this.resolveInterfaceBinding();
@@ -618,7 +618,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             subprogramDefinitions = this.findAllSimilarlyNamedExternalSubprograms();
         else // probably an internal subprogram
             return findAllImmediateReferences();
-        
+
         Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
         result.addAll(findAllImmediateReferences()); // e.g., PRIVATE referring to subprogram in an INTERFACE block
         for (Definition subprogram : subprogramDefinitions)
@@ -630,7 +630,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     private Set<PhotranTokenRef> internalFindAllReferencesToSubprogIncludingInterfacesAndExternalStmts()
     {
         assert this.isExternallyVisibleSubprogramDefinition();
-        
+
         Set<PhotranTokenRef> result = new TreeSet<PhotranTokenRef>();
         addExternalSubprogramDefinitions(result);
         addInterfaceDecls(result);
@@ -664,7 +664,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             result.addAll(externalDef.internalFindAllReferences(false));
         }
     }
-    
+
     /** @return true iff this is an entity defined inside an INTERFACE block */
     public boolean isExternalSubprogramReferenceInInterfaceBlock()
     {
@@ -672,7 +672,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
         Token token = getTokenRef().findToken();
         ScopingNode scopeOfThisDef = token.getEnclosingScope();
-        
+
         HashSet<Definition> result = collectResolutions(token, scopeOfThisDef);
         return !resolvesToSubprogramArgument(result);
     }
@@ -683,13 +683,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 //        ASTInterfaceStmtNode stmt = tokenRef.findToken().findNearestAncestor(ASTInterfaceBlockNode.class).getInterfaceStmt();
 //        return stmt.getGenericName() == null && stmt.getGenericSpec() == null;
 //    }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * @return if this is a subprogram declared in an INTERFACE block, a list of all possible matching subprogram
      * Definitions; otherwise, <code>null</code>
-     * 
+     *
      * @see #findMatchingDeclarationsInInterfaces()
      */
     public Collection<Definition> resolveInterfaceBinding()
@@ -699,7 +699,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         Token token = getTokenRef().findToken();
         ScopingNode scopeOfThisDef = token.getEnclosingScope();
         ScopingNode parentScope = scopeOfThisDef.getEnclosingScope();
-        
+
         HashSet<Definition> result = collectResolutions(token, scopeOfThisDef);
         if (resolvesToSubprogramArgument(result)) return Collections.emptyList();
         if (needToResolveInParentScope(result)) result = collectResolutions(token, parentScope);
@@ -713,7 +713,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         Token tok = getTokenRef().findTokenOrReturnNull();
         return tok != null && tok.findNearestAncestor(ASTInterfaceBlockNode.class) != null;
     }
-    
+
     private HashSet<Definition> collectResolutions(Token token, ScopingNode scope)
     {
         HashSet<Definition> result = new HashSet<Definition>();
@@ -732,7 +732,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         for (Definition def : listOfDefs)
             if (def != null && def.isSubprogramArgument())
                 return true;
-        
+
         return false;
     }
 
@@ -742,15 +742,15 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         // itself, then we should check the parent scope: There might be a
         // matching subprogram imported from a module (or defined as an external
         // subprogram) there.
-        
+
         return result.size() < 2;
     }
-    
+
     private ArrayList<Definition> collectMatchingExternalSubprograms(Token token)
     {
         return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(token.getText());
     }
-    
+
     /**
      * @return if this is an external subprogram, a list of all other external subprograms with the same name
      * (i.e., subprograms that might also be referenced by a similar INTERFACE block or EXTERNAL statement)
@@ -759,13 +759,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         return PhotranVPG.getInstance().findAllExternalSubprogramsNamed(this.canonicalizedName);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * @return if this is a subprogram declared in an EXTERNAL statement, a list of all possible matching subprogram
      * Definitions; otherwise, <code>null</code>
-     * 
+     *
      * @see #findMatchingDeclarationsInExternalStmts()
      */
     public Collection<Definition> resolveExternalBinding()
@@ -775,7 +775,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         Token token = getTokenRef().findToken();
         ScopingNode scopeOfThisDef = token.getEnclosingScope();
         ScopingNode parentScope = scopeOfThisDef.getEnclosingScope();
-        
+
         HashSet<Definition> result = collectExternalResolutions(token, scopeOfThisDef);
         if (resolvesToSubprogramArgument(result)) return Collections.emptyList();
         if (needToResolveInParentScope(result)) result = collectResolutions(token, parentScope);
@@ -789,7 +789,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         Token tok = getTokenRef().findTokenOrReturnNull();
         return tok != null && tok.findNearestAncestor(ASTExternalStmtNode.class) != null;
     }
-    
+
     private HashSet<Definition> collectExternalResolutions(Token token, ScopingNode scope)
     {
         HashSet<Definition> result = new HashSet<Definition>();
@@ -802,13 +802,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         }
         return result;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * @return if this is an external subprogram, a list of all possible matching declarations in INTERFACE blocks;
      * otherwise, the empty set
-     * 
+     *
      * @see #resolveInterfaceBinding()
      */
     public Collection<Definition> findMatchingDeclarationsInInterfaces()
@@ -831,11 +831,11 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 //        // TODO Auto-generated method stub
 //        return null;
 //    }
-    
+
     /**
      * @return if this is an external subprogram, a list of all possible matching declarations in EXTERNAL statements;
      * otherwise, <code>null</code>
-     * 
+     *
      * @see #resolveExternalBinding()
      */
     public Collection<Definition> findMatchingDeclarationsInExternalStmts()
@@ -856,11 +856,11 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         	+ ")";
     }
 
-    
+
     @Override public boolean equals(Object other)
     {
         if (!(other instanceof Definition)) return false;
-        
+
         Definition o = (Definition)other;
         return equals(this.arraySpec, o.arraySpec)
             && equals(this.canonicalizedName, o.canonicalizedName)
@@ -871,7 +871,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             && equals(this.type, o.type)
             ; // && equals(this.visibility, o.visibility);
     }
-    
+
     private boolean equals(Object a, Object b)
     {
         if (a == null && b == null)
@@ -881,7 +881,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         else
             return false;
     }
-    
+
     @Override public int hashCode()
     {
         return hashCode(this.arraySpec)
@@ -908,46 +908,46 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         String commentsBefore = "\n", name = getCanonicalizedName(), commentsAfter = "";
         boolean isScopingUnit = false;
-        
+
         Token tok = tokenRef.findTokenOrReturnNull();
         if (tok != null)
         {
             if (!name.equals("(anonymous)"))
                 name = tok.getText();
-            
+
             ScopingNode localScope = tok.getLocalScope();
             if (localScope != null)
             {
                 isScopingUnit = (localScope != tok.getEnclosingScope());
-                
+
                 IASTNode headerStmt;
                 if (isScopingUnit)
                     headerStmt = localScope.getHeaderStmt();
                 else
                     headerStmt = findEnclosingSpecificationStmt(tok);
-                
+
                 if (headerStmt != null)
                 {
                     Token first = headerStmt.findFirstToken();
                     Token last = headerStmt.findLastToken();
                     if (first != null) commentsBefore = first.getWhiteBefore();
                     if (last != null) commentsAfter = last.getWhiteAfter();
-                    
+
                     Token after = findFirstTokenAfter(last, localScope);
                     if (after != null && !startsWithBlankLine(after.getWhiteBefore()))
                         commentsAfter += after.getWhiteBefore();
                 }
             }
         }
-        
+
         return commentsBefore + describe(name) + "\n" + commentsAfter;
     }
-    
+
     private boolean startsWithBlankLine(String string)
     {
         while (string.startsWith(" ") || string.startsWith("\t"))
             string = string.substring(1);
-        
+
         return string.startsWith("\r") || string.startsWith("\n");
     }
 
@@ -957,16 +957,16 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         {
             private Token lastToken = null;
             private Token result = null;
-            
+
             @Override public void visitToken(Token thisToken)
             {
                 if (lastToken == target)
                     result = thisToken;
-                
+
                 lastToken = thisToken;
             }
         }
-        
+
         TokenFinder t = new TokenFinder();
         localScope.accept(t);
         return t.result;
@@ -977,14 +977,14 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         for (IASTNode candidate = tok.getParent(); candidate != null; candidate = candidate.getParent())
             if (candidate instanceof ISpecificationStmt)
                 return candidate;
-        
+
         return null;
     }
 
     private String describe(String name)
     {
         StringBuilder sb = new StringBuilder();
-        
+
         switch (classification)
         {
         case VARIABLE_DECLARATION:
@@ -993,50 +993,50 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             sb.append(":: ");
             sb.append(name);
             break;
-            
+
         case IMPLICIT_LOCAL_VARIABLE:
             sb.append("! "); sb.append(describeClassification()); sb.append('\n');
             sb.append(describeType());
             sb.append(":: ");
             sb.append(name);
             break;
-            
+
         case SUBROUTINE:
             sb.append("subroutine ");
             sb.append(name);
             //TODO: describeParameters(def.getType());
             break;
-            
+
         case FUNCTION:
             //TODO: describeReturnType(def.getType());
             sb.append("function ");
             sb.append(name);
             //TODO: describeParameters(def.getType());
             break;
-            
+
         case INTERFACE:
             sb.append("interface ");
             sb.append(name);
             // TODO: Describe contents
             break;
-            
+
         case MODULE:
             sb.append("module ");
             sb.append(name);
             // TODO: Describe contents
             break;
-        
+
         case DERIVED_TYPE:
             sb.append("type :: ");
             sb.append(name);
             // TODO: Describe contents
             break;
-            
+
         default:
             sb.append("! "); sb.append(describeClassification()); sb.append('\n');
             sb.append(name);
         }
-        
+
         return sb.toString();
     }
 
@@ -1111,7 +1111,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     ////////////////////////////////////////////////////////////////////////////////
     // IPhotranSerializable Implementation
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     public static Definition readFrom(InputStream in) throws IOException
     {
         Definition result = new Definition();
@@ -1134,7 +1134,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         result.save = PhotranVPGSerializer.deserialize(in);
         return result;
     }
-    
+
     public void writeTo(OutputStream out) throws IOException
     {
         PhotranVPGSerializer.serialize(classification.ordinal(), out);
@@ -1154,7 +1154,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         PhotranVPGSerializer.serialize(optional, out);
         PhotranVPGSerializer.serialize(save, out);
     }
-    
+
     public char getSerializationCode()
     {
         return PhotranVPGSerializer.CLASS_DEFINITION;
