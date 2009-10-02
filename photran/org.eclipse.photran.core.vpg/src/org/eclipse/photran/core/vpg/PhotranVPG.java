@@ -639,7 +639,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return hasFixedFormContentType(getFilenameForIFile(file));
     }
 
-    public static boolean hasFreeormContentType(IFile file)
+    public static boolean hasFreeFormContentType(IFile file)
     {
         return hasFreeFormContentType(getFilenameForIFile(file));
     }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring;
-import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;

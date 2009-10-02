@@ -86,8 +86,12 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
                 IFortranAST tempAST = this.vpg.acquirePermanentAST(f);
                 if (tempAST == null)
                     status.addError("One of the selected files (" + f.getName() +") cannot be parsed.");
-                introduceImplicitNoneInFile(pm, tempAST.getRoot(), tempAST, f);
-                vpg.releaseAST(f);
+                else
+                {
+                    introduceImplicitNoneInFile(pm, tempAST.getRoot(), tempAST, f);
+                    vpg.releaseAST(f);
+                }
+                
             }
         }
         finally

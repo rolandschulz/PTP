@@ -796,7 +796,7 @@
    <extension point="org.eclipse.ui.popupMenus">
    <objectContribution
    		adaptable="true"
-   		objectClass="org.eclipse.core.resources.IFile"
+   		objectClass="org.eclipse.core.resources.IResource"
    		nameFilter="*"
    		id="org.eclipse.photran.ui.FortranFileRefactoring">
           <!--enablement>
@@ -810,12 +810,15 @@
             </or>
           </enablement-->
           <visibility>
-           <!--objectState
-                name="contentTypeId"
-                value="org.eclipse.photran.core.fortranSource"/-->
-           <objectState
-                name="contentTypeId"
-                value="org.eclipse.photran.core.freeFormFortranSource"/>
+            <or>
+               <objectState
+                  name="contentTypeId"
+                  value="org.eclipse.photran.core.freeFormFortranSource"/>
+               <objectClass
+                  name="org.eclipse.core.resources.IFolder" />
+               <objectClass 
+                  name="org.eclipse.core.resources.IProject" />
+            </or>
          </visibility>
          <menu
                id="org.eclipse.photran.ui.RefactoringMenu"

@@ -14,7 +14,12 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
@@ -57,7 +62,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         {
             IPath fileFullPath = f.getFullPath();
             if(fileFullPath.equals(fullPath))
-                return true;
+                return true;  
         }
         return false;
     }
@@ -181,10 +186,59 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
             if (obj instanceof IFile)
             {
                 IFile file = (IFile)obj;
-                myFiles.add(file);
+                //TODO: Add support for Fixed-form files
+                if(PhotranVPG.hasFreeFormContentType(file))
+                    myFiles.add(file);
+            }
+            else if(obj instanceof IFolder || obj instanceof IProject)
+            {
+                IContainer tempC = (IContainer)obj;
+                try
+                {
+                    myFiles.addAll(extractFiles(tempC.members()));
+                }
+                catch (CoreException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
         return myFiles;
+    }
+    
+    /**
+     * Helper method for populateFilesFromSelection. Since selection takes in a 
+     * IStructuredSelection, we can't recurse on it. That's when the helper method
+     * comes in useful. This extracts all the files from selected files/folders/projects
+     * @param resources
+     * @return
+     */
+    private ArrayList<IFile> extractFiles(IResource[] resources)
+    {
+        ArrayList<IFile> files = new ArrayList<IFile>();
+        for(IResource r : resources)
+        {
+            if(r instanceof IFile)
+            {
+                if(PhotranVPG.hasFreeFormContentType((IFile)r))
+                    files.add((IFile)r);
+            }
+            else if(r instanceof IFolder || r instanceof IProject)
+            {
+                IContainer tempC = (IContainer)r;
+                try
+                {
+                    files.addAll(extractFiles(tempC.members()));
+                }
+                catch (CoreException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        return files;
     }
     
     /**
