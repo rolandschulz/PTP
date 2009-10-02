@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -101,11 +102,12 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	private Button fRenameButton;
 	
 	private ISelection fSelection;
+	private boolean fEnabled = true;
 	
 	private final ListenerList fSelectionListeners = new ListenerList();
 	private final IServiceModelManager fManager = ServiceModelManager.getInstance();
 	
-	private IServiceConfiguration fSelectedConfig;
+	private IServiceConfiguration fSelectedConfig = null;
 
 	public ServiceConfigurationSelectionWidget(Composite parent, int style) {
 		super(parent, style);
@@ -130,9 +132,15 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			public void selectionChanged(SelectionChangedEvent event) {
-				boolean enable = !fViewer.getSelection().isEmpty();
+				ISelection selection = fViewer.getSelection();
+				boolean enable = !selection.isEmpty();
 				fRemoveButton.setEnabled(enable);
 				fRenameButton.setEnabled(enable);
+				if (enable) {
+					ITreeSelection treeSelection = (ITreeSelection)selection;
+					TreePath path = treeSelection.getPaths()[0];
+					fSelectedConfig = (IServiceConfiguration)path.getFirstSegment();
+				}
 				notifySelection(fViewer.getSelection());
 			}
 			
@@ -206,6 +214,26 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 				}
 			}
 		});
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#getEnabled()
+	 */
+	@Override
+	public boolean getEnabled() {
+		return fEnabled;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
+	@Override
+	public void setEnabled(boolean enabled) {
+		fViewer.getTree().setEnabled(enabled);
+		fAddButton.setEnabled(enabled);
+		fRemoveButton.setEnabled(enabled);
+		fRenameButton.setEnabled(enabled);
+		fEnabled = enabled;
 	}
 
 	/**
