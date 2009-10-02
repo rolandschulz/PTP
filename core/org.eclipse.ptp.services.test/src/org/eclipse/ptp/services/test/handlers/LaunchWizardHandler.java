@@ -9,23 +9,20 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.services.ui.handlers;
+package org.eclipse.ptp.services.test.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.wizards.ServiceConfigurationWizard;
+import org.eclipse.ptp.services.ui.wizards.ServiceConfigurationWidget;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  */
 public class LaunchWizardHandler extends AbstractHandler {
-	private static IServiceConfiguration fConfig = ServiceModelManager.getInstance().newServiceConfiguration("test");
-	
 	/**
 	 * The constructor.
 	 */
@@ -38,7 +35,7 @@ public class LaunchWizardHandler extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		ServiceConfigurationWizard wizard = new ServiceConfigurationWizard(fConfig);
+		ServiceConfigurationWidget wizard = new ServiceConfigurationWidget(ServiceModelManager.getInstance().getConfigurations());
 		WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 		return null;
