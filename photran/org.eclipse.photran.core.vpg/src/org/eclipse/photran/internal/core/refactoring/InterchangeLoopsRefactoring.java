@@ -27,67 +27,59 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 
 /**
+ * Interchanges two perfectly-nested DO-loops.
  *
- * @author Tim
+ * @author Tim Yuvashev
  */
 public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
 {
-
-    private StatementSequence selection = null;
     private ASTProperLoopConstructNode outerLoop = null;
     private ASTProperLoopConstructNode innerLoop = null;
 
-    /**
-     * @param file
-     * @param selection
-     */
     public InterchangeLoopsRefactoring(IFile file, ITextSelection selection)
     {
         super(file, selection);
-        // TODO Auto-generated constructor stub
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring#doCheckFinalConditions(org.eclipse.ltk.core.refactoring.RefactoringStatus, org.eclipse.core.runtime.IProgressMonitor)
-     */
-    @Override
-    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
-        throws PreconditionFailure
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring#doCheckInitialConditions(org.eclipse.ltk.core.refactoring.RefactoringStatus, org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
 
-        // Ensure that partial loops won't be extracted
+        // Change AST to represent DO-loops as ASTProperLoopConstructNodes
         LoopReplacer.replaceAllLoopsIn(this.astOfFileInEditor.getRoot());
-        setLoops();
-        //If there is only 1 loop, don't do anything
-        if(outerLoop == null || innerLoop == null || outerLoop == innerLoop)
-            fail("Please select nested loops to refactor.");
 
-        status.addWarning("WARNING: This is an UNCHECKED TRANSFORMATION and is NOT guaranteed to preserve behavior.  Proceed at your own risk.");
+        outerLoop = findOuterLoop();
+        innerLoop = findInnerLoop();
+        if (outerLoop == null || innerLoop == null || outerLoop == innerLoop)
+            fail("Please select two perfectly-nested loops to refactor.");
+
+        status.addWarning("WARNING: This is an UNCHECKED TRANSFORMATION and is NOT guaranteed to preserve behavior.  " +
+            "Proceed at your own risk.");
     }
 
-    protected void setLoops()
+    private ASTProperLoopConstructNode findOuterLoop()
     {
-        outerLoop = getLoopNode(this.astOfFileInEditor, this.selectedRegionInEditor);
-        if(outerLoop != null)
-            innerLoop = getLoopNode(outerLoop.getBody().findFirstToken(),
-                                    outerLoop.getBody().findLastToken());
+        return getLoopNode(this.astOfFileInEditor, this.selectedRegionInEditor);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring#doCreateChange(org.eclipse.core.runtime.IProgressMonitor)
-     */
+    private ASTProperLoopConstructNode findInnerLoop()
+    {
+        if (outerLoop != null)
+            return getLoopNode(outerLoop.getBody().findFirstToken(),
+                               outerLoop.getBody().findLastToken());
+        else
+            return null;
+    }
+
+    @Override
+    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
+        throws PreconditionFailure
+    {
+        // No final preconditions
+    }
+
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException,
         OperationCanceledException
@@ -97,7 +89,6 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         swapComments();
 
         Reindenter.reindent(outerLoop, this.astOfFileInEditor, Strategy.REINDENT_EACH_LINE);
-        //Reindenter.reindent(innerLoop, this.astOfFileInEditor);
 
         this.addChangeFromModifiedAST(this.fileInEditor, pm);
     }
@@ -107,11 +98,6 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         ASTLabelDoStmtNode outerHeader = outerLoop.getLoopHeader();
         ASTLabelDoStmtNode innerHeader = innerLoop.getLoopHeader();
 
-        /*innerLoop.replaceChild(innerHeader, outerHeader);
-        outerLoop.replaceChild(outerHeader, innerHeader);
-
-        outerHeader.setParent(innerLoop);
-        innerHeader.setParent(outerLoop);*/
         swap(outerHeader, innerHeader);
     }
 
@@ -120,11 +106,6 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         ASTEndDoStmtNode outerEnd = outerLoop.getEndDoStmt();
         ASTEndDoStmtNode innerEnd = innerLoop.getEndDoStmt();
 
-        /*outerEnd.setParent(innerLoop);
-        innerEnd.setParent(outerLoop);
-
-        innerLoop.replaceChild(innerEnd, outerEnd);
-        outerLoop.replaceChild(outerEnd, innerEnd);*/
         swap(outerEnd, innerEnd);
     }
 
@@ -149,14 +130,9 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         outerLoop.replaceChild(outerElement, innerElement);
     }
 
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ltk.core.refactoring.Refactoring#getName()
-     */
     @Override
     public String getName()
     {
         return "Interchange Loops";
     }
-
 }
