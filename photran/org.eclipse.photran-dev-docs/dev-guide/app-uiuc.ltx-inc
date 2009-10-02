@@ -1,0 +1,68 @@
+% Additional Information for UIUC Personnel
+
+\begin{center}
+\framebox{\parbox{5.5in}{\textit{The following information is only of interest
+to developers in the Department of Computer Science at the University of
+Illinois at Urbana-Champaign.}}}
+\end{center}
+
+\section{Photran Subversion Repository at UIUC}
+
+A private Subversion repository for internal testing and research work is
+provided by TSG at the following URL.  \textit{You will only be able to access
+this repository if you have specifically been granted access.}  The repository
+requires authentication using your NetID and Kerberos password.
+To access a Subversion repository from Eclipse, you must install an additional
+Eclipse plug-in (either Subclipse or Subversive).
+
+\begin{center}
+\begin{verbatim}
+https://subversion.cs.uiuc.edu/svn/Photran/
+\end{verbatim}
+\end{center}
+
+Currently, this repository contains the following.
+
+\begin{itemize}
+
+\item
+\textbf{Lua refactoring tool (lua-refactoring).}
+A small, prototype, Eclipse-based refactoring tool for the Lua scripting
+language, based on Photran's refactoring infrastructure.
+
+\item
+\textbf{Large Fortran test codes (photran-projects).}
+Checking these out into your workspace will enable about 6,000 additional
+test cases in the JUnit test suite.  \textit{These applications are PRIVATE.
+They may NOT be distributed and are intended only for testing Photran.}
+
+\item
+\textbf{Sample Obfuscation refactoring (sample-refactoring).}
+The sample refactoring described in Appendix~\ref{app:obfuscate_refactoring}.
+
+\item
+\textbf{C preprocessor support (c-preprocessor).}
+C preprocessor support, based on the C preprocessor in CDT 5.  This will
+eventually be moved into the public CVS repository.
+
+\end{itemize}
+
+\section{Photran Web Site at UIUC}
+
+TSG provides a Web hosting infrastructure based on the popular CPanel system
+and has set up a web hosting account for Photran.
+This hosting environment supports PHP, MySQL databases, CGI
+scripts, and a number of other popular web technologies.
+Documentation for these features is provided in the control
+panel.  You can access your web content via the control panel,
+SSH, or WebDAV.
+Here are the account details:
+
+\begin{center}
+\begin{verbatim}
+        web URL: http://photran.cs.illinois.edu/
+  control panel: https://cpanel.cs.illinois.edu:2083/
+     SSH access: cpanel.cs.illinois.edu
+       web root: ~/public_html
+\end{verbatim}
+\end{center}
