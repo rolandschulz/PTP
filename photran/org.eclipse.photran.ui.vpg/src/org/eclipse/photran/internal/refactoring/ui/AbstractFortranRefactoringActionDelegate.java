@@ -41,7 +41,7 @@ import org.eclipse.ui.internal.Workbench;
 
 /**
  * This is the base class for most (all?) of the Eclipse action delegates for Fortran refactoring actions.
- * 
+ *
  * @author Jeff Overbey, Timofey Yuvashev
  */
 @SuppressWarnings("restriction")
@@ -49,24 +49,24 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
 {
     @SuppressWarnings("unused")
     private Class<?> refactoringClass, wizardClass;
-    
+
     public AbstractFortranRefactoringActionDelegate(Class<?> refactoringClass, Class<?> wizardClass)
     {
         this.refactoringClass = refactoringClass;
         this.wizardClass = wizardClass;
     }
-    
+
     private static boolean hasFile(ArrayList<IFile> files, IPath fullPath)
     {
         for(IFile f : files)
         {
             IPath fileFullPath = f.getFullPath();
             if(fileFullPath.equals(fullPath))
-                return true;  
+                return true;
         }
         return false;
     }
-    
+
     private boolean saveFile(AbstractFortranEditor editor)
     {
         ArrayList<IFile> filesToCheck = new ArrayList<IFile>();
@@ -74,31 +74,31 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         IEditorPart[] dirtyEditors = {editor};
         return saveModifiedFiles(filesToCheck, dirtyEditors);
     }
-    
+
     private boolean saveSelectedFiles(IStructuredSelection structSel)
     {
         ArrayList<IFile> filesToCheck = populateFilesFromSelection(structSel);
         IEditorPart[] dirtyEditors = Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getDirtyEditors();
         return saveModifiedFiles(filesToCheck, dirtyEditors);
     }
-    
+
     //This function returns user selection (OK or Cancel) as a boolean.
     // If it is passed in "false", user is not prompted, and "true" is returned by default
     private boolean promptUser(boolean shouldPrompt)
     {
         boolean userSelection = true;
-        
+
         if(shouldPrompt)
         {
-            userSelection = MessageDialog.openConfirm(null, 
-                "Files need to be saved", 
+            userSelection = MessageDialog.openConfirm(null,
+                "Files need to be saved",
                 "In order to refactor the selected file(s) they will be saved. " +
                 "Do you want to proceed?");
         }
-        
-        return userSelection;            
+
+        return userSelection;
     }
-    
+
     private boolean saveModifiedFiles(ArrayList<IFile> filesToCheck, IEditorPart[] dirtyEditors)
     {
         boolean promptUser = true;
@@ -119,29 +119,29 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
                     //Otherwise, return false
                     else
                         return false;
-                    
+
                     //Make sure the user is not prompted for every file
-                    promptUser = false;                    
+                    promptUser = false;
                 }
             }
         }
         return true;
     }
-    
+
     /**
-     * Checks if there are multiple selected files or if a file is selected from 
-     * PackageExplorer window. If that is the case, runs a separate routine for 
+     * Checks if there are multiple selected files or if a file is selected from
+     * PackageExplorer window. If that is the case, runs a separate routine for
      * creating a <code>FortranRefactoring</code> and <code>RefactoringWizard</code>.
-     * Otherwise, uses its ancestor's run() method. 
-     * 
+     * Otherwise, uses its ancestor's run() method.
+     *
      * @param action instanceof IAction
      */
     @Override public void run(IAction action)
     {
-        //If there are unsaved files, and the user chooses not to save them, don't run 
+        //If there are unsaved files, and the user chooses not to save them, don't run
         // the refacotring
         boolean shouldRun = true;
-        
+
         if(action instanceof ObjectPluginAction)
         {
             ISelection select = ((ObjectPluginAction)action).getSelection();
@@ -159,15 +159,15 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         else
         {
             //HACK: For some reason the editor is not set at certain times
-            AbstractFortranEditor editor = 
+            AbstractFortranEditor editor =
                 (AbstractFortranEditor)Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
             shouldRun = saveFile(editor);
             if(shouldRun)
-                super.run(action);   
+                super.run(action);
         }
     }
-    
+
     //TODO: Possibly prompt the user if he/she wants to save the files that
     // we are trying to refactor? Or should we save them by default?
     private void saveFileInEditorIfDirty(IEditorPart editor)
@@ -175,7 +175,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         if(editor.isDirty())
             editor.doSave(null);
     }
-       
+
     private ArrayList<IFile> populateFilesFromSelection(IStructuredSelection structSel)
     {
         ArrayList<IFile> myFiles = new ArrayList<IFile>();
@@ -187,10 +187,10 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
             {
                 IFile file = (IFile)obj;
                 //TODO: Add support for Fixed-form files
-                if(PhotranVPG.hasFreeFormContentType(file))
+                if (PhotranVPG.hasFreeFormContentType(file))
                     myFiles.add(file);
             }
-            else if(obj instanceof IFolder || obj instanceof IProject)
+            else if (obj instanceof IFolder || obj instanceof IProject)
             {
                 IContainer tempC = (IContainer)obj;
                 try
@@ -206,9 +206,9 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         }
         return myFiles;
     }
-    
+
     /**
-     * Helper method for populateFilesFromSelection. Since selection takes in a 
+     * Helper method for populateFilesFromSelection. Since selection takes in a
      * IStructuredSelection, we can't recurse on it. That's when the helper method
      * comes in useful. This extracts all the files from selected files/folders/projects
      * @param resources
@@ -240,37 +240,37 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         }
         return files;
     }
-    
+
     /**
-     * Creates an <code>AbstractFortranRefactoring</code> and a <code>RefactoringWizard</code> 
+     * Creates an <code>AbstractFortranRefactoring</code> and a <code>RefactoringWizard</code>
      * for refactorings that require/accept operations on multiple files(i.e. IntroduceImplicitNone)
-     * 
+     *
      * @param structSel instanceof IStructured selection. Used to extract the list of selected files
      *          to be modified
      */
     private void runForSelectedFiles(IStructuredSelection structSel)
     {
         ArrayList<IFile> myFiles = populateFilesFromSelection(structSel);
-        
+
         AbstractFortranRefactoring refact = getRefactoring(myFiles);
         RefactoringWizard wizard = getRefactoringWizard(wizardClass, refact);
         try
         {
             //AbstractFortranEditor abstEditor = (AbstractFortranEditor)Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             //Shell shell = abstEditor == null ? null : abstEditor.getShell();
-            
+
             Shell shell = Workbench.getInstance().getActiveWorkbenchWindow().getShell();
             if (shell == null) return;
-            
+
             String name = refact.getName();
             RefactoringWizardOpenOperation wiz = new RefactoringWizardOpenOperation(wizard);
             wiz.run(shell, name);
-            
+
             AbstractFortranEditor activeFortranEditor = getFortranEditor();
             if (activeFortranEditor != null)
                 activeFortranEditor.forceOutlineViewUpdate();
         }
-        catch (InterruptedException e) 
+        catch (InterruptedException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -280,14 +280,14 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
             PhotranVPG.getInstance().releaseAllASTs();
         }
     }
-    
-    
+
+
     /**
      * (Required by FortranEditorActionDelegate)
-     * 
+     *
      * Runs a <code>FortranRefactoring</code> on the contents of the active editor, using the
      * given <code>RefactoringWizard</code> for user interaction.
-     * 
+     *
      * @param refactoringClass instanceof FortranRefactoring
      * @param wizardClass instanceof RefactoringWizard
      */
@@ -307,9 +307,9 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
                 files.add(getFortranEditor().getIFile());
                 AbstractFortranRefactoring refactoring = getRefactoring(files);
                 RefactoringWizard wizard = getRefactoringWizard(wizardClass, refactoring);
-                
+
                 new RefactoringWizardOpenOperation(wizard).run(getFortranEditor().getShell(), refactoring.getName());
-                
+
                 getFortranEditor().forceOutlineViewUpdate();
             }
         }
@@ -330,7 +330,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
      * @return FortranRefactoring
      */
     protected abstract AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files);
-    
+
     /**
      * Invoke the constructor of the given <code>RefactoringWizard</code> with the given
      * <code>FortranRefactoring</code> as its sole argument.
