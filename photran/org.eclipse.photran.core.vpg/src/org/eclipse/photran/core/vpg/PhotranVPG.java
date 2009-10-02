@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -458,6 +459,41 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         if (commonBlockName == null) commonBlockName = "";
 
         return getIncomingDependenciesTo("common:" + canonicalizeIdentifier(commonBlockName));
+    }
+
+    public Iterable<String> listAllModules()
+    {
+        return listAllStartingWith("module:");
+    }
+
+    public Iterable<String> listAllSubprograms()
+    {
+        return listAllStartingWith("subprogram:");
+    }
+
+    public Iterable<String> listAllCommonBlocks()
+    {
+        return listAllStartingWith("common:");
+    }
+
+    private Iterable<String> listAllStartingWith(String prefix)
+    {
+        /*
+         * When there is a module "module1" declared in module1.f90, the VPG
+         * will contain a dependency
+         *
+         *     module:module1    -----depends-on----->    module1.f90
+         *
+         * So we can determine all modules by searching the list of dependent
+         * filenames.  Note that this will include every module that is
+         * declared, even if it is never used.
+         */
+
+        TreeSet<String> result = new TreeSet<String>();
+        for (String name : db.listAllDependentFilenames())
+            if (name.startsWith(prefix))
+                result.add(name.substring(prefix.length()));
+        return result;
     }
 
 	public Definition getDefinitionFor(PhotranTokenRef tokenRef)
