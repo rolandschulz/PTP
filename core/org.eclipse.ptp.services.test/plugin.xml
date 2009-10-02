@@ -99,7 +99,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.ptp.services.ui.handlers.LaunchWizardHandler"
+            class="org.eclipse.ptp.services.test.handlers.LaunchWizardHandler"
             commandId="org.eclipse.ptp.services.ui.commands.launchWizard">
       </handler>
       <handler
