@@ -245,9 +245,6 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
             changePrivateToPublic(ast);
         else if(numPrivateEnt > 1)
         {
-            assert accessNode != null;
-            assert identifierNode != null;            
-            
             createPublicNode(ast);
             removeIdentifierFromPrivateList();
         }
