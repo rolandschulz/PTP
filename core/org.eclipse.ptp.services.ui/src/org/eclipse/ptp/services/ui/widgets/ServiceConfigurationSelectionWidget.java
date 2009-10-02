@@ -91,9 +91,13 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 				}
 				return children.toArray();
 			}
+			if (element instanceof IServiceModelManager && fExcludedConfigs != null) {
+				Set<IServiceConfiguration> children = ((IServiceModelManager)element).getConfigurations();
+				children.removeAll(fExcludedConfigs);
+				return children.toArray();
+			}
 			return super.getChildren(element);
 		}
-		
 	}
 	
 	private TreeViewer fViewer;
@@ -103,6 +107,8 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	
 	private ISelection fSelection;
 	private boolean fEnabled = true;
+	private Set<IServiceConfiguration> fExcludedConfigs;
+	private boolean fButtonsVisible = true;
 	
 	private final ListenerList fSelectionListeners = new ListenerList();
 	private final IServiceModelManager fManager = ServiceModelManager.getInstance();
@@ -110,6 +116,11 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	private IServiceConfiguration fSelectedConfig = null;
 
 	public ServiceConfigurationSelectionWidget(Composite parent, int style) {
+		this (parent, style, null, true);
+	}
+	
+	public ServiceConfigurationSelectionWidget(Composite parent, int style, 
+			Set<IServiceConfiguration> excluded, boolean buttons) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 
@@ -133,89 +144,104 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection selection = fViewer.getSelection();
-				boolean enable = !selection.isEmpty();
-				fRemoveButton.setEnabled(enable);
-				fRenameButton.setEnabled(enable);
-				if (enable) {
+				if (!selection.isEmpty()) {
 					ITreeSelection treeSelection = (ITreeSelection)selection;
 					TreePath path = treeSelection.getPaths()[0];
 					fSelectedConfig = (IServiceConfiguration)path.getFirstSegment();
+				} else {
+					fSelectedConfig = null;
 				}
+				updateControls();
 				notifySelection(fViewer.getSelection());
 			}
 			
 		});
 		fViewer.setInput(ServiceModelManager.getInstance());
 		
-		Composite buttonsComp = new Composite(this, SWT.NONE);
-		buttonsComp.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
-		buttonsComp.setLayout(new GridLayout(1, false));
-	
-		fAddButton = new Button(buttonsComp, SWT.PUSH);
-		GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		data.widthHint = 110;
-		fAddButton.setLayoutData(data);
-		fAddButton.setText(Messages.ServiceConfigurationSelectionWidget_1);
-		fAddButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
-				InputDialog dialog = new InputDialog(fAddButton.getShell(), Messages.ServiceConfigurationSelectionWidget_2, 
-						Messages.ServiceConfigurationSelectionWidget_3, null, null);
-				if (dialog.open() == InputDialog.OK) {
-					IServiceConfiguration config = fManager.newServiceConfiguration(dialog.getValue());
-					fManager.addConfiguration(config);
-					fViewer.refresh();
-				}
-			}
-		});
+		if (buttons) {
+			Composite buttonsComp = new Composite(this, SWT.NONE);
+			buttonsComp.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
+			buttonsComp.setLayout(new GridLayout(1, false));
 		
-		fRemoveButton = new Button(buttonsComp, SWT.PUSH);
-		fRemoveButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		fRemoveButton.setText(Messages.ServiceConfigurationSelectionWidget_4);
-		fRemoveButton.setEnabled(false);
-		fRemoveButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
-				ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
-				if (!selection.isEmpty()) {
-					Object[] configs = (Object[])selection.toArray();
-					String names = ""; //$NON-NLS-1$
-					for (int i = 0; i < configs.length; i++) {
-						if (i > 0) {
-							names += ", "; //$NON-NLS-1$
-						}
-						names += "\"" + ((IServiceConfiguration)configs[i]).getName() + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-					}
-					boolean doRemove = MessageDialog.openConfirm(fRemoveButton.getShell(), Messages.ServiceConfigurationSelectionWidget_9,
-							NLS.bind(Messages.ServiceConfigurationSelectionWidget_10, names));
-					if (doRemove) {
-						for (Object config : configs) {
-							fManager.remove((IServiceConfiguration)config);
-						}
+			fAddButton = new Button(buttonsComp, SWT.PUSH);
+			GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+			data.widthHint = 110;
+			fAddButton.setLayoutData(data);
+			fAddButton.setText(Messages.ServiceConfigurationSelectionWidget_1);
+			fAddButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					InputDialog dialog = new InputDialog(fAddButton.getShell(), Messages.ServiceConfigurationSelectionWidget_2, 
+							Messages.ServiceConfigurationSelectionWidget_3, null, null);
+					if (dialog.open() == InputDialog.OK) {
+						IServiceConfiguration config = fManager.newServiceConfiguration(dialog.getValue());
+						fManager.addConfiguration(config);
 						fViewer.refresh();
 					}
 				}
-			}
-		});
-		
-		fRenameButton = new Button(buttonsComp, SWT.PUSH);
-		fRenameButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		fRenameButton.setText(Messages.ServiceConfigurationSelectionWidget_11);
-		fRenameButton.setEnabled(false);
-		fRenameButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
-				ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
-				if (!selection.isEmpty()) {
-					InputDialog dialog = new InputDialog(fAddButton.getShell(), Messages.ServiceConfigurationSelectionWidget_12, 
-							Messages.ServiceConfigurationSelectionWidget_13, null, null);
-					if (dialog.open() == InputDialog.OK) {
-						IServiceConfiguration config = (IServiceConfiguration)selection.getFirstElement();
-						config.setName(dialog.getValue());
-						fViewer.update(config, null);
+			});
+			
+			fRemoveButton = new Button(buttonsComp, SWT.PUSH);
+			fRemoveButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+			fRemoveButton.setText(Messages.ServiceConfigurationSelectionWidget_4);
+			fRemoveButton.setEnabled(false);
+			fRemoveButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
+					if (!selection.isEmpty()) {
+						Object[] configs = (Object[])selection.toArray();
+						String names = ""; //$NON-NLS-1$
+						for (int i = 0; i < configs.length; i++) {
+							if (i > 0) {
+								names += ", "; //$NON-NLS-1$
+							}
+							names += "\"" + ((IServiceConfiguration)configs[i]).getName() + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						boolean doRemove = MessageDialog.openConfirm(fRemoveButton.getShell(), Messages.ServiceConfigurationSelectionWidget_9,
+								NLS.bind(Messages.ServiceConfigurationSelectionWidget_10, names));
+						if (doRemove) {
+							for (Object config : configs) {
+								fManager.remove((IServiceConfiguration)config);
+							}
+							fViewer.refresh();
+						}
 					}
 				}
-			}
-		});
+			});
+			
+			fRenameButton = new Button(buttonsComp, SWT.PUSH);
+			fRenameButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+			fRenameButton.setText(Messages.ServiceConfigurationSelectionWidget_11);
+			fRenameButton.setEnabled(false);
+			fRenameButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
+					if (!selection.isEmpty()) {
+						InputDialog dialog = new InputDialog(fAddButton.getShell(), Messages.ServiceConfigurationSelectionWidget_12, 
+								Messages.ServiceConfigurationSelectionWidget_13, null, null);
+						if (dialog.open() == InputDialog.OK) {
+							IServiceConfiguration config = (IServiceConfiguration)selection.getFirstElement();
+							config.setName(dialog.getValue());
+							fViewer.update(config, null);
+						}
+					}
+				}
+			});
+		}
+		
+		fExcludedConfigs = excluded;
+		fButtonsVisible = buttons;
 	}
-
+	
+	private void updateControls() {
+		fViewer.getTree().setEnabled(fEnabled);
+		if (fButtonsVisible) {
+			fAddButton.setEnabled(fEnabled);
+			boolean enabled = fEnabled && getSelectedConfiguration() != null;
+			fRemoveButton.setEnabled(enabled);
+			fRenameButton.setEnabled(enabled);
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Control#getEnabled()
 	 */
@@ -229,10 +255,6 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	 */
 	@Override
 	public void setEnabled(boolean enabled) {
-		fViewer.getTree().setEnabled(enabled);
-		fAddButton.setEnabled(enabled);
-		fRemoveButton.setEnabled(enabled);
-		fRenameButton.setEnabled(enabled);
 		fEnabled = enabled;
 	}
 
