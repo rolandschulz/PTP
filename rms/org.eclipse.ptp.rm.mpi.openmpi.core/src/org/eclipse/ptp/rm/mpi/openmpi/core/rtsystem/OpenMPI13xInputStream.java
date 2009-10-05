@@ -319,27 +319,11 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 					return ch;
 				}
 				
-				ch = super.read();
-				if (ch < 0) {
-					return -1;
+				if (!rootTag) {
+					buffer.insert(0, rootEndTagString);
 				}
-				if (ch < ' ') {
-					// Skip embedded newlines (bug #287204)
-					break;
-				}
-				if (buffer.length() > 0) {
-					ch = buffer.charAt(0);
-					buffer.deleteCharAt(0);
-					
-					if (ch == '>') {
-						if (!rootTag) {
-							buffer.insert(0, rootEndTagString);
-						}
-						state = State.EPILOG;
-					}
-					return ch;
-				}
-				return -1;
+				state = State.EPILOG;
+				break;
 				
 			default:
 				assert(false);
