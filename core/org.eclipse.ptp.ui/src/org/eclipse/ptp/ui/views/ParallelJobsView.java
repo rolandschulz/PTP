@@ -38,7 +38,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -71,7 +70,6 @@ import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
-import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.JobFocusAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
@@ -89,13 +87,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
@@ -730,21 +728,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		jobTableViewer = new TableViewer(sashForm, SWT.SINGLE | SWT.BORDER);
 		jobTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobTableViewer.setLabelProvider(new LabelProvider() {
-			public Image getImage(Object element) {
-				if (element instanceof IPJob) {
-					IPJob job = (IPJob) element;
-					return ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0];
-				}
-				return null;
-			}
-			public String getText(Object element) {
-				if (element instanceof IPJob) {
-					return ((IPJob) element).getName();
-				}
-				return ""; //$NON-NLS-1$
-			}
-		});
+		jobTableViewer.setLabelProvider(new WorkbenchLabelProvider());
 		jobTableViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
