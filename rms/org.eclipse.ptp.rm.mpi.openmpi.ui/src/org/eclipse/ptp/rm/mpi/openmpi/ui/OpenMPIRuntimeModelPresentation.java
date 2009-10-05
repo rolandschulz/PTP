@@ -37,14 +37,15 @@ public class OpenMPIRuntimeModelPresentation implements IRuntimeModelPresentatio
 					}
 					return RMModelImages.procImages.get(status.getValue());
 				}
-			} else if (pElement instanceof IPJob) {
-				StringAttribute status = pElement.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
-				if (status != null) {
-					if (((IPJob)pElement).isDebug()) {
-						return RMModelImages.jobDebugImages.get(status.getValue());
-					}
-					return RMModelImages.jobImages.get(status.getValue());
+			}
+		} else if (object instanceof IPJob) {
+			IPJob job = (IPJob)object;
+			StringAttribute status = job.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+			if (status != null) {
+				if (job.isDebug()) {
+					return RMModelImages.jobDebugImages.get(status.getValue());
 				}
+				return RMModelImages.jobImages.get(status.getValue());
 			}
 		}
 		return null;
@@ -54,6 +55,18 @@ public class OpenMPIRuntimeModelPresentation implements IRuntimeModelPresentatio
 	 * @see org.eclipse.ptp.ui.IRuntimeModelPresentation#getText(java.lang.Object)
 	 */
 	public String getText(Object object) {
+		IPElement element = null;
+		if (object instanceof IElement) {
+			element = ((IElement)object).getPElement();
+		} else if (object instanceof IPElement) {
+			element = (IPElement)object;
+		}
+		if (element != null) {
+			StringAttribute status = element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+			if (status != null) {
+				return status.getValue();
+			}
+		}
 		return null;
 	}
 
