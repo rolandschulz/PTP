@@ -138,6 +138,7 @@ public class Messages extends NLS {
 	public static String ProcessAttributes_8;
 	public static String PTPCorePlugin_0;
 	public static String QueueAttributes_0;
+	public static String QueueAttributes_1;
 	public static String ResourceManagerAttributes_0;
 	public static String ResourceManagerAttributes_1;
 	public static String ResourceManagerAttributes_2;
