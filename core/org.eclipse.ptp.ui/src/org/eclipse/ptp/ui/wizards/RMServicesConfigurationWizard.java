@@ -315,7 +315,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		fResourceManager = resourceManager;
 		for (IServiceConfiguration config : fModelManager.getConfigurations()) {
 			IServiceProvider provider = config.getServiceProvider(fLaunchService);
-			if (provider.getId().equals(fServiceProvider.getId())) {
+			if (provider != null && provider.getId().equals(fServiceProvider.getId())) {
 				fServiceConfiguration = config;
 				break;
 			}
