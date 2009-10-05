@@ -191,8 +191,13 @@ public class BuildLaunchUtils {
 				
 				if(curTool==null||curTool.equals("")||!(new File(curTool).exists()))
 				{
-					curTool=BuildLaunchUtils.checkToolEnvPath((String) me.getValue());
-					pstore.setValue(toolBinID,curTool);//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+					String gVal = (String) me.getValue();
+					if(gVal!=null&&gVal.trim().length()>0)
+					{
+						curTool=BuildLaunchUtils.checkToolEnvPath(gVal);
+						if(curTool!=null)
+							pstore.setValue(toolBinID,curTool);//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+					}
 				}
 			}
 	}
