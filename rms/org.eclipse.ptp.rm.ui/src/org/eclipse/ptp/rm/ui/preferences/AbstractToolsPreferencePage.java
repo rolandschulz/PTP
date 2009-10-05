@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.ui.preferences;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -230,7 +230,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 	Spinner periodicMonitorTimeSpinner = null;
 	Text remoteInstallPathText = null;
 
-	private int capabilities = AbstractToolRMConfiguration.NO_CAP_SET;
+	private int capabilities = IToolRMConfiguration.NO_CAP_SET;
 	final String prefix; // to get preferences
 
 	public AbstractToolsPreferencePage(String prefix, int capabilities) {
@@ -275,7 +275,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * launch cmd
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_LAUNCH) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_LAUNCH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_LaunchCommand);
 
@@ -294,7 +294,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * discover cmd
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_DISCOVER) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_DISCOVER) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_DiscoverCommand);
 
@@ -306,7 +306,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * Periodic monitor cmd and time
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_PeriodicMonitorCommand);
 
@@ -324,7 +324,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * Continuous monitor cmd
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_ContinuosMonitorCommand);
 
@@ -336,7 +336,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * Installation path
 		 */
-		if ((capabilities & AbstractToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
+		if ((capabilities & IToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_InstallationPath);
 
