@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.mpi.mpich2.ui.wizards.MPICH2ConfigurationWizardPage;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.wizards.MPICH2RMConfigurationWizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
@@ -45,8 +46,9 @@ public class MPICH2ProviderContributor implements IServiceProviderContributor
 	{
 		WizardPage wizardPages[];
 		
-		wizardPages = new WizardPage[1];
+		wizardPages = new WizardPage[2];
 		wizardPages[0] = new MPICH2RMConfigurationWizardPage((IRMConfigurationWizard)wizard);
+		wizardPages[1] = new MPICH2ConfigurationWizardPage((IRMConfigurationWizard)wizard);
 		return wizardPages;
 	}
 
