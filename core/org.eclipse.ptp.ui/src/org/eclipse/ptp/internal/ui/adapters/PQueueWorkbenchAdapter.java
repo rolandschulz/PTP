@@ -52,4 +52,20 @@ public class PQueueWorkbenchAdapter extends WorkbenchAdapter {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
+	 */
+	@Override
+	public String getLabel(Object object) {
+		IPQueue queue = (IPQueue) object;
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(queue.getResourceManager().getResourceManagerId());
+		if (presentation != null) {
+			final String label = presentation.getText(object);
+			if (label != null) {
+				return label;
+			}
+		}
+		return queue.getState().toString();
+	}
+
 }
