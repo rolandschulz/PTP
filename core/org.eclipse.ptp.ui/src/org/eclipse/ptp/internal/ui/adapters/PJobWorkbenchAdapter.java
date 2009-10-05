@@ -45,4 +45,19 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 		return new ImageImageDescriptor(ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0]);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
+	 */
+	@Override
+	public String getLabel(Object object) {
+		IPJob job = (IPJob) object;
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(job.getQueue().getResourceManager().getResourceManagerId());
+		if (presentation != null) {
+			final String label = presentation.getText(object);
+			if (label != null) {
+				return label;
+			}
+		}
+		return job.getState().toString();
+	}
 }

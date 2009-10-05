@@ -30,6 +30,15 @@ import org.eclipse.ui.model.WorkbenchAdapter;
 public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
+	 */
+	@Override
+	public Object[] getChildren(Object object) {
+		IPMachine machine = (IPMachine) object;
+		return machine.getNodes();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
 	 */
 	@Override
@@ -46,12 +55,19 @@ public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	@Override
-	public Object[] getChildren(Object object) {
+	public String getLabel(Object object) {
 		IPMachine machine = (IPMachine) object;
-		return machine.getNodes();
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(machine.getResourceManager().getResourceManagerId());
+		if (presentation != null) {
+			final String label = presentation.getText(object);
+			if (label != null) {
+				return label;
+			}
+		}
+		return machine.getState().toString();
 	}
 
 }

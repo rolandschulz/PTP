@@ -45,4 +45,19 @@ public class PNodeWorkbenchAdapter extends WorkbenchAdapter {
 		return new ImageImageDescriptor(ParallelImages.nodeImages[node.getState().ordinal()][0]);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
+	 */
+	@Override
+	public String getLabel(Object object) {
+		IPNode node = (IPNode) object;
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(node.getMachine().getResourceManager().getResourceManagerId());
+		if (presentation != null) {
+			final String label = presentation.getText(object);
+			if (label != null) {
+				return label;
+			}
+		}
+		return node.getState().toString();
+	}
 }
