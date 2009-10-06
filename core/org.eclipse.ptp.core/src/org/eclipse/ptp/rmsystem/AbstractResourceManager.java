@@ -1180,7 +1180,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @param state
 	 */
 	protected synchronized void setState(ResourceManagerAttributes.State state) {
-		getConfiguration().setState(state);
 		EnumeratedAttribute<State> stateAttr = getStateAttribute();
 		if (stateAttr.getValue() != state) {
 			stateAttr.setValue(state);
