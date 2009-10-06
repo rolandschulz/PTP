@@ -58,6 +58,6 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 				return label;
 			}
 		}
-		return job.getState().toString();
+		return job.getName();
 	}
 }
