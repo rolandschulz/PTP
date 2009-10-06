@@ -31,7 +31,7 @@ public class SelectDefaultResourceManagerAction extends Action {
 	public void run() {
 		RMManager rm = PTPUIPlugin.getDefault().getRMManager();
 		if (rm != null) {
-			rm.fireRMSelectedEvent(resourceManager);
+			rm.fireSetDefaultRMEvent(resourceManager);
 		}
 		view.refreshViewer();
 	}

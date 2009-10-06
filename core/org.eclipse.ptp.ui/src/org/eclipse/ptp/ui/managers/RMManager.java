@@ -14,6 +14,7 @@ package org.eclipse.ptp.ui.managers;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -35,17 +36,33 @@ public class RMManager {
 	}
 
 	/**
-	 * Fire a RM selection event
+	 * Fire an event when the default resource manager is set.
 	 * 
 	 * @param rm selected resource manager
 	 */
-	public void fireRMSelectedEvent(final IResourceManager rm) {
+	public void fireSetDefaultRMEvent(final IResourceManager rm) {
 		selectedRM = rm;
 		for (Object listener: rmSelectionListeners.getListeners()) {
 			final IRMSelectionListener rmListener = (IRMSelectionListener)listener;
 			SafeRunner.run(new SafeRunnable() {
 				public void run() {
-					rmListener.resourceManagerSelected(rm);
+					rmListener.setDefault(rm);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * Fire an event when the selection in the resource manager view changes
+	 * 
+	 * @param selection new selection
+	 */
+	public void fireSelectedEvent(final ISelection selection) {
+		for (Object listener: rmSelectionListeners.getListeners()) {
+			final IRMSelectionListener rmListener = (IRMSelectionListener)listener;
+			SafeRunner.run(new SafeRunnable() {
+				public void run() {
+					rmListener.selectionChanged(selection);
 				}
 			});
 		}
@@ -88,7 +105,7 @@ public class RMManager {
 	 */
 	public void shutdown() {
 		saveSelectedRM();
-		fireRMSelectedEvent(null);
+		fireSetDefaultRMEvent(null);
 		rmSelectionListeners.clear();
 	}
 	
@@ -108,7 +125,7 @@ public class RMManager {
 			RMSelectionPersistence store = new RMSelectionPersistence();
 			selectedRM = store.getDefaultRM();
 			if (selectedRM != null) {
-				fireRMSelectedEvent(selectedRM);
+				fireSetDefaultRMEvent(selectedRM);
 			}
 			loaded = true;
 		}
