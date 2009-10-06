@@ -36,6 +36,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	extends ServiceProvider 
 	implements IResourceManagerConfiguration
 {
+	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
@@ -46,13 +47,21 @@ public abstract class AbstractResourceManagerServiceProvider
 	private final IModelManager fModelManager = PTPCorePlugin.getDefault().getModelManager();
 	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
-	
+
 	/*
 	 * Keep a copy of our service configuration so we don't have to search for it
 	 */
 	private IServiceConfiguration fServiceConfiguration = null;
 	
 	private IModelManagerChildListener fModelListener = new IModelManagerChildListener() {
+		
+		public void handleEvent(IChangedResourceManagerEvent e) {
+			// Don't need to do anything
+		}
+		
+		public void handleEvent(INewResourceManagerEvent e) {
+			// Don't need to do anything
+		}
 		
 		public void handleEvent(IRemoveResourceManagerEvent e) {
 			if (e.getResourceManager().getUniqueName().equals(getUniqueName())) {
@@ -66,14 +75,6 @@ public abstract class AbstractResourceManagerServiceProvider
 					fServiceConfiguration.setServiceProvider(fLaunchService, null);
 				}
 			}
-		}
-		
-		public void handleEvent(INewResourceManagerEvent e) {
-			// Don't need to do anything
-		}
-		
-		public void handleEvent(IChangedResourceManagerEvent e) {
-			// Don't need to do anything
 		}
 	};
 	
@@ -139,21 +140,9 @@ public abstract class AbstractResourceManagerServiceProvider
 		registerListeners();
 	}
 	
-	public void registerListeners() {
-		fServiceManager.addEventListener(fEventListener, 
-				IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED |
-				IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED);
-		fModelManager.addListener(fModelListener);
-	}
-	
-	public void unregisterListeners() {
-		fServiceManager.removeEventListener(fEventListener);
-		fModelManager.removeListener(fModelListener);
-	}
-	
 	@Override
 	public abstract Object clone();
-
+	
 	/**
 	 * Create a resource manager using this configuration.
 	 *  
@@ -162,12 +151,19 @@ public abstract class AbstractResourceManagerServiceProvider
 	public abstract IResourceManagerControl createResourceManager();
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getAutoStart()
+	 */
+	public boolean getAutoStart() {
+		return getBoolean(TAG_AUTOSTART, false);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getConnectionName()
 	 */
 	public String getConnectionName() {
 		return getString(TAG_CONNECTION_NAME, ""); //$NON-NLS-1$
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
 	 */
@@ -196,7 +192,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	public String getResourceManagerId() {
 		return super.getId();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getState()
 	 */
@@ -210,7 +206,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	public String getType() {
 		return super.getName();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
@@ -234,6 +230,17 @@ public abstract class AbstractResourceManagerServiceProvider
 		return false;
 	}
 	
+	/**
+	 * Register for service model configuration change and remove events
+	 * Register for runtime model events
+	 */
+	public void registerListeners() {
+		fServiceManager.addEventListener(fEventListener, 
+				IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED |
+				IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED);
+		fModelManager.addListener(fModelListener);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#save(org.eclipse.ui.IMemento)
 	 */
@@ -243,6 +250,13 @@ public abstract class AbstractResourceManagerServiceProvider
 		 *  bridge between RM configurations and service configurations.
 		 */
 		memento.putString(TAG_UNIQUE_NAME, getUniqueName());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setAutoStart(boolean)
+	 */
+	public void setAutoStart(boolean flag) {
+		putBoolean(TAG_AUTOSTART, flag);
 	}
 	
 	/* (non-Javadoc)
@@ -258,7 +272,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	public void setDescription(String description) {
 		putString(TAG_DESCRIPTION, description);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setName(java.lang.String)
 	 */
@@ -272,7 +286,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	public void setRemoteServicesId(String id) {
 		putString(TAG_REMOTE_SERVICES_ID, id);
 	}
-	
+
 	/**
 	 * @param id
 	 */
@@ -296,5 +310,13 @@ public abstract class AbstractResourceManagerServiceProvider
 	 */
 	public void setUniqueName(String id) {
 		putString(TAG_UNIQUE_NAME, id);
+	}
+	
+	/**
+	 * Unregister from listening to service model and runtime models.
+	 */
+	public void unregisterListeners() {
+		fServiceManager.removeEventListener(fEventListener);
+		fModelManager.removeListener(fModelListener);
 	}
 }
