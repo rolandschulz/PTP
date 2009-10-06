@@ -65,7 +65,7 @@ public class PQueueWorkbenchAdapter extends WorkbenchAdapter {
 				return label;
 			}
 		}
-		return queue.getState().toString();
+		return queue.getName();
 	}
 
 }

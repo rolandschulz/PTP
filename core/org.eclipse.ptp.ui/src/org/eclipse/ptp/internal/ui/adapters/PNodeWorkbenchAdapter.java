@@ -58,6 +58,6 @@ public class PNodeWorkbenchAdapter extends WorkbenchAdapter {
 				return label;
 			}
 		}
-		return node.getState().toString();
+		return node.getName();
 	}
 }

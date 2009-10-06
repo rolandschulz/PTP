@@ -67,7 +67,7 @@ public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
 				return label;
 			}
 		}
-		return machine.getState().toString();
+		return machine.getName();
 	}
 
 }
