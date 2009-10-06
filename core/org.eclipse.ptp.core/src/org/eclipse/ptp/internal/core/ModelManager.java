@@ -241,8 +241,9 @@ public class ModelManager implements IModelManager {
 		ServiceModelManager.getInstance().getActiveConfiguration();
 		
 		for (IResourceManager rm : getUniverse().getResourceManagers()) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
-				rmsNeedStarting.add((IResourceManagerControl)rm);
+			IResourceManagerControl rmControl = (IResourceManagerControl)rm;
+			if (rmControl.getConfiguration().getAutoStart()) {
+				rmsNeedStarting.add(rmControl);
 			}
 		}
 		
