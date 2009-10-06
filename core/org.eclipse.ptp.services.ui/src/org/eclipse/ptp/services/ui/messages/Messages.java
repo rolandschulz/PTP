@@ -72,6 +72,8 @@ public class Messages extends NLS {
 	public static String ServiceModelWidget_7;
 
 	public static String ServiceModelWidget_8;
+	
+	public static String NewServiceModelWidgetDialog_title;
 
 	public static String ServicesDialog_0;
 	public static String ServicesDialog_1;
