@@ -359,11 +359,7 @@ public class JobsListView extends ViewPart {
 		String name = attrDef.getName();
 		column.getColumn().setText(name);
 		PixelConverter converter = new PixelConverter(viewer.getControl());
-		int colWidth = converter.convertWidthInCharsToPixels(name.length());
-		if (resizable) {
-			colWidth = Math.max(converter.convertWidthInCharsToPixels(name.length()*2),
-							converter.convertWidthInCharsToPixels(5));
-		}
+		int colWidth = converter.convertWidthInCharsToPixels(resizable ? name.length() + 5 : name.length());
 		column.getColumn().setWidth(colWidth);
 		colDefs.add(attrDef);
 	}
