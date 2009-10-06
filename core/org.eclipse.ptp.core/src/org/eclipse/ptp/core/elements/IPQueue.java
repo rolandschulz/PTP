@@ -25,27 +25,39 @@ import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 public interface IPQueue extends IPElement {
 
 	/**
+	 * Add a listener for events related to children of this queue.
+	 * 
 	 * @param listener
 	 */
 	public void addChildListener(IQueueChildListener listener);
 
 	/**
+	 * Add a listener for events related to this queue.
+	 * 
 	 * @param listener
 	 */
 	public void addElementListener(IQueueListener listener);
 
 	/**
+	 * Find a job object using its ID.
+	 * Returns null if no job is found.
+	 * 
 	 * @param job_id
 	 * @return IPJob
 	 */
 	public IPJob getJobById(String job_id);
 
 	/**
-	 * @return IPJob[]
+	 * Get the jobs in this queue. 
+	 * Returns an empty array if there are no jobs
+	 * 
+	 * @return array of jobs in this queue
 	 */
 	public IPJob[] getJobs();
 
 	/**
+	 * Get the resource manager that controls this queue.
+	 * 
 	 * @return IResourceManager
 	 */
 	public IResourceManager getResourceManager();
@@ -58,11 +70,15 @@ public interface IPQueue extends IPElement {
 	public QueueAttributes.State getState();
 	
 	/**
+	 * Remove a listener for events related to children of this queue.
+	 * 
 	 * @param listener
 	 */
 	public void removeChildListener(IQueueChildListener listener);
 	
 	/**
+	 * Remove a listener for events related to this queue.
+	 * 
 	 * @param listener
 	 */
 	public void removeElementListener(IQueueListener listener);

@@ -19,8 +19,8 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
-import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
+import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 
 
 /**
@@ -36,11 +36,15 @@ import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 public interface IPMachine extends IPElement {
 	
 	/**
+	 * Add a listener for events related to children of this machine.
+	 * 
 	 * @param listener
 	 */
 	public void addChildListener(IMachineChildListener listener);
 
 	/**
+	 * Add a listener for events related to this machine.
+	 * 
 	 * @param listener
 	 */
 	public void addElementListener(IMachineListener listener);
@@ -64,8 +68,8 @@ public interface IPMachine extends IPElement {
 	public IPNode getNodeById(String id);
 
 	/**
-	 * Returns an array of all the Nodes that this Machine is comprised of. May
-	 * return null if there are none.
+	 * Returns an array of all the Nodes that this Machine is comprised of. 
+	 * Returns an empty array if there are no nodes.
 	 * 
 	 * @return The Nodes in this Machine - <code>null</code> if there are
 	 *         none.
@@ -73,6 +77,8 @@ public interface IPMachine extends IPElement {
 	public IPNode[] getNodes();
 	
 	/**
+	 * Get the resource manager that controls this machine.
+	 * 
 	 * @return the machine's parent resource manager
 	 */
 	public IResourceManager getResourceManager();
@@ -85,11 +91,15 @@ public interface IPMachine extends IPElement {
 	public MachineAttributes.State getState();
 
 	/**
+	 * Add a listener for events related to children of this machine.
+	 * 
 	 * @param listener
 	 */
 	public void removeChildListener(IMachineChildListener listener);
 
 	/**
+	 * Add a listener for events related to this machine.
+	 * 
 	 * @param listener
 	 */
 	public void removeElementListener(IMachineListener listener);
