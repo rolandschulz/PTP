@@ -11,6 +11,7 @@
  */
 package org.eclipse.ptp.ui;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 public interface IRMSelectionListener {
@@ -19,5 +20,12 @@ public interface IRMSelectionListener {
 	 * 
 	 * @param rm selected resource manager
 	 */
-	public void resourceManagerSelected(IResourceManager rm);
+	public void setDefault(IResourceManager rm);
+	
+	/**
+	 * Notify the listener that the selection has changed in the RM view
+	 * 
+	 * @param selection new selection
+	 */
+	public void selectionChanged(ISelection selection);
 }

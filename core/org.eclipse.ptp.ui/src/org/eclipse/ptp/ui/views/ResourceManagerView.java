@@ -36,9 +36,12 @@ import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
@@ -86,15 +89,11 @@ import org.eclipse.ptp.ui.actions.SelectDefaultResourceManagerAction;
 import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -212,14 +211,6 @@ public class ResourceManagerView extends ViewPart {
 			selectedFont = (Font)new LocalResourceManager(JFaceResources.getResources()).get(FontDescriptor.createFrom(selectedFontData));
 		}
 
-		private IResourceManager getResourceManager(Object parentElement) {
-			IResourceManager rm = null;
-			if (parentElement instanceof IAdaptable) {
-				rm = (IResourceManager) ((IAdaptable) parentElement).getAdapter(IResourceManager.class);
-			}
-			return rm;
-		}
-		
 		/* (non-Javadoc)
 		 * @see org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
 		 */
@@ -232,8 +223,16 @@ public class ResourceManagerView extends ViewPart {
 			}
 			return unSelectedFont;
 		}
+		
+		private IResourceManager getResourceManager(Object parentElement) {
+			IResourceManager rm = null;
+			if (parentElement instanceof IAdaptable) {
+				rm = (IResourceManager) ((IAdaptable) parentElement).getAdapter(IResourceManager.class);
+			}
+			return rm;
+		}
 	}
-	
+
 	private final class RMChildListener implements
 			IResourceManagerChildListener {
 		private final MachineListener machineListener = new MachineListener();
@@ -370,11 +369,10 @@ public class ResourceManagerView extends ViewPart {
 		 */
 		public void handleEvent(IResourceManagerChangeEvent e) {
 			IResourceManager rm = e.getSource();
-			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
 			if (rmManager != null &&
 					rm.getState() == ResourceManagerAttributes.State.STOPPED && 
 					rm == rmManager.getSelected()) {
-				rmManager.fireRMSelectedEvent(null);
+				rmManager.fireSetDefaultRMEvent(null);
 			}
 			refreshViewer(rm);
 		}
@@ -400,22 +398,20 @@ public class ResourceManagerView extends ViewPart {
 		}
 	}
 
-	private final Set<IResourceManager> resourceManagers = new HashSet<IResourceManager>();
-
 	private TreeViewer viewer;
-
 	private RemoveResourceManagersAction removeResourceManagerAction;
 	private AddResourceManagerAction addResourceManagerAction;
 	private EditResourceManagerAction editResourceManagerAction;
 	private SelectDefaultResourceManagerAction selectResourceManagerAction;
-
+	private final Set<IResourceManager> resourceManagers = new HashSet<IResourceManager>();
 	private final MMChildListener mmChildListener = new MMChildListener();
 	private final RMListener rmListener = new RMListener();
 	private final RMChildListener rmChildListener = new RMChildListener();
+	private final RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
 
 	public ResourceManagerView() {
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -423,7 +419,25 @@ public class ResourceManagerView extends ViewPart {
 		viewer = new TreeViewer(parent, SWT.MULTI);
 		viewer.setContentProvider(new WorkbenchContentProvider());
 		viewer.setLabelProvider(new ResourceManagerLabelProvider(viewer.getTree().getFont()));
-
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (rmManager != null) {
+					rmManager.fireSelectedEvent(event.getSelection());
+				}
+			}
+		});
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				ITreeSelection selection = (ITreeSelection)event.getSelection();
+				if (!selection.isEmpty()) {
+					IResourceManagerControl rm = (IResourceManagerControl)selection.getFirstElement();
+					if (rm.getState() == ResourceManagerAttributes.State.STOPPED) {
+						editResourceManagerAction.setResourceManager(rm);
+						editResourceManagerAction.run();
+					}
+				}
+			}
+		});
 		viewer.setInput(PTPCorePlugin.getDefault().getUniverse());
 
 		// -----------------------------
@@ -439,35 +453,6 @@ public class ResourceManagerView extends ViewPart {
 		// ----------------------------------------------------------------------
 		getSite().setSelectionProvider(viewer);
 
-		viewer.getTree().addMouseListener(new MouseAdapter() {
-			/* (non-Javadoc)
-			 * @see org.eclipse.swt.events.MouseAdapter#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
-			 */
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				ITreeSelection selection = (ITreeSelection)viewer.getSelection();
-				if (!selection.isEmpty()) {
-					IResourceManagerControl rm = (IResourceManagerControl)selection.getFirstElement();
-					if (rm.getState() == ResourceManagerAttributes.State.STOPPED) {
-						editResourceManagerAction.setResourceManager(rm);
-						editResourceManagerAction.run();
-					}
-				}
-			}
-
-			/* (non-Javadoc)
-			 * @see org.eclipse.swt.events.MouseAdapter#mouseDown(org.eclipse.swt.events.MouseEvent)
-			 */
-			public void mouseDown(MouseEvent e) {
-				ISelection selection = viewer.getSelection();
-				TreeItem item = viewer.getTree().getItem(new Point(e.x, e.y));
-				if (item == null && !selection.isEmpty()) {
-					viewer.getTree().deselectAll();
-				}
-				else if (item != null) {
-				}
-			}
-		});
 
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		
@@ -481,7 +466,10 @@ public class ResourceManagerView extends ViewPart {
 	    }
 		mm.addListener(mmChildListener);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public synchronized void dispose() {
 		PTPCorePlugin.getDefault().getModelManager().removeListener(mmChildListener);
 		for (IResourceManager resourceManager : resourceManagers) {
@@ -499,7 +487,7 @@ public class ResourceManagerView extends ViewPart {
 		}
 		return viewer.getTree().getFont();
 	}
-
+	
 	public void refreshViewer() {
 		ISafeRunnable safeRunnable = new SafeRunnable(){
 
@@ -523,7 +511,7 @@ public class ResourceManagerView extends ViewPart {
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	public void updateViewer(final IPElement element) {
 		ISafeRunnable safeRunnable = new SafeRunnable(){
 
