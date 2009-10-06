@@ -18,11 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ui.IMemento;
 
 public interface IResourceManagerConfiguration extends Cloneable {
-	
 	/**
 	 * Create a copy of this configuration.
 	 * 
@@ -30,6 +28,15 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 */
 	public Object clone();
 	
+	/**
+	 * Get the auto start flag for this resource manager. If the auto start
+	 * flag is set to true, an attempt will be made to start the resource
+	 * manager when Eclipse is launched.
+	 * 
+	 * @return state of the auto start flag
+	 */
+	public boolean getAutoStart();
+
 	/**
 	 * Get the connection name. This is a string used by the remote service provider to
 	 * identify a particular connection. A resource manager only supports a single
@@ -39,7 +46,7 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @return connection name
 	 */
 	public String getConnectionName();
-
+	
 	/**
 	 * Returns the description of the resource manager.
 	 *
@@ -62,36 +69,28 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @return remote service provider ID
 	 */
 	public String getRemoteServicesId();
-	
+
 	/**
 	 * Returns the id of the factory that created the resource manager.
 	 *
 	 * @return the id of the factory that created the resource manager
 	 */
 	public String getResourceManagerId();
-	
-	/**
-	 * Get the last known state of the resource manager. This is primarily used to persist
-	 * the the state of the resource manager, and so that it can be restored on startup.
-	 * 
-	 * @return state of the resource manager
-	 */
-	public ResourceManagerAttributes.State getState();
-	
+
 	/**
 	 * Returns the type of the resource manager. This is the name of the resource manager factory.
 	 *
 	 * @return the type of the resource manager
 	 */
 	public String getType();
-
+	
 	/**
 	 * Get a unique name for this resource manager. 
 	 * 
 	 * @return unique name
 	 */
 	public String getUniqueName();
-
+	
 	/**
 	 * This resource manager needs the debugger to help with
 	 * a debug launch. What this means depends on the type
@@ -101,13 +100,23 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @return true if help is required
 	 */
 	public boolean needsDebuggerLaunchHelp();
-
+	
 	/**
 	 * Save the state of the configuration.
 	 * 
 	 * @param memento
+	 * @deprecated
 	 */
 	public void save(IMemento memento);
+	
+	/**
+	 * Set the auto start flag for this resource manager. If the auto start
+	 * flag is set to true, an attempt will be made to start the resource
+	 * manager when Eclipse is launched.
+	 * 
+	 * @param flag auto start flag
+	 */
+	public void setAutoStart(boolean flag);
 	
 	/**
 	 * Set the name of the connection used by this resource manager. The
@@ -142,11 +151,4 @@ public interface IResourceManagerConfiguration extends Cloneable {
 	 * @param id remote service provider extension ID
 	 */
 	public void setRemoteServicesId(String id);
-	
-	/**
-	 * Set the last known state of the resource manager
-	 * 
-	 * @param state state of the resource manager
-	 */
-	public void setState(ResourceManagerAttributes.State state);
 }
