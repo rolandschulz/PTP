@@ -64,6 +64,7 @@ public interface IResourceManager extends IPElement,
 	
 	/**
 	 * Find a machine object using its ID
+	 * Returns null if no machine is found.
 	 * 
 	 * @param id ID of the machine object
 	 * @return machine object corresponding to the ID
@@ -71,7 +72,8 @@ public interface IResourceManager extends IPElement,
 	public IPMachine getMachineById(String id);
 	
 	/**
-	 * Get an array containing all the machines known by this RM
+	 * Get an array containing all the machines known by this RM.
+	 * If there are no machines, an empty array is returned.
 	 * 
 	 * @return array of machines known by this RM
 	 */
@@ -85,7 +87,8 @@ public interface IResourceManager extends IPElement,
 	public String getName();
 
 	/**
-	 * Find a queue object using its ID
+	 * Find a queue object using its ID.
+	 * Returns null if no queue is found.
 	 * 
 	 * @param id ID of the queue object
 	 * @return queue object corresponding to the ID
@@ -93,7 +96,8 @@ public interface IResourceManager extends IPElement,
 	public IPQueue getQueueById(String id);
 
 	/**
-	 * Fina a queue object using its name attribute
+	 * Find a queue object using its name attribute.
+	 * Returns null if no queue is found.
 	 * 
 	 * @param name name attribute of the queue object
 	 * @return queue object corresponding to the name
@@ -101,7 +105,8 @@ public interface IResourceManager extends IPElement,
 	public IPQueue getQueueByName(String name);
 
 	/**
-	 * Get an array containing all the queues known by this RM
+	 * Get an array containing all the queues known by this RM.
+	 * If there are no queues, an empty array is returned.
 	 * 
 	 * @return array of queues known by this RM
 	 */

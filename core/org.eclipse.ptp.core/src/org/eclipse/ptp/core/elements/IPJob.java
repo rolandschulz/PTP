@@ -37,14 +37,14 @@ import org.eclipse.ptp.core.elements.listeners.IJobListener;
 public interface IPJob extends IPElement {
 	
 	/**
-	 * Add a listener for child events.
+	 * Add a listener for child events relating to this job.
 	 * 
 	 * @param listener
 	 */
 	public void addChildListener(IJobChildListener listener);
 
 	/**
-	 * Add a listner for element events.
+	 * Add a listener for events related to this job.
 	 * 
 	 * @param listener
 	 */
@@ -91,8 +91,8 @@ public interface IPJob extends IPElement {
 	public IPProcess getProcessByIndex(String number);
 	
 	/**
-	 * Returns an array of the Processes comprised by this Job. Might return
-	 * <code>null</code> if no Processes have yet been assigned.
+	 * Returns an array of the Processes comprised by this Job. 
+	 * Returns an empty array if there are no processes.
 	 * 
 	 * @return The Processes in this Job.
 	 */
@@ -120,14 +120,14 @@ public interface IPJob extends IPElement {
 	public boolean isDebug();
 
 	/**
-	 * Remove a listener for child events.
+	 * Remove a listener for events relating to children of this job.
 	 * 
 	 * @param listener
 	 */
 	public void removeChildListener(IJobChildListener listener);
 	
 	/**
-	 * Remove a listener for element events.
+	 * Remove a listener for events relating to this job.
 	 * 
 	 * @param listener
 	 */

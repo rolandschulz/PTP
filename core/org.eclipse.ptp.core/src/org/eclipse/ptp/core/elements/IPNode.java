@@ -19,18 +19,22 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
-import org.eclipse.ptp.core.elements.listeners.INodeListener;
 import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
+import org.eclipse.ptp.core.elements.listeners.INodeListener;
 
 
 public interface IPNode extends IPElement {
 
 	/**
+	 * Add a listener for events related to children of this node.
+	 * 
 	 * @param listener
 	 */
 	public void addChildListener(INodeChildListener listener);
 
 	/**
+	 * Add a listener for events related to this node.
+	 * 
 	 * @param listener
 	 */
 	public void addElementListener(INodeListener listener);
@@ -53,6 +57,7 @@ public interface IPNode extends IPElement {
 
 	/**
 	 * Return any processes that are linked to this node
+	 * Returns an empty array if there are no processes.
 	 * 
 	 * @return array of processes
 	 */
@@ -66,11 +71,15 @@ public interface IPNode extends IPElement {
 	public NodeAttributes.State getState();
 
 	/**
+	 * Remove a listener for events related to children of this node.
+	 * 
 	 * @param listener
 	 */
 	public void removeChildListener(INodeChildListener listener);
 	
 	/**
+	 * Remove a listener for events related to this node.
+	 * 
 	 * @param listener
 	 */
 	public void removeElementListener(INodeListener listener);
