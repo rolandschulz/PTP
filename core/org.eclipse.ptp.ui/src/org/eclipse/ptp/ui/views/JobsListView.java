@@ -103,11 +103,10 @@ public class JobsListView extends ViewPart {
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
 		 */
 		public void handleEvent(IChangedJobEvent e) {
-			for (IPJob job : e.getJobs()) {
-				refresh(job);
-			}
+			update(e.getJobs().toArray(new IPJob[0]));
 			
 			// Refresh the terminate job button
+			// TODO: scalability bottleneck
 			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
 				public void run() {
 					terminateAllAction.updateTerminateJobState();
@@ -120,19 +119,21 @@ public class JobsListView extends ViewPart {
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(final INewJobEvent e) {
-			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
-				public void run() {
-					updateColumns(e.getJobs().iterator().next());
-				}
-			});
-			refresh(null);
+			if (fColumnsNeedUpdating) {
+				PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+					public void run() {
+						addColumns(viewer, e.getJobs().iterator().next());
+					}
+				});
+			}
+			refresh();
 		}
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
-			refresh(null);
+			refresh();
 		}
 	}
 	
@@ -186,6 +187,7 @@ public class JobsListView extends ViewPart {
 	private TerminateJobFromListAction terminateAllAction;
 	private IResourceManager fSelectedRM = null;
 	private IPQueue fSelectedQueue = null;
+	private boolean fColumnsNeedUpdating = false;
 
 	/*
 	 * Model listeners
@@ -223,15 +225,17 @@ public class JobsListView extends ViewPart {
 				 * Otherwise get jobs from all queues the RM knows about
 				 */
 				if (fSelectedRM != null) {
-					List<IPJob> jobList = new ArrayList<IPJob>();
-					for (IPQueue queue : fSelectedRM.getQueues()) {
-						for (IPJob job : queue.getJobs()) {
-							jobList.add(job);
-						}
-					}
-					return jobList.toArray(new IPJob[jobList.size()]);
+					return getAllJobs(fSelectedRM).toArray(new IPJob[0]);
 				}
-				return new Object[0];
+				/*
+				 * Otherwise get all jobs from all queues
+				 * TODO: should probably not do this!
+				 */
+				Set<IPJob> jobs = new HashSet<IPJob>();
+				for (IResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
+					jobs.addAll(getAllJobs(rm));
+				}
+				return jobs.toArray(new IPJob[0]);
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			}
@@ -292,7 +296,7 @@ public class JobsListView extends ViewPart {
 				if (oldRM != fSelectedRM) {
 					createColumns(viewer);
 				}
-				refresh(null);
+				refresh();
 			}
 
 			public void setDefault(IResourceManager rm) {
@@ -304,14 +308,14 @@ public class JobsListView extends ViewPart {
 	public TableViewer getViewer() {
 		return viewer;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
 	public void setFocus() {
 	}
-	
+
 	/**
 	 * @param tableViewer
 	 * @param fontMetrics
@@ -327,6 +331,10 @@ public class JobsListView extends ViewPart {
 			 */
 			@Override
 			public Image getImage(Object element) {
+				/*
+				 * If this is the state column, get the image, otherwise return
+				 * null and just use the text.
+				 */
 				if (attrDef == JobAttributes.getStateAttributeDefinition()) {
 					IWorkbenchAdapter adapter = (IWorkbenchAdapter)Platform.getAdapterManager().getAdapter(element, IWorkbenchAdapter.class);
 					if (adapter != null) {
@@ -341,6 +349,10 @@ public class JobsListView extends ViewPart {
 			 */
 			@Override
 			public String getText(Object element) {
+				/*
+				 * If this is not the state column, then use the attribute text.
+				 * If it is the state column, just return null an use the icon.
+				 */
 				IPJob job = (IPJob)element;
 				if (attrDef != JobAttributes.getStateAttributeDefinition()) {
 					IAttribute<?,?,?> attr = job.getAttribute(attrDef.getId());
@@ -369,9 +381,6 @@ public class JobsListView extends ViewPart {
 	 * @param job
 	 */
 	private void addColumns(TableViewer tableViewer, IPJob job) {
-		addColumn(JobAttributes.getStateAttributeDefinition(), false);
-		addColumn(ElementAttributes.getNameAttributeDefinition(), true);
-
 		if (job != null) {
 			for (IAttribute<?,?,?> attr : job.getAttributes()) {
 				IAttributeDefinition<?,?,?> attrDef = attr.getDefinition();
@@ -383,6 +392,14 @@ public class JobsListView extends ViewPart {
 	}
 	
 	/**
+	 * Create the columns for the table. This is done whenever the selection
+	 * in the RM view changes.
+	 * 
+	 * 1. Always create the state and name columns.
+	 * 2. Assume that job attributes from a single RM are always constant, so only
+	 *    look at the first job from any queue.
+	 * 3. Do this for each RM (if no RM selected)
+	 * 
 	 * @param tableViewer
 	 */
 	private void createColumns(TableViewer tableViewer) {
@@ -390,28 +407,74 @@ public class JobsListView extends ViewPart {
 			column.dispose();
 		}
 		colDefs.clear();
-		addColumns(tableViewer, getFirstJob());
+		
+		addColumn(JobAttributes.getStateAttributeDefinition(), false);
+		addColumn(ElementAttributes.getNameAttributeDefinition(), true);
+
+		IPJob[] jobs = getFirstJobs();
+		
+		if (jobs.length > 0) {
+			for (IPJob job : jobs) {
+				addColumns(tableViewer, job);
+			}
+			fColumnsNeedUpdating = false;
+		} else {
+			fColumnsNeedUpdating = true;
+		}
 	}
 	
 	/**
-	 * Finds the first job in the selected RM queue (or queues if no
-	 * queue is selected). The attributes from the job are used to create 
-	 * the viewer columns.
+	 * Find all jobs from all queues belonging to a RM
+	 * 
+	 * @param rm
+	 * @return set of jobs
+	 */
+	private Set<IPJob> getAllJobs(IResourceManager rm) {
+		Set<IPJob> jobList = new HashSet<IPJob>();
+		for (IPQueue queue : rm.getQueues()) {
+			for (IPJob job : queue.getJobs()) {
+				jobList.add(job);
+			}
+		}
+		return jobList;
+	}
+	
+	/**
+	 * Finds the first few jobs to use to create the table columns
+	 * If an RM queue is selected, just return the first job
+	 * If an RM is selected, return the first job from one of the queues 
+	 * If no RM is selected, return the first job from one of the queues in each RM
 	 * 
 	 * @return first job or null if there are no jobs
 	 */
-	private IPJob getFirstJob() {
+	private IPJob[] getFirstJobs() {
+		List<IPJob> jobsList = new ArrayList<IPJob>();
+		
 		if (fSelectedQueue != null) {
-			return getFirstJob(fSelectedQueue);
+			IPJob job = getFirstJob(fSelectedQueue);
+			if (job != null) {
+				jobsList.add(job);
+			}
 		} else if (fSelectedRM != null) {
 			for (IPQueue queue : fSelectedRM.getQueues()) {
 				IPJob job = getFirstJob(queue);
 				if (job != null) {
-					return job;
+					jobsList.add(job);
+					break;
+				}
+			}
+		} else {
+			for (IResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
+				for (IPQueue queue : rm.getQueues()) {
+					IPJob job = getFirstJob(queue);
+					if (job != null) {
+						jobsList.add(job);
+						break;
+					}
 				}
 			}
 		}
-		return null;
+		return jobsList.toArray(new IPJob[0]);
 	}
 	
 	/**
@@ -429,34 +492,31 @@ public class JobsListView extends ViewPart {
 	}
 	
 	/**
-	 * @param job
+	 * Refresh the viewer from the model.
 	 */
-	private void refresh(final IPJob job) {
-		PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				if (!viewer.getTable().isDisposed()) {
-					if (job != null) {
-						updateColumns(job);
-						viewer.refresh(job);
-					} else {
-						viewer.refresh();
-					}
+	private void refresh() {
+		if (!viewer.getTable().isDisposed()) {
+			PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					viewer.refresh();
 				}
-			}
-		});
-	}
-	
-	/**
-	 * @param job
-	 */
-	private void updateColumns(IPJob job) {
-		for (IAttribute<?,?,?> attr : job.getAttributes()) {
-			IAttributeDefinition<?,?,?> attrDef = attr.getDefinition();
-			if (!colDefs.contains(attrDef) && attrDef.getDisplay()) {
-				addColumn(attrDef, true);
-			}
+			});
 		}
-		viewer.getTable().layout(true);
+	}
+
+	/**
+	 * Update the viewer if the supplied jobs have changed
+	 * 
+	 * @param jobs array of jobs that have changed
+	 */
+	private void update(final IPJob[] jobs) {
+		if (!viewer.getTable().isDisposed()) {
+			PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					viewer.update(jobs, null);
+				}
+			});
+		}
 	}
 
 }
