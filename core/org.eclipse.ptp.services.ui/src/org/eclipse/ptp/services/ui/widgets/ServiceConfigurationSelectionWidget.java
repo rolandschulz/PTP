@@ -51,6 +51,15 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * Displays a tree view of service configurations so that the user can easily
  * see what services and providers are available in the configuration.
  * 
+ * Provides "Add...", "Remove", and "Rename" buttons to allow the creation,
+ * removal and renaming of service configurations. These buttons can be
+ * enabled/disabled by using the <code>buttons</code> parameter to the constructor.
+ * 
+ * The <code>excluded</code> constructor parameter can be used to supply a list
+ * of configurations to exclude from the list.
+ * 
+ * The whole control can be enabled/disabled using the <code>setEnabled</code> method.
+ * 
  */
 public class ServiceConfigurationSelectionWidget extends Composite implements ISelectionProvider {
 	/**
