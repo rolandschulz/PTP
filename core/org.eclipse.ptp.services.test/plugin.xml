@@ -88,7 +88,7 @@
       <command
             categoryId="org.eclipse.ptp.services.ui.commands.category"
             id="org.eclipse.ptp.services.ui.commands.launchWizard"
-            name="Launch Wizard...">
+            name="Configure...">
       </command>
       <command
             categoryId="org.eclipse.ptp.services.ui.commands.category"
