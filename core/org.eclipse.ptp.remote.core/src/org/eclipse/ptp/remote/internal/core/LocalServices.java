@@ -21,7 +21,8 @@ import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
 public class LocalServices implements IRemoteServicesDelegate {
 	public static final String LocalServicesId = "org.eclipse.ptp.remote.LocalServices"; //$NON-NLS-1$
 
-	private IRemoteConnectionManager connMgr;
+	private IRemoteConnectionManager connMgr = new LocalConnectionManager();
+	private IRemoteFileManager fileMgr = new LocalFileManager();
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getConnectionManager()
@@ -44,7 +45,7 @@ public class LocalServices implements IRemoteServicesDelegate {
 		if (!(conn instanceof LocalConnection)) {
 			return null;
 		}
-		return new LocalFileManager();
+		return fileMgr;
 	}
 	
 	/* (non-Javadoc)
@@ -73,16 +74,13 @@ public class LocalServices implements IRemoteServicesDelegate {
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#initialize()
 	 */
 	public void initialize() {
-		if (connMgr == null) {
-			connMgr = new LocalConnectionManager();
-		}
+		// No initialization to do
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#isInitialized()
 	 */
 	public boolean isInitialized() {
-		initialize();
-		return connMgr != null;
+		return true;
 	}
 }
