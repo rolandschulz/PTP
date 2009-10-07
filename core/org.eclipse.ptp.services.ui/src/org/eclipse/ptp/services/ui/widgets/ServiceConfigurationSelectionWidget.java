@@ -265,6 +265,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	@Override
 	public void setEnabled(boolean enabled) {
 		fEnabled = enabled;
+		updateControls();
 	}
 
 	/**
