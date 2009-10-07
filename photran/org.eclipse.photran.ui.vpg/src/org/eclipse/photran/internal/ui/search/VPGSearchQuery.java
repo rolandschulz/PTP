@@ -13,7 +13,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.search;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -24,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
@@ -33,6 +36,7 @@ import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
+import org.eclipse.ui.internal.Workbench;
 
 /**
  * An implementation of {@link ISearchQuery} that performs searches using
@@ -41,6 +45,7 @@ import org.eclipse.search.ui.ISearchResult;
  * 
  * @author Doug Schaefer
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
+ * @author Kurt Hendle
  */
 public class VPGSearchQuery implements ISearchQuery {
 
@@ -66,6 +71,7 @@ public class VPGSearchQuery implements ISearchQuery {
     private List<IResource> scope;
     private int searchFlags;
     private String origPatternStr;
+    private TreeSet<String> projectsWithRefactoringDisabled = new TreeSet<String>();
     
     public VPGSearchQuery(
             List<IResource> scope,
@@ -215,6 +221,12 @@ public class VPGSearchQuery implements ISearchQuery {
          *         false otherwise
          */
         private boolean shouldAccept(Definition def) {
+            //ignores references in projects which do not have refactoring enabled
+            if(!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(def.getTokenRef().getFile())){
+                projectsWithRefactoringDisabled.add(def.getTokenRef().getFile().getProject().getName());
+                return false;
+            }
+            
             if ((searchFlags & FIND_PROGRAM) != 0 &&
                 def.isMainProgram()) {
                 return true;
@@ -275,6 +287,27 @@ public class VPGSearchQuery implements ISearchQuery {
             for (IResource resource : scope) {
                 resource.accept(visitor);
             }
+            
+            Workbench.getInstance().getDisplay().asyncExec(new Runnable()
+            {
+                public void run()
+                {
+                    String projects = "\n";
+                    Iterator<String> iter = projectsWithRefactoringDisabled.descendingIterator();
+                    while(iter.hasNext())
+                    {
+                        projects += iter.next() + "\n";
+                    }
+                    
+                    MessageDialog.openWarning(
+                        Workbench.getInstance().getActiveWorkbenchWindow().getShell(),
+                        "Warning",
+                        "References in the following projects have been excluded from the search" +
+                        " results because Fortran analysis/refactoring is disabled:\n" + projects +
+                        "\nPlease enable Fortran analysis/refactoring for these projects if you wish" +
+                        " for their references to show in search results.");
+                }
+            });
             
         } catch (CoreException e) {
             return e.getStatus();
