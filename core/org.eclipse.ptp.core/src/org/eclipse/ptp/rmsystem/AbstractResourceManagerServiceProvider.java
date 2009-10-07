@@ -131,6 +131,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	
 	public AbstractResourceManagerServiceProvider(AbstractResourceManagerServiceProvider provider) {
 		super(provider);
+		setAutoStart(provider.getAutoStart());
 		setConnectionName(provider.getConnectionName());
 		setDescription(provider.getDescription());
 		setRemoteServicesId(provider.getRemoteServicesId());
