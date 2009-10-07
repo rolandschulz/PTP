@@ -53,10 +53,10 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * 
  * Provides "Add...", "Remove", and "Rename" buttons to allow the creation,
  * removal and renaming of service configurations. These buttons can be
- * enabled/disabled by using the <code>buttons</code> parameter to the constructor.
+ * enabled/disabled by using the <code>buttons</code> constructor parameter.
  * 
  * The <code>excluded</code> constructor parameter can be used to supply a list
- * of configurations to exclude from the list.
+ * of configurations to be exclude from the list.
  * 
  * The whole control can be enabled/disabled using the <code>setEnabled</code> method.
  * 
