@@ -129,6 +129,9 @@ public class Messages extends NLS {
 	public static String RMServicesConfigurationWizard_0;
 	public static String RMServicesConfigurationWizard_1;
 	public static String RMServicesConfigurationWizard_10;
+	public static String RMServicesConfigurationWizard_11;
+	public static String RMServicesConfigurationWizard_12;
+	public static String RMServicesConfigurationWizard_13;
 	public static String RMServicesConfigurationWizard_2;
 	public static String RMServicesConfigurationWizard_3;
 	public static String RMServicesConfigurationWizard_4;
