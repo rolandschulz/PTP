@@ -62,7 +62,7 @@
 		point="org.eclipse.ui.perspectives">
 		<perspective
 			icon="icons/parallel_perspective.gif"
-			class="org.eclipse.ptp.internal.ui.PRunPerspectiveFactory"
+			class="org.eclipse.ptp.internal.ui.PTPRuntimePerspectiveFactory"
 			name="%perspective.name"
 			id="org.eclipse.ptp.ui.PTPRunPerspective"/>
 	</extension>   
