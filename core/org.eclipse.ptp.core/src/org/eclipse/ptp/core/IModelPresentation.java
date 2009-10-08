@@ -22,9 +22,6 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 
 /**
  * @author rsqrd
- */
-/**
- * @author rsqrd
  *
  */
 public interface IModelPresentation {
