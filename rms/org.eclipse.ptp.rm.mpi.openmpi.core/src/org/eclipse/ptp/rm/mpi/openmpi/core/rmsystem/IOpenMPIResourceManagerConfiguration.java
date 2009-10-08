@@ -32,6 +32,20 @@ public interface IOpenMPIResourceManagerConfiguration extends IToolRMConfigurati
 	public String getDetectedVersion();
 
 	/**
+	 * Get the detected Open MPI major version.
+	 * 
+	 * @return the detected point version (default 0)
+	 */
+	public int getMajorVersion();
+
+	/**
+	 * Get the detected Open MPI minor version.
+	 * 
+	 * @return the detected point version (default 0)
+	 */
+	public int getMinorVersion();
+
+	/**
 	 * Get the detected Open MPI service version.
 	 * 
 	 * @return the detected point version (default 0)
