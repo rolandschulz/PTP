@@ -28,13 +28,14 @@ import org.eclipse.ptp.services.core.IServiceModelEvent;
 import org.eclipse.ptp.services.core.IServiceModelEventListener;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.IMemento;
 
 public abstract class AbstractResourceManagerServiceProvider 	
 	extends ServiceProvider 
-	implements IResourceManagerConfiguration
+	implements IResourceManagerConfiguration, IServiceProviderWorkingCopy
 {
 	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
@@ -47,6 +48,11 @@ public abstract class AbstractResourceManagerServiceProvider
 	private final IModelManager fModelManager = PTPCorePlugin.getDefault().getModelManager();
 	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
+	
+	/*
+	 * If we're a working copy, keep a copy of the original
+	 */
+	private IServiceProvider fServiceProvider = null;
 
 	/*
 	 * Keep a copy of our service configuration so we don't have to search for it
@@ -81,26 +87,29 @@ public abstract class AbstractResourceManagerServiceProvider
 	private IServiceModelEventListener fEventListener = new IServiceModelEventListener() {
 		
 		public void handleEvent(IServiceModelEvent event) {
-			IServiceConfiguration config = (IServiceConfiguration)event.getSource();
-			IServiceProvider provider = config.getServiceProvider(fLaunchService);
-			
-			/*
-			 * We get notified of events on any service configuration, so make sure that
-			 * we only respond to ours.
-			 */
-			final boolean ourEvent = (provider instanceof IResourceManagerConfiguration &&
-					((IResourceManagerConfiguration)provider).getUniqueName().equals(getUniqueName()));
-			
-			if (ourEvent) {
-				switch (event.getType()) {
-				case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED:
-					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());
+			switch (event.getType()) {
+			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
+				IServiceProvider provider = ((IServiceConfiguration)event.getSource()).getServiceProvider(fLaunchService);
+				if (provider instanceof IResourceManagerConfiguration &&
+						((IResourceManagerConfiguration)provider).getUniqueName().equals(getUniqueName())) {
+					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());;
 					if (rm != null) {
 						fModelManager.removeResourceManager((IResourceManagerControl)rm);
 					}
-					break;
+				}
+				break;
+			}
+				
+			case IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED: {
+				IServiceConfiguration config = (IServiceConfiguration)event.getSource();
+				IServiceProvider provider = config.getServiceProvider(fLaunchService);
+				if (provider instanceof IResourceManagerConfiguration &&
+						((IResourceManagerConfiguration)provider).getUniqueName().equals(getUniqueName())) {
+					/*
+					 * Generated when a new service provider is added to the configuration or
+					 * an existing service provider is replaced.
+					 */
 					
-				case IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED:
 					/*
 					 * Remove old resource manager if there was one
 					 */
@@ -113,14 +122,25 @@ public abstract class AbstractResourceManagerServiceProvider
 					}
 					
 					/*
-					 * Now, if we're being added, then add a new resource manager
+					 * Now add a new resource manager
 					 */
-					if (ourEvent) {
-						fModelManager.addResourceManager(createResourceManager());
-						fServiceConfiguration = config;
-					}
-					break;
+					fModelManager.addResourceManager(createResourceManager());
+					fServiceConfiguration = config;
 				}
+				break;
+			}
+			
+			case IServiceModelEvent.SERVICE_PROVIDER_CHANGED: {
+				IServiceProvider provider = (IServiceProvider)event.getSource();
+				if (provider instanceof IResourceManagerConfiguration &&
+						((IResourceManagerConfiguration)provider).getUniqueName().equals(getUniqueName())) {
+					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());;
+					if (rm != null) {
+						fModelManager.updateResourceManager(rm);
+					}
+				}
+				break;
+			}
 			}
 		}
 	};
@@ -129,20 +149,17 @@ public abstract class AbstractResourceManagerServiceProvider
 		registerListeners();
 	}
 	
-	public AbstractResourceManagerServiceProvider(AbstractResourceManagerServiceProvider provider) {
-		super(provider);
-		setAutoStart(provider.getAutoStart());
-		setConnectionName(provider.getConnectionName());
-		setDescription(provider.getDescription());
-		setRemoteServicesId(provider.getRemoteServicesId());
-		setResourceManagerId(provider.getResourceManagerId());
-		setName(provider.getName());
-		setUniqueName(null); // Generate another unique id
-		registerListeners();
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * Don't register listeners as this copy will just be discarded at some point.
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public AbstractResourceManagerServiceProvider(IServiceProvider provider) {
+		fServiceProvider = provider;
+		setProperties(provider.getProperties());
+		setDescriptor(provider.getDescriptor());
 	}
-	
-	@Override
-	public abstract Object clone();
 	
 	/**
 	 * Create a resource manager using this configuration.
@@ -238,7 +255,8 @@ public abstract class AbstractResourceManagerServiceProvider
 	public void registerListeners() {
 		fServiceManager.addEventListener(fEventListener, 
 				IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED |
-				IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED);
+				IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED |
+				IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
 		fModelManager.addListener(fModelListener);
 	}
 	
@@ -251,6 +269,15 @@ public abstract class AbstractResourceManagerServiceProvider
 		 *  bridge between RM configurations and service configurations.
 		 */
 		memento.putString(TAG_UNIQUE_NAME, getUniqueName());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#save()
+	 */
+	public void save() {
+		if (fServiceProvider != null) {
+			fServiceProvider.setProperties(getProperties());
+		}
 	}
 	
 	/* (non-Javadoc)
