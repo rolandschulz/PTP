@@ -415,17 +415,25 @@ public class Token implements IToken, IASTNode
     
     public static class FakeToken extends Token
     {
-    	private Token basedOn;
+    	private ScopingNode scope;
     	private FakeTokenRef tokenRef;
-    	
-    	public FakeToken(Token basedOn, String text)
-    	{
-    		super(basedOn);
-    		this.setText(text);
-    		this.basedOn = basedOn;
-    		this.tokenRef = new FakeTokenRef(basedOn.getTokenRef(), text);
-    	}
-    	    	
+        
+        public FakeToken(Token basedOn, String text)
+        {
+            super(basedOn);
+            this.setText(text);
+            this.scope = basedOn.getEnclosingScope();
+            this.tokenRef = new FakeTokenRef(basedOn.getTokenRef(), text);
+        }
+        
+        public FakeToken(ScopingNode scope, String text)
+        {
+            super(new Token(null, text));
+            this.setText(text);
+            this.scope = scope;
+            this.tokenRef = new FakeTokenRef(text);
+        }
+        
     	@Override public String getText()
     	{
     		return tokenRef.getText();
@@ -438,7 +446,7 @@ public class Token implements IToken, IASTNode
     	
         public List<PhotranTokenRef> manuallyResolveBinding()
         {
-        	return basedOn.getEnclosingScope().manuallyResolve(this);
+        	return scope.manuallyResolve(this);
         }
     	
     	private static class FakeTokenRef extends PhotranTokenRef
@@ -446,12 +454,17 @@ public class Token implements IToken, IASTNode
         	private static final long serialVersionUID = 1L;
         	
 			private String text;
-        	
-        	public FakeTokenRef(PhotranTokenRef basedOn, String text)
-        	{
-        		super(basedOn);
-        		this.text = text;
-        	}
+            
+            public FakeTokenRef(PhotranTokenRef basedOn, String text)
+            {
+                super(basedOn);
+                this.text = text;
+            }
+            
+            public FakeTokenRef(String text)
+            {
+                this(new PhotranTokenRef("", -1, -1), text);
+            }
         	
         	@Override public String getText()
         	{

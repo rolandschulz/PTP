@@ -44,7 +44,7 @@ public class ListAllModulesTestCase extends RefactoringTestCase
         importFile(DIR, "module4.f90");
         importFile(DIR, "use-module4.f90");
         PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
-        PhotranVPG.getDatabase().printOn(System.out);
+        //PhotranVPG.getDatabase().printOn(System.out);
     }
 
     public void testListAllModules() throws Exception

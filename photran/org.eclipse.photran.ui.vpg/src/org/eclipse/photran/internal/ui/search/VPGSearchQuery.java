@@ -47,6 +47,7 @@ import org.eclipse.ui.internal.Workbench;
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  * @author Kurt Hendle
  */
+@SuppressWarnings("restriction")
 public class VPGSearchQuery implements ISearchQuery {
 
     // First bit after the FINDs in PDOMSearchQuery.
@@ -288,26 +289,29 @@ public class VPGSearchQuery implements ISearchQuery {
                 resource.accept(visitor);
             }
             
-            Workbench.getInstance().getDisplay().asyncExec(new Runnable()
+            if (!PhotranVPG.inTestingMode() && Workbench.getInstance().getWorkbenchWindowCount() > 0)
             {
-                public void run()
+                Workbench.getInstance().getDisplay().asyncExec(new Runnable()
                 {
-                    String projects = "\n";
-                    Iterator<String> iter = projectsWithRefactoringDisabled.descendingIterator();
-                    while(iter.hasNext())
+                    public void run()
                     {
-                        projects += iter.next() + "\n";
+                        String projects = "\n";
+                        Iterator<String> iter = projectsWithRefactoringDisabled.descendingIterator();
+                        while(iter.hasNext())
+                        {
+                            projects += iter.next() + "\n";
+                        }
+                        
+                        MessageDialog.openWarning(
+                            Workbench.getInstance().getActiveWorkbenchWindow().getShell(),
+                            "Warning",
+                            "References in the following projects have been excluded from the search" +
+                            " results because Fortran analysis/refactoring is disabled:\n" + projects +
+                            "\nPlease enable Fortran analysis/refactoring for these projects if you wish" +
+                            " for their references to show in search results.");
                     }
-                    
-                    MessageDialog.openWarning(
-                        Workbench.getInstance().getActiveWorkbenchWindow().getShell(),
-                        "Warning",
-                        "References in the following projects have been excluded from the search" +
-                        " results because Fortran analysis/refactoring is disabled:\n" + projects +
-                        "\nPlease enable Fortran analysis/refactoring for these projects if you wish" +
-                        " for their references to show in search results.");
-                }
-            });
+                });
+            }
             
         } catch (CoreException e) {
             return e.getStatus();
