@@ -18,49 +18,41 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
+import org.eclipse.ptp.internal.core.events.ChangedResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public class ModelManager implements IModelManager {
-	public final static String EXTENSION_POINT_ID = "resourceManagers"; //$NON-NLS-1$
-	
 	private class RMStartupJob extends Job {
 		private IResourceManagerControl resourceManager;
 		
@@ -89,17 +81,10 @@ public class ModelManager implements IModelManager {
 		
 	}
 	
-	private IResourceManagerFactory[] resourceManagerFactories;
-	
 	private final ListenerList resourceManagerListeners = new ListenerList();
-
-	// protected IPMachine machine = null;
-	protected IPJob processRoot = null;
+	protected final IServiceModelManager fManager = ServiceModelManager.getInstance();
 
 	protected IPUniverseControl universe = new PUniverse();
-	protected ILaunchConfiguration config = null;
-	
-	protected final IServiceModelManager fManager = ServiceModelManager.getInstance();
 	
 	public ModelManager() {
 	}
@@ -126,60 +111,6 @@ public class ModelManager implements IModelManager {
 		for (IResourceManagerControl rm : rms) {
 			addResourceManager(rm);
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFactories()
-	 */
-	public IResourceManagerFactory[] getResourceManagerFactories()
-	{
-		if (resourceManagerFactories != null) {
-			return resourceManagerFactories;
-		}
-		
-		final ArrayList<AbstractResourceManagerFactory> factoryList = new ArrayList<AbstractResourceManagerFactory>();
-	
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPCorePlugin.getUniqueIdentifier(), EXTENSION_POINT_ID);
-		final IExtension[] extensions = extensionPoint.getExtensions();
-		
-		for (int iext = 0; iext < extensions.length; ++iext) {
-			final IExtension ext = extensions[iext];
-			
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-		
-			for (int i=0; i< elements.length; i++)
-			{
-				IConfigurationElement ce = elements[i];
-				try {
-					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
-					factory.setId(ce.getAttribute("id")); //$NON-NLS-1$
-					factory.setName(ce.getAttribute("name")); //$NON-NLS-1$
-					factoryList.add(factory);
-				} catch (CoreException e) {
-					PTPCorePlugin.log(e);
-				}
-			}
-		}
-		resourceManagerFactories =
-			(IResourceManagerFactory[]) factoryList.toArray(
-					new IResourceManagerFactory[factoryList.size()]);
-	
-		return resourceManagerFactories;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFactory(java.lang.String)
-	 */
-	public IResourceManagerFactory getResourceManagerFactory(String id)
-	{
-		IResourceManagerFactory[] factories = getResourceManagerFactories();
-		for (int i=0; i<factories.length; i++)
-		{
-			if (factories[i].getId().equals(id)) return factories[i];
-		}
-		
-		throw new RuntimeException(Messages.ModelManager_2);
 	}
 
 	/* (non-Javadoc)
@@ -310,6 +241,26 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#updateResourceManager(org.eclipse.ptp.core.elements.IResourceManager)
+	 */
+	public void updateResourceManager(IResourceManager rm) {
+		fireChangedResourceManager(Arrays.asList(rm));
+	}
+	
+	/**
+	 * Fire a changed resource manager event.
+	 * 
+	 * @param rms collection of resource managers
+	 */
+	private void fireChangedResourceManager(final Collection<IResourceManager> rms) {
+		IChangedResourceManagerEvent event = 
+			new ChangedResourceManagerEvent(this, rms);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener)listener).handleEvent(event);
+		}
+	}
+
 	/**
 	 * Fire a new resource manager event.
 	 * 
@@ -334,16 +285,6 @@ public class ModelManager implements IModelManager {
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IModelManagerChildListener)listener).handleEvent(event);
 		}
-	}
-
-	/**
-	 * Locate the resource managers configuration file.
-	 * 
-	 * @return
-	 */
-	private File getResourceManagersFile() {
-		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		return plugin.getStateLocation().append("resourceManagers.xml").toFile(); //$NON-NLS-1$
 	}
 
 	/**

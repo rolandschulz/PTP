@@ -23,8 +23,6 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
@@ -50,31 +48,13 @@ public interface IModelManager extends IModelPresentation {
 	public void addResourceManagers(IResourceManagerControl[] addedManagers);
 	
 	/**
-	 * Get the resource manager factories that have been registered via
-	 * extensions.
-	 * 
-	 * @return array of resource manager factories
-	 * @deprecated Replaced with {@link IServiceProvider}
-	 */
-	public IResourceManagerFactory[] getResourceManagerFactories();
-	
-	/**
-	 * Find the resource manager factory corresponding to the supplied ID.
-	 * 
-	 * @param id
-	 * @return the requested resource manager factory
-	 * @deprecated Replaced with {@link IServiceProvider}
-	 */
-	public IResourceManagerFactory getResourceManagerFactory(String id);
-
-	/**
 	 * Find the resource manager with the supplied unique name
 	 * 
 	 * @param rmUniqueName
 	 * @return resource manager
 	 */
 	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName);
-
+	
 	/**
 	 * Find resource managers that have been started
 	 * 
@@ -91,7 +71,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @throws CoreException
 	 */
 	public void loadResourceManagers() throws CoreException;
-	
+
 	/**
 	 * Remove listener for model manager child events.
 	 * 
@@ -118,7 +98,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @deprecated Resource manager persistence is handled by {@link ServiceModelManager}
 	 */
 	public void saveResourceManagers();
-
+	
 	/**
 	 * Shuts down the model manager. Should only be called at plugin shutdown.
 	 * @throws CoreException
@@ -138,4 +118,12 @@ public interface IModelManager extends IModelPresentation {
 	 * @throws CoreException
 	 */
 	public void stopResourceManagers() throws CoreException;
+
+	/**
+	 * Notify the model that the resource manager attributes
+	 * or configuration has been changed.
+	 * 
+	 * @param rm resource manager
+	 */
+	public void updateResourceManager(IResourceManager rm);
 }
