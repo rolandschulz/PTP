@@ -20,14 +20,7 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.ui.IMemento;
 
-public interface IResourceManagerConfiguration extends Cloneable {
-	/**
-	 * Create a copy of this configuration.
-	 * 
-	 * @return a copy of this configuration
-	 */
-	public Object clone();
-	
+public interface IResourceManagerConfiguration {
 	/**
 	 * Get the auto start flag for this resource manager. If the auto start
 	 * flag is set to true, an attempt will be made to start the resource
