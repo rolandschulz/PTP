@@ -9,11 +9,10 @@
  *    QNX - Initial API and implementation
  *    Markus Schorn (Wind River Systems)
  *    Ed Swartz (Nokia)
- *    Quillback: Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith 
+ *    Quillback: Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.search;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -42,7 +41,7 @@ import org.eclipse.ui.internal.Workbench;
  * An implementation of {@link ISearchQuery} that performs searches using
  * Photran's VPG.  Based on org.eclipse.cdt.internal.ui.search.PDOMSearchQuery
  * from CDT 5.0.
- * 
+ *
  * @author Doug Schaefer
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  * @author Kurt Hendle
@@ -60,11 +59,11 @@ public class VPGSearchQuery implements ISearchQuery {
     public static final int FIND_ALL_TYPES
         = FIND_PROGRAM | FIND_FUNCTION | FIND_VARIABLE
         | FIND_SUBROUTINE | FIND_COMMON_BLOCK | FIND_MODULE;
-    
+
     public static final int FIND_REFERENCES = 0x01;
     public static final int FIND_DECLARATIONS = 0x02;
     public static final int FIND_ALL_OCCURANCES = FIND_REFERENCES | FIND_DECLARATIONS;
-    
+
     protected ReferenceSearchResult result = new ReferenceSearchResult(this);
 
     private String scopeDesc;
@@ -73,7 +72,7 @@ public class VPGSearchQuery implements ISearchQuery {
     private int searchFlags;
     private String origPatternStr;
     private TreeSet<String> projectsWithRefactoringDisabled = new TreeSet<String>();
-    
+
     public VPGSearchQuery(
             List<IResource> scope,
             String scopeDesc,
@@ -84,7 +83,7 @@ public class VPGSearchQuery implements ISearchQuery {
         this.scope = scope;
         this.scopeDesc = scopeDesc;
         searchFlags = flags;
-        
+
         // remove spurious whitespace, which will make the search fail 100% of the time
         this.origPatternStr = patternStr.trim();
         this.patternStr = convertPattern(isRegex, origPatternStr);
@@ -121,7 +120,7 @@ public class VPGSearchQuery implements ISearchQuery {
         }
         return buff.toString();
     }
-    
+
     public String getLabel() {
         return "'"+origPatternStr+"' - " + result.getMatchCount() + " occurence(s) in " + scopeDesc;
     }
@@ -140,7 +139,7 @@ public class VPGSearchQuery implements ISearchQuery {
     /**
      * An IResourceVisitor to just count the number of nodes that we'll visit when searching through
      * the given resources.
-     * 
+     *
      * @author Quillback
      */
     private class VPGCountResourceVisitor implements IResourceVisitor {
@@ -157,7 +156,7 @@ public class VPGSearchQuery implements ISearchQuery {
     /**
      * An IResourceVisitor to search through the given resources for the identifier patternStr, and
      * return results in the ReferenceSearchResult returned by getSearchResult().
-     * 
+     *
      * @author Quillback
      */
     private class VPGSearchResourceVisitor implements IResourceVisitor {
@@ -184,7 +183,7 @@ public class VPGSearchQuery implements ISearchQuery {
             Token searchToken = new Token(Terminal.T_IDENT, patternStr);
             searchToken.setFile((IFile)resource);
 
-            for (ScopingNode sNode : ast.getRoot().getAllContainedScopes()) {    
+            for (ScopingNode sNode : ast.getRoot().getAllContainedScopes()) {
 
                 List<PhotranTokenRef> refs = sNode.manuallyResolve(searchToken);
                 for (PhotranTokenRef ref : refs) {
@@ -227,7 +226,7 @@ public class VPGSearchQuery implements ISearchQuery {
                 projectsWithRefactoringDisabled.add(def.getTokenRef().getFile().getProject().getName());
                 return false;
             }
-            
+
             if ((searchFlags & FIND_PROGRAM) != 0 &&
                 def.isMainProgram()) {
                 return true;
@@ -252,7 +251,7 @@ public class VPGSearchQuery implements ISearchQuery {
                 def.isCommon()) {
                 return true;
             }
-            
+
             return false;
         }
 
@@ -288,20 +287,20 @@ public class VPGSearchQuery implements ISearchQuery {
             for (IResource resource : scope) {
                 resource.accept(visitor);
             }
-            
+
             if (!PhotranVPG.inTestingMode() && Workbench.getInstance().getWorkbenchWindowCount() > 0)
             {
                 Workbench.getInstance().getDisplay().asyncExec(new Runnable()
                 {
                     public void run()
                     {
-                        String projects = "\n";
-                        Iterator<String> iter = projectsWithRefactoringDisabled.descendingIterator();
-                        while(iter.hasNext())
+                        StringBuilder projects = new StringBuilder();
+                        for (String project : projectsWithRefactoringDisabled)
                         {
-                            projects += iter.next() + "\n";
+                            projects.append(project);
+                            projects.append('\n');
                         }
-                        
+
                         MessageDialog.openWarning(
                             Workbench.getInstance().getActiveWorkbenchWindow().getShell(),
                             "Warning",
@@ -312,7 +311,7 @@ public class VPGSearchQuery implements ISearchQuery {
                     }
                 });
             }
-            
+
         } catch (CoreException e) {
             return e.getStatus();
         }
