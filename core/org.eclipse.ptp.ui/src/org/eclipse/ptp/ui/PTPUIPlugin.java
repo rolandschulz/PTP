@@ -56,8 +56,6 @@ import org.osgi.framework.BundleContext;
  */
 public class PTPUIPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
-    public static final String RM_EXTENSION_POINT_ID = "rmConfigurationWizards"; //$NON-NLS-1$
-    public static final String RMEXT_EXTENSION_POINT_ID = "rmConfigurationWizardExtensions"; //$NON-NLS-1$
     public static final String RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID = "runtimeModelPresentations"; //$NON-NLS-1$
     
 	//The shared instance.
@@ -238,7 +236,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
 		registerAdapterFactories();
-		retrieveConfigurationWizardPageFactories();
 		retrieveRuntimeModelPresentations();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
@@ -273,67 +270,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		factory = new WorkbenchAdapterAdapterFactory();
 		manager.registerAdapters(factory, IPElement.class);
 	}
-
-	/**
-	 * Locate and load wizard page factory extensions
-	 */
-	@SuppressWarnings("unchecked")
-	private void retrieveConfigurationWizardPageFactories() {
-    	configurationWizardPageFactories.clear();
-    	extensionWizardPageFactories.clear();
-    	
-    	HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extFactories = 
-    		new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
-    	
-    	IExtensionRegistry registry = Platform.getExtensionRegistry();
-
-    	/*
-    	 * First find all extension factories
-    	 */
-    	IExtensionPoint extWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RMEXT_EXTENSION_POINT_ID);
-		final IExtension[] extWizardExtensions = extWizardPoint.getExtensions();
-		
-		for (IExtension ext : extWizardExtensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-		
-			for (IConfigurationElement ce : elements) {
-				try {
-					RMConfigurationExtensionWizardPageFactory factory = (RMConfigurationExtensionWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
-					String id = ce.getAttribute("id"); //$NON-NLS-1$
-					ArrayList<RMConfigurationExtensionWizardPageFactory> list = extFactories.get(id);
-					if (id == null) {
-						list = new ArrayList<RMConfigurationExtensionWizardPageFactory>();
-						extFactories.put(id, list);
-					}
-					list.add(factory);
-				} catch (CoreException e) {
-					log(e);
-				}
-			}
-		}
-		
-		/*
-		 * Now find all wizard factories. Also keep a list of extension wizards for each wizard factory class.
-		 */
-    	IExtensionPoint confWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RM_EXTENSION_POINT_ID);
-		final IExtension[] confWizardExtensions = confWizardPoint.getExtensions();
-		
-		for (IExtension ext : confWizardExtensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-		
-			for (IConfigurationElement ce : elements) {
-				try {
-					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
-					Class rmFactoryClass = factory.getRMFactoryClass();
-					configurationWizardPageFactories.put(rmFactoryClass.getName(), factory);
-					extensionWizardPageFactories.put(rmFactoryClass.getName(), extFactories.get(ce.getAttribute("id"))); //$NON-NLS-1$
-				} catch (CoreException e) {
-					log(e);
-				}
-			}
-		}
-    }
-
 
 	/**
 	 * Locate and load runtime model presentation extensions
