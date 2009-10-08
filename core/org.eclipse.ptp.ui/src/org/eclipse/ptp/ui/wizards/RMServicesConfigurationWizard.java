@@ -39,6 +39,7 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
@@ -61,7 +62,11 @@ import org.eclipse.swt.widgets.Text;
 
 public class RMServicesConfigurationWizard extends Wizard implements IRMConfigurationWizard {
 
-	public class ResourceManagerPage extends WizardPage {
+	/**
+	 * Wizard page for common resource manager configuration.
+	 * This is the final page that the wizard will display.
+	 */
+	private class ResourceManagerPage extends WizardPage {
 
 		private Text descText;
 		private Text nameText;
@@ -161,6 +166,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			setPageComplete(true);
 		}
 
+		private void setAutoStart(boolean flag) {
+			autoStartButton.setSelection(flag);
+		}
+
 		private void setEnabled(boolean enabled) {
 			nameText.setEnabled(enabled);
 			descText.setEnabled(enabled);
@@ -171,12 +180,12 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			descText.setText(config.getDescription());
 			
 		}
-
-		private void setAutoStart(boolean flag) {
-			autoStartButton.setSelection(flag);
-		}
 	}
 	
+	/**
+	 * Wizard page for selecting a service configuration from a list
+	 * of service configurations.
+	 */
 	private class SelectServiceConfigurationPage extends WizardPage {
 
 		private ServiceConfigurationSelectionWidget serviceConfigWidget;
@@ -216,11 +225,18 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 				config = (IServiceConfiguration)path.getFirstSegment();
 			}
 			
-			serviceConfigurationSelected(config);
+			setServiceConfiguration(config);
 			setPageComplete(config != null);
 		}
 	}
 	
+	/**
+	 * Wizard page for selecting the resource manager type. 
+	 * 
+	 * Resource manager types correspond to service providers for
+	 * the Launch service that implement IResourceManagerConfiguration.
+	 *
+	 */
 	private class SelectServiceProviderPage extends WizardPage {
 
 		private List fServiceProviderList;
@@ -253,18 +269,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 		private void createServiceProviderChoiceControl(Composite container) {
 			/*
-			 * Locate all service providers that implement IResourceManagerConfiguration
+			 * Locate all service providers
+			 * 
+			 * TODO: This assumes all LAUNCH_SERVICE providers implement IResourceManagerConfiguration
+			 * 		 Probably better to create an RM_LAUNCH_SERVICE instead.
+			 * 
 			 */
 			IService launchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
-			ArrayList<IServiceProviderDescriptor> providerDescs = new ArrayList<IServiceProviderDescriptor>();
-			for (IServiceProviderDescriptor desc : launchService.getProvidersByPriority()) {
-				IServiceProvider provider = fModelManager.getServiceProvider(desc);
-				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					providerDescs.add(desc);
-				}
-			}
-			
-			fProviders = providerDescs.toArray(new IServiceProviderDescriptor[0]);
+			fProviders = launchService.getProvidersByPriority().toArray(new IServiceProviderDescriptor[0]);
 			String[] providerNames = new String[fProviders.length];
 			for (int i = 0; i < fProviders.length; ++i) {
 				providerNames[i] = fProviders[i].getName();
@@ -277,11 +289,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			fServiceProviderList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			fServiceProviderList.setItems(providerNames);
 			fServiceProviderList.setEnabled(fProviders.length > 0);
-			fServiceProviderList.addSelectionListener(new SelectionListener() {
-				public void widgetDefaultSelected(SelectionEvent e) {
-					// no-op
-				}
-
+			fServiceProviderList.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					handleProviderSelection();
 				}
@@ -289,7 +297,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		}
 
 		private void handleProviderSelection() {
-			serviceProviderSelected(fProviders[fServiceProviderList.getSelectionIndex()]);
+			setServiceProvider(fModelManager.getServiceProvider(fProviders[fServiceProviderList.getSelectionIndex()]));
 			setPageComplete(true);
 		}
 	}
@@ -304,8 +312,8 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private final IServiceModelManager fModelManager = ServiceModelManager.getInstance();
 
 	private Map<String, IWizardPage[]> fCachedPages = new HashMap<String, IWizardPage[]>();
-	private boolean fUseDefaultNameAndDesc;
-	private IResourceManagerControl fResourceManager = null;
+	private boolean fUseDefaultNameAndDesc = true;
+	private boolean fUsingWorkingCopy = false;
 	private IServiceConfiguration fServiceConfiguration = null; 
 	private IServiceProvider fServiceProvider = null;
 
@@ -320,7 +328,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 				Messages.RMServicesConfigurationWizard_9);
 		fResourceManagerPage = new ResourceManagerPage(
 				Messages.RMServicesConfigurationWizard_10);
-		fUseDefaultNameAndDesc = true;
 		fLaunchService = fModelManager.getService(IServiceConstants.LAUNCH_SERVICE);
 		setWizardPages(null);
 	}
@@ -330,24 +337,16 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	public RMServicesConfigurationWizard(IResourceManagerControl resourceManager) {
 		this();
-		setConfiguration((IResourceManagerConfiguration)resourceManager.getConfiguration().clone());
 		fUseDefaultNameAndDesc = false;
-		fResourceManager = resourceManager;
-		for (IServiceConfiguration config : fModelManager.getConfigurations()) {
-			IServiceProvider provider = config.getServiceProvider(fLaunchService);
-			if (provider != null && provider.getId().equals(getServiceProvider().getId())) {
-				fServiceConfiguration = config;
-				break;
-			}
-		}
-		setWizardPages(getServiceProvider().getDescriptor());
+		fUsingWorkingCopy = true;
+		setServiceProvider(((IServiceProvider)resourceManager.getConfiguration()).copy());
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#addPages()
 	 */
 	public void addPages() {
-		if (fResourceManager == null) {
+		if (!fUsingWorkingCopy) {
 			addPage(fSelectServiceConfigurationPage);
 			addPage(fSelectServiceProviderPage);
 		}
@@ -438,7 +437,11 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		if (fUseDefaultNameAndDesc) {
 			getConfiguration().setDefaultNameAndDesc();
 		}
-		fServiceConfiguration.setServiceProvider(fLaunchService, getServiceProvider());
+		if (fUsingWorkingCopy) {
+			((IServiceProviderWorkingCopy)getServiceProvider()).save();
+		} else {
+			getServiceConfiguration().setServiceProvider(fLaunchService, getServiceProvider());
+		}
 		return true;
 	}
 
@@ -452,6 +455,13 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	/**
 	 * @return
 	 */
+	private IServiceConfiguration getServiceConfiguration() {
+		return fServiceConfiguration;
+	}
+	
+	/**
+	 * @return
+	 */
 	private IServiceProvider getServiceProvider() {
 		return fServiceProvider;
 	}
@@ -459,30 +469,16 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	/**
 	 * @param config
 	 */
-	private void serviceConfigurationSelected(IServiceConfiguration config) {
+	private void setServiceConfiguration(IServiceConfiguration config) {
 		fServiceConfiguration = config;
 	}
 	
-	/**
-	 * @param desc
-	 */
-	private void serviceProviderSelected(IServiceProviderDescriptor desc) {
-		setServiceProvider(fModelManager.getServiceProvider(desc));
-		setWizardPages(desc);
-	}
-	
-	/**
-	 * @param config
-	 */
-	private void setConfiguration(IResourceManagerConfiguration config) {
-		fServiceProvider = (IServiceProvider)config;
-	}
-
 	/**
 	 * @param provider
 	 */
 	private void setServiceProvider(IServiceProvider provider) {
 		fServiceProvider = provider;
+		setWizardPages(provider.getDescriptor());
 	}
 
 	private void setWizardPages(IServiceProviderDescriptor desc) {
@@ -505,7 +501,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		}
 
 		fWizardPages.clear();
-		if (fResourceManager == null) {
+		if (!fUsingWorkingCopy) {
 			fWizardPages.add(fSelectServiceConfigurationPage);
 			fWizardPages.add(fSelectServiceProviderPage);
 		}
