@@ -135,7 +135,7 @@ public class ResourceManagerView extends ViewPart {
 		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
 		 */
 		public void handleEvent(IChangedResourceManagerEvent e) {
-			// No need to do anything
+			updateViewer(e.getResourceManagers().toArray(new IResourceManager[0]));
 		}
 
 		/* (non-Javadoc)
@@ -146,10 +146,7 @@ public class ResourceManagerView extends ViewPart {
 			resourceManagers.add(resourceManager);
 			resourceManager.addElementListener(rmListener);
 			resourceManager.addChildListener(rmChildListener);
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
-				public void run() {
-					refreshViewer(PTPCorePlugin.getDefault().getUniverse());
-				}});
+			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 		}
 
 		/* (non-Javadoc)
@@ -161,10 +158,7 @@ public class ResourceManagerView extends ViewPart {
 			resourceManager.removeElementListener(rmListener);
 			resourceManager.removeChildListener(rmChildListener);
 			rmChildListener.removeListeners(resourceManager);
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
-				public void run() {
-					refreshViewer(PTPCorePlugin.getDefault().getUniverse());
-				}});
+			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 		}
 	}
 	
@@ -490,7 +484,6 @@ public class ResourceManagerView extends ViewPart {
 	
 	public void refreshViewer() {
 		ISafeRunnable safeRunnable = new SafeRunnable(){
-
 			public void run() throws Exception {
 				viewer.refresh();
 			}
@@ -500,7 +493,6 @@ public class ResourceManagerView extends ViewPart {
 
 	public void refreshViewer(final IPElement element) {
 		ISafeRunnable safeRunnable = new SafeRunnable(){
-
 			public void run() throws Exception {
 				viewer.refresh(element);
 			}
@@ -511,12 +503,20 @@ public class ResourceManagerView extends ViewPart {
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-
+	
 	public void updateViewer(final IPElement element) {
 		ISafeRunnable safeRunnable = new SafeRunnable(){
-
 			public void run() throws Exception {
 				viewer.update(element, null);
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+	
+	public void updateViewer(final IPElement[] elements) {
+		ISafeRunnable safeRunnable = new SafeRunnable(){
+			public void run() throws Exception {
+				viewer.update(elements, null);
 			}
 		};
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
