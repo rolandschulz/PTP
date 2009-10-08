@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -30,6 +31,8 @@ import org.eclipse.core.runtime.IAdaptable;
  * @see IService
  */
 public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable {
+	public IServiceProviderWorkingCopy copy();
+	
 	/**
 	 * Returns the boolean value of the given key.
 	 * 
@@ -64,6 +67,14 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	public int getInt(String key, int defaultValue);
 	
 	/**
+	 * Returns an unmodifiable view of the properties that apply 
+	 * to this service provider.
+	 * 
+	 * @return map containing the properties
+	 */
+	public Map<String, String> getProperties();
+	
+	/**
 	 * Returns the string value of the given key.
 	 * 
 	 * @param key the key
@@ -78,10 +89,12 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	 * @return true if provider has been configured
 	 */
 	public boolean isConfigured();
-	
+
 	/**
 	 * Returns a set of all the property keys that apply to this
 	 * service provider.
+	 * 
+	 * @deprecated use <code>getProperties().keySet()</code> instead.
 	 */
 	public Set<String> keySet();
 
@@ -93,7 +106,6 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	 */
 	public void putBoolean(String key, boolean value);
 	
-	
 	/**
 	 * Sets the value of the given key to the given int
 	 * 
@@ -101,7 +113,7 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	 * @param value the value
 	 */
 	public void putInt(String key, int value);
-	
+
 	/**
 	 * Sets the value of the given key to the given string
 	 * 
@@ -116,5 +128,14 @@ public interface IServiceProvider extends IServiceProviderDescriptor, IAdaptable
 	 * @param descriptor descriptor to set
 	 */
 	public void setDescriptor(IServiceProviderDescriptor descriptor);
+	
+	/**
+	 * Add the properties in the supplied map to the properties
+	 * of the service provider. Will replace any properties of
+	 * the same name.
+	 * 
+	 * @param map map containing the properties to be added.
+	 */
+	public void setProperties(Map<String, String> map);
 	
 }
