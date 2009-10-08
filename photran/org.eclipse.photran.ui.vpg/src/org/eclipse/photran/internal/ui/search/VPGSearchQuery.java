@@ -289,7 +289,9 @@ public class VPGSearchQuery implements ISearchQuery {
                 resource.accept(visitor);
             }
 
-            if (!PhotranVPG.inTestingMode() && Workbench.getInstance().getWorkbenchWindowCount() > 0)
+            if (!PhotranVPG.inTestingMode()
+                && Workbench.getInstance().getWorkbenchWindowCount() > 0
+                && !projectsWithRefactoringDisabled.isEmpty())
             {
                 Workbench.getInstance().getDisplay().asyncExec(new Runnable()
                 {
