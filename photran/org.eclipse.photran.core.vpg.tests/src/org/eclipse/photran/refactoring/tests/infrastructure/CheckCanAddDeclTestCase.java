@@ -33,11 +33,11 @@ import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 public class CheckCanAddDeclTestCase extends RefactoringTestCase
 {
     private static final String DIR = "check-can-add-test-code";
-    
+
     private ASTMainProgramNode mainProgram;
     private ASTSubroutineSubprogramNode internalSubroutine;
     private ASTModuleNode module;
-    
+
     @Override public void setUp() throws Exception
     {
         super.setUp();
@@ -45,16 +45,16 @@ public class CheckCanAddDeclTestCase extends RefactoringTestCase
         IFile main_f90 = importFile(DIR, "main.f90");
         IFile module_f90 = importFile(DIR, "module.f90");
         PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
-        
+
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        compileAndRunFortranProgram();
+        //compileAndRunFortranProgram();
 
         PhotranVPG vpg = PhotranVPG.getInstance();
         IFortranAST mainFileAST = vpg.acquireTransientAST(main_f90);
         IFortranAST moduleFileAST = vpg.acquireTransientAST(module_f90);
         assertNotNull(mainFileAST);
         assertNotNull(moduleFileAST);
-        
+
         mainProgram = mainFileAST.findFirstTokenOnLine(1).findNearestAncestor(ASTMainProgramNode.class);
         internalSubroutine = mainFileAST.findFirstTokenOnLine(23).findNearestAncestor(ASTSubroutineSubprogramNode.class);
         module = moduleFileAST.findFirstTokenOnLine(1).findNearestAncestor(ASTModuleNode.class);
@@ -97,11 +97,11 @@ public class CheckCanAddDeclTestCase extends RefactoringTestCase
             protected void runTest()
             {
                 assertFalse(canAdd("private_module_subroutine"));
-                
+
                 // These are the same as above, since declaring these in the module
                 // will cause them to be imported into the main program, preventing
                 // the main program from redeclaring them
-                
+
                 assertTrue(canAdd("something_new"));
                 assertFalse(canAdd("assigned_local_variable"));
                 assertFalse(canAdd("AsSiGnEd_LoCaL_vArIaBlE"));
@@ -132,7 +132,7 @@ public class CheckCanAddDeclTestCase extends RefactoringTestCase
                 assertFalse(canAdd("internal_subroutine"));
                 assertFalse(canAdd("local_variable_accessed_from_internal_subroutine"));
                 assertTrue(canAdd("private_module_subroutine"));
-                
+
                 // These will shadow declarations in an outer scope, but since they're not
                 // referenced, that is OK
                 assertTrue(canAdd("assigned_local_variable"));
@@ -151,11 +151,11 @@ public class CheckCanAddDeclTestCase extends RefactoringTestCase
             }
         }.runTest();
     }
-    
+
     /**
      * This is intended to be subclassed in order to gain access to the protected methods of
      * {@link AbstractFortranRefactoring} to test those methods.
-     * 
+     *
      * @author Jeff Overbey
      */
     private class FauxFortranRefactoring extends AbstractFortranRefactoring
@@ -164,7 +164,7 @@ public class CheckCanAddDeclTestCase extends RefactoringTestCase
         {
             this.vpg = PhotranVPG.getInstance();
         }
-        
+
         @Override
         protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm)
             throws PreconditionFailure
