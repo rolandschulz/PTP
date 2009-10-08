@@ -17,8 +17,9 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
- * This event is generated when the attributes on one or more resource managers have changed. It is
- * a bulk event that is sent to child listeners on the model manager.
+ * This event is generated when the attributes or configuration of one or more 
+ * resource managers have changed. It is a bulk event that is sent to child listeners 
+ * on the model manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IModelManagerChildListener
  */
