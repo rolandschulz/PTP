@@ -54,12 +54,19 @@ public interface IServiceModelEvent {
 	 * will return an instance of IServiceModelManager.
 	 */
 	public static final int SERVICE_MODEL_LOADED = 				0x020;
+	
+	/**
+	 * Event type that can be used to indicate that a service provider
+	 * has been modified. For this type of event, {@link #getSource()}
+	 * will return an instance of IServiceProvider.
+	 */
+	public static final int SERVICE_PROVIDER_CHANGED =			0x040;
 
 	/**
 	 * Event type that can be used to indicate that notification of all
 	 * types of events is requested.
 	 */
-	public static final int ALL_EVENTS = 						0x03f;
+	public static final int ALL_EVENTS = 						0x07f;
 
 	/**
 	 * Returns an object identifying the source of this event.
