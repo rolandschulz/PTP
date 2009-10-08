@@ -18,6 +18,8 @@ import org.eclipse.ptp.rm.pbs.core.PBSPreferenceManager;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 
 /**
@@ -29,29 +31,27 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	private static final String TAG_PBSD_DEFAULTS = "pbsdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	
-	private Preferences preferences;
+	private Preferences preferences = PBSPreferenceManager.getPreferences();
 
-	public PBSServiceProvider() 
-	{
+	public PBSServiceProvider() {
 		super();
-		preferences = PBSPreferenceManager.getPreferences();
 		setDescription("PBS Resource Manager"); //$NON-NLS-1$
 	}
 
-	public PBSServiceProvider(PBSServiceProvider provider)
-	{
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public PBSServiceProvider(IServiceProvider provider) {
 		super(provider);
-		preferences = PBSPreferenceManager.getPreferences();
-		setPBSdArgs(provider.getPBSdArgs());
-		setPBSdPath(provider.getPBSdPath());
-		setUseDefaults(provider.getUseDefaults());
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#clone()
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
 	 */
 	@Override
-	public Object clone() {
+	public IServiceProviderWorkingCopy copy() {
 		return new PBSServiceProvider(this);
 	}
 	
@@ -78,21 +78,21 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		return getString(TAG_PBSD_PATH, preferences.getString(EMPTY_STRING));
 	}
 	
-    /* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
 	 */
 	@Override
 	public String getResourceManagerId() {
 		return getId();
 	}
-    
-	/* (non-Javadoc)
+	
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration#getUseDefaults()
 	 */
 	public boolean getUseDefaults() {
 		return getBoolean(TAG_PBSD_DEFAULTS, true);
 	}
-	
+    
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */

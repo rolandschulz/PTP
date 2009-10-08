@@ -19,6 +19,8 @@ import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 
 /**
@@ -49,50 +51,30 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	private static final String TAG_MAX_NODE_POLL = "LL_MNodePollInterval"; //$NON-NLS-1$
 	private static final String TAG_JOB_POLL = "LL_JobPollInterval"; //$NON-NLS-1$
 	
-	private Preferences preferences;
+	private Preferences preferences = IBMLLPreferenceManager.getPreferences();
 	
 	public LLServiceProvider() {
 		super();
-		preferences = IBMLLPreferenceManager.getPreferences();
 		setDescription("IBM LL Resource Manager"); //$NON-NLS-1$
 	}
-	
-	public LLServiceProvider(LLServiceProvider provider)	{
+
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public LLServiceProvider(IServiceProvider provider)	{
 		super(provider);
-		preferences = IBMLLPreferenceManager.getPreferences();
-		setArgsMessage(provider.getArgsMessage());
-		setDebugLoop(provider.getDebugLoop());
-		setDefaultMulticluster(provider.getDefaultMulticluster());
-		setErrorMessage(provider.getErrorMessage());
-		setFatalMessage(provider.getFatalMessage());
-		setForceProxyLocal(provider.getForceProxyLocal());
-		setForceProxyMulticluster(provider.getForceProxyMulticluster());
-		setGuiArgsMessage(provider.getGuiArgsMessage());
-		setGuiErrorMessage(provider.getGuiErrorMessage());
-		setGuiFatalMessage(provider.getGuiFatalMessage());
-		setGuiInfoMessage(provider.getGuiInfoMessage());
-		setGuiTraceMessage(provider.getGuiTraceMessage());
-		setGuiWarningMessage(provider.getGuiWarningMessage());
-		setInfoMessage(provider.getInfoMessage());
-		setJobPolling(provider.getJobPolling());
-		setLibraryPath(provider.getLibraryPath());
-		setMaxNodePolling(provider.getMaxNodePolling());
-		setMinNodePolling(provider.getMinNodePolling());
-		setSuppressTemplateWrite(provider.getSuppressTemplateWrite());
-		setTemplateFile(provider.getTemplateFile());
-		setTemplateWriteAlways(provider.getTemplateWriteAlways());
-		setTraceOption(provider.getTraceOption());
-		setWarningMessage(provider.getWarningMessage());
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#clone()
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
 	 */
 	@Override
-	public Object clone() {
+	public IServiceProviderWorkingCopy copy() {
 		return new LLServiceProvider(this);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
 	 */
@@ -437,7 +419,7 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	public void setTemplateWriteAlways(String option) {
 		putString(TAG_TEMPLATE_WRITE_ALWAYS, option);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.ibm.ll.ui.IIBMLLResourceManagerConfiguration#setTraceOption(java.lang.String)
 	 */

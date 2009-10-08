@@ -17,18 +17,11 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider implements IMPICH2ResourceManagerConfiguration {
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
-	/*
-	 * Actual version that is used to select correct commands. This version
-	 * only persists while the RM is running.
-	 */
-	private int majorVersion = 0;
-	private int minorVersion = 0;
-	private int serviceVersion = 0;
-	
 	public MPICH2ServiceProvider() {
 		super(MPICH2_CAPABILITIES);
 
@@ -41,23 +34,23 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 		setRemoteInstallPath(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 	}
 	
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
 	public MPICH2ServiceProvider(MPICH2ServiceProvider provider) {
 		super(provider);
-		provider.setLaunchCmd(getLaunchCmd());
-		provider.setDebugCmd(getDebugCmd());
-		provider.setDiscoverCmd(getDiscoverCmd());
-		provider.setPeriodicMonitorCmd(getPeriodicMonitorCmd());
-		provider.setPeriodicMonitorTime(getPeriodicMonitorTime());
-		provider.setRemoteInstallPath(getRemoteInstallPath());
-		provider.setVersionId(getVersionId());
-		provider.setDescription(getDescription());
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
+	 */
 	@Override
-	public Object clone() {
+	public IServiceProviderWorkingCopy copy() {
 		return new MPICH2ServiceProvider(this);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
 	 */

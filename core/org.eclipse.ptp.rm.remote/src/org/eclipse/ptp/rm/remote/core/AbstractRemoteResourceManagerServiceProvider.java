@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 public abstract class AbstractRemoteResourceManagerServiceProvider extends AbstractResourceManagerServiceProvider implements IRemoteResourceManagerConfiguration
 {
@@ -27,14 +28,15 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	public AbstractRemoteResourceManagerServiceProvider() {
 	}
 
-	public AbstractRemoteResourceManagerServiceProvider(AbstractRemoteResourceManagerServiceProvider provider) {
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public AbstractRemoteResourceManagerServiceProvider(IServiceProvider provider) {
 		super(provider);
-		setInvocationOptions(provider.getInvocationOptionsStr());
-		setLocalAddress(provider.getLocalAddress());
-		setOptions(provider.getOptions());
-		setProxyServerPath(provider.getProxyServerPath());
 	}
-	
+
 	/**
 	 * Append invocation options to existing options. The contents of optionString are 
 	 * split into space separated strings.
