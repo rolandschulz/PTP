@@ -183,12 +183,13 @@ public class VPGSearchQuery implements ISearchQuery {
             Token searchToken = new Token(Terminal.T_IDENT, patternStr);
             searchToken.setFile((IFile)resource);
 
-            for (ScopingNode sNode : ast.getRoot().getAllContainedScopes()) {
-
-                List<PhotranTokenRef> refs = sNode.manuallyResolve(searchToken);
-                for (PhotranTokenRef ref : refs) {
-                    if (ref.getOffset() >= 0 && ref.getLength() >= 0) {
-                        foundDefinition(ref);
+            if (ast.getRoot().getEmptyProgram() == null) { // manuallyResolve errs on empty file
+                for (ScopingNode sNode : ast.getRoot().getAllContainedScopes()) {
+                    List<PhotranTokenRef> refs = sNode.manuallyResolve(searchToken);
+                    for (PhotranTokenRef ref : refs) {
+                        if (ref.getOffset() >= 0 && ref.getLength() >= 0) {
+                            foundDefinition(ref);
+                        }
                     }
                 }
             }
