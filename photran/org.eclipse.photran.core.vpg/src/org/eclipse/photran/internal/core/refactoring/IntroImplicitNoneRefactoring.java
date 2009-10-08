@@ -26,6 +26,7 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -34,9 +35,9 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFile
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 
 /**
- * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all implicitly-declared variables
- * into a scope and all nested scopes (where needed).
- *
+ * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all
+ * implicitly-declared variables into a scope and all nested scopes (where needed).
+ * 
  * @author Jeff Overbey, Timofey Yuvashev
  */
 public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
@@ -52,46 +53,52 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
         return "Introduce Implicit None";
     }
 
-    /*public String getScopeDescription()
-    {
-    	return selectedScope == null || selectedScope.getHeaderStmt() == null
-    		? "the selected scope..."
-    		: "\n" + SourcePrinter.getSourceCodeFromASTNode(selectedScope.getHeaderStmt());
-    }*/
+    /*
+     * public String getScopeDescription() { return selectedScope == null ||
+     * selectedScope.getHeaderStmt() == null ? "the selected scope..." : "\n" +
+     * SourcePrinter.getSourceCodeFromASTNode(selectedScope.getHeaderStmt()); }
+     */
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm)
+        throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
         removeFixedFormFilesFrom(this.selectedFiles, status);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Final Preconditions & Change Creation
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
+        throws PreconditionFailure
     {
         logVPGErrors(status);
 
         try
         {
-            for(IFile f : this.selectedFiles)
+            for (IFile f : this.selectedFiles)
             {
                 IFortranAST tempAST = this.vpg.acquirePermanentAST(f);
                 if (tempAST == null)
-                    status.addError("One of the selected files (" + f.getName() +") cannot be parsed.");
+                {
+                    status.addError(
+                        "One of the selected files ("
+                        + f.getName()
+                        + ") cannot be parsed.");
+                }
                 else
                 {
                     introduceImplicitNoneInFile(pm, tempAST.getRoot(), tempAST, f);
                     vpg.releaseAST(f);
                 }
-                
+
             }
         }
         finally
@@ -101,27 +108,27 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     }
 
     @SuppressWarnings("unchecked")
-    private void introduceImplicitNoneInFile(IProgressMonitor progressMonitor,
-                                             ScopingNode scopeNode,
-                                             IFortranAST ast,
-                                             IFile file)
+    private void introduceImplicitNoneInFile(
+        IProgressMonitor progressMonitor,
+        ScopingNode scopeNode,
+        IFortranAST ast,
+        IFile file)
     {
         assert scopeNode != null;
-        //Get all scopes contained in the file
+        // Get all scopes contained in the file
         List<ScopingNode> nodeList = scopeNode.getAllContainedScopes();
 
         for (ScopingNode scope : nodeList)
         {
             if (!(scope instanceof ASTExecutableProgramNode)
-                &&  !(scope instanceof ASTDerivedTypeDefNode)
-                &&  !scope.isImplicitNone())
+                && !(scope instanceof ASTDerivedTypeDefNode) && !scope.isImplicitNone())
             {
                 ASTImplicitStmtNode implicitStmt = findExistingImplicitStatement(scope);
                 if (implicitStmt != null) implicitStmt.removeFromTree();
 
                 IASTListNode<IBodyConstruct> newDeclarations = constructDeclarations(scope);
                 IASTListNode<IASTNode> body = (IASTListNode<IASTNode>)scope.getOrCreateBody();
-                body.addAll(0, newDeclarations);
+                body.addAll(findIndexOfLastUseStmtIn(body)+1, newDeclarations);
                 Reindenter.reindent(newDeclarations, ast);
             }
         }
@@ -150,52 +157,69 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
         return null;
     }
 
+    private int findIndexOfLastUseStmtIn(IASTListNode<IASTNode> body)
+    {
+        int result = -1;
+        
+        for (int i = 0; i < body.size(); i++)
+        {
+            if (body.get(i) instanceof ASTUseStmtNode)
+                result = i;
+            else
+                break; // USE statements precede all other statements, so we can stop here
+        }
+        
+        return result;
+    }
+
     private IASTListNode<IBodyConstruct> constructDeclarations(final ScopingNode scope)
     {
         final ArrayList<Definition> definitions = new ArrayList<Definition>(16);
 
         for (Definition def : scope.getAllDefinitions())
-        	if (def != null && def.isImplicit())
-        		definitions.add(def);
+            if (def != null && def.isImplicit()) definitions.add(def);
 
         StringBuilder newStmts = new StringBuilder();
         newStmts.append("implicit none" + EOL);
         for (Definition def : sort(definitions))
-        	newStmts.append(constructDeclaration(def));
+            newStmts.append(constructDeclaration(def));
         return parseLiteralStatementSequence(newStmts.toString());
     }
 
     private ArrayList<Definition> sort(ArrayList<Definition> array)
     {
-        for (int indexOfElementToInsert = 1; indexOfElementToInsert < array.size(); indexOfElementToInsert++)
+        for (int indexOfElementToInsert = 1;
+             indexOfElementToInsert < array.size();
+             indexOfElementToInsert++)
         {
             Definition def = array.get(indexOfElementToInsert);
-            int targetIndex = findIndexToInsertAt(array, indexOfElementToInsert);
+            int targetIndex = findInsertionIndexForSorting(array, indexOfElementToInsert);
             for (int i = indexOfElementToInsert - 1; i >= targetIndex; i--)
-                array.set(i+1, array.get(i));
+                array.set(i + 1, array.get(i));
             array.set(targetIndex, def);
         }
         return array;
     }
 
-    private int findIndexToInsertAt(ArrayList<Definition> array, int indexOfElementToInsert)
+    private int findInsertionIndexForSorting(ArrayList<Definition> array, int indexOfElementToInsert)
     {
         for (int beforeIndex = 0; beforeIndex < indexOfElementToInsert; beforeIndex++)
-            if (array.get(indexOfElementToInsert).getCanonicalizedName().compareTo(array.get(beforeIndex).getCanonicalizedName()) < 0)
-                return beforeIndex;
+            if (array.get(indexOfElementToInsert).getCanonicalizedName().compareTo(
+                array.get(beforeIndex).getCanonicalizedName()) < 0) return beforeIndex;
 
         return indexOfElementToInsert;
     }
 
-	private String constructDeclaration(final Definition def)
-	{
-		Type type = def.getType();
-		String typeString = type == null ? "type(unknown)" : type.toString(); // TODO
-		return typeString + " :: " + def.getCanonicalizedName() + EOL;
-	}
+    private String constructDeclaration(final Definition def)
+    {
+        Type type = def.getType();
+        String typeString = type == null ? "type(unknown)" : type.toString(); // TODO
+        return typeString + " :: " + def.getCanonicalizedName() + EOL;
+    }
 
     @Override
-    protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException, OperationCanceledException
+    protected void doCreateChange(IProgressMonitor progressMonitor) throws CoreException,
+        OperationCanceledException
     {
         // Change creation done in #doCheckFinalConditions
     }
