@@ -20,6 +20,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implements IOpenMPIResourceManagerConfiguration {
 
@@ -53,21 +54,22 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
 	
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
 	public OpenMPIServiceProvider(OpenMPIServiceProvider provider) {
 		super(provider);
-		provider.setLaunchCmd(getLaunchCmd());
-		provider.setDebugCmd(getDebugCmd());
-		provider.setDiscoverCmd(getDiscoverCmd());
-		provider.setRemoteInstallPath(getRemoteInstallPath());
-		provider.setVersionId(getVersionId());
-		provider.setUseInstallDefaults(getUseInstallDefaults());
-		provider.setUseToolDefaults(getUseToolDefaults());
-		provider.setCommandsEnabled(getCommandsEnabled());
-		provider.setDescription(getDescription());
+		majorVersion = provider.getMajorVersion();
+		minorVersion = provider.getMinorVersion();
+		serviceVersion = provider.getServiceVersion();
 	}
 
-	@Override
-	public Object clone() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#copy()
+	 */
+	public IServiceProviderWorkingCopy copy() {
 		return new OpenMPIServiceProvider(this);
 	}
 
@@ -79,7 +81,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		IPUniverseControl universe = (IPUniverseControl)PTPCorePlugin.getDefault().getUniverse();
 		return new OpenMPIResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
-	
+
 	/**
 	 * Get the detected Open MPI version. Only the major and minor version
 	 * numbers are used. Any point or beta release information is discarded.
@@ -89,6 +91,20 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	 */
 	public String getDetectedVersion() {
 		return majorVersion + "." + minorVersion; //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getMajorVersion()
+	 */
+	public int getMajorVersion() {
+		return majorVersion;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getMinorVersion()
+	 */
+	public int getMinorVersion() {
+		return minorVersion;
 	}
 
 	/* (non-Javadoc)

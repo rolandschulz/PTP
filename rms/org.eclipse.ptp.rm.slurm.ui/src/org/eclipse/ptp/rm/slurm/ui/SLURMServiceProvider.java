@@ -18,6 +18,8 @@ import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvid
 import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManager;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 
 /**
@@ -29,29 +31,27 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	private static final String TAG_SLURMD_DEFAULTS = "slurmdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	
-	private Preferences preferences;
-
-	public SLURMServiceProvider() 
-	{
+	private Preferences preferences = SLURMPreferenceManager.getPreferences();
+	
+	public SLURMServiceProvider() {
 		super();
-		preferences = SLURMPreferenceManager.getPreferences();
 		setDescription("SLURM Resource Manager"); //$NON-NLS-1$
 	}
 
-	public SLURMServiceProvider(SLURMServiceProvider provider)
-	{
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public SLURMServiceProvider(IServiceProvider provider) {
 		super(provider);
-		preferences = SLURMPreferenceManager.getPreferences();
-		setSlurmdArgs(provider.getSlurmdArgs());
-		setSlurmdPath(provider.getSlurmdPath());
-		setUseDefaults(provider.getUseDefaults());
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#clone()
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
 	 */
 	@Override
-	public Object clone() {
+	public IServiceProviderWorkingCopy copy() {
 		return new SLURMServiceProvider(this);
 	}
 	
@@ -79,20 +79,20 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 		return getString(TAG_SLURMD_ARGS, preferences.getString(EMPTY_STRING));
 	}
 	
-    /* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration#getSlurmdPath()
 	 */
 	public String getSlurmdPath() {
 		return getString(TAG_SLURMD_PATH, preferences.getString(EMPTY_STRING));
 	}
-    
-	/* (non-Javadoc)
+	
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration#getUseDefaults()
 	 */
 	public boolean getUseDefaults() {
 		return getBoolean(TAG_SLURMD_DEFAULTS, true);
 	}
-	
+    
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */

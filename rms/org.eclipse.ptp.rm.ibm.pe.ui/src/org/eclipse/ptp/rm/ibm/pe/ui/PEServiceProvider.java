@@ -19,6 +19,8 @@ import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManager;
 import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 
 /**
@@ -35,35 +37,27 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
     private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
     private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
     
-    private Preferences preferences;
-
-	public PEServiceProvider() 
-	{
+    private Preferences preferences = PEPreferenceManager.getPreferences();
+	
+	public PEServiceProvider() {
 		super();
-		preferences = PEPreferenceManager.getPreferences();
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
 	}
-    
-	public PEServiceProvider(PEServiceProvider provider)
-	{
+	
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public PEServiceProvider(IServiceProvider provider) {
 		super(provider);
-		preferences = PEPreferenceManager.getPreferences();
-		setDebugLevel(provider.getDebugLevel());
-		setJobPollInterval(provider.getJobPollInterval());
-		setLibraryOverride(provider.getLibraryOverride());
-		setLoadLevelerMode(provider.getLoadLevelerMode());
-		setNodeMaxPollInterval(provider.getNodeMaxPollInterval());
-		setNodeMinPollInterval(provider.getNodeMinPollInterval());
-		setRunMiniproxy(provider.getRunMiniproxy());
-		setSuspendProxy(provider.getSuspendProxy());
-		setUseLoadLeveler(provider.getUseLoadLeveler());
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#clone()
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
 	 */
 	@Override
-	public Object clone() {
+	public IServiceProviderWorkingCopy copy() {
 		return new PEServiceProvider(this);
 	}
 	
@@ -76,22 +70,22 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 		return new PEResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 	
-    /* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getDebugLevel()
 	 */
 	public String getDebugLevel()
 	{
 		return getString(TAG_DEBUG_LEVEL, preferences.getString(PEPreferenceConstants.TRACE_LEVEL));
 	}
-    
-	/* (non-Javadoc)
+	
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getJobPollInterval()
 	 */
 	public String getJobPollInterval()
 	{
 		return getString(TAG_JOB_POLL_INTERVAL, preferences.getString(PEPreferenceConstants.JOB_POLL_INTERVAL));
 	}
-
+    
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getLibraryOverride()
 	 */
@@ -99,7 +93,7 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	{
 		return getString(TAG_LIBRARY_OVERRIDE, preferences.getString(PEPreferenceConstants.LIBRARY_OVERRIDE));
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getLoadLevelerMode()
 	 */

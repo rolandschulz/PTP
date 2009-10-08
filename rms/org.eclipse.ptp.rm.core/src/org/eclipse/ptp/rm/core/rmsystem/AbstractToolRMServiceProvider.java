@@ -34,23 +34,18 @@ public abstract class AbstractToolRMServiceProvider extends AbstractRemoteResour
 
 	private int fCapabilities;
 
-	public AbstractToolRMServiceProvider(AbstractToolRMServiceProvider provider) {
-		super(provider);
-		setCommandsEnabled(provider.getCommandsEnabled());
-		setContinuousMonitorCmd(provider.getContinuousMonitorCmd());
-		setDebugCmd(provider.getDebugCmd());
-		setDiscoverCmd(provider.getDiscoverCmd());
-		setLaunchCmd(provider.getLaunchCmd());
-		setPeriodicMonitorCmd(provider.getPeriodicMonitorCmd());
-		setPeriodicMonitorTime(provider.getPeriodicMonitorTime());
-		setRemoteInstallPath(provider.getRemoteInstallPath());
-		setUseInstallDefaults(provider.getUseInstallDefaults());
-		setUseToolDefaults(provider.getUseToolDefaults());
-		fCapabilities = provider.getCapabilities();
-	}
-
 	public AbstractToolRMServiceProvider(int capabilities) {
 		fCapabilities = capabilities;
+	}
+	
+	/**
+	 * Constructor for creating a working copy of the service provider
+	 * 
+	 * @param provider provider we are making a copy from
+	 */
+	public AbstractToolRMServiceProvider(AbstractToolRMServiceProvider provider) {
+		super(provider);
+		fCapabilities = provider.getCapabilities();
 	}
 	
 	/* (non-Javadoc)
