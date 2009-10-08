@@ -44,10 +44,11 @@ public class CheckCanAddDeclTestCase extends RefactoringTestCase
 
         IFile main_f90 = importFile(DIR, "main.f90");
         IFile module_f90 = importFile(DIR, "module.f90");
+        importFile(DIR, "external.f90");
         PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
 
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        //compileAndRunFortranProgram();
+        compileAndRunFortranProgram("module.f90", "main.f90", "external.f90");
 
         PhotranVPG vpg = PhotranVPG.getInstance();
         IFortranAST mainFileAST = vpg.acquireTransientAST(main_f90);

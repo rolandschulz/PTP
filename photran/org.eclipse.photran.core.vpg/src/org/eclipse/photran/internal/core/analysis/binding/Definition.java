@@ -97,6 +97,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         VARIABLE_DECLARATION { @Override public String toString() { return "Local variable"; } },
         WHERE,
         ENUMERATOR, // F03
+        IMPLICIT_EXTERNAL_SUBPROGRAM,
         ;
 
         @Override public String toString()

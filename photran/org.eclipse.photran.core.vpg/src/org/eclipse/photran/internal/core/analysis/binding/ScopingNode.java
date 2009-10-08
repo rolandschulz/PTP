@@ -33,6 +33,7 @@ import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataNameNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndBlockDataStmtNode;
@@ -61,6 +62,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeNameNode;
+import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.IBlockDataBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IDerivedTypeBodyConstruct;
@@ -669,9 +671,15 @@ public abstract class ScopingNode extends ASTNode
 
     	String name = PhotranVPG.canonicalizeIdentifier(identifier.getText());
 
+
     	PhotranTokenRef tokenRef = identifier.getTokenRef();
 		Type type = implicitSpec.getType(name.charAt(0));
-		Definition def = new Definition(identifier.getText(), tokenRef, Definition.Classification.IMPLICIT_LOCAL_VARIABLE, /*Visibility.PUBLIC,*/ type);
+        Definition.Classification classification = Definition.Classification.IMPLICIT_LOCAL_VARIABLE;
+        if (isSubroutineNameInCallStmt(identifier) || isFunctionNameInFunctionCall(identifier))
+            classification = Definition.Classification.IMPLICIT_EXTERNAL_SUBPROGRAM;
+        else
+            classification = Definition.Classification.IMPLICIT_LOCAL_VARIABLE;
+		Definition def = new Definition(identifier.getText(), tokenRef, classification, /*Visibility.PUBLIC,*/ type);
 
     	vpg.setDefinitionFor(tokenRef, def);
     	vpg.markScope(tokenRef, this);
@@ -679,7 +687,36 @@ public abstract class ScopingNode extends ASTNode
     	bindings.foundDefinition(tokenRef, getGlobalScope());
 	}
 
-	public List<Definition> getAllDefinitions()
+    private boolean isSubroutineNameInCallStmt(Token identifier)
+    {
+        ASTCallStmtNode call = identifier.findNearestAncestor(ASTCallStmtNode.class);
+        if (call != null && call.getSubroutineName() != null)
+            return matches(call.getSubroutineName(), identifier);
+        else
+            return false;
+    }
+
+    private boolean isFunctionNameInFunctionCall(Token identifier)
+    {
+        ASTVarOrFnRefNode call = identifier.findNearestAncestor(ASTVarOrFnRefNode.class);
+        if (call != null && call.getName() != null)
+            return matches(call.getName().getName(), identifier)
+                && (call.getPrimarySectionSubscriptList() != null
+                    || call.getFunctionArgList() != null);
+        else
+            return false;
+    }
+
+    private boolean matches(Token identifier1, Token identifier2)
+    {
+        if (identifier1 == null || identifier2 == null)
+            return false;
+        else
+            return    PhotranVPG.canonicalizeIdentifier(identifier1.getText())
+              .equals(PhotranVPG.canonicalizeIdentifier(identifier2.getText()));
+    }
+
+    public List<Definition> getAllDefinitions()
 	{
 		PhotranVPG vpg = PhotranVPG.getInstance();
 		List<Definition> result = new LinkedList<Definition>();

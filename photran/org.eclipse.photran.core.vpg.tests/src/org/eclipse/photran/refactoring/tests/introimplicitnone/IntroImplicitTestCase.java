@@ -28,42 +28,44 @@ public class IntroImplicitTestCase extends RefactoringTestCase
     private static final String DIR = "intro-implicit-test-code";
 
     private static NullProgressMonitor pm = new NullProgressMonitor();
-    
+
     protected String filename;
     protected LineCol lineCol;
+    protected boolean shouldCompileAndRun;
 
     public IntroImplicitTestCase() {;}  // when JUnit invokes a subclass outside a test suite
 
-    public IntroImplicitTestCase(String filename, LineCol lineCol)
+    public IntroImplicitTestCase(String filename, LineCol lineCol, boolean shouldCompileAndRun)
     {
         this.filename = filename;
         this.lineCol = lineCol;
+        this.shouldCompileAndRun = shouldCompileAndRun;
         this.setName("test");
     }
 
     protected void doRefactoring() throws Exception
     {
         String description = "Attempt to introduce implicit none at " + lineCol;
-            
+
         IntroImplicitNoneRefactoring refactoring = createRefactoring(filename, lineCol);
-        
+
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        String before = compileAndRunFortranProgram();
+        String before = shouldCompileAndRun ? compileAndRunFortranProgram() : "";
 
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());
-        
+
         status = refactoring.checkFinalConditions(pm);
         assertTrue(description + " failed final precondition check: " + status.toString(), !status.hasError());
-        
+
         Change change = refactoring.createChange(pm);
         assertNotNull(description + " returned null Change object", change);
         assertTrue(description + " returned invalid Change object", change.isValid(pm).isOK());
         change.perform(pm);
-        
+
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        
-        String after = compileAndRunFortranProgram();
+
+        String after = shouldCompileAndRun ? compileAndRunFortranProgram() : "";
         System.out.println(after);
         assertEquals(before, after);
     }
@@ -71,13 +73,13 @@ public class IntroImplicitTestCase extends RefactoringTestCase
     private IntroImplicitNoneRefactoring createRefactoring(final String filename, final LineCol lineCol) throws Exception
     {
         final IFile thisFile = importFile(DIR, filename);
-        
+
         //project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); // Runs in separate thread... grrr...
         ArrayList<IFile> files = new ArrayList<IFile>();
         files.add(thisFile);
         return new IntroImplicitNoneRefactoring(files);//thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
     }
-    
+
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
         return super.readTestFile(DIR, filename);
@@ -85,12 +87,12 @@ public class IntroImplicitTestCase extends RefactoringTestCase
 
     /**
      * Given an array with all of the positions of identifiers that should be renamed together, try applying the Rename refactoring to
-     * each, and make sure all the others change with it. 
+     * each, and make sure all the others change with it.
      */
     public void test() throws Exception
     {
         if (filename == null) return; // when JUnit invokes this outside a test suite
-        
+
         doRefactoring();
         assertEquals(
             readTestFile(filename + ".result"), // expected result

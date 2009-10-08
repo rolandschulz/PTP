@@ -14,11 +14,11 @@ public class IntroImplicitTestSuite extends TestSuite
         suite.addTest(getSuiteFor("hello2.f90"));
         return suite;
     }
-    
+
     private static TestSuite getSuiteFor(String baseFilename)
     {
         TestSuite subSuite = new TestSuite("Introducing Implicit None in " + baseFilename);
-        subSuite.addTest(new IntroImplicitTestCase(baseFilename, new LineCol(1, 9)));
+        subSuite.addTest(new IntroImplicitTestCase(baseFilename, new LineCol(1, 9), true));
         return subSuite;
     }
 }

@@ -27,12 +27,12 @@ import org.eclipse.photran.core.vpg.util.LineCol;
 public abstract class RefactoringTestCase extends BaseTestFramework
 {
     private static HashMap<String, ArrayList<Integer>> lineMaps = new HashMap<String, ArrayList<Integer>>();
-    
+
     public RefactoringTestCase()
     {
     	if (!PhotranVPG.inTestingMode()) fail("WHEN RUNNING JUNIT TESTS, THE \"TESTING\" ENVIRONMENT VARIABLE MUST BE SET");
     }
-    
+
     protected IFile importFile(String srcDir, String filename) throws Exception
     {
         //project.getProject().getFile(filename).delete(true, new NullProgressMonitor());
@@ -48,7 +48,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         lineMap.add(0); // Offset of line 1
         return readStream(lineMap, Activator.getDefault().getBundle().getResource(srcDir + "/" + filename).openStream());
     }
-    
+
     protected String readStream(ArrayList<Integer> lineMap, InputStream inputStream) throws IOException
     {
         StringBuffer sb = new StringBuffer(4096);
@@ -57,7 +57,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         {
             sb.append((char)ch);
             offset++;
-            
+
             if (ch == '\n' && lineMap != null)
             {
                 //System.out.println("Line " + (lineMap.size()+1) + " starts at offset " + offset);
@@ -87,7 +87,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
     {
         return lineMaps.get(filename).get(lineCol.getLine()-1) + (lineCol.getCol()-1);
     }
-    
+
     public void testLevenshtein()
     {
         assertEquals(0, levenshteinDistance("", ""));
@@ -99,25 +99,25 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         assertEquals(1, levenshteinDistance("kitten", "kittten"));
         assertEquals(2, levenshteinDistance("kitten", "kien"));
     }
-    
+
     /**
      * Computes the Levenshtein distance between two strings.
-     * 
+     *
      * Based on pseudocode from http://en.wikipedia.org/wiki/Levenshtein_distance
-     * 
+     *
      * @return the Levenshtein distance between <code>s</code> and <code>t</code>
      */
     protected int levenshteinDistance(String s, String t)
     {
         int m = s.length(), n = t.length();
-        
+
         int[][] d = new int[m+1][n+1];
-      
+
         for (int i = 1; i <= m; i++)
             d[i][0] = i;
         for (int j = 1; j <= n; j++)
             d[0][j] = j;
-      
+
         for (int i = 1; i <= m; i++)
         {
             for (int j = 1; j <= n; j++)
@@ -128,19 +128,19 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                               d[i-1][j-1] + cost); // substitution
             }
         }
-      
+
         return d[m][n];
     }
-    
+
     private int min(int a, int b, int c)
     {
         return Math.min(Math.min(a, b), c);
     }
-    
+
     protected void assertLevDist(String errorMessage, int expected, String s, String t)
     {
         int actual = levenshteinDistance(s, t);
-        
+
         if (actual != expected)
         {
             // Use assertEquals so that JUnit will pop up a comparison viewer
@@ -149,7 +149,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                          t);
         }
     }
-    
+
     /**
      * If the environment variables COMPILER and EXECUTABLE are set during the JUnit run,
      * compiles and runs the Fortran program being refactored and returns the output of
@@ -163,7 +163,9 @@ public abstract class RefactoringTestCase extends BaseTestFramework
      * imported into the test project using {@link #importFile(String, String)}) into a
      * single executable, and then run that executable.  This can be invoked before and
      * after a refactoring is performed to make sure runtime behavior is actually preserved
-     * for the test program.
+     * for the test program.  If a specific ordering of the filenames is desired, it
+     * must be passed as an argument to this method; otherwise, all *.f* resources in the
+     * test project will be passed to the compiler in no specific order.
      * <p>
      * COMPILER must be set to the path of your Fortran compiler, e.g.,
      * /usr/local/gfortran/bin/gfortran
@@ -178,28 +180,36 @@ public abstract class RefactoringTestCase extends BaseTestFramework
      * statement to manually flush the output to ensure that your test cases always pass.
      * In gfortran, you can "CALL FLUSH" to invoke the (proprietary) flush intrinsic; or
      * there is also a FLUSH statement in Fortran 2003.
-     * 
+     *
      * @return the output from the compiler and executable
      * @throws Exception
      */
-    protected String compileAndRunFortranProgram() throws Exception
+    protected String compileAndRunFortranProgram(String... filenamesOpt) throws Exception
     {
         String compiler = System.getenv("COMPILER");
         if (compiler == null) return "";
-        
+
         String exe = System.getenv("EXECUTABLE");
         if (exe == null) return "";
-        
+
         ArrayList<String> args = new ArrayList<String>(8);
         args.add(compiler);
         args.add("-o");
         args.add(exe);
-        for (IResource res : project.members())
-            if (res instanceof IFile && res.getFileExtension().startsWith("f"))
-                args.add(res.getName());
-        
+        if (filenamesOpt == null || filenamesOpt.length == 0)
+        {
+            for (IResource res : project.members())
+                if (res instanceof IFile && res.getFileExtension().startsWith("f"))
+                    args.add(res.getName());
+        }
+        else
+        {
+            for (String filename : filenamesOpt)
+                args.add(filename);
+        }
+
         System.out.println(toString(args));
-        
+
         ProcessBuilder builder = new ProcessBuilder(args);
         builder.directory(project.getLocation().toFile());
         builder.redirectErrorStream(true);
@@ -213,7 +223,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                 fail("Compilation exited abnormally with exit code " + exitCode + "\n" + output.toString());
             waitFor(output);
         }
-        
+
         builder = new ProcessBuilder(exe);
         builder.directory(project.getLocation().toFile());
         builder.redirectErrorStream(true);
@@ -227,7 +237,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                 fail("Compilation succeeded, but execution exited abnormally with exit code " + exitCode + "\n" + output.toString() + "\n" + output2.toString());
             waitFor(output2);
         }
-        
+
         return output.toString() + "\n" + output2.toString();
     }
 
@@ -249,18 +259,18 @@ public abstract class RefactoringTestCase extends BaseTestFramework
             sb.append((i == 0 ? "" : " ") + args.get(i));
         return sb.toString();
     }
-    
+
     private static class ConcurrentReader extends Thread
     {
         private InputStream stdout;
         private StringBuilder sb;
-        
+
         public ConcurrentReader(InputStream stdout)
         {
             this.stdout = stdout;
             this.sb = new StringBuilder();
         }
-        
+
         @Override public void run()
         {
             BufferedReader in = new BufferedReader(new InputStreamReader(stdout));
@@ -289,12 +299,12 @@ public abstract class RefactoringTestCase extends BaseTestFramework
                 }
             }
         }
-        
+
         private synchronized void done()
         {
             notifyAll();
         }
-        
+
         @Override public String toString()
         {
             return sb.toString();
