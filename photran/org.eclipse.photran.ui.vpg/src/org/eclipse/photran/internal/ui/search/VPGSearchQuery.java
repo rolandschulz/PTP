@@ -308,7 +308,7 @@ public class VPGSearchQuery implements ISearchQuery {
                             Workbench.getInstance().getActiveWorkbenchWindow().getShell(),
                             "Warning",
                             "References in the following projects have been excluded from the search" +
-                            " results because Fortran analysis/refactoring is disabled:\n" + projects +
+                            " results because Fortran analysis/refactoring is disabled:\n\n" + projects +
                             "\nPlease enable Fortran analysis/refactoring for these projects if you wish" +
                             " for their references to show in search results.");
                     }
