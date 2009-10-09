@@ -87,12 +87,13 @@ public interface IServiceModelEvent {
 	 * Returns the type of event being reported.
 	 *
 	 * @return one of the event type constants
-	 * @see #SERVICE_CONFIGURATION_ADDED
-	 * @see #SERVICE_CONFIGURATION_REMOVED
-	 * @see #SERVICE_CONFIGURATION_CHANGED
-	 * @see #SERVICE_CONFIGURATION_SELECTED
-	 * @see #SERVICE_MODEL_SAVED
-	 * @see #SERVICE_MODEL_LOADED
+	 * {@link #SERVICE_CONFIGURATION_ADDED}
+	 * {@link #SERVICE_CONFIGURATION_REMOVED}
+	 * {@link #SERVICE_CONFIGURATION_CHANGED}
+	 * {@link #SERVICE_CONFIGURATION_SELECTED}
+	 * {@link #SERVICE_PROVIDER_CHANGED}
+	 * {@link #SERVICE_MODEL_SAVED}
+	 * {@link #SERVICE_MODEL_LOADED}
 	 */
 	public int getType();
 }
