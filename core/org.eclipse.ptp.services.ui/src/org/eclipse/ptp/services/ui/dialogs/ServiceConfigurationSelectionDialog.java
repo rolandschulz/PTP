@@ -25,7 +25,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 
 /**
  * Display a dialog prompting the user to select a service configuration to add
@@ -36,7 +35,6 @@ import org.eclipse.swt.widgets.Table;
  * 
  */
 public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
-	private Table serviceConfigurationList;
 	private IServiceConfiguration selectedConfig;
 
 	private Set<IServiceConfiguration> currentServiceConfigurations;
