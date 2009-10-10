@@ -77,7 +77,8 @@ public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
 		serviceConfigurationPane.setLayout(layout);
 		serviceConfigurationPane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		Composite widget = new ServiceConfigurationSelectionWidget(serviceConfigurationPane, SWT.NONE, currentServiceConfigurations, false);
+		Composite widget = new ServiceConfigurationSelectionWidget(serviceConfigurationPane, SWT.NONE, 
+				currentServiceConfigurations, null, false);
 		widget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		return widget;
 	}
