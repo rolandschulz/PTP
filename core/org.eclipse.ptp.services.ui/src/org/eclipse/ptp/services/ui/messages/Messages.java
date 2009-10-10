@@ -51,6 +51,16 @@ public class Messages extends NLS {
 	public static String ServiceConfigurationSelectionWidget_11;
 	public static String ServiceConfigurationSelectionWidget_12;
 	public static String ServiceConfigurationSelectionWidget_13;
+
+	public static String ServiceConfigurationSelectionWidget_14;
+
+	public static String ServiceConfigurationSelectionWidget_5;
+
+	public static String ServiceConfigurationSelectionWidget_6;
+
+	public static String ServiceConfigurationSelectionWidget_7;
+
+	public static String ServiceConfigurationSelectionWidget_8;
 	
 	public static String ServiceConfigurationWizard_0;
 	public static String ServiceConfigurationWizard_1;
