@@ -13,25 +13,37 @@
  */
 package org.eclipse.ptp.services.ui.widgets;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -41,14 +53,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * Standard widget for selecting a service configuration.
  * 
- * Displays a tree view of service configurations so that the user can easily
+ * Displays a table view of service configurations so that the user can easily
  * see what services and providers are available in the configuration.
  * 
  * Provides "Add...", "Remove", and "Rename" buttons to allow the creation,
@@ -87,7 +99,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		 */
 		@Override
 		public Object[] getChildren(Object element) {
-			if (element instanceof IServiceConfiguration) {
+			if (!fUseCheckboxes && element instanceof IServiceConfiguration) {
 				IServiceConfiguration config = (IServiceConfiguration)element;
 				Set<Object> children = new HashSet<Object>();
 				for (IService service : config.getServices()) {
@@ -100,7 +112,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 				}
 				return children.toArray();
 			}
-			if (element instanceof IServiceModelManager && fExcludedConfigs != null) {
+			if (fExcludedConfigs != null && element instanceof IServiceModelManager) {
 				Set<IServiceConfiguration> children = ((IServiceModelManager)element).getConfigurations();
 				children.removeAll(fExcludedConfigs);
 				return children.toArray();
@@ -108,73 +120,101 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			return super.getChildren(element);
 		}
 	}
-	
-	private TreeViewer fViewer;
-	private Button fAddButton;
-	private Button fRemoveButton;
-	private Button fRenameButton;
-	
-	private ISelection fSelection;
-	private boolean fEnabled = true;
-	private Set<IServiceConfiguration> fExcludedConfigs;
-	private boolean fButtonsVisible = true;
+
+	private final static int TABLE_WIDTH = 400;
+	private final static int TABLE_HEIGHT = 250;
+	private final static int BUTTON_WIDTH = 110;
 	
 	private final ListenerList fSelectionListeners = new ListenerList();
 	private final IServiceModelManager fManager = ServiceModelManager.getInstance();
 	
+	private TableViewer fTableViewer;
+	private Table fTable;
+	private TableColumnLayout fTableLayout;
+	private Button fAddButton;
+	private Button fRemoveButton;
+	private Button fRenameButton;
+	private Button fSelectAllButton;
+	private Button fDeselectAllButton;
+	
+	private ISelection fSelection;
+	private boolean fEnabled = true;
+	private boolean fButtonsVisible = true;
+	private boolean fUseCheckboxes = false;
+	private Set<IService> fServices = null;
+	private Set<IServiceConfiguration> fExcludedConfigs = null;
+	
 	private IServiceConfiguration fSelectedConfig = null;
 
 	public ServiceConfigurationSelectionWidget(Composite parent, int style) {
-		this (parent, style, null, true);
+		this (parent, style, null, null, true);
 	}
 	
 	public ServiceConfigurationSelectionWidget(Composite parent, int style, 
-			Set<IServiceConfiguration> excluded, boolean buttons) {
+			Set<IServiceConfiguration> excluded, Set<IService> services, boolean enableButtons) {
 		super(parent, style);
-		setLayout(new GridLayout(2, false));
-
-		Composite labelComp = new Composite(this, SWT.NONE);
-		labelComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		labelComp.setLayout(new GridLayout(1, false));
-		Label label = new Label(labelComp, SWT.NONE);
-		label.setText(Messages.ServiceConfigurationSelectionWidget_0);
-
-		Composite treeComp = new Composite(this, SWT.NONE);
-		treeComp.setLayout(new GridLayout(1, false));
-		treeComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
-		fViewer = new TreeViewer(treeComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-		fViewer.setContentProvider(new ServiceContentProvider());
-		fViewer.setLabelProvider(new WorkbenchLabelProvider());
-		fViewer.setComparator(new ServiceConfigurationComparator());
-		fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		fViewer.getTree().setLinesVisible(true);
-		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		fServices = services;
+		fUseCheckboxes = ((style & SWT.CHECK) == SWT.CHECK);
+		
+		if (enableButtons && !fUseCheckboxes) {
+			setLayout(new GridLayout(2, false));
+		} else {
+			setLayout(new GridLayout(1, false));
+		}
 
-			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection selection = fViewer.getSelection();
-				if (!selection.isEmpty()) {
-					ITreeSelection treeSelection = (ITreeSelection)selection;
-					TreePath path = treeSelection.getPaths()[0];
-					fSelectedConfig = (IServiceConfiguration)path.getFirstSegment();
-				} else {
-					fSelectedConfig = null;
+		Composite tableComposite = new Composite(this, SWT.NONE);
+		fTableLayout = new TableColumnLayout();
+		tableComposite.setLayout(fTableLayout);
+		tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		
+		if (fUseCheckboxes) {
+			fTable = new Table(tableComposite, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+			fTableViewer = new CheckboxTableViewer(fTable);
+			((CheckboxTableViewer)fTableViewer).addCheckStateListener(new ICheckStateListener() {
+				public void checkStateChanged(CheckStateChangedEvent event) {
+					updateControls();
 				}
-				updateControls();
-				notifySelection(fViewer.getSelection());
-			}
-			
-		});
-		fViewer.setInput(ServiceModelManager.getInstance());
+			});
+		} else {
+			fTableViewer = new TableViewer(tableComposite, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+			fTable = fTableViewer.getTable();
+		}
 		
-		if (buttons) {
+		fTable.setLayout(new TableLayout());
+		GridData data = new GridData(GridData.FILL_BOTH);
+		data.heightHint = TABLE_HEIGHT;
+		data.widthHint = TABLE_WIDTH;
+		fTable.setLayoutData(data);
+		
+		/*
+		 * Only add headers if there is more than one column
+		 */
+		if (fServices != null) {
+			fTable.setHeaderVisible(true);
+		}
+
+		fTableViewer.setContentProvider(new ServiceContentProvider());
+		fTableViewer.setLabelProvider(new WorkbenchLabelProvider());
+		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				notifySelection(fTableViewer.getSelection());
+				updateControls();
+			}
+		});
+		
+		addColumns();
+		
+		fTableViewer.setInput(ServiceModelManager.getInstance());
+		
+		if (enableButtons && !fUseCheckboxes) {
 			Composite buttonsComp = new Composite(this, SWT.NONE);
 			buttonsComp.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 			buttonsComp.setLayout(new GridLayout(1, false));
 		
 			fAddButton = new Button(buttonsComp, SWT.PUSH);
-			GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-			data.widthHint = 110;
+			data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+			data.widthHint = BUTTON_WIDTH;
 			fAddButton.setLayoutData(data);
 			fAddButton.setText(Messages.ServiceConfigurationSelectionWidget_1);
 			fAddButton.addSelectionListener(new SelectionAdapter() {
@@ -184,7 +224,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 					if (dialog.open() == InputDialog.OK) {
 						IServiceConfiguration config = fManager.newServiceConfiguration(dialog.getValue());
 						fManager.addConfiguration(config);
-						fViewer.refresh();
+						fTableViewer.refresh();
 					}
 				}
 			});
@@ -195,7 +235,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			fRemoveButton.setEnabled(false);
 			fRemoveButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
-					ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
+					IStructuredSelection selection = (IStructuredSelection)fTableViewer.getSelection();
 					if (!selection.isEmpty()) {
 						Object[] configs = (Object[])selection.toArray();
 						String names = ""; //$NON-NLS-1$
@@ -211,7 +251,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 							for (Object config : configs) {
 								fManager.remove((IServiceConfiguration)config);
 							}
-							fViewer.refresh();
+							fTableViewer.refresh();
 						}
 					}
 				}
@@ -223,32 +263,77 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			fRenameButton.setEnabled(false);
 			fRenameButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
-					ITreeSelection selection = (ITreeSelection)fViewer.getSelection();
+					IStructuredSelection selection = (IStructuredSelection)fTableViewer.getSelection();
 					if (!selection.isEmpty()) {
 						InputDialog dialog = new InputDialog(fAddButton.getShell(), Messages.ServiceConfigurationSelectionWidget_12, 
 								Messages.ServiceConfigurationSelectionWidget_13, null, null);
 						if (dialog.open() == InputDialog.OK) {
 							IServiceConfiguration config = (IServiceConfiguration)selection.getFirstElement();
 							config.setName(dialog.getValue());
-							fViewer.update(config, null);
+							fTableViewer.update(config, null);
 						}
 					}
 				}
 			});
 		}
 		
+		if (enableButtons && fUseCheckboxes) {
+			Composite buttonsComp = new Composite(this, SWT.NONE);
+			buttonsComp.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
+			buttonsComp.setLayout(new GridLayout(2, false));
+			
+			fSelectAllButton = new Button(buttonsComp, SWT.PUSH);
+			data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+			data.widthHint = BUTTON_WIDTH;
+			fSelectAllButton.setLayoutData(data);
+			fSelectAllButton.setText(Messages.ServiceConfigurationSelectionWidget_5);
+			fSelectAllButton.setEnabled(false);
+			fSelectAllButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					((CheckboxTableViewer)fTableViewer).setAllChecked(true);
+					notifySelection(fTableViewer.getSelection());
+				}
+			});
+		
+			fDeselectAllButton = new Button(buttonsComp, SWT.PUSH);
+			data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+			data.widthHint = BUTTON_WIDTH;
+			fDeselectAllButton.setLayoutData(data);
+			fDeselectAllButton.setText(Messages.ServiceConfigurationSelectionWidget_6);
+			fDeselectAllButton.setEnabled(false);
+			fDeselectAllButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					((CheckboxTableViewer)fTableViewer).setAllChecked(false);
+					notifySelection(fTableViewer.getSelection());
+				}
+			});
+		}
+	
 		fExcludedConfigs = excluded;
-		fButtonsVisible = buttons;
+		fButtonsVisible = enableButtons;
+		updateControls();
 	}
 	
-	private void updateControls() {
-		fViewer.getTree().setEnabled(fEnabled);
-		if (fButtonsVisible) {
-			fAddButton.setEnabled(fEnabled);
-			boolean enabled = fEnabled && getSelectedConfiguration() != null;
-			fRemoveButton.setEnabled(enabled);
-			fRenameButton.setEnabled(enabled);
+	/**
+	 * Adds the listener to the collection of listeners who will
+	 * be notified when the users selects a service configuration
+	 * </p>
+	 * @param listener the listener that will be notified of the selection
+	 */
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		fSelectionListeners.add(listener);
+	}
+	
+	/**
+	 * Gets the elements that have been checked in the viewer
+	 * 
+	 * @return array containing the elements that are checked
+	 */
+	public Object[] getCheckedElements() {
+		if (fUseCheckboxes) {
+			return ((CheckboxTableViewer)fTableViewer).getCheckedElements();
 		}
+		return new Object[0];
 	}
 	
 	/* (non-Javadoc)
@@ -257,6 +342,32 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	@Override
 	public boolean getEnabled() {
 		return fEnabled;
+	}
+	
+	/**
+	 * Return the service configuration selected by the user
+	 * 
+	 * @return Selected service configuration
+	 */
+	public IServiceConfiguration getSelectedConfiguration() {
+		return fSelectedConfig;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
+	public ISelection getSelection() {
+		return fSelection;
+	}
+
+	/**
+	 * Removes the listener from the collection of listeners who will
+	 * be notified when a service configuration is selected by the user.
+	 *
+	 * @param listener the listener which will no longer be notified
+	 */
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		fSelectionListeners.remove(listener);
 	}
 
 	/* (non-Javadoc)
@@ -267,34 +378,62 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		fEnabled = enabled;
 		updateControls();
 	}
-
-	/**
-	 * Adds the listener to the collection of listeners who will
-	 * be notified when the users selects a service configuration
-	 * </p>
-	 * @param listener the listener that will be notified of the selection
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
 	 */
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
-		fSelectionListeners.add(listener);
-	}
-
-	/**
-	 * Return the service configuration selected by the user
-	 * 
-	 * @return Selected service configuration
-	 */
-	public IServiceConfiguration getSelectedConfiguration() {
-		return fSelectedConfig;
+	public void setSelection(ISelection selection) {
+		fSelection = selection;
 	}
 	
-	/**
-	 * Removes the listener from the collection of listeners who will
-	 * be notified when a service configuration is selected by the user.
-	 *
-	 * @param listener the listener which will no longer be notified
-	 */
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-		fSelectionListeners.remove(listener);
+	private TableViewerColumn addColumn(String colName) {
+		TableViewerColumn column = new TableViewerColumn(fTableViewer, SWT.NONE);
+		column.getColumn().setResizable(true);
+		column.getColumn().setMoveable(true);
+		column.getColumn().setText(colName);
+		PixelConverter converter = new PixelConverter(fTableViewer.getControl());
+		int colWidth = converter.convertWidthInCharsToPixels(colName.length() + 5);
+		fTableLayout.setColumnData(column.getColumn(), new ColumnWeightData(10, colWidth));
+		return column;
+	}
+
+	private void addColumns() {
+		TableViewerColumn firstColumn = addColumn(Messages.ServiceConfigurationSelectionWidget_7);
+		firstColumn.setLabelProvider(new ColumnLabelProvider(){
+			@Override
+			public String getText(Object element) {
+				return ((IServiceConfiguration)element).getName();
+			}
+		});
+		
+		if (fServices != null) {
+			SortedSet<IService> services = new TreeSet<IService>(new Comparator<IService>() {
+				public int compare(IService o1, IService o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+			for (IService service : fServices) {
+				services.add(service);
+			}
+			
+			for (IService service : services) {
+				String name = service.getName() + Messages.ServiceConfigurationSelectionWidget_8;
+				final TableViewerColumn column = addColumn(name);
+				column.getColumn().setData(service);
+				column.setLabelProvider(new ColumnLabelProvider(){
+					@Override
+					public String getText(Object element) {
+						IServiceConfiguration config = ((IServiceConfiguration)element);
+						IService service = (IService)column.getColumn().getData();
+						IServiceProvider provider = config.getServiceProvider(service);
+						if (provider == null || provider.equals(service.getNullProvider())) {
+							return Messages.ServiceConfigurationSelectionWidget_14;
+						}
+						return provider.getName();
+					}
+				});
+			}
+		}
 	}
 	
 	/**
@@ -303,24 +442,32 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	 * @param e event that was generated by the selection
 	 */
 	private void notifySelection(ISelection selection) {
+		if (!selection.isEmpty()) {
+			IStructuredSelection structuredSelection = (IStructuredSelection)selection;
+			fSelectedConfig = (IServiceConfiguration)structuredSelection.getFirstElement();
+		} else {
+			fSelectedConfig = null;
+		}
 		setSelection(selection);
 		SelectionChangedEvent event = new SelectionChangedEvent(this, getSelection());
 		for (Object listener : fSelectionListeners.getListeners()) {
 			((ISelectionChangedListener) listener).selectionChanged(event);
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	
+	/**
+	 * Update buttons when something changes
 	 */
-	public ISelection getSelection() {
-		return fSelection;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
-	 */
-	public void setSelection(ISelection selection) {
-		fSelection = selection;
+	private void updateControls() {
+		fTable.setEnabled(fEnabled);
+		if (!fUseCheckboxes && fButtonsVisible) {
+			fAddButton.setEnabled(fEnabled);
+			boolean enabled = fEnabled && getSelectedConfiguration() != null;
+			fRemoveButton.setEnabled(enabled);
+			fRenameButton.setEnabled(enabled);
+		} else if (fButtonsVisible) {
+			fSelectAllButton.setEnabled(fEnabled);
+			fDeselectAllButton.setEnabled(fEnabled);
+		}
 	}
 }
