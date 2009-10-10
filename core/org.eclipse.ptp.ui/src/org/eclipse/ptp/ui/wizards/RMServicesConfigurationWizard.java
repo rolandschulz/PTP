@@ -20,14 +20,12 @@ package org.eclipse.ptp.ui.wizards;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
@@ -202,31 +200,23 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	        composite.setLayout(new GridLayout());
 	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 	        
-	        serviceConfigWidget = new ServiceConfigurationSelectionWidget(composite, SWT.NONE);
+			Label label = new Label(composite, SWT.NONE);
+			label.setText(Messages.RMServicesConfigurationWizard_14);
+
+	        serviceConfigWidget = new ServiceConfigurationSelectionWidget(composite, SWT.NONE, null, 
+	        							Collections.singleton(fLaunchService), false);
 	        GridData data = new GridData(GridData.FILL_BOTH);
 	        data.heightHint = 200;
 	        serviceConfigWidget.setLayoutData(data);
 	        serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(SelectionChangedEvent event) {
-					handleSelectionChanged(event);
+					setServiceConfiguration(serviceConfigWidget.getSelectedConfiguration());
+					setPageComplete(getServiceConfiguration() != null);
 				}
 	        });
 
 			setControl(composite);
 			setPageComplete(false);
-		}
-		
-		public void handleSelectionChanged(SelectionChangedEvent event) {
-			IServiceConfiguration config = null;
-			ISelection selection = event.getSelection();
-			if (!selection.isEmpty() && selection instanceof ITreeSelection) {
-				ITreeSelection treeSelection = (ITreeSelection)selection;
-				TreePath path = treeSelection.getPaths()[0];
-				config = (IServiceConfiguration)path.getFirstSegment();
-			}
-			
-			setServiceConfiguration(config);
-			setPageComplete(config != null);
 		}
 	}
 	
@@ -275,8 +265,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			 * 		 Probably better to create an RM_LAUNCH_SERVICE instead.
 			 * 
 			 */
-			IService launchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
-			fProviders = launchService.getProvidersByPriority().toArray(new IServiceProviderDescriptor[0]);
+			fProviders = fLaunchService.getProvidersByPriority().toArray(new IServiceProviderDescriptor[0]);
 			String[] providerNames = new String[fProviders.length];
 			for (int i = 0; i < fProviders.length; ++i) {
 				providerNames[i] = fProviders[i].getName();
@@ -308,8 +297,8 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private final SelectServiceProviderPage fSelectServiceProviderPage;
 	private final SelectServiceConfigurationPage fSelectServiceConfigurationPage;
 	private final ResourceManagerPage fResourceManagerPage;
-	private final IService fLaunchService;
 	private final IServiceModelManager fModelManager = ServiceModelManager.getInstance();
+	private final IService fLaunchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
 
 	private Map<String, IWizardPage[]> fCachedPages = new HashMap<String, IWizardPage[]>();
 	private boolean fUseDefaultNameAndDesc = true;
@@ -328,7 +317,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 				Messages.RMServicesConfigurationWizard_9);
 		fResourceManagerPage = new ResourceManagerPage(
 				Messages.RMServicesConfigurationWizard_10);
-		fLaunchService = fModelManager.getService(IServiceConstants.LAUNCH_SERVICE);
 		setWizardPages(null);
 	}
 
