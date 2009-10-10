@@ -76,7 +76,6 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	/**
 	 * Comparator class used to sort service configurations in ascending order
 	 * by name
-	 * 
 	 */
 	private class ServiceConfigurationComparator extends ViewerComparator {
 		/* (non-Javadoc)
@@ -91,21 +90,24 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		}
 	}
 	
-	private class ServiceContentProvider extends WorkbenchContentProvider {
+	/**
+	 * Content provider for service configurations
+	 */
+	private class ServiceConfigurationContentProvider extends WorkbenchContentProvider {
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getChildren(java.lang.Object)
 		 */
 		@Override
 		public Object[] getChildren(Object element) {
-			if (element instanceof IServiceModelManager) {
-				Set<IServiceConfiguration> children = ((IServiceModelManager)element).getConfigurations();
-				if (fExcludedConfigs != null) {
-					children.removeAll(fExcludedConfigs);
-				}
-				return children.toArray();
+			Set<IServiceConfiguration> children = fDisplayConfigs;
+			if (children == null) {
+				children = ServiceModelManager.getInstance().getConfigurations();
 			}
-			return super.getChildren(element);
+			if (fExcludedConfigs != null) {
+				children.removeAll(fExcludedConfigs);
+			}
+			return children.toArray();
 		}
 	}
 
@@ -131,7 +133,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	private boolean fUseCheckboxes = false;
 	private Set<IService> fServices = null;
 	private Set<IServiceConfiguration> fExcludedConfigs = null;
-	
+	private Set<IServiceConfiguration> fDisplayConfigs = null;
 	private IServiceConfiguration fSelectedConfig = null;
 
 	public ServiceConfigurationSelectionWidget(Composite parent, int style) {
@@ -182,7 +184,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			fTable.setHeaderVisible(true);
 		}
 
-		fTableViewer.setContentProvider(new ServiceContentProvider());
+		fTableViewer.setContentProvider(new ServiceConfigurationContentProvider());
 		fTableViewer.setLabelProvider(new WorkbenchLabelProvider());
 		fTableViewer.setComparator(new ServiceConfigurationComparator());
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -192,9 +194,9 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			}
 		});
 		
-		addColumns();
+		createColumns();
 		
-		fTableViewer.setInput(ServiceModelManager.getInstance());
+		fTableViewer.setInput(this);
 		
 		if (enableButtons && !fUseCheckboxes) {
 			Composite buttonsComp = new Composite(this, SWT.NONE);
@@ -359,6 +361,17 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		fSelectionListeners.remove(listener);
 	}
 
+	/**
+	 * Set the service configurations to display in the viewer. Passing null
+	 * will display all known configurations (default).
+	 * 
+	 * @param configurations configurations to display, or null to display all
+	 */
+	public void setConfigurations(Set<IServiceConfiguration> configurations) {
+		fDisplayConfigs = configurations;
+		fTableViewer.refresh();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
 	 */
@@ -375,6 +388,12 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		fSelection = selection;
 	}
 	
+	/**
+	 * Add the named column to the viewer
+	 * 
+	 * @param colName name to use for the column heading
+	 * @return the column
+	 */
 	private TableViewerColumn addColumn(String colName) {
 		TableViewerColumn column = new TableViewerColumn(fTableViewer, SWT.NONE);
 		column.getColumn().setResizable(true);
@@ -386,7 +405,12 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		return column;
 	}
 
-	private void addColumns() {
+	/**
+	 * Create the columns in the viewer. Always creates at least one column, the service
+	 * configuration name. The other columns are determined by the set of services
+	 * passed to the constructor.
+	 */
+	private void createColumns() {
 		TableViewerColumn firstColumn = addColumn(Messages.ServiceConfigurationSelectionWidget_7);
 		firstColumn.setLabelProvider(new ColumnLabelProvider(){
 			@Override
