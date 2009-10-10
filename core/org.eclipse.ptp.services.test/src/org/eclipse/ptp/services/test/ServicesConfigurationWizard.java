@@ -18,14 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.test;
 
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.ui.widgets.ServiceConfigurationSelectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -56,24 +52,12 @@ public class ServicesConfigurationWizard extends Wizard {
 	        serviceConfigWidget.setLayoutData(data);
 	        serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(SelectionChangedEvent event) {
-					handleSelectionChanged(event);
+					setPageComplete(serviceConfigWidget.getSelectedConfiguration() != null);
 				}
 	        });
 
 			setControl(composite);
 			setPageComplete(false);
-		}
-		
-		public void handleSelectionChanged(SelectionChangedEvent event) {
-			IServiceConfiguration config = null;
-			ISelection selection = event.getSelection();
-			if (!selection.isEmpty() && selection instanceof ITreeSelection) {
-				ITreeSelection treeSelection = (ITreeSelection)selection;
-				TreePath path = treeSelection.getPaths()[0];
-				config = (IServiceConfiguration)path.getFirstSegment();
-			}
-			
-			setPageComplete(config != null);
 		}
 	}
 
