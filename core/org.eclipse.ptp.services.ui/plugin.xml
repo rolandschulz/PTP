@@ -118,4 +118,32 @@
          </action>
       </viewerContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.eclipse.ptp.services.ui.importWizardCategory"
+            name="%ServiceImportWizardCategory.name">
+      </category>
+      <wizard
+            category="org.eclipse.ptp.services.ui.importWizardCategory"
+            class="org.eclipse.ptp.services.ui.wizards.ServiceConfigurationImportWizard"
+            icon="icons/obj16/service_configuration_obj.gif"
+            id="org.eclipse.ptp.services.ui.serviceConfigurationImportWizard"
+            name="%ServiceConfigurationImportWizard.name">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="org.eclipse.ptp.services.ui.exportWizardCategory"
+            name="%ServiceExportWizardCategory.name">
+      </category>
+      <wizard
+            category="org.eclipse.ptp.services.ui.exportWizardCategory"
+            class="org.eclipse.ptp.services.ui.wizards.ServiceConfigurationExportWizard"
+            icon="icons/obj16/service_configuration_obj.gif"
+            id="org.eclipse.ptp.services.ui.serviceConfigurationExportWizard"
+            name="%ServiceConfigurationExportWizard.name">
+      </wizard>
+   </extension>
 </plugin>

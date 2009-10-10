@@ -27,6 +27,54 @@ public class Messages extends NLS {
 
 	public static String SelectActiveServiceConfigurationAction_0;
 
+	public static String ServiceConfigurationExportWizard_0;
+
+	public static String ServiceConfigurationExportWizard_1;
+
+	public static String ServiceConfigurationExportWizard_10;
+
+	public static String ServiceConfigurationExportWizard_11;
+
+	public static String ServiceConfigurationExportWizard_13;
+
+	public static String ServiceConfigurationExportWizard_14;
+
+	public static String ServiceConfigurationExportWizard_15;
+
+	public static String ServiceConfigurationExportWizard_4;
+
+	public static String ServiceConfigurationExportWizard_5;
+
+	public static String ServiceConfigurationExportWizard_6;
+
+	public static String ServiceConfigurationExportWizard_7;
+
+	public static String ServiceConfigurationExportWizard_8;
+
+	public static String ServiceConfigurationExportWizard_9;
+
+	public static String ServiceConfigurationImportWizard_1;
+
+	public static String ServiceConfigurationImportWizard_10;
+
+	public static String ServiceConfigurationImportWizard_11;
+
+	public static String ServiceConfigurationImportWizard_2;
+
+	public static String ServiceConfigurationImportWizard_3;
+
+	public static String ServiceConfigurationImportWizard_4;
+
+	public static String ServiceConfigurationImportWizard_5;
+
+	public static String ServiceConfigurationImportWizard_6;
+
+	public static String ServiceConfigurationImportWizard_7;
+
+	public static String ServiceConfigurationImportWizard_8;
+
+	public static String ServiceConfigurationImportWizard_9;
+
 	public static String ServiceConfigurationPreferencePage_0;
 	public static String ServiceConfigurationPreferencePage_1;
 	public static String ServiceConfigurationPreferencePage_2;
