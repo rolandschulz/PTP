@@ -14,7 +14,6 @@
 package org.eclipse.ptp.services.ui.widgets;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -99,22 +98,11 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		 */
 		@Override
 		public Object[] getChildren(Object element) {
-			if (!fUseCheckboxes && element instanceof IServiceConfiguration) {
-				IServiceConfiguration config = (IServiceConfiguration)element;
-				Set<Object> children = new HashSet<Object>();
-				for (IService service : config.getServices()) {
-					children.add(config.getServiceProvider(service));
-				}
-				for (IService service : fManager.getServices()) {
-					if (config.isDisabled(service)) {
-						children.add(service);
-					}
-				}
-				return children.toArray();
-			}
-			if (fExcludedConfigs != null && element instanceof IServiceModelManager) {
+			if (element instanceof IServiceModelManager) {
 				Set<IServiceConfiguration> children = ((IServiceModelManager)element).getConfigurations();
-				children.removeAll(fExcludedConfigs);
+				if (fExcludedConfigs != null) {
+					children.removeAll(fExcludedConfigs);
+				}
 				return children.toArray();
 			}
 			return super.getChildren(element);
@@ -196,6 +184,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 
 		fTableViewer.setContentProvider(new ServiceContentProvider());
 		fTableViewer.setLabelProvider(new WorkbenchLabelProvider());
+		fTableViewer.setComparator(new ServiceConfigurationComparator());
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				notifySelection(fTableViewer.getSelection());
