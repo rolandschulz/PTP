@@ -204,7 +204,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			label.setText(Messages.RMServicesConfigurationWizard_14);
 
 	        serviceConfigWidget = new ServiceConfigurationSelectionWidget(composite, SWT.NONE, null, 
-	        							Collections.singleton(fLaunchService), false);
+	        							Collections.singleton(fLaunchService), true);
 	        GridData data = new GridData(GridData.FILL_BOTH);
 	        data.heightHint = 200;
 	        serviceConfigWidget.setLayoutData(data);
