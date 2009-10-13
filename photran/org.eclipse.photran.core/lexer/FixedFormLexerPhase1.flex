@@ -144,7 +144,7 @@ import org.eclipse.core.resources.IFile;
                                         
         if(!tokenText.equals(yytext()) && terminal != Terminal.T_EOS)
         {
-            prevToken.setPreprocessorDirective(tokenText);
+            prevToken.setPreprocessorDirective(new FixedFormReplacement(tokenText));
             prevToken.setText(yytext());
         }
         

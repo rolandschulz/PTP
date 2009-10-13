@@ -84,7 +84,7 @@ public final class FortranPreprocessor extends InputStream
     
     private int offset = 0, line = 1;
     
-    private LinkedList<String> directivesInTopLevelFile;
+    private LinkedList<FortranIncludeDirective> directivesInTopLevelFile;
     private ArrayList<Integer> directiveStartOffsets;
     
     private LinkedList<String> fileNames;
@@ -101,7 +101,7 @@ public final class FortranPreprocessor extends InputStream
         streamStack = new StreamStack();
         streamStack.push(new LineInputStream(readFrom, filename));
         
-        directivesInTopLevelFile = new LinkedList<String>();
+        directivesInTopLevelFile = new LinkedList<FortranIncludeDirective>();
         directivesInTopLevelFile.add(null);
         directiveStartOffsets = new ArrayList<Integer>();
         directiveStartOffsets.add(new Integer(0));
@@ -140,11 +140,11 @@ public final class FortranPreprocessor extends InputStream
         throw new IllegalArgumentException();
     }
 
-    public String getDirectiveAtOffset(int offset)
+    public FortranIncludeDirective getDirectiveAtOffset(int offset)
     {
         for (int i = directiveStartOffsets.size()-1; i >= 0; i--)
             if (((Integer)directiveStartOffsets.get(i)).intValue() <= offset)
-                return (String)directivesInTopLevelFile.get(i);
+                return (FortranIncludeDirective)directivesInTopLevelFile.get(i);
         
         throw new IllegalArgumentException();
     }
@@ -201,7 +201,7 @@ public final class FortranPreprocessor extends InputStream
             {
                 if (inTopLevelFile())
                 {
-                    directivesInTopLevelFile.add(includeLine);
+                    directivesInTopLevelFile.add(new FortranIncludeDirective(includeLine));
                     directiveStartOffsets.add(new Integer(offset));
                 }
 

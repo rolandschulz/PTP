@@ -34,7 +34,7 @@ java -Xmx512M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-wo
 	-genTerminalClass false \
 	-genLexerInterface false \
 	-genTokenClass false \
-	-enablePreproc String \
+	-enablePreproc IPreprocessorReplacement \
 	$SRCDIR/fortran2003.bnf
 
 echo Applying patches...

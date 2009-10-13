@@ -69,7 +69,7 @@ public class Token implements IToken, IASTNode
      * expanded.  <code>Token</code>s expanded from the same directive will have pointer-identical
      * <code>preprocessorDirective</code>s.
      */
-    protected String preprocessorDirective = null;
+    protected IPreprocessorReplacement preprocessorDirective = null;
     
     protected IFile ifile = null;
     protected java.io.File javaFile = null;
@@ -156,12 +156,12 @@ public class Token implements IToken, IASTNode
      */
     public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
 
-    public String getPreprocessorDirective()
+    public IPreprocessorReplacement getPreprocessorDirective()
     {
         return preprocessorDirective;
     }
 
-    public void setPreprocessorDirective(String preprocessorDirective)
+    public void setPreprocessorDirective(IPreprocessorReplacement preprocessorDirective)
     {
         this.preprocessorDirective = preprocessorDirective;
     }
@@ -361,7 +361,7 @@ public class Token implements IToken, IASTNode
     // Source Code Reproduction
     ///////////////////////////////////////////////////////////////////////////
     
-    public String printOn(PrintStream out, String currentPreprocessorDirective)
+    public IPreprocessorReplacement printOn(PrintStream out, IPreprocessorReplacement currentPreprocessorDirective)
     {
         if (this.preprocessorDirective != currentPreprocessorDirective)
         {

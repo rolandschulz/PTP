@@ -37,7 +37,7 @@ public class SimpleToken implements IToken
     /**
      * The guarding directive
      */
-    protected String preprocessorDirective = null;
+    protected IPreprocessorReplacement preprocessorDirective = null;
     
     ///////////////////////////////////////////////////////////////////////////
     // Additional Fields - Not updated when refactoring
@@ -102,9 +102,9 @@ public class SimpleToken implements IToken
      */
     public void setWhiteAfter(String value) {;}
     
-    public String getPreprocessorDirective() { return preprocessorDirective; }
+    public IPreprocessorReplacement getPreprocessorDirective() { return preprocessorDirective; }
     
-    public void setPreprocessorDirective(String preprocessorDirective) { this.preprocessorDirective = preprocessorDirective; }
+    public void setPreprocessorDirective(IPreprocessorReplacement preprocessorDirective) { this.preprocessorDirective = preprocessorDirective; }
 
     public int getLine()
     {

@@ -37,7 +37,7 @@ import org.eclipse.photran.internal.core.lexer.TokenFactory;
 public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
 {
     private FortranPreprocessor preprocessor;
-    private String lastDirective;
+    private FortranIncludeDirective lastDirective;
 
     public PreprocessingFreeFormLexerPhase1(InputStream in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
@@ -56,7 +56,7 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
     {
         Token token = (Token)super.yylex();
         
-        String thisDirective = preprocessor.getDirectiveAtOffset(lastTokenStreamOffset);
+        FortranIncludeDirective thisDirective = preprocessor.getDirectiveAtOffset(lastTokenStreamOffset);
         if (thisDirective != null && lastDirective == null)
             adjustWhiteBeforeAtIncludeStart(token);
         else if (thisDirective == null && lastDirective != null)

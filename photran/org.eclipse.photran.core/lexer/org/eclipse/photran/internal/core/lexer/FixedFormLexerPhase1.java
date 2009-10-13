@@ -34,10 +34,8 @@
  */
  
 package org.eclipse.photran.internal.core.lexer;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.LinkedList;
+
 import org.eclipse.core.resources.IFile;
 
 
@@ -930,7 +928,7 @@ class FixedFormLexerPhase1 implements ILexer {
                                         
         if(!tokenText.equals(yytext()) && terminal != Terminal.T_EOS)
         {
-            prevToken.setPreprocessorDirective(tokenText);
+            prevToken.setPreprocessorDirective(new FixedFormReplacement(tokenText));
             prevToken.setText(yytext());
         }
         
