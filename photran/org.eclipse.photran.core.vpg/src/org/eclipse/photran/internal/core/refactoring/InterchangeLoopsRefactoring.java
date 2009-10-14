@@ -91,6 +91,8 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         Reindenter.reindent(outerLoop, this.astOfFileInEditor, Strategy.REINDENT_EACH_LINE);
 
         this.addChangeFromModifiedAST(this.fileInEditor, pm);
+        
+        vpg.releaseAST(this.fileInEditor);
     }
 
     protected void swapHeaders()
