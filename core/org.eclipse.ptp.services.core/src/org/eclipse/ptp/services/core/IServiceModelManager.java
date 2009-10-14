@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.services.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -60,6 +61,15 @@ public interface IServiceModelManager extends IAdaptable {
 	public void addEventListener(IServiceModelEventListener listener, int type);
 	
 	/**
+	 * Export a set of service configurations to a file. 
+	 * 
+	 * @param file file name used to save the configuration
+	 * @return service configurations to export
+	 * @throws InvocationTargetException wraps any exceptions thrown during export
+	 */
+	public boolean exportConfigurations(String filename, IServiceConfiguration[] configs) throws InvocationTargetException;
+	
+	/**
 	 * Get the global "active" service configuration. The "active" configuration is an
 	 * arbitrary configuration can be used by tools that do not operate on a project basis.
 	 * 
@@ -80,6 +90,13 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws ProjectNotConfiguredException if the project has not been configured
 	 */
 	public IServiceConfiguration getActiveConfiguration(IProject project);
+	
+	/**
+	 * Returns all the service categories that have been registered with
+	 * the system.
+	 * @return
+	 */
+	public Set<IServiceCategory> getCategories();
 	
 	/**
 	 * Get the named configuration for this project.
@@ -170,19 +187,31 @@ public interface IServiceModelManager extends IAdaptable {
 	public Set<IService> getServices(String natureID);
 	
 	/**
-	 * Returns all the service categories that have been registered with
-	 * the system.
-	 * @return
+	 * Import a set of service configurations from a file. The configurations
+	 * must be added to the model using {@link #addConfiguration(IServiceConfiguration)}
+	 * before they can be used. No model events will be generated while loading
+	 * the configurations.
+	 * 
+	 * @param file file name containing the configuration
+	 * @return imported service configurations
+	 * @throws InvocationTargetException wraps any exceptions thrown during import
 	 */
-	public Set<IServiceCategory> getCategories();
-	
+	public IServiceConfiguration[] importConfigurations(String filename) throws InvocationTargetException;
+
 	/**
 	 * Returns true if the given project has a configuration.
 	 * 
 	 */
 	public boolean isConfigured(IProject project);
 	
-	
+	/**
+	 * Validate a set of service configurations in a file
+	 * 
+	 * @param file file name of the file containing the configurations
+	 * @return true if valid, false otherwise
+	 */
+	public boolean isValidConfigurationFile(String filename);
+
 	/**
 	 * Obtain a new service configuration with name 'name'. The name
 	 * does not need to be unique. This service configuration will not
@@ -193,7 +222,7 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @return new service configuration
 	 */
 	public IServiceConfiguration newServiceConfiguration(String name);
-	
+
 	/**
 	 * Removes all the configurations and services associated to the given project.
 	 * If the project has not been configured then this method does nothing.
@@ -201,14 +230,14 @@ public interface IServiceModelManager extends IAdaptable {
 	 * @throws NullPointerException if project is null
 	 */
 	public void remove(IProject project);
-
+	
 	/**
 	 * Removes the service configuration.
 	 * 
 	 * @param conf the configuration
 	 */
 	public void remove(IServiceConfiguration conf);
-
+	
 	/**
 	 * TODO What happens if you try to remove the active configuration?
 	 * TODO What happens if there are no configurations left after removing the given configuration?

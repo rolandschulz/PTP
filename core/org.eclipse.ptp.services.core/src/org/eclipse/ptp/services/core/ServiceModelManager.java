@@ -13,11 +13,13 @@ package org.eclipse.ptp.services.core;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,6 +47,7 @@ import org.eclipse.ptp.services.internal.core.ServiceModelEvent;
 import org.eclipse.ptp.services.internal.core.ServiceModelEventManager;
 import org.eclipse.ptp.services.internal.core.ServiceProviderDescriptor;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
 /**
@@ -97,26 +100,18 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	} 
 	
 	/**
-	 * Save the model configuration to persistent storage
+	 * Save a collection of service configurations to the memento
+	 * NOTE: does not actually save the memento
 	 * 
-	 * @param configs
-	 * @param projectConfigs
-	 * @param activeConfigs
-	 * @param writer
-	 * @throws IOException
+	 * @param memento memento used to save configurations
+	 * @param configs collection of serice configurations to save
 	 */
-	private static void saveModelConfiguration(Map<String, IServiceConfiguration> configs,
-			Map<IProject, Map<String, IServiceConfiguration>> projectConfigs,
-			Map<IProject, IServiceConfiguration> activeConfigs,
-			Writer writer) throws IOException {
-		
-		XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
-		
-		for (IServiceConfiguration config : configs.values()) {
+	private static void saveConfigurations(IMemento memento, IServiceConfiguration[] configs) {
+		for (IServiceConfiguration config : configs) {
 			String configurationId = config.getId();
 			String configurationName = config.getName();
 			
-			IMemento configMemento = rootMemento.createChild(SERVICE_CONFIGURATION_ELEMENT_NAME);
+			IMemento configMemento = memento.createChild(SERVICE_CONFIGURATION_ELEMENT_NAME);
 			configMemento.putString(ATTR_ID, configurationId);
 			configMemento.putString(ATTR_NAME, configurationName);
 			
@@ -144,6 +139,25 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Save the model configuration to persistent storage
+	 * 
+	 * @param configs
+	 * @param projectConfigs
+	 * @param activeConfigs
+	 * @param writer
+	 * @throws IOException
+	 */
+	private static void saveModelConfiguration(Map<String, IServiceConfiguration> configs,
+			Map<IProject, Map<String, IServiceConfiguration>> projectConfigs,
+			Map<IProject, IServiceConfiguration> activeConfigs,
+			Writer writer) throws IOException {
+		
+		XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
+		
+		saveConfigurations(rootMemento, configs.values().toArray(new IServiceConfiguration[0]));
 		
 		for (Entry<IProject, Map<String, IServiceConfiguration>> entry : projectConfigs.entrySet()) {
 			IProject project = entry.getKey();
@@ -181,7 +195,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			((ServiceProvider)provider).saveState(providerConfigMemento);
 		}
 	}
-	
 	/** Default location to save service model configuration */
 	private final IPath defaultSaveFile;
 	private Map<String, IServiceConfiguration> fConfigurations = new HashMap<String, IServiceConfiguration>();
@@ -196,6 +209,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private ServiceModelEventManager fEventManager = new ServiceModelEventManager();
 	private boolean fModelLoaded = false;
 	
+	private boolean fEventsEnabled = true;
+	
 	private static ServiceModelManager fInstance;
 	
 	public static synchronized ServiceModelManager getInstance() {
@@ -204,11 +219,11 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		return fInstance;
 	}
-	
+
 	private ServiceModelManager() {
 		defaultSaveFile = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -242,6 +257,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		addConfiguration(conf);
 	}
 	
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addConfiguration(org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -252,12 +268,41 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 	}
 	
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#addEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener, int)
 	 */
 	public void addEventListener(IServiceModelEventListener listener, int type) {
 		fEventManager.addEventListener(listener, type);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#exportConfigurations(java.lang.String, java.util.Set)
+	 */
+	public boolean exportConfigurations(String filename, 
+			IServiceConfiguration[] configs) throws InvocationTargetException {
+		final File file = new File(filename);
+		if (!file.exists()) {
+			final Writer writer;
+			try {
+				writer = new BufferedWriter(new FileWriter(file));
+			} catch (IOException e) {
+				throw new InvocationTargetException(e);
+			}
+			try {
+				final XMLMemento rootMemento = XMLMemento.createWriteRoot(SERVICE_MODEL_ELEMENT_NAME);
+				saveConfigurations(rootMemento, configs);
+				rootMemento.save(writer);
+			} catch (IOException e) {
+				throw new InvocationTargetException(e);
+			} finally {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					throw new InvocationTargetException(e);
+				}
+			}
+		}
+		return false;
 	}
 	
 	/* (non-Javadoc)
@@ -267,7 +312,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		checkAndLoadModel();
 		return fDefaultServiceConfiguration;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getActiveConfiguration(org.eclipse.core.resources.IProject)
 	 */
@@ -297,7 +342,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		return null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getConfiguration(java.lang.String)
 	 */
@@ -351,7 +396,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		return projectsForConfig;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getService(java.lang.String)
 	 */
@@ -364,7 +409,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServiceProvider(org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID,	PROVIDER_EXTENSION_ID);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID, PROVIDER_EXTENSION_ID);
 		if (extensionPoint != null) {
 			for (IExtension extension : extensionPoint.getExtensions()) {
 				for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -402,13 +447,43 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		checkAndLoadModel();
 		return getConf(fProjectServices, project);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#getServices(java.lang.String)
 	 */
 	public Set<IService> getServices(String natureId) {
 		loadServicesFromExtensionRegistry();
 		return fNatureServices.get(natureId);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#importConfigurations(java.lang.String)
+	 */
+	public IServiceConfiguration[] importConfigurations(String filename) throws InvocationTargetException {
+		final File file = new File(filename);
+		if (file.exists()) {
+			final Reader reader;
+			try {
+				reader = new BufferedReader(new FileReader(file));
+			} catch (FileNotFoundException e) {
+				throw new InvocationTargetException(e);
+			}
+			try {
+				final XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
+				setEnableEvents(false);
+				return doLoadConfigurations(rootMemento, true);
+			} catch (WorkbenchException e) {
+				throw new InvocationTargetException(e);
+			} finally {
+				setEnableEvents(true);
+				try {
+					reader.close();
+				} catch (IOException e) {
+					throw new InvocationTargetException(e);
+				}
+			}
+		}
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -418,7 +493,77 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		checkAndLoadModel();
 		return fProjectConfigurations.containsKey(project);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceModelManager#isValidConfigurationFile(java.lang.String)
+	 */
+	public boolean isValidConfigurationFile(String filename) {
+		File file = new File(filename);
+		if (file.exists()) {
+			final Reader reader;
+			try {
+				reader = new BufferedReader(new FileReader(file));
+			} catch (FileNotFoundException e) {
+				return false;
+			}
+			try {
+				final XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
+				final IMemento[] children = rootMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME);
+				if (children == null || children.length == 0) {
+					return false;
+				}
+				for (IMemento configMemento : children) {
+					String configId = configMemento.getString(ATTR_ID);
+					if (configId == null) {
+						return false;
+					}
+					String configName = configMemento.getString(ATTR_NAME);
+					if (configName == null) {
+						return false;
+					}
+					for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
+						String serviceId = serviceMemento.getString(ATTR_ID);
+						if (serviceId == null) {
+							return false;
+						}
+						IService service = getService(serviceId);
+						if (service == null) {
+							return false;
+						}
+						if (!validateServiceProvider(serviceMemento, service)) {
+							return false;
+						}
+					}
+					for (IMemento disabledMemento : configMemento.getChildren(DISABLED_PROVIDERS_ELEMENT_NAME)) {
+						String serviceId = disabledMemento.getString(ATTR_ID);
+						if (serviceId == null) {
+							return false;
+						}
+						IService service = getService(serviceId);
+						if (service == null) {
+							return false;
+						}
+						for (IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
+							if (!validateServiceProvider(providerMemento, service)) {
+								return false;
+							}
+						}
+					}
+					
+				}
+			} catch (WorkbenchException e) {
+				return false;
+			} finally {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					// Too late now
+				}
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * Replaces the current service model configuration with what is
 	 * specified in the default save file. If the file does not exist
@@ -458,32 +603,13 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 
 		initialize(); // Clear out the existing model
 		
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
 		
-		for (IMemento configMemento : rootMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
-			String configId = configMemento.getString(ATTR_ID);
-			String configName = configMemento.getString(ATTR_NAME);
-			ServiceConfiguration config = newServiceConfiguration(configId, configName);
-			
-			for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
-				String serviceId = serviceMemento.getString(ATTR_ID);
-				IService service = getService(serviceId);
-				IServiceProvider provider = loadServiceProvider(serviceMemento, service);
-				config.setServiceProvider(service, provider);
-			}
-			
-			for (IMemento disabledMemento : configMemento.getChildren(DISABLED_PROVIDERS_ELEMENT_NAME)) {
-				String serviceId = disabledMemento.getString(ATTR_ID);
-				IService service = getService(serviceId);
-				for (IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
-					IServiceProvider provider = loadServiceProvider(providerMemento, service);
-					config.addFormerServiceProvider(service, provider);
-				}
-			}
-			
-			fConfigurations.put(configId, config);
+		for (IServiceConfiguration config: doLoadConfigurations(rootMemento, false)) {
+			addConfiguration(config);
 		}
+		
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		
 		for (IMemento projectMemento : rootMemento.getChildren(PROJECT_ELEMENT_NAME)) {
 			String projectName = projectMemento.getString(ATTR_NAME);
@@ -506,7 +632,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#newServiceConfiguration(java.lang.String)
 	 */
@@ -542,7 +668,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.core.resources.IProject)
 	 */
@@ -570,7 +696,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fConfigurations.remove(conf.getId());
 		notifyListeners(new ServiceModelEvent(conf, IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED));
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeConfiguration(org.eclipse.core.resources.IProject, org.eclipse.ptp.services.core.IServiceConfiguration)
 	 */
@@ -581,14 +707,14 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			confs.remove(conf.getId());
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#removeEventListener(org.eclipse.ptp.services.core.IServiceModelEventListener)
 	 */
 	public void removeEventListener(IServiceModelEventListener listener) {
 		fEventManager.removeEventListener(listener);
 	}
-	
+
 	/**
 	 * Saves the model configuration into the plugin's metadata area using
 	 * the default file name.
@@ -665,6 +791,48 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}
 	}
+	
+	/**
+	 * Do the actual job of loading configurations.
+	 * 
+	 * If the configurations are being imported then a new ID is generated for each configuration.
+	 * This is to avoid the import causing duplicate configuration IDs.
+	 * 
+	 * @param rootMemento
+	 * @return
+	 */
+	private IServiceConfiguration[] doLoadConfigurations(IMemento rootMemento, boolean importing) {
+		Set<IServiceConfiguration> configs = new HashSet<IServiceConfiguration>();
+		
+		for (IMemento configMemento : rootMemento.getChildren(SERVICE_CONFIGURATION_ELEMENT_NAME)) {
+			String configId = configMemento.getString(ATTR_ID);
+			if (importing) {
+				configId = UUID.randomUUID().toString();
+			}
+			String configName = configMemento.getString(ATTR_NAME);
+			ServiceConfiguration config = newServiceConfiguration(configId, configName);
+			
+			for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
+				String serviceId = serviceMemento.getString(ATTR_ID);
+				IService service = getService(serviceId);
+				IServiceProvider provider = loadServiceProvider(serviceMemento, service);
+				config.setServiceProvider(service, provider);
+			}
+			
+			for (IMemento disabledMemento : configMemento.getChildren(DISABLED_PROVIDERS_ELEMENT_NAME)) {
+				String serviceId = disabledMemento.getString(ATTR_ID);
+				IService service = getService(serviceId);
+				for (IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
+					IServiceProvider provider = loadServiceProvider(providerMemento, service);
+					config.addFormerServiceProvider(service, provider);
+				}
+			}
+			
+			configs.add(config);
+		}
+		
+		return configs.toArray(new IServiceConfiguration[0]);
+	}
 
 	/**
 	 * Initialize model
@@ -707,7 +875,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Locate and initialize service extensions.
 	 */
@@ -811,7 +979,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}	
 	}
-	
+
 	/**
 	 * Create a service configuration with the specified id and name. Used when
 	 * restoring saved state.
@@ -822,5 +990,37 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 */
 	private ServiceConfiguration newServiceConfiguration(String id, String name) {
 		return new ServiceConfiguration(id, name);
+	}
+	
+	/**
+	 * Enable/disable model events.
+	 * 
+	 * @param enable
+	 */
+	private void setEnableEvents(boolean enable) {
+		fEventsEnabled = enable;
+	}
+	
+	/**
+	 * Validate a service provider from persistent state
+	 * 
+	 * @param providerMemento
+	 * @param service
+	 * @return
+	 */
+	private boolean validateServiceProvider(IMemento providerMemento, IService service) {
+		String providerId = providerMemento.getString(ATTR_PROVIDER_ID);
+		if (providerId == null) {
+			return false;
+		}
+		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
+		if (descriptor == null) {
+			return false;
+		}
+		IMemento providerConfigMemento = providerMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
+		if (providerConfigMemento == null) {
+			return false;
+		}
+		return true;
 	}
 }
