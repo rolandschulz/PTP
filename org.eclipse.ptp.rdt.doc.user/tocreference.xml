@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Reference" link_to="toc.xml#reference"> 
+<toc label="Reference" link_to="toc.xml#reference">
+   <topic href="html/reference/remote_c_cpp_perspective.html" label="Remote C/C++ Development Perspective">
+   </topic>
+ <topic href="html/reference/remote_c_views.html" label="Remote C/C++ Views and Editors">
+    <topic href="html/reference/project_explorer_view.htm" label="Project Explorer View">
+    </topic>
+    <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor">
+    </topic>
+    <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy view">
+    </topic>
+    <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy view">
+    </topic>
+    <topic href="html/reference/outline_view.html" label="Outline view">
+    </topic>
+    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_make_targets_view.htm" label="Make Targets view">
+    </topic>
+    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_console_view.htm" label="Console view">
+    </topic>
+    <topic label="Problems view">
+    </topic>
+    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_properties_view.htm" label="Properties view">
+    </topic>
+    <topic label="Tasks view">
+    </topic>
+ </topic>
+ <topic label="Remote C/C++ Properties">
+    <topic label="Remote Paths and Symbols Property Page">
+       <topic href="html/reference/remote_properties_paths.html" label="Remote Paths">
+       </topic>
+       <topic href="html/reference/remote_properties_symbols.html" label="Symbols">
+       </topic>
+    </topic>
+    <topic href="html/reference/remote_services.html" label="Remote Services Property Page">
+    </topic>
+ </topic> 
 	<topic label="Remote C/C++ New Project Wizard"  href="html/reference/remote_c_new_project_wizard.html">
     <topic href="html/reference/remote_c_new_project_wizard_1.html" label="Name, Location, Project Type and Toolchain Page">
     </topic>
@@ -10,30 +44,12 @@
     <topic href="html/reference/remote_c_new_project_wizard_3.html" label="Service Providers Page">
     </topic> 
 	</topic>
- <topic label="Remote C/C++ Views and Editors">
-    <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor">
-    </topic>
-    <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy">
-    </topic>
-    <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy">
-    </topic>
-    <topic href="html/reference/outline_view.html" label="Outline View">
-    </topic>
- </topic>
- <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search">
- </topic>
  <topic label="Import/Export Project Settings Wizards">
     <topic href="html/reference/settings_wizard_export.html" label="Export Wizard">
     </topic>
     <topic href="html/reference/settings_wizard_import.html" label="Import Wizard">
     </topic>
  </topic>
- <topic label="Remote Paths and Symbols Property Page">
-    <topic href="html/reference/remote_properties_paths.html" label="Remote Paths">
-    </topic>
-    <topic href="html/reference/remote_properties_symbols.html" label="Symbols">
-    </topic>
- </topic>
- <topic href="html/reference/remote_services.html" label="Remote Services Property Page">
+ <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search">
  </topic>
 </toc>
