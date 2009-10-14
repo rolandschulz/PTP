@@ -282,6 +282,12 @@
             </or>
          </enabledWhen>
       </page>
+      <page
+            category="org.eclipse.cdt.ui.newui.Page_head_general"
+            class="org.eclipse.ptp.rdt.ui.properties.IndexerOptionPropertyPage"
+            id="org.eclipse.ptp.rdt.ui.indexer"
+            name="%CDTIndexerProperty.name">
+      </page>
    </extension>
    <extension
          point="org.eclipse.cdt.ui.cPropertyTab">
@@ -654,4 +660,28 @@
            </nature>
         </service>
      </extension>
+     
+     <extension point="org.eclipse.ui.activities">
+       <category
+             id="org.eclipse.ptp.rdt.ui.rdtCategory"
+             name="%rdt.category.name.0">
+       </category>
+       
+       <categoryActivityBinding
+             activityId="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
+             categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
+       </categoryActivityBinding>
+       
+       <activity
+             id="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
+             name="%cdtIndexerProperty.name">
+       </activity>
+    
+       <activityPatternBinding
+             activityId="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
+             pattern="org\.eclipse\.cdt\.ui/org\.eclipse\.cdt\.ui\.indexer">
+       </activityPatternBinding>
+       
+     </extension>
+     
 </plugin>
