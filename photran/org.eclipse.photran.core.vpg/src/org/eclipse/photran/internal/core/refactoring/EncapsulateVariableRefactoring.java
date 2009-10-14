@@ -96,8 +96,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     
     public void setGetterName(String gName)
     {
-        String parans = gName.substring(gName.length()-2, gName.length());
-        if(parans.equalsIgnoreCase("()"))
+        String parens = gName.length() < 2 ? "" : gName.substring(gName.length()-2, gName.length());
+        if(parens.equalsIgnoreCase("()"))
             getterName = gName.substring(0, gName.length()-2);
         else
             getterName = gName;
@@ -105,8 +105,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     
     public void setSetterName(String sName)
     {
-        String parans = sName.substring(sName.length()-2, sName.length());
-        if(parans == "()")
+        String parens = sName.length() < 2 ? "" : sName.substring(sName.length()-2, sName.length());
+        if(parens.equalsIgnoreCase("()"))
             setterName = sName.substring(0, sName.length()-2);
         else
             setterName = sName;
