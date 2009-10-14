@@ -207,6 +207,9 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.pldt.lapi-feature"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.pldt.upc-feature"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.perf-feature"/>
 		</antcall>
 		<antcall target="tagone">
@@ -391,6 +394,9 @@
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv"/>
 		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.upc"/>
+		</antcall>		
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards"/>
 		</antcall>		
