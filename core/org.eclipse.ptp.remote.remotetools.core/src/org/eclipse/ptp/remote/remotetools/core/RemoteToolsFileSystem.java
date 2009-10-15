@@ -28,6 +28,7 @@ import java.net.URI;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileSystem;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 public class RemoteToolsFileSystem extends FileSystem 
 {
@@ -84,6 +85,7 @@ public class RemoteToolsFileSystem extends FileSystem
 		} 
 		catch (Exception e) {
 			//Could be an URI format exception
+			PTPRemoteCorePlugin.log(e);
 			return EFS.getNullFileSystem().getStore(uri);
 		}
 	}
