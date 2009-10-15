@@ -14,7 +14,6 @@ package org.eclipse.ptp.rm.slurm.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -28,6 +27,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -400,9 +400,9 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 			
 			String initialPath = "//"; // Start at root since SLURMD is probably installed in the system somewhere //$NON-NLS-1$
-			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.SLURMConfigurationWizardPage_select, initialPath);
+			String selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.SLURMConfigurationWizardPage_select, initialPath, IRemoteUIConstants.OPEN);
 			if (selectedPath != null) {
-				pathText.setText(selectedPath.toString());
+				pathText.setText(selectedPath);
 			}
 		}
 	}
