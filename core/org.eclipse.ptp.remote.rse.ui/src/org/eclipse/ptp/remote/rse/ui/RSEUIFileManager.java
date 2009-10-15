@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.ui;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import java.util.Vector;
+
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -28,64 +28,118 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	private IRemoteConnectionManager connMgr;
 	private IRemoteConnection connection = null;
 	private IHost connHost = null;
-	
+
 	public RSEUIFileManager(IRemoteServices services) {
 		this.connMgr = services.getConnectionManager();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse
+	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public IPath browseDirectory(Shell shell, String message, String filterPath) {
-		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell, message, connHost);
+	public String browseDirectory(Shell shell, String message,
+			String filterPath, int flags) {
+		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell,
+				message, connHost);
 		dlg.setBlockOnOpen(true);
-		if(dlg.open() == Window.OK) {
+		if (dlg.open() == Window.OK) {
 			connHost = dlg.getSelectedConnection();
 			connection = connMgr.getConnection(connHost.getName());
 			Object retObj = dlg.getSelectedObject();
-			if(retObj instanceof IRemoteFile) {
+			if (retObj instanceof IRemoteFile) {
 				IRemoteFile selectedFile = (IRemoteFile) retObj;
-				return new Path(selectedFile.getAbsolutePath());
+				return selectedFile.getAbsolutePath();
 			}
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.
+	 * widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public IPath browseFile(Shell shell, String message, String filterPath) {
-		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
+	public String browseFile(Shell shell, String message, String filterPath,
+			int flags) {
+		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message,
+				connHost);
 		dlg.setBlockOnOpen(true);
-		if(dlg.open() == Window.OK) {
+		if (dlg.open() == Window.OK) {
 			connHost = dlg.getSelectedConnection();
 			connection = connMgr.getConnection(connHost.getName());
 			Object retObj = dlg.getSelectedObject();
-			if(retObj instanceof IRemoteFile) {
+			if (retObj instanceof IRemoteFile) {
 				IRemoteFile selectedFile = (IRemoteFile) retObj;
-				return new Path(selectedFile.getAbsolutePath());
+				return selectedFile.getAbsolutePath();
 			}
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.
+	 * widgets.Shell, java.lang.String, java.lang.String)
+	 */
+	public String[] browseFiles(Shell shell, String message, String filterPath,
+			int flags) {
+		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message,
+				connHost);
+		dlg.setBlockOnOpen(true);
+		dlg.setMultipleSelectionMode(true);
+		if (dlg.open() == Window.OK) {
+			connHost = dlg.getSelectedConnection();
+			connection = connMgr.getConnection(connHost.getName());
+			Object retObj[] = dlg.getSelectedObjects();
+			Vector<String> selections = new Vector<String>(retObj.length);
+			for (int i = 0; i < retObj.length; i++) {
+				if (retObj[i] instanceof IRemoteFile) {
+					selections.add(((IRemoteFile) retObj[i]).getAbsolutePath());
+				}
+			}
+			String remotePaths[] = new String[selections.size()];
+			int i = 0;
+			for (String s : selections) {
+				remotePaths[i++] = s;
+			}
+			return remotePaths;
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return connection;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse
+	 * .ptp.remote.core.IRemoteConnection)
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		this.connection = connection;
-		this.connHost = ((RSEConnection)connection).getHost();
+		this.connHost = ((RSEConnection) connection).getHost();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
 	 */
 	public void showConnections(boolean enable) {
 	}
