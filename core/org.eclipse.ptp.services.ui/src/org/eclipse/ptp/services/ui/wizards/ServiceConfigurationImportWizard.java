@@ -1,15 +1,22 @@
 package org.eclipse.ptp.services.ui.wizards;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.messages.Messages;
+import org.eclipse.ptp.services.ui.widgets.ServiceConfigurationSelectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -29,6 +36,7 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 		private String file = ""; //$NON-NLS-1$
 		private Combo fileCombo;
 		private Button browseButton;
+		private ServiceConfigurationSelectionWidget fServiceWidget;
 		private int messageType = NONE;
 
 		public SelectFilePage(String pageName, String title, ImageDescriptor titleImage) {
@@ -37,8 +45,24 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 		}
 
 		public void createControl(Composite parent) {
-	        Composite composite = new Composite(parent, SWT.NULL);
-	        composite.setFont(parent.getFont());
+			Composite workArea = new Composite(parent, SWT.NONE);
+			setControl(workArea);
+
+	        workArea.setFont(parent.getFont());
+	        workArea.setLayout(new GridLayout());
+			workArea.setLayoutData(new GridData(GridData.FILL_BOTH
+					| GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+
+			createFileSelectionArea(workArea);
+			createConfigurationsArea(workArea);
+			
+			updateEnablement();
+			Dialog.applyDialogFont(parent);
+			messageType = ERROR;
+		}
+		
+		private void createFileSelectionArea(Composite workArea) {
+			Composite composite = new Composite(workArea, SWT.NULL);
 	        composite.setLayout(new GridLayout());
 	        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			GridLayout layout = new GridLayout();
@@ -75,12 +99,12 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 			browseButton.setLayoutData(data);
 			browseButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
-					FileDialog d = new FileDialog(getShell());
-					d.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
+					FileDialog d = new FileDialog(getShell(), SWT.OPEN);
+					d.setFilterExtensions(new String[] {"*.cfg", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
 					d.setFilterNames(new String[] {Messages.ServiceConfigurationImportWizard_4, Messages.ServiceConfigurationImportWizard_5});
 					String fileName= getFileName();
 					if (fileName != null && fileName.length() > 0) {
-						int separator= fileName.lastIndexOf(System.getProperty ("file.separator").charAt (0)); //$NON-NLS-1$
+						int separator = fileName.lastIndexOf(System.getProperty("file.separator").charAt(0)); //$NON-NLS-1$
 						if (separator != -1) {
 							fileName= fileName.substring(0, separator);
 						}
@@ -92,18 +116,51 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 					if (f != null) {
 						fileCombo.setText(f);
 						file = f;
+						updateConfigurations(file);
 					}
 				}
 			});
-
-			setControl(composite);
-			updateEnablement();
-			Dialog.applyDialogFont(parent);
-			messageType = ERROR;
+		}
+		
+		private void updateConfigurations(String file) {
+			try {
+				final String filename = file;
+				getContainer().run(true, true, new IRunnableWithProgress() {
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						monitor.beginTask(Messages.ServiceConfigurationImportWizard_0, 100);
+						fServiceConfigurations = fModelManager.importConfigurations(filename);
+						monitor.worked(100);
+						monitor.done();
+					}
+				});
+			} catch (InvocationTargetException e) {
+			} catch (InterruptedException e) {
+				// Do nothing
+			}
+			
+			fServiceWidget.setConfigurations(fServiceConfigurations);
+			fServiceWidget.setAllChecked(true);
+		}
+		
+		private void createConfigurationsArea(Composite workArea) {
+			Composite composite = new Composite(workArea, SWT.NONE);
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
+					| GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
+			
+			Label label = new Label(composite, SWT.NONE);
+			label.setText(Messages.ServiceConfigurationImportWizard_12);
+			
+			fServiceWidget = new ServiceConfigurationSelectionWidget(composite, SWT.CHECK, null, null, true);
+			fServiceWidget.setConfigurations(new IServiceConfiguration[0]);
 		}
 		
 		public String getFileName() {
 			return file;
+		}
+		
+		public IServiceConfiguration[] getServiceConfigurations() {
+			return fServiceWidget.getCheckedServiceConfigurations();
 		}
 		
 		private void updateEnablement() {
@@ -125,10 +182,10 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 					setMessage(Messages.ServiceConfigurationImportWizard_8, messageType); 
 					setPageComplete(false);
 					return;
-//				} else if (!ProjectSetImporter.isValidProjectSetFile(file)) {
-//					setMessage("The specified file is not a valid service configuration file.", messageType);
-//					setPageComplete(false);
-//					return;
+				} else if (!fModelManager.isValidConfigurationFile(file)) {
+					setMessage(Messages.ServiceConfigurationImportWizard_13, messageType);
+					setPageComplete(false);
+					return;
 				}
 				complete = true;
 			}
@@ -150,6 +207,8 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 	}
 	
 	private SelectFilePage mainPage;
+	private IServiceConfiguration[] fServiceConfigurations;
+	private IServiceModelManager fModelManager = ServiceModelManager.getInstance();
 	
 	public ServiceConfigurationImportWizard() {
 		setNeedsProgressMonitor(true);
@@ -166,6 +225,9 @@ public class ServiceConfigurationImportWizard extends Wizard implements IImportW
 	 */
 	@Override
 	public boolean performFinish() {
+		for (IServiceConfiguration config : mainPage.getServiceConfigurations()) {
+			fModelManager.addConfiguration(config);
+		}
 		return true;
 	}
 
