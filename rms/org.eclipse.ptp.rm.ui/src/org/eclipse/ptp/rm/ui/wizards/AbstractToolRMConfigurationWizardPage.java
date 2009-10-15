@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,6 +22,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -577,9 +577,9 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			fileMgr.setConnection(connection);
 
 			String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere //$NON-NLS-1$
-			IPath selectedPath = fileMgr.browseDirectory(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath);
+			String selectedPath = fileMgr.browseDirectory(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath, IRemoteUIConstants.OPEN);
 			if (selectedPath != null) {
-				remoteInstallPathText.setText(selectedPath.toString());
+				remoteInstallPathText.setText(selectedPath);
 			}
 		}
 	}
