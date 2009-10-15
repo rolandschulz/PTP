@@ -287,13 +287,13 @@
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe.ui"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpich2.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.mpich2.core"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpich2.proxy"/>
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.mpich2.proxy"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpich2.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.mpich2.ui"/>
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.core"/>
@@ -302,7 +302,19 @@
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.ui"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.core"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.proxy"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.ui"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.slurm.core"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.slurm.proxy"/>
 		</antcall>		
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.slurm.ui"/>
