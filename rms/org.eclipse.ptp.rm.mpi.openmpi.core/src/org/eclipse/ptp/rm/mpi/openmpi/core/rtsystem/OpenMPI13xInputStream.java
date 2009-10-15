@@ -139,6 +139,8 @@ public class OpenMPI13xInputStream extends FilterInputStream {
 		validTags.add("</host>"); //$NON-NLS-1$
 		validTags.add("<process.*>"); //$NON-NLS-1$
 		validTags.add("</process>"); //$NON-NLS-1$
+		validTags.add("<noderesolve.*>"); //$NON-NLS-1$
+		validTags.add("</noderesolve>"); //$NON-NLS-1$
 		validTags.add("<stdout.*>"); //$NON-NLS-1$
 		validTags.add("</stdout>"); //$NON-NLS-1$
 		validTags.add("<stderr.*>"); //$NON-NLS-1$
