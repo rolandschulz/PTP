@@ -40,55 +40,58 @@ import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.util.ArrayUtil;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.internal.rdt.core.model.BindingAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.CElement;
 import org.eclipse.ptp.internal.rdt.core.model.Path;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.navigation.SimpleName;
+import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 
 public class OpenDeclarationHandler {
 	
 	private static final int KIND_OTHER = 0;
 	private static final int KIND_USING_DECL = 1;
 	private static final int KIND_DEFINITION = 2;
-
+	public static final String CLASS_NAME = "CDTMiner-OpenDeclarationHandler"; //$NON-NLS-1$
+	
 	private static int PARSE_MODE_FAST = 
 		ITranslationUnit.AST_SKIP_ALL_HEADERS | 
 		ITranslationUnit.AST_CONFIGURE_USING_SOURCE_CONTEXT;
+
 	
-	
-	public static OpenDeclarationResult handleOpenDeclaration(String scopeName, ITranslationUnit workingCopy, String selectedText, int selectionStart, int selectionLength) {
+	public static OpenDeclarationResult handleOpenDeclaration(String scopeName, ITranslationUnit workingCopy, String selectedText, int selectionStart, int selectionLength, DataStore _dataStore) {
 
-		System.out.println("Getting declaration for selection in " + workingCopy.getElementName()); //$NON-NLS-1$
-		System.out.println("scope: " + scopeName); //$NON-NLS-1$
-		System.out.println("path: " + workingCopy.getLocationURI()); //$NON-NLS-1$
-		System.out.println("offset: " + selectionStart); //$NON-NLS-1$
-		System.out.println("length: " + selectionLength); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Getting declaration for selection in " + workingCopy.getElementName(), _dataStore); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "scope: " + scopeName, _dataStore); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "path: " + workingCopy.getLocationURI(), _dataStore); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "offset: " + selectionStart, _dataStore); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "length: " + selectionLength, _dataStore); //$NON-NLS-1$
 
-		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME);
+		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
 
-		System.out.println("Acquiring read lock"); //$NON-NLS-1$
-		System.out.flush();
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Acquiring read lock", _dataStore); //$NON-NLS-1$
+		
 		
 		try {
 			index.acquireReadLock();
 		} catch (InterruptedException e) {
-			e.printStackTrace(); // TODO better error handling
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
 			return OpenDeclarationResult.failureUnexpectedError();
 		}
 		
-		System.out.println("Got Read lock"); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Got Read lock", _dataStore); //$NON-NLS-1$
 		
 		try {
-			return doHandleOpenDeclaration(scopeName, workingCopy, selectedText, selectionStart, selectionLength, index);
+			return doHandleOpenDeclaration(scopeName, workingCopy, selectedText, selectionStart, selectionLength, index, _dataStore);
 			
 		} catch (CoreException e) {
-			e.printStackTrace();
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
 			return OpenDeclarationResult.failureUnexpectedError();
 		} finally {
 			index.releaseReadLock();
-			System.out.println("Lock released"); //$NON-NLS-1$
+			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Lock released", _dataStore);   //$NON-NLS-1$
 		}
 	}
 
@@ -110,7 +113,7 @@ public class OpenDeclarationHandler {
 	
 	
 	private static OpenDeclarationResult doHandleOpenDeclaration(String scopeName, ITranslationUnit workingCopy, String selectedText, 
-			                                                     int selectionStart, int selectionLength, IIndex index) throws CoreException {
+			                                                     int selectionStart, int selectionLength, IIndex index, DataStore _dataStore) throws CoreException {
 		IASTTranslationUnit ast = workingCopy.getAST(index, PARSE_MODE_FAST);
 		
 		final IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
@@ -152,7 +155,7 @@ public class OpenDeclarationHandler {
 					}
 				}
 
-				ICElement[] elements = convertToCElements(workingCopy, index, declNames);
+				ICElement[] elements = convertToCElements(workingCopy, index, declNames, _dataStore);
 				if(elements != null && elements.length > 0)
 					return OpenDeclarationResult.resultCElements(elements);
 					
@@ -168,12 +171,12 @@ public class OpenDeclarationHandler {
 			}
 		}
 		
-		return navigationFallBack(ast, index, selectedText); 
+		return navigationFallBack(ast, index, selectedText, _dataStore); 
 	}
 	
 
 
-	private static ICElement[] convertToCElements(ITranslationUnit unit, IIndex index, IName[] names) {
+	private static ICElement[] convertToCElements(ITranslationUnit unit, IIndex index, IName[] names, DataStore _dataStore) {
 		List<ICElement> elements = new ArrayList<ICElement>();
 		for(IName name : names) {
 			try {
@@ -181,9 +184,9 @@ public class OpenDeclarationHandler {
 				if(element instanceof ISourceReference)
 					elements.add(element);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
 			} catch (DOMException e) {
-				e.printStackTrace();
+				UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore); 
 			}
 		}
 		return elements.toArray(new ICElement[elements.size()]);
@@ -289,7 +292,7 @@ public class OpenDeclarationHandler {
 	/**
 	 * If the names cannot be found using a binding then fall back to a text search.
 	 */
-	private static OpenDeclarationResult navigationFallBack(IASTTranslationUnit ast, IIndex index, String selectedText) {
+	private static OpenDeclarationResult navigationFallBack(IASTTranslationUnit ast, IIndex index, String selectedText, DataStore _dataStore) {
 		if(selectedText == null || selectedText.length() == 0)
 			return null;
 		
@@ -316,7 +319,7 @@ public class OpenDeclarationHandler {
 				return OpenDeclarationResult.resultNames(convertNames(names.toArray(new IName[names.size()])));
 			
 		} catch (CoreException e) {
-			System.out.println(e);
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
 		}
 		
 		return OpenDeclarationResult.failureSymbolLookup(selectedText);
