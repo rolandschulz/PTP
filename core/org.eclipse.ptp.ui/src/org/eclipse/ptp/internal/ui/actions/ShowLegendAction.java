@@ -40,24 +40,3 @@ public class ShowLegendAction implements IWorkbenchWindowActionDelegate {
 	}	
 }
 
-/*
-public class ShowLegendAction extends ParallelAction {
-	public ShowLegendAction(ViewPart view) {
-		super(view);
-	}
-
-	protected void init(boolean isEnable) {
-	    this.setText(UIMessage.getResourceString("ShowLegendAction.text"));
-	    this.setToolTipText(UIMessage.getResourceString("ShowLegendAction.tooltip"));
-	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWLEGEND_ACTION_NORMAL));
-	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWLEGEND_ACTION_DISABLE));
-	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWLEGEND_ACTION_HOVER));
-	    this.setEnabled(getLaunchManager().isMPIRuning());
-	}
-
-	public void run() {
-		LegendDialog ld = new LegendDialog(getShell());
-		ld.open();
-	}
-}
-*/

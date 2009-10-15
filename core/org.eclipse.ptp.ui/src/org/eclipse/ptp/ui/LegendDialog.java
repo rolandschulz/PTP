@@ -60,32 +60,22 @@ public class LegendDialog extends Dialog
 		Messages.LegendDialog_12,
 		Messages.LegendDialog_13,
 		Messages.LegendDialog_14,
-		Messages.LegendDialog_15,
-		Messages.LegendDialog_16,
-		Messages.LegendDialog_17		
 	};
 	
 	private String nodeStateText[] = {
+		Messages.LegendDialog_15,
+		Messages.LegendDialog_16,
+		Messages.LegendDialog_17,
 		Messages.LegendDialog_18,
 		Messages.LegendDialog_19,
 		Messages.LegendDialog_20,
+	};
+	
+	private String processStateText[] = {
 		Messages.LegendDialog_21,
 		Messages.LegendDialog_22,
 		Messages.LegendDialog_23,
 		Messages.LegendDialog_24,
-		Messages.LegendDialog_25,
-		Messages.LegendDialog_26,
-		Messages.LegendDialog_27,
-	};
-	
-	private String processStateText[] = {
-		Messages.LegendDialog_28,
-		Messages.LegendDialog_29,
-		Messages.LegendDialog_30,
-		Messages.LegendDialog_31,
-		Messages.LegendDialog_32,
-		Messages.LegendDialog_33,
-		Messages.LegendDialog_34
 	};
 	
 	/**
@@ -98,7 +88,7 @@ public class LegendDialog extends Dialog
 	
 	public LegendDialog(Shell parent, int style) {
 		super(parent, style);
-		setText(Messages.LegendDialog_35);
+		setText(Messages.LegendDialog_25);
 	}
 	
 	public String open() {
@@ -123,7 +113,7 @@ public class LegendDialog extends Dialog
 		
 		/* the RM box */
 		Group box = new Group(shell, SWT.BORDER);
-		box.setText(Messages.LegendDialog_36);
+		box.setText(Messages.LegendDialog_26);
 		FillLayout fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -154,7 +144,7 @@ public class LegendDialog extends Dialog
 		
 		/* the machines box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText(Messages.LegendDialog_37);
+		box.setText(Messages.LegendDialog_27);
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -183,7 +173,7 @@ public class LegendDialog extends Dialog
 		
 		/* the node box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText(Messages.LegendDialog_38);
+		box.setText(Messages.LegendDialog_28);
 		GridLayout g = new GridLayout(2, true);
 		box.setLayout(g);
 		data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -212,7 +202,7 @@ public class LegendDialog extends Dialog
 		
 		/* the job box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText(Messages.LegendDialog_39);
+		box.setText(Messages.LegendDialog_29);
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -241,7 +231,7 @@ public class LegendDialog extends Dialog
 				
 		/* the process box */
 		box = new Group(shell, SWT.BORDER);
-		box.setText(Messages.LegendDialog_40);
+		box.setText(Messages.LegendDialog_30);
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
@@ -269,7 +259,7 @@ public class LegendDialog extends Dialog
 		}
 		
         Button close = new Button(shell, SWT.PUSH);
-        close.setText(Messages.LegendDialog_41);
+        close.setText(Messages.LegendDialog_31);
         data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
         data.horizontalSpan = 2;
 		close.setLayoutData(data);

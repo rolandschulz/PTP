@@ -28,6 +28,14 @@ public class Messages extends NLS {
 	public static String JobManager_1;
 	public static String LegendDialog_0;
 	public static String LegendDialog_1;
+	public static String LegendDialog_2;
+	public static String LegendDialog_3;
+	public static String LegendDialog_4;
+	public static String LegendDialog_5;
+	public static String LegendDialog_6;
+	public static String LegendDialog_7;
+	public static String LegendDialog_8;
+	public static String LegendDialog_9;
 	public static String LegendDialog_10;
 	public static String LegendDialog_11;
 	public static String LegendDialog_12;
@@ -38,7 +46,6 @@ public class Messages extends NLS {
 	public static String LegendDialog_17;
 	public static String LegendDialog_18;
 	public static String LegendDialog_19;
-	public static String LegendDialog_2;
 	public static String LegendDialog_20;
 	public static String LegendDialog_21;
 	public static String LegendDialog_22;
@@ -49,7 +56,6 @@ public class Messages extends NLS {
 	public static String LegendDialog_27;
 	public static String LegendDialog_28;
 	public static String LegendDialog_29;
-	public static String LegendDialog_3;
 	public static String LegendDialog_30;
 	public static String LegendDialog_31;
 	public static String LegendDialog_32;
@@ -58,16 +64,6 @@ public class Messages extends NLS {
 	public static String LegendDialog_35;
 	public static String LegendDialog_36;
 	public static String LegendDialog_37;
-	public static String LegendDialog_38;
-	public static String LegendDialog_39;
-	public static String LegendDialog_4;
-	public static String LegendDialog_40;
-	public static String LegendDialog_41;
-	public static String LegendDialog_5;
-	public static String LegendDialog_6;
-	public static String LegendDialog_7;
-	public static String LegendDialog_8;
-	public static String LegendDialog_9;
 	public static String MachineManager_0;
 	public static String MachineManager_1;
 	public static String MachineManager_2;
