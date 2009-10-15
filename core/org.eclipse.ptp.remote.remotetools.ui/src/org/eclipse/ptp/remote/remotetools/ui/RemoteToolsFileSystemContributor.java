@@ -21,13 +21,13 @@
  * David Dykstal (IBM) - [235840] externalizing dialog title
  ********************************************************************************/
 
-
 package org.eclipse.ptp.remote.remotetools.ui;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -43,29 +43,35 @@ import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 
 	public URI browseFileSystem(String initialPath, Shell shell) {
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID);
-		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault()
+				.getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID);
+		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault()
+				.getRemoteUIServices(services);
 		IRemoteUIFileManager uiFileMgr = uiServices.getUIFileManager();
 		uiFileMgr.showConnections(true);
-		IPath path = uiFileMgr.browseDirectory(shell, "Browse File System", initialPath);
+		IPath path = new Path(uiFileMgr.browseDirectory(shell,
+				"Browse File System", initialPath, 0));
 		if (path != null) {
 			IRemoteConnection conn = uiFileMgr.getConnection();
 			IRemoteFileManager fileMgr = services.getFileManager(conn);
-			return ((RemoteToolsFileManager)fileMgr).toURI(path);
+			return ((RemoteToolsFileManager) fileMgr).toURI(path);
 		}
-		
+
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.ide.fileSystem.FileSystemContributor#getURI(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.ide.fileSystem.FileSystemContributor#getURI(java.lang.
+	 * String)
 	 */
 	@Override
 	public URI getURI(String string) {
 		try {
 			return new URI(string);
-		}
-		catch (URISyntaxException e) {
+		} catch (URISyntaxException e) {
 		}
 		return null;
 	}

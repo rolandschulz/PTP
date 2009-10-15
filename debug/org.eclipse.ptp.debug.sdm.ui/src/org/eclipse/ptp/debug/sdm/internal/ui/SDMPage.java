@@ -54,13 +54,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IResourceManagerControl resourceManager = null;
 	private boolean pathIsDirty = true;
 	private boolean pathIsValid = false;
-	
+
 	protected Text fRMDebuggerPathText = null;
 	protected Text fRMDebuggerAddressText = null;
 	protected Button fRMDebuggerBrowseButton = null;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#activated(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#activated(org.eclipse
+	 * .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
 	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
@@ -69,13 +73,21 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 */
 		try {
 			fRMDebuggerAddressText.setText(getAddress(workingCopy));
-			fRMDebuggerPathText.setText(workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
-		} catch(CoreException e) {
+			fRMDebuggerPathText
+					.setText(workingCopy
+							.getAttribute(
+									IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+									EMPTY_STRING));
+		} catch (CoreException e) {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -89,14 +101,16 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		label.setLayoutData(gd);
 
 		fRMDebuggerPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
+				true, false));
 		fRMDebuggerPathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				pathIsDirty = true;
 				updateLaunchConfigurationDialog();
 			}
 		});
-		fRMDebuggerBrowseButton = createPushButton(comp, Messages.SDMPage_1, null);
+		fRMDebuggerBrowseButton = createPushButton(comp, Messages.SDMPage_1,
+				null);
 		fRMDebuggerBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -114,7 +128,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		label.setLayoutData(gd);
 
 		fRMDebuggerAddressText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fRMDebuggerAddressText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fRMDebuggerAddressText.setLayoutData(new GridData(SWT.FILL,
+				SWT.BEGINNING, true, false));
 		fRMDebuggerAddressText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				updateLaunchConfigurationDialog();
@@ -124,31 +139,53 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		setControl(parent);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
 		return Messages.SDMPage_3;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		/*
-		 * Launch configuration is selected or we have just selected SDM as the debugger...
+		 * Launch configuration is selected or we have just selected SDM as the
+		 * debugger...
 		 */
 		try {
-			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
-			resourceManager = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-			fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING));
-			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING));
+			String rmId = configuration
+					.getAttribute(
+							IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+							EMPTY_STRING);
+			resourceManager = (IResourceManagerControl) PTPCorePlugin
+					.getDefault().getModelManager()
+					.getResourceManagerFromUniqueName(rmId);
+			fRMDebuggerAddressText.setText(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
+					EMPTY_STRING));
+			fRMDebuggerPathText
+					.setText(configuration
+							.getAttribute(
+									IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+									EMPTY_STRING));
 		} catch (CoreException e) {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
@@ -165,8 +202,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					pathIsValid = true;
 				}
 				pathIsDirty = false;
-			} 
-			
+			}
+
 			if (!pathIsValid) {
 				setErrorMessage(Messages.SDMPage_6);
 			}
@@ -174,7 +211,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		return (getErrorMessage() == null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
 	 */
 	@Override
@@ -192,29 +231,32 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					pathIsValid = true;
 				}
 				pathIsDirty = false;
-			} 
-			
+			}
+
 			if (!pathIsValid) {
 				setErrorMessage(Messages.SDMPage_9);
 			}
 		}
-		//setErrorMessage(errMsg);
+		// setErrorMessage(errMsg);
 		return (getErrorMessage() == null);
 	}
-	
+
 	/**
 	 * Verify that the supplied path exists on the remote system
 	 * 
-	 * @param path path to verify
+	 * @param path
+	 *            path to verify
 	 * @return true if path exists
 	 */
 	private boolean verifyPath(String path) {
 		IRemoteConnection rmConn = getRemoteConnection();
 		if (rmConn != null) {
-			IRemoteFileManager fileManager = getRemoteServices().getFileManager(rmConn);
+			IRemoteFileManager fileManager = getRemoteServices()
+					.getFileManager(rmConn);
 			if (fileManager != null) {
 				try {
-					IFileStore res = fileManager.getResource(new Path(path), new NullProgressMonitor());
+					IFileStore res = fileManager.getResource(new Path(path),
+							new NullProgressMonitor());
 					if (res.fetchInfo().exists()) {
 						return true;
 					}
@@ -230,8 +272,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse
+	 * .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		/*
@@ -240,13 +286,22 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * things are valid.
 		 */
 		if (isValid(configuration)) {
-			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, getFieldContent(fRMDebuggerPathText.getText()));
-			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getFieldContent(fRMDebuggerAddressText.getText()));
+			configuration
+					.setAttribute(
+							IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+							getFieldContent(fRMDebuggerPathText.getText()));
+			configuration.setAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
+					getFieldContent(fRMDebuggerAddressText.getText()));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.
+	 * debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		/*
@@ -254,24 +309,34 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 */
 		String path = ""; //$NON-NLS-1$
 		/*
-		 * Guess that the sdm executable is in the same location as the proxy. 
+		 * Guess that the sdm executable is in the same location as the proxy.
 		 */
 		try {
-			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
-			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+			String rmId = configuration
+					.getAttribute(
+							IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+							EMPTY_STRING);
+			IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin
+					.getDefault().getModelManager()
+					.getResourceManagerFromUniqueName(rmId);
 			if (rm != null) {
 				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 				if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
-					IRemoteResourceManagerConfiguration remConfig = (IRemoteResourceManagerConfiguration)rmConfig;
+					IRemoteResourceManagerConfiguration remConfig = (IRemoteResourceManagerConfiguration) rmConfig;
 					IPath rmPath = new Path(remConfig.getProxyServerPath());
-					path = rmPath.removeLastSegments(1).append("sdm").toString(); //$NON-NLS-1$/
+					path = rmPath.removeLastSegments(1)
+							.append("sdm").toString(); //$NON-NLS-1$/
 				}
 			}
 		} catch (CoreException e) {
 		}
 
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, path);
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+				path);
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
+				getAddress(configuration));
 	}
 
 	/**
@@ -286,9 +351,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 			if (fileManager != null) {
 				fileManager.setConnection(getRemoteConnection());
-				IPath path = fileManager.browseFile(getShell(),
-						Messages.SDMPage_10,
-						fRMDebuggerPathText.getText());
+				IPath path = new Path(fileManager.browseFile(getShell(),
+						Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0));
 				if (path != null)
 					return path.toString();
 			}
@@ -302,18 +366,22 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	/**
-	 * Work out the address to supply as argument to the debug server. There are currently
-	 * two cases:
+	 * Work out the address to supply as argument to the debug server. There are
+	 * currently two cases:
 	 * 
-	 * 1. If port forwarding is enabled, then the address needs to be the address of the host that is
-	 * running the proxy (since this is where the tunnel begins), but accessible from the machine running
-	 * the debug server. Since the debug server machine may be on a local network (e.g. a node in a
-	 * cluster), it will typically NOT be the same address that is used to start the proxy.
+	 * 1. If port forwarding is enabled, then the address needs to be the
+	 * address of the host that is running the proxy (since this is where the
+	 * tunnel begins), but accessible from the machine running the debug server.
+	 * Since the debug server machine may be on a local network (e.g. a node in
+	 * a cluster), it will typically NOT be the same address that is used to
+	 * start the proxy.
 	 * 
-	 * 2. If port forwarding is not enabled, then the address will be the address of the host running
-	 * Eclipse). NOTE: this assumes that the machine running the debug server can contact the local host directly.
-	 * In the case of the SDM, the "master" debug server process can potentially run on any node in the cluster.
-	 * In many environments, compute nodes cannot communicate outside their local network.
+	 * 2. If port forwarding is not enabled, then the address will be the
+	 * address of the host running Eclipse). NOTE: this assumes that the machine
+	 * running the debug server can contact the local host directly. In the case
+	 * of the SDM, the "master" debug server process can potentially run on any
+	 * node in the cluster. In many environments, compute nodes cannot
+	 * communicate outside their local network.
 	 * 
 	 * @param configuration
 	 * @return
@@ -322,13 +390,20 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		String address;
 		String rmId;
 		try {
-			address = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING);
-			rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
+			address = configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
+					EMPTY_STRING);
+			rmId = configuration
+					.getAttribute(
+							IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+							EMPTY_STRING);
 		} catch (CoreException e) {
 			return EMPTY_STRING;
 		}
 
-		IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+		IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin
+				.getDefault().getModelManager()
+				.getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
 			/*
 			 * If the resource manager has been changed and this is a remote
@@ -341,7 +416,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 						return getRemoteConnection().getAddress();
 					} else {
-						return  config.getLocalAddress();
+						return config.getLocalAddress();
 					}
 				} else {
 					return "localhost"; //$NON-NLS-1$
@@ -358,9 +433,10 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
 		if (resourceManager != null) {
-			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
+			IResourceManagerConfiguration rmConfig = resourceManager
+					.getConfiguration();
 			if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
-				return (IRemoteResourceManagerConfiguration)rmConfig;
+				return (IRemoteResourceManagerConfiguration) rmConfig;
 			}
 		}
 		return null;
@@ -369,16 +445,19 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	/**
 	 * Return remote services
+	 * 
 	 * @return remote services
 	 */
 	private IRemoteServices getRemoteServices() {
 		if (resourceManager != null) {
-			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId());
+			IResourceManagerConfiguration rmConfig = resourceManager
+					.getConfiguration();
+			return PTPRemoteCorePlugin.getDefault().getRemoteServices(
+					rmConfig.getRemoteServicesId());
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Look up remote UI services
 	 * 
@@ -400,14 +479,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteConnection getRemoteConnection() {
 		IRemoteServices rsrv = getRemoteServices();
 		if (rsrv != null) {
-			return rsrv.getConnectionManager().getConnection(resourceManager.getConfiguration().getConnectionName());
+			return rsrv.getConnectionManager().getConnection(
+					resourceManager.getConfiguration().getConnectionName());
 		}
 		return null;
 	}
 
 	/**
 	 * Get and clean content of a Text field
-	 * @param text text obtained from a Text field
+	 * 
+	 * @param text
+	 *            text obtained from a Text field
 	 * @return cleaned up content
 	 */
 	protected String getFieldContent(String text) {

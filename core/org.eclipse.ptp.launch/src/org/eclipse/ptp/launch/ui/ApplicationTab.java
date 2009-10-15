@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -73,15 +74,17 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * The Main tab is used to specify the resource manager for the launch,
- * select the project and executable to launch, and specify the location
- * of the executable if it is a remote launch.
+ * The Main tab is used to specify the resource manager for the launch, select
+ * the project and executable to launch, and specify the location of the
+ * executable if it is a remote launch.
  */
 public class ApplicationTab extends LaunchConfigurationTab {
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener {
+	protected class WidgetListener extends SelectionAdapter implements
+			ModifyListener {
 		public void modifyText(ModifyEvent e) {
 			updateLaunchConfigurationDialog();
 		}
+
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
@@ -109,11 +112,15 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	protected Button localAppButton = null;
 	protected Button consoleButton = null;
 	protected WidgetListener listener = new WidgetListener();
-	
+
 	protected final boolean combinedOutputDefault = true;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -133,7 +140,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		projText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		projText.addModifyListener(listener);
 
-		projButton = createPushButton(mainComp, Messages.Tab_common_Browse_1, null);
+		projButton = createPushButton(mainComp, Messages.Tab_common_Browse_1,
+				null);
 		projButton.addSelectionListener(listener);
 
 		createVerticalSpacer(comp, 1);
@@ -146,7 +154,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		appText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		appText.addModifyListener(listener);
 
-		appButton = createPushButton(mainComp, Messages.Tab_common_Browse_2, null);
+		appButton = createPushButton(mainComp, Messages.Tab_common_Browse_2,
+				null);
 		appButton.addSelectionListener(listener);
 
 		createVerticalSpacer(mainComp, 2);
@@ -163,17 +172,21 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		localAppText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		localAppText.addModifyListener(listener);
 
-		browseAppButton = createPushButton(mainComp, Messages.ApplicationTab_2, null);
+		browseAppButton = createPushButton(mainComp, Messages.ApplicationTab_2,
+				null);
 		browseAppButton.addSelectionListener(listener);
 
 		createVerticalSpacer(mainComp, 2);
 
-		consoleButton = createCheckButton(mainComp, Messages.ApplicationTab_Console);
+		consoleButton = createCheckButton(mainComp,
+				Messages.ApplicationTab_Console);
 		consoleButton.setSelection(combinedOutputDefault);
 		consoleButton.addSelectionListener(listener);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
 	 */
 	@Override
@@ -181,34 +194,56 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		return LaunchImages.getImage(LaunchImages.IMG_MAIN_TAB);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
 		return Messages.ApplicationTab_Main;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
 
 		try {
-			projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
-			appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, EMPTY_STRING));
-			localAppText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH, EMPTY_STRING));
-			localAppButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false));
-			consoleButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false));
+			projText.setText(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+					EMPTY_STRING));
+			appText.setText(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+					EMPTY_STRING));
+			localAppText
+					.setText(configuration
+							.getAttribute(
+									IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH,
+									EMPTY_STRING));
+			localAppButton.setSelection(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE,
+					false));
+			consoleButton.setSelection(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false));
 		} catch (CoreException e) {
 			setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION);
 		}
-		handleLocalApplicationButtonSelected(); // Refreshes the local path textbox enable state.
+		handleLocalApplicationButtonSelected(); // Refreshes the local path
+		// textbox enable state.
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration config) {
@@ -220,17 +255,24 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			IStatus status = workspace.validateName(name, IResource.PROJECT);
 			if (status.isOK()) {
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+				IProject project = ResourcesPlugin.getWorkspace().getRoot()
+						.getProject(name);
 				if (!project.exists()) {
-					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_not_exist, new Object[] {name}));
+					setErrorMessage(NLS.bind(
+							Messages.ApplicationTab_Project_not_exist,
+							new Object[] { name }));
 					return false;
 				}
 				if (!project.isOpen()) {
-					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_is_closed, new Object[] {name}));
+					setErrorMessage(NLS.bind(
+							Messages.ApplicationTab_Project_is_closed,
+							new Object[] { name }));
 					return false;
 				}
 			} else {
-				setErrorMessage(NLS.bind(Messages.ApplicationTab_Illegal_project, new Object[]{status.getMessage()}));
+				setErrorMessage(NLS.bind(
+						Messages.ApplicationTab_Illegal_project,
+						new Object[] { status.getMessage() }));
 				return false;
 			}
 		}
@@ -241,16 +283,16 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			return false;
 		}
 
-		if(localAppButton.getSelection()) {
+		if (localAppButton.getSelection()) {
 			name = getFieldContent(localAppText.getText());
-			if(name == null) {
+			if (name == null) {
 				setErrorMessage(Messages.ApplicationTab_3);
 			}
 			File file = new File(name);
-			if(!file.isAbsolute()) {
+			if (!file.isAbsolute()) {
 				setErrorMessage(Messages.ApplicationTab_4);
 			}
-			if(!file.exists() || !file.isFile()) {
+			if (!file.exists() || !file.isFile()) {
 				setErrorMessage(Messages.ApplicationTab_5);
 			}
 		}
@@ -258,8 +300,12 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse
+	 * .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(
@@ -275,25 +321,31 @@ public class ApplicationTab extends LaunchConfigurationTab {
 				IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH,
 				getFieldContent(localAppText.getText()));
 		configuration.setAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_CONSOLE,
-				consoleButton.getSelection());
+				IPTPLaunchConfigurationConstants.ATTR_CONSOLE, consoleButton
+						.getSelection());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.
+	 * debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		IProject project = getDefaultProject(configuration);
 		String projectName = null;
 		if (project != null) {
 			projectName = project.getName();
-			String name = getLaunchConfigurationDialog().generateName(projectName);
+			String name = getLaunchConfigurationDialog().generateName(
+					projectName);
 			configuration.rename(name);
 		}
 
-		configuration.setAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-				projectName);
+		configuration
+				.setAttribute(
+						IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+						projectName);
 		configuration.setAttribute(
 				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 				(String) null);
@@ -305,8 +357,12 @@ public class ApplicationTab extends LaunchConfigurationTab {
 				false);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.debug.ui.AbstractLaunchConfigurationTab#
+	 * setLaunchConfigurationDialog
+	 * (org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
 	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
@@ -314,43 +370,60 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Create a dialog that allows the user to select a file in the current project.
+	 * Create a dialog that allows the user to select a file in the current
+	 * project.
 	 * 
 	 * @return selected file
 	 */
 	protected IResource chooseFile() {
 		final IProject project = getProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
-					Messages.ApplicationTab_Enter_project_before_browsing_for_program);
+			MessageDialog
+					.openInformation(
+							getShell(),
+							Messages.ApplicationTab_Project_required,
+							Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 			return null;
 		}
 
 		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 		BaseWorkbenchContentProvider contentProvider = new BaseWorkbenchContentProvider();
-		ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), labelProvider, contentProvider);
+		ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(
+				getShell(), labelProvider, contentProvider);
 		dialog.setTitle(Messages.ApplicationTab_Program_selection);
-		dialog.setMessage(Messages.ApplicationTab_Choose_program_to_run_from_NAME);
+		dialog
+				.setMessage(Messages.ApplicationTab_Choose_program_to_run_from_NAME);
 		dialog.setBlockOnOpen(true);
 		dialog.setAllowMultiple(false);
 		dialog.setInput(project);
 		dialog.setValidator(new ISelectionStatusValidator() {
 			public IStatus validate(Object[] selection) {
-				if (selection.length == 0 || ! (selection[0] instanceof IFile)) {
-					return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO,
-							Messages.ApplicationTab_Selection_must_be_file, null);
+				if (selection.length == 0 || !(selection[0] instanceof IFile)) {
+					return new Status(IStatus.ERROR, PTPCorePlugin
+							.getUniqueIdentifier(), IStatus.INFO,
+							Messages.ApplicationTab_Selection_must_be_file,
+							null);
 				}
 				try {
-					IResource resource = project.findMember( ((IFile)selection[0]).getProjectRelativePath());
-					if (resource == null || resource.getType() != IResource.FILE) {
-						return new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO,
-								Messages.ApplicationTab_Selection_must_be_file, null);
+					IResource resource = project
+							.findMember(((IFile) selection[0])
+									.getProjectRelativePath());
+					if (resource == null
+							|| resource.getType() != IResource.FILE) {
+						return new Status(IStatus.ERROR, PTPCorePlugin
+								.getUniqueIdentifier(), IStatus.INFO,
+								Messages.ApplicationTab_Selection_must_be_file,
+								null);
 					}
 
-					return new Status(IStatus.OK, PTPCorePlugin.getUniqueIdentifier(), IStatus.OK, resource.getName(), null);
+					return new Status(IStatus.OK, PTPCorePlugin
+							.getUniqueIdentifier(), IStatus.OK, resource
+							.getName(), null);
 				} catch (Exception ex) {
-					return new Status(IStatus.ERROR, PTPCorePlugin.PLUGIN_ID, IStatus.INFO,
-							Messages.ApplicationTab_Selection_must_be_file, null);
+					return new Status(IStatus.ERROR, PTPCorePlugin.PLUGIN_ID,
+							IStatus.INFO,
+							Messages.ApplicationTab_Selection_must_be_file,
+							null);
 				}
 			}
 		});
@@ -369,7 +442,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		IProject[] projects = getWorkspaceRoot().getProjects();
 
 		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
+				getShell(), labelProvider);
 		dialog.setTitle(Messages.ApplicationTab_Project_Selection_Title);
 		dialog.setMessage(Messages.ApplicationTab_Project_Selection_Message);
 		dialog.setElements(projects);
@@ -385,9 +459,9 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Get a default project. This is either the project name that
-	 * has been previously selected, or the project that is currently
-	 * selected in the workspace.
+	 * Get a default project. This is either the project name that has been
+	 * previously selected, or the project that is currently selected in the
+	 * workspace.
 	 * 
 	 * @param configuration
 	 * @return default project
@@ -395,7 +469,9 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	protected IProject getDefaultProject(ILaunchConfiguration configuration) {
 		String projectName = null;
 		try {
-			projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+			projectName = configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+					(String) null);
 		} catch (CoreException e) {
 			return null;
 		}
@@ -408,13 +484,14 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			if (page != null) {
 				ISelection selection = page.getSelection();
 				if (selection instanceof IStructuredSelection) {
-					IStructuredSelection ss = (IStructuredSelection)selection;
+					IStructuredSelection ss = (IStructuredSelection) selection;
 					if (!ss.isEmpty()) {
 						Object obj = ss.getFirstElement();
 						if (obj instanceof IAdaptable) {
-							Object o = ((IAdaptable)obj).getAdapter(IResource.class);
+							Object o = ((IAdaptable) obj)
+									.getAdapter(IResource.class);
 							if (o instanceof IResource)
-								return ((IResource)o).getProject();
+								return ((IResource) o).getProject();
 						}
 					}
 				}
@@ -432,8 +509,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Get the IProject the corresponds to the project name that is
-	 * displayed in the projText control
+	 * Get the IProject the corresponds to the project name that is displayed in
+	 * the projText control
 	 * 
 	 * @return project
 	 */
@@ -455,29 +532,39 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
 			if (project == null) {
-				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
-						Messages.ApplicationTab_Enter_project_before_browsing_for_program);
+				MessageDialog
+						.openInformation(
+								getShell(),
+								Messages.ApplicationTab_Project_required,
+								Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
 			initPath = getProject().getLocationURI().getPath();
 		}
-		
-		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(getLaunchConfiguration());
+
+		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
+					.getRemoteServices(conf.getRemoteServicesId());
 			if (remoteServices != null) {
-				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin
+						.getDefault().getRemoteUIServices(remoteServices);
 				if (remoteUIServices != null) {
-					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+					IRemoteConnectionManager connMgr = remoteServices
+							.getConnectionManager();
 					if (connMgr != null) {
-						IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
+						IRemoteConnection conn = connMgr.getConnection(conf
+								.getConnectionName());
 						if (conn != null) {
-							IRemoteUIFileManager fileManager = remoteUIServices.getUIFileManager();
+							IRemoteUIFileManager fileManager = remoteUIServices
+									.getUIFileManager();
 							if (fileManager != null) {
 								fileManager.setConnection(conn);
 								fileManager.showConnections(false);
-								IPath path = fileManager.browseFile(getShell(), Messages.ApplicationTab_6, initPath);
+								IPath path = new Path(fileManager.browseFile(
+										getShell(), Messages.ApplicationTab_6,
+										initPath, 0));
 								if (path != null) {
 									appText.setText(path.toString());
 								}
@@ -513,8 +600,11 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		projText.setText(projectName);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#updateLaunchConfigurationDialog()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.debug.ui.AbstractLaunchConfigurationTab#
+	 * updateLaunchConfigurationDialog()
 	 */
 	@Override
 	protected void updateLaunchConfigurationDialog() {
@@ -534,20 +624,36 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
 			if (project == null) {
-				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
-						Messages.ApplicationTab_Enter_project_before_browsing_for_program);
+				MessageDialog
+						.openInformation(
+								getShell(),
+								Messages.ApplicationTab_Project_required,
+								Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
 			initPath = getProject().getLocationURI().getPath();
 		}
-		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
-		if(localServices != null && localUIServices != null) {
-			IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-			IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
-			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager();
+		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault()
+				.getDefaultServices();
+		IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault()
+				.getRemoteUIServices(localServices);
+		if (localServices != null && localUIServices != null) {
+			IRemoteConnectionManager lconnMgr = localServices
+					.getConnectionManager();
+			IRemoteConnection lconn = lconnMgr.getConnection(null); // Since
+			// it's a
+			// local
+			// service,
+			// doesn't
+			// matter
+			// which
+			// parameter
+			// is passed
+			IRemoteUIFileManager localUIFileMgr = localUIServices
+					.getUIFileManager();
 			localUIFileMgr.setConnection(lconn);
-			IPath path = localUIFileMgr.browseFile(getShell(), Messages.ApplicationTab_7, initPath);
+			IPath path = new Path(localUIFileMgr.browseFile(getShell(),
+					Messages.ApplicationTab_7, initPath, 0));
 			if (path != null) {
 				localAppText.setText(path.toString());
 			}
