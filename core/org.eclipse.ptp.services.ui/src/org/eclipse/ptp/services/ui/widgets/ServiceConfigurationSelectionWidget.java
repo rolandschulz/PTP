@@ -13,7 +13,10 @@
  */
 package org.eclipse.ptp.services.ui.widgets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -100,9 +103,11 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		 */
 		@Override
 		public Object[] getChildren(Object element) {
-			Set<IServiceConfiguration> children = fDisplayConfigs;
-			if (children == null) {
-				children = ServiceModelManager.getInstance().getConfigurations();
+			List<IServiceConfiguration> children = new ArrayList<IServiceConfiguration>();
+			if (fDisplayConfigs == null) {
+				children.addAll(ServiceModelManager.getInstance().getConfigurations());
+			} else {
+				children.addAll(Arrays.asList(fDisplayConfigs));
 			}
 			if (fExcludedConfigs != null) {
 				children.removeAll(fExcludedConfigs);
@@ -133,7 +138,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	private boolean fUseCheckboxes = false;
 	private Set<IService> fServices = null;
 	private Set<IServiceConfiguration> fExcludedConfigs = null;
-	private Set<IServiceConfiguration> fDisplayConfigs = null;
+	private IServiceConfiguration[] fDisplayConfigs = null;
 	private IServiceConfiguration fSelectedConfig = null;
 
 	public ServiceConfigurationSelectionWidget(Composite parent, int style) {
@@ -152,6 +157,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		} else {
 			setLayout(new GridLayout(1, false));
 		}
+		setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
 		Composite tableComposite = new Composite(this, SWT.NONE);
 		fTableLayout = new TableColumnLayout();
@@ -281,8 +287,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			fSelectAllButton.setEnabled(false);
 			fSelectAllButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
-					((CheckboxTableViewer)fTableViewer).setAllChecked(true);
-					notifySelection(fTableViewer.getSelection());
+					setAllChecked(true);
 				}
 			});
 		
@@ -294,8 +299,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 			fDeselectAllButton.setEnabled(false);
 			fDeselectAllButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
-					((CheckboxTableViewer)fTableViewer).setAllChecked(false);
-					notifySelection(fTableViewer.getSelection());
+					setAllChecked(false);
 				}
 			});
 		}
@@ -320,11 +324,12 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	 * 
 	 * @return array containing the elements that are checked
 	 */
-	public Object[] getCheckedElements() {
+	public IServiceConfiguration[] getCheckedServiceConfigurations() {
 		if (fUseCheckboxes) {
-			return ((CheckboxTableViewer)fTableViewer).getCheckedElements();
+			Object[] elements = ((CheckboxTableViewer)fTableViewer).getCheckedElements();
+			return Arrays.asList(elements).toArray(new IServiceConfiguration[0]);
 		}
-		return new Object[0];
+		return new IServiceConfiguration[0];
 	}
 	
 	/* (non-Javadoc)
@@ -343,7 +348,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	public IServiceConfiguration getSelectedConfiguration() {
 		return fSelectedConfig;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
 	 */
@@ -362,12 +367,24 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 	}
 
 	/**
+	 * Sets all elements in the viewer to the given checked state.
+	 * 
+	 * @param state
+	 */
+	public void setAllChecked(boolean state) {
+		if (fUseCheckboxes) {
+			((CheckboxTableViewer)fTableViewer).setAllChecked(state);
+			notifySelection(fTableViewer.getSelection());
+		}
+	}
+
+	/**
 	 * Set the service configurations to display in the viewer. Passing null
 	 * will display all known configurations (default).
 	 * 
 	 * @param configurations configurations to display, or null to display all
 	 */
-	public void setConfigurations(Set<IServiceConfiguration> configurations) {
+	public void setConfigurations(IServiceConfiguration[] configurations) {
 		fDisplayConfigs = configurations;
 		fTableViewer.refresh();
 	}
@@ -400,7 +417,7 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		column.getColumn().setMoveable(true);
 		column.getColumn().setText(colName);
 		PixelConverter converter = new PixelConverter(fTableViewer.getControl());
-		int colWidth = converter.convertWidthInCharsToPixels(colName.length() + 5);
+		int colWidth = converter.convertWidthInCharsToPixels(colName.length() + 1);
 		fTableLayout.setColumnData(column.getColumn(), new ColumnWeightData(10, colWidth));
 		return column;
 	}
