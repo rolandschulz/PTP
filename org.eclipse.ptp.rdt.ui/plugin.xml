@@ -287,6 +287,11 @@
             class="org.eclipse.ptp.rdt.ui.properties.IndexerOptionPropertyPage"
             id="org.eclipse.ptp.rdt.ui.indexer"
             name="%CDTIndexerProperty.name">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.cdt.core.cnature"/>
+		     </adapt>         
+         </enabledWhen>
       </page>
    </extension>
    <extension
