@@ -16,6 +16,8 @@ import java.net.URISyntaxException;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.internal.core.index.IndexFileLocation;
+import org.eclipse.dstore.core.model.DataStore;
+import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 
 /**
  * @author crecoskie
@@ -23,13 +25,17 @@ import org.eclipse.cdt.internal.core.index.IndexFileLocation;
  */
 public class RemoteLocationConverter implements IIndexLocationConverter {
 
-	/**
-	 * 
-	 */
+	private DataStore _dataStore = null;
+	private static final String CLASS_NAME = "CDTMiner-RemoteLocationConverter"; //$NON-NLS-1$
+	
+	public RemoteLocationConverter(DataStore _dataStore) {
+		this._dataStore = _dataStore;
+	}
+
 	public RemoteLocationConverter() {
 		// TODO Auto-generated constructor stub
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.index.IIndexLocationConverter#fromInternalFormat(java.lang.String)
 	 */
@@ -37,8 +43,12 @@ public class RemoteLocationConverter implements IIndexLocationConverter {
 		try {
 			return new IndexFileLocation(new URI("file", null, raw, null, null), null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (_dataStore != null) {
+				UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore );
+			}
+			else {
+				e.printStackTrace();
+			}
 		}
 		
 		return null;

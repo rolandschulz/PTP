@@ -17,8 +17,10 @@ import org.eclipse.cdt.internal.core.pdom.IndexerProgress;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
+import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerProgress;
+import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 
 /**
  * A progress monitor that serialize indexer progress information.
@@ -34,9 +36,13 @@ public class RemoteIndexProgressMonitor implements IProgressMonitor {
 	private DataElement fStatus;
 	private StandaloneFastIndexer fIndexer;
 	
-	public RemoteIndexProgressMonitor(StandaloneFastIndexer indexer, DataElement status) {
+	private DataStore _dataStore;
+	private static final String CLASS_NAME = "CDTMiner-RemoteIndexProgressMonitor"; //$NON-NLS-1$
+	
+	public RemoteIndexProgressMonitor(StandaloneFastIndexer indexer, DataElement status, DataStore _dataStore) {
 		fStatus = status;
 		fIndexer = indexer;
+		this._dataStore = _dataStore;
 	}
 
 	/* (non-Javadoc)
@@ -121,7 +127,8 @@ public class RemoteIndexProgressMonitor implements IProgressMonitor {
 			
 			fStatus.getDataStore().refresh(fStatus);
 		} catch (IOException e) {
-			e.printStackTrace();
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			
 		} 
 	}
 	
