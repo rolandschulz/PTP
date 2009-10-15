@@ -44,6 +44,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			String filterPath, int flags) {
 		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell,
 				message, connHost);
+		dlg.setDefaultSystemConnection(connHost, true);
 		dlg.setBlockOnOpen(true);
 		if (dlg.open() == Window.OK) {
 			connHost = dlg.getSelectedConnection();
@@ -68,6 +69,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			int flags) {
 		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message,
 				connHost);
+		dlg.setDefaultSystemConnection(connHost, true);
 		dlg.setBlockOnOpen(true);
 		if (dlg.open() == Window.OK) {
 			connHost = dlg.getSelectedConnection();
@@ -92,6 +94,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			int flags) {
 		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message,
 				connHost);
+		dlg.setDefaultSystemConnection(connHost, true);
 		dlg.setBlockOnOpen(true);
 		dlg.setMultipleSelectionMode(true);
 		if (dlg.open() == Window.OK) {
