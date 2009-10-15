@@ -27,7 +27,8 @@ public interface IRemoteUIFileManager {
 	 * @param initialPath
 	 *            initial path to use when displaying files
 	 * @param flags
-	 *            option settings for dialog
+	 *            option settings for dialog (not currently used)
+	 *            valid values are NONE (@see IRemoteUIConstants)
 	 * @return the path to the directory relative to the remote system or null
 	 *         if the browser was cancelled
 	 */
@@ -48,6 +49,7 @@ public interface IRemoteUIFileManager {
 	 *            initial path to use when displaying files
 	 * @param flags
 	 *            options settings for dialog
+	 *            valid values are NONE, SAVE, or OPEN (@see IRemoteUIConstants)
 	 * @return the path to the file relative to the remote system or null if the
 	 *         browser was cancelled
 	 */
@@ -68,7 +70,8 @@ public interface IRemoteUIFileManager {
 	 * @param initialPath
 	 *            initial path to use when displaying files
 	 * @param flags
-	 *            options settings for dialog
+	 *            options settings for dialog (@see IRemoteUIConstants)
+	 *            valid values are NONE, SAVE, or OPEN (@see IRemoteUIConstants)
 	 * @return the path to the file relative to the remote system or null if the
 	 *         browser was cancelled
 	 */
