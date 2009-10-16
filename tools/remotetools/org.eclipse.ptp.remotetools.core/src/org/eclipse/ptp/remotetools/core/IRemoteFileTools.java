@@ -11,8 +11,10 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.core;
 
-import java.util.Enumeration;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
@@ -25,7 +27,9 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
  * @author Daniel Ferber, Richard Maciel
  */
 public interface IRemoteFileTools {
-
+	public static final int NONE = 0;
+	public static final int APPEND = 1 << 0;
+	
 	/**
 	 * Return an IRemoteCopyTools object
 	 * @throws RemoteConnectionException
@@ -100,18 +104,35 @@ public interface IRemoteFileTools {
 	 * Create a new directory.
 	 * <p>
 	 * If directory exists, nothings is done.
-	 * Create parent directories as necessary.
+	 * Parent directories will be created as necessary.
+	 * 
+	 * @param directory
+	 *			Directory to be created.
+	 * @throws RemoteExecutionException
+	 *			The directory could not be created.
+	 * @throws RemoteConnectionException
+	 *			The connection failed.
+	 * @throws CancelException
+	 *			The operation was canceled by another thread.
+	 */
+	public void createDirectory(String directory) throws RemoteOperationException,
+			RemoteConnectionException, CancelException;
+
+	/**
+	 * Create a new empty file.
+	 * <p>
+	 * If file exists, nothings is done.
 	 * 
 	 * @param file
-	 *            Directory to be created.
+	 *			File to be created.
 	 * @throws RemoteExecutionException
-	 *             The directory could not be created.
+	 *			The file could not be created.
 	 * @throws RemoteConnectionException
-	 *             The connection failed.
+	 *			The connection failed.
 	 * @throws CancelException
-	 *             The operation was canceled by another thread.
+	 *			The operation was canceled by another thread.
 	 */
-	public void createDirectory(String file) throws RemoteOperationException,
+	public void createFile(String file) throws RemoteOperationException,
 			RemoteConnectionException, CancelException;
 
 	/**
@@ -225,4 +246,8 @@ public interface IRemoteFileTools {
 	public IRemoteFileEnumeration createFileEnumeration(String path) throws RemoteOperationException, RemoteConnectionException, CancelException;
 	public IRemoteFileEnumeration createRecursiveFileEnumeration(String path) throws RemoteOperationException, RemoteConnectionException, CancelException;
 
+	public InputStream getInputStream(String file, IProgressMonitor monitor) 
+			throws RemoteOperationException, RemoteConnectionException, CancelException;
+	public OutputStream getOutputStream(String file, int options, IProgressMonitor monitor) 
+		throws RemoteOperationException, RemoteConnectionException, CancelException;
 }
