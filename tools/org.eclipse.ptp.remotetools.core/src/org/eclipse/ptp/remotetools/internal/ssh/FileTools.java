@@ -12,12 +12,17 @@
 package org.eclipse.ptp.remotetools.internal.ssh;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
 import org.eclipse.ptp.remotetools.core.IRemoteFile;
@@ -33,6 +38,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.SftpProgressMonitor;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 /**
@@ -40,6 +46,31 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
  * 
  */
 public class FileTools implements IRemoteFileTools {
+	public static class FileToolsProgressMonitor implements SftpProgressMonitor {
+		private IProgressMonitor fMonitor;
+		private long fWorkToDate;
+
+		public FileToolsProgressMonitor(IProgressMonitor monitor) {
+			fMonitor = monitor;
+		}
+		public void init(int op, String src, String dest, long max){
+			fWorkToDate = 0;
+			String srcFile = new Path(src).lastSegment();
+			String desc = srcFile;
+			//TODO avoid cast from long to int
+			fMonitor.beginTask(desc, (int)max);
+
+		}
+		public boolean count(long count){
+			fWorkToDate += count;
+			//fMonitor.worked((int)count);
+			return !(fMonitor.isCanceled());
+		}
+		public void end(){
+			//fMonitor.done();
+		}
+	}
+
 	protected ExecutionManager manager;
 	public int cachedUserID;
 	public Set cachedGroupIDSet;
@@ -77,22 +108,75 @@ public class FileTools implements IRemoteFileTools {
 		test();
 		validateRemotePath(file);
 		IRemotePathTools pathTool = manager.getRemotePathTools();
-		try {
-			executeCommand("rm -rf " + pathTool.quote(file, true)); //$NON-NLS-1$
-		} catch (RemoteExecutionException e) {
-			throw new RemoteOperationException(e);
-		} 
+		String path = pathTool.quote(file, true);
+		SftpATTRS attrs = fetchRemoteAttr(file);
+		
+		if (attrs == null) {
+			return;
+		}
+			
+		if (attrs.isDir()) {
+			try {
+				manager.getConnection().getDefaultSFTPChannel().rmdir(path);
+			} catch (SftpException e) {
+				if (e.id == ChannelSftp.SSH_FX_FAILURE) {
+					try {
+						executeCommand("rm -rf " + pathTool.quote(file, true)); //$NON-NLS-1$
+					} catch (RemoteExecutionException e1) {
+						throw new RemoteOperationException(e1);
+					} 
+				} else {
+					throw new RemoteOperationException(e);
+				}
+			}
+		} else {
+			try {
+				manager.getConnection().getDefaultSFTPChannel().rm(path);
+			} catch (SftpException e) {
+				throw new RemoteOperationException(e);
+			}
+		}
 	}
 
-	public void createDirectory(String file) throws RemoteOperationException, RemoteConnectionException, CancelException {
+	public void createDirectory(String directory) throws RemoteOperationException, RemoteConnectionException, CancelException {
+		test();
+		validateRemotePath(directory);
+		IRemotePathTools pathTool = manager.getRemotePathTools();
+		
+		String path = pathTool.quote(directory, true);
+		SftpATTRS attrs = fetchRemoteAttr(path);
+		if (attrs != null) {
+			if (attrs.isDir()) {
+				return;
+			}
+			throw new RemoteOperationException(Messages.RemoteFileTools_CreateDirectory_FileNameExists);
+		}
+		
+		String parent = pathTool.parent(path);
+		attrs = fetchRemoteAttr(parent);
+		if (attrs == null) {
+			createDirectory(parent);
+		}
+		
+		try {
+			manager.getConnection().getDefaultSFTPChannel().mkdir(path);
+		} catch (SftpException e) {
+			throw new RemoteOperationException(e);
+		}
+	}
+	
+	public void createFile(String file) throws RemoteOperationException, RemoteConnectionException, CancelException {
 		test();
 		validateRemotePath(file);
 		IRemotePathTools pathTool = manager.getRemotePathTools();
+		String path = pathTool.quote(file, true);
+		
 		try {
-			executeCommand("mkdir -p " + pathTool.quote(file, true)); //$NON-NLS-1$
-		} catch (RemoteExecutionException e) {
+			OutputStream os = manager.getConnection().getDefaultSFTPChannel().put(path);
+			os.close();
+		} catch (Exception e) {
 			throw new RemoteOperationException(e);
-		} 
+		}
 	}
 	
 	public void assureDirectory(String directory) throws RemoteOperationException, RemoteConnectionException, CancelException {
@@ -259,7 +343,7 @@ public class FileTools implements IRemoteFileTools {
 		
 		cacheUserData();
 		
-		List result = new ArrayList();
+		List<RemoteItem> result = new ArrayList<RemoteItem>();
 		Enumeration enumeration = files.elements();
 		while (enumeration.hasMoreElements()) {
 			LsEntry entry = (LsEntry) enumeration.nextElement();
@@ -364,5 +448,70 @@ public class FileTools implements IRemoteFileTools {
 		item.setReadable(file.canRead());
 		item.setWriteable(file.canWrite());
 		item.commitAttributes();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileTools#getInputStream(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public InputStream getInputStream(String file, IProgressMonitor monitor) throws RemoteOperationException,
+			RemoteConnectionException, CancelException {
+		test();
+		validateRemotePath(file);
+		IRemotePathTools pathTool = manager.getRemotePathTools();
+		String path = pathTool.quote(file, true);
+
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		
+		InputStream stream = null;
+		
+		try {
+			stream = manager.getConnection().getDefaultSFTPChannel().get(path);
+		} catch (Exception e) {
+			throw new RemoteOperationException(e);
+		}
+		
+		if (monitor.isCanceled()) {
+			throw new CancelException();
+		}
+		
+		return stream;	
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileTools#getOutputStream(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public OutputStream getOutputStream(String file, int options, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException, CancelException {
+		test();
+		validateRemotePath(file);
+		IRemotePathTools pathTool = manager.getRemotePathTools();
+		String path = pathTool.quote(file, true);
+
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		
+		OutputStream stream = null;
+		
+		try {
+			SftpProgressMonitor sftpMonitor = new FileToolsProgressMonitor(monitor);
+			int mode;
+			if ((options & IRemoteFileTools.APPEND) == 0) {
+				mode = ChannelSftp.OVERWRITE;
+			} else {
+				mode = ChannelSftp.APPEND;
+			}
+			ChannelSftp channel = manager.getConnection().getDefaultSFTPChannel();
+			stream = channel.put(path, sftpMonitor, mode);
+		} catch (Exception e) {
+			throw new RemoteOperationException(e);
+		}
+		
+		if (monitor.isCanceled()) {
+			throw new CancelException();
+		}
+		
+		return stream;	
 	}
 }

@@ -108,6 +108,7 @@ public class Messages extends NLS {
 	public static String RemoteFileTools_ValidateRemoteFile_NotValid;
 	public static String RemoteFileTools_ValidateRemotePath_NotValid;
 	public static String RemoteStatusTools_GetPasswdFields_NoUsernameInPasswdFile;
+	public static String RemoteFileTools_CreateDirectory_FileNameExists;
 	public static String ScriptExecution_StartExecution_FailedInitStreams;
 	public static String UploadExecution_StartExecution_FailedCreateUpload;
 }
