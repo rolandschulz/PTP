@@ -21,6 +21,9 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
  * @author Richard Maciel, Daniel Felix Ferber
  * @since 1.1
  * <b>Review OK</b>
+ * 
+ * NOTE: this interface should not normally be used directly
+ * @see org.eclipse.ptp.remote.core.IRemoteConnection
  */
 public interface IRemoteConnection
 {

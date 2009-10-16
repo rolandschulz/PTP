@@ -27,7 +27,14 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
  * @author Daniel Ferber, Richard Maciel
  */
 public interface IRemoteFileTools {
+	/**
+	 * Equivalent to specifying no options
+	 */
 	public static final int NONE = 0;
+	
+	/**
+	 * Append output to the end of a file
+	 */
 	public static final int APPEND = 1 << 0;
 	
 	/**
@@ -243,11 +250,49 @@ public interface IRemoteFileTools {
 			throws RemoteConnectionException,
 			CancelException, RemoteOperationException;
 	
+	/**
+	 * @param path
+	 * @return
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
 	public IRemoteFileEnumeration createFileEnumeration(String path) throws RemoteOperationException, RemoteConnectionException, CancelException;
+
+	/**
+	 * @param path
+	 * @return
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
 	public IRemoteFileEnumeration createRecursiveFileEnumeration(String path) throws RemoteOperationException, RemoteConnectionException, CancelException;
 
+	/**
+	 * Get an input stream connected to a file.
+	 * 
+	 * @param file file name of the file
+	 * @param monitor progress monitor
+	 * @return InputStream that can be used to read from the file
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
 	public InputStream getInputStream(String file, IProgressMonitor monitor) 
 			throws RemoteOperationException, RemoteConnectionException, CancelException;
+	
+	/**
+	 * Get an output stream connected to a file.
+	 * 
+	 * @param file file name of the file
+	 * @param options options to modify the behavior of the method. Legal values
+	 * 				  are NONE and APPEND.
+	 * @param monitor progress monitor
+	 * @return OutputStream that can be used to write to the file
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
 	public OutputStream getOutputStream(String file, int options, IProgressMonitor monitor) 
 		throws RemoteOperationException, RemoteConnectionException, CancelException;
 }

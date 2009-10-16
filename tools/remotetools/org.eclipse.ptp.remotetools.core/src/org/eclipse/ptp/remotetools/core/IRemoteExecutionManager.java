@@ -28,6 +28,9 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
  * 
  * @author Richard Maciel, Daniel F. Ferber
  * @since 1.1
+ * 
+ * NOTE: this interface should not normally be used directly
+ * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder
  */
 public interface IRemoteExecutionManager {
 	/**
