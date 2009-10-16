@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -884,12 +883,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 					if (fileMgr != null) {
 						fileMgr.setConnection(connection);
 						String correctPath = proxyPathText.getText();
-						IPath selectedPath = new Path(
-								fileMgr
-										.browseFile(
+						String selectedPath = fileMgr.browseFile(
 												getShell(),
 												Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16,
-												correctPath, 0));
+												correctPath, 0);
 						if (selectedPath != null) {
 							proxyPathText.setText(selectedPath.toString());
 						}
