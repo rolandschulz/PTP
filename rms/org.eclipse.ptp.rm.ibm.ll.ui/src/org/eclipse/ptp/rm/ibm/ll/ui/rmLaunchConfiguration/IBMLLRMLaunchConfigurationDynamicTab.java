@@ -484,7 +484,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			fmgr.setConnection(remoteConnection);
 			selectedFile = fmgr.browseFile(parentShell,
 					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0).toString();
+					0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -518,7 +518,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			fmgr.setConnection(remoteConnection);
 			selectedFile = fmgr.browseFile(parentShell,
 					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0).toString();
+					0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
