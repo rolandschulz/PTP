@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
-import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 
 public class IBMLLPreferenceManager {
 	private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmll_proxy"; //$NON-NLS-1$
@@ -70,7 +70,7 @@ public class IBMLLPreferenceManager {
 			}
        }
 		
-		preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
-		preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS); 
+		preferences.setDefault(RMPreferenceConstants.PROXY_PATH, server);
+		preferences.setDefault(RMPreferenceConstants.OPTIONS, OPTIONS); 
 	}
 }

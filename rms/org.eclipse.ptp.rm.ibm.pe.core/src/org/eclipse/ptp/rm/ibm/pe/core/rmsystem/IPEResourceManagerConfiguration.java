@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.core.rmsystem;
 
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 
 public interface IPEResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 

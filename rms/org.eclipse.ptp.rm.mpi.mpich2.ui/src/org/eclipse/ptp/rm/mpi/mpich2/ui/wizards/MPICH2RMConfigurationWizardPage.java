@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.mpi.mpich2.ui.wizards;
 
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 /**

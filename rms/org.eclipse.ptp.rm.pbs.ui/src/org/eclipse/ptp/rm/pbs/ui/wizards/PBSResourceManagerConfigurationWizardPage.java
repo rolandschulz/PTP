@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.pbs.ui.wizards;
 
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 public final class PBSResourceManagerConfigurationWizardPage extends

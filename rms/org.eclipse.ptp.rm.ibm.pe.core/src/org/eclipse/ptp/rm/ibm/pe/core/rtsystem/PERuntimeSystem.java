@@ -26,7 +26,7 @@
 package org.eclipse.ptp.rm.ibm.pe.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeSystem;
+import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeSystem;
 
 public class PERuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public PERuntimeSystem(PEProxyRuntimeClient proxy, AttributeDefinitionManager manager) {

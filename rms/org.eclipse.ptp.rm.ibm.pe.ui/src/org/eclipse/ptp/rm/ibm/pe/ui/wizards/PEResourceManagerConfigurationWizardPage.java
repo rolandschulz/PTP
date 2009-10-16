@@ -27,7 +27,7 @@ package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 

@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManager;

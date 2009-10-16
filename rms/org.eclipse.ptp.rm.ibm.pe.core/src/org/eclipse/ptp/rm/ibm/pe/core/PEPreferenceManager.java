@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
-import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 
 public class PEPreferenceManager
 {
@@ -71,8 +71,8 @@ public class PEPreferenceManager
 	    }
 	}
 
-	preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
-	preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
+	preferences.setDefault(RMPreferenceConstants.PROXY_PATH, server);
+	preferences.setDefault(RMPreferenceConstants.OPTIONS, OPTIONS);
 	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_OPTION, PEPreferenceConstants.OPTION_NO);
 	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_MODE, "d"); //$NON-NLS-1$
 	preferences.setDefault(PEPreferenceConstants.JOB_POLL_INTERVAL, "30"); //$NON-NLS-1$

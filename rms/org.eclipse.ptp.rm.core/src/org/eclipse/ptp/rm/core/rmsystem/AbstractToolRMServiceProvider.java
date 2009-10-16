@@ -13,7 +13,6 @@
  */
 package org.eclipse.ptp.rm.core.rmsystem;
 
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 
 /**
  * @author greg

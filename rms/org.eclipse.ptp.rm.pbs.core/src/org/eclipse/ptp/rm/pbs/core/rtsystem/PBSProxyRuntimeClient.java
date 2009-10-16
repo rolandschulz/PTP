@@ -11,8 +11,8 @@
 
 package org.eclipse.ptp.rm.pbs.core.rtsystem;
 
+import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeClient;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeClient;
 
 public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 	public PBSProxyRuntimeClient(IPBSResourceManagerConfiguration config, 
