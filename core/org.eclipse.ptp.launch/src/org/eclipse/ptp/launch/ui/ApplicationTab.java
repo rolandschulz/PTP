@@ -27,9 +27,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -562,9 +560,9 @@ public class ApplicationTab extends LaunchConfigurationTab {
 							if (fileManager != null) {
 								fileManager.setConnection(conn);
 								fileManager.showConnections(false);
-								IPath path = new Path(fileManager.browseFile(
+								String path = fileManager.browseFile(
 										getShell(), Messages.ApplicationTab_6,
-										initPath, 0));
+										initPath, 0);
 								if (path != null) {
 									appText.setText(path.toString());
 								}
@@ -641,21 +639,14 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			IRemoteConnectionManager lconnMgr = localServices
 					.getConnectionManager();
 			IRemoteConnection lconn = lconnMgr.getConnection(null); // Since
-			// it's a
-			// local
-			// service,
-			// doesn't
-			// matter
-			// which
-			// parameter
-			// is passed
+			// it's a local service, doesn't matter which parameter is passed
 			IRemoteUIFileManager localUIFileMgr = localUIServices
 					.getUIFileManager();
 			localUIFileMgr.setConnection(lconn);
-			IPath path = new Path(localUIFileMgr.browseFile(getShell(),
-					Messages.ApplicationTab_7, initPath, 0));
+			String path = localUIFileMgr.browseFile(getShell(),
+					Messages.ApplicationTab_7, initPath, 0);
 			if (path != null) {
-				localAppText.setText(path.toString());
+				localAppText.setText(path);
 			}
 		}
 	}
