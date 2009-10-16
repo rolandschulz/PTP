@@ -351,10 +351,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 			if (fileManager != null) {
 				fileManager.setConnection(getRemoteConnection());
-				IPath path = new Path(fileManager.browseFile(getShell(),
-						Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0));
-				if (path != null)
-					return path.toString();
+				return fileManager.browseFile(getShell(),
+						Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0);
 			}
 		} else {
 			FileDialog dialog = new FileDialog(getShell());
