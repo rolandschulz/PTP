@@ -11,13 +11,15 @@
 package org.eclipse.ptp.remote.ui;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.messages.Messages;
 
 public class RemoteUIServicesProxy implements IRemoteUIServices {
-	private static final String ATTR_ID = "id";
-	private static final String ATTR_NAME = "name";
-	private static final String ATTR_CLASS = "class";
+	private static final String ATTR_ID = "id"; //$NON-NLS-1$
+	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
+	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 	
 	private static String getAttribute(IConfigurationElement configElement, String name, String defaultValue) {
 		String value = configElement.getAttribute(name);
@@ -27,7 +29,7 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 		if (defaultValue != null) {
 			return defaultValue;
 		}
-		throw new IllegalArgumentException("Missing " + name + " attribute");
+		throw new IllegalArgumentException(NLS.bind(Messages.RemoteUIServicesProxy_1, name));
 	}
 
 	private final IConfigurationElement configElement;
@@ -57,12 +59,12 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 			factory = (IRemoteUIServicesFactory)configElement.createExecutableExtension(ATTR_CLASS);
 		} catch (Exception e) {
 			PTPRemoteCorePlugin.log(
-					"Failed to instatiate factory: "
-					+ configElement.getAttribute(ATTR_CLASS)
-					+ " in type: "
-					+ id
-					+ " in plugin: "
-					+ configElement.getDeclaringExtension().getNamespaceIdentifier());
+					NLS.bind(Messages.RemoteUIServicesProxy_2,
+					new Object[] {
+						configElement.getAttribute(ATTR_CLASS),
+						id,
+						configElement.getDeclaringExtension().getNamespaceIdentifier()
+					}));
 		}
 		return factory;
 	}
