@@ -47,7 +47,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 	/**
 	 * Set of jobs running on the remote target environment.
 	 */
-	private Map<ITargetJob, TargetControlledJob> remoteJobs;
+	private Map<ITargetJob, TargetControlledJob> remoteJobs = new HashMap<ITargetJob, TargetControlledJob>();
 
 	/**
 	 * A connection (using ssh) to the remote target environment.
@@ -233,10 +233,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 			listener.afterJobFinish(job);
 		}
 		/** Remove job from list of jobs. */
-		if (remoteJobs == null) {
-			/* The method may be called by pending jobs that were canceled while disconnecting. */
-			return;
-		}
 		remoteJobs.remove(job);
 	}
 
@@ -323,7 +319,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 						sshParameters.cipherType, sshParameters.timeout);
 			}
 			remoteConnection.connect(monitor);
-			remoteJobs = new HashMap<ITargetJob, TargetControlledJob>();
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			throw e;
@@ -376,6 +371,10 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 
 	public boolean executeRemoteCommand(IProgressMonitor monitor, String command, String[] args) throws CoreException {
+		if (remoteConnection == null) {
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), "Internal error: remote connection invalid", null)); //$NON-NLS-1$
+		}
+		
 		for (int i = 0; i < args.length; i++) {
 			command += (" " + args[i]); //$NON-NLS-1$
 		}
@@ -423,10 +422,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 		return (remoteConnection != null) && (remoteConnection.isConnected());
 	}
 	
-//	public IRemoteConnection getConnection() {
-//		return remoteConnection;
-//	}
-
 	protected synchronized void terminateJobs(IProgressMonitor monitor) {
 		/*
 		 * Issue each job to terminate gracefully.
@@ -461,10 +456,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 		/*
 		 * Any still running jobs will fail.
 		 */
-		if (remoteJobs != null) {
-			remoteJobs.clear();
-			remoteJobs = null;
-		}
+		remoteJobs.clear();
 		if (remoteConnection != null) {
 			remoteConnection.disconnect();
 			remoteConnection = null;
