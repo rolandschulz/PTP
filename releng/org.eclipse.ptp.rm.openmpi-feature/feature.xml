@@ -26,19 +26,18 @@
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.remote.core"/>
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.rm.core"/>
-      <import plugin="org.eclipse.ptp.rm.remote"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
-      <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.search"/>
       <import plugin="org.eclipse.ptp.ui"/>
       <import plugin="org.eclipse.ptp.launch"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.ptp.rm.ui"/>
       <import plugin="org.eclipse.ptp.utils.ui"/>
-      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
