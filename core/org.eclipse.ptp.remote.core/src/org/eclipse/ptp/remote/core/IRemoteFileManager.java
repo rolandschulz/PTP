@@ -22,6 +22,10 @@ public interface IRemoteFileManager {
 	 * Get the resource associated with path. IFileStore can then
 	 * be used to perform operations on the file.
 	 * 
+	 * The remote connection does not need to be open to used this method,
+	 * but subsequent operations on the IFileStore that access the underlying
+	 * remote filesystem may require the connection to be open.
+	 * 
 	 * @param path path to resource
 	 * @param monitor progress monitor
 	 * @return the file store representing the remote path
@@ -32,6 +36,9 @@ public interface IRemoteFileManager {
 	/**
 	 * Get the working directory. Relative paths will be resolved using this path.
 	 * 
+	 * The remote connection does not need to be open to use this method, however a default 
+	 * directory path, rather than the actual working directory, may be returned in this case.
+	 * 
 	 * @return IPath representing the current working directory
 	 */
 	public IPath getWorkingDirectory();
@@ -39,6 +46,8 @@ public interface IRemoteFileManager {
 	/**
 	 * Convert URI to a remote path. This path is suitable for
 	 * direct file operations <i>on the remote system</i>.
+	 * 
+	 * The remote connection does not need to be open to use this method.
 	 * 
 	 * @return IPath representing the remote path
 	 */
@@ -48,6 +57,8 @@ public interface IRemoteFileManager {
 	 * Convert remote path to equivalent URI. This URI is suitable
 	 * for EFS operations <i>on the local system</i>.
 	 * 
+	 * The remote connection does not need to be open to use this method.
+	 * 
 	 * @param path path on remote system
 	 * @return URI representing path on remote system
 	 */
@@ -56,6 +67,8 @@ public interface IRemoteFileManager {
 	/**
 	 * Convert string representation of a remote path to equivalent URI. This URI is suitable
 	 * for EFS operations <i>on the local system</i>.
+	 * 
+	 * The remote connection does not need to be open to use this method.
 	 * 
 	 * @param path path on remote system
 	 * @return URI representing path on remote system
