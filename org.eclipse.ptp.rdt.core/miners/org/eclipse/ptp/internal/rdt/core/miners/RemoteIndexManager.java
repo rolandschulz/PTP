@@ -33,13 +33,16 @@ import org.eclipse.cdt.internal.core.pdom.dom.c.PDOMCLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.cpp.PDOMCPPLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.indexer.PDOMIndexerTask;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 
 
 public class RemoteIndexManager {
 	
 	public static final String PDOM_EXTENSION = ".pdom"; //$NON-NLS-1$
+	private static final String CLASS_NAME = "CDTMiner-RemoteIndexManager"; //$NON-NLS-1$
 	
 	private static RemoteIndexManager theInstance = null;
 	
@@ -72,22 +75,22 @@ public class RemoteIndexManager {
 	
 	
 	
-	public IIndex getIndexForScope(String scope) {
+	public IIndex getIndexForScope(String scope, DataStore dataStore) {
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
 			Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
 			
 			for(String currentScope : ScopeManager.getInstance().getAllScopes()) {
-				IIndexFragment fragment = getIndexerForScope(currentScope).getIndex().getWritableFragment();
+				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore).getIndex().getWritableFragment();
 				fragments.add(fragment);
 			}
 			
 			if(fragments.isEmpty())
-				System.out.println("Warning: index contains 0 fragments"); //$NON-NLS-1$
+				UniversalServerUtilities.logWarning(CLASS_NAME, "Index contains 0 fragments", dataStore); //$NON-NLS-1$
 			
 			return new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
 		}
 		else {
-			StandaloneFastIndexer indexer = getIndexerForScope(scope);
+			StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore);
 			return indexer.getIndex();
 		}
 	}
@@ -98,8 +101,8 @@ public class RemoteIndexManager {
 	 * 
 	 * @see PDOMIndexerTask constructor
 	 */
-	public StandaloneFastIndexer getIndexerForScope(String scope, IRemoteIndexerInfoProvider provider) {
-		StandaloneFastIndexer indexer = getIndexerForScope(scope);
+	public StandaloneFastIndexer getIndexerForScope(String scope, IRemoteIndexerInfoProvider provider, DataStore dataStore) {
+		StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore);
 		
 		// configure the indexer using the provider
 		indexer.setScannerInfoProvider(provider);
@@ -149,7 +152,7 @@ public class RemoteIndexManager {
 	}
 
 	
-	public StandaloneFastIndexer getIndexerForScope(String scope) {
+	public StandaloneFastIndexer getIndexerForScope(String scope, DataStore dataStore) {
 		
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
 			throw new IllegalArgumentException("Attempted to get indexer for root scope."); //$NON-NLS-1$
@@ -175,20 +178,17 @@ public class RemoteIndexManager {
 		
 		if(indexFile == null) {
 			indexFile = new File(scope + PDOM_EXTENSION); // creates a file object located in the server working directory
-			System.err.printf("Can't create index file at %s, attempting to use %s instead\n", path, indexFile.getParent()); //$NON-NLS-1$
+			UniversalServerUtilities.logWarning(CLASS_NAME, "Can't create index file at " + path + " attempting to use " + indexFile.getParent() + " instead", dataStore); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			scopeToIndexLocationMap.put(scope, indexFile.getParent());
 		}
-		
-		System.out.println("Index at location: " + indexFile.getAbsolutePath()); //$NON-NLS-1$
-		System.out.flush();
+		UniversalServerUtilities.logInfo(CLASS_NAME, "Index at location:" + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
 
 		try {
 			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, LOG);
 
 			scopeToIndexerMap.put(scope, indexer);
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			UniversalServerUtilities.logError(CLASS_NAME, "Core Exception while getting indexer for scope", e, dataStore);  //$NON-NLS-1$
 		}
 
 		return indexer;
@@ -201,7 +201,7 @@ public class RemoteIndexManager {
 	 * @param scope
 	 * @return true if and only if the file is successfully deleted; false otherwise
 	 */
-	public boolean removeIndexFile(String scope) {
+	public boolean removeIndexFile(String scope, DataStore dataStore) {
 		
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
 			throw new IllegalArgumentException("Attempted to remove index file for root scope."); //$NON-NLS-1$
@@ -216,8 +216,7 @@ public class RemoteIndexManager {
 		else
 			indexFile = new File(loc, scope + PDOM_EXTENSION);
 		
-		System.out.println("Remove index at location: " + indexFile.getAbsolutePath()); //$NON-NLS-1$
-		System.out.flush();
+		UniversalServerUtilities.logInfo(CLASS_NAME, "Remove index at location: " + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
 		
 		return indexFile.delete();
 	}
@@ -227,7 +226,7 @@ public class RemoteIndexManager {
 	 * @param projects the projects to get the index for
 	 * @return an index for the projects
 	 */
-	public IIndex getIndexForProjects(ICProject[] projects) {
+	public IIndex getIndexForProjects(ICProject[] projects, DataStore dataStore) {
 		if(projects == null) {
 			throw new IllegalArgumentException("Get index for projects - projects cannot be null."); //$NON-NLS-1$
 		}
@@ -239,7 +238,7 @@ public class RemoteIndexManager {
 		for (int i = 0; i < projects.length; i++) {
 			String currentScope = projects[i].getElementName();
 			if (allScopes.contains(currentScope)) {
-				IIndexFragment fragment = getIndexerForScope(currentScope).getIndex().getWritableFragment();
+				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore).getIndex().getWritableFragment();
 				
 				fragments.add(fragment);
 			}
@@ -277,35 +276,34 @@ public class RemoteIndexManager {
 	 * 
 	 * @return The actual path to where the file was moved.
 	 */
-	public String moveIndexFile(String scope, String path) {
+	public String moveIndexFile(String scope, String path, DataStore dataStore) {
 		String oldLocation = scopeToIndexLocationMap.get(scope); 
 		String newLocation = setIndexFileLocation(scope, path);
 		if(!newLocation.equals(path)) {
-			System.out.printf("Can't move index file to %s, using %s instead\n", path, newLocation); //$NON-NLS-1$ 
+			UniversalServerUtilities.logWarning(CLASS_NAME, "Can't move index file to " + path + " using " + newLocation + " instead", dataStore); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
 		}
 		
 		if(newLocation.equals(oldLocation)) {
-			System.out.println("Index file not moved because source and destination are the same"); //$NON-NLS-1$ 
+			UniversalServerUtilities.logWarning(CLASS_NAME, "Index file not moved because source and destination are the same", dataStore); //$NON-NLS-1$ 
 			return oldLocation;
 		}
-		
-		System.out.printf("Moving index file %s%s from %s to %s\n", scope, PDOM_EXTENSION, oldLocation, newLocation);//$NON-NLS-1$ 
+		UniversalServerUtilities.logWarning(CLASS_NAME, "Moving index file " + scope + PDOM_EXTENSION + " from " + oldLocation + " to " + newLocation, dataStore);  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		String fileName = scope + PDOM_EXTENSION;
 		File pdomFile = new File(oldLocation, fileName);
 		
 		if(!pdomFile.exists()) {
-			System.out.println("Can't find index file at " + oldLocation); //$NON-NLS-1$
+			UniversalServerUtilities.logWarning(CLASS_NAME, "Can't find index file at " + oldLocation, dataStore); //$NON-NLS-1$
 			return oldLocation;
 		}
 			
 		boolean success = pdomFile.renameTo(new File(newLocation, fileName));
 		if(success) {
-			System.out.printf("Index file moved from %s to %s\n", oldLocation, newLocation); //$NON-NLS-1$
+			UniversalServerUtilities.logInfo(CLASS_NAME, "Index file moved from " + oldLocation + " to " + newLocation, dataStore); //$NON-NLS-1$ //$NON-NLS-2$
 			return newLocation;
 		}
 		else {
-			System.out.println("Index file could not be moved"); //$NON-NLS-1$
+			UniversalServerUtilities.logWarning(CLASS_NAME, "Index file could not be moved", dataStore); //$NON-NLS-1$
 			return oldLocation;
 		}
 	}
