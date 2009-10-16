@@ -26,14 +26,12 @@ package org.eclipse.ptp.remote.remotetools.ui;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileManager;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileSystem;
+import org.eclipse.ptp.remote.remotetools.ui.messages.Messages;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -41,7 +39,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 
 public class RemoteToolsFileSystemContributor extends FileSystemContributor {
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ide.fileSystem.FileSystemContributor#browseFileSystem(java.lang.String, org.eclipse.swt.widgets.Shell)
+	 */
 	public URI browseFileSystem(String initialPath, Shell shell) {
 		IRemoteServices services = PTPRemoteCorePlugin.getDefault()
 				.getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID);
@@ -49,12 +49,11 @@ public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 				.getRemoteUIServices(services);
 		IRemoteUIFileManager uiFileMgr = uiServices.getUIFileManager();
 		uiFileMgr.showConnections(true);
-		IPath path = new Path(uiFileMgr.browseDirectory(shell,
-				"Browse File System", initialPath, 0));
+		String path = uiFileMgr.browseDirectory(shell,
+				Messages.RemoteToolsFileSystemContributor_0, initialPath, 0);
 		if (path != null) {
 			IRemoteConnection conn = uiFileMgr.getConnection();
-			IRemoteFileManager fileMgr = services.getFileManager(conn);
-			return ((RemoteToolsFileManager) fileMgr).toURI(path);
+			return RemoteToolsFileSystem.getURIFor(conn.getName(), path);
 		}
 
 		return null;
