@@ -25,11 +25,10 @@ import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
 	private IRemoteExecutionManager fExeMgr;
-	private RemoteToolsConnection fConnection;
+	private final RemoteToolsConnection fConnection;
 	
-	public RemoteToolsFileManager(RemoteToolsConnection conn, IRemoteExecutionManager exeMgr) {
+	public RemoteToolsFileManager(RemoteToolsConnection conn) {
 		fConnection = conn;
-		fExeMgr = exeMgr;
 	}
 	
 	/* (non-Javadoc)
@@ -39,13 +38,26 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		return new RemoteToolsFileStore(fConnection.getName(), path.toString());
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory()
+	 */
 	public IPath getWorkingDirectory() {
+		if (fExeMgr == null) {
+			try {
+				fExeMgr = fConnection.createExecutionManager();
+			} catch (RemoteConnectionException e) {
+				// Ignore
+			}
+		}
+
 		String cwd = "//"; //$NON-NLS-1$
-		try {
-			cwd = fExeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
-		} catch (RemoteExecutionException e) {
-		} catch (RemoteConnectionException e) {
-		} catch (CancelException e) {
+		if (fExeMgr != null) {
+			try {
+				cwd = fExeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
+			} catch (RemoteExecutionException e) {
+			} catch (RemoteConnectionException e) {
+			} catch (CancelException e) {
+			}
 		}
 		return new Path(cwd);
 	}
