@@ -13,6 +13,7 @@ feature@org.eclipse.ptp.rm.ibm.ll=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/c
 feature@org.eclipse.ptp.rm.ibm.pe=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rm.ibm.pe-feature
 feature@org.eclipse.ptp.rm.mpich2=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rm.mpich2-feature
 feature@org.eclipse.ptp.rm.openmpi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rm.openmpi-feature
+feature@org.eclipse.ptp.rm.pbs=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rm.pbs-feature
 feature@org.eclipse.ptp.rm.slurm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rm.slurm-feature
 feature@org.eclipse.ptp.external=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.external-feature
 feature@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature
