@@ -98,6 +98,11 @@ public interface IRemoteItem {
 //	public String getGroupId();
 //	public String setGroupId();
 	
+	/**
+	 * Tests if the remote item is a directory.
+	 * 
+	 * @return true if the remote item is a directory
+	 */
 	public boolean isDirectory();
 	
 	/**

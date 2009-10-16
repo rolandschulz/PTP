@@ -18,6 +18,10 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
 
+/**
+ * NOTE: this interface should not normally be used directly
+ * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder
+ */
 public interface IRemoteExecutionTools {
 	/**
 	 * Create a object that describes a bash script to be executed on the remote host.

@@ -17,7 +17,6 @@ import java.io.OutputStream;
 
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
-import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 
@@ -27,6 +26,8 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
  * 
  * @author Daniel Felix Ferber, Richard Maciel
  * 
+ * NOTE: this interface should not normally be used directly
+ * @see org.eclipse.ptp.remote.core.IRemoteFileManager
  */
 public interface IRemoteCopyTools {
 	public IRemoteUploadExecution executeUpload(String remoteFile, InputStream source) throws RemoteConnectionException;
