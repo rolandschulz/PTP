@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.core.rmsystem;
 
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
 
 public interface IToolRMConfiguration extends IRemoteResourceManagerConfiguration {
 	public static final int CAP_LAUNCH = 1 << 0;

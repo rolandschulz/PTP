@@ -12,8 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.ui.wizards;
 
-import org.eclipse.ptp.rm.remote.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
+import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 public final class SLURMResourceManagerConfigurationWizardPage extends

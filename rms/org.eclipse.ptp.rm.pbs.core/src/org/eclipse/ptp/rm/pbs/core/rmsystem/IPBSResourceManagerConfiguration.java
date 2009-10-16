@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.core.rmsystem;
 
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 
 public interface IPBSResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 

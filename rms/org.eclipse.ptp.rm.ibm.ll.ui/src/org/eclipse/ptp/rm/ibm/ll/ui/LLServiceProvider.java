@@ -14,11 +14,11 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 

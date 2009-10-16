@@ -14,7 +14,7 @@
 package org.eclipse.ptp.rm.slurm.core.rtsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.rm.remote.core.AbstractRemoteProxyRuntimeSystem;
+import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeSystem;
 
 public class SLURMRuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public SLURMRuntimeSystem(SLURMProxyRuntimeClient proxy, AttributeDefinitionManager manager) {

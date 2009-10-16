@@ -12,9 +12,9 @@ package org.eclipse.ptp.rm.pbs.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.pbs.core.PBSPreferenceManager;
-import org.eclipse.ptp.rm.remote.ui.preferences.AbstractRemotePreferencePage;
+import org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage;
 
-public class PBSPreferencePage extends AbstractRemotePreferencePage {
+public class PBSPreferencePage extends AbstractRemoteRMPreferencePage {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#getPreferences()
 	 */

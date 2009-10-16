@@ -60,7 +60,7 @@ import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**

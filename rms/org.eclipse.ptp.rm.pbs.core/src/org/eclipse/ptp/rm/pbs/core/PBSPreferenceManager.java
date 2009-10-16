@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.pbs.core;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
-import org.eclipse.ptp.rm.remote.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 
 public class PBSPreferenceManager {
 	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
@@ -48,7 +48,7 @@ public class PBSPreferenceManager {
 			}
        }
 		
-		preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
-		preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
+		preferences.setDefault(RMPreferenceConstants.PROXY_PATH, server);
+		preferences.setDefault(RMPreferenceConstants.OPTIONS, OPTIONS);
 	}
 }

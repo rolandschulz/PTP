@@ -30,7 +30,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
