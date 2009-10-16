@@ -11,12 +11,7 @@
 package org.eclipse.ptp.remote.remotetools.core;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
@@ -24,95 +19,35 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
-import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
-import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
-	private IRemoteExecutionManager exeMgr;
-	private RemoteToolsConnection connection;
-	private Map<IPath, IFileStore> pathCache = new HashMap<IPath, IFileStore>();
+	private IRemoteExecutionManager fExeMgr;
+	private RemoteToolsConnection fConnection;
 	
 	public RemoteToolsFileManager(RemoteToolsConnection conn, IRemoteExecutionManager exeMgr) {
-		this.connection = conn;
-		this.exeMgr = exeMgr;
-	}
-	
-	/**
-	 * Store an IRemoteResource in the cache
-	 * 
-	 * @param path path to the remote resource
-	 * @param resource resource to add to the cache
-	 */
-	public void cache(IPath path, IFileStore resource) {
-		synchronized (pathCache) {
-			pathCache.put(path, resource);
-		}
-	}
-
-	/**
-	 * Get the execution manager for this file manager
-	 * @return
-	 */
-	public IRemoteExecutionManager getExecutionManager() {
-		return exeMgr;
+		fConnection = conn;
+		fExeMgr = exeMgr;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
 	 */
 	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
-		IFileStore res = lookup(path);
-		if (res != null) {
-			return res;
-		}
-		
-		IRemoteItem item;
-		boolean isDirectory = false;
-		try {
-			String pathStr = path.toString();
-			IRemoteFileTools tools = exeMgr.getRemoteFileTools();
-			item = tools.getItem(pathStr);
-			if (tools.hasDirectory(pathStr)) {
-				isDirectory = true;
-			}
-		} catch (RemoteConnectionException e) {
-			throw new IOException(e.getMessage());
-		} catch (RemoteOperationException e) {
-			throw new IOException(e.getMessage());
-		} catch (CancelException e) {
-			throw new IOException(e.getMessage());
-		}
-		
-		res = new RemoteToolsFileStore(this, item, isDirectory);
-		cache(path, res);
-		return res;
+		return new RemoteToolsFileStore(fConnection.getName(), path.toString());
 	}
 	
 	public IPath getWorkingDirectory() {
 		String cwd = "//"; //$NON-NLS-1$
 		try {
-			cwd = exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
+			cwd = fExeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
 		} catch (RemoteExecutionException e) {
 		} catch (RemoteConnectionException e) {
 		} catch (CancelException e) {
 		}
 		return new Path(cwd);
-	}
-		
-	/**
-	 * Look up a cached IRemoteResource
-	 * 
-	 * @param path path to the remote resource
-	 * @return cached IRemoteResource or null
-	 */
-	public IFileStore lookup(IPath path) {
-		synchronized (pathCache) {
-			return pathCache.get(path);
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -126,17 +61,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
-		String authority = connection.getName();
-		try {
-			authority = URLEncoder.encode(authority, "UTF-8"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			// Should not happen
-		}
-		try {
-			return new URI("remotetools", authority, path.makeAbsolute().toPortableString(), null, null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			return null;
-		}
+		return RemoteToolsFileSystem.getURIFor(fConnection.getName(), path.toString());
 	}
 
 	/* (non-Javadoc)
