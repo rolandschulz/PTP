@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -27,53 +30,65 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFile;
+import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
-import org.eclipse.ptp.remotetools.core.IRemoteUploadExecution;
+import org.eclipse.ptp.remotetools.exception.CancelException;
+import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 public class RemoteToolsFileStore extends FileStore {
+	private static Map<URI, RemoteToolsFileStore> instanceMap = new HashMap<URI, RemoteToolsFileStore>();
 
 	/**
 	 * Public factory method for obtaining RemoteToolsFileStore instances.
 	 * @param uri URI to get a fileStore for
 	 * @return an RemoteToolsFileStore instance for the URI.
 	 */
-	public static RemoteToolsFileStore getInstance(URI uri) throws IOException {
-		String name = uri.getAuthority();
-		String path = uri.getPath();
-		IRemoteConnectionManager connMgr = RemoteToolsServices.getInstance().getConnectionManager();
-		RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(name);
-		IRemoteFileManager fileMgr = RemoteToolsServices.getInstance().getFileManager(conn);
-		return (RemoteToolsFileStore)fileMgr.getResource(new Path(path), new NullProgressMonitor());
+	public static RemoteToolsFileStore getInstance(URI uri) {
+		synchronized (instanceMap) {
+			RemoteToolsFileStore store = (RemoteToolsFileStore)instanceMap.get(uri);
+			if (store == null) {
+				String name = uri.getAuthority();
+				try {
+					name = URLDecoder.decode(name, "UTF-8"); //$NON-NLS-1$
+				} catch (UnsupportedEncodingException e) {
+					// Should not happen
+				}
+				String path = uri.getPath();
+				store = new RemoteToolsFileStore(name, path);
+				instanceMap.put(uri, store);
+			}
+			return store;
+		}
 	}
+	
+	private final String fConnectionName;
+	private final IPath fRemotePath;
 
-	private IRemoteItem remoteItem;
-	private URI remoteURI;
-	private RemoteToolsFileManager fileMgr;
-	private IRemoteExecutionManager exeMgr;
-	private boolean isDirectory;
-	private IRemoteUploadExecution uploadExecution = null;
-
-	public RemoteToolsFileStore(RemoteToolsFileManager mgr, IRemoteItem remoteItem,
-			boolean isDirectory) {
-		this.fileMgr = mgr;
-		this.exeMgr = mgr.getExecutionManager();
-		this.remoteItem = remoteItem;
-		this.isDirectory = isDirectory;
-		this.remoteURI = mgr.toURI(new Path(remoteItem.getPath()));
+	private IRemoteItem remoteItem = null;
+	private IRemoteExecutionManager exeMgr = null;
+	
+	public RemoteToolsFileStore(String connName, String path) {
+		fConnectionName = connName;
+		fRemotePath = new Path(path);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		
 		IRemoteItem[] items;
 		try {
-			items = exeMgr.getRemoteFileTools().listItems(remoteItem.getPath());
+			items = getExecutionManager(monitor).getRemoteFileTools().listItems(fRemotePath.toString());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
@@ -96,13 +111,17 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public void delete(int options, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
 		try {
-			exeMgr.getRemoteFileTools().removeFile(remoteItem.getPath());
+			getExecutionManager(monitor).getRemoteFileTools().removeFile(fRemotePath.toString());
 		}
 		catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					"Could not delete file", e));
+					Messages.RemoteToolsFileStore_0, e));
 		}
 	}
 
@@ -111,28 +130,34 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
-		FileInfo info = new FileInfo(new Path(remoteItem.getPath()).lastSegment());
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 
+		IRemoteItem item = getRemoteItem(monitor);
+		
 		try {
-			remoteItem.refreshAttributes();
+			item.refreshAttributes();
 		} catch(Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					e.getMessage(), e));
 		}
 		
-		if (!remoteItem.exists()) {
+		FileInfo info = new FileInfo(getName());
+
+		if (!item.exists()) {
 			info.setExists(false);
 			return info;
 		}	
 		
 		info.setExists(true);
-		info.setLastModified(remoteItem.getModificationTime());
-		info.setDirectory(isDirectory);
-		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !remoteItem.isWritable());
+		info.setLastModified(item.getModificationTime());
+		info.setDirectory(item.isDirectory());
+		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !item.isWritable());
 
-		if (!isDirectory) {
-			IRemoteFile file = (IRemoteFile)remoteItem;
+		if (!item.isDirectory()) {
+			IRemoteFile file = (IRemoteFile)item;
 			info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, file.isExecutable());
 			info.setLength(file.getSize());
 		}
@@ -145,18 +170,8 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileStore getChild(String name) {
-		IPath childPath = new Path(remoteItem.getPath()).append(name);
-
-		IFileStore resource = fileMgr.lookup(childPath);
-		if (resource != null) {
-			return resource;
-		}
-
-		try {
-			return fileMgr.getResource(childPath, new NullProgressMonitor());
-		} catch (IOException e) {
-			return null;
-		}
+		URI uri = RemoteToolsFileSystem.getURIFor(fConnectionName, fRemotePath.append(name).toString());
+		return RemoteToolsFileStore.getInstance(uri);
 	}
 
 	/* (non-Javadoc)
@@ -164,11 +179,10 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public String getName() {
-		IPath path = new Path(remoteItem.getPath());
-		if (path.isRoot()) {
-			return path.toString();
+		if (fRemotePath.isRoot()) {
+			return fRemotePath.toString();
 		}
-		return new Path(remoteItem.getPath()).lastSegment();
+		return fRemotePath.lastSegment();
 	}
 
 	/* (non-Javadoc)
@@ -179,17 +193,11 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileStore getParent() {
-		IPath parent = new Path(exeMgr.getRemotePathTools().parent(remoteItem.getPath()));
-
-		IFileStore resource = fileMgr.lookup(parent);
-		if (resource != null) {
-			return resource;
+		String parentPath = fRemotePath.toString();
+		if (fRemotePath.segmentCount() > 0) {
+			parentPath = fRemotePath.removeLastSegments(1).toString();
 		}
-		try {
-			return fileMgr.getResource(parent, new NullProgressMonitor());
-		} catch (IOException e) {
-			return null;
-		}
+		return RemoteToolsFileStore.getInstance(RemoteToolsFileSystem.getURIFor(fConnectionName, parentPath));
 	}
 
 	/* (non-Javadoc)
@@ -197,12 +205,25 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
+		if ((options & EFS.SHALLOW) == EFS.SHALLOW) {
+			IFileStore parent = getParent();
+			if (parent != null && !parent.fetchInfo(EFS.NONE, monitor).exists()) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						Messages.RemoteToolsFileStore_1, null));
+			}
+		}
+		
 		try {
-			exeMgr.getRemoteFileTools().createDirectory(remoteItem.getPath());
+			getExecutionManager(monitor).getRemoteFileTools().createDirectory(fRemotePath.toString());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					"The directory could not be created", e));
+					Messages.RemoteToolsFileStore_2, e));
 		}
 
 		return this;
@@ -213,17 +234,23 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
-		if (isDirectory) {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
+		IRemoteItem item = getRemoteItem(monitor);
+		
+		if (item.isDirectory()) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-			"Is a directory"));
+			Messages.RemoteToolsFileStore_3));
 		}
 		try {
-			return exeMgr.getRemoteCopyTools().executeDownload(remoteItem.getPath()).getInputStreamFromProcessRemoteFile();
+			return getExecutionManager(monitor).getRemoteFileTools().getInputStream(item.getPath(), monitor);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					"Could not get input stream", e));
+					Messages.RemoteToolsFileStore_4, e));
 		}
 	}
 
@@ -232,43 +259,48 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
-		if (isDirectory) {
-			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-			"Is a directory"));
-		}
-		
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+
+		IRemoteItem item = getRemoteItem(monitor);
+
+		try {
+			item.refreshAttributes();
+		} catch(Exception e) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+					e.getMessage(), e));
+		}
+
+		if (!item.exists()) {
+			try {
+				getExecutionManager(monitor).getRemoteFileTools().createFile(item.getPath());
+			} catch(Exception e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						e.getMessage(), e));
+			}
+		}
+		
+		if (item.isDirectory()) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+			Messages.RemoteToolsFileStore_3));
+		}
 		
 		try {
-			uploadExecution = exeMgr.getRemoteCopyTools().executeUpload(remoteItem.getPath());
-
-			synchronized (remoteItem) {
-				while (!monitor.isCanceled() && !remoteItem.exists()) {
-					remoteItem.wait(500);
-					
-					try {
-						remoteItem.refreshAttributes();
-					} catch(Exception e) {
-						throw new CoreException(new Status(IStatus.ERROR,
-								RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-								e.getMessage(), e));
-					}
-				}
+			// Convert from EFS option constants to IFileService option constants
+			if ((options & EFS.APPEND) != 0) {
+				options = IRemoteFileTools.APPEND;
+			} else {
+				options = IRemoteFileTools.NONE;
 			}
-
-			if (monitor.isCanceled()) {
-				uploadExecution.cancel();
-				return null;
-			}
-			
-			return uploadExecution.getOutputStreamToProcessRemoteFile();
+			return getExecutionManager(monitor).getRemoteFileTools().getOutputStream(item.getPath(), options, monitor);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					"Could not open output stream", e));
+					Messages.RemoteToolsFileStore_6, e));
 		}
 	}
 
@@ -277,33 +309,33 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
+		IRemoteItem item = getRemoteItem(monitor);
+
 		try {
-			if (uploadExecution != null) {
-				if (!uploadExecution.wasFinished()) {
-					uploadExecution.waitForEndOfExecution();
-				}
-				uploadExecution = null;
-			}
 			boolean modified = false;
-			remoteItem.refreshAttributes();
+			item.refreshAttributes();
 			if ((options & EFS.SET_ATTRIBUTES) != 0) {
 				//We cannot currently write isExecutable(), isHidden()
 				boolean writeable = !info.getAttribute(EFS.ATTRIBUTE_READ_ONLY);
-				remoteItem.setWriteable(writeable);
-				if(!this.isDirectory) {
+				item.setWriteable(writeable);
+				if (!item.isDirectory()) {
 					boolean executable = info.getAttribute(EFS.ATTRIBUTE_EXECUTABLE);
-					IRemoteFile file = (IRemoteFile)remoteItem;
+					IRemoteFile file = (IRemoteFile)item;
 					file.setExecutable(executable);
 				}
 				modified = true;
 			}
 			if ((options & EFS.SET_LAST_MODIFIED) != 0) {
 				long modtime = info.getLastModified();
-				remoteItem.setModificationTime(modtime);
+				item.setModificationTime(modtime);
 				modified = true;
 			}
 			if (modified) {
-				remoteItem.commitAttributes();
+				item.commitAttributes();
 			}
 		} catch(Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
@@ -317,6 +349,98 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public URI toURI() {
-		return remoteURI;
+		return RemoteToolsFileSystem.getURIFor(fConnectionName, fRemotePath.toString());
+	}
+
+	/**
+	 * Get the remote tools execution manager associated with the connection. Will attempt to
+	 * initialize and open the connection if necessary.
+	 * 
+	 * @param monitor progress monitor
+	 * @return remote tools execution manager
+	 * @throws CoreException
+	 */
+	private IRemoteExecutionManager getExecutionManager(IProgressMonitor monitor) throws CoreException {
+		final RemoteToolsServices services = RemoteToolsServices.getInstance();
+		if (!services.isInitialized()) {
+			services.initialize();
+			if (!services.isInitialized()) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						Messages.RemoteToolsFileStore_5));
+			}
+		}
+		final RemoteToolsConnectionManager connMgr = (RemoteToolsConnectionManager)services.getConnectionManager();
+		if (connMgr == null) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+					Messages.RemoteToolsFileStore_7));
+		}
+		final RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(fConnectionName);
+		if (conn == null) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+					NLS.bind(Messages.RemoteToolsFileStore_8, fConnectionName)));
+		}
+		if (!conn.isOpen()) {
+			try {
+				conn.open(monitor);
+			} catch (RemoteConnectionException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						e.getLocalizedMessage()));
+			}
+            if (monitor.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						Messages.RemoteToolsFileStore_12));
+            }
+		}
+		if (!conn.isOpen()) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+					NLS.bind(Messages.RemoteToolsFileStore_10, fConnectionName)));
+		}
+		if (exeMgr == null) {
+			try {
+				exeMgr = conn.createExecutionManager();
+			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						e.getLocalizedMessage()));
+			}
+		}
+		return exeMgr;
+	}
+
+	/**
+	 * Gets the remote item associated with this file store. Will open the connection
+	 * if necessary.
+	 * 
+	 * @param monitor progress monitor
+	 * @return remote item
+	 * @throws CoreException
+	 */
+	private IRemoteItem getRemoteItem(IProgressMonitor monitor) throws CoreException {
+		final IRemoteExecutionManager mgr = getExecutionManager(monitor);
+		if (remoteItem == null) {
+			try {
+				IRemoteFileTools tools = mgr.getRemoteFileTools();
+				remoteItem = tools.getItem(fRemotePath.toString());
+			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						e.getLocalizedMessage()));
+			} catch (RemoteOperationException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						e.getLocalizedMessage()));
+			} catch (CancelException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+						e.getLocalizedMessage()));
+			}
+		}
+		return remoteItem;
 	}
 }

@@ -23,7 +23,10 @@
 
 package org.eclipse.ptp.remote.remotetools.core;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -87,6 +90,27 @@ public class RemoteToolsFileSystem extends FileSystem
 			//Could be an URI format exception
 			PTPRemoteCorePlugin.log(e);
 			return EFS.getNullFileSystem().getStore(uri);
+		}
+	}
+	
+	/**
+	 * Return an URI uniquely naming a remote tools remote resource.
+	 * 
+	 * @param connectionName remote tools connection name
+	 * @param path absolute path to resource as valid on the remote system
+	 * @return an URI uniquely naming the remote resource.
+	 */
+	public static URI getURIFor(String connectionName, String path) {
+		String authority;
+		try {
+			authority = URLEncoder.encode(connectionName, "UTF-8"); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		try {
+			return new URI("remotetools", authority, path, null, null); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }
