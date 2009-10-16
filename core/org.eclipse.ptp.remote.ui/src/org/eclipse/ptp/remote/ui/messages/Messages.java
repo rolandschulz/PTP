@@ -9,13 +9,16 @@
  *    IBM - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.remote.ui;
+package org.eclipse.ptp.remote.ui.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.remote.ui.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.remote.ui.messages.messages"; //$NON-NLS-1$
 	
+	public static String RemoteResourceBrowser_1;
+	public static String RemoteResourceBrowser_2;
+
 	public static String RemoteResourceBrowser_resourceTitle;
 	public static String RemoteResourceBrowser_fileTitle;
 	public static String RemoteResourceBrowser_directoryTitle;
@@ -24,6 +27,9 @@ public class Messages extends NLS {
 	public static String RemoteResourceBrowser_directoryLabel;
 	public static String RemoteResourceBrowser_connectonLabel;
 	public static String RemoteResourceBrowser_newConnection;
+
+	public static String RemoteUIServicesProxy_1;
+	public static String RemoteUIServicesProxy_2;
 
 	static {
 		// initialize resource bundle

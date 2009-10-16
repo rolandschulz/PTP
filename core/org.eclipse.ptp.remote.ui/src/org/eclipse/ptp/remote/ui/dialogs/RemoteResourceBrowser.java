@@ -42,8 +42,8 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.Messages;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -134,7 +134,7 @@ public class RemoteResourceBrowser extends Dialog {
 	 * @return selected path
 	 */
 	public String getPath() {
-		if (remotePath.equals("")) {
+		if (remotePath.equals("")) { //$NON-NLS-1$
 			return null;
 		}
 		return remotePath;
@@ -223,8 +223,8 @@ public class RemoteResourceBrowser extends Dialog {
 					try {
 						conn.open(monitor);
 					} catch (RemoteConnectionException e) {
-						ErrorDialog.openError(getShell(), "Connection Error",
-								"Could not open connection", new Status(
+						ErrorDialog.openError(getShell(), Messages.RemoteResourceBrowser_1,
+								Messages.RemoteResourceBrowser_2, new Status(
 										IStatus.ERROR,
 										PTPRemoteUIPlugin.PLUGIN_ID, e
 												.getMessage()));
@@ -235,12 +235,12 @@ public class RemoteResourceBrowser extends Dialog {
 			try {
 				new ProgressMonitorDialog(getShell()).run(true, true, op);
 			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(getShell(), "Connection Error",
-						"Could not open connection", new Status(IStatus.ERROR,
+				ErrorDialog.openError(getShell(), Messages.RemoteResourceBrowser_1,
+						Messages.RemoteResourceBrowser_2, new Status(IStatus.ERROR,
 								PTPRemoteUIPlugin.PLUGIN_ID, e.getMessage()));
 			} catch (InterruptedException e) {
-				ErrorDialog.openError(getShell(), "Connection Error",
-						"Could not open connection", new Status(IStatus.ERROR,
+				ErrorDialog.openError(getShell(), Messages.RemoteResourceBrowser_1,
+						Messages.RemoteResourceBrowser_2, new Status(IStatus.ERROR,
 								PTPRemoteUIPlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
