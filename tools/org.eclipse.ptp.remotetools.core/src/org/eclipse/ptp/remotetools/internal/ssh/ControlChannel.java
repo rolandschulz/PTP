@@ -137,7 +137,7 @@ public class ControlChannel implements ILineStreamListener {
 	}
 
 	public void streamError(Exception e) {
-		Debug.println2(Messages.ControlChannel_Debug_ControlConnectionReceived + e); //$NON-NLS-1$
+		Debug.println2(Messages.ControlChannel_Debug_ControlConnectionReceived + e);
 	}
 
 	public synchronized String getControlTerminalPath() {
