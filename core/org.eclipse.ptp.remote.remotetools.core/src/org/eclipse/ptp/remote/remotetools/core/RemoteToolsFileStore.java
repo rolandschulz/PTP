@@ -395,11 +395,11 @@ public class RemoteToolsFileStore extends FileStore {
 						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 						Messages.RemoteToolsFileStore_12));
             }
-		}
-		if (!conn.isOpen()) {
-			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					NLS.bind(Messages.RemoteToolsFileStore_10, fConnectionName)));
+    		if (!conn.isOpen()) {
+    			throw new CoreException(new Status(IStatus.ERROR,
+    					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
+    					NLS.bind(Messages.RemoteToolsFileStore_10, fConnectionName)));
+    		}
 		}
 		if (exeMgr == null) {
 			try {
