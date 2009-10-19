@@ -119,8 +119,8 @@ plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:
 plugin@org.eclipse.ptp.rdt.managedbuilder.xlc.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui
 
 ! ISP Plugins
-plugin@org.eclipse.ptp.isp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.isp
-plugin@org.eclipse.ptp.isp.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.isp.help
+plugin@org.eclipse.ptp.isp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp
+plugin@org.eclipse.ptp.isp.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp.help
 
 ! Fragments
 fragment@org.eclipse.ptp.aix.ppc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.aix.ppc
