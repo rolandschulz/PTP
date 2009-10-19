@@ -497,10 +497,10 @@
 			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.services.ui"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.isp"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.isp.help"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp.help"/>
 		</antcall>		
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
