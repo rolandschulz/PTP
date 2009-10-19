@@ -61,6 +61,9 @@
 	<feature id="org.eclipse.ptp.perf.tau" url="features/org.eclipse.ptp.perf.tau_3.0.0.@timeStamp@.jar" version="3.0.0.@timeStamp@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
+	<feature id="org.eclipse.ptp.isp" url="features/org.eclipse.ptp.isp_3.0.0.@timeStamp@.jar" version="3.0.0.@timeStamp@">
+		<category name="Parallel Tools Platform 3.0"/>
+	</feature>
 	
 	<category-def name="Remote Development Tools" label="Remote Development Tools"/>
 	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_3.0.0.@timeStamp@.jar" version="3.0.0.@timeStamp@">
