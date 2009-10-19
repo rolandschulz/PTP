@@ -23,6 +23,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.perf.Activator;
+import org.eclipse.ptp.perf.tau.papitest.TestPAPI;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -38,15 +39,18 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferencePage{
 	protected Button checkAutoOpts=null;
 	protected Button checkAixOpts=null;
+	protected Button testPAPI=null;
+	
+	TestPAPI tp = new TestPAPI();
 	
 	
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener
 	{
 		public void widgetSelected(SelectionEvent e) {
-//			Object source = e.getSource();
-//			if(source == browseBinButton) {
-//				handleBinBrowseButtonSelected();
-//			}
+			Object source = e.getSource();
+			if(source == testPAPI) {
+				tp.run();
+			}
 			updatePreferencePage();
 		}
 
@@ -84,6 +88,11 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 		checkAutoOpts=createCheckButton(parent, "Check for TAU System options");
 		checkAutoOpts.setLayoutData(gridData);
 		checkAutoOpts.addSelectionListener(listener);
+		
+		testPAPI=new Button(parent, SWT.NONE);
+		testPAPI.setText("Test PAPI");
+		testPAPI.addSelectionListener(listener);
+		
 		return parent;
 	}
 
