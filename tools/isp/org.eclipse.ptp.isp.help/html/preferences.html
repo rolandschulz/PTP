@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+	<title>ISP-Plug-in Preferences</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>ISP-Plug-in Preferences</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<p>
+<em>To edit preferences open eclipse and go to Window -&#62; Preferences -&#62; ISP</em>
+</p>
+
+<a name="ispPrefs"></a>
+<img src="images/ispPrefs.png">
+
+<h4>Note:</h4>
+<ol>
+    <li>
+        If ISP is configured and installed with default values, there is no need to fill in the last three items on the ISP preferences
+        page. When blank, the plug-in will assume they are in the default location. These three items simply need to be in your path.
+    </li>
+    <li>
+        Please note the smaller help button on this preference page (below ispUI Script label).
+        Clicking this button while viewing the ISP preference page will bring you to this help page.
+    </li>
+</ol>
+
+<h2>ISP Preferences Reference Table</h2>
+<table border="1"  cellpadding="5">
+<tr><th>Preference</th><th>Meaning or Condition When Selected</th></tr>
+<tr><td>Enable FIB</td> <td>Enables detection of irrelevant barriers</td></tr>
+<tr><td>Report MPI Calls</td> <td>Outputs the number of MPI calls trapped for each rank (Console View)</td></tr>
+<tr><td>Enable OpenMP</td> <td>Enables OpenMP based parallelization on multi-core machines</td></tr>
+<tr><td>Use Blocking Sends</td> <td><b>It is Highly recommended that this be activated:</b> sends will be treated as blocking, without buffering</td></tr>
+<tr><td>Report Progress</td> <td>Outputs progress every (n) MPI calls (default is 4). Note: If this is checked, please set the Report progress field below</td></tr>
+<tr><td>Verbose Mode</td> <td>Output the transition list for all interleavings, otherwise only output last interleaving if deadlock.</td></tr>
+<tr><td>Port</td> <td>Assigns the port to communicate with MPI programs(default is 9999). ISP will search for a port that is free if specified port is unavailable</td></tr>
+<tr><td>Number of Processes</td> <td>The number of processes to start when analyzing the MPI program (defualt is 2)</td></tr>
+<tr><td>Report Progress Every (n) MPI Calls</td> <td>Outputs progress every (n) MPI calls (default is 4).  Note: This is ignored if Report Progress is not checked</td></tr>
+<tr><td>Clear ISP Console on Each Run</td> <td>Clears ISP Console output before each run.  If it is not checked then the more recent results are appended to the top</td></tr>
+<tr><td>isp executable </td> <td>The location of the <b>isp executable</b></td></tr>
+<tr><td>ispcc script</td> <td>The location of the <b>ispcc script</b></td></tr>
+<tr><td>ispui script</td> <td>The location of the <b>ispui script</b></td></tr>
+</table>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+</html>

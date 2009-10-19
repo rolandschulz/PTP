@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+    <title>Troubleshooting</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>Troubleshooting</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+<p>&nbsp;</p>
+
+<p>
+This section addresses the most common issues encountered when using the ISP Plug-in for Eclipse. If you encounter something
+that is not not mentioned here, please email your problem to <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a>. We
+will get back to you with a solution as soon as possible.
+</p>
+
+<p>&nbsp;</p>
+
+<table border="1" cellpadding="8">
+<tr>
+<th>Problem</th><th>Solution</th>
+</tr>
+<tr>
+    <td>When I try to run ISP, the ISP Console reports <b>No such file or directory</b>.</td>
+    <td>Make sure the paths to the ISP executable and other scripts are properly set on the ISP preference page</td>
+</tr>
+<tr>
+    <td>When I try to run ISP, I get an error message saying that an error occurred while trying to run ISP.</td>
+    <td>If the error details say: “Cannot run program ISPCC” Then ISP was not installed properly.  Try re-installing ISP itself.</td>
+</tr>
+<tr>
+    <td><img src="images/ispExceptionDialog.png"><br></br><img src="images/uiExceptionDialog.png"></td>
+    <td>You most likely have not set the paths to the ISP executable or one of its scripts properly in the 
+    preference page. Make sure you don't have a trailing <b>&#34;&#47;&#34;</b> on any path. (e.g. &#47;usr&#47;local&#47;bin&#47;)
+    Just use the browse buttons on the ISP preference page to safely navigate to the directory.</td>
+</tr>
+<tr>
+    <td>I don’t see ISP in the menu, there is no trident icon anywhere, and the ISP Views do not exist.</td>
+    <td>The Eclipse Plug-­in was not installed properly.  Try installing it again from <a href="http://www.cs.utah.edu/formal_verification/ISP-Eclipse/">
+        http://www.cs.utah.edu/formal_verification/ISP-Eclipse/</a>.</td>
+</tr>
+<tr>
+    <td>While running ISP from the command line I get an error saying “Server unable to bind!”</td>
+    <td>This means the specified port is in use. By default ISP starts at port 9999. Use the –p flag to specify a different port number.<br><br>
+        <i>Those using the Eclipse plug­in do not need to worry about this problem. If port 9999 fails to bind the plug­in will search until
+        it finds a port that is usable (leaving port numbers &#60; 1025 available to the system).</i></td>
+</tr>
+<tr>
+    <td>I’m running Eclipse and when I try to running ISP, Eclipse becomes unresponsive.</td>
+    <td>Make sure your process manager is running. The ISP Plug-in assumes your process manager is already running</td>
+</tr>
+<tr>
+    <td>I’m trying to view a log file in the Eclipse editor, and I get editor message saying that the file is out of sync with the file system.</td>
+    <td>ISP has generates a new log file. Just hit F5 to refresh the Eclipse editor's view of the file.</td>
+</tr>
+<tr>
+    <td>I can't find the log file ISP generated in my project.</td>
+    <td>Refresh your project. It should be in a directory named &quot;isp&quot; at the same level as the source file.</td>
+</tr>
+</table>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+</html>

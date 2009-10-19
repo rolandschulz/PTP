@@ -1,0 +1,315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+    <title>ISP Overview</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>ISP Overview</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<p>
+ISP is a tool for formally verifying MPI programs. It can be used by anyone who can write
+simple MPI C programs, and requires no special training. ISP allows you to formally verify your MPI C
+programs automatically without any extra efforts on your part (apart from compiling and
+making your examples) and flags the following errors:
+</p>
+
+<ul>
+    <li>Deadlocks</li>
+    <li>Assertion violations</li>
+    <li>Object leaks</li>
+</ul>
+
+<p>
+In addition, it helps you understand as well as step through all relevant process interleavings
+(schedules). Notice our use of the word ‘relevant’: even a short MPI program may have too many
+(an “exponential number”) of interleavings. For example, an MPI program with five processes, each
+containing five MPI calls, can have well in excess of 1000 interleavings. However, ISP generates
+a new interleaving only when it represents a truly new (as yet unexamined) behavior of your program.
+</p>
+
+<h3>As examples:</h3>
+<ul>
+    <li>
+        If an MPI program consisting of two processes issues point-to-point sends and non-wildcard
+        receives to each other, then there is no observable difference (apart from performance or
+        resource consumption) whether the sends are posted before each matching receive or vice
+        versa; in this case, ISP will generate only one interleaving;
+        </li>
+    <li>
+        If an MPI program consisting of three processes is such that the second process issues a
+        sequence of wildcard receives, and the first and third process issue point-to-point sends
+        to process two, then the exact non-deterministic choices of matches made at each step may
+        affect the ensuing computation (including the conditional outcomes). In such programs, it
+        is possible to force an exponential number of interleavings. In practice, here is how the
+        results look (these examples come with the ISP distribution).
+    </li>
+    <li>
+        For Parmetis [1], a 14,000+ line MPI program that makes 56,990 MPI calls for four ranks and
+        171,956 calls for eight ranks, ISP needed to examine only one interleaving!
+    </li>
+    <li>
+        For many tests in the Umpire test suite [2], conventional MPI testing tools missed deadlocks
+        despite examining many schedules. ISP determined a minimal list of interleavings to examine,
+        finding deadlocks whenever they existed (see our table of results at the URL given under [3]).
+    </li>
+    <li>
+        For Madre [4], a naive algorithm – present in the current release of ISP – can result in n!
+        interleavings. An improved algorithm called POE B in the upcoming release of ISP reduces this
+        to one interleaving. Much like with existing partial order [5], ISP does not guarantee a
+        minimalnumber of interleavings, although it comes pretty close to it.
+    </li>
+</ul>
+
+<h3>How ISP Works:</h3>
+<p>
+ISP works by intercepting the MPI calls made by the target program and making decisions on when
+to send these MPI calls to the MPI library. This is accomplished by the two main components of ISP:
+the Profiler and the Scheduler. An overview of ISP’s components and their interaction with the
+program as well as the MPI library is provided in Figure 1 below.
+</p>
+
+<center>
+<img src="images/ISP-diagram.gif"><br>
+<b>Figure 1</b>
+</center>
+
+<h3>Profiler:</h3>
+<p>
+The interception of MPI calls is accomplished by compiling the ISP Profiler together with
+the target program’s source code. The Profiler makes use of MPI’s profiling mechanism
+(PMPI). Then the Profiler provides its own version of MPI <i>f</i> (replacing the original) for each corresponding MPI function <i>f</i>. Within
+each of these MPI <i>f</i> , the profiler communicates with the scheduler using TCP sockets to
+send information about the MPI call the process wants to make. It will then wait for the
+scheduler to make a decision on whether to send the MPI call to the MPI library or to
+postpone it until later. When the permission to fire <i>f</i> is given from the scheduler, the
+corresponding PMPI <i>f</i> will be issued to the MPI run-time. Since all MPI libraries come
+with functions such as PMPI <i>f</i> for every MPI function <i>f</i>, this approach provides a portable
+and light-weight instrumentation mechanism for MPI programs being verified [6].
+</p>
+
+<h3>Scheduler:</h3>
+<p>
+The ISP Scheduler helps carry out the POE algorithm. As it turns out, the POE algorithm is
+based on exploiting MPI’s out-of-order completion semantics. In other words,
+</p>
+ 
+<ul>
+    <li>
+        (i) Not all MPI operations issued by a process complete in that order.
+    </li>
+    <li>
+        (ii) A proper modeling of this out of-order completion semantics is essential in
+        order to meet goals G1 and G2. For example, two MPI_Isend commands issued in
+        succession by an MPI process P1 to the same target process (say P2) are forced to
+        match in order, whereas if these MPI_Isends are targeted to two different MPI
+        processes, then they may match contrary to the issue order. As another example,
+        any operation following an MPI_Barrier must complete only after the barrier has
+        completed, while an operation issued before the barrier may linger across the
+        barrier, and actually complete after the barrier [6]!
+    </li>
+</ul>
+
+<h3>Description of POE Algorithm:</h3>
+<p>POE stands for &#X201C;POR with out-of-order and elusive interleavings" </P>
+<P>
+MPI programs suffer from &#X201C;elusive" interleavings in the presence of MPI
+wildcard Receive <I>R</I>(*) . Issuing the MPI sends in different orders does not
+help as the MPI runtime provides no guarantees based on when the Send is
+actually issued. POE employs dynamic source re-writing in place of wildcard
+so that every interleaving explored by POE algorithm is deterministic. Also,
+the presence of collectives such as <CODE>MPI\_Barrier</CODE> can cause traditional
+runtime verification techniques such as &#X201C;Dynamic Partial Order Reduction" to
+fail since it is not always possible to issue instructions in different orders
+in the presence of collectives. POE also addresses this issue by creating
+&#X201C;match sets".
+</P>
+
+<P>
+POE algorithm works by creating a graph structure with the MPI operations of
+processes as nodes and by adding <EM>Intra-Completes-Before</EM> (IntraCB) edges
+between these nodes. As the name suggests, IntraCB edges are only added between
+the MPI operations within the MPI processes. The IntraCB edges are added
+between the MPI operations based on the MPI semantics of the operations. MPI
+functions like <CODE>MPI_Barriers</CODE>, <CODE>MPI_Wait</CODE> etc have the semantics,
+that no later MPI operations can be issued until these MPI operations complete.
+We call such operations as <EM>fence operations</EM>. Note that instructions
+issued before the fence operations can linger even after the fence operation
+is complete. </P><P>The IntraCB edges are added based on the following rules:
+Let <I>i</I> and <I>j</I> be the MPI operations of a process <I>P</I> such that <I>i</I> &lt; <I>j</I> (i.e.,
+<I>i</I> comes before <I>j</I> in the program order. There is an IntraCB edge between <I>i</I>
+and <I>j</I> is one of the following is true:
+</P>
+
+<UL>
+    <LI><I>i</I> is a <EM>fence</EM> operation.</LI>
+    <LI><I>i</I> and <I>j</I> are send operations and the destination of <I>i</I> and <I>j</I> are the same</LI>
+    <LI><I>i</I> and <I>j</I> are receive operations and the source of <I>i</I> and <I>j</I> are the same</LI>
+    <LI><I>i</I> is a wildcard receive operation and <I>j</I> is a receive operation.</LI>
+</UL>
+
+<P>
+If there is a path from <I>i</I> to <I>j</I> then <I>i</I> is called the ancestor of <I>j</I>. POE
+algorithm uses these IntraCB edges to form <EM>match-sets</EM> to be issued into
+the MPI runtime. The following is the (informal) algorithm:</P><P>An MPI operation is &#X201C;matched"
+if it has been issued to the MPI runtime by the POE algorithm.
+</P>
+
+<OL CLASS="enumerate" type=1>
+    <LI>Run the MPI processes until they all reach fence operations.</LI>
+    <LI>Let <I>e</I> denote the MPI operations of all processes such that for each <I>i</I> &#X2208; <I>e</I>, all ancestors of <I>i</I> have been matched.</LI>
+    <LI>Let <I>m</I> denote the match-sets formed out of <I>e</I> as follows:
+    <UL>
+        <LI>
+            <B>SR-Match:</B> <I>i</I>, <I>j</I> &#X2208; <I>e</I> such that <I>i</I> and <I>j</I> are send and receive
+            operations where source (destination) of <I>i</I> is equal to the destination
+            (source)j, then &#X27E8; <I>i</I>, <I>j</I>&#X27E9; form a match set.
+        </LI>
+        <LI>
+            <B>SR*-Match</B> If <I>i</I> is a wildcard receive and <I>j</I><SUB>1</SUB>,<I>j</I><SUB>2</SUB>&#X2026; <I>j</I><SUB><I>n</I></SUB> are the matching
+            sends, then create the match-sets as {&#X27E8; <I>i</I>, <I>j</I><SUB>1</SUB>&#X27E9;, &#X27E8; <I>i</I>,
+            <I>j</I><SUB>2</SUB>&#X27E9;, &#X2026; &#X27E8; <I>i</I>, <I>j</I><SUB><I>n</I></SUB>&#X27E9;}. Each element of the set is issued as a different interleaving.
+        </LI>
+        <LI>
+            <B>C-Match:</B> If <I>i</I><SUB>1</SUB>,<I>i</I><SUB>2</SUB>&#X2026; <I>i</I><SUB><I>n</I></SUB> are the same collective operation of <I>n</I> processes
+            then &#X27E8; <I>i</I><SUB>1</SUB>, <I>i</I><SUB>2</SUB>, &#X2026;, <I>i</I><SUB><I>n</I></SUB>&#X27E9; form a match set.
+        </LI>
+        <LI>
+            <B>W-Match</B>If <I>i</I> is an <CODE>MPI_Wait</CODE>, then &#X27E8; <I>i</I> &#X27E9; forms a match set.
+        </LI>
+    </UL>
+    </LI>
+    <LI>
+        Issue the match sets to MPI runtime in the following priority order: <EM>C-Match &gt; W-Match &gt; SR-Match &gt; SR*-Match</EM>.
+    </LI>
+    <LI>
+        If any of the processes issued a fence operation then goto step 1. Else, goto step 4. 
+    </LI>
+    <LI>
+        If there are no match sets and all processes have issued <CODE>MPI_Finalize</CODE>, check if any wildcard match sets are yet to be explored. If yes, then restart the processes and goto step 1, otherwise, exit.
+    </LI>
+    <LI>
+        If there are no match sets and there is atleast one process that has not issued <CODE>MPI_Finalize</CODE>, then there is a deadlock. Flag a deadlock and kill all the MPI processes.
+    </LI>  
+</OL>
+
+<h3>Obtaining ISP and Examples</h3>
+
+ISP can be downloaded from the Gauss Group's <a href="http://www.cs.utah.edu/formal_verification/ISP-release">ISP Release Page</a>.
+
+<p>
+    What you will receive are the full sources as well as the following examples in the directory isp-tests:
+</p>
+
+<ul>
+    <li>
+        12 examples pertaining to the Game of Life (in directory life, courtesy of Bill Gropp of UIIC
+        and Rusty Lusk of Argonne from their EuroPVM/MPI 2007 tutorials)
+    </li>
+    <li>
+        74 examples of the Umpire test suite (in directory Umpire), courtesy of Bronis de Supinski from LLNL.
+    </li>
+    <li>
+        12 examples under others developed by various authors.
+    </li>
+    <li>
+        16 examples under madre-0.3 courtesy of Stephen F. Siegel (U. of Delaware) from his Madre release (see our PPoPP 2009 paper).
+    </li>
+    <li>
+        The Parmetis 3.1 hypergraph partitioner (see our PPoPP 2009 paper).
+    </li>
+</ul>
+
+<h3>Source Code Analyzer</h3>
+<p>
+This is a unique user interface which visually displays the output that ISP generated by highlighting
+lines in the source file. It shows both the current MPI call, and any matching point-to-point
+or collective operation. It also allows the user to examine MPI calls for a particular rank with
+an easy to use <b>Rank Locking</b> feature.
+</p>
+
+<p>
+The source code analyzer also allows examination of flagged errors with one click. The <b>Examine Error</b>
+feature will highlight the problem line in the source code within the Eclipse editor. In addition, it offers
+features to browse calls by rank and by interleaving as well as listing any resource leaks found in the
+source code. One click on the flagged leak in the <b>Resource Leak Browser</b> takes the user to the suspect line
+of code in the Eclipse editor.
+</p>
+
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h3>Why the Trident?</h3>
+            <p>
+                Because It is a universal symbol for &quot;slaying the evil bug&quot;!
+            </p>
+        </td>
+    </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr>
+
+<h3>References</h3>
+<ul>
+    <li>
+        [1] ParMETIS - Parallel graph partitioning and fill-reducing matrix ordering.
+    </li>
+    <li>
+        [2] Jeffrey S. Vetter and Bronis R. de Supinski. Dynamic software testing of MPI
+        applications with Umpire. In Supercomputing ’00: Proceedings of the 2000 ACM/IEEE
+        Conference on Supercomputing (CDROM). IEEE Computer Society, 2000. Article 51.    
+    </li>
+    <li>
+       [3] Sarvani Vakkalanka, Ganesh Gopalakrishnan, and Robert M. Kirby. Dynamic verification
+       of MPI programs with reductions in presence of split operations and relaxed orderings.
+       In Aarti Gupta and Sharad Malik, editors, CAV, volume 5123 of Lecture Notes in
+       Computer Science. Springer, 2008.
+    </li>
+    <li>
+        [4] Stephen F. Siegel. The MADRE web page.
+    </li>
+    <li>
+        [5] Edmund M. Clarke, Orna Grumberg, and Doron A. Peled. Model Checking. MIT Press, 2000.
+    </li>
+    <li>
+        [6] Anh Vo, Sarvani Vakkalanka,Rajeev Thakur Michael DeLisi Ganesh Gopalakrishnan and Robert M. Kirby.
+        Formal Verification of Practical MPI Programs. PPoPP’09, February 14–18, 2009, Raleigh, North Carolina, USA.
+    </li>
+</ul>
+
+<p>&nbsp;</p>
+<hr>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+</html>

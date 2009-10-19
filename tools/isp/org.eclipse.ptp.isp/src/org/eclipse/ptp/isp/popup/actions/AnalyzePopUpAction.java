@@ -1,0 +1,133 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Utah School of Computing
+ * 50 S Central Campus Dr. 3190 Salt Lake City, UT 84112
+ * http://www.cs.utah.edu/formal_verification/
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Alan Humphrey - Initial API and implementation
+ *    Christopher Derrick - Initial API and implementation
+ *    Prof. Ganesh Gopalakrishnan - Project Advisor
+ *******************************************************************************/
+
+package org.eclipse.ptp.isp.popup.actions;
+
+import java.io.File;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.isp.messages.Messages;
+import org.eclipse.ptp.isp.util.IspUtilities;
+import org.eclipse.ptp.isp.views.ISPAnalyze;
+import org.eclipse.ui.IActionDelegate;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+
+public class AnalyzePopUpAction implements IObjectActionDelegate {
+
+	private IStructuredSelection selection;
+
+	/**
+	 * Constructor.
+	 */
+	public AnalyzePopUpAction() {
+		super();
+	}
+
+	/**
+	 * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
+	 */
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+	}
+
+	/**
+	 * @see IActionDelegate#run(IAction)
+	 */
+	public void run(IAction action) {
+		if (this.selection == null) {
+			return;
+		}
+
+		IFile f = (IFile) this.selection.getFirstElement();
+		IPath s = f.getLocation();
+		String sourceFilePath = s.toPortableString();
+
+		// Make sure the file is valid
+		if (this.selection.toString().equals("<empty selection>")) { //$NON-NLS-1$
+			IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_0, Messages.AnalyzePopUpAction_1);
+		} else {
+			int dotIndex = sourceFilePath.lastIndexOf("."); //$NON-NLS-1$
+			if (dotIndex == -1) {
+				IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_0,
+						Messages.AnalyzePopUpAction_1);
+			}
+
+			// Filter extensions
+			String extension = sourceFilePath.substring(dotIndex);
+			if (extension.equals(".c") || extension.equals(".cpp")) { //$NON-NLS-1$ //$NON-NLS-2$
+
+				// Now that we have a valid path, save it to the one step
+				// history
+				IspUtilities.saveLastFile(sourceFilePath);
+
+				if (IspUtilities.doIspcc(sourceFilePath) != -1) {
+					IspUtilities.doIsp(sourceFilePath);
+
+					// Check if the file exists
+					String logFilePath = IspUtilities
+							.getLogFile(sourceFilePath);
+					File file = new File(logFilePath);
+					boolean exists = false;
+					while (!exists) {
+						exists = file.exists();
+					}
+
+					// Find the active file
+					IWorkbenchWindow window = PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow();
+					IWorkbenchPage page = window.getActivePage();
+
+					// Open the Analyzer View
+					try {
+						page.showView(ISPAnalyze.ID);
+						IspUtilities.activateAnalyzer(sourceFilePath,
+								logFilePath, true);
+					} catch (PartInitException pie) {
+						IspUtilities.showExceptionDialog(null, pie);
+						IspUtilities.logError(
+								Messages.AnalyzePopUpAction_2,
+								pie);
+					}
+					IspUtilities.activateAnalyzer(sourceFilePath, logFilePath,
+							true);
+				} else {
+					IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_3,
+							Messages.AnalyzePopUpAction_1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
+	 */
+	public void selectionChanged(IAction action, ISelection selection) {
+		if (selection instanceof IStructuredSelection) {
+			this.selection = (IStructuredSelection) selection;
+		} else {
+			this.selection = null;
+		}
+	}
+
+}

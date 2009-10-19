@@ -1,0 +1,213 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+    <title>Understanding ISP Output</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>Understanding ISP Console Output</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<p>
+<b>Disclaimer:</b> There is no real reason for the casual user to understand in any 
+great detail, the output displayed in the ISP Console View or the contents of the log
+files that ISP generates. This plug-in exists to provide a visual interface to make
+using and understanding ISP easier. Probably the best/easiest way to understand the
+output is to use the Java GUI or the Source Code Analyzer View which will display the
+output in a graphical and easily understood manner. This page is designed to redirect casual users
+with this disclaimer, but to provide detailed explanations of the formatting of the
+output to any who are curious.
+</p>
+
+<h3>Sample Output (from the ISP Console View):</h3>
+<pre>
+ISP - Insitu Partial Order
+-----------------------------------------
+Command:&nbsp;&nbsp;&nbsp; 
+./any_srccandeadlock9.exe
+Number Procs: 3
+Server: localhost:9687
+Blocking Sends: Disabled
+FIB: Enabled
+-----------------------------------------
+Started Process: 6687
+INTERLEAVING :1
+(1) is alive on laptop
+(0) is alive on laptop
+(2) is alive on laptop
+Started Process: 6694
+(1) Finished normally
+(2) Finished normally
+(0) Finished normally
+INTERLEAVING :2
+(0) is alive on laptop
+(1) is alive on laptop
+(2) is alive on laptop
+application called MPI_Abort(MPI_COMM_WORLD, 1) process 1[cli_1]: aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 1) process 1
+application called MPI_Abort(MPI_COMM_WORLD, 1) process 0[cli_0]: aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 1) process 0
+application called MPI_Abort(MPI_COMM_WORLD, 1) process 2[cli_2]: aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 1) process 2
+rank 2 in job 6 laptop_35830 caused collective abort of all ranks
+&nbsp;&nbsp;&nbsp; exit status of rank 2: return code 1
+rank 1 in job 6 laptop_35830 caused collective abort of all ranks
+&nbsp;&nbsp;&nbsp; exit status of rank 1: return code 1
+rank 0 in job 6 laptop_35830 ; caused collective abort of all ranks
+&nbsp;&nbsp;&nbsp; exit status of rank 0: return code 1
+-----------------------------------------
+Transition list for 0
+0 1 0 0 Barrier any_srccandeadlock9.c:36 1{[0, 1][0, 2]} {}
+1 4 1 0 Irecv any_srccandeadlock9.c:47 -1 0 1{[0, 2]} {}
+Matched with process :2 transition :1
+2 7 2 0 Recv any_srccandeadlock9.c:49 2 0{} {}
+
+Transition list for 1
+0 2 0 1 Barrier any_srccandeadlock9.c:36 1{[1, 1][1, 2]} {}
+1 5 1 1 Send any_srccandeadlock9.c:74 0 0{} {}
+2 8 2 1 Barrier any_srccandeadlock9.c:77 2{} {}
+
+Transition list for 2
+0 3 0 2 Barrier any_srccandeadlock9.c:36 1{[2, 1][2, 2]} {}
+1 6 1 2 Send any_srccandeadlock9.c:62 0 0{} {}
+Matched with process :0 transition :1
+2 9 2 2 Recv any_srccandeadlock9.c:64 0 0{} {}
+
+No matching MPI call found!
+Detected a DEADLOCK!
+Killing program any_srccandeadlock9.exe
+-----------------------------------------
+</pre>
+
+<h2>Output is separated into segments by lines of dashes.</h2>
+<br>
+<ul>
+<li>The first segment is just a title and will always display ISP Insitu Partial Order.</li>
+<li>
+The second segment is fairly self explanatory, it provides the 
+String used to specify the executable, the number of processes used, the server 
+used, whether or not Blocking Sends should be used, and whether or not FIB is 
+being used.
+</li>
+<li>
+The third segment is separated into interleavings. An interleaving (also called a schedule)
+is a description of how the ISP Scheduler issued instruction to the MPI runtime. In this
+segment, a brief explanation of how each process ran in each interleaving is given. In
+the example above all three processes started and finished normally in the first interleaving,
+but in the second interleaving a deadlock was found so each process had to abort.
+</li>
+<li>
+The last segment describes how each MPI call was handled. Its 
+format is very similar to that of the log file except that the calls are grouped 
+by the process that issued it. To understand what it means 
+please read the following section on understanding the log file.
+</li>
+</ul>
+
+<h2>Understanding the Log Files</h2>
+<p>
+Like ISP output, users are not expected to be able to 
+understand log files. The best way understand what the log file contents represent is to 
+run the Java GUI to graphically see the information it holds. The log file consists 
+of a single number on the first line that says how many processes were used to 
+create the file and a list of every MPI call that program issued and information 
+about how that call interacts with other calls, unless a deadlock is found. If 
+there is a deadlock then the log will have a line giving the interleave number 
+and the word “DEADLOCK”. After this line the log file will abruptly end and 
+remaining MPI calls will not be displayed. Here is the log file generated 
+by the example above.
+</p>
+
+<pre>
+1 0 0 1 1 Barrier 0_0:1:2: { 1 2 } { [ 1 1 ] [ 1 2 ] [ 2 1 ] [ 2 2 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
+1 0 1 4 5 Irecv 1 0 0_0:1:2: { 2 5 } { } Match: 1 1 File: 23 any_srccandeadlock9.c 47
+1 0 2 7 7 Recv 2 0 0_0:1:2: { 3 4 } { } Match: 2 1 File: 23 any_srccandeadlock9.c 49
+1 0 3 10 8 Send 2 0 0_0:1:2: { } { [ 2 3 ] [ 2 4 ] } Match: 2 2 File: 23 any_srccandeadlock9.c 51
+1 0 4 11 11 Recv 1 0 0_0:1:2: { 5 } { } Match: 2 3 File: 23 any_srccandeadlock9.c 54
+1 0 5 14 12 Wait { 6 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 56
+1 0 6 15 13 Barrier 0_0:1:2: { 7 } { [ 1 3 ] [ 2 5 ] } Match: -1 -1 File: 23  any_srccandeadlock9.c 77
+1 0 7 16 16 Finalize { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 79
+1 1 0 2 2 Barrier 0_0:1:2: { 1 2 } { [ 0 1 ] [ 0 2 ] [ 2 1 ] [ 2 2 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
+1 1 1 5 4 Send 0 0 0_0:1:2: { } { [ 0 2 ] [ 0 5 ] } Match: 0 1 File: 23 any_srccandeadlock9.c 74
+1 1 2 8 14 Barrier 0_0:1:2: { 3 } { [ 0 7 ] [ 2 5 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 77
+1 1 3 17 17 Finalize { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 79
+1 2 0 3 3 Barrier 0_0:1:2: { 1 2 } { [ 0 1 ] [ 0 2 ] [ 1 1 ] [ 1 2 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
+1 2 1 6 6 Send 0 0 0_0:1:2: { } { [ 0 3 ] [ 0 4 ] } Match: 0 2 File: 23 any_srccandeadlock9.c 62
+1 2 2 9 9 Recv 0 0 0_0:1:2: { 3 4 } { } Match: 0 3 File: 23 any_srccandeadlock9.c 64
+1 2 3 12 10 Send 0 0 0_0:1:2: { } { [ 0 5 ] } Match: 0 4 File: 23 any_srccandeadlock9.c 66
+1 2 4 13 15 Barrier 0_0:1:2: { 5 } { [ 0 7 ] [ 1 3 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 77
+1 2 5 18 18 Finalize { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 79
+2 0 0 1 19 Barrier 0_0:1:2: { 1 2 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
+2 0 1 4 23 Irecv 1 0 0_0:1:2: { 2 } { } Match: 2 1 File: 23 any_srccandeadlock9.c 47
+2 0 2 7 7 Recv 2 0 0_0:1:2: { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 49
+2 1 0 2 20 Barrier 0_0:1:2: { 1 2 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
+2 1 1 5 4 Send 0 0 0_0:1:2: { } { } Match: -1 -1 File: 23 any_src-can-deadlock9.c 74
+2 1 2 8 14 Barrier 0_0:1:2: { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 77
+2 2 0 3 21 Barrier 0_0:1:2: { 1 2 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
+2 2 1 6 22 Send 0 0 0_0:1:2: { } { } Match: 0 1 File: 23 any_srccandeadlock9.c 62
+2 2 2 9 9 Recv 0 0 0_0:1:2: { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 64
+2 DEADLOCK
+</pre>
+
+<hr>
+
+<p>
+To understand the format, we will take a single line from a log file as an example and explain each part.
+</p>
+
+<p>
+1 0 0 1 1 Barrier 0_0:1:2: { 1 2 } { [ 1 1 ] [ 1 2 ] [ 2 1 ] [ 2 2 ] } Match: -1 -1 File: 23 any_src-can-deadlock9.c 36
+</p>
+
+<table border="1" cellpadding="5">
+<tr><tH>Title</th><th>Explanation</th></tr>
+<tr><td>1 – Interleave Number (1-based)</td><td>This was issued by the first interleaving </td></tr>
+<tr><td>0 – Process Number (0-based)</td><td> This call was issued by process zero</td></tr>
+<tr><td>0 – Process Call Index (0-based)</td>
+	<td>This was first call issued by this process</td></tr>
+<tr><td style="width: 245px">1 – ISP Call Number (1-based)</td><td>This was the first call received by ISP</td></tr>
+<tr><td style="width: 245px">1 – ISP Issue Number (1-based)</td><td>This was the first call performed by ISP</td></tr>
+<tr><td style="width: 245px">Barrier – MPI Command</td><td>This call was a Barrier</td></tr>
+<tr><td style="width: 245px">0 – Call Arguments</td><td>Varies from call to call, here it is the COM</td></tr>
+<tr><td style="width: 245px">0:1:2 – Affected Processes</td>
+	<td>This call affects processes 1, 2, and 3</td></tr>
+<tr><td style="width: 245px">{1 2} – Intra-Process calls blocked</td>
+	<td>Blocks the calls from this processes with Process Call Index of 1 and 2</td></tr>
+<tr><td style="width: 245px">{ [ 1 1 ] [ 1 2 ] [ 2 1 ] [ 2 2 ] } - <br>Inter-Process calls blocked</td>
+	<td>Blocks the indicated calls found in other processes. Each are listed in pairs (numbers between the [ ] form a pair), the first element of the pair is the process where it is found, the second is the Process Call Index. So the first pair tells us that the call from process 1 with a Process Call Index of 1 is blocked.</td></tr>
+<tr><td style="width: 245px">Match: -1 -1 – Matches</td>
+	<td>For calls like Send and Recv and has -1 -1 for calls without matches</td></tr>
+<tr><td style="width: 245px">File: 23 any_src-can-deadlock9.c</td>
+	<td>The log file was generated by any_src-can-deadlock9.c</td></tr>
+<tr><td style="width: 245px">36</td><td>This call is found on line 36</td></tr>
+</table>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+
+</html>

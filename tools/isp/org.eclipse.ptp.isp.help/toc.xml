@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="ISP Plug-in User Guide" topic="html/toc.html">
+    <topic label="Overview"  href="html/overview.html"/>
+    <topic label="ISP Plug-in Prerequisites"  href="html/prereqs.html"/> 
+    <topic label="ISP Plug-in Preferences"  href="html/preferences.html"/>
+    <topic label="Console View"  href="html/consoleView.html"/>
+    <topic label="Understanding ISP Console Output" href="html/output.html" />
+    <topic label="Java GUI" href="html/javaGui.html" />
+    <topic label="Code Analyzer View"  href="html/analyzerView.html"/>
+    <topic label="Troubleshooting the ISP Plug-in"  href="html/troubleshooting.html"/>
+</toc>

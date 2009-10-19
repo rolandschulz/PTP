@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+	<title>ISP Plug-in Prerequisites</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>ISP Plug-in Prerequisites</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<p>
+The following prerequisites are required for the ISP Plug-in (v1.0) installation. For more detailed information,
+including installation instructions, see the <a href="http://www.cs.utah.edu/formal_verification/ISP-Eclipse/">
+ISP - Eclipse Plug-in Update Site</a>
+</p>
+
+<ul>
+    <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">ISP itself (v0.1.1)</a></li>
+    <li><a href="http://java.sun.com/javase/downloads/index.jsp">Java 1.6 or later</a></li>
+    <li><a href="http://eclipse.org/downloads">Eclipse SDK</a> version 3.5 (Galileo) and beyond</li>
+    <li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 6.0 and beyond</li>
+    <li><a href="http://eclipse.org/ptp/">Eclipse Parallel Tools Platform (PTP)</a> version 3.0 and beyond</li>
+</ul>
+
+<p>&nbsp;</p>
+
+<table border="1" cellpadding="8">
+  <tr>
+    <th colspan="2" scope="col">Operating Systems and Architectures Supported<br></th>
+  </tr>
+  <tr>
+    <th scope="col">Operating System</th>
+    <th scope="col">Architecture</th>
+  </tr>
+  <tr>
+    <td>Linux</td>
+    <td>x86, x86_64</td>
+  </tr>
+  <tr>
+    <td>MacOS X</td>
+    <td>x86</td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+
+<p>
+Some implementation of MPI must be installed,  MPICH2 or OpenMP both work well. You will also need a
+process manager for clusters, like <i>mpd</i> installed and running. The ISP plug-in assumes your process
+manager is already running when it is loaded.
+</p>
+
+<ul>
+    <li><a href="http://www.mcs.anl.gov/research/projects/mpich2/downloads/index.php?s=downloads">MPICH2 </a> version 1.0.6p1 (or later)</li>
+    <li><a href="http://open-mpi.org">Open MPI</a> version 1.2.x and 1.3.x</li>
+</ul>
+
+<p>&nbsp;</p>
+
+<hr>
+<h2>Here are some of the requirements to run ISP:</h2>
+
+<ul>
+    <li>
+        <b>Machine:</b> ISP can be run on machines with one or more CPU cores. With more cores,
+        ISP’s OpenMP parallelization can help speed up model checking.
+    </li>
+    <li>
+        <b>Sockets:</b> ISP can be run with TCP sockets or Unix-domain sockets. The latter is
+        much faster, but requires all ISP runs to occur within one machine. A distributed ISP
+        checker is in our future plans.
+    </li>
+    <li>
+        <b>Operating Systems:</b> The Eclipse Plug-in is designed for Linux and MacOS X
+    </li>
+    <li>
+        <b>MPI Library:</b> The current ISP release is for MPICH 2.1. We have successfully tested
+        ISP with OpenMPI as well as Microsoft’s MPI (sometimes called CCS). An enhanced configure
+        and make will be released corresponding to these MPI libraries also. If you are interested,
+        kindly let us know and we can help tailor the current distribution with these other MPI
+        libraries. For MAC OS/X, one can run ISP using the OpenMPI that comes by default.        
+    </li>
+</ul>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+</html>
