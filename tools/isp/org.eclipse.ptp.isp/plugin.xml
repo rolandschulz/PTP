@@ -225,14 +225,14 @@
             icon="icons/magnified-trident.gif"
             category="org.eclipse.ptp.isp"
             class="org.eclipse.ptp.isp.views.ISPConsole"
-            id="org.eclipse.ptp.isp.views.ISP_Console">
+            id="org.eclipse.ptp.isp.views.ISPConsole">
       </view>
       <view
             name="ISP Analyzer"
             icon="icons/trident.gif"
             category="org.eclipse.ptp.isp"
             class="org.eclipse.ptp.isp.views.ISPAnalyze"
-            id="org.eclipse.ptp.isp.views.ISP_Analyze">
+            id="org.eclipse.ptp.isp.views.ISPAnalyze">
       </view>
    </extension>
    
