@@ -8,41 +8,67 @@
 
 <body>
 <h1>Remote Services Properties Page</h1>
-<img src="../../images/properties_service_model.png" alt="Remote Services Properties Page">
+<h3>C/C++ Indexing Service</h3>
+<img src="../../images/properties_service_indexing.png" alt="Remote Services Properties Page - Indexing">
 <br><br><br>
-
 <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse" bordercolor="#999999">
   <tr>
     <th><b>Name</b></th>
     <th><b>Function</b></th>
   </tr>
   <tr>
-    <td>Service</td>
-    <td><a href="../concepts/services.html">Services</a> are essentially well defined sets of functionality which can be provided by Service Providers.</td>
+    <td>Enable Service</td>
+    <td>Enable or disable the indexing service.  <a href="../concepts/services.html">Services</a> are essentially well defined sets of functionality which can be provided by Service Providers.</td>
   </tr>
   <tr>
     <td>Service Provider</td>
-    <td><a href="../concepts/services.html">Service Providers</a> provide implementations of a Service.
+    <td><a href="../concepts/providers.html">Service Providers</a> provide implementations of a Service.
         Each service has a list of available providers.
-        The NULL service provider is selected by default and does nothing.
-        To select a service provider click on the table cell and a list of providers will appear. 
-        Each service provider must be configured separately.
+        
     </td>
   </tr>
   <tr>
-    <td>Provider Configuration</td>
-    <td>Shows details of the service provider configuration, such as the name of the connection
-        that the provider has been configured to use. If the provider has not yet been configured
-        then <b>Not configured</b> will be shown.
+    <td>Host</td>
+    <td>The remote machine where parsing and indexing are done.
     </td>
   </tr>
   <tr>
-    <td>Configure</td>
-    <td>Each service provider must be configured separately. Select a service provider then
-    click the Configure button, a dialog will appear that will allow the provider to be configured.
+    <td>Index location</td>
+    <td>The location where the index (database) of named entities is stored.
     </td>
   </tr>
 </table>
-  
+<br>
+<br>
+<img src="../../images/properties_service_build.png" alt="Remote Services Properties Page - Build">
+<br><br><br>
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse" bordercolor="#999999">
+  <tr>
+    <th><b>Name</b></th>
+    <th><b>Function</b></th>
+  </tr>
+  <tr>
+    <td>Enable Service</td>
+    <td>Enable or disable the build service.  <a href="../concepts/services.html">Services</a> are essentially well defined sets of functionality which can be provided by Service Providers.</td>
+  </tr>
+  <tr>
+    <td>Service Provider</td>
+    <td><a href="../concepts/providers.html">Service Providers</a> provide implementations of a Service.
+        Each service has a list of available providers.
+        
+    </td>
+  </tr>
+  <tr>
+    <td>Provider</td>
+    <td>Select an <a href="../concepts/build_service.html">implementation</a> of the build service provider.
+    </td>
+  </tr>
+  <tr>
+    <td>Connection</td>
+    <td>The name of the connection that the provider has been configured to use.
+    </td>
+  </tr>
+</table>
+  <br>
 </body>
 </html>
