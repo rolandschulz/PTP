@@ -18,7 +18,7 @@ navigation features and parts of content assist.
 
 <p>
 The parser must be configured properly for it to find header files, otherwise
-the code analysis features of RDT may not have sufficient information available,
+the code analysis features may not have sufficient information available,
 and will not provide a complete analysis.
 </p>
 
@@ -42,22 +42,16 @@ Tasks for configuring the parser:
 <p>
 The indexer used for C/C++ projects may be configured using the
 <b>C/C++ General &gt; Indexer</b> properties page.
-For RDT Remote C/C++ projects the <b>RDT Remote Fast Indexer</b> must be selected,
-otherwise RDT will not be able to communicate with the remote index and
-none of the code analysis features of RDT will work correctly.
+For Remote C/C++ projects the <b>RDT Remote Fast Indexer</b> must be selected,
+otherwise the project will not be able to communicate with the remote index and
+none of the code analysis features will work correctly.
 </p>
 
-<p>
-The indexer properties page has sections for specifying that references
-should be skipped and for specifying that certain files should be parsed
-up front. Currently RDT does not support these properties, and changing
-them has no effect.
-</p>
 
 <p><b>Editor Warnings</b><p>
 
 <p>
-There is a known issue with RDT where sometimes the remote editor displays
+There is a known issue where sometimes the remote editor displays
 false warnings about syntax errors or invalid include directives. To disable
 editor warnings do the following:
 <ol>
