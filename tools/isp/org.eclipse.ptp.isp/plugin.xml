@@ -102,7 +102,7 @@
    </extension>
 
     
-   <!-- Commands extension point and contributions ()for menus & toolbar -->
+   <!-- Commands extension point and contributions (for toolbar buttons) -->
    <extension
          point="org.eclipse.ui.commands">
       <category
@@ -179,39 +179,6 @@
       </menuContribution>
     </extension>
     
-    
-   <!-- Menu extension point and contributions (menu items) -->
-   <extension
-        point="org.eclipse.ui.menus">
-        <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-             <menu
-               label="&amp;ISP"
-               id="org.eclipse.ptp.isp.menu">
-             </menu>
-        </menuContribution>
-  </extension>
-  <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-              locationURI="menu:org.eclipse.ptp.isp.menu?after=additions">
-            <command
-                  commandId="org.eclipse.ptp.isp.commands.numprocsCommand"
-                  id="org.eclipse.ptp.isp.menu.command1"
-                  icon="icons/triple-trident.gif">
-            </command>
-            <command
-                  commandId="org.eclipse.ptp.isp.commands.analyzeCommand"
-                  id="org.eclipse.ptp.isp.toolbar.menu.command2"
-                  icon="icons/trident.gif">
-            </command>
-            <command
-                  commandId="org.eclipse.ptp.isp.commands.consoleCommand"
-                  id="org.eclipse.ptp.isp.menu.command3"
-                  icon="icons/magnified-trident.gif">
-            </command>
-      </menuContribution>
-    </extension>
-
     
    <!-- Views extension point -->
    <extension
