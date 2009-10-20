@@ -12,7 +12,7 @@
     <topic href="html/tasks/creating_makefile.html" label="Creating a makefile">
     </topic>
  </topic>
- <topic href="html/tasks/configuring_the_parser.html" label="Configuring The Parser">
+ <topic href="html/tasks/configuring_the_parser.html" label="Configuring The Parser/Indexer">
  </topic>
  <topic href="html/tasks/write_remote_code.html" label="Writing Remote Code">
     <topic href="html/tasks/customize_the_remote_c_editor.html" label="Customize The Remote C/C++ Editor">
