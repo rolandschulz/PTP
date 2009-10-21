@@ -1242,21 +1242,19 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             char **debugger_args;
             char **debugger_envp;
             int max_fd;
-            int a;
+            int a = 0;
 
             debug_arg_count++;
             debugger_args = (char **) malloc((debug_arg_count + 3) * sizeof(char *));
-            debugger_args[0] = POE;
-            debugger_args[1] = debugger_full_path;
+            debugger_args[a++] = debugger_full_path;
             /* Use --jobid to inform node elements of debugger what their poe pid is.
              * This 'jobid' will be used to set up a message queue to accept connections
              * from the application process when it launches on the node.
              */
-            asprintf(&debugger_args[2], "--jobid=%d", getpid());
-            for (i = 0, a = 3; i < nargs; i++) {
+            asprintf(&debugger_args[a++], "--jobid=%d", getpid());
+            for (i = 0; i < nargs; i++) {
                 if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
-                    debugger_args[a] = strchr(args[i], '=') + 1;
-                    a++;
+                    debugger_args[a++] = strchr(args[i], '=') + 1;
                 }
             }
             debugger_args[a] = NULL;
@@ -1282,7 +1280,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                 TRACE_DETAIL_V("Target debugger_args[%d]: %s\n", i, debugger_args[i]);
                 i++;
             }
-            status = execve(POE, debugger_args, debugger_envp);
+            status = execve(debugger_args[0], debugger_args, debugger_envp);
             print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", debugger_args[0], strerror(errno));
             post_submitjob_error(trans_id, jobid, "Exec failed");
             TRACE_EXIT;
