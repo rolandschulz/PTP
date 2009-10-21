@@ -9,13 +9,13 @@
     </topic>
     <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor">
     </topic>
-    <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy view">
-    </topic>
-    <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy view">
-    </topic>
     <topic href="html/reference/outline_view.html" label="Outline view">
     </topic>
     <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_make_targets_view.htm" label="Make Targets view">
+    </topic>
+    <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy view">
+    </topic>
+    <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy view">
     </topic>
     <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_console_view.htm" label="Console view">
     </topic>
@@ -23,12 +23,12 @@
     </topic>
     <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_properties_view.htm" label="Properties view">
     </topic>
-    <topic label="Tasks view">
+    <topic href="../org.eclipse.platform.doc.user/reference/ref-31.htm" label="Tasks view">
     </topic>
  </topic>
  <topic label="Remote C/C++ Properties">
     <topic label="Remote Paths and Symbols Property Page">
-       <topic href="html/reference/remote_properties_paths.html" label="Remote Paths">
+       <topic href="html/reference/remote_properties_paths.html" label="Remote Includes">
        </topic>
        <topic href="html/reference/remote_properties_symbols.html" label="Symbols">
        </topic>
