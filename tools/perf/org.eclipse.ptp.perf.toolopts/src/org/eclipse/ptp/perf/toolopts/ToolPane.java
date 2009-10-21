@@ -48,7 +48,7 @@ public class ToolPane implements IAppInput {
 	public static final int ANALYSIS = 5;
 	public static final int ENV_VAR = 6;
 
-	
+
 	/**
 	 * If true then this pane is merely a placeholder for a pane defined
 	 * elsewhere
@@ -60,7 +60,7 @@ public class ToolPane implements IAppInput {
 	 * pane
 	 */
 	private StringBuffer optString = null;
-	
+
 	private Map<String,String> varMap = null;
 
 	/**
@@ -130,7 +130,7 @@ public class ToolPane implements IAppInput {
 	 * The type of tool the parameter defined by this pane goes to
 	 */
 	public int paneType = -1;
-	
+
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
 		try {
 			return configuration.getAttribute(configVarID,
@@ -201,14 +201,23 @@ public class ToolPane implements IAppInput {
 		optString = new StringBuffer(this.prependOpts).append(this.encloseOpts);
 		for (int i = 0; i < options.length; i++) {
 			if (options[i].unitCheck == null || options[i].unitCheck.getSelection()) {
+				
+				String text="";
+				if(options[i].argbox!=null){
+					text = options[i].argbox.getText();
+				}
+				
+				boolean useField=!options[i].fieldrequired||text.trim().length()>0;
+				
 				if(options[i].isArgument){
-					optString.append(options[i].optionLine).append(this.separateOpts);
+					if(useField)
+						optString.append(options[i].optionLine).append(this.separateOpts);
 				}
 				else{
 					if(options[i].argbox!=null)
 					{
-						String text = options[i].argbox.getText();
-						if(!options[i].fieldrequired||text.trim().length()>0){
+						
+						if(useField){
 							varMap.put(options[i].optName,text);
 						}else{
 							varMap.remove(options[i].optName);
@@ -216,7 +225,7 @@ public class ToolPane implements IAppInput {
 					}else{
 						if(options[i].type==ToolOption.TOGGLE){
 							if(options[i].setOn!=null)
-							varMap.put(options[i].optName,options[i].setOn);
+								varMap.put(options[i].optName,options[i].setOn);
 						}
 					}
 				}
@@ -258,7 +267,7 @@ public class ToolPane implements IAppInput {
 		if (opt.type > 0) {
 			opt.optionLine = new StringBuffer(opt.optName).append(
 					this.separateNameValue).append(this.encloseValues).append(
-					opt.argbox.getText()).append(this.encloseValues);
+							opt.argbox.getText()).append(this.encloseValues);
 
 			OptUpdate();
 		}
@@ -292,7 +301,7 @@ public class ToolPane implements IAppInput {
 	 * @throws CoreException
 	 */
 	public void initializePane(ILaunchConfiguration configuration)
-			throws CoreException {
+	throws CoreException {
 		String arg = "";
 		for (int i = 0; i < options.length; i++) {
 			if (options[i].unitCheck != null)
@@ -300,7 +309,7 @@ public class ToolPane implements IAppInput {
 				options[i].unitCheck.setSelection(configuration.getAttribute(
 						options[i].confDefString, options[i].defState));
 			}
-			
+
 			if (options[i].usesTextBox()) {
 				arg = configuration.getAttribute(options[i].confArgString,
 						options[i].defText);
@@ -340,15 +349,15 @@ public class ToolPane implements IAppInput {
 			{
 				configuration.setAttribute(options[i].confArgString,options[i].argbox.getText());
 			}
-//			if(options[i].type==ToolOption.TOGGLE){
-//				String argVal=null;
-//				if(set){
-//					argVal=options[i].setOn;
-//				}else{
-//					argVal=options[i].setOff;
-//				}
-//				configuration.setAttribute(options[i].confArgString,argVal);
-//			}
+			//			if(options[i].type==ToolOption.TOGGLE){
+			//				String argVal=null;
+			//				if(set){
+			//					argVal=options[i].setOn;
+			//				}else{
+			//					argVal=options[i].setOff;
+			//				}
+			//				configuration.setAttribute(options[i].confArgString,argVal);
+			//			}
 		}
 	}
 
@@ -390,7 +399,7 @@ public class ToolPane implements IAppInput {
 
 		return optString.toString();
 	}
-	
+
 	public Map<String,String> getVarMap(){
 		return varMap;
 	}
