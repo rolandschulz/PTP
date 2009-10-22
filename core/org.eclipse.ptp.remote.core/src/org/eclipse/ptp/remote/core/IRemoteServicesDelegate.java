@@ -53,16 +53,6 @@ public interface IRemoteServicesDelegate {
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
 	
 	/**
-	 * Get a remote services extension
-	 * 
-	 * @param conn connection used by the extension
-	 * @param extension class name of the extension
-	 * @return object implementing the requested extension class, or null if the extension is not supported
-	 */
-	@SuppressWarnings("unchecked")
-	public Object getServicesExtension(IRemoteConnection conn, Class extension);
-	
-	/**
 	 * Start initializing the remote service.
 	 */
 	public void initialize();
