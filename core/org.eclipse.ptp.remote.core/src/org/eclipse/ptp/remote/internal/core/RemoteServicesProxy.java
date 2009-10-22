@@ -142,15 +142,6 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
-	 */
-	@SuppressWarnings("unchecked")
-	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
-		loadServices();
-		return delegate.getServicesExtension(conn, extension);
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize()
 	 */
 	public void initialize() {
