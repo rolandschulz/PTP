@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.core;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,9 +17,12 @@ import java.net.URLEncoder;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.rse.core.model.IHost;
+import org.eclipse.rse.subsystems.files.core.model.RemoteFileUtility;
+import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
+import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
 
 public class RSEFileManager implements IRemoteFileManager {
 	private RSEConnection connection;
@@ -28,26 +30,30 @@ public class RSEFileManager implements IRemoteFileManager {
 	public RSEFileManager(RSEConnection conn) {
 		this.connection = conn;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
 	 */
-	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
+	public IFileStore getResource(String path) {
 		return connection.getFileSystem().getStore(toURI(path));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IPath getWorkingDirectory() {
-		return new Path("/"); // TODO: RSE doesn't provide any way to get this //$NON-NLS-1$
+	public String getWorkingDirectory() {
+		IFileServiceSubSystem fileService = getFileServiceSubSystem(connection.getHost());
+		if (fileService != null) {
+			return fileService.getFileService().getUserHome().getAbsolutePath();
+		}
+		return "/"; //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
 	 */
-	public IPath toPath(URI uri) {
-		return new Path(uri.getPath());
+	public String toPath(URI uri) {
+		return uri.getPath();
 	}
 
 	/* (non-Javadoc)
@@ -72,5 +78,21 @@ public class RSEFileManager implements IRemoteFileManager {
 	 */
 	public URI toURI(String path) {
 		return toURI(new Path(path));
+	}
+	
+	/**
+	 * Find the file service subsystem from the IHost
+	 * 
+	 * @param host
+	 * @return
+	 */
+	private IFileServiceSubSystem getFileServiceSubSystem(IHost host) {
+		IRemoteFileSubSystem[] fileSubsystems = RemoteFileUtility.getFileSubSystems(host);
+		for(IRemoteFileSubSystem subsystem : fileSubsystems) {
+			if(subsystem instanceof IFileServiceSubSystem && subsystem.isConnected()) {
+				return (IFileServiceSubSystem) subsystem;
+			}
+		}
+		return null;
 	}
 }

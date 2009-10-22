@@ -10,41 +10,35 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.internal.core;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 public class LocalFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
 	 */
-	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
-		try {
-			return EFS.getLocalFileSystem().getStore(path);
-		} finally {
-			monitor.done();
-		}
+	public IFileStore getResource(String path) {
+		return EFS.getLocalFileSystem().getStore(new Path(path));
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IPath getWorkingDirectory() {
-		return new Path(System.getProperty("user.dir")); //$NON-NLS-1$
+	public String getWorkingDirectory() {
+		return System.getProperty("user.dir"); //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toPath(java.net.URI)
 	 */
-	public IPath toPath(URI uri) {
-		return URIUtil.toPath(uri);
+	public String toPath(URI uri) {
+		return URIUtil.toPath(uri).toString();
 	}
 	
 	/* (non-Javadoc)
