@@ -195,6 +195,9 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.slurm-feature"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.pbs-feature"/>
+		</antcall>		
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.external-feature"/>
 		</antcall>
 		<antcall target="tagone">
