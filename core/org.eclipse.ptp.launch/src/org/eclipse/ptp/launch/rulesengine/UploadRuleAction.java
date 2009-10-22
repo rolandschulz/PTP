@@ -11,8 +11,6 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.rulesengine;
 
-import java.io.IOException;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -22,14 +20,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
 import org.eclipse.ptp.launch.data.UploadRule;
-import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**
@@ -147,15 +142,9 @@ public class UploadRuleAction implements IRuleAction {
 		for (int i = 0; i < localPaths.length; i++) {
 			IPath localPath = localPaths[i];
 
-			IFileStore localFileStore = null;
-
-			try {
-				IRemoteFileManager localFileManager = process.getLocalFileManager(configuration);
-				localFileStore = localFileManager.getResource(localPath, monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.UploadRuleAction_0, e));
-			}
-			IFileInfo localFileInfo = localFileStore.fetchInfo();
+			IRemoteFileManager localFileManager = process.getLocalFileManager(configuration);
+			IFileStore localFileStore = localFileManager.getResource(localPath.toString());
+			IFileInfo localFileInfo = localFileStore.fetchInfo(EFS.NONE, monitor);
 
 			if(!localFileInfo.exists()) {
 				// Warn user and go to the next file
@@ -168,24 +157,14 @@ public class UploadRuleAction implements IRuleAction {
 			IPath remotePath = remotePathParent.append(localPath.lastSegment());
 
 			// Generate the FileStore for the remote path
-			IFileStore remoteFileStore = null;
 			IRemoteFileManager remoteFileManager = process.getRemoteFileManager(configuration);
-			try {
-				remoteFileStore = remoteFileManager.getResource(remotePath, monitor);
-			} catch (IOException e1) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.UploadRuleAction_1, e1));
-			}
+			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
 
 			/*
 			 * Assure the remote path exists.
 			 */
-			try {
-				IFileStore parentFileStore = remoteFileManager.getResource(remotePathParent, monitor);
-				parentFileStore.mkdir(EFS.NONE, monitor);
-			} catch (IOException e1) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.UploadRuleAction_1, e1));
-			}
-
+			IFileStore parentFileStore = remoteFileManager.getResource(remotePathParent.toString());
+			parentFileStore.mkdir(EFS.NONE, monitor);
 
 			doUpload(localFileStore, localPath, remoteFileStore, remotePath);
 

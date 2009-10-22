@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
@@ -92,17 +90,9 @@ public class SDMRunner extends Job {
 			IRemoteConnection connection = connectionManager.getConnection(configuration.getConnectionName());
 			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 
-			IFileStore directory = null;
-			if (workDir != null) {
-				try {
-					directory = fileManager.getResource(new Path(workDir), monitor);
-				} catch (IOException e) {
-					throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), Messages.SDMRunner_1, e));
-				}
-			}
 			IRemoteProcessBuilder sdmProcessBuilder = remoteServices.getProcessBuilder(connection, command);
-			if (directory != null) {
-				sdmProcessBuilder.directory(directory);
+			if (workDir != null) {
+				sdmProcessBuilder.directory(fileManager.getResource(workDir));
 			}
 
 			/*

@@ -7,13 +7,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
-import java.io.IOException;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -429,18 +427,12 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 					setErrorMessage(Messages
 							.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
 				}
-				try {
-					remoteResource = remoteService.getFileManager(
-							remoteConnection).getResource(testPath,
-							new NullProgressMonitor());
-					fileInfo = remoteResource.fetchInfo();
-					if ((!fileInfo.exists()) || (!fileInfo.isDirectory())) {
-						setErrorMessage(Messages
-								.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
-					}
-				} catch (IOException e) {
+				remoteResource = remoteService.getFileManager(
+						remoteConnection).getResource(testPath.toString());
+				fileInfo = remoteResource.fetchInfo();
+				if ((!fileInfo.exists()) || (!fileInfo.isDirectory())) {
 					setErrorMessage(Messages
-							.getString("Invalid.remoteConnectionError") + " " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+							.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
 				}
 				proxyOptions = proxyOptions + LIB_OVERRIDE_OPTION
 						+ "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$

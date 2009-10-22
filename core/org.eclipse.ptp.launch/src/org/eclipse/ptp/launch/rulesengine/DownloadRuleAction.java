@@ -11,8 +11,6 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.rulesengine;
 
-import java.io.IOException;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -22,13 +20,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadRule;
 import org.eclipse.ptp.launch.data.OverwritePolicies;
-import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**
@@ -95,13 +90,8 @@ public class DownloadRuleAction implements IRuleAction {
 		
 		// Get the file store of the parent dir.
 		IRemoteFileManager localFileManager = process.getLocalFileManager(configuration);
-		IFileStore localFileParentResource = null;
-		try {
-			localFileParentResource = localFileManager.getResource(localParentPath, monitor);
-		} catch (IOException e) {
-			throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.DownloadRuleAction_0, e));
-		}
-		IFileInfo localFileParentInfo = localFileParentResource.fetchInfo();
+		IFileStore localFileParentResource = localFileManager.getResource(localParentPath.toString());
+		IFileInfo localFileParentInfo = localFileParentResource.fetchInfo(EFS.NONE, monitor);
 		
 		// Create the localpath if necessary
 		if(!localFileParentInfo.exists()) {
@@ -120,13 +110,8 @@ public class DownloadRuleAction implements IRuleAction {
 				remotePath = remoteWorkingPath.append(remotePath);
 			}
 			
-			IFileStore remoteFileStore = null;
-			try {
-				IRemoteFileManager remoteFileManager = process.getRemoteFileManager(configuration);
-				remoteFileStore = remoteFileManager.getResource(remotePath, monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.DownloadRuleAction_1, e));
-			}
+			IRemoteFileManager remoteFileManager = process.getRemoteFileManager(configuration);
+			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
 			
 			// Check if the remote resource exists
 			IFileInfo remoteFileInfo = remoteFileStore.fetchInfo(EFS.NONE, monitor);
@@ -142,12 +127,7 @@ public class DownloadRuleAction implements IRuleAction {
 			IPath localPath = localParentPath.append(remotePath.lastSegment());
 			
 			// Generate the file store for the local path
-			IFileStore localFileStore = null;
-			try {
-				localFileStore = localFileManager.getResource(localPath, monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, Messages.DownloadRuleAction_0, e));
-			}
+			IFileStore localFileStore = localFileManager.getResource(localPath.toString());
 
 			doDownload(remoteFileStore, remotePath, localFileStore, localPath);
 		}

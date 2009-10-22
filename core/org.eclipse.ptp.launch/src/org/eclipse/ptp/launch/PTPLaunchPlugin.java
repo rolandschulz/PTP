@@ -19,13 +19,11 @@
 
 package org.eclipse.ptp.launch;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -34,7 +32,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -369,18 +366,11 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
 					Messages.PTPLaunchPlugin_3));
 		}
-		IPath resPath = new Path(path);
-		try {
-			IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
-			if (!res.fetchInfo().exists()) {
-				throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
-						NLS.bind(Messages.PTPLaunchPlugin_5, new Object[] {path})));
-			}
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.PTPLaunchPlugin_6, e.getCause()));
+		if (!fileManager.getResource(path).fetchInfo().exists()) {
+			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
+					NLS.bind(Messages.PTPLaunchPlugin_5, new Object[] {path})));
 		}
-		return resPath;
+		return new Path(path);
 	}
 
 	/**

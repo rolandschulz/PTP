@@ -665,14 +665,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_CreateCommand, e);
 			}
 
-			IRemoteProcessBuilder processBuilder;
-			try {
-				processBuilder = getRtSystem().createProcessBuilder(command, directory);
-			} catch (IOException e) {
-				changeJobState(JobAttributes.State.COMPLETED);
-				changeJobStatus(MPIJobAttributes.Status.ERROR);
-				return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.AbstractToolRuntimeSystemJob_Exception_BeforeExecution, e);
-			}
+			IRemoteProcessBuilder processBuilder = getRtSystem().createProcessBuilder(command, directory);
 			processBuilder.environment().putAll(environment);
 			
 			try {

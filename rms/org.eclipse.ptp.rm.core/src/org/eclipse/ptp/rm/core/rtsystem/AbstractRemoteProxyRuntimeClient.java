@@ -17,10 +17,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
@@ -181,8 +182,12 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 					throw new IOException(Messages.AbstractRemoteProxyRuntimeClient_9);
 				}
 				
-				IFileStore res = fileManager.getResource(new Path(config.getProxyServerPath()), subMon.newChild(2));
-				if (!res.fetchInfo().exists()){
+				IFileStore res = fileManager.getResource(config.getProxyServerPath());
+				try {
+					if (!res.fetchInfo(EFS.NONE, subMon.newChild(2)).exists()) {
+						throw new IOException(NLS.bind(Messages.AbstractRemoteProxyRuntimeClient_12, config.getProxyServerPath()));
+					}
+				} catch (CoreException e1) {
 					throw new IOException(NLS.bind(Messages.AbstractRemoteProxyRuntimeClient_12, config.getProxyServerPath()));
 				}
 				
