@@ -30,6 +30,10 @@ public class StructureTemplateDeclaration extends StructureDeclaration implement
 		fTemplate.setTemplateParameterTypes(element.getTemplateParameterTypes());
 	}
 
+	public String[] getTemplateArguments() {
+		return  fTemplate.getTemplateArguments();
+	}
+	
 	public int getNumberOfTemplateParameters() {
 		return fTemplate.getNumberOfTemplateParameters();
 	}
