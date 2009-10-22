@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rtsystem;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,13 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -709,14 +705,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return remoteServices.getProcessBuilder(connection, command);
 	}
 
-	public IRemoteProcessBuilder createProcessBuilder(List<String> command, String workdir) throws IOException {
+	public IRemoteProcessBuilder createProcessBuilder(List<String> command, String workdir) {
 		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-		IFileStore directory = null;
-		if (fileManager != null) {
-			directory = fileManager.getResource(new Path(workdir), new NullProgressMonitor());
-		}
 		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
-		processBuilder.directory(directory);
+		if (fileManager != null) {
+			processBuilder.directory(fileManager.getResource(workdir));
+		}
 		return processBuilder;
 	}
 

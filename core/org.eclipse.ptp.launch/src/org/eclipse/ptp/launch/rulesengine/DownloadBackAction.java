@@ -11,21 +11,14 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.rulesengine;
 
-import java.io.IOException;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.data.DownloadBackRule;
-import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**
@@ -64,18 +57,10 @@ public class DownloadBackAction implements IRuleAction {
 			IFileStore remoteFileStore = null;
 			IFileStore localFileStore = null;
 			
-			try {
-			remoteFileStore = remoteFileManager.getResource(rule.getRemoteFile(i), 
-					monitor);
-			IPath localPath = new Path(rule.getLocalFile(i).getAbsolutePath());
-			localFileStore = localFileManager.getResource(localPath, monitor);
-			} catch (IOException e) {
-				throw new CoreException(new Status(Status.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-						Messages.DownloadBackAction_0, e));
-			}
+			remoteFileStore = remoteFileManager.getResource(rule.getRemoteFile(i).toString());
+			localFileStore = localFileManager.getResource(rule.getLocalFile(i).getAbsolutePath());
 			
 			doDownload(remoteFileStore, localFileStore);
-			//downloadFile(localFile, remotePath);
 		}
 	}
 

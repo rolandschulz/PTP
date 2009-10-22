@@ -10,10 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -253,16 +251,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		if (rmConn != null) {
 			IRemoteFileManager fileManager = getRemoteServices()
 					.getFileManager(rmConn);
-			if (fileManager != null) {
-				try {
-					IFileStore res = fileManager.getResource(new Path(path),
-							new NullProgressMonitor());
-					if (res.fetchInfo().exists()) {
-						return true;
-					}
-				} catch (Exception e) {
-					// Any exception means the verify failed
-				}
+			if (fileManager != null &&
+				fileManager.getResource(path).fetchInfo().exists()) {
+				return true;
 			}
 			return false;
 		}

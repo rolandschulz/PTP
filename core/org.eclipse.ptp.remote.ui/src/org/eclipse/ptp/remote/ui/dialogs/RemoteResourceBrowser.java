@@ -10,19 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.dialogs;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
@@ -252,16 +249,11 @@ public class RemoteResourceBrowser extends Dialog {
 			 * treeViewer input is set or the treeViewer fails. No idea why this
 			 * is.
 			 */
-			IPath cwd = fileMgr.getWorkingDirectory();
-			IPath initial = findInitialPath(cwd, new Path(initialPath));
+			String cwd = fileMgr.getWorkingDirectory();
+			IPath initial = findInitialPath(cwd, initialPath);
 			remotePathText.setText(initial.toString());
 
-			IFileStore root;
-			try {
-				root = fileMgr.getResource(cwd, new NullProgressMonitor());
-			} catch (IOException e) {
-				return false;
-			}
+			IFileStore root = fileMgr.getResource(cwd);
 
 			treeViewer.setInput(new DeferredFileStore(root));
 
@@ -355,29 +347,26 @@ public class RemoteResourceBrowser extends Dialog {
 	/**
 	 * Determine the initial path for the browser. This is the initialPath, if:
 	 * 
-	 * 1. it was supplied 2. if it exists on the remote machine 3. if it is
-	 * relative to the cwd
+	 * 1. it was supplied 
+	 * 2. if it exists on the remote machine 
+	 * 3. if it is relative to the cwd
 	 * 
 	 * If none of these conditions are satisfied, then the initial path will be
 	 * the cwd.
 	 * 
+	 * @param cwd
 	 * @param initialPath
 	 * @return
 	 */
-	private IPath findInitialPath(IPath cwd, IPath pathToCheck) {
-		IPath path = cwd;
-
-		if (pathToCheck.matchingFirstSegments(cwd) != cwd.segmentCount()) {
-			return path;
-		}
-		if (pathToCheck != null) {
-			try {
-				IFileInfo info = fileMgr.getResource(pathToCheck,
-						new NullProgressMonitor()).fetchInfo();
-				if (info.exists()) {
-					path = pathToCheck;
-				}
-			} catch (IOException e) {
+	private IPath findInitialPath(String cwd, String initialPath) {
+		IPath path = new Path(cwd);
+		if (initialPath != null) {
+			IPath pathToCheck = new Path(initialPath);
+			if (pathToCheck.matchingFirstSegments(path) != path.segmentCount()) {
+				return path;
+			}
+			if (fileMgr.getResource(initialPath).fetchInfo().exists()) {
+				path = pathToCheck;
 			}
 		}
 		return path;

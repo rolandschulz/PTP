@@ -274,12 +274,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		// Try to read.
 		DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Opening hostfile."); //$NON-NLS-1$
 		IProgressMonitor monitor = new NullProgressMonitor();
-		IFileStore hostfile;
-		try {
-			hostfile = fileMgr.getResource(hostFilePath, monitor);
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileNotFound, hostFilePath), e));
-		}
+		IFileStore hostfile = fileMgr.getResource(hostFilePath.toString());
 
 		InputStream is = null;
 		try {

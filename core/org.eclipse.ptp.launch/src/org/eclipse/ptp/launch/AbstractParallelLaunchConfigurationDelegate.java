@@ -734,22 +734,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 					Messages.AbstractParallelLaunchConfigurationDelegate_0));
 		}
 
-		try {
-			IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
-
-			if(!rres.fetchInfo().exists()) {
-				// Local file not found!
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-						Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
-			}
-			IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
-
-			// Copy file
-			rres.copy(lres, EFS.OVERWRITE, monitor);
-		} catch (IOException e) {
+		IFileStore rres = remoteFileManager.getResource(remotePath);
+		if(!rres.fetchInfo(EFS.NONE, monitor).exists()) {
+			// Local file not found!
 			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_remote_resource_info));
+					Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
 		}
+		IFileStore lres = localFileManager.getResource(localPath);
+
+		// Copy file
+		rres.copy(lres, EFS.OVERWRITE, monitor);
 	}
 
 	/**
@@ -770,22 +764,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 					Messages.AbstractParallelLaunchConfigurationDelegate_0));
 		}
 
-		try {
-			IFileStore lres = localFileManager.getResource(new Path(localPath), new NullProgressMonitor());
-			if(!lres.fetchInfo().exists()) {
-				// Local file not found!
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-						Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
-			}
-			IFileStore rres = remoteFileManager.getResource(new Path(remotePath), monitor);
-
-			// Copy file
-			lres.copy(rres, EFS.OVERWRITE, monitor);
-
-		} catch (IOException e) {
+		IFileStore lres = localFileManager.getResource(localPath);
+		if(!lres.fetchInfo(EFS.NONE, monitor).exists()) {
+			// Local file not found!
 			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_local_resource_info));
+					Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
 		}
+		IFileStore rres = remoteFileManager.getResource(remotePath);
+
+		// Copy file
+		lres.copy(rres, EFS.OVERWRITE, monitor);
 	}
 
 	/**

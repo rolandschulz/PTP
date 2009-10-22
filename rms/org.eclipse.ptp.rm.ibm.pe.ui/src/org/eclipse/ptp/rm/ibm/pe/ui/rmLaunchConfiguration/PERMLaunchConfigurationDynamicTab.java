@@ -39,7 +39,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -2860,19 +2859,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		try {
-			remoteResource = remoteService.getFileManager(remoteConnection)
-					.getResource(testPath, new NullProgressMonitor());
-			fileInfo = remoteResource.fetchInfo();
-			if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
-				throw new ValidationException(Messages.getString(errorID));
-			}
-		} catch (IOException e) {
-			throw new ValidationException(Messages
-					.getString("Invalid.remoteConnectionError")
-					+ " " + e.getMessage());
+		remoteResource = remoteService.getFileManager(remoteConnection)
+				.getResource(testPath.toString());
+		fileInfo = remoteResource.fetchInfo();
+		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
+			throw new ValidationException(Messages.getString(errorID));
 		}
-	}
+}
 
 	/**
 	 * Validate that an output file is accessible
@@ -2893,17 +2886,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		try {
-			remoteResource = remoteService.getFileManager(remoteConnection)
-					.getResource(testPath, new NullProgressMonitor());
-			fileInfo = remoteResource.fetchInfo();
-			if (fileInfo.isDirectory()) {
-				throw new ValidationException(Messages.getString(errorID));
-			}
-		} catch (IOException e) {
-			throw new ValidationException(Messages
-					.getString("Invalid.remoteConnectionError")
-					+ " " + e.getMessage());
+		remoteResource = remoteService.getFileManager(remoteConnection)
+				.getResource(testPath.toString());
+		fileInfo = remoteResource.fetchInfo();
+		if (fileInfo.isDirectory()) {
+			throw new ValidationException(Messages.getString(errorID));
 		}
 	}
 
@@ -2936,19 +2923,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 				if (!testPath.isValidPath(path)) {
 					throw new ValidationException(Messages.getString(errorID));
 				}
-				try {
-					remoteResource = remoteService.getFileManager(
-							remoteConnection).getResource(testPath,
-							new NullProgressMonitor());
-					fileInfo = remoteResource.fetchInfo();
-					if (!fileInfo.isDirectory()) {
-						throw new ValidationException(Messages
-								.getString(errorID));
-					}
-				} catch (IOException e) {
+				remoteResource = remoteService.getFileManager(
+						remoteConnection).getResource(testPath.toString());
+				fileInfo = remoteResource.fetchInfo();
+				if (!fileInfo.isDirectory()) {
 					throw new ValidationException(Messages
-							.getString("Invalid.remoteConnectionError")
-							+ " " + e.getMessage());
+							.getString(errorID));
 				}
 				selector.resetValidationState();
 			} catch (ValidationException e) {

@@ -10,25 +10,15 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
-import org.eclipse.ptp.rm.ui.RMUIPlugin;
 import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
@@ -547,39 +537,17 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		if (remUIServices != null && connection != null) {
 			if (!connection.isOpen()) {
-				IRunnableWithProgress op = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor)
-					throws InvocationTargetException,
-					InterruptedException {
-						try {
-							connection.open(monitor);
-						} catch (RemoteConnectionException e) {
-							ErrorDialog.openError(getShell(), Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionError,
-									Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription,
-									new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID, e.getMessage()));
-						}
-					}
-
-				};
-				try {
-					new ProgressMonitorDialog(getShell()).run(true, true, op);
-				} catch (InvocationTargetException e) {
-					ErrorDialog.openError(getShell(), Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionError,
-							Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription,
-							new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID, e.getMessage()));
-				} catch (InterruptedException e) {
-					ErrorDialog.openError(getShell(), Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionError,
-							Messages.AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription,
-							new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID, e.getMessage()));
-				}
+				PTPRemoteUIPlugin.getDefault().openConnectionWithProgress(getShell(), connection);
 			}
-			IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
-			fileMgr.setConnection(connection);
-
-			String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere //$NON-NLS-1$
-			String selectedPath = fileMgr.browseDirectory(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath, IRemoteUIConstants.OPEN);
-			if (selectedPath != null) {
-				remoteInstallPathText.setText(selectedPath);
+			if (connection.isOpen()) {
+				IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
+				fileMgr.setConnection(connection);
+	
+				String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere //$NON-NLS-1$
+				String selectedPath = fileMgr.browseDirectory(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath, IRemoteUIConstants.OPEN);
+				if (selectedPath != null) {
+					remoteInstallPathText.setText(selectedPath);
+				}
 			}
 		}
 	}

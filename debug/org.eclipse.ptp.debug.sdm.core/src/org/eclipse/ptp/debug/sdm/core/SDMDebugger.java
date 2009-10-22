@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -305,18 +305,11 @@ public class SDMDebugger implements IPDebugger {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, 
 					Messages.SDMDebugger_3));
 		}
-		IPath resPath = new Path(path);
-		try {
-			IFileStore res = fileManager.getResource(resPath, new NullProgressMonitor());
-			if (!res.fetchInfo().exists()) {
-				throw new CoreException(new Status(IStatus.INFO, SDMDebugCorePlugin.PLUGIN_ID,
-						NLS.bind(Messages.SDMDebugger_5, new Object[] {path})));
-			}
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID,
-					Messages.SDMDebugger_6, e.getCause()));
+		if (!fileManager.getResource(path).fetchInfo().exists()) {
+			throw new CoreException(new Status(IStatus.INFO, SDMDebugCorePlugin.PLUGIN_ID,
+					NLS.bind(Messages.SDMDebugger_5, new Object[] {path})));
 		}
-		return resPath;
+		return new Path(path);
 	}
 
 	/**
@@ -399,14 +392,9 @@ public class SDMDebugger implements IPDebugger {
 		IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
 		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
 
-		try {
-			this.fRoutingFileStore = remoteFileManager.getResource(routingFilePath, monitor);
-		} catch (IOException e) {
-			throw newCoreException(e);
-		}
+		fRoutingFileStore = remoteFileManager.getResource(routingFilePath.toString());
 
-		IFileInfo info = fRoutingFileStore.fetchInfo();
-		if (info.exists()) {
+		if (fRoutingFileStore.fetchInfo(EFS.NONE, monitor).exists()) {
 			try {
 				fRoutingFileStore.delete(0, monitor);
 			} catch (CoreException e) {

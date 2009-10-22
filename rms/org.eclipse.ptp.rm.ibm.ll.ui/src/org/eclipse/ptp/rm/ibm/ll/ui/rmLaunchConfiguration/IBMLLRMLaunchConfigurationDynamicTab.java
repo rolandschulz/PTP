@@ -33,7 +33,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -2506,7 +2505,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			throw new ValidationException(Messages.getString(errorID));
 		}
 		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath, new NullProgressMonitor());
+				.getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
 			throw new ValidationException(Messages.getString(errorID));
@@ -2534,7 +2533,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			throw new ValidationException(Messages.getString(errorID));
 		}
 		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath, new NullProgressMonitor());
+				.getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if (fileInfo.isDirectory()) {
 			throw new ValidationException(Messages.getString(errorID));
@@ -2572,7 +2571,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 					throw new ValidationException(Messages.getString(errorID));
 				}
 				remoteResource = remoteService.getFileManager(remoteConnection)
-						.getResource(testPath, new NullProgressMonitor());
+						.getResource(testPath.toString());
 				fileInfo = remoteResource.fetchInfo();
 				if (!fileInfo.isDirectory()) {
 					throw new ValidationException(Messages.getString(errorID));

@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ui.wizards;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -35,7 +34,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
@@ -688,14 +686,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 										throws InvocationTargetException,
 										InterruptedException {
 									try {
-										IFileStore file = fileMgr.getResource(
-												new Path(path), monitor);
+										IFileStore file = fileMgr.getResource(path);
 										if (!monitor.isCanceled()) {
 											proxyPathIsValid = file.fetchInfo(
 													EFS.NONE, monitor).exists();
 										}
-									} catch (IOException e) {
-										throw new InvocationTargetException(e);
 									} catch (CoreException e) {
 										throw new InvocationTargetException(e);
 									}
