@@ -19,7 +19,6 @@ import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -139,19 +138,9 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			
 			// set the directory in which to run the command
 			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-			IFileStore workingDirFileStore;
-			try {
-				if(changeToDirectory != null)
-					workingDirFileStore = fileManager.getResource(changeToDirectory, monitor);
-				else
-					workingDirFileStore = null;
-			} catch (IOException e) {
-				// rethrow as CoreException
-				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error changing directory.", e)); //$NON-NLS-1$ //$NON-NLS-2$
+			if(changeToDirectory != null && fileManager != null) {
+				processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 			}
-			
-			if(workingDirFileStore != null)
-				processBuilder.directory(workingDirFileStore);
 			
 			// combine stdout and stderr
 			// TODO FIXME:  this doesn't currently work for the RSE provider

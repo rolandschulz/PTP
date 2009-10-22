@@ -35,7 +35,6 @@ import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -251,8 +250,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					
 					// set the directory in which to run the command
 					IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-					IFileStore workingDirFileStore = fileManager.getResource(workingDirectory, monitor);
-					processBuilder.directory(workingDirFileStore);
+					if (fileManager != null) {
+						processBuilder.directory(fileManager.getResource(workingDirectory.toString()));
+					}
 					
 					// Before launching give visual cues via the monitor
 					monitor.subTask(MakeMessages.getString("MakeBuilder.Invoking_Command") + command); //$NON-NLS-1$
