@@ -21,6 +21,7 @@ public class Template implements ITemplate, Serializable {
 
 	private String[] fParameterTypes;
 	private String fSignature;
+	protected String[] fTemplateArgs;
 
 	public int getNumberOfTemplateParameters() {
 		return fParameterTypes == null ? 0 : fParameterTypes.length;
@@ -28,6 +29,21 @@ public class Template implements ITemplate, Serializable {
 
 	public String[] getTemplateParameterTypes() {
 		return fParameterTypes;
+	}
+	
+	public String[] getTemplateArguments() {
+		return fTemplateArgs;
+	}
+
+	/**
+	 * Sets the parameter types and template arguments.
+	 */
+	public void setTemplateInfo(String[] templateParameterTypes, String[] args) {
+		if (templateParameterTypes != null)
+			fParameterTypes = templateParameterTypes;
+		if (args != null) {
+			fTemplateArgs= args;
+		}
 	}
 
 	public String getTemplateSignature() throws CModelException {
