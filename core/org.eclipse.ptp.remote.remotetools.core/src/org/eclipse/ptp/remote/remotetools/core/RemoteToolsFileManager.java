@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -32,16 +30,16 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
 	 */
-	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException {
-		return new RemoteToolsFileStore(fConnection.getName(), path.toString());
+	public IFileStore getResource(String path) {
+		return new RemoteToolsFileStore(fConnection.getName(), path);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory()
 	 */
-	public IPath getWorkingDirectory() {
+	public String getWorkingDirectory() {
 		if (fExeMgr == null) {
 			try {
 				fExeMgr = fConnection.createExecutionManager();
@@ -59,14 +57,14 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			} catch (CancelException e) {
 			}
 		}
-		return new Path(cwd);
+		return cwd;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toPath(java.net.URI)
 	 */
-	public IPath toPath(URI uri) {
-		return new Path(uri.getPath());
+	public String toPath(URI uri) {
+		return uri.getPath();
 	}
 
 	/* (non-Javadoc)

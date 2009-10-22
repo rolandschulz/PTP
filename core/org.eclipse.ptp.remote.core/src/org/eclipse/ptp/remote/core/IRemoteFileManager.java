@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IRemoteFileManager {
 	/**
@@ -27,12 +25,10 @@ public interface IRemoteFileManager {
 	 * remote filesystem may require the connection to be open.
 	 * 
 	 * @param path path to resource
-	 * @param monitor progress monitor
 	 * @return the file store representing the remote path
-	 * @throws IOException if the associated resource cannot be located
 	 */
-	public IFileStore getResource(IPath path, IProgressMonitor monitor) throws IOException;
-	
+	public IFileStore getResource(String path);
+
 	/**
 	 * Get the working directory. Relative paths will be resolved using this path.
 	 * 
@@ -41,7 +37,7 @@ public interface IRemoteFileManager {
 	 * 
 	 * @return IPath representing the current working directory
 	 */
-	public IPath getWorkingDirectory();
+	public String getWorkingDirectory();
 	
 	/**
 	 * Convert URI to a remote path. This path is suitable for
@@ -51,7 +47,7 @@ public interface IRemoteFileManager {
 	 * 
 	 * @return IPath representing the remote path
 	 */
-	public IPath toPath(URI uri);
+	public String toPath(URI uri);
 	
 	/**
 	 * Convert remote path to equivalent URI. This URI is suitable
