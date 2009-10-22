@@ -47,6 +47,10 @@ public class MethodTemplate extends Method implements IMethodTemplate {
 	public String[] getTemplateParameterTypes() {
 		return fTemplate.getTemplateParameterTypes();
 	}
+	
+	public String[] getTemplateArguments() {
+		return  fTemplate.getTemplateArguments();
+	}
 
 	public String getTemplateSignature() throws CModelException {
 		return fTemplate.getTemplateSignature();

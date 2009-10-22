@@ -64,6 +64,10 @@ public class StructureTemplate extends Structure implements IStructureTemplate {
 	public String[] getTemplateParameterTypes() {
 		return fTemplate.getTemplateParameterTypes();
 	}
+	
+	public String[] getTemplateArguments() {
+		return  fTemplate.getTemplateArguments();
+	}
 
 	public String getTemplateSignature() throws CModelException {
 		return fTemplate.getTemplateSignature();

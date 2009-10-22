@@ -47,6 +47,10 @@ public class FunctionTemplate extends Function implements IFunctionTemplate {
 	public String[] getTemplateParameterTypes() {
 		return fTemplate.getTemplateParameterTypes();
 	}
+	
+	public String[] getTemplateArguments() {
+		return  fTemplate.getTemplateArguments();
+	}
 
 	public String getTemplateSignature() throws CModelException {
 		return fTemplate.getTemplateSignature();
