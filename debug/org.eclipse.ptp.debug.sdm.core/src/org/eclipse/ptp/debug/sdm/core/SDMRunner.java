@@ -40,7 +40,6 @@ public class SDMRunner extends Job {
 		super(Messages.SDMRunner_0);
 		this.setPriority(Job.LONG);
 		this.setSystem(true);
-		this.setSystem(false);
 		this.rmControl = rmControl;
 		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_4); 
 	}
