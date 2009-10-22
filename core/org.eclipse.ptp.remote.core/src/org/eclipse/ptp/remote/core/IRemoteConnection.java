@@ -32,8 +32,8 @@ public interface IRemoteConnection {
 	 * fwdAddress. 
 	 * 
 	 * @param localPort local port to forward
-	 * @param remoteAddress address of remote machine
-	 * @param remotePort remote port on remote machine
+	 * @param fwdAddress address of remote machine
+	 * @param fwdPort remote port on remote machine
 	 * @throws RemoteConnectionException
 	 */
 	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
