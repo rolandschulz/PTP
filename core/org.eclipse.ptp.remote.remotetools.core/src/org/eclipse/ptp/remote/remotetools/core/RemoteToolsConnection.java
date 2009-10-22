@@ -105,7 +105,36 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (!isOpen()) {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
-		return 0;
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		monitor.beginTask(Messages.RemoteToolsConnection_forwarding, 10);
+		/*
+		 * Start with a different port number, in case we're doing this all on localhost.
+		 */
+		int localPort = fwdPort + 1;
+		
+		/*
+		 * Try to find a free port on the remote machine. This take a while, so
+		 * allow it to be canceled. If we've tried all ports (which could take a
+		 * very long while) then bail out.
+		 */
+		try {
+			while (!monitor.isCanceled()) {
+				try {
+					forwardLocalPort(localPort, fwdAddress, fwdPort);
+				} catch (AddressInUseException e) {
+					if (++localPort == fwdPort) {
+						throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
+					}
+					monitor.worked(1);
+				}
+				return localPort;
+			}
+		} finally {
+			monitor.done();
+		}
+		return -1;
 	}
 	
 	/* (non-Javadoc)
@@ -132,6 +161,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public int forwardRemotePort(String fwdAddress, int fwdPort,
 			IProgressMonitor monitor) throws RemoteConnectionException {
+		if (!isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -145,19 +177,22 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		 * allow it to be canceled. If we've tried all ports (which could take a
 		 * very long while) then bail out.
 		 */
-		while (!monitor.isCanceled()) {
-			try {
-				forwardRemotePort(remotePort, fwdAddress, fwdPort);
-			} catch (AddressInUseException e) {
-				if (++remotePort == fwdPort) {
-					throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
+		try {
+			while (!monitor.isCanceled()) {
+				try {
+					forwardRemotePort(remotePort, fwdAddress, fwdPort);
+				} catch (AddressInUseException e) {
+					if (++remotePort == fwdPort) {
+						throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
+					}
+					monitor.worked(1);
 				}
-				monitor.worked(1);
+				monitor.done();
+				return remotePort;
 			}
+		} finally {
 			monitor.done();
-			return remotePort;
 		}
-		monitor.done();
 		return -1;
 	}
 
