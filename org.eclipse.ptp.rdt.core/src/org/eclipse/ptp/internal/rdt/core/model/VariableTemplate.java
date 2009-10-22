@@ -39,6 +39,10 @@ public class VariableTemplate extends Variable implements ITemplate {
 	public String[] getTemplateParameterTypes() {
 		return fTemplate.getTemplateParameterTypes();
 	}
+	
+	public String[] getTemplateArguments() {
+		return new String[0];
+	}
 
 	public String getTemplateSignature() throws CModelException {
 		return fTemplate.getTemplateSignature();
