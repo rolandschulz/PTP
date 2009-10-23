@@ -54,7 +54,7 @@ public class TranslationUnitTests extends TestCase {
 			}
 		};
 		unit.setLanguage(GPPLanguage.getDefault());
-		unit.setASTContext(scannerInfo );
+		unit.setASTContext(scannerInfo, Collections.<String,String>emptyMap());
 		return unit.getAST();
 	}
 	
