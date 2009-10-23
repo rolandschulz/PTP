@@ -13,8 +13,10 @@ package org.eclipse.ptp.internal.rdt.core;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.internal.core.indexer.IStandaloneScannerInfoProvider;
 import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
+import org.eclipse.ptp.rdt.core.ILanguagePropertyProvider;
 
 /**
  * Provides necessary information to the remote indexer.
@@ -40,12 +42,38 @@ public interface IRemoteIndexerInfoProvider extends IStandaloneScannerInfoProvid
 		KEY_SKIP_MACRO_REFERENCES = "updatePolicy"; //$NON-NLS-1$
 	
 	
+	/**
+	 * Returns true if the given indexer preference is
+	 * enabled.
+	 */
+	boolean checkIndexerPreference(String key);
+	
+	/**
+	 * Returns the language ID for the given file path.
+	 * This tells the remote indexer which parser to use for the file.
+	 */
 	String getLanguageID(String path);
 	
+	/**
+	 * Returns true if the file represented by the given path
+	 * is a header file, returns false if its a source file.
+	 * 
+	 * TODO is this information actually being used?
+	 */
 	boolean isHeaderUnit(String path);
 	
-	Map<String,Boolean> getIndexerPreferences();
-	
+	/**
+	 * Returns a list of files to be parsed up front
+	 * before the project is indexed.
+	 */
 	List<String> getFilesToParseUpFront();
+	
+	/**
+	 * Returns an extensible set of language properties.
+	 * TODO
+	 * @see ILanguagePropertyProvider
+	 * @see ILanguage
+	 */
+	Map<String,String> getLanguageProperties(String languageId);
 }
 

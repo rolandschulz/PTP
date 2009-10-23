@@ -11,15 +11,16 @@
 </sealing>
 </manifest>
 <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-<javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.includebrowser{IIndexIncludeValue.java"/>
+<javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.rdt.core{IConfigurableLanguage.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteIndexerInputAdapter.java"/>
+<javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.includebrowser{IIndexIncludeValue.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{THGraph.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{THGraphNode.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteIndexerInfoProvider.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.contentassist"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{OpenDeclarationResult.java"/>
-<javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{SimpleName.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{IRemoteIndexerInfoProvider.java"/>
+<javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{SimpleName.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.model"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.callhierarchy{CElementSet.java"/>
 <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{IndexQueries.java"/>
