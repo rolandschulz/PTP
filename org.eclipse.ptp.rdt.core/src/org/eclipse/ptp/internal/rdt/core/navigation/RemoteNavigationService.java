@@ -11,14 +11,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.navigation;
 
+import java.util.Map;
+
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.IScannerInfo;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
@@ -36,7 +40,7 @@ public class RemoteNavigationService extends AbstractRemoteService implements IN
 		subsystem.checkProject(unit.getCProject().getProject(), monitor);
 		
 		if(unit instanceof TranslationUnit) {
-			IScannerInfo scannerInfo = null;
+			IScannerInfo scannerInfo;
 			if(unit.getResource() == null) {
 				// external translation unit... get scanner info from the context?
 				scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(unit.getCProject().getProject());
@@ -44,8 +48,19 @@ public class RemoteNavigationService extends AbstractRemoteService implements IN
 			else {
 				scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(unit.getResource());
 			}
-			((TranslationUnit)unit).setASTContext(scannerInfo);
+
+			Map<String,String> langaugeProperties = null;
+			try {
+				String languageId = unit.getLanguage().getId();
+				IProject project = unit.getCProject().getProject();
+				langaugeProperties = RemoteIndexerInfoProviderFactory.getLanguageProperties(languageId, project);
+			} catch(Exception e) {
+				RDTLog.logError(e);
+			}
+			
+			((TranslationUnit)unit).setASTContext(scannerInfo, langaugeProperties);
 		}
+		
 		
 		return subsystem.openDeclaration(scope, unit, selectedText, selectionStart, selectionLength, monitor);
 	}

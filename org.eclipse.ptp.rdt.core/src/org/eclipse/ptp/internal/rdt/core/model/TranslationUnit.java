@@ -52,10 +52,11 @@ import org.eclipse.ptp.internal.rdt.core.miners.StandaloneSavedCodeReaderFactory
 public class TranslationUnit extends Parent implements ITranslationUnit {
 	private static final long serialVersionUID = 1L;
 
-	Class<? extends ILanguage> fLanguageClass;
+	private String fLanguageId;
 	transient protected ILanguage fLanguage;
 
 	private IScannerInfo fScannerInfo;
+	private Map<String,String> fLanguageProperties; // may be null as most languages don't need additional config
 	private boolean isHeaderUnit = false;
 	
 	
@@ -90,6 +91,23 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		setLocationURI(element.getLocationURI());
 		isHeaderUnit = element.isHeaderUnit();
 	}
+	
+	/**
+	 * This method must be called before a Translation Unit object is serialized
+	 * to set up the context so that an AST can be generated on the remote side.
+	 */
+	public void setASTContext(IScannerInfo scannerInfo, Map<String,String> languageProperties) {
+		fScannerInfo = scannerInfo;
+		fLanguageProperties = languageProperties;
+	}
+	
+	public String getLanguageId() {
+		return fLanguageId;
+	}
+	
+	public Map<String,String> getLanguageProperties() {
+		return fLanguageProperties;
+	}
 
 	public IInclude createInclude(String name, boolean isStd,
 			ICElement sibling, IProgressMonitor monitor) throws CModelException {
@@ -118,13 +136,11 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return getAST(null, 0);
 	}
 
-	public void setASTContext(IScannerInfo scannerInfo) {
-		fScannerInfo = scannerInfo;
-	}
+	
 	
 	public void setLanguage(ILanguage language) {
 		fLanguage = language;
-		fLanguageClass = language == null ? null : language.getClass();
+		fLanguageId = language == null ? null : language.getId();
 	}
 	
 	/* -- ST-Origin --
@@ -297,6 +313,11 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	public ILanguage getLanguage() throws CoreException {
 		checkState();
 		return fLanguage;
+	}
+	
+	private void checkState() {
+		if(fLanguage == null)
+			throw new IllegalStateException();
 	}
 
 	public IPath getLocation() {
@@ -488,17 +509,6 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return null;
 	}
 	
-	private void checkState() {
-		if (fLanguage == null && fLanguageClass != null) {
-			try {
-				fLanguage = fLanguageClass.newInstance();
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
 
 	public IWorkingCopy findSharedWorkingCopy() {
 		// TODO Auto-generated method stub
