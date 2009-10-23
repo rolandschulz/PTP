@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="languageProperties" name="Language Property Provider" schema="schema/languageProperties.exsd"/>
    <extension
          id="org.eclipse.ptp.rdt.core.RemoteFastIndexer"
          name="%remoteIndexer.name"

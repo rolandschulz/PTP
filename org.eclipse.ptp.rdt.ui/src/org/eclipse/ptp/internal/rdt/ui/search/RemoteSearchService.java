@@ -80,7 +80,8 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 			ITranslationUnit unit = ModelAdapter.adaptElement(null, element, 0, false);
 			if (unit instanceof TranslationUnit) {
 				TranslationUnit tu = (TranslationUnit) unit;
-				tu.setASTContext(new RemoteScannerInfo());
+				// TODO is it ok to use an empty scanner info?
+				tu.setASTContext(new RemoteScannerInfo(), null);
 			}
 			RemoteSearchTextSelectionQuery query = new RemoteSearchTextSelectionQuery(convertScope(searchScope), unit, selNode.getText(), selNode.getOffset(), selNode.getLength(), limitTo);
 			return new RemoteSearchTextSelectionQueryAdapter(getSubSystem(), indexScope, query);

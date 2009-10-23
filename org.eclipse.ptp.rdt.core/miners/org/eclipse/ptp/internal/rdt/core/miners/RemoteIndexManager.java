@@ -106,32 +106,29 @@ public class RemoteIndexManager {
 		
 		// configure the indexer using the provider
 		indexer.setScannerInfoProvider(provider);
-		indexer.setLanguageMapper(new RemoteLanguageMapper(provider));
+		indexer.setLanguageMapper(new RemoteLanguageMapper(provider, dataStore));
 		indexer.setFilesToParseUpFront(provider.getFilesToParseUpFront().toArray(new String[]{}));
 		
-		Map<String,Boolean> prefs = provider.getIndexerPreferences();
-		
-		if (!prefs.isEmpty()) {
-			if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {
-				indexer.setSkipReferences(PDOMWriter.SKIP_ALL_REFERENCES);
-			}
-			else {
-				int skipReferences = 0;
-				if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_TYPE_REFERENCES))
-					skipReferences |= PDOMWriter.SKIP_TYPE_REFERENCES;
-				if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_MACRO_REFERENCES))
-					skipReferences |= PDOMWriter.SKIP_MACRO_REFERENCES;
-				//if(prefs.get(IRemoteIndexerInfoProvider.KEY_SKIP_IMPLICIT_REFERENCES))
-				//	skipReferences |= PDOMWriter.SKIP_IMPLICIT_REFERENCES;
-				
-				if(skipReferences == 0)
-					indexer.setSkipReferences(PDOMWriter.SKIP_NO_REFERENCES);
-				else
-					indexer.setSkipReferences(skipReferences);
-			}
-			
-			indexer.setIndexAllFiles(prefs.get(IRemoteIndexerInfoProvider.KEY_INDEX_ALL_FILES));
+		if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {
+			indexer.setSkipReferences(PDOMWriter.SKIP_ALL_REFERENCES);
 		}
+		else {
+			int skipReferences = 0;
+			if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_TYPE_REFERENCES))
+				skipReferences |= PDOMWriter.SKIP_TYPE_REFERENCES;
+			if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_MACRO_REFERENCES))
+				skipReferences |= PDOMWriter.SKIP_MACRO_REFERENCES;
+			//if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_IMPLICIT_REFERENCES))
+			//	skipReferences |= PDOMWriter.SKIP_IMPLICIT_REFERENCES;
+			
+			if(skipReferences == 0)
+				indexer.setSkipReferences(PDOMWriter.SKIP_NO_REFERENCES);
+			else
+				indexer.setSkipReferences(skipReferences);
+		}
+		
+		indexer.setIndexAllFiles(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_INDEX_ALL_FILES));
+
 		
 		return indexer;
 	}
