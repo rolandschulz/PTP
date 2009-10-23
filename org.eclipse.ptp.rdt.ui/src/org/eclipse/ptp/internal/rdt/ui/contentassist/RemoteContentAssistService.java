@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.ui.contentassist;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -76,7 +77,14 @@ public class RemoteContentAssistService extends AbstractRemoteService implements
 		
 		if(targetUnit instanceof TranslationUnit) {
 			IScannerInfo scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(unit.getResource());
-			((TranslationUnit)targetUnit).setASTContext(scannerInfo);
+			Map<String,String> langaugeProperties = null;
+			try {
+				String languageId = unit.getLanguage().getId();
+				langaugeProperties = RemoteIndexerInfoProviderFactory.getLanguageProperties(languageId, project);
+			} catch(Exception e) {
+				RDTLog.logError(e);
+			}
+			((TranslationUnit)targetUnit).setASTContext(scannerInfo, langaugeProperties);
 		}
 		
 		return subsystem.computeCompletionProposals(scope, remoteContext , targetUnit);

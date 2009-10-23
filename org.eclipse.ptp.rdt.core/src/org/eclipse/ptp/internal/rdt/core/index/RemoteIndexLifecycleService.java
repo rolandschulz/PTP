@@ -57,18 +57,19 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 
 
 	public void reindex(Scope scope, String indexLocation, List<ICElement> changedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
-		ICIndexSubsystem indexSubsystem = getSubSystem();
-		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(changedElements);
-		
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot workspaceRoot = workspace.getRoot();
-		IProject project = workspaceRoot.getProject(scope.getName());
-		if (project != null && project.isOpen()){
-			indexSubsystem.checkProject(project, new NullProgressMonitor());
-		}
-		
-		// TODO:  handle changedElements
-		indexSubsystem.reindexScope(scope, provider, indexLocation, monitor, task);
+//		ICIndexSubsystem indexSubsystem = getSubSystem();
+//		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(changedElements);
+//		
+//		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+//		IWorkspaceRoot workspaceRoot = workspace.getRoot();
+//		IProject project = workspaceRoot.getProject(scope.getName());
+//		if (project != null && project.isOpen()){
+//			indexSubsystem.checkProject(project, new NullProgressMonitor());
+//		}
+//		
+//		// TODO:  handle changedElements
+//		indexSubsystem.reindexScope(scope, provider, indexLocation, monitor, task);
+		reindex(scope, indexLocation, monitor, task);
 	}
 
 
