@@ -1,0 +1,2 @@
+I If you have this project in your workspace,
+it's probably from an older PTP build, so you can delete it.
