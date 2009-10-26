@@ -338,6 +338,26 @@ public class BuildLaunchUtils {
 		return (eval==0);//true;
 	}
 	
+	public static boolean runVis(List<String> tool, Map<String,String> env, File directory){
+		int eval=-1;
+		try{
+		
+			ProcessBuilder pb = new ProcessBuilder(tool);
+			pb.directory(directory);
+			if(env!=null){
+				pb.environment().putAll(env);
+			}
+			
+			Process p = pb.start();
+		
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+			}
+		return (eval==0);//true;
+	}
+	
 	static class StreamRunner extends Thread
 	{
 		InputStream is;

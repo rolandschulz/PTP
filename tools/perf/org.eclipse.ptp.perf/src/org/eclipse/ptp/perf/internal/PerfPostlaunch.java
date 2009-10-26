@@ -86,7 +86,11 @@ public class PerfPostlaunch extends PerfStep implements IPerformanceLaunchConfig
 						}
 						if(runTool!=null)
 						{
-							BuildLaunchUtils.runTool(runTool, null, projectLoc,tool.analysisCommands[i].outToFile);
+							if(tool.analysisCommands[i].isVisualizer)
+								BuildLaunchUtils.runVis(runTool, null, projectLoc);
+							else{
+								BuildLaunchUtils.runTool(runTool, null, projectLoc,tool.analysisCommands[i].outToFile);
+							}
 						}
 						else
 						{

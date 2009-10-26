@@ -265,9 +265,6 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
 		{
 			outputLocation=thisProject.getFile(newname).getLocation().toOSString();
 		}
-        
-		
-		
 		return true;
 	}
 	
@@ -320,9 +317,7 @@ public class PerfBuilder extends PerfStep implements IPerformanceLaunchConfigura
         	}
         	newname+="_"+nameMod;
         }
-        	
-
-        
+                
         progPath=newname+File.separator+binary;
 		//System.out.println(progPath);
 		

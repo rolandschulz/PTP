@@ -305,6 +305,8 @@ public class ToolParser extends DefaultHandler{
 					currentTool.groupApp.put(currentApp.toolGroup, currentApp.toolCommand);
 				if(inExecution)
 					currentTool.prependExecution=true;
+				
+				currentApp.isVisualizer=getBooleanAttribute("visualizer",false,atts);
 			}
 		}
 		else if(name.equals(GLOBAL)){

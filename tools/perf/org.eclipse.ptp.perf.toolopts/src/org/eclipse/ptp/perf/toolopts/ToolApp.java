@@ -42,6 +42,11 @@ public class ToolApp {
 	public String toolCommand=null;
 	
 	/**
+	 * If true the command is launched and output is not handled.  Otherwise output is manged for printing on the console.
+	 */
+	public boolean isVisualizer=false;
+	
+	/**
 	 * The array of string arguments assoicated with this tool
 	 */
 	//public ToolArgument[] arguments=null;
