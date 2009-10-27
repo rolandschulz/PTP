@@ -22,6 +22,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceCategory;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -38,6 +39,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -45,6 +47,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -72,39 +75,84 @@ public class NewServiceModelWidget extends Composite {
 	
 	private Map<String,IServiceProvider> providerMap = new HashMap<String,IServiceProvider>();
 	
+	private final ListenerList fSelectionListeners = new ListenerList();
+	
+	private static Comparator<IServiceCategory> CATEGORY_COMPARATOR = new Comparator<IServiceCategory>() {
+		public int compare(IServiceCategory x, IServiceCategory y) {
+			return x.getName().compareTo(y.getName());
+		}
+	};
+	
+	private static Comparator<IService> SERVICE_COMPARATOR = new Comparator<IService>() {
+		public int compare(IService x, IService y) {
+			return comparePriorities(x.getPriority(), y.getPriority(), x.getName(), y.getName());
+		}
+	};	
+
+	private static Comparator<IServiceProviderDescriptor> PROVIDER_COMPARATOR = new Comparator<IServiceProviderDescriptor>() {
+		public int compare(IServiceProviderDescriptor x, IServiceProviderDescriptor y) {
+			return comparePriorities(x.getPriority(), y.getPriority(), x.getName(), y.getName());
+		}
+	};
+	
+	private static int comparePriorities(Integer p1, Integer p2, String name1, String name2) {
+		// sort by priority but fall back on sorting alphabetically
+		if(p1 == null && p2 == null)
+			return name1.compareTo(name2);
+		if(p1 == null)
+			return -1;
+		if(p2 == null)
+			return 1;
+		if (p1.equals(p2)) {
+			return name1.compareTo(name2);
+		}
+		return p1.compareTo(p2);
+	}
+	
+	private static boolean filterOut(Set<String> serviceIds, Set<String> filterIds) {
+		if(serviceIds.isEmpty() || filterIds.isEmpty())
+			return false;
+
+		for(String id : serviceIds) {
+			if(filterIds.contains(id)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	public NewServiceModelWidget(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new GridLayout(2, false));
+		
+		GridLayout bodyLayout = new GridLayout(2, false);
+		bodyLayout.marginHeight = 0;
+		bodyLayout.marginWidth = 0;
+		setLayout(bodyLayout);
 
 		Label label = new Label(this, SWT.NONE);
-		label.setLayoutData(new GridData());
+		GridData labelData = new GridData(SWT.FILL, SWT.NONE, true, false);
+		labelData.horizontalSpan = 2;
+		label.setLayoutData(labelData);
 		label.setText(Messages.NewServiceModelWidget_0);
 		
-		Label filler = new Label(this, SWT.NONE); 
-		filler.setLayoutData(new GridData());
-		filler.setText(""); //$NON-NLS-1$
-		
-		Composite left = new Composite(this, SWT.NONE);
-		GridData data = new GridData(GridData.FILL_VERTICAL);
-		data.widthHint = 200;
-		left.setLayoutData(data);
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		left.setLayout(layout);
-		
-		servicesTree = new Tree(left, SWT.BORDER  | SWT.SINGLE);
-		servicesTree.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
+		servicesTree = new Tree(this, SWT.BORDER  | SWT.SINGLE);
+		GridData servicesTreeData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		servicesTreeData.minimumWidth = 200;
+		servicesTree.setLayoutData(servicesTreeData);
 		servicesTree.addSelectionListener(new SelectionAdapter() {
 			@Override public void widgetSelected(SelectionEvent e) {
-				displayService(servicesTree.getSelection()[0]);
+				TreeItem[] items = servicesTree.getSelection();
+				TreeItem item = null;
+				if (items.length > 0) {
+					item = items[0];
+				}
+				displayService(item);
+				notifySelection(e);
 			}
 		});
 		
 		providerComposite = new Composite(this, SWT.NONE);
-		providerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		providerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		providerComposite.setLayout(new GridLayout(1, false));
 		
 		enabledCheckbox = new Button(providerComposite, SWT.CHECK);
@@ -124,9 +172,9 @@ public class NewServiceModelWidget extends Composite {
 		provider.setEnabled(false);
 		
 		providerCombo = new Combo(providerComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		data = new GridData(GridData.FILL_HORIZONTAL);
-		data.widthHint = 250;
-		providerCombo.setLayoutData(data);
+		GridData providerComboData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		providerComboData.widthHint = 200;
+		providerCombo.setLayoutData(providerComboData);
 		providerCombo.addSelectionListener(new SelectionAdapter() {
 			@Override public void widgetSelected(SelectionEvent e) {
 				IServiceProviderDescriptor[] descriptors = (IServiceProviderDescriptor[]) providerCombo.getData();
@@ -139,9 +187,9 @@ public class NewServiceModelWidget extends Composite {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		configurationComposite = new Composite(providerComposite, SWT.NONE);
-		data = new GridData(GridData.FILL_BOTH);
-		data.horizontalSpan = 2;
-		configurationComposite.setLayoutData(data);
+		GridData configurationCompositeData = new GridData(GridData.FILL_BOTH);
+		configurationCompositeData.horizontalSpan = 2;
+		configurationComposite.setLayoutData(configurationCompositeData);
 		stackLayout = new StackLayout();
 		stackLayout.marginHeight = 0;
 		stackLayout.marginWidth = 0;
@@ -161,8 +209,59 @@ public class NewServiceModelWidget extends Composite {
 		});
 	}
 	
+	/**
+	 * Adds the listener to the collection of listeners who will
+	 * be notified when the users selects a service configuration
+	 * </p>
+	 * @param listener the listener that will be notified of the selection
+	 */
+	public void addSelectionListener(SelectionListener listener) {
+		fSelectionListeners.add(listener);
+	}
+
+	public void applyChangesToConfiguration() {
+		if(configuration == null)
+			return;
+		
+		for(TreeItem categoryTreeItem : servicesTree.getItems()) {
+			for(TreeItem serviceTreeItem : categoryTreeItem.getItems()) {
+				IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
+				boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
+				
+				if(disabled) {
+					configuration.disable(service);
+				}
+				else {
+					// TODO check if the state of the new service provider is actually different from the current one
+					// no need to fire bogus change events
+					IServiceProvider serviceProvider = (IServiceProvider) serviceTreeItem.getData(PROVIDER_KEY);
+					if(serviceProvider != null)
+						configuration.setServiceProvider(service, serviceProvider);
+				}
+			}
+		}
+	}
 	
+	/**
+	 * Returns the service configuration object that is being displayed
+	 * by this widget. In order for the changes made by the user to be 
+	 * reflected in the configuration the applyChangesToConfiguration() method
+	 * must be called first.
+	 */
+	public IServiceConfiguration getServiceConfiguration() {
+		return configuration;
+	}
 	
+	/**
+	 * Removes the listener from the collection of listeners who will
+	 * be notified when a service configuration is selected by the user.
+	 *
+	 * @param listener the listener which will no longer be notified
+	 */
+	public void removeSelectionListener(SelectionListener listener) {
+		fSelectionListeners.remove(listener);
+	}
+
 	/**
 	 * Causes the tree to display all the services that are available
 	 * in the system. Services that are not part of the given service
@@ -175,8 +274,7 @@ public class NewServiceModelWidget extends Composite {
 	public void setServiceConfiguration(IServiceConfiguration conf) {
 		setServiceConfiguration(conf, null);
 	}
-
-
+	
 	/**
 	 * Causes the tree to display all the services that are available
 	 * in the system. Services that are not part of the given service
@@ -197,17 +295,67 @@ public class NewServiceModelWidget extends Composite {
 		displayService(null);
 	}
 	
-	
-	/**
-	 * Returns the service configuration object that is being displayed
-	 * by this widget. In order for the changes made by the user to be 
-	 * reflected in the configuration the applyChangesToConfiguration() method
-	 * must be called first.
-	 */
-	public IServiceConfiguration getServiceConfiguration() {
-		return configuration;
+	private TreeItem createTreeCategory(Tree parent, IServiceCategory category) {
+		TreeItem item = new TreeItem(servicesTree, SWT.NONE);
+		item.setText(category == null ? Messages.NewServiceModelWidget_3 : category.getName());
+		item.setImage(configIcon);
+		return item;
 	}
 	
+	private void createTreeContent(Set<String> filterNatureIds) {
+		servicesTree.removeAll();
+		if(configuration == null)
+			return;
+		
+		if(filterNatureIds == null)
+			filterNatureIds = Collections.emptySet();
+		
+		SortedSet<IService> defaultCategoryServices = new TreeSet<IService>(SERVICE_COMPARATOR);
+		SortedMap<IServiceCategory, SortedSet<IService>> categoryServices = new TreeMap<IServiceCategory, SortedSet<IService>>(CATEGORY_COMPARATOR);
+		
+		for(IService service : ServiceModelManager.getInstance().getServices()) {
+			if(filterOut(service.getNatures(), filterNatureIds))
+				continue;
+			
+			IServiceCategory category = service.getCategory();
+			if(category == null) {
+				defaultCategoryServices.add(service);
+			}
+			else {
+				SortedSet<IService> services = categoryServices.get(category);
+				if(services == null) {
+					services = new TreeSet<IService>(SERVICE_COMPARATOR);
+					categoryServices.put(category, services);
+				}
+				services.add(service);
+			}
+		}
+		
+		for(Map.Entry<IServiceCategory,SortedSet<IService>> entry : categoryServices.entrySet()) {
+			TreeItem parent = createTreeCategory(servicesTree, entry.getKey());
+			for(IService service : entry.getValue()) {
+				createTreeService(parent, service);
+			}
+			parent.setExpanded(true);
+		}
+		
+		if(!defaultCategoryServices.isEmpty()) {
+			TreeItem parent = createTreeCategory(servicesTree, null);
+			for(IService service : defaultCategoryServices) {
+				createTreeService(parent, service);
+			}
+			parent.setExpanded(true);
+		}
+	}
+	
+	private void createTreeService(TreeItem parent, IService service) {
+		boolean disabled = configuration.isDisabled(service);
+		TreeItem child = new TreeItem(parent, SWT.NONE);
+		child.setText(service.getName());
+		child.setData(SERVICE_KEY, service);
+		child.setData(DISABLED_KEY, disabled);
+		child.setImage(disabled ? disabledIcon : enabledIcon);
+	}
 	
 	private void displayService(TreeItem serviceTreeItem) {
 		// Each tree item represents a service
@@ -266,6 +414,47 @@ public class NewServiceModelWidget extends Composite {
 		}
 	}
 	
+	/**
+	 * Returns the active provider if there is one or returns
+	 * one of the former providers if possible.
+	 */
+	private IServiceProvider getExistingProvider(String providerId, IService service) {
+		IServiceProvider setProvider = configuration.getServiceProvider(service);
+		if(setProvider != null && providerId.equals(setProvider.getId()))
+			return setProvider;
+		
+		if(configuration instanceof ServiceConfiguration) {
+			for(IServiceProvider formerProvider : ((ServiceConfiguration)configuration).getFormerServiceProviders(service)) {
+				if(providerId.equals(formerProvider.getId())) {
+					return formerProvider;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Notify all listeners of the selection.
+	 * 
+	 * @param e event that was generated by the selection
+	 */
+	private void notifySelection(SelectionEvent e) {
+		Event newEvent = new Event();
+		newEvent.item = e.item;
+		newEvent.x = e.x;
+		newEvent.y = e.y;
+		newEvent.width = e.width;
+		newEvent.height = e.height;
+		newEvent.detail = e.detail;
+		newEvent.stateMask = e.stateMask;
+		newEvent.text = e.text;
+		newEvent.doit = e.doit;
+		newEvent.widget = this;
+		SelectionEvent event = new SelectionEvent(newEvent);
+		for (Object listener : fSelectionListeners.getListeners()) {
+			((SelectionListener) listener).widgetSelected(event);
+		}
+	}
 	
 	private void selectProvider(IServiceProviderDescriptor descriptor) {
 		TreeItem serviceTreeItem = servicesTree.getSelection()[0];
@@ -277,7 +466,7 @@ public class NewServiceModelWidget extends Composite {
 			IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
 			IServiceProvider existingProvider = getExistingProvider(newProvider.getId(), service);
 			if(existingProvider != null) {
-				for(String key : existingProvider.keySet()) {
+				for(String key : existingProvider.getProperties().keySet()) {
 					newProvider.putString(key, existingProvider.getString(key, null));
 				}
 			}
@@ -301,165 +490,11 @@ public class NewServiceModelWidget extends Composite {
 		stackLayout.topControl = comp;
 		configurationComposite.layout();
 	}
-
-	
-	/**
-	 * Returns the active provider if there is one or returns
-	 * one of the former providers if possible.
-	 */
-	private IServiceProvider getExistingProvider(String providerId, IService service) {
-		IServiceProvider setProvider = configuration.getServiceProvider(service);
-		if(setProvider != null && providerId.equals(setProvider.getId()))
-			return setProvider;
-		
-		if(configuration instanceof ServiceConfiguration) {
-			for(IServiceProvider formerProvider : ((ServiceConfiguration)configuration).getFormerServiceProviders(service)) {
-				if(providerId.equals(formerProvider.getId())) {
-					return formerProvider;
-				}
-			}
-		}
-		return null;
-	}
-	
 	
 	protected void changeServiceState(boolean disabled) {
 		TreeItem serviceTreeItem = servicesTree.getSelection()[0];
 		serviceTreeItem.setData(DISABLED_KEY, disabled);		
 		serviceTreeItem.setImage(disabled ? disabledIcon : enabledIcon);
 		displayService(serviceTreeItem);
-	}
-	
-	
-	private void createTreeContent(Set<String> filterNatureIds) {
-		servicesTree.removeAll();
-		if(configuration == null)
-			return;
-		
-		if(filterNatureIds == null)
-			filterNatureIds = Collections.emptySet();
-		
-		SortedSet<IService> defaultCategoryServices = new TreeSet<IService>(SERVICE_COMPARATOR);
-		SortedMap<IServiceCategory, SortedSet<IService>> categoryServices = new TreeMap<IServiceCategory, SortedSet<IService>>(CATEGORY_COMPARATOR);
-		
-		for(IService service : ServiceModelManager.getInstance().getServices()) {
-			if(filterOut(service.getNatures(), filterNatureIds))
-				continue;
-			
-			IServiceCategory category = service.getCategory();
-			if(category == null) {
-				defaultCategoryServices.add(service);
-			}
-			else {
-				SortedSet<IService> services = categoryServices.get(category);
-				if(services == null) {
-					services = new TreeSet<IService>(SERVICE_COMPARATOR);
-					categoryServices.put(category, services);
-				}
-				services.add(service);
-			}
-		}
-		
-		for(Map.Entry<IServiceCategory,SortedSet<IService>> entry : categoryServices.entrySet()) {
-			TreeItem parent = createTreeCategory(servicesTree, entry.getKey());
-			for(IService service : entry.getValue()) {
-				createTreeService(parent, service);
-			}
-			parent.setExpanded(true);
-		}
-		
-		if(!defaultCategoryServices.isEmpty()) {
-			TreeItem parent = createTreeCategory(servicesTree, null);
-			for(IService service : defaultCategoryServices) {
-				createTreeService(parent, service);
-			}
-			parent.setExpanded(true);
-		}
-	}
-	
-	private static boolean filterOut(Set<String> serviceIds, Set<String> filterIds) {
-		if(serviceIds.isEmpty() || filterIds.isEmpty())
-			return false;
-
-		for(String id : serviceIds) {
-			if(filterIds.contains(id)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	private TreeItem createTreeCategory(Tree parent, IServiceCategory category) {
-		TreeItem item = new TreeItem(servicesTree, SWT.NONE);
-		item.setText(category == null ? Messages.NewServiceModelWidget_3 : category.getName());
-		item.setImage(configIcon);
-		return item;
-	}
-	
-	private void createTreeService(TreeItem parent, IService service) {
-		boolean disabled = configuration.isDisabled(service);
-		TreeItem child = new TreeItem(parent, SWT.NONE);
-		child.setText(service.getName());
-		child.setData(SERVICE_KEY, service);
-		child.setData(DISABLED_KEY, disabled);
-		child.setImage(disabled ? disabledIcon : enabledIcon);
-	}
-	
-	
-	public void applyChangesToConfiguration() {
-		if(configuration == null)
-			return;
-		
-		for(TreeItem categoryTreeItem : servicesTree.getItems()) {
-			for(TreeItem serviceTreeItem : categoryTreeItem.getItems()) {
-				IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
-				boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
-				
-				if(disabled) {
-					configuration.disable(service);
-				}
-				else {
-					// TODO check if the state of the new service provider is actually different from the current one
-					// no need to fire bogus change events
-					IServiceProvider serviceProvider = (IServiceProvider) serviceTreeItem.getData(PROVIDER_KEY);
-					if(serviceProvider != null)
-						configuration.setServiceProvider(service, serviceProvider);
-				}
-			}
-		}
-	}
-	
-	
-	
-	private static Comparator<IServiceCategory> CATEGORY_COMPARATOR = new Comparator<IServiceCategory>() {
-		public int compare(IServiceCategory x, IServiceCategory y) {
-			return x.getName().compareTo(y.getName());
-		}
-	};
-	
-	private static Comparator<IService> SERVICE_COMPARATOR = new Comparator<IService>() {
-		public int compare(IService x, IService y) {
-			return comparePriorities(x.getPriority(), y.getPriority(), x.getName(), y.getName());
-		}
-	};
-	
-	private static Comparator<IServiceProviderDescriptor> PROVIDER_COMPARATOR = new Comparator<IServiceProviderDescriptor>() {
-		public int compare(IServiceProviderDescriptor x, IServiceProviderDescriptor y) {
-			return comparePriorities(x.getPriority(), y.getPriority(), x.getName(), y.getName());
-		}
-	};
-	
-	private static int comparePriorities(Integer p1, Integer p2, String name1, String name2) {
-		// sort by priority but fall back on sorting alphabetically
-		if(p1 == null && p2 == null)
-			return name1.compareTo(name2);
-		if(p1 == null)
-			return -1;
-		if(p2 == null)
-			return 1;
-		if (p1.equals(p2)) {
-			return name1.compareTo(name2);
-		}
-		return p1.compareTo(p2);
 	}
 }
