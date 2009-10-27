@@ -59,11 +59,13 @@ sh build.sh $*
 # Build RDT server packages
 cd results/plugins
 
-# Check out rdt.core.remotejars, rdt.core.stubs and cdt.core for source
+# Check out rdt.core.remotejars, rdt.core.stubs, cdt.core, cdt.core.lrparser, cdt.core.lrparser.xlc for source
 export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
 cvs co -r $TAG -d org.eclipse.ptp.rdt.core.remotejars org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.remotejars
 cvs co -r $TAG -d org.eclipse.ptp.rdt.core.stubs org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs
 cvs co -r $CDT_TAG -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
+cvs co -r $CDT_TAG -d org.eclipse.cdt.core.lrparser org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser
+cvs co -r $CDT_TAG -d org.eclipse.cdt.core.lrparser.xlc org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc
 
 cd org.eclipse.ptp.rdt.core.remotejars
 

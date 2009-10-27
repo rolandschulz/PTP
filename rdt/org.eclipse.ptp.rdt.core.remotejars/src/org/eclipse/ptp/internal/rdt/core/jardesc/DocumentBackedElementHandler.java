@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 
 	private Element fFiles;
 	private Element fProperties;
+	private Element fGrammarTemplate;
 	private Document fDocument;
 	private String fBasePath;
 
@@ -49,9 +50,11 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 		
 		fFiles = fDocument.createElement("files"); //$NON-NLS-1$
 		fProperties = fDocument.createElement("properties"); //$NON-NLS-1$
+		fGrammarTemplate = fDocument.createElement("g"); //$NON-NLS-1$
 		
 		root.appendChild(fFiles);
 		root.appendChild(fProperties);
+		root.appendChild(fGrammarTemplate);
 	}
 	
 	/**
@@ -76,7 +79,9 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 		String basePath = fBasePath + "/" + folder + "/" + path;  //$NON-NLS-1$//$NON-NLS-2$
 		for (String name : collectTopLevelClasses(basePath, fileName)) {
 			Element element;
-			if (fileName.endsWith(".properties"))
+			if (fileName.endsWith(".g"))
+				element= fDocument.createElement("grammar_file"); //$NON-NLS-1$
+			else if (fileName.endsWith(".properties"))
 				element = fDocument.createElement("properties_file"); //$NON-NLS-1$
 			else
 				element = fDocument.createElement("file"); //$NON-NLS-1$
@@ -92,7 +97,9 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 			
 			element.setTextContent(className.toString());
 			
-			if (fileName.endsWith(".properties"))
+			if (fileName.endsWith(".g"))
+				fGrammarTemplate.appendChild(element);
+			else if (fileName.endsWith(".properties"))
 				fProperties.appendChild(element);
 			else
 				fFiles.appendChild(element);			
@@ -125,6 +132,8 @@ public abstract class DocumentBackedElementHandler implements IElementHandler {
 			} else if (file.getName().endsWith(".java")) { //$NON-NLS-1$
 				addFile(project, path, file.getName(), sourceFolder);
 			} else if (file.getName().endsWith(".properties")) { //$NON-NLS-1$
+				addFile(project, path, file.getName(), sourceFolder);
+			} else if (file.getName().endsWith(".g")) { //$NON-NLS-1$
 				addFile(project, path, file.getName(), sourceFolder);
 			}
 		}
