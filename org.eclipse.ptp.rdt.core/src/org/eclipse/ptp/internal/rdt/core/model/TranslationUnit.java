@@ -33,6 +33,7 @@ import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IUsing;
 import org.eclipse.cdt.core.model.IWorkingCopy;
+import org.eclipse.cdt.core.model.LanguageManager;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.DefaultLogService;
 import org.eclipse.cdt.core.parser.IParserLogService;
@@ -46,8 +47,13 @@ import org.eclipse.cdt.internal.core.pdom.indexer.ProjectIndexerIncludeResolutio
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInputAdapter;
+import org.eclipse.ptp.internal.rdt.core.RemoteUtil;
+import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
+import org.eclipse.ptp.internal.rdt.core.miners.RemoteLanguageMapper;
 import org.eclipse.ptp.internal.rdt.core.miners.StandaloneSavedCodeReaderFactory;
+import org.eclipse.ptp.rdt.core.IConfigurableLanguage;
 
 public class TranslationUnit extends Parent implements ITranslationUnit {
 	private static final long serialVersionUID = 1L;
@@ -316,8 +322,22 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	}
 	
 	private void checkState() {
-		if(fLanguage == null)
-			throw new IllegalStateException();
+		if(fLanguage == null && fLanguageId != null) {
+			if(RemoteUtil.isRemote()) { // if we are running in the miner
+				DataStore dataStore = null;
+				if(Thread.currentThread() instanceof CDTMiner) {
+					dataStore = ((CDTMiner)Thread.currentThread())._dataStore;
+				}
+				
+				fLanguage = RemoteLanguageMapper.getLanguageById(fLanguageId, fLanguageProperties, dataStore); 
+				if(fLanguageProperties != null && fLanguage instanceof IConfigurableLanguage) {
+					((IConfigurableLanguage)fLanguage).setProperties(fLanguageProperties);
+				}
+			}
+			else {
+				fLanguage = LanguageManager.getInstance().getLanguage(fLanguageId);
+			}
+		}
 	}
 
 	public IPath getLocation() {
