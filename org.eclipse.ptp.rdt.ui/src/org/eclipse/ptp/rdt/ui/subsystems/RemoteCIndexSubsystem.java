@@ -12,7 +12,6 @@ package org.eclipse.ptp.rdt.ui.subsystems;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -276,7 +275,17 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 				} catch (Exception e) {
 					RDTLog.logError(e);	
 				}
-
+				
+				if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
+					for (int i = 0; i < status.getNestedSize(); i ++ ){
+						DataElement element = status.get(i);
+				    	if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
+				    		RDTLog.logError(Messages.getString("RemoteCIndexSubsystem.11", scope.getName())); //$NON-NLS-1$
+				    		break;				    
+				    	}
+					}
+				}
+				
 				monitor.done();
             }
 	    }
@@ -387,6 +396,16 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 				} catch (Exception e) {
 					RDTLog.logError(e);	
 				}
+				
+				if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
+					for (int i = 0; i < status.getNestedSize(); i ++ ){
+						DataElement element = status.get(i);
+				    	if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
+				    		RDTLog.logError(Messages.getString("RemoteCIndexSubsystem.11", scope.getName())); //$NON-NLS-1$
+				    		break;				    
+				    	}
+					}
+				}
 
 				monitor.done();
 			}
@@ -397,23 +416,34 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 
 	private RemoteIndexerProgress getIndexerProgress(DataElement status) {
 		int num = status.getNestedSize();
-    	if (num > 0) {    		
-			DataElement element = status.get(num-1);
-    		String data = element.getName();
-    		try
-    		{
-    			Object result = Serializer.deserialize(data);
-    			if (result == null || !(result instanceof RemoteIndexerProgress))
-    			{
-    				return null;
+    	if (num > 0) {    	
+    		boolean foundProgressInfo = false;
+    		int counter = 1;
+    		DataElement element = null;
+    		while (!foundProgressInfo && counter <= num){
+    			element = status.get(num-counter);
+    			if(element != null && CDTMiner.T_INDEXER_PROGRESS_INFO.equals(element.getType())) {
+    				foundProgressInfo = true;
     			}
-    			RemoteIndexerProgress info = (RemoteIndexerProgress) result;
-    			return info;
-    		} catch (IOException e) {
-    			RDTLog.logError(e);	
-    		} catch (ClassNotFoundException e) {
-    			RDTLog.logError(e);	
-    		}    		
+    			counter++;
+    		}			
+			if(element != null && CDTMiner.T_INDEXER_PROGRESS_INFO.equals(element.getType())) {
+	    		String data = element.getName();
+	    		try
+	    		{
+	    			Object result = Serializer.deserialize(data);
+	    			if (result == null || !(result instanceof RemoteIndexerProgress))
+	    			{
+	    				return null;
+	    			}
+	    			RemoteIndexerProgress info = (RemoteIndexerProgress) result;
+	    			return info;
+	    		} catch (IOException e) {
+	    			RDTLog.logError(e);	
+	    		} catch (ClassNotFoundException e) {
+	    			RDTLog.logError(e);	
+	    		}    		
+			}
     	}
     	return null;
 	}
