@@ -36,7 +36,19 @@
 	
 	<property name="cdtCoreVersion" value="5.1.1.200909110608"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+	
+	<property name="cdtLRParserVersion" value="5.1.0.200909110608"/>
+	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
+	
+	<property name="cdtLRParserXLCVersion" value="1.0.0.200909110608"/>
+	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
+	
+	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
+	<property name="rdtXLCProperties" value="languages.properties"/>
 
+	<property name="lpgRuntimeVersion" value="1.1.0.v200803061910"/>
+	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
+	
 	<property name="coreRuntimeVersion" value="3.5.0.v20090525"/>
 	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
 	
@@ -72,6 +84,14 @@
 			<property name="basedir" value="${basedir}/.."/>
 			<property name="jarfile" value="${basedir}/stubs.jar"/>
 		</ant>
+		<ant antfile="${basedir}/build.lrparser.xml">
+			<property name="basedir" value="${basedir}/.."/>
+			<property name="jarfile" value="${basedir}/lrparser.jar"/>
+		</ant>
+		<ant antfile="${basedir}/build.xlcparser.xml">
+			<property name="basedir" value="${basedir}/.."/>
+			<property name="jarfile" value="${basedir}/xlcparser.jar"/>
+		</ant>
 	
 		<antcall target="clean.except.jars"></antcall>
 
@@ -82,13 +102,19 @@
 			<param name="bindir" expression="@dot"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/cdtmodel.files.xml" out="${basedir}/build.cdtmodel.xml">
-			<param name="bindir" expression="build"/>
+			<param name="bindir" expression="@dot"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/cdtparser.files.xml" out="${basedir}/build.cdtparser.xml">
-			<param name="bindir" expression="build"/>
+			<param name="bindir" expression="@dot"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/stubs.files.xml" out="${basedir}/build.stubs.xml">
-			<param name="bindir" expression="build"/>
+			<param name="bindir" expression="@dot"/>
+		</xslt>
+		<xslt style="${stylesheet}" in="${basedir}/lrparser.files.xml" out="${basedir}/build.lrparser.xml">
+			<param name="bindir" expression="@dot"/>
+		</xslt>
+		<xslt style="${stylesheet}" in="${basedir}/xlcparser.files.xml" out="${basedir}/build.xlcparser.xml">
+			<param name="bindir" expression="@dot"/>
 		</xslt>
 	</target>
 	
@@ -100,9 +126,9 @@
 				source="1.5"
 				target="1.5"
 	  	/>		
-		<mkdir dir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/build"/>
+		<mkdir dir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/@dot"/>
 		<javac srcdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/src"
-				destdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/build"
+				destdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/@dot"
 				source="1.5"
 				target="1.5"
 	  	/>
@@ -111,11 +137,25 @@
 	<target name="get.cdt.bin">
 		<!--Get cdt.core from PTP build-->
 		<unzip src="${basedir}/../../eclipse/plugins/${cdtCoreJar}"
-			dest="${basedir}/../org.eclipse.cdt.core/build"
+			dest="${basedir}/../org.eclipse.cdt.core/@dot"
 		/>
 	</target>
 	
-	<target name="generate.file.lists" depends="compile.all, get.cdt.bin">
+	<target name="get.cdt.core.lrparser.bin">
+		<!--Get cdt.core.lrparser from PTP build-->
+		<unzip src="${basedir}/../../eclipse/plugins/${cdtLRParserJar}"
+			dest="${basedir}/../org.eclipse.cdt.core.lrparser/@dot"
+		/>
+	</target>
+	
+	<target name="get.cdt.core.lrparser.xlc.bin">
+		<!--Get cdt.core.lrparser.xlc from PTP build-->
+		<unzip src="${basedir}/../../eclipse/plugins/${cdtLRParserXLCJar}"
+			dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/@dot"
+		/>
+	</target>
+	
+	<target name="generate.file.lists" depends="compile.all, get.cdt.bin, get.cdt.core.lrparser.bin, get.cdt.core.lrparser.xlc.bin">
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
@@ -148,6 +188,22 @@
 			<arg value="stubs.files.xml"/>
 			<arg value=".."/>
 		</java>
+		<java
+			fork="true"
+			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
+			classpath="${basedir}/build">
+			<arg value="lrparser.jardesc"/>
+			<arg value="lrparser.files.xml"/>
+			<arg value=".."/>
+		</java>
+		<java
+			fork="true"
+			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
+			classpath="${basedir}/build">
+			<arg value="xlcparser.jardesc"/>
+			<arg value="xlcparser.files.xml"/>
+			<arg value=".."/>
+		</java>
 	</target>
 	
 	<target name="clean" depends="clean.except.jars">
@@ -156,6 +212,8 @@
 			<include name="cdtmodel.jar"/>
 			<include name="cdtparser.jar"/>
 			<include name="stubs.jar"/>
+			<include name="lrparser.jar"/>
+			<include name="xlcparser.jar"/>
 			<include name="${serverBaseName}-linux-*.tar"/>
 			<include name="${serverBaseName}-macosx-*.tar"/>
 			<include name="${serverBaseName}-unix-*.tar"/>
@@ -169,11 +227,16 @@
 			<include name="build.cdtmodel.xml"/>
 			<include name="build.cdtparser.xml"/>
 			<include name="build.stubs.xml"/>
+			<include name="build.lrparser.xml"/>
+			<include name="build.xlcparser.xml"/>
 			<include name="cdtminer.files.xml"/>
 			<include name="cdtmodel.files.xml"/>
 			<include name="cdtparser.files.xml"/>
 			<include name="stubs.files.xml"/>
+			<include name="lrparser.files.xml"/>
+			<include name="xlcparser.files.xml"/>
 		</delete>
+		
 		<delete dir="${remoteServerTempDir}"/>
 		<delete dir="${platformTempDir}"/>
 	</target>
@@ -219,7 +282,7 @@
 	</target>
 	
 	<target name="prepare.script.linux">
-		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar"/>
+		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/${lpgRuntimeJar}"/>
 		<replace token=":$oldClasspath" value=":${rdtClassPath}:$oldClasspath" file="${remoteServerTempDir}/server.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.pl"/>
 		
@@ -230,25 +293,25 @@
 	</target>
 	
 	<target name="prepare.script.unix">
-		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar"/>
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar:lrparser.jar:xlcparser.jar:${lpgRuntimeJar}"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$ENV{CLASSPATH}=&quot;$plugins_dir:$plugins_dir/dstore_extra_server.jar:$plugins_dir/dstore_core.jar:$plugins_dir/dstore_miners.jar:$plugins_dir/clientserver.jar"/>
-		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar"/>				
+		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/${lpgRuntimeJar}"/>				
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
 	
 	<target name="prepare.script.macosx">
-		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar"/>
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar:lrparser.jar:xlcparser.jar:${lpgRuntimeJar}"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$classpath = &quot;$plugin_dir"/>
-		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar"/>				
+		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/${lpgRuntimeJar}"/>				
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
@@ -263,7 +326,7 @@
 		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.rdt.core.miners.CDTMiner</concat>
 		
 		<!-- Add RDT JARs to the server script's classpath -->
-		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\${icuBaseJar};%ECLIPSEDIR%\stubs.jar"/>
+		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\${icuBaseJar};%ECLIPSEDIR%\stubs.jar;%ECLIPSEDIR%\lrparser.jar;%ECLIPSEDIR%\xlcparser.jar;%ECLIPSEDIR%\${lpgRuntimeJar}"/>
 		<replace token=";%CLASSPATH%" value=";${rdtClassPath};%CLASSPATH%" file="${remoteServerTempDir}/setup.bat"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.bat"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.bat"/>
@@ -277,9 +340,14 @@
 				<include name="cdtmodel.jar"/>
 				<include name="cdtparser.jar"/>
 				<include name="stubs.jar"/>
+				<include name="lrparser.jar"/>
+				<include name="xlcparser.jar"/>
 			</fileset>
 		</copy>
-			
+		
+		<copy file="${rdtXLCPropertiesPath}/${rdtXLCProperties}" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../../eclipse/plugins/${lpgRuntimeJar}" todir="${remoteServerTempDir}"/>
+
 		<copy todir="${remoteServerTempDir}">
 			<fileset dir="${platformTempDir}/eclipse/plugins">
 				<include name="${coreRuntimeJar}"/>
