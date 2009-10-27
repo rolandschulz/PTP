@@ -113,4 +113,8 @@
          id="org.eclipse.ptp.isp"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.rdt.xlc"
+         version="0.0.0"/>
+
 </feature>
