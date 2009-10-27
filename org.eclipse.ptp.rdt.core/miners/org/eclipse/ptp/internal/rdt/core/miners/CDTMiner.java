@@ -367,7 +367,6 @@ public class CDTMiner extends Miner {
 				String scopeName = getString(theCommand, 1);
 				String hostName = getString(theCommand, 2);
 				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 3));
-				initializeTranslationUnit(unit);
 				int selectionStart = getInteger(theCommand, 4);
 				int selectionLength = getInteger(theCommand, 5);
 				
@@ -408,7 +407,6 @@ public class CDTMiner extends Miner {
 				String scopeName = getString(theCommand, 1);
 				RemoteContentAssistInvocationContext context = (RemoteContentAssistInvocationContext) Serializer.deserialize(getString(theCommand, 2));
 				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 3));
-				initializeTranslationUnit(unit);
 				
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Computing completions...", _dataStore); //$NON-NLS-1$
 				
@@ -459,7 +457,6 @@ public class CDTMiner extends Miner {
 				String scopeName = getString(theCommand, 1);
 				String hostName = getString(theCommand, 2);
 				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 3));
-				initializeTranslationUnit(unit);
 				int selectionStart = getInteger(theCommand, 4);
 				int selectionLength = getInteger(theCommand, 5);
 				
@@ -478,7 +475,6 @@ public class CDTMiner extends Miner {
 			try {
 				String scopeName = getString(theCommand, 1);
 				ITranslationUnit unit = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
-				initializeTranslationUnit(unit);
 				String selectedText = getString(theCommand, 3);
 				int selectionStart = getInteger(theCommand, 4);
 				int selectionLength = getInteger(theCommand, 5);
@@ -589,7 +585,6 @@ public class CDTMiner extends Miner {
 			try 
 			{
 				ITranslationUnit workingCopy = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 1));
-				initializeTranslationUnit(workingCopy);
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Model Builder: building working copy: " + workingCopy.getElementName() + "...", _dataStore); //$NON-NLS-1$ //$NON-NLS-2$
 				
 				handleGetModel(workingCopy, status);
@@ -604,20 +599,6 @@ public class CDTMiner extends Miner {
 		}
 		
 		return status;
-	}
-	
-	
-	/**
-	 * Must call this on a translation unit that has just been deserialized
-	 * if you want to use it to get an AST.
-	 */
-	protected void initializeTranslationUnit(ITranslationUnit unit) { 
-		if(unit instanceof TranslationUnit) {
-			TranslationUnit tu = (TranslationUnit) unit;
-			String languageId = tu.getLanguageId();
-			Map<String,String> languageProperties = tu.getLanguageProperties();
-			tu.setLanguage(RemoteLanguageMapper.getLanguageById(languageId, languageProperties, _dataStore));
-		}
 	}
 	
 	
