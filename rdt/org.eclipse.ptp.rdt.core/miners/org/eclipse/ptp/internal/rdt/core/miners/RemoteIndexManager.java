@@ -21,7 +21,6 @@ import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.model.ICProject;
-import org.eclipse.cdt.core.parser.DefaultLogService;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.internal.core.index.CIndex;
 import org.eclipse.cdt.internal.core.index.IIndexFragment;
@@ -33,6 +32,7 @@ import org.eclipse.cdt.internal.core.pdom.dom.c.PDOMCLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.cpp.PDOMCPPLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.indexer.PDOMIndexerTask;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -46,7 +46,7 @@ public class RemoteIndexManager {
 	
 	private static RemoteIndexManager theInstance = null;
 	
-	private static final IParserLogService LOG = new DefaultLogService();
+//	private static final IParserLogService LOG = new DefaultLogService();
 	private static final PDOMCLinkageFactory cLinkageFactory = new PDOMCLinkageFactory();
 	private static final PDOMCPPLinkageFactory cppLinkageFactory = new PDOMCPPLinkageFactory();
 	private static final IIndexLocationConverter locationConverter = new RemoteLocationConverter();;
@@ -80,7 +80,7 @@ public class RemoteIndexManager {
 			Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
 			
 			for(String currentScope : ScopeManager.getInstance().getAllScopes()) {
-				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore).getIndex().getWritableFragment();
+				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore, null).getIndex().getWritableFragment();
 				fragments.add(fragment);
 			}
 			
@@ -90,7 +90,7 @@ public class RemoteIndexManager {
 			return new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
 		}
 		else {
-			StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore);
+			StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore, null);
 			return indexer.getIndex();
 		}
 	}
@@ -101,8 +101,8 @@ public class RemoteIndexManager {
 	 * 
 	 * @see PDOMIndexerTask constructor
 	 */
-	public StandaloneFastIndexer getIndexerForScope(String scope, IRemoteIndexerInfoProvider provider, DataStore dataStore) {
-		StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore);
+	public StandaloneFastIndexer getIndexerForScope(String scope, IRemoteIndexerInfoProvider provider, DataStore dataStore, DataElement status) {
+		StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore, status);
 		
 		// configure the indexer using the provider
 		indexer.setScannerInfoProvider(provider);
@@ -149,15 +149,20 @@ public class RemoteIndexManager {
 	}
 
 	
-	public StandaloneFastIndexer getIndexerForScope(String scope, DataStore dataStore) {
+	public StandaloneFastIndexer getIndexerForScope(String scope, DataStore dataStore, DataElement status) {
 		
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
 			throw new IllegalArgumentException("Attempted to get indexer for root scope."); //$NON-NLS-1$
 		}
 		
 		StandaloneFastIndexer indexer = (StandaloneFastIndexer) scopeToIndexerMap.get(scope);
-		if (indexer != null)
+		if (indexer != null) {
+			if (status != null) {
+				IParserLogService LOG = new RemoteLogService(dataStore, status);
+				indexer.setParserLog(LOG);
+			}
 			return indexer;
+		}
 
 		String path = scopeToIndexLocationMap.get(scope);
 		File indexFile = null;
@@ -181,6 +186,7 @@ public class RemoteIndexManager {
 		UniversalServerUtilities.logInfo(CLASS_NAME, "Index at location:" + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
 
 		try {
+			IParserLogService LOG = new RemoteLogService(dataStore, status);
 			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, LOG);
 
 			scopeToIndexerMap.put(scope, indexer);
@@ -235,7 +241,7 @@ public class RemoteIndexManager {
 		for (int i = 0; i < projects.length; i++) {
 			String currentScope = projects[i].getElementName();
 			if (allScopes.contains(currentScope)) {
-				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore).getIndex().getWritableFragment();
+				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore, null).getIndex().getWritableFragment();
 				
 				fragments.add(fragment);
 			}
