@@ -82,7 +82,8 @@ public class RemoteLanguageMapper implements ILanguageMapper {
 	private static ILanguage instantiateAndConfigureLanguage(String languageId, Map<String,String> languageProperties, DataStore dataStore) {
 		String className = getClassName(languageId, dataStore);
 		if(className == null) {
-			UniversalServerUtilities.logWarning(LOG_TAG, "No class for " + languageId, dataStore); //$NON-NLS-1$
+			if(dataStore != null) 
+				UniversalServerUtilities.logWarning(LOG_TAG, "No class for " + languageId, dataStore); //$NON-NLS-1$
 			return null;
 		}
 		
@@ -90,15 +91,18 @@ public class RemoteLanguageMapper implements ILanguageMapper {
 		try {
 			Class<?> clazz = Class.forName(className);
 			language = (ILanguage) clazz.newInstance();
-			UniversalServerUtilities.logInfo(LOG_TAG, "Instantiated language: " + className, dataStore); //$NON-NLS-1$
+			if(dataStore != null) 
+				UniversalServerUtilities.logInfo(LOG_TAG, "Instantiated language: " + className, dataStore); //$NON-NLS-1$
 		} catch(Exception e) {
-			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, dataStore);
+			if(dataStore != null) 
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, dataStore);
 			return null;
 		}
 		
 		if(languageProperties != null && language instanceof IConfigurableLanguage) {
 			((IConfigurableLanguage) language).setProperties(languageProperties);
-			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Configured language: " + className, dataStore); //$NON-NLS-1$
+			if(dataStore != null) 
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Configured language: " + className, dataStore); //$NON-NLS-1$
 		}
 		
 		return language;
@@ -121,12 +125,15 @@ public class RemoteLanguageMapper implements ILanguageMapper {
 					languageIdToClassName.load(new FileInputStream(file));
 
 			} catch (FileNotFoundException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, dataStore);
+				if(dataStore != null)
+					UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, dataStore);
 			} catch (IOException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, dataStore);
+				if(dataStore != null)
+					UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, dataStore);
 			}
 			
-			UniversalServerUtilities.logInfo(LOG_TAG, "Language ID mappings: " + languageIdToClassName, dataStore); //$NON-NLS-1$
+			if(dataStore != null)
+				UniversalServerUtilities.logInfo(LOG_TAG, "Language ID mappings: " + languageIdToClassName, dataStore); //$NON-NLS-1$
 		}
 		
 		return languageIdToClassName.getProperty(languageId);
