@@ -33,14 +33,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 
 /**
  * This class implements a project properties page which allows the user to
@@ -51,6 +52,15 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		IWorkbenchPropertyPage {
+	
+	private class ServiceScrolledComposite extends SharedScrolledComposite {
+
+		public ServiceScrolledComposite(Composite parent, int style) {
+			super(parent, style);
+		}
+		
+	}
+	
 	/**
 	 * Class to handle widget selection events
 	 * 
@@ -86,6 +96,8 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 				addServiceConfiguration();
 			} else if (source == removeButton) {
 				removeServiceConfiguration();
+			} else if (source == serviceModelWidget) {
+				serviceModelPane.reflow(true);
 			}
 		}
 	}
@@ -97,28 +109,30 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	 * @author dave
 	 * 
 	 */
-	private class ServiceConfigurationComparator implements Comparator {
+	private class ServiceConfigurationComparator implements Comparator<IServiceConfiguration> {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object o1, Object o2) {
-			return ((IServiceConfiguration) o1).getName().compareTo(
-					((IServiceConfiguration) o2).getName());
+		public int compare(IServiceConfiguration o1, IServiceConfiguration o2) {
+			return o1.getName().compareTo(o2.getName());
 		}
 	}
 
+	private static int BUTTON_WIDTH = 85;
+
 	private Button addButton;
+	
 	private IServiceConfiguration currentConfig;
 	private Vector<IServiceConfiguration> deletedServiceConfigurations;
-	private EventHandler eventHandler;
+	private final EventHandler eventHandler = new EventHandler();
 	private Composite propertiesPane;
 	private Button removeButton;
 	private ServiceConfigurationComparator serviceConfigurationComparator;
 	private Table serviceConfigurationList;
-	private Composite serviceModelPane;
+	private ServiceScrolledComposite serviceModelPane;
 	private NewServiceModelWidget serviceModelWidget;
 
 	/**
@@ -127,6 +141,22 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	public ServiceConfigurationPropertyPage() {
 		super();
 		serviceConfigurationComparator = new ServiceConfigurationComparator();
+	}
+
+	/**
+	 * Delete service configurations when Ok or Apply button is pressed
+	 * 
+	 * @return Status from superclass indicating if Ok processing is to continue
+	 */
+	public boolean performOk() {
+		deleteServiceConfigurations();
+		serviceModelWidget.applyChangesToConfiguration();
+		try {
+			ServiceModelManager.getInstance().saveModelConfiguration();
+		} catch (IOException e) {
+			ServicesUIPlugin.getDefault().log(e);
+		}
+		return super.performOk();
 	}
 
 	/**
@@ -161,71 +191,6 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 						getProject(), config);
 			}
 		}
-	}
-
-	@Override
-	protected Control createContents(Composite parent) {
-		GridLayout parentPaneLayout;
-		GridLayout propertiesPaneLayout;
-		GridLayout serviceConfigLayout;
-		RowLayout buttonLayout;
-		Composite serviceConfigurationPane;
-		Composite buttonPane;
-
-		eventHandler = new EventHandler();
-
-		// Create a top level composite for the widgets in this panel
-		parentPaneLayout = new GridLayout(1, true);
-		parent.setLayout(parentPaneLayout);
-
-		// Create the properties pane, which will contain the service
-		// configuration list
-		// and the current service configuration
-		propertiesPane = new Composite(parent, SWT.NONE);
-		propertiesPaneLayout = new GridLayout(2, true);
-		propertiesPaneLayout.makeColumnsEqualWidth = false;
-		propertiesPane.setLayout(propertiesPaneLayout);
-		propertiesPane.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		// Create the pane for the service configuration list and then create
-		// the service configuration list
-		serviceConfigurationPane = new Composite(propertiesPane, SWT.NONE);
-		serviceConfigLayout = new GridLayout(1, true);
-		serviceConfigurationPane.setLayout(serviceConfigLayout);
-		serviceConfigurationPane.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		serviceConfigurationList = new Table(serviceConfigurationPane, SWT.SINGLE);
-		serviceConfigurationList.setLayoutData(new GridData(GridData.FILL_BOTH));
-		serviceConfigurationList.setLinesVisible(true);
-		serviceConfigurationList.addSelectionListener(eventHandler);
-
-		// Create the pane which will contain the current service model
-		serviceModelPane = new Composite(propertiesPane, SWT.NONE);
-		serviceModelPane.setLayout(new GridLayout(1, false));
-		serviceModelPane.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
-		serviceModelWidget = new NewServiceModelWidget(serviceModelPane, SWT.NONE);
-		serviceModelWidget.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
-
-		// Create the pane and buttons to add and remove service configurations
-		buttonPane = new Composite(serviceConfigurationPane, SWT.NONE);
-		buttonLayout = new RowLayout();
-		buttonLayout.fill = true;
-		buttonLayout.center = false;
-		buttonLayout.justify = true;
-		buttonPane.setLayout(buttonLayout);
-		addButton = new Button(buttonPane, SWT.PUSH);
-		addButton.setText(Messages.ServiceConfigurationPropertyPage_0);
-		addButton.addSelectionListener(eventHandler);
-		removeButton = new Button(buttonPane, SWT.PUSH);
-		removeButton.setText(Messages.ServiceConfigurationPropertyPage_1);
-		removeButton.addSelectionListener(eventHandler);
-
-		// Fill in the list of service configurations currently used by this
-		// project
-		getProjectConfigurations();
-		return propertiesPane;
 	}
 
 	/**
@@ -265,11 +230,11 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	 * and then populate the service configuration list.
 	 */
 	private void getProjectConfigurations() {
-		Object serviceConfigurations[];
+		IServiceConfiguration serviceConfigurations[];
 
 		try {
 			serviceConfigurations = ServiceModelManager.getInstance()
-					.getConfigurations(getProject()).toArray();
+					.getConfigurations(getProject()).toArray(new IServiceConfiguration[0]);
 			Arrays.sort(serviceConfigurations, serviceConfigurationComparator);
 			for (Object config : serviceConfigurations) {
 				TableItem item;
@@ -280,22 +245,6 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			}
 		} catch (ProjectNotConfiguredException e) {
 		}
-	}
-
-	/**
-	 * Delete service configurations when Ok or Apply button is pressed
-	 * 
-	 * @return Status from superclass indicating if Ok processing is to continue
-	 */
-	public boolean performOk() {
-		deleteServiceConfigurations();
-		serviceModelWidget.applyChangesToConfiguration();
-		try {
-			ServiceModelManager.getInstance().saveModelConfiguration();
-		} catch (IOException e) {
-			ServicesUIPlugin.getDefault().log(e);
-		}
-		return super.performOk();
 	}
 
 	/**
@@ -342,7 +291,80 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 					}
 				}
 				serviceModelWidget.setServiceConfiguration(selectedConfig, natures);
+				serviceModelWidget.setEnabled(true);
+				serviceModelPane.reflow(true);
 			}
+		} else {
+			currentConfig = null;
+			serviceModelWidget.setServiceConfiguration(null);
+			serviceModelWidget.setEnabled(false);
 		}
+	}
+
+	@Override
+	protected Control createContents(Composite parent) {
+		// Create the properties pane, which will contain the service
+		// configuration list
+		// and the current service configuration
+		propertiesPane = new Composite(parent, SWT.NONE);
+		GridLayout propertiesPaneLayout = new GridLayout(1, true);
+		propertiesPaneLayout.marginHeight = 0;
+		propertiesPaneLayout.marginWidth = 0;
+		propertiesPane.setLayout(propertiesPaneLayout);
+
+		// Create the pane for the service configuration list and then create
+		// the service configuration list
+		Composite serviceConfigurationPane = new Composite(propertiesPane, SWT.NONE);
+		GridLayout serviceConfigLayout = new GridLayout(2, false);
+		serviceConfigurationPane.setLayout(serviceConfigLayout);
+		serviceConfigurationPane.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label label = new Label(serviceConfigurationPane, SWT.NONE);
+		label.setText("Project Service Configurations");
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalSpan = 2;
+		label.setLayoutData(data);
+
+		serviceConfigurationList = new Table(serviceConfigurationPane, SWT.SINGLE|SWT.BORDER);
+		serviceConfigurationList.setLayoutData(new GridData(GridData.FILL_BOTH));
+		serviceConfigurationList.setLinesVisible(false);
+		serviceConfigurationList.addSelectionListener(eventHandler);
+
+		// Create the pane and buttons to add and remove service configurations
+		Composite buttonPane = new Composite(serviceConfigurationPane, SWT.NONE);
+		buttonPane.setLayout(new GridLayout(1, true));
+		addButton = new Button(buttonPane, SWT.PUSH);
+		addButton.setText(Messages.ServiceConfigurationPropertyPage_0);
+		addButton.addSelectionListener(eventHandler);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		data.widthHint = BUTTON_WIDTH;
+		addButton.setLayoutData(data);
+		removeButton = new Button(buttonPane, SWT.PUSH);
+		removeButton.setText(Messages.ServiceConfigurationPropertyPage_1);
+		removeButton.addSelectionListener(eventHandler);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		data.widthHint = BUTTON_WIDTH;
+		removeButton.setLayoutData(data);
+
+		// Create the pane which will contain the current service model
+		serviceModelPane = new ServiceScrolledComposite(propertiesPane, SWT.V_SCROLL|SWT.H_SCROLL);
+		serviceModelPane.setExpandVertical(true);
+		serviceModelPane.setExpandHorizontal(true);
+		serviceModelPane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		Composite serviceComp = new Composite(serviceModelPane, SWT.NONE);
+		serviceComp.setLayout(new GridLayout(1, true));
+		
+		serviceModelWidget = new NewServiceModelWidget(serviceComp, SWT.NONE);
+		serviceModelWidget.addSelectionListener(eventHandler);
+		serviceModelWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		serviceModelPane.setContent(serviceComp);
+		serviceModelPane.setMinSize(serviceComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
+		// Fill in the list of service configurations currently used by this
+		// project
+		getProjectConfigurations();
+		return propertiesPane;
 	}
 }
