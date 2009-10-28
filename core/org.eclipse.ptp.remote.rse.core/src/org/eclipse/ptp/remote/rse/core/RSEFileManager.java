@@ -25,30 +25,49 @@ import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSys
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
 
 public class RSEFileManager implements IRemoteFileManager {
-	private RSEConnection connection;
+	private IPath fWorkingDir = null;
+	private final RSEConnection fConnection;
 
 	public RSEFileManager(RSEConnection conn) {
-		this.connection = conn;
+		fConnection = conn;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
 	 */
-	public IFileStore getResource(String path) {
-		return connection.getFileSystem().getStore(toURI(path));
+	public IFileStore getResource(String pathStr) {
+		IPath path = new Path(pathStr);
+		if (!path.isAbsolute()) {
+			path = fWorkingDir.append(path);
+		}
+		return fConnection.getFileSystem().getStore(toURI(path));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public String getWorkingDirectory() {
-		IFileServiceSubSystem fileService = getFileServiceSubSystem(connection.getHost());
-		if (fileService != null) {
-			return fileService.getFileService().getUserHome().getAbsolutePath();
+		if (fWorkingDir == null) {
+			IFileServiceSubSystem fileService = getFileServiceSubSystem(fConnection.getHost());
+			if (fileService != null) {
+				fWorkingDir = new Path(fileService.getFileService().getUserHome().getAbsolutePath());
+			} else {
+				fWorkingDir = new Path("/"); //$NON-NLS-1$
+			}
 		}
-		return "/"; //$NON-NLS-1$
+		return fWorkingDir.toString();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java.lang.String)
+	 */
+	public void setWorkingDirectory(String pathStr) {
+		IPath path = new Path(pathStr);
+		if (path.isAbsolute()) {
+			fWorkingDir = path;
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
 	 */
@@ -60,7 +79,7 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
-		String authority = connection.getHost().getHostName();
+		String authority = fConnection.getHost().getHostName();
 		try {
 			authority = URLEncoder.encode(authority, "UTF-8"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException e) {
