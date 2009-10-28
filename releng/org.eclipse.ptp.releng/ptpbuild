@@ -20,7 +20,7 @@ CDT_TAG=HEAD
 # main staging directory
 BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
 
-args=`getopt d:t: $*`
+args=`getopt c:d:t: $*`
 
 if [ $? != 0 ]; then
 	echo "usage: ptpbuild [-t tag] [-c cdt_tag] [-d build_dir] [build_args]"
