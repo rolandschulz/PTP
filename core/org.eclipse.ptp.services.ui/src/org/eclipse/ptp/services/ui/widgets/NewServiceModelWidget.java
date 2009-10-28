@@ -46,7 +46,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
@@ -130,14 +129,14 @@ public class NewServiceModelWidget extends Composite {
 		setLayout(bodyLayout);
 
 		Label label = new Label(this, SWT.NONE);
-		GridData labelData = new GridData(SWT.FILL, SWT.NONE, true, false);
+		GridData labelData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		labelData.horizontalSpan = 2;
 		label.setLayoutData(labelData);
 		label.setText(Messages.NewServiceModelWidget_0);
 		
 		servicesTree = new Tree(this, SWT.BORDER  | SWT.SINGLE);
-		GridData servicesTreeData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		servicesTreeData.minimumWidth = 200;
+		GridData servicesTreeData = new GridData(SWT.FILL, SWT.FILL, false, true);
+		servicesTreeData.widthHint = 150;
 		servicesTree.setLayoutData(servicesTreeData);
 		servicesTree.addSelectionListener(new SelectionAdapter() {
 			@Override public void widgetSelected(SelectionEvent e) {
@@ -152,10 +151,14 @@ public class NewServiceModelWidget extends Composite {
 		});
 		
 		providerComposite = new Composite(this, SWT.NONE);
-		providerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		providerComposite.setLayout(new GridLayout(1, false));
+		providerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		enabledCheckbox = new Button(providerComposite, SWT.CHECK);
+		Composite selectionComposite = new Composite(providerComposite, SWT.NONE);
+		selectionComposite.setLayout(new GridLayout(1, false));
+		selectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		enabledCheckbox = new Button(selectionComposite, SWT.CHECK);
 		enabledCheckbox.setText(Messages.NewServiceModelWidget_1);
 		enabledCheckbox.setLayoutData(new GridData());
 		enabledCheckbox.addSelectionListener(new SelectionAdapter() {
@@ -166,12 +169,12 @@ public class NewServiceModelWidget extends Composite {
 		});
 		enabledCheckbox.setEnabled(false);
 		
-		Label provider = new Label(providerComposite, SWT.NONE);
+		Label provider = new Label(selectionComposite, SWT.NONE);
 		provider.setText(Messages.NewServiceModelWidget_2);
 		provider.setLayoutData(new GridData());
 		provider.setEnabled(false);
 		
-		providerCombo = new Combo(providerComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		providerCombo = new Combo(selectionComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridData providerComboData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		providerComboData.widthHint = 200;
 		providerCombo.setLayoutData(providerComboData);
@@ -183,7 +186,7 @@ public class NewServiceModelWidget extends Composite {
 		});
 		providerCombo.setEnabled(false);
 		
-		Label separator = new Label(providerComposite, SWT.SEPARATOR | SWT.SHADOW_OUT | SWT.HORIZONTAL);
+		Label separator = new Label(selectionComposite, SWT.SEPARATOR | SWT.SHADOW_OUT | SWT.HORIZONTAL);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		configurationComposite = new Composite(providerComposite, SWT.NONE);
@@ -360,16 +363,16 @@ public class NewServiceModelWidget extends Composite {
 	private void displayService(TreeItem serviceTreeItem) {
 		// Each tree item represents a service
 		IService service = null;
-		if(serviceTreeItem != null)
+		if (serviceTreeItem != null) {
 			service = (IService) serviceTreeItem.getData(SERVICE_KEY);
+		}
 		
 		// clear everything out
 		providerCombo.removeAll();
-		for(Control child : providerComposite.getChildren())
-			child.setEnabled(service != null);
+		enabledCheckbox.setEnabled(false);
 		
 		// if the user selected a category node then clear out the composite too and quit
-		if(service == null) {
+		if (service == null) {
 			stackLayout.topControl = null;
 			configurationComposite.layout();
 			return;
@@ -377,7 +380,7 @@ public class NewServiceModelWidget extends Composite {
 		
 		// get the service provider that has been selected
 		IServiceProvider provider = (IServiceProvider) serviceTreeItem.getData(PROVIDER_KEY);
-		if(provider == null && !configuration.isDisabled(service)) {
+		if (provider == null && !configuration.isDisabled(service)) {
 			provider = configuration.getServiceProvider(service);
 		}
 		
@@ -391,7 +394,7 @@ public class NewServiceModelWidget extends Composite {
 		Arrays.sort(descriptors, PROVIDER_COMPARATOR);
 		
 		int selection = 0;
-		for(int i = 0; i < descriptors.length; i++) {
+		for (int i = 0; i < descriptors.length; i++) {
 			providerCombo.add(descriptors[i].getName());
 			if(provider != null && provider.getId().equals(descriptors[i].getId()))
 				selection = i;
@@ -403,13 +406,13 @@ public class NewServiceModelWidget extends Composite {
 		boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
 		providerCombo.setEnabled(!disabled);
 		enabledCheckbox.setSelection(!disabled);
+		enabledCheckbox.setEnabled(true);
 		
-		if(disabled) {
+		if (disabled) {
 			// this is easier than disabling the provider composite
 			stackLayout.topControl = null;
 			configurationComposite.layout();
-		}
-		else {
+		} else {
 			selectProvider(descriptors[selection]);
 		}
 	}
