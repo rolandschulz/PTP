@@ -23,7 +23,6 @@ import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
 	private IPath fWorkingDir = null;
-	private IRemoteExecutionManager fExeMgr;
 	private final RemoteToolsConnection fConnection;
 
 	public RemoteToolsFileManager(RemoteToolsConnection conn) {
@@ -54,7 +53,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			}
 			if (exeMgr != null) {
 				try {
-					fWorkingDir = new Path(fExeMgr.getExecutionTools().executeWithOutput("pwd").trim()); //$NON-NLS-1$
+					fWorkingDir = new Path(exeMgr.getExecutionTools().executeWithOutput("pwd").trim()); //$NON-NLS-1$
 				} catch (RemoteExecutionException e) {
 				} catch (RemoteConnectionException e) {
 				} catch (CancelException e) {
