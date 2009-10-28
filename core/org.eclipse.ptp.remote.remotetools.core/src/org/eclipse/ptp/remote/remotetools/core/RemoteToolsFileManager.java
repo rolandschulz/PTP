@@ -22,9 +22,10 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
+	private IPath fWorkingDir = null;
 	private IRemoteExecutionManager fExeMgr;
 	private final RemoteToolsConnection fConnection;
-	
+
 	public RemoteToolsFileManager(RemoteToolsConnection conn) {
 		fConnection = conn;
 	}
@@ -32,32 +33,48 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
 	 */
-	public IFileStore getResource(String path) {
-		return new RemoteToolsFileStore(fConnection.getName(), path);
+	public IFileStore getResource(String pathStr) {
+		IPath path = new Path(pathStr);
+		if (!path.isAbsolute()) {
+			path = fWorkingDir.append(path);
+		}
+		return new RemoteToolsFileStore(fConnection.getName(), path.toString());
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory()
 	 */
 	public String getWorkingDirectory() {
-		if (fExeMgr == null) {
+		if (fWorkingDir == null) {
+			IRemoteExecutionManager exeMgr = null;
 			try {
-				fExeMgr = fConnection.createExecutionManager();
+				exeMgr = fConnection.createExecutionManager();
 			} catch (RemoteConnectionException e) {
 				// Ignore
 			}
-		}
-
-		String cwd = "//"; //$NON-NLS-1$
-		if (fExeMgr != null) {
-			try {
-				cwd = fExeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
-			} catch (RemoteExecutionException e) {
-			} catch (RemoteConnectionException e) {
-			} catch (CancelException e) {
+			if (exeMgr != null) {
+				try {
+					fWorkingDir = new Path(fExeMgr.getExecutionTools().executeWithOutput("pwd").trim()); //$NON-NLS-1$
+				} catch (RemoteExecutionException e) {
+				} catch (RemoteConnectionException e) {
+				} catch (CancelException e) {
+				}
+			}
+			if (fWorkingDir == null) {
+				fWorkingDir = new Path("//"); //$NON-NLS-1$
 			}
 		}
-		return cwd;
+		return fWorkingDir.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java.lang.String)
+	 */
+	public void setWorkingDirectory(String pathStr) {
+		IPath path = new Path(pathStr);
+		if (path.isAbsolute()) {
+			fWorkingDir = path;
+		}
 	}
 	
 	/* (non-Javadoc)
