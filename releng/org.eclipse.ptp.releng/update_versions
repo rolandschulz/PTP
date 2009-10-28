@@ -30,6 +30,7 @@ FEATURES="\
 	org.eclipse.ptp.pldt.lapi-feature \
 	org.eclipse.ptp.pldt.upc-feature \
 	org.eclipse.ptp.rdt-feature \
+	org.eclipse.ptp.rdt.xlc-feature \
 	org.eclipse.ptp.remote-feature \
 	org.eclipse.ptp.remote.remotetools-feature \
 	org.eclipse.ptp.remote.rse-feature \
