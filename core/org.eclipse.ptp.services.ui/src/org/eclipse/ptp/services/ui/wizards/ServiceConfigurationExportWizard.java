@@ -196,7 +196,7 @@ public class ServiceConfigurationExportWizard extends Wizard implements IImportW
 	}
 	
 	private MainExportWizardPage mainPage = 
-			new MainExportWizardPage("exportWizardPage", 
+			new MainExportWizardPage("exportWizardPage",  //$NON-NLS-1$
 					Messages.ServiceConfigurationExportWizard_11, null); //$NON-NLS-1$;
 	
 	public ServiceConfigurationExportWizard() {

@@ -83,7 +83,7 @@ public class NewServiceConfigurationProjectWizard extends Wizard implements INew
 	@Override
 	public void addPages() {
 		addPage(new IntroPage(Messages.ServiceConfigurationWizard_6));
-		addPage(new ServiceConfigurationSelectionWizardPage("Service Configuration Selection"));
+		addPage(new ServiceConfigurationSelectionWizardPage(Messages.NewServiceConfigurationProjectWizard_0));
 	}
 
 	public void init(IWorkbench workbench, IStructuredSelection selection) {

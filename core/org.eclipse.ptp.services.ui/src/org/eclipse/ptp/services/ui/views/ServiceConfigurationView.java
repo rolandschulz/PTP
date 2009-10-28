@@ -141,7 +141,7 @@ public class ServiceConfigurationView extends ViewPart {
 	 * Create the popup menu
 	 */
 	private void createContextMenu() {
-		MenuManager menuManager = new MenuManager("#PopupMenu", "org.eclipse.ptp.services.ui.views.serviceConfigurationView.contextMenu"); //$NON-NLS-1$
+		MenuManager menuManager = new MenuManager("#PopupMenu", "org.eclipse.ptp.services.ui.views.serviceConfigurationView.contextMenu"); //$NON-NLS-1$ //$NON-NLS-2$
 		menuManager.setRemoveAllWhenShown(true);
 		Menu menu = menuManager.createContextMenu(fViewer.getControl());
 		fViewer.getControl().setMenu(menu);

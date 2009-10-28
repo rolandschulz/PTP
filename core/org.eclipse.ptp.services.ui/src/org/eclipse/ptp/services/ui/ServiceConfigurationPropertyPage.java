@@ -320,7 +320,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		serviceConfigurationPane.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label label = new Label(serviceConfigurationPane, SWT.NONE);
-		label.setText("Project Service Configurations");
+		label.setText(Messages.ServiceConfigurationPropertyPage_2);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 2;
 		label.setLayoutData(data);
