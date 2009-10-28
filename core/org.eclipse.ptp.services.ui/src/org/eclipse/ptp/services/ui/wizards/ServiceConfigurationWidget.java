@@ -171,7 +171,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 		fTable.setHeaderVisible (true);
 		
 		TableColumnLayout layout = new TableColumnLayout();
-		String[] titles = {"Project", "Configuration", "Status"};
+		String[] titles = {Messages.ServiceConfigurationWidget_0, Messages.ServiceConfigurationWidget_1, Messages.ServiceConfigurationWidget_2};
 		for (int i=0; i<titles.length; i++) {
 			TableColumn column = new TableColumn (fTable, SWT.NONE);
 			column.setText (titles [i]);
@@ -316,7 +316,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 		item.setText (0, config.getName());
 		
 		// column 1 holds the status string
-		item.setText(1, "Not configured");
+		item.setText(1, Messages.ServiceConfigurationWidget_3);
 
 		item.setData(SERVICE_KEY, config);
 

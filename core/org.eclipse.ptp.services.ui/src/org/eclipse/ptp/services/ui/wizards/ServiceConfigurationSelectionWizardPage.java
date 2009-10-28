@@ -24,6 +24,7 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
@@ -87,7 +88,7 @@ public class ServiceConfigurationSelectionWizardPage extends WizardSelectionPage
 	public ServiceConfigurationSelectionWizardPage(String pageName) {
 		super(pageName);
 		setTitle(pageName);
-		setDescription("Create or select a service configuration for the project");
+		setDescription(Messages.ServiceConfigurationSelectionWizardPage_0);
 	}
 	
 	/* (non-Javadoc)
@@ -106,20 +107,20 @@ public class ServiceConfigurationSelectionWizardPage extends WizardSelectionPage
         
         if (configs.size() > 0) {
 	        Label label1 = new Label(container, SWT.LEFT);
-	        label1.setText("One or more service configurations already exist.");
+	        label1.setText(Messages.ServiceConfigurationSelectionWizardPage_1);
 
 	        Label label2 = new Label(container, SWT.LEFT);
-	        label2.setText("If you wish to use an existing configuration, select it from the list.");
+	        label2.setText(Messages.ServiceConfigurationSelectionWizardPage_2);
 	        
 	        new ServiceConfigurationWidget(configs).createContents(container);
         } else {
 	        Label label1 = new Label(container, SWT.LEFT);
-	        label1.setText("You do not have any existing service configurations, so this wizard will help you create a new one.");
+	        label1.setText(Messages.ServiceConfigurationSelectionWizardPage_3);
 
 	        Label label2 = new Label(container, SWT.LEFT);
-	        label2.setText("The new configuration will be saved with your project, and can be used when creating new projects in the future.");
+	        label2.setText(Messages.ServiceConfigurationSelectionWizardPage_4);
 	        
-	        IServiceConfiguration config = manager.newServiceConfiguration("Default");
+	        IServiceConfiguration config = manager.newServiceConfiguration(Messages.ServiceConfigurationSelectionWizardPage_5);
 	        for (IService service : manager.getServices()) {
 				SortedSet<IServiceProviderDescriptor> providers = service.getProvidersByPriority();
 				if (providers.size() > 0) {
