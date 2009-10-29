@@ -51,7 +51,19 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-public class NewServiceModelWidget extends Composite {
+/**
+ * A widget for configuring the services providers for a given service configuration.
+ * 
+ * Displays a table containing the service providers grouped by category on the left part 
+ * of the widget. When a provider is selected, the right hand part of the widget will
+ * display the provider configuration along with a check box to enable/disable the provider
+ * and a combo to select a different provider for the service.
+ * 
+ * The configuration UI for the selected provider is supplied by the providerContributor 
+ * extension point. 
+ * 
+ */
+public class ServiceProviderConfigurationWidget extends Composite {
 	
 	// Keys for data attached to TreeItems that represent services
 	private static final String SERVICE_KEY = "service";   // IService //$NON-NLS-1$
@@ -120,7 +132,7 @@ public class NewServiceModelWidget extends Composite {
 		return true;
 	}
 	
-	public NewServiceModelWidget(Composite parent, int style) {
+	public ServiceProviderConfigurationWidget(Composite parent, int style) {
 		super(parent, style);
 		
 		GridLayout bodyLayout = new GridLayout(2, false);
