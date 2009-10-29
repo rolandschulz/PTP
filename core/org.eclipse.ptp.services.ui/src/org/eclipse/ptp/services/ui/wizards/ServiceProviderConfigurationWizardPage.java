@@ -14,6 +14,10 @@ package org.eclipse.ptp.services.ui.wizards;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Abstract base class for wizard pages used to configure service providers
+ * using the {@link #ServiceProviderConfigurationWizard}.
+ */
 public abstract class ServiceProviderConfigurationWizardPage extends WizardPage {
 
 	/**

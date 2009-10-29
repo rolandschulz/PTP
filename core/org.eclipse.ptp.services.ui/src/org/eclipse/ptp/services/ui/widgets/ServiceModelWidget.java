@@ -36,7 +36,7 @@ import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
-import org.eclipse.ptp.services.ui.dialogs.ServicesDialog;
+import org.eclipse.ptp.services.ui.dialogs.ServiceSelectionDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -55,10 +55,12 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * Old style configuration widget. Displays a table with three columns, service,
+ * provider, and configured status. Uses add/remove/configure buttons. New services
+ * are added using the {@link #ServiceSelectionDialog}. Services are configured using
+ * wizard pages supplied by the providerContributor extension point.
+ * 
+ * NOT CURRENTLY USED AND MAY BE DEPRECATED
  * 
  */
 public class ServiceModelWidget {
@@ -77,7 +79,7 @@ public class ServiceModelWidget {
 				}
 			}
 			
-			ServicesDialog dialog = new ServicesDialog(getShell(), displaySet.toArray(new IService[0]));
+			ServiceSelectionDialog dialog = new ServiceSelectionDialog(getShell(), displaySet.toArray(new IService[0]));
 			if (dialog.open() == Dialog.OK) {
 				IService[] selectedServices = dialog.getSelectedServices();
 				for (IService service : selectedServices) {

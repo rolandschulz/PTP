@@ -33,6 +33,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+/**
+ * Wizard page used by {@link #ServiceConfigurationWizard} to select a service provider for 
+ * a particular service.
+ * 
+ * NOT CURRENTLY USED AND MAY BE DEPRECATED
+ *
+ */
 public class ServiceConfigurationWizardPage extends WizardPage {
 
 	private final IService fService;
