@@ -25,17 +25,18 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * @author greg
- *
+ * Dialog that displays a list of available services and allows the user
+ * to select one or more. The selected services are available by calling
+ * {@link #getSelectedServices()}.
  */
-public class ServicesDialog extends TitleAreaDialog {
+public class ServiceSelectionDialog extends TitleAreaDialog {
 	protected static final String SERVICE_KEY = "service-id"; //$NON-NLS-1$
 
 	private IService[] fSelectedServices = new IService[0];
 	private Table fTable;
 	private IService[] fServices;
 	
-	public ServicesDialog(Shell parentShell, IService[] services) {
+	public ServiceSelectionDialog(Shell parentShell, IService[] services) {
 		super(parentShell);
 		this.fServices = services;
 		setShellStyle(getShellStyle() | SWT.SHEET);
