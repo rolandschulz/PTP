@@ -20,6 +20,14 @@ public class Messages extends NLS {
 
 	public static String PTPRemoteUIPlugin_1;
 
+	public static String RemoteDirectoryWidget_0;
+
+	public static String RemoteDirectoryWidget_1;
+
+	public static String RemoteDirectoryWidget_2;
+
+	public static String RemoteDirectoryWidget_3;
+
 	public static String RemoteResourceBrowser_1;
 	public static String RemoteResourceBrowser_2;
 
