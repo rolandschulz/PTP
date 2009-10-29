@@ -115,7 +115,7 @@
 #define TRACE_EXIT print_message(TRACE_MESSAGE, "<<< %s exited. (Line %d)\n", __FUNCTION__, __LINE__);
 #define TRACE_DETAIL(format) print_message(TRACE_DETAIL_MESSAGE, format)
 #define TRACE_DETAIL_V(format, ...) print_message(TRACE_DETAIL_MESSAGE, format, __VA_ARGS__)
-
+#define HOSTLIST_ALLOCATE_FACTOR 10000
 typedef struct jobinfo *jobinfoptr; /* Forward reference to jobinfo         */
 
 typedef struct
@@ -162,6 +162,7 @@ typedef struct jobinfo
     ioinfo stderr_info; /* Stderr file buffer info              */
     int numtasks; /* Number of tasks in application       */
     taskinfo *tasks; /* Tasks in this application            */
+    char **current_hostlist; /* Hostlist for this job */
     pthread_t startup_thread; /* Startup monitor thread for app       */
     time_t submit_time; /* Time job was submitted               */
     char label_io; /* User set MP_LABELIO                  */
@@ -350,6 +351,9 @@ static char **env_array;
 static regex_t msgid_regex;
 static regex_t errormsg_regex;
 static struct timeval run_start_time;
+static char **current_hostlist;
+static int current_hostlist_size;
+static int current_hostlist_limit;
 
 #ifdef __linux__
 static struct option longopts[] = {
@@ -987,6 +991,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     argp_count = 0;
     argp_limit = 10;
     debug_sdm_mode = 0;
+    current_hostlist = NULL;
     /*
      * Process arguments passed to this function
      */
@@ -1183,6 +1188,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         status = chdir(cwd);
         if (status == -1) {
             post_submitjob_error(trans_id, jobid, "Invalid working directory");
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             TRACE_EXIT;
             return PROXY_RES_OK;
         }
@@ -1197,11 +1205,17 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     }
     if (execdir == NULL) {
         post_submitjob_error(trans_id, jobid, "No executable directory specified");
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
         TRACE_EXIT;
         return PROXY_RES_OK;
     }
     if (execname == NULL) {
         post_submitjob_error(trans_id, jobid, "No executable specified");
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
         TRACE_EXIT;
         return PROXY_RES_OK;
     }
@@ -1219,6 +1233,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
          */
         if (debugger_path == NULL || debugger_name == NULL) {
             post_submitjob_error(trans_id, jobid, "Debugger executuable not found");
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             return PROXY_RES_OK;
         }
         else {
@@ -1227,6 +1244,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
 
         if (access(debugger_full_path, X_OK) < 0) {
             post_submitjob_error(trans_id, jobid, strerror(errno));
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             return PROXY_RES_OK;
         }
 
@@ -1283,6 +1303,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             status = execve(debugger_args[0], debugger_args, debugger_envp);
             print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", debugger_args[0], strerror(errno));
             post_submitjob_error(trans_id, jobid, "Exec failed");
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             TRACE_EXIT;
             exit(1);
         }
@@ -1309,6 +1332,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     status = setup_stdout_fd(trans_id, jobid, stdout_pipe, stdout_path, "stdout", &(job->stdout_fd),
             &(job->stdout_redirect));
     if (status == -1) {
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
         TRACE_EXIT;
         return PROXY_RES_OK;
     }
@@ -1317,6 +1343,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             &(job->stderr_file), &(job->stderr_redirect));
     RegisterFileHandler(job->stderr_fd, READ_FILE_HANDLER, stderr_handler, job);
     if (status == -1) {
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
         TRACE_EXIT;
         return PROXY_RES_OK;
     }
@@ -1342,6 +1371,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     job->stderr_info.write_func = send_stderr;
     job->discovered_job = 0;
     job->numtasks = -1;
+    job->current_hostlist = current_hostlist;
     envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value, pe_debugger_id, 0);
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
@@ -1373,11 +1403,17 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         TRACE_DETAIL("+++ Setting up poe stdio file descriptors\n");
         status = setup_child_stdout(trans_id, jobid, job->stdout_redirect, &(job->stdout_fd), stdout_pipe);
         if (status == -1) {
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             TRACE_EXIT;
             exit(1);
         }
         status = setup_child_stderr(trans_id, jobid, stderr_pipe);
         if (status == -1) {
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             TRACE_EXIT;
             exit(1);
         }
@@ -1405,6 +1441,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         status = execve("/usr/bin/poe", argv, envp);
         print_message(ERROR_MESSAGE, "%s failed to execute, status %s\n", argv[0], strerror(errno));
         post_submitjob_error(trans_id, jobid, "Exec failed");
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
         TRACE_EXIT;
         exit(1);
     }
@@ -1416,6 +1455,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
 #endif
             post_submitjob_error(trans_id, jobid, "Fork failed");
+            if (current_hostlist != NULL) {
+                free(current_hostlist);
+            }
             return PROXY_RES_OK;
         }
         else {
@@ -1757,7 +1799,24 @@ startup_monitor(void *job_ident)
                             *cp = '\0';
                         }
                     }
-                    taskp->hostname = strdup(p);
+                        /*
+                         * If a hostlist (MP_HOSTFILE) was used, get the hostlist name
+                         * corresponding to the task unless the name in the hostlist
+                         * starts with '@' indicating a LoadLeveler pool id. In the case
+                         * of a LoadLeveler pool id, use the hostname in the attach.cfg
+                         * file since that is the onle name we know.
+                         */
+                    if (job->current_hostlist != NULL) {
+                        if (*(job->current_hostlist[tasknum]) == '@') {
+                            taskp->hostname = strdup(p);
+                        }
+                        else {
+                            taskp->hostname = strdup(job->current_hostlist[tasknum]);
+                        }
+                    }
+                    else {
+                        taskp->hostname = strdup(p);
+                    }
                     /*
                      * get task pid
                      */
@@ -1808,6 +1867,9 @@ startup_monitor(void *job_ident)
                 sleep(1);
             }
         }
+    }
+    if (job->current_hostlist != NULL) {
+        free(job->current_hostlist);
     }
     free(cfginfo);
     job->tasks = tasks;
@@ -1916,7 +1978,6 @@ startup_monitor(void *job_ident)
                 print_message(ERROR_MESSAGE, "Node %s not found in node list\n", taskp->hostname);
             }
             else {
-
                 node->task_count = node->task_count + 1;
                 sprintf(procid_str, "%d", taskp[i].proxy_taskid);
                 AddToList(taskid_list, strdup(procid_str));
@@ -2259,7 +2320,7 @@ void redirect_io(void)
         print_message(TRACE_DETAIL_MESSAGE, "Invoking miniproxy with args %s\n", miniproxy_parmlist);
         if (fork() == 0) {
             execve(miniproxy_args[0], miniproxy_args, miniproxy_env);
-            print_message(ERROR_MESSAGE, "Failed to invke miniproxy %s: %s\n", miniproxy_args[0], strerror(errno));
+            print_message(ERROR_MESSAGE, "Failed to invoke miniproxy %s: %s\n", miniproxy_args[0], strerror(errno));
             TRACE_EXIT;
             exit(1);
         }
@@ -3510,22 +3571,41 @@ void update_nodes(int trans_id, FILE * hostlist)
     valstr = NULL;
     res = fgets(hostname, sizeof(hostname), hostlist);
     new_nodes = NewList();
+        /*
+         * Allocate storage for an array of hostnames. This array contains an entry for
+         * each hostname in the hostfile list. This array is used when processing the
+         * attach.cfg file to get the user-specified hostname corresponding to the
+         * task in the attach.cfg file. This array is required since the hostname in
+         * the attach.cfg file may be a different hostname that specified in the hostlist,
+         * which causes errors when trying to match to the original hostlist
+         */
+    current_hostlist_size = 0;
+    current_hostlist_limit = HOSTLIST_ALLOCATE_FACTOR;
+    current_hostlist = malloc(current_hostlist_limit * sizeof(char *));
+    malloc_check(current_hostlist, __FUNCTION__, __LINE__);
     while (res != NULL) {
         char *cp;
 
-        /*
-         * Truncate node name to short form name
-         */
-        cp = strpbrk(hostname, ".\n\r");
-        if (cp != NULL) {
-            *cp = '\0';
-        }
-        if (find_node(hostname) == NULL) {
-            node_refcount *node;
-
-            node = add_node(hostname);
-            AddToList(new_nodes, node);
-            node_count = node_count + 1;
+            /*
+             * Process only non-blank, non-comment lines
+             */
+        cp = strtok(hostname, " .\t\n\r");
+        if ((cp != NULL) && ((*cp != '*') && (*cp != '!'))) {
+                /*
+                 * Copy short hostname to hostlist array
+                 */
+            if (current_hostlist_size >= current_hostlist_limit) {
+                current_hostlist_limit = current_hostlist_limit + HOSTLIST_ALLOCATE_FACTOR;
+                current_hostlist = realloc(current_hostlist, current_hostlist_size * sizeof(char *));
+                malloc_check(current_hostlist, __FUNCTION__, __LINE__);
+            }
+            current_hostlist[current_hostlist_size++] = strdup(cp);
+            if (find_node(hostname) == NULL) {
+                node_refcount *node;
+                node = add_node(hostname);
+                AddToList(new_nodes, node);
+                node_count = node_count + 1;
+            }
         }
         res = fgets(hostname, sizeof(hostname), hostlist);
     }
@@ -5237,11 +5317,11 @@ void send_stderr(jobinfo * job, char *buf)
          * the front end.
          */
         if (job->stderr_redirect) {
-            int match;
+            int is_aix_msgid;
 
             fprintf(job->stderr_file, "%s", buf);
-            match = regexec(&msgid_regex, buf, 0, NULL, 0);
-            if (match == 0) {
+            is_aix_msgid = regexec(&msgid_regex, buf, 0, NULL, 0);
+            if (is_aix_msgid == 0) {
                 send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PROC_STDERR_ATTR, buf);
             }
         }
@@ -5359,7 +5439,7 @@ proxy_attr_def_enum_event(int trans_id, char *id, char *name, char *desc, int di
     return msg;
 }
 
-void send_new_node_list(int trans_id, int machine_id, List * new_nodes)
+void send_new_node_list(int trans_id, int machine_ident, List * new_nodes)
 {
     proxy_msg *msg;
     node_refcount *noderef;
@@ -5367,7 +5447,7 @@ void send_new_node_list(int trans_id, int machine_id, List * new_nodes)
 
     pthread_mutex_lock(&node_lock);
     SetList(new_nodes);
-    sprintf(id_string, "%d", machine_id);
+    sprintf(id_string, "%d", machine_ident);
     msg = proxy_new_node_event(trans_id, id_string, SizeOfList(new_nodes));
     noderef = GetListElement(new_nodes);
     while (noderef != NULL) {
