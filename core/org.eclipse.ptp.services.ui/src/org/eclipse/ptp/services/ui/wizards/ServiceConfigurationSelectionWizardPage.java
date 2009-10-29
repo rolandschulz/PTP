@@ -33,6 +33,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+/**
+ * Main page used by the NewServiceConfigurationProjectWizard to select an existing
+ * service configuration or create a new one.
+ * 
+ * NOT CURRENTLY USED AND MAY BE DEPRECATED
+ */
 public class ServiceConfigurationSelectionWizardPage extends WizardSelectionPage {
 
 	private class ServiceNode implements IWizardNode {

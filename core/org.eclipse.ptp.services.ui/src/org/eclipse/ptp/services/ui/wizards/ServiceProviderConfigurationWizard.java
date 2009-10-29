@@ -24,6 +24,10 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
 
+/**
+ * Wizard for configuring a particular service provider. Obtains pages from the
+ * providerContributor extension point.
+ */
 public class ServiceProviderConfigurationWizard extends Wizard {
 
 	protected final IWizardPage fPageLink;

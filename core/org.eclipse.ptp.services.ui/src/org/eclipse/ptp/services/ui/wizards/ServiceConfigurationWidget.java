@@ -36,10 +36,10 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.ServicesUIPlugin;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.services.ui.ServiceModelUIManager;
-import org.eclipse.ptp.services.ui.dialogs.ServicesDialog;
+import org.eclipse.ptp.services.ui.ServicesUIPlugin;
+import org.eclipse.ptp.services.ui.dialogs.ServiceSelectionDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -57,11 +57,10 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * Wizard to configure service providers using the wizard supplied by
+ * the providerContributer extension point. 
  * 
+ * NOT CURRENTLY USED AND MAY BE DEPRECATED
  */
 public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	
@@ -75,7 +74,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 				}
 			}
 			
-			ServicesDialog dialog = new ServicesDialog(getShell(), displaySet.toArray(new IService[0]));
+			ServiceSelectionDialog dialog = new ServiceSelectionDialog(getShell(), displaySet.toArray(new IService[0]));
 			if (dialog.open() == Dialog.OK) {
 				IService[] selectedServices = dialog.getSelectedServices();
 				for (IService service : selectedServices) {

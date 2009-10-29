@@ -39,6 +39,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+/**
+ * Wizard for configuring a service configuration using the old style configuration
+ * widget (a table with multiple columns) provided by {@link #ServiceModelWiget}
+ * 
+ * NOT CURRENTLY USED AND MAY BE DEPRECATED
+ */
 public class ServiceConfigurationWizard extends Wizard implements INewWizard {
 
 	private class ServicesPage extends WizardSelectionPage {

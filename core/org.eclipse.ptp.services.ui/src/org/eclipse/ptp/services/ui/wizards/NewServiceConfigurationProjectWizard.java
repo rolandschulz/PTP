@@ -31,6 +31,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+/**
+ * A wizard for creating a new service configuration by stepping through service provider
+ * configuration wizard pages.
+ * 
+ * NOT CURRENTLY USED AND MAY BE DEPRECATED
+ */
 public class NewServiceConfigurationProjectWizard extends Wizard implements INewWizard {
 
 	private class IntroPage extends WizardPage {
