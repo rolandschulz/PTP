@@ -152,11 +152,15 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		fServices = services;
 		fUseCheckboxes = ((style & SWT.CHECK) == SWT.CHECK);
 		
+		GridLayout bodyLayout;
 		if (enableButtons && !fUseCheckboxes) {
-			setLayout(new GridLayout(2, false));
+			bodyLayout = new GridLayout(2, false);
 		} else {
-			setLayout(new GridLayout(1, false));
+			bodyLayout = new GridLayout(1, false);
 		}
+		bodyLayout.marginHeight = 0;
+		bodyLayout.marginWidth = 0;
+		setLayout(bodyLayout);
 		setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
 		Composite tableComposite = new Composite(this, SWT.NONE);
@@ -309,11 +313,8 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		updateControls();
 	}
 	
-	/**
-	 * Adds the listener to the collection of listeners who will
-	 * be notified when the users selects a service configuration
-	 * </p>
-	 * @param listener the listener that will be notified of the selection
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		fSelectionListeners.add(listener);
@@ -356,11 +357,8 @@ public class ServiceConfigurationSelectionWidget extends Composite implements IS
 		return fSelection;
 	}
 
-	/**
-	 * Removes the listener from the collection of listeners who will
-	 * be notified when a service configuration is selected by the user.
-	 *
-	 * @param listener the listener which will no longer be notified
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		fSelectionListeners.remove(listener);
