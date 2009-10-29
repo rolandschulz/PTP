@@ -76,7 +76,7 @@ public class RemoteCReconcilingStrategy extends CReconcilingStrategy {
 				
 				RemoteReconcileWorkingCopyOperation op = new RemoteReconcileWorkingCopyOperation(workingCopy, computeAST, true);
 		        op.runOperation(fProgressMonitor);
-				
+		        ((ICReconcilingListener)fEditor).reconciled(null, true, fProgressMonitor);
 			}
 		} catch (OperationCanceledException oce) {
 			// document was modified while parsing
