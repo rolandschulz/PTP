@@ -27,7 +27,7 @@ import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.dialogs.ServiceConfigurationSelectionDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
-import org.eclipse.ptp.services.ui.widgets.NewServiceModelWidget;
+import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -133,7 +133,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	private ServiceConfigurationComparator serviceConfigurationComparator;
 	private Table serviceConfigurationList;
 	private ServiceScrolledComposite serviceModelPane;
-	private NewServiceModelWidget serviceModelWidget;
+	private ServiceProviderConfigurationWidget serviceModelWidget;
 
 	/**
 	 * Create the service configuration properties page
@@ -355,7 +355,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		Composite serviceComp = new Composite(serviceModelPane, SWT.NONE);
 		serviceComp.setLayout(new GridLayout(1, true));
 		
-		serviceModelWidget = new NewServiceModelWidget(serviceComp, SWT.NONE);
+		serviceModelWidget = new ServiceProviderConfigurationWidget(serviceComp, SWT.NONE);
 		serviceModelWidget.addSelectionListener(eventHandler);
 		serviceModelWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
