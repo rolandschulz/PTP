@@ -27,7 +27,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.widgets.NewServiceModelWidget;
+import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
 import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
@@ -59,7 +59,7 @@ public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 		IWizard wizard = MBSCustomPageManager.getPageData(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID).getWizardPage().getWizard();
 		IProject project = ((CDTCommonProjectWizard) wizard).getLastProject();
 		
-		NewServiceModelWidget widget = (NewServiceModelWidget)getMBSProperty(SERVICE_MODEL_WIDGET_PROPERTY);
+		ServiceProviderConfigurationWidget widget = (ServiceProviderConfigurationWidget)getMBSProperty(SERVICE_MODEL_WIDGET_PROPERTY);
 		widget.applyChangesToConfiguration();
 		IServiceConfiguration config = widget.getServiceConfiguration();
 		
