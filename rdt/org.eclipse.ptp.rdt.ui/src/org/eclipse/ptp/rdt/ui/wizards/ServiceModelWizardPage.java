@@ -25,7 +25,7 @@ import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.widgets.NewServiceModelWidget;
+import org.eclipse.ptp.services.ui.widgets.ServiceConfigurationSelectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -43,7 +43,6 @@ import org.eclipse.ui.PlatformUI;
  *
  */
 public class ServiceModelWizardPage extends MBSCustomPage {
-
 	public static final String SERVICE_MODEL_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.ui.serviceModelWizardPage"; //$NON-NLS-1$
 	public static final String DEFAULT_CONFIG = Messages.getString("ConfigureRemoteServices.0"); //$NON-NLS-1$
 	
@@ -56,7 +55,7 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 	private Image fImage;
 	private Control fCanvas;
 	private IServiceConfiguration fConfig;
-	private NewServiceModelWidget fModelWidget;
+	private ServiceConfigurationSelectionWidget fModelWidget;
 	
 
 	public ServiceModelWizardPage(String pageID) {
@@ -107,7 +106,7 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 	 */
 	public void createControl(Composite parent) {
 		fCanvas = parent; // TODO
-		fModelWidget = new NewServiceModelWidget(parent, SWT.NONE);
+		fModelWidget = new ServiceConfigurationSelectionWidget(parent, SWT.NONE);
 		
 		MBSCustomPageManager.addPageProperty(pageID, SERVICE_MODEL_WIDGET_PROPERTY, fModelWidget);
 		
@@ -120,7 +119,7 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 		
 		fConfig = ServiceModelManager.getInstance().newServiceConfiguration(configName);
 		
-		fModelWidget.setServiceConfiguration(fConfig);
+		fModelWidget.setConfigurations(new IServiceConfiguration[]{fConfig});
 		
 		Control control = fModelWidget.getParent().getShell(); //get the shell or doesn't display help correctly
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(control,RDTHelpContextIds.SERVICE_MODEL_WIZARD);
