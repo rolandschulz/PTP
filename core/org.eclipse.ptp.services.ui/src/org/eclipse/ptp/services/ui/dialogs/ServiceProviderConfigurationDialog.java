@@ -15,7 +15,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.ui.messages.Messages;
-import org.eclipse.ptp.services.ui.widgets.NewServiceModelWidget;
+import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,23 +26,23 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Launches a dialog that contains the NewServiceModelWidget
+ * Launches a dialog that contains the ServiceProviderConfigurationWidget
  * with OK and Cancel buttons.
  */
-public class NewServiceModelWidgetDialog extends Dialog {
+public class ServiceProviderConfigurationDialog extends Dialog {
 
-	private NewServiceModelWidget fServiceModelWidget;
+	private ServiceProviderConfigurationWidget fServiceModelWidget;
 	private IServiceConfiguration fConfig;
 	private Control fDialogControl;
 	private Point fDialogSize;
 	
-	public NewServiceModelWidgetDialog(IShellProvider parentShell, IServiceConfiguration config) {
+	public ServiceProviderConfigurationDialog(IShellProvider parentShell, IServiceConfiguration config) {
 		super(parentShell);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 		fConfig = config;
 	}
 
-	public NewServiceModelWidgetDialog(Shell parentShell, IServiceConfiguration config) {
+	public ServiceProviderConfigurationDialog(Shell parentShell, IServiceConfiguration config) {
 		super(parentShell);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 		fConfig = config;
@@ -63,7 +63,7 @@ public class NewServiceModelWidgetDialog extends Dialog {
 	protected Control createDialogArea(Composite parent) {
 		final Composite dialogArea = (Composite) super.createDialogArea(parent);
 		
-		fServiceModelWidget = new NewServiceModelWidget(dialogArea, SWT.NONE);
+		fServiceModelWidget = new ServiceProviderConfigurationWidget(dialogArea, SWT.NONE);
 		fServiceModelWidget.setServiceConfiguration(fConfig);
  		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
  		data.minimumHeight = 400;
