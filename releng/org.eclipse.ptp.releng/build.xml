@@ -4,7 +4,7 @@
 	</target>
 	
 	<target name="build" depends="zips,test"/>
-	<target name="nightly" depends="tag,zips,sign,test,copy"/>
+	<target name="nightly" depends="tag,zips,sign,test,copy,check"/>
 	<target name="testbuild" depends="zips,test,copy"/>
 	<target name="buildcopy" depends="zips,copy"/>
 	
@@ -133,7 +133,14 @@
 		<move file="${buildDirectory}/signed/${photranMasterFile}" todir="${zipsdir}"/>
 		-->
 	</target>
+	
 	<target name="test" depends="init" unless="hasErrors"/>
+	
+	<target name="check" depends="init" if="hasErrors">
+		<echo>BUILD FAILED</echo>
+		<echo>Errors were detected in the build output.</echo>
+	</target>
+		
 	<target name="copy" depends="init" unless="hasErrors">
 		<mkdir dir="${copyToDir}/${buildType}.${buildId}"/>
 		<copy todir="${copyToDir}/${buildType}.${buildId}">
