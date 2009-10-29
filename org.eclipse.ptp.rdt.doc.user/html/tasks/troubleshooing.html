@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+  
+<title>Troubleshooting Remote Development Tools</title>
+</head>
+
+<body>
+      <h1>Troubleshooting</h1>
+<br><br>
+<p><b>Indexer Problems</b></p>
+
+<img src="../../images/indexer_problem.png" alt="Remote indexing warning dialog"/>
+<p>
+A prompt will appear when problems are encountered during indexing.  Information
+on these problems can be found in the Remote System Explorer <b>rsecomm.log</b>, located in 
+<code>$HOME/.eclipse/RSE/</code> on the remote host.</p>
+<br>
+<br>
+<p><b>Editor Warnings</b></p>
+
+<p>
+There is a known issue where sometimes the remote editor displays
+false warnings about syntax errors or invalid include directives. To disable
+editor warnings do the following:
+</p>
+<ol>
+  <li>Use the workbench menu to open the Preferences dialog, <b>Window &gt; Preferences.</b></li>
+  <li>Navigate to the Annotations preference page, <b>General &gt; Editors &gt; Text Editors &gt; Annotations</b>.</li>
+  <li>Select <b>C/C++ Indexer Markers.</b></li>
+  <li>Uncheck all the checkboxes.</li>
+  <li>Click <b>Apply</b>.</li>
+</ol>
+
+
+<p>&nbsp;<br>
+&nbsp;</p>  
+
+</body>
+
+</html>

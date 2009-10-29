@@ -23,5 +23,7 @@
  <topic href="html/tasks/analyze_code.html" label="Analyze Code">
  </topic>
  <topic href="html/tasks/rse_tmanagesearch.html" label="Search for text and files on remote servers">
+ </topic>
+ <topic href="html/tasks/troubleshooing.html" label="Troubleshooting Remote Development Tools">
  </topic> 
 </toc>
