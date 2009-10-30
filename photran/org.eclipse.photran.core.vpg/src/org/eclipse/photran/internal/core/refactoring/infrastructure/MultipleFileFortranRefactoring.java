@@ -12,6 +12,7 @@ package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,10 @@ public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefa
         assert files != null && files.size() > 0;
 
         this.vpg = PhotranVPG.getInstance();
-        this.selectedFiles = files;
+        
+        // Copy the list to ensure it is mutable
+        this.selectedFiles = new LinkedList<IFile>();
+        this.selectedFiles.addAll(files);
     }
 
     @Override

@@ -27,9 +27,20 @@ public class PhotranResourceFilter implements IResourceFilter
         if (resource instanceof IProject)
             return PhotranVPG.getInstance().shouldProcessProject((IProject)resource);
         else if (resource instanceof IFile)
-            return PhotranVPG.getInstance().shouldProcessFile((IFile)resource);
+            return ((IFile)resource).getProject() != null
+                && PhotranVPG.getInstance().shouldProcessProject(((IFile)resource).getProject())
+                && PhotranVPG.getInstance().shouldProcessFile((IFile)resource);
         else
             return true;
     }
 
+    public String getError(IResource resource)
+    {
+        if (resource instanceof IProject)
+            return PhotranVPG.getInstance().describeWhyCannotProcessProject((IProject)resource);
+        else if (resource instanceof IFile)
+            return PhotranVPG.getInstance().describeWhyCannotProcessFile((IFile)resource);
+        else
+            return null;
+    }
 }

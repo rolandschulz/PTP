@@ -242,6 +242,45 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         }
     }
 
+    public String describeWhyCannotProcessProject(IProject project)
+    {
+        try
+        {
+            if (!project.isAccessible())
+                return "The project " + project.getName() + " is not accessible.  "
+                     + "Please make sure that it is open and that the permissions are set correctly.";
+            else if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID))
+                return "The project " + project.getName() + " is not a Fortran, C, or C++ project.  "
+                     + "Plase convert it to a Fortran, C, or C++ project and enable analysis and "
+                     + "refactoring in the project properties.";
+            else if (!SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"))
+                return "Please enable analysis and refactoring in the project properties for "
+                     + project.getName() + ".";
+            else
+                return null;
+        }
+        catch (CoreException e)
+        {
+            throw new Error(e);
+        }
+    }
+
+    public String describeWhyCannotProcessFile(IFile file)
+    {
+        if (file.getProject() == null)
+            return "The file " + file.getName() + " is not located in a Fortran, C, or C++ project.";
+        else if (!shouldProcessProject(file.getProject()))
+            return describeWhyCannotProcessProject(file.getProject());
+        else if (!shouldProcessFile(file))
+            return "The file " + file.getName() + "'s filename extension ("
+                 + file.getFileExtension()
+                 + ") indicates that this is not a Fortran source file.\n\nIf you believe that this "
+                 + "is incorrect, please see the Photran User's Guide for instructions on how to "
+                 + "change the file's content type in the workbench preferences.";
+        else
+            return null;
+    }
+
 	@Override
 	protected PhotranTokenRef getTokenRef(Token forToken)
 	{

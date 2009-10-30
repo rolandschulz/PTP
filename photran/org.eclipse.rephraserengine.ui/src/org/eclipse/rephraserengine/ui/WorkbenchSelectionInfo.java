@@ -50,6 +50,7 @@ import org.eclipse.ui.internal.Workbench;
 public class WorkbenchSelectionInfo
 {
     private IResourceFilter resourceFilter;
+    private String errorMsg;
 
     private IEditorPart activeEditor;
     private IFile fileInEditor;
@@ -107,7 +108,11 @@ public class WorkbenchSelectionInfo
 
         IFileEditorInput fileInput = (IFileEditorInput)input;
         fileInEditor = fileInput.getFile();
-        if (!resourceFilter.shouldProcess(fileInEditor)) fileInEditor = null;
+        if (!resourceFilter.shouldProcess(fileInEditor))
+        {
+            fileInEditor = null;
+            errorMsg = resourceFilter.getError(fileInEditor);
+        }
 
         if (selection instanceof ITextSelection)
         {
@@ -130,11 +135,17 @@ public class WorkbenchSelectionInfo
             {
                 IAdaptable item = (IAdaptable)selectedItem;
                 IResource res = (IResource)item.getAdapter(IResource.class);
-                if (res != null && resourceFilter.shouldProcess(res))
-                    result.add(res);
+                if (res != null)
+                {
+                    if (resourceFilter.shouldProcess(res))
+                        result.add(res);
+                    else
+                        errorMsg = resourceFilter.getError(res);
+                }
             }
         }
 
+        if (!result.isEmpty()) errorMsg = null;
         return result;
     }
 
@@ -233,5 +244,15 @@ public class WorkbenchSelectionInfo
     public List<IFile> getAllFilesInSelectedResources()
     {
         return allFilesInSelectedResources;
+    }
+    
+    /**
+     * @return an error message to display to the user, if all of the files in the selection were
+     * filtered out, which describes why that happened and possibly what the user can do about it;
+     * may be <code>null</code>
+     */
+    public String getErrorMessage()
+    {
+        return errorMsg;
     }
 }

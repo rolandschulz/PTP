@@ -44,4 +44,9 @@ public class TextFileResourceFilter implements IResourceFilter
             && resource.isAccessible()
             && !resource.isDerived();
     }
+
+    public String getError(IResource resource)
+    {
+        return "The file " + resource.getName() + " is not a text file, or it is not accessible.";
+    }
 }

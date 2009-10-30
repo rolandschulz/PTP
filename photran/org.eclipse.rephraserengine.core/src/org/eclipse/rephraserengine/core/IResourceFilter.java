@@ -30,4 +30,14 @@ public interface IResourceFilter
 {
     /** @return true iff this resource can and should be processed */
     boolean shouldProcess(IResource resource);
+
+    /**
+     * As a precondition, this method will only be invoked if {@link #shouldProcess(IResource)}
+     * recently returned <code>false</code> for the given resource.
+     * 
+     * @return an error message, if the given resource has been filtered out due to an error
+     * condition, or <code>null</code> otherwise.  The error message will be displayed to the user,
+     * so it may also be useful to describe what the user can do to fix the error.
+     */
+    String getError(IResource resource);
 }

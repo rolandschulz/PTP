@@ -26,4 +26,9 @@ public class DefaultResourceFilter implements IResourceFilter
     {
        return resource.isAccessible();
     }
+    
+    public String getError(IResource resource)
+    {
+        return "The resource (" + resource.getName() + ") is not accessible.";
+    }
 }
