@@ -193,6 +193,9 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public IFileStore getParent() {
+		if (fRemotePath.isRoot()) {
+			return null;
+		}
 		String parentPath = fRemotePath.toString();
 		if (fRemotePath.segmentCount() > 0) {
 			parentPath = fRemotePath.removeLastSegments(1).toString();
