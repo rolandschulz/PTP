@@ -420,6 +420,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         }
         
         program.getInternalSubprograms().add(subprogram);
+        subprogram.setParent(program.getInternalSubprograms());
         
         Reindenter.reindent(subprogram, this.astOfFileInEditor);
 
