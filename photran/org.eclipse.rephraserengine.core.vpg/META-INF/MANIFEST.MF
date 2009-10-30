@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rephraser Engine Core VPG Plug-in
+Bundle-SymbolicName: org.eclipse.rephraserengine.core.vpg
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse.org - Photran
+Export-Package: org.eclipse.rephraserengine.core.vpg,
+ org.eclipse.rephraserengine.core.vpg.db.caching,
+ org.eclipse.rephraserengine.core.vpg.db.cdt,
+ org.eclipse.rephraserengine.core.vpg.eclipse,
+ org.eclipse.rephraserengine.internal.core.preservation;x-friends:="org.eclipse.rephraserengine.core.vpg.tests,org.eclipse.rephraserengine.ui.vpg",
+ org.eclipse.rephraserengine.internal.core.vpg.db.cdt;x-friends:="org.eclipse.rephraserengine.core.vpg.tests",
+ org.eclipse.rephraserengine.internal.db.org.eclipse.cdt.core;x-friends:="org.eclipse.rephraserengine.core.vpg.tests",
+ org.eclipse.rephraserengine.internal.db.org.eclipse.cdt.internal.core.pdom.db;x-friends:="org.eclipse.rephraserengine.core.vpg.tests",
+ org.eclipse.rephraserengine.internal.db.org.eclipse.cdt.internal.core.pdom.dom;x-friends:="org.eclipse.rephraserengine.core.vpg.tests"
+Bundle-Execution-Environment: J2SE-1.5
+Bundle-ClassPath: cdtdb-4.0.3-eclipse.jar,
+ .
+Import-Package: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.rephraserengine.core,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -1,0 +1,23 @@
+program tabs
+    implicit none
+	!
+ 	!
+  	!
+   	!
+    	!
+     	!
+      	!
+       	!
+        	!
+         	!
+          	!
+           	!
+        		!
+         		!
+          		!
+           		!
+        	a	!
+         	ab	!
+          	abc	!
+           	abcd	!
+end program tabs

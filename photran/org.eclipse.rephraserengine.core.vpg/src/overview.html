@@ -1,0 +1,296 @@
+<html>
+<body>
+<a name="VPG"></a>
+<center>
+<h1>Virtual Program Graph - Architectural Overview</h1>
+<p><i>Jeff Overbey &bull; July-August 2007</i></p>
+</center>
+
+<!-- ============================================================================================================== -->
+<!-- ============================================================================================================== -->
+<h2>Introduction</h2>
+<!-- ============================================================================================================== -->
+<!-- ============================================================================================================== -->
+
+<p>In source-to-source program transformation systems,
+it is common to represent programs as abstract syntax trees (ASTs) with &quot;extra&quot; edges between nodes.
+For example, an AST node representing the use of a variable <i>i</i> might have an edge pointing to the
+declaration of <i>i.</i>  A subclass might have a different kind of edge pointing at its superclass.
+Edges can also be used to describe dependencies, data flow, control flow, and many other properties.
+An AST with these &quot;extra&quot; edges is called a <i>program graph.</i></p>
+
+<div class="indent1">
+<!-- ============================================================================================================== -->
+<h3>Example</h3>
+<!-- ============================================================================================================== -->
+
+
+<p>Consider the following program in a fictitious programming language.</p>
+
+<pre>
+program
+  integer i = 3
+  print i + " is the value of i" 
+end program
+</pre>
+
+<p>A program graph might look like the following.  The nodes and solid edges comprise the AST;
+rectangular nodes represent tokens in the source program.
+The &quot;extra&quot; edges--the edges that make it a program graph rather than just an ordinary
+AST--are labeled and dotted.</p>
+
+<p align="center"><img src="doc-files/vpg.png" border="0"></p>
+
+<p>This program graph has two types of edges.
+<ul>
+<li> A <i>binding</i> edge links variables references to their corresponding declarations.
+<li> A <i>scope of declaration</i> edge links declarations to the node representing their scope.
+</ul>
+</p>
+
+<p>Now, consider how this graph can be used.
+<ul>
+<li> To find the declaration of a variable, we simply follow the <i>binding</i> edge to its declaration.
+<li> To find all of the references to a variable, we search for all of the <i>binding</i> edges pointing
+     to its declaration.
+<li> To determine the scope of a variable, we follow its <i>scope of declaration</i> edge.
+<li> Similarly, we can find all of the variables defined in a scope by searching for all of the
+     <i>scope of declaration</i> edges pointing to that node.
+<li> A <i>scope of declaration</i> edge links declarations to the node representing their scope.
+</ul>
+</p>
+
+</div>
+
+<!-- ============================================================================================================== -->
+<!-- ============================================================================================================== -->
+<h2>Virtual Program Graphs (VPGs)</h2>
+<!-- ============================================================================================================== -->
+<!-- ============================================================================================================== -->
+
+<p>Often, program graphs only conceptual: &quot;Real&quot; programs can be extremely large,
+spanning hundreds of files, and edges may span across these files.  For example, a function
+defined in one file may be used in another, so a <i>binding</i> edge would span across files.
+Of course, it is inefficient--and sometimes impossible--to store ASTs for several hundred files
+in memory.  Therefore, most systems cache information about externally-visible
+declarations in a <b>program database.</b>
+It becomes the programmer's responsibility to parse individual files and to distinguish what
+is available the program database from what is available in the AST.</p>
+
+<p>The <tt>bz.over.vpg</tt> package serves as a basis for implementing <b>virtual program graphs,</b> which
+hide parsing and database access from the programmer.  Essentially, the programmer can <i>pretend</i>
+that an AST for the entire (several-hundred-file) program is available in memory.</p>
+
+<!--p><i>N.B. There is a separate package <tt>(bz.over.vpg.core.eclipse)</tt> which allows a VPG to be
+integrated into an Eclipse plug-in, automatically updating itself when files are changed.
+The additional features and requirements of Eclipse-integrated VPGs are described
+<a href="#Eclipse">later</a>..</i></p-->
+
+<div class="indent1">
+<!-- ============================================================================================================== -->
+<h3>Using a Virtual Program Graph</h3>
+<!-- ============================================================================================================== -->
+
+<p>In this section, we will describe how a virtual program appears to work according to someone who is using
+it to write a refactoring or implement a search feature in an IDE, etc.  In other words, this is its
+external interface, the interface seen by people who need to do program analyses.</p>
+
+<p>To a user, the VPG itself appears to have only two capabilities:
+<ul>
+<li> When the user needs the AST for a particular file, he asks the VPG to provide it to him.
+<li> The VPG contains an error log, describing files that could not be parsed for one reason or another.
+     At times, the user may want to retrieve entries from this log and display them to the user.
+</ul>
+</p>
+
+<p>When used properly, the real benefit of a VPG is the methods that can be added to AST nodes.
+   In the example VPG in the picture above, for example, 
+<ul>
+<li> The user could call a method <tt>getDeclaration()</tt> on a <tt>VariableReference</tt> node,
+     which would return the corresponding <tt>Declaration</tt> node.
+<li> The user could call a method <tt>getAllReferences()</tt> on a <tt>Declaration</tt> node,
+     which would return a list of all of the references to that declaration.
+<li> The user could call a method <tt>getScope()</tt> on a <tt>Declaration</tt> node,
+     which would return the scope of that definition (e.g., a <tt>Program</tt> node).
+<li> The user could call a method <tt>getScope()</tt> on a <tt>VariableReference</tt> node,
+     which would return the scope of its definition.
+</ul>
+</p>
+
+<p>Again, it is important to remember that the returned node <i>does not have to be in the same file.</i>
+For example, <tt>getAllReferences()</tt> could return a list of all of the references to that variable,
+even if they span hundreds of files.  (Of course, it does not have to load hundreds of ASTs into memory
+to do this!)</p>
+
+</div>
+
+<div class="indent1">
+<!-- ============================================================================================================== -->
+<h3>Building a Virtual Program Graph</h3>
+<!-- ============================================================================================================== -->
+
+<p>This section describes how methods on AST nodes (such as the ones in the bulleted list above)
+are actually implemented.  (If you are simply <i>using</i> a VPG, there is no reason to read this
+section: If a VPG is implemented well, all of this should be hidden from you.)</p>
+
+<div class="indent2">
+<a name="DEA"></a>
+<h4>Dependencies, Edges, Annotations, and the VPG Database</h4>
+<!-- ============================================================================================================== -->
+
+<p>VPGs contain a number of methods that are not visible to ordinary users
+of VPGs: They are intended to be used only for implementing user-visible methods on AST nodes,
+such as the ones described above.</p>  
+
+<p>Recall that a program graph is just an AST with extra edges.
+A VPG contains edges, but it also contains <i>dependencies</i> and <i>annotations.</i>
+<ul>
+<li> <i>Edges</i> were described above: They point from one AST node to another.  There can be
+     many different types of edges.
+<li> <i>Dependencies</i> point from one file to another.  For example, if File A uses a function
+     defined in File B, then there is a dependency from File A to File B.  A dependency could also
+     occur if File A imports a module from File B, or <tt>#include</tt>s File B (in C/C++), etc.
+<li> <i>Annotations</i> let an arbitrary object be associated with a node in an AST.
+     For example, some object describing the type of a variable
+     (e.g., &quot;integer array of length 10&quot;)
+     could be associated with a <tt>Declaration</tt> node in an AST.
+</ul>
+</p>
+
+<p>All of the edges, dependencies, and annotations are stored on disk in a <i>VPG Database.</i></p>
+
+</div>
+
+<div class="indent2">
+<a name="TokenRef"></a>
+<h4>TokenRefs</h4>
+<!-- ============================================================================================================== -->
+
+<p>A <tt>TokenRef</tt> is just a simple object with three fields:
+<ul>
+<li> a filename,
+<li> an offset, and
+<li> a length.
+</ul>
+</p>
+
+<p>Since edges point from one AST node to another, annotations are associated with a particular
+AST node, and both edges and annotations are stored on disk, there needs to be some concise way to describe
+AST nodes.  This is the purpose of a <tt>TokenRef</tt>.<p>
+
+<p>As the name implies, <tt>TokenRef</tt>s are actually suitable for uniquely identifying particular
+<i>tokens</i> in an AST.  <i>Although it should be hidden from the </i>user<i> of
+a VPG, the edges and annotations in a VPG are actually associated with tokens, not arbitrary AST nodes.</i>
+This was a carefully-made decision, based on the heuristic that essentially every &quot;interesting&quot;
+node in a AST has at least one token that can be used to distinguish it from other &quot;interesting&quot;
+nodes.  Functions have names.  Variables have names.  Programs have names.  Scopes are typically
+things like functions or programs.  Assignment statements have an equals sign.  And so forth.</p>
+
+<p><small><i>Again, this is a heuristic.  One common case where it is not true is when the root
+node of an AST needs to be annotated: This can be handled, for example, by deciding that a
+<tt>TokenRef</tt> referring to offset -1, length 0 refers to the root node of the AST, by convention.
+If it really is necessary to refer to completely arbitrary nodes in the AST, one could cheat: The
+nodes in an AST could be numbered from 0 to </i>n<i>, and the &quot;offset&quot; of a <tt>TokenRef</tt>
+could store a node number (the length field could be ignored).</i></small></p>
+
+</div>
+
+<div class="indent2">
+<h4>Mapping TokenRefs to Tokens</h4>
+<!-- ============================================================================================================== -->
+
+<p>VPGs provide a method <tt>findToken(TokenRef)</tt> which returns a pointer to the given token in an AST.
+This is called <i>dereferencing the <tt>TokenRef</tt>.</i></p>
+
+<p>This is perhaps surprising, because an AST for the file pointed to might or might not be in memory.
+   This is fine; since the VPG is where users go to request ASTs anyway, the VPG &quot;knows&quot; whether
+   an AST for that file is in memory or not.  If not, it loads it.
+   When a VPG needs to provide an AST for a file, regardless of whether the user requests it or it
+   happens as a result of dereferencing a <tt>TokenRef</tt>, the following happens.
+<ul>
+<li> The VPG maintains a cache of ASTs.  If an up-to-date AST is available in the cache, it is
+     simply provided to the user.  If not, the VPG calls the parser, which provides an AST.
+<li> The VPG database is checked; if the information for the file it parsed is out of date,
+     the dependencies, edges, and annotations for that file (and any dependent files) are recalculated.
+<li> The new AST is added to the cache.
+</ul>
+
+<p>When an AST is requested from the VPG, the requested AST can be either <i>permanent</i> or <i>transient</i>.
+A transient AST will be garbage collected when there are no pointers remaining to any of its nodes.
+A permanent AST will be held in memory until the user explicitly tells the VPG to release it.
+If dereferencing a <tt>TokenRef</tt> requires building a new AST, a transient AST is constructed, so it
+can be garbage collected as soon as the user is done using that AST.  Of course, the user can ask the
+VPG to make that AST permanent if he so desires.</p>
+
+</div>
+
+<div class="indent2">
+<h4>VPG-Building Methods</h4>
+<!-- ============================================================================================================== -->
+
+<p>VPGs provide package-private methods to
+<ul>
+<li> add dependencies, edges, and annotations,
+<li> delete dependencies, edges, and annotations,
+<li> retrieve all of the incoming or outgoing edges to/from a particular token,
+<li> retrieve all of the incoming or outgoing dependencies to/from a particular file,
+<li> log errors and warnings, and 
+<li> delete all of the dependencies, edges, and annotations associated with a particular file.
+</ul>
+</p>
+
+<p>In the section &quot;Using a Virtual Program Graph,&quot; we described several methods that
+could be implemented on AST nodes using a VPG.  For example, we suggested that
+&quot;The user could call a method <tt>getAllReferences()</tt> on a <tt>Declaration</tt> node,
+which would return a list of all of the references to that declaration.&quot;
+This could be implemented as follows.
+<ul>
+<li> When the VPG is built, <i>binding</i> edges are pointed at the identifier token
+     associated with the declaration.
+<li> To get all of the references, we ask the VPG for all of the incoming <i>binding</i>
+     edges for the identifier.  Each of these points to another token.  If necessary, we
+     can search upwards from each token in the AST, and return its <tt>VariableDeclaration</tt>
+     node.
+</ul>
+
+</div>
+
+</div>
+
+<!-- ============================================================================================================== -->
+<!-- ============================================================================================================== -->
+<a name="Eclipse"></a>
+<h2>Eclipse Integration</h2>
+<!-- ============================================================================================================== -->
+<!-- ============================================================================================================== -->
+
+Special support is provided for integrating VPGs into Eclipse-based tools.
+<ul>
+<li> Eclipse-based VPGs can sit quietly in the background, updating the VPG database
+     incrementally as the user edits files.  When the Eclipse-based VPG is
+     &quot;started,&quot; it scans the entire Eclipse workspace to make sure its database
+     entries for all of the files are up-to-date.  Then, it updates itself incrementally
+     as files are added, changed, or deleted.
+<li> There is a special type of workspace job and scheduling rule for tasks which access
+     the VPG.  These ensure that only one VPG job is running at any given time.
+     The background/incremental updates are one type of VPG job, and it is important
+     not to read from or write to the VPG while those are running.  Additionally,
+     the provided implementations of VPGs are not thread-safe: If two threads try to access
+     the VPG simultaneously, very strange errors can occur, such as parser stack underflows
+     or a completely corrupted VPG database.
+</ul> 
+
+<!--h2>Implementing a Virtual Program Graph</h2>
+    
+<p>VPGs were designed according to the following principles.
+<ul>
+<li> Parsing a file and constructing an AST is inexpensive and can be done &quot;on demand.&quot;
+<li> Disk accesses are expensive; a minimal amount of information should be maintained on disk.
+</ul>
+</p>
+
+There are several example VPGs available, which should be used as reference for implementing
+a VPG. -->
+
+</body>
+</html>

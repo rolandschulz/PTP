@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="jar">
+<target name="jar">
+
+      <jar destfile="../distrib/cdtdb-4.0.3-cmdline.jar">
+        <fileset dir="../distrib"
+          includes="license.html"
+        />
+        <fileset dir="../bin"
+          includes="**/*"
+        />
+        <fileset dir="../src-cdtdb-4.0.3"
+          includes="**/*"
+        />
+        <fileset dir="../src-cdtdb-mock-objects"
+          includes="**/*"
+        />
+      </jar>
+
+      <jar destfile="../distrib/cdtdb-4.0.3-eclipse.jar">
+        <fileset dir="../distrib"
+          includes="license.html"
+        />
+        <fileset dir="../bin"
+          includes="org/eclipse/rephraserengine/internal/db/org/eclipse/cdt/**/*"
+        />
+        <fileset dir="../src-cdtdb-4.0.3"
+          includes="org/eclipse/rephraserengine/internal/db/org/eclipse/cdt/**/*"
+        />
+      </jar>
+
+</target>
+</project>

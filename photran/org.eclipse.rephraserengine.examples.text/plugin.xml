@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.rephraserengine.ui.refactoring.refactorings">
+
+      <!-- Define a ResourceFilter, which tells what types of projects and files we can refactor -->
+      <resourceFilter class="org.eclipse.rephraserengine.examples.text.TextFileResourceFilter" />
+
+      <!-- Add a new group to the Refactor menu... -->
+      <group>
+         <!-- ...and put our refactoring in that group -->
+         <resourceRefactoring
+            class="org.eclipse.rephraserengine.examples.text.ConvertTabsToSpacesRefactoring" />
+      </group>
+   </extension>
+
+</plugin>

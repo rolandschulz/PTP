@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <!--=============================-->
+   <!-- Refactoring Extension Point -->
+   <!--=============================-->
+   <extension-point id="refactorings" name="Refactorings" schema="schema/refactorings.exsd" />
+
+   <!--===============-->
+   <!-- Refactor Menu -->
+   <!--===============-->
+   <extension point="org.eclipse.ui.menus">
+
+      <!-- Refactor menu in the menu bar -->
+      <!-- ============================= -->
+      <!-- Always visible -->
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=edit">
+         <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
+              http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
+         <menu
+               label="Refac&amp;tor"
+               id="org.eclipse.jdt.ui.refactoring.menu">
+            <dynamic
+                  class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
+                  id="org.eclipse.rephraserengine.ui.menus.refactor">
+            </dynamic>
+         </menu>
+      </menuContribution>
+
+      <!-- Refactor sub-menu in popup menus -->
+      <!--  (e.g., in the Navigator view)   -->
+      <!-- ================================ -->
+      <!-- Visible when at least one IResource is selected -->
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.reorganize">
+         <menu
+               label="Refac&amp;tor"
+               id="org.eclipse.jdt.ui.refactoring.menu">
+            <dynamic
+                  class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
+                  id="org.eclipse.rephraserengine.ui.menus.refactor">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     operator="or">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+
+   </extension>
+
+</plugin>

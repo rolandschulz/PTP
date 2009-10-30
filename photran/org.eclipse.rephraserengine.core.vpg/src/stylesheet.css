@@ -1,0 +1,48 @@
+/* Javadoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { background-color: #FFFFFF; font-family: Trebuchet MS, Verdana, Helvetica, Arial, sans-serif; font-size: 90% }
+
+/* Headings */
+// h1 { font-size: 150% }
+
+h1 { margin-top: 100px }
+h2 { margin-top: 80px; border-bottom: 1px solid #008080 }
+h3 { margin-top: 40px }
+h4 { margin-top: 40px }
+
+p  { font-family: Times, serif; font-size: 12pt }
+td { font-family: Times, serif; font-size: 12pt }
+li { font-family: Times, serif; font-size: 12pt }
+tt { font-size: 10pt }
+
+a:link    { color: #008080; text-decoration: none }
+a:visited { color: #008080; text-decoration: none }
+a:hover   { color: #008080; text-decoration: underline }
+a:active  { color: #008080; text-decoration: none }
+
+div.indent1 { margin-left: 80px }
+div.indent2 { margin-left: 80px }
+
+/* Table colors */
+// .TableHeadingColor     { background: #CCCCFF } /* Dark mauve */
+// .TableHeadingColor     { background: #CCFFFF } /* Dark mauve */
+.TableHeadingColor     { background: #80C0C0 } /* Dark mauve */
+.TableSubHeadingColor  { background: #EEFFFF } /* Light mauve */
+.TableRowColor         { background: #FFFFFF } /* White */
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 100%; font-family: Helvetica, Arial, sans-serif }
+.FrameHeadingFont { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+.FrameItemFont    { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#EEFFFF;} /* Light mauve */
+.NavBarCell1Rev { background-color:#008B8B;} /* Dark Blue */
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}

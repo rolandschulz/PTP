@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rephraser Engine ISV Documentation
+Bundle-SymbolicName: org.eclipse.rephraserengine.doc.isv; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse.org - Photran

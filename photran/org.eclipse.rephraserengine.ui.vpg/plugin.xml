@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <!--===============================-->
+   <!-- VPG Extension Point -->
+   <!--===============================-->
+   <extension-point id="vpg" name="VPG" schema="schema/vpg.exsd" />
+
+   <!--=======================================-->
+   <!-- Debugging Actions in Refactoring Menu -->
+   <!--=======================================-->
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Refactoring Debugging Actions"
+            description="Refactoring Debugging Actions"
+            visible="true"
+            id="org.eclipse.rephraserengine.ui.DebugActionSet">
+         <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
+              http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
+         <menu
+               label="Refac&amp;tor"
+               path="edit"
+               id="org.eclipse.jdt.ui.refactoring.menu">
+                                                          <!-- JAVA REFACTORINGS IN THIS GROUP: -->
+            <separator name="undoRedoGroup"/>             <!-- ================================ -->
+            <separator name="reorgGroup"/>                <!-- Rename, Move -->
+            <separator name="codingGroup"/>               <!-- Change Signature, Extract Var/Method, Inline -->
+            <separator name="reorgGroup2"/>               <!-- Convert -->
+            <separator name="typeGroup"/>                 <!-- Extract Superclass, Pull Up, Push Down -->
+            <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
+            <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
+            <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
+            <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
+         </menu>
+
+         <menu
+               label="(&amp;Debugging)"
+               path="org.eclipse.jdt.ui.refactoring.menu/scriptGroup"
+               id="debugging">
+            <separator name="debugging"/>
+            <separator name="debugginginterfaces"/>
+            <separator name="vpgstats"/>
+            <separator name="vpgdb"/>
+         </menu>
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.DisplayVPGErrorLogAction"
+               id="org.eclipse.rephraserengine.ui.DisplayVPGErrorLogAction"
+               label="Display &amp;Error/Warning Log"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"/>
+         <!-- -->
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.ResetDBStatisticsAction"
+               id="org.eclipse.rephraserengine.ui.ResetVPGStatisticsAction"
+               label="&amp;Reset Database Statistics"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.DisplayDBStatisticsAction"
+               id="org.eclipse.rephraserengine.ui.DisplayVPGStatisticsAction"
+               label="Display Database &amp;Statistics"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
+         <!-- -->
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.ClearDBAction"
+               id="org.eclipse.rephraserengine.ui.ClearVPGDatabaseAction"
+               label="Clear and Rebuild Database"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.EnsureDBUpToDateAction"
+               id="org.eclipse.rephraserengine.ui.RefreshVPGDatabaseAction"
+               label="Ensure Database is Up-to-Date"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.DisplayModelAction"
+               id="org.eclipse.rephraserengine.ui.DisplayVPGModelAction"
+               label="Display Edge Model of Current File"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
+         <action
+               class="org.eclipse.rephraserengine.internal.ui.actions.DisplayDBAction"
+               id="org.eclipse.rephraserengine.ui.DisplayVPGDatabaseAction"
+               label="Display Database"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
+      </actionSet>
+   </extension>
+
+   <!-- Associate the action set with the Resource perspective -->
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <actionSet id="org.eclipse.rephraserengine.ui.DebugActionSet"/>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>
