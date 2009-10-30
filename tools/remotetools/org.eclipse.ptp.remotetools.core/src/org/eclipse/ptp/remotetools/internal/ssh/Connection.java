@@ -371,6 +371,13 @@ public class Connection implements IRemoteConnection {
 
 	/**
 	 * This class is required by the jsch library.
+	 * 
+	 * Jsch will call {@link #promptKeyboardInteractive} until the password
+	 * is correct or it times out. We only allow it to try once, then return null in
+	 * order to speed up the timeout.
+	 * 
+	 * TODO: this should prompt the user for a password if {@link @promptKeyboardInteractive}
+	 * is called twice, since their password is wrong for some reason.
 	 *
 	 * @author Richard Maciel
 	 *
@@ -379,6 +386,7 @@ public class Connection implements IRemoteConnection {
 		private String password;
 		private String passphrase;
 		private boolean isPasswdBased;
+		private boolean firstTry = true;
 
 		private SSHUserInfo() { }
 
@@ -411,6 +419,10 @@ public class Connection implements IRemoteConnection {
 			return isPasswdBased;
 		}
 		
+		public void reset() {
+			firstTry = true;
+		}
+		
 		public void setUsePassword(boolean usePassword) {
 			this.isPasswdBased = usePassword;
 		}
@@ -428,9 +440,12 @@ public class Connection implements IRemoteConnection {
 			}
 			String[] response = new String[1];
 			response[0] = password;
-			return response;
+			if (firstTry) {
+				firstTry = false;
+				return response;
+			}
+			return null;
 		}
-
 	}
 
 	/**
@@ -614,6 +629,7 @@ public class Connection implements IRemoteConnection {
 		Session newSession = null;
 		try {
 			newSession = jsch.getSession(username, hostname, port);
+			sshuserinfo.reset();
 			newSession.setUserInfo(sshuserinfo);
 			setSessionCipherType(newSession);
 		} catch (JSchException e) {
