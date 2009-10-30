@@ -370,9 +370,9 @@ public class Connection implements IRemoteConnection {
 	}
 
 	/**
-	 * This class is required by the jsch library.
+	 * This class is required by the JSch library.
 	 * 
-	 * Jsch will call {@link #promptKeyboardInteractive} until the password
+	 * JSch will call {@link #promptKeyboardInteractive} until the password
 	 * is correct or it times out. We only allow it to try once, then return null in
 	 * order to speed up the timeout.
 	 * 
@@ -391,7 +391,11 @@ public class Connection implements IRemoteConnection {
 		private SSHUserInfo() { }
 
 		public String getPassword() {
-			return password;
+			if (firstTry) {
+				firstTry = false;
+				return password;
+			}
+			return null;
 		}
 		
 		public void setPassword(String password) {
