@@ -31,66 +31,68 @@ public class KeywordCaseTestCase extends RefactoringTestCase
     private static final String DIR = "keyword-case-test-code";
 
     private static NullProgressMonitor pm = new NullProgressMonitor();
-    
+
     protected String filename;
     protected boolean lowerCase;
-    
+
     public KeywordCaseTestCase() {;} // when JUnit invokes a subclass outside a test suite
-    
+
     public KeywordCaseTestCase(String filename, boolean lowerCase)
     {
         this.filename = filename;
         this.lowerCase = lowerCase;
         this.setName("test");
     }
-    
+
     /** Borrowed from IntroImplicitTestCase.java */
     protected void doRefactoring() throws Exception
     {
         String description = "Attempt to upcase keywords in " + filename;
-        
+
         KeywordCaseRefactoring refactoring = createRefactoring(filename);
         refactoring.setLowerCase(lowerCase);
-        
+
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());
-        
+
         status = refactoring.checkFinalConditions(pm);
         assertTrue(description + " failed final precondition check: " + status.toString(), !status.hasError());
-        
+
         Change change = refactoring.createChange(pm);
         assertNotNull(description + " returned null Change object", change);
         assertTrue(description + " returned invalid Change object", change.isValid(pm).isOK());
         change.perform(pm);
-        
+
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
     }
-    
+
     private KeywordCaseRefactoring createRefactoring(final String filename) throws Exception
     {
         final IFile thisFile = importFile(DIR, filename);
-        
+
         ArrayList<IFile> files = new ArrayList<IFile>();
         files.add(thisFile);
-        
-        return new KeywordCaseRefactoring(files);
+
+        KeywordCaseRefactoring r = new KeywordCaseRefactoring();
+        r.initialize(files);
+        return r;
     }
-    
+
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
         return super.readTestFile(DIR, filename);
     }
 
-    /** 
+    /**
      * Borrowed from IntroImplicitTestCase.java *
-     * 
+     *
      * Given an array with all of the positions of identifiers that should be renamed together, try applying the Rename refactoring to
-     * each, and make sure all the others change with it. 
+     * each, and make sure all the others change with it.
      */
     public void test() throws Exception
     {
         if (filename == null) return; // when JUnit invokes this outside a test suite
-        
+
         doRefactoring();
         assertEquals(
             readTestFile(filename + ".result").replaceAll("\\r", ""), // expected result

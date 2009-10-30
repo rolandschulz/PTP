@@ -2,12 +2,12 @@
 	<target name="hi">
 		<echo message="${eclipse.home}"/>
 	</target>
-	
+
 	<target name="build" depends="zips,test"/>
 	<target name="nightly" depends="tag,zips,sign,test,copy"/>
 	<target name="testbuild" depends="zips,test,copy"/>
 	<target name="buildcopy" depends="zips,copy"/>
-	
+
 	<target name="init">
 		<touch file="${user.home}/.cvspass" />
 		<tstamp/>
@@ -44,7 +44,7 @@
 		<mkdir dir="${buildDirectory}"/>
 		<mkdir dir="${testReports}"/>
 	</target>
-	
+
 	<target name="fetch" depends="init">
 		<ant antfile="build.xml" dir="${pde.build.scripts}" target="preBuild">
 			<property name="builder" value="${basedir}/master"/>
@@ -53,13 +53,13 @@
 			<property name="builder" value="${basedir}/master"/>
 		</ant>
 	</target>
-	
+
 	<target name="unzip" depends="init" unless="dontUnzip">
 		<untar src="${eclipseDist}" dest="${buildDirectory}" compression="gzip"/>
 		<unzip src="${cdtDist}" dest="${buildDirectory}/eclipse"/>
 		<unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/>
 	</target>
-	
+
 	<target name="zips" depends="init,unzip">
 		<ant antfile="build.xml" dir="${pde.build.scripts}">
 			<property name="builder" value="${basedir}/master" />
@@ -94,15 +94,15 @@
 			<fileset dir="${buildDirectory}/${buildType}.${buildId}"/>
 		</copy>
 	</target>
-	
+
 	<target name="tagone">
 		<cvs cvsroot="/cvsroot/tools" command="rtag ${tagbranch} ${tagname} ${tagmodule}"/>
 	</target>
-	
+
 	<target name="tag" depends="init">
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
-		</antcall>	
+		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cdtinterface"/>
 		</antcall>
@@ -123,7 +123,7 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.intel-feature"/>
-		</antcall>	
+		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.core"/>
 		</antcall>
@@ -135,18 +135,36 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.ui"/>
-		</antcall>		
+		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.managedbuilder.xlf.ui"/>
-		</antcall>		
+		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui"/>
-		</antcall>		
+		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui.vpg"/>
-		</antcall>	
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature"/>
-		</antcall>	
+		</antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.refactoring"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.vpg"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui.refactoring"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui.vpg"/>
+        </antcall>
 	</target>
 </project>

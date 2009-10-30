@@ -14,7 +14,10 @@ Require-Bundle: org.eclipse.photran.core.vpg,
  org.junit,
  org.eclipse.cdt.core,
  org.eclipse.jface,
- org.eclipse.search
+ org.eclipse.search,
+ org.eclipse.rephraserengine.core.vpg,
+ org.eclipse.rephraserengine.core,
+ org.eclipse.rephraserengine.core.refactoring
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.photran.refactoring.tests.Activator
 Export-Package: org.eclipse.photran.internal.core.tests,

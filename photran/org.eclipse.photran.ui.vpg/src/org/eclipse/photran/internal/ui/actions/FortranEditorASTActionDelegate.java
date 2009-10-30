@@ -28,12 +28,11 @@ import org.eclipse.photran.core.vpg.util.OffsetLength;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.rephraserengine.core.vpg.eclipse.VPGSchedulingRule;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.progress.IProgressService;
-
-import bz.over.vpg.eclipse.VPGSchedulingRule;
 
 /**
  * Base class providing utility methods to actions contributed to the Fortran editor.

@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
@@ -49,10 +48,11 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
+import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
 
 /**
- * 
+ *
  * @author Tim
  */
 public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
@@ -66,18 +66,9 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     private String setterName = null;
     private HashSet<IFile> modifiedFiles = new HashSet<IFile>();
     private boolean wereMethodsCreated = false;
-    
-    public static final String UMBIGUOUS_DEF = "Could not find definition for this identifier, "+
+
+    public static final String AMBIGUOUS_DEF = "Could not find definition for this identifier, "+
                                                 "or its definition was ambiguous.";
-    
-    /**
-     * @param file
-     * @param selection
-     */
-    public EncapsulateVariableRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
 
     ///////////////////////////////////////////////////////////
     ///             Public methods                         ///
@@ -87,13 +78,14 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         String capitalizedIdentName = getCapitalizedIdentName();
         return "get"+capitalizedIdentName;
     }
-    
+
     public String getDefaultSetterName()
     {
         String capitalizedIdentName = getCapitalizedIdentName();
         return "set"+capitalizedIdentName;
     }
-    
+
+    @UserInputString(label="Getter method name ", defaultValueMethod="getDefaultGetterName")
     public void setGetterName(String gName)
     {
         String parens = gName.length() < 2 ? "" : gName.substring(gName.length()-2, gName.length());
@@ -102,7 +94,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         else
             getterName = gName;
     }
-    
+
+    @UserInputString(label="Setter method name ", defaultValueMethod="getDefaultSetterName")
     public void setSetterName(String sName)
     {
         String parens = sName.length() < 2 ? "" : sName.substring(sName.length()-2, sName.length());
@@ -111,23 +104,23 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         else
             setterName = sName;
     }
-    
+
     public String getGetterName()
     {
         return getterName == null ? getDefaultGetterName() : getterName;
     }
-    
+
     public String getSetterName()
     {
         return setterName == null ? getDefaultSetterName() : setterName;
     }
-    
-    
+
+
     public boolean isArgument()
     {
         return isUsedAsArgument;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.ltk.core.refactoring.Refactoring#getName()
      */
@@ -136,8 +129,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     {
         return "Encapsulate Variable";
     }
-    
-    
+
+
     ///////////////////////////////////////////////////////////
     ///            Initial Precondition check              ///
     /////////////////////////////////////////////////////////
@@ -149,16 +142,16 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         Token t = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if(t == null)
             fail("Could not find token based on selection.");
-        
+
         selectedReference = t.getTokenRef();
         Terminal term = t.getTerminal();
         if(term == null || term != Terminal.T_IDENT)
             fail("Please select an identifier to encapsulate");
-        
+
         selectedTokenDef = findUnambiguousTokenDefinition(t);
         if(selectedTokenDef == null)
         {
-            fail(UMBIGUOUS_DEF);
+            fail(AMBIGUOUS_DEF);
         }
         canBeEncapsulated(selectedTokenDef);
 
@@ -166,7 +159,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         allRefs = refs;
         processTokenRefs(refs);
     }
-    
+
     protected void canBeEncapsulated(Definition def) throws PreconditionFailure
     {
         if(!isDefinedInModule(def))
@@ -180,7 +173,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         if(def.isTarget())
             fail("Can't encapsulate targets.");
     }
- 
+
     protected boolean isDefinedInModule(Definition def)
     {
         Token t = def.getTokenRef().findTokenOrReturnNull();
@@ -189,15 +182,15 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         ASTModuleNode modNode = t.findNearestAncestor(ASTModuleNode.class);
         return modNode != null;
     }
-    
-    protected void processTokenRefs(Set<PhotranTokenRef> refs) throws PreconditionFailure 
+
+    protected void processTokenRefs(Set<PhotranTokenRef> refs) throws PreconditionFailure
     {
         for(PhotranTokenRef ref : refs)
         {
             checkForFixedForm(ref.getFile());
         }
     }
-    
+
     protected void checkForFixedForm(IFile file) throws PreconditionFailure
     {
         if(PhotranVPG.hasFixedFormContentType(file))
@@ -207,9 +200,9 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     " contains a reference to the variable you want to encapsulate");
         }
     }
-    
-    
-    
+
+
+
     ///////////////////////////////////////////////////////////
     ///            Final Precondition check                ///
     /////////////////////////////////////////////////////////
@@ -219,13 +212,13 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
-    { 
-        checkForConflictingBindings(new ConflictingBindingErrorHandler(status), 
+    {
+        checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
                                     selectedTokenDef,
                                     allRefs,
                                     getGetterName(),
                                     getSetterName());
-        
+
         for(PhotranTokenRef ref : allRefs)
         {
             Token t = ref.findTokenOrReturnNull();
@@ -234,17 +227,17 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
 
             if(!isUsedAsArgument)
                 detectIfUsedAsArgument(t, status);
-            
+
             //Should only create getters and setters once
             replaceWithGetOrSet(t, status);
         }
-        
+
         for(IFile f : modifiedFiles)
             this.addChangeFromModifiedAST(f, pm);
     }
 
     protected void detectIfUsedAsArgument(Token t, RefactoringStatus status) throws PreconditionFailure
-    { 
+    {
         //If reference is used as a parameter, then it has to be inside this node
         ASTSubroutineArgNode subNode = t.findNearestAncestor(ASTSubroutineArgNode.class);
 
@@ -253,20 +246,20 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
             if(!isUsedAsArgument) //No need to keep re-setting values after one
                                   //instance was found
             {
-                String message = 
-                    "!!!WARNING!!!" + EOL + 
-                    "Variable you want to encapsulate is used as an argument in a function." + EOL + 
+                String message =
+                    "!!!WARNING!!!" + EOL +
+                    "Variable you want to encapsulate is used as an argument in a function." + EOL +
                     "Encapsulating this variable might change the expected behavior of that function." + EOL +
-                    "Proceed at your own disgression." + EOL + 
+                    "Proceed at your own disgression." + EOL +
                     "File: "+t.getFilenameToDisplayToUser()+" line: "+t.getLine()+EOL;
-                
+
                 RefactoringStatusContext context = createContext(t.getTokenRef()); // Highlights problematic definition in file
                 status.addWarning(message, context);
                 isUsedAsArgument = true;
             }
         }
     }
-    
+
     protected void replaceWithGetOrSet(Token t, RefactoringStatus status) throws PreconditionFailure
     {
         if(isTokenRead(t))
@@ -299,26 +292,26 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
             status.addWarning(message, context);
         }
     }
-    
+
     protected boolean isTokenRead(Token t)
-    {   
+    {
         ASTVarOrFnRefNode expressionNode = t.findNearestAncestor(ASTVarOrFnRefNode.class);
         if(expressionNode == null)
             return false;
         return true;
     }
-    
+
     protected void replaceWithGetter(Token t) throws PreconditionFailure
     {
         checkIfCanEncapsulateWithGetter(t);
-        
+
         IExpr newExpr = parseLiteralExpression(getGetterName() + "()");
         newExpr.findFirstToken().setWhiteBefore("");
         IExpr oldExpr = t.findNearestAncestor(IExpr.class);
         oldExpr.replaceWith(newExpr);
         newExpr.setParent(oldExpr.getParent());
     }
-    
+
     protected void checkIfCanEncapsulateWithGetter(Token t) throws PreconditionFailure
     {
         IExpr expr = t.findNearestAncestor(IExpr.class);
@@ -329,8 +322,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 t.getFilenameToDisplayToUser() + " line " + t.getLine());
         }
     }
-    
-    
+
+
     @SuppressWarnings("unchecked")
     protected void setGetterAndSetter() throws PreconditionFailure
     {
@@ -339,13 +332,13 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
             fail("Could not find a token corresponding to the variable definition");
         ASTModuleNode mod = varDefTok.findNearestAncestor(ASTModuleNode.class);
         IASTListNode lst = mod.getBody();
-        
+
         addPrivateStatement(varDefTok, lst);
         //TODO: Check for conflict names of functions
         addGetterFunction(selectedTokenDef, lst);
         addSetterFunction(selectedTokenDef, lst);
     }
-    
+
     //TODO: Possibly re-factor this function (too long?)
     @SuppressWarnings("unchecked")
     protected void addPrivateStatement(Token varDefTok, IASTListNode lst) throws PreconditionFailure
@@ -360,35 +353,35 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 if(possibleTypeDec != null && possibleTypeDec == typeDec)
                 {
                     ASTTypeDeclarationStmtNode newDeclNode = removePublicDeclarationIfNeeded(varDefTok, possibleTypeDec, lst);
-                    ASTAccessStmtNode newAccessNode = 
+                    ASTAccessStmtNode newAccessNode =
                         (ASTAccessStmtNode)parseLiteralStatement("private :: " + varDefTok.getText() + EOL);
-                    
+
                     newAccessNode.setParent(lst);
-                    
+
                     if(newDeclNode != null)
                     {
                         lst.insertAfter(newDeclNode, newAccessNode);
-                        Reindenter.reindent(newDeclNode, 
-                            vpg.acquireTransientAST(varDefTok.getIFile()), 
+                        Reindenter.reindent(newDeclNode,
+                            vpg.acquireTransientAST(varDefTok.getIFile()),
                             Strategy.REINDENT_EACH_LINE);
                     }
                     else
                         lst.insertAfter(possibleTypeDec, newAccessNode);
-                    
+
                     modifiedFiles.add(varDefTok.getIFile());
-                    Reindenter.reindent(newAccessNode, 
-                                        vpg.acquireTransientAST(varDefTok.getIFile()), 
+                    Reindenter.reindent(newAccessNode,
+                                        vpg.acquireTransientAST(varDefTok.getIFile()),
                                         Strategy.REINDENT_EACH_LINE);
                     break;
                 }
             }
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     protected ASTTypeDeclarationStmtNode removePublicDeclarationIfNeeded(
-                Token varDefTok, 
-                ASTTypeDeclarationStmtNode declNode, 
+                Token varDefTok,
+                ASTTypeDeclarationStmtNode declNode,
                 IASTListNode lst)
     {
         if(declNode.getAttrSpecSeq() != null)
@@ -398,7 +391,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 return redeclareVariable(varDefTok, declNode);
             }
         }
-        
+
         boolean wasRemoved = false;
         for(int i = 0; i < lst.size() && !wasRemoved; i++)
         {
@@ -411,14 +404,14 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     lst.remove(accessNode);
                     break;
                 }
-                    
+
             }
         }
-        
+
         return null;
     }
-    
-    
+
+
     /* (non-Javadoc)
      * @see org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring#doCreateChange(org.eclipse.core.runtime.IProgressMonitor)
      */
@@ -426,9 +419,9 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     protected void doCreateChange(IProgressMonitor pm) throws CoreException,
         OperationCanceledException
     {
-        
+
     }
-    
+
     protected boolean isTokenWrittenTo(Token t)
     {
         ASTAssignmentStmtNode assign = t.findNearestAncestor(ASTAssignmentStmtNode.class);
@@ -436,42 +429,42 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
             return false;
         return true;
     }
-    
-    
-    
+
+
+
     protected void replaceWithSetter(Token t)
     {
         String whiteBeforeOld = t.getWhiteBefore();
-        
+
         ASTAssignmentStmtNode oldAssignNode = t.findNearestAncestor(ASTAssignmentStmtNode.class);
-        
+
         //String rhsString = oldAssignNode.getRhs().toString().trim();
-        
+
         String setterString = "call " + getSetterName() + "()";
         ASTCallStmtNode newCallNode = (ASTCallStmtNode)parseLiteralStatement(setterString);
         newCallNode.findFirstToken().setWhiteBefore(whiteBeforeOld);
-        
+
         IASTListNode<ASTSubroutineArgNode> argList = convertToArguments(oldAssignNode);
         argList.setParent(newCallNode);
-        
+
         newCallNode.setArgList(argList);
         oldAssignNode.replaceWith(newCallNode);
         newCallNode.setParent(oldAssignNode.getParent());
     }
-    
+
     protected IASTListNode<ASTSubroutineArgNode> convertToArguments(ASTAssignmentStmtNode oldAssignNode)
     {
         ASTSubroutineArgNode args = new ASTSubroutineArgNode();
         Token tok = oldAssignNode.getRhs().findFirstToken();
         tok.setWhiteBefore("");
-        
+
         args.setExpr(oldAssignNode.getRhs());
         oldAssignNode.getRhs().setParent(args);
 
         ArrayList<ASTSubroutineArgNode> argList = new ArrayList<ASTSubroutineArgNode>();
         argList.add(args);
         ASTSeparatedListNode<ASTSubroutineArgNode> sepList = new ASTSeparatedListNode<ASTSubroutineArgNode>(null, argList, true);
-        
+
         args.setParent(sepList);
         return sepList;
     }
@@ -498,55 +491,55 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         }
         return i;
     }
-    
+
     @SuppressWarnings("unchecked")
     protected void addGetterFunction(Definition def, IASTListNode lst)
     {
         int index = findOrCreateContainsIndex(lst);
-        ASTFunctionSubprogramNode funNode = createGetterFunction(def);      
+        ASTFunctionSubprogramNode funNode = createGetterFunction(def);
         funNode.setParent(lst);
         lst.insertAfter(lst.get(index), funNode);
-        Reindenter.reindent(funNode, 
-            vpg.acquireTransientAST(def.getTokenRef().getFile()), 
+        Reindenter.reindent(funNode,
+            vpg.acquireTransientAST(def.getTokenRef().getFile()),
             Strategy.SHIFT_ENTIRE_BLOCK);
     }
-    
+
     @SuppressWarnings("unchecked")
     protected void addSetterFunction(Definition def, IASTListNode lst)
     {
         int index = findOrCreateContainsIndex(lst);
-        ASTSubroutineSubprogramNode funNode = createSetterFunction(def);      
+        ASTSubroutineSubprogramNode funNode = createSetterFunction(def);
         funNode.setParent(lst);
         lst.insertAfter(lst.get(index), funNode);
-        Reindenter.reindent(funNode, 
-            vpg.acquireTransientAST(def.getTokenRef().getFile()), 
+        Reindenter.reindent(funNode,
+            vpg.acquireTransientAST(def.getTokenRef().getFile()),
             Strategy.SHIFT_ENTIRE_BLOCK);
     }
-    
+
     protected ASTFunctionSubprogramNode createGetterFunction(Definition def)
     {
         String type = def.getType().toString();
         String getterFunction = type + " function " + getGetterName() + "()" + EOL +
-                                "    implicit none" + EOL + 
+                                "    implicit none" + EOL +
                                 "    " + getGetterName() + " = " + def.getTokenRef().getText() +EOL +
                                 "end function" + EOL;
         ASTFunctionSubprogramNode newFunNode = (ASTFunctionSubprogramNode)parseLiteralProgramUnit(getterFunction);
         return newFunNode;
     }
-    
+
     protected ASTSubroutineSubprogramNode createSetterFunction(Definition def)
     {
         String type = def.getType().toString();
         String valueName = "value";
-        String setterFunction = "subroutine " + getSetterName() + "(" + valueName + ")" + EOL + 
-                                "    implicit none" + EOL + 
+        String setterFunction = "subroutine " + getSetterName() + "(" + valueName + ")" + EOL +
+                                "    implicit none" + EOL +
                                 "    " + type + ", intent(in) :: " + valueName + EOL +
                                 "    " + def.getTokenRef().getText() +" = " + valueName + EOL +
                                 "end subroutine" + EOL;
         ASTSubroutineSubprogramNode newSubNode = (ASTSubroutineSubprogramNode)parseLiteralProgramUnit(setterFunction);
         return newSubNode;
     }
-    
+
     @SuppressWarnings("unchecked")
     protected boolean containsPublicInDecl(IASTListNode lst)
     {
@@ -561,14 +554,14 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         }
         return false;
     }
-    
+
     protected ASTTypeDeclarationStmtNode createNewDeclaration(Token varDefTok, ASTTypeSpecNode typeSpec)
     {
         String newDecl = findUnambiguousTokenDefinition(varDefTok).getType().toString() + " :: " + varDefTok.getText();
         ASTTypeDeclarationStmtNode declNode = (ASTTypeDeclarationStmtNode)parseLiteralStatement(newDecl);
         return declNode;
     }
-    
+
     protected ASTTypeDeclarationStmtNode removeAllAndRedeclare(Token varDefTok, ASTTypeDeclarationStmtNode oldDeclNode)
     {
         ASTTypeDeclarationStmtNode newDeclNode = createNewDeclaration(varDefTok, oldDeclNode.getTypeSpec());
@@ -576,7 +569,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         newDeclNode.setParent(oldDeclNode.getParent());
         return newDeclNode;
     }
-    
+
     @SuppressWarnings("unchecked")
     protected ASTTypeDeclarationStmtNode removeAndRedeclare(Token varDefTok, ASTTypeDeclarationStmtNode oldDeclNode)
     {
@@ -595,7 +588,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         parent.insertAfter(oldDeclNode, newDeclNode);
         return newDeclNode;
     }
-    
+
     @SuppressWarnings("unchecked")
     protected ASTTypeDeclarationStmtNode redeclareVariable(Token varDefTok, ASTTypeDeclarationStmtNode declNode)
     {
@@ -622,13 +615,13 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                         varList.remove(id);
                         return true;
                     }
-                    
+
                 }
             }
         }
         return false;
     }
-    
+
     ///////////////////////////////////////////////////////////
     ///             Private methods                        ///
     /////////////////////////////////////////////////////////
@@ -640,8 +633,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         String capitalizedIdentName = upCase.concat(identName.substring(1));
         return capitalizedIdentName;
     }
-    
-    
+
+
     ///////////////////////////////////////////////////////////
     ///           Conflict error hanlder class             ///
     /////////////////////////////////////////////////////////
@@ -681,5 +674,5 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         }
     }
 
- 
+
 }

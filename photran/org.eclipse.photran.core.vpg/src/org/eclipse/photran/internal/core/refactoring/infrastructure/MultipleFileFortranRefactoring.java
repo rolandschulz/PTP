@@ -10,32 +10,32 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
 
 /**
  * This is a base class for all Photran refactorings that apply to multiple files
  * @author Jeff Overbey, Timofey Yuvashev
  */
-public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefactoring
+public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefactoring implements IResourceRefactoring
 {
-    protected ArrayList<IFile> selectedFiles = null;
-    
-    public MultipleFileFortranRefactoring(ArrayList<IFile> files)
+    protected List<IFile> selectedFiles = null;
+
+    public void initialize(List<IFile> files)
     {
         assert files != null && files.size() > 0;
-        
-        this.vpg= PhotranVPG.getInstance();
+
+        this.vpg = PhotranVPG.getInstance();
         this.selectedFiles = files;
     }
-    
+
     @Override
     protected RefactoringStatus getAbstractSyntaxTree(RefactoringStatus status)
     {
@@ -46,16 +46,16 @@ public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefa
     protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
     {
         if (PhotranVPG.inTestingMode()) return;
-        
+
         HashSet<IFile> filesToBeRemoved = new HashSet<IFile>();
-        
+
         for(IFile f : this.selectedFiles)
         {
             if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(f))
             {
-                //FIXME: If a file is not associated with a project, this will return null 
+                //FIXME: If a file is not associated with a project, this will return null
                 // and needs to be fixed
-                status.addWarning("Please enable analysis and refactoring in the project "+ 
+                status.addWarning("Please enable analysis and refactoring in the project "+
                     f.getProject().getName() + " properties.");
                 filesToBeRemoved.add(f);
             }
@@ -63,11 +63,11 @@ public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefa
         //Remove files that didn't have Refactoring enabled in their projects
         this.selectedFiles.removeAll(filesToBeRemoved);
     }
-    
+
     protected void removeFixedFormFilesFrom(Collection<IFile> files, RefactoringStatus status)
     {
         Set<IFile> filesToRemove = new HashSet<IFile>();
-        
+
         for (IFile file : files)
         {
             if (!filesToRemove.contains(file) && PhotranVPG.hasFixedFormContentType(file))
@@ -76,7 +76,7 @@ public abstract class MultipleFileFortranRefactoring extends AbstractFortranRefa
                 filesToRemove.add(file);
             }
         }
-        
+
         files.removeAll(filesToRemove);
     }
 

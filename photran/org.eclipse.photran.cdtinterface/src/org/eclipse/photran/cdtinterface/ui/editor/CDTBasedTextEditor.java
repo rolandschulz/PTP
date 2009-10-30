@@ -56,7 +56,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  * A {@link TextEditor} that reuses the Outline view from CDT, as well as its document provider
  * and possibly its ruler context menu.  Also uses CDT's resource bundle to support content
  * assist actions.
- * 
+ *
  * @author Jeff Overbey, mostly copied from {@link CEditor}
  */
 public abstract class CDTBasedTextEditor extends TextEditor implements ISelectionChangedListener
@@ -78,7 +78,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
         // when you right-click the Fortran editor's ruler
         setRulerContextMenuId("#CEditorRulerContext"); //$NON-NLS-1$
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Actions (use CDT resource bundle)
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
         super.createActions();
 
         // See CEditor#createActions
-        
+
         final ResourceBundle bundle = ConstructedCEditorMessages.getResourceBundle();
 
         IAction action = new ContentAssistAction(bundle, "ContentAssistProposal.", this); //$NON-NLS-1$
@@ -130,7 +130,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
             } catch (CModelException ex) {
                 ce= null;
             }
-            if (ce != null) { 
+            if (ce != null) {
                 final ISelection selection= new StructuredSelection(ce);
                 return new IShowInSource() {
                     public ShowInContext getShowInContext() {
@@ -171,7 +171,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
 
 //    /**
 //     * Gets the outline page of the c-editor.
-//     * 
+//     *
 //     * @return Outline page.
 //     */
 //    public CContentOutlinePage getOutlinePage() {
@@ -190,7 +190,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
 //
 //    /**
 //     * Sets an input for the outline page.
-//     * 
+//     *
 //     * @param page
 //     *            Page to set the input.
 //     * @param input
@@ -204,10 +204,10 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
 //            page.setInput(manager.getWorkingCopy(input));
 //        }
 //    }
-    
+
     // ISelectionChangedListener Implementation ///////////////////////////////////////////////////
     // (for updating editor when Outline clicked)
-    
+
     /**
      * React to changed selection in the outline view.
      * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
@@ -301,7 +301,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
     }
 
     /**
-     * Checks is the editor active part. 
+     * Checks is the editor active part.
      * @return <code>true</code> if editor is the active part of the workbench.
      */
     private boolean isActivePart() {

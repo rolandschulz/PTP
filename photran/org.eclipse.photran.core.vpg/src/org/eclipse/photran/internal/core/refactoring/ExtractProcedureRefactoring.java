@@ -17,11 +17,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
@@ -55,7 +53,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 /**
  * Refactoring to extract a sequence of statements into a new subroutine,
  * replacing the sequence with a call to that subroutine.
- * 
+ *
  * @author Jeff Overbey
  */
 /*
@@ -67,73 +65,67 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
 	private StatementSequence selection = null;
 	private List<Definition> localVarsToPassInAsParams = new LinkedList<Definition>();
 	private String newName = null;
-	
-    public ExtractProcedureRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-        //System.out.println(this.fileInEditor.getName());
-    }
-    
+
     @Override
     public String getName()
     {
         return "Extract Procedure";
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // User-Specified Parameters
     ///////////////////////////////////////////////////////////////////////////
-    
+
     public void setName(String name)
     {
         assert name != null;
-        
+
         this.newName = name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        
+
         // Ensure that partial loops won't be extracted
         LoopReplacer.replaceAllLoopsIn(this.astOfFileInEditor.getRoot());
-        
+
     	selection = this.findEnclosingStatementSequence(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selection == null || selection.selectedStmts.isEmpty())
             fail("Please select a sequence of contiguous statements to extract.");
-        
+
         if (selection.enclosingScope == null)
             fail("INTERNAL ERROR: Unable to locate enclosing scope");
-        
+
         if (!selection.enclosingScope.isSubprogram() && !selection.enclosingScope.isMainProgram())
             fail("Statements can only be extracted from inside a subprogram or main program.");
-        
+
         for (IASTNode stmt : selection.selectedStmts)
             if (!(stmt instanceof IBodyConstruct))
                 fail("The statement \"" + stmt.toString().trim() + "\" cannot be extracted");
-        
+
         checkForLabels(status);
-        
+
         for (IASTNode stmt : selection.selectedStmts)
             if (!(stmt instanceof IExecutionPartConstruct))
                 fail("Only executable statements can be extracted; the statement \"" + stmt.toString().trim() + "\" cannot");
-        
+
         determineParameters();
-        
+
         for (Definition param : localVarsToPassInAsParams)
             if (param.isPointer())
                 fail("The selected statements cannot be extracted because doing so would require passing a pointer variable as a parameter");
     }
-    
+
     private void checkForLabels(RefactoringStatus status)
     {
         Pattern numericLabel = Pattern.compile("[0-9]+");
-        
+
         for (IASTNode stmt : selection.enclosingScope.getBody())
         {
             if (numericLabel.matcher(stmt.findFirstToken().getText()).matches())
@@ -156,24 +148,24 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     private List<Definition> localVarsReferencedInDecls()
     {
         List<Definition> result = new LinkedList<Definition>();
-        
+
         for (Set<Definition> addlVars = addlLocalVariablesReferencedIn(localVarsToPassInAsParams);
              !addlVars.isEmpty();
              addlVars = addlLocalVariablesReferencedIn(result))
         {
             result.addAll(0, addlVars);
         }
-        
+
         return result;
     }
 
     private Set<Definition> localVariablesUsedIn(List<IASTNode> stmts)
     {
         Set<Definition> result = new TreeSet<Definition>();
-        
+
         for (IASTNode stmt : selection.selectedStmts)
             result.addAll(localVariablesUsedIn(stmt));
-        
+
         return result;
     }
 
@@ -209,14 +201,14 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     private Set<Definition> addlLocalVariablesReferencedIn(Collection<Definition> vars)
     {
         final Set<Definition> result = new TreeSet<Definition>();
-        
+
         for (Definition def : vars)
         {
             ASTArraySpecNode arraySpec = findArraySpec(def);
             if (arraySpec != null)
                 result.addAll(localVariablesUsedIn(arraySpec));
         }
-        
+
         return result;
     }
 
@@ -225,7 +217,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         ASTArraySpecNode arraySpec = findArraySpecInTypeDecl(def);
         if (arraySpec != null)
             return arraySpec;
-        
+
         arraySpec = findArraySpecInDimensionStmt(def);
         return arraySpec;
     }
@@ -239,12 +231,12 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
                 for (ASTAttrSpecSeqNode attrSpecSeq : typeDecl.getAttrSpecSeq())
                     if (attrSpecSeq.getAttrSpec().isDimension())
                         return attrSpecSeq.getAttrSpec().getArraySpec();
-            
+
             for (ASTEntityDeclNode decl : typeDecl.getEntityDeclList())
                 if (decl.getArraySpec() != null && matches(decl.getObjectName(), def))
                     return decl.getArraySpec();
         }
-        
+
         return null;
     }
 
@@ -258,7 +250,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         class Visitor extends GenericASTVisitor
         {
             private ASTArraySpecNode result = null;
-            
+
             @Override public void visitASTDimensionStmtNode(ASTDimensionStmtNode node)
             {
                 for (ASTArrayDeclaratorNode arrayDeclarator : node.getArrayDeclaratorList())
@@ -266,7 +258,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
                         result = arrayDeclarator.getArraySpec();
             }
         }
-        
+
         ScopingNode scope = def.getTokenRef().findToken().findNearestAncestor(ScopingNode.class);
         Visitor v = new Visitor();
         scope.accept(v);
@@ -306,15 +298,15 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         if (!isValidIdentifier(newName))
             fail(newName + " is not a valid identifier");
     }
-    
+
     private void checkIfSubprogramNameWillConflict(RefactoringStatus status)
     {
         ScopingNode enclosingSubprogram = selection.enclosingScope;
-        
+
         ScopingNode outerScope = enclosingSubprogram.findNearestAncestor(ScopingNode.class);
         if (outerScope == null)
             throw new Error("INTERNAL ERROR: No outer scope");
-        
+
         FakeToken newSubprogramName = new FakeToken(enclosingSubprogram.getNameToken(), newName);
         List<PhotranTokenRef> conflictingDefs = outerScope.manuallyResolveNoImplicits(newSubprogramName);
         if (!conflictingDefs.isEmpty())
@@ -343,7 +335,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
             ASTSubroutineSubprogramNode newSubprogram = createNewSubprogram();
             insertSubroutineCall();
             moveStatementsIntoBodyOf(newSubprogram);
-            
+
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
         }
         finally
@@ -355,27 +347,27 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     private ASTSubroutineSubprogramNode createNewSubprogram()
     {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("\n");
         sb.append("subroutine ");
         sb.append(newName);
         sb.append(parameterList());
         sb.append("\n");
-        
+
         sb.append("    implicit none\n");
-        
+
         sb.append(parameterDeclarations());
-        
+
         sb.append("end subroutine\n");
-        
+
         ASTSubroutineSubprogramNode newSubroutine = (ASTSubroutineSubprogramNode)parseLiteralProgramUnit(sb.toString());
-        
+
         return insertNewSubprogram(newSubroutine);
     }
 
     /* The new subprogram must be an internal subprogram if the statements are being extracted
      * from a main program or subprogram that contains other internal subprograms.  Otherwise,
-     * references to existing internal subprograms will not carry over to the extracted subprogram. 
+     * references to existing internal subprograms will not carry over to the extracted subprogram.
      */
     private ASTSubroutineSubprogramNode insertNewSubprogram(ASTSubroutineSubprogramNode newSubroutine)
     {
@@ -391,13 +383,13 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     private ASTSubroutineSubprogramNode insertAfterEnclosingSubprogram(ASTSubroutineSubprogramNode newSubroutine)
     {
         ScopingNode enclosingSubprogram = selection.enclosingScope;
-        
+
         IASTNode parent = enclosingSubprogram.getParent();
         if (!(parent instanceof IASTListNode))
             throw new Error("INTERNAL ERROR: Subprogram parent is not IASTListNode");
-        
+
         ((IASTListNode)parent).insertAfter(enclosingSubprogram, newSubroutine);
-        
+
         Reindenter.reindent(newSubroutine, this.astOfFileInEditor);
 
         return newSubroutine;
@@ -411,17 +403,17 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
             program.setContainsStmt(containsStmt);
             containsStmt.setParent(program);
         }
-        
+
         if (program.getInternalSubprograms() == null)
         {
             ASTListNode<IInternalSubprogram> internals = new ASTListNode<IInternalSubprogram>();
             program.setInternalSubprograms(internals);
             internals.setParent(program);
         }
-        
+
         program.getInternalSubprograms().add(subprogram);
         subprogram.setParent(program.getInternalSubprograms());
-        
+
         Reindenter.reindent(subprogram, this.astOfFileInEditor);
 
         return subprogram;
@@ -430,53 +422,53 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     private String parameterList()
     {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("(");
-        
+
         int i = 0;
         for (Definition var : localVarsToPassInAsParams)
         {
             if (i++ > 0) sb.append(", ");
             sb.append(var.getDeclaredName());
         }
-        
+
         sb.append(")");
-        
+
         return sb.toString();
     }
 
     private String parameterDeclarations()
     {
         StringBuilder sb = new StringBuilder();
-        
+
         for (Definition var : localVarsToPassInAsParams)
         {
             sb.append("    ");
             sb.append(declarationOf(var));
             sb.append("\n");
         }
-        
+
         return sb.toString();
     }
 
     private String declarationOf(Definition var)
     {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append(var.getType().toString());
-        
+
         if (var.isAllocatable()) sb.append(", allocatable");
         if (var.isIntentIn() && !var.isIntentOut()) sb.append(", intent(in)");
         if (!var.isIntentIn() && var.isIntentOut()) sb.append(", intent(out)");
         if (var.isPointer()) sb.append(", pointer");
         if (var.isTarget()) sb.append(", target");
-        
+
         sb.append(" :: ");
         sb.append(var.getDeclaredName());
-        
+
         if (var.getArraySpec() != null)
             sb.append(var.getArraySpec());
-        
+
         return sb.toString();
     }
 
@@ -488,7 +480,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         sb.append(newName);
         sb.append(parameterList());
         sb.append("\n");
-        
+
         IBodyConstruct callStmt = parseLiteralStatement(sb.toString());
         ((IASTListNode)selection.listContainingStmts).insertBefore(selection.firstStmt(), callStmt);
         callStmt.setParent(selection.listContainingStmts);
@@ -500,12 +492,12 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
         for (IASTNode stmt : selection.selectedStmts)
         {
             assert stmt instanceof IBodyConstruct;
-            
+
             stmt.removeFromTree();
             newSubprogram.getBody().add((IBodyConstruct)stmt);
             stmt.setParent(newSubprogram.getBody());
         }
-        
+
         Reindenter.reindent(selection.firstToken(), selection.lastToken(), this.astOfFileInEditor);
     }
 }

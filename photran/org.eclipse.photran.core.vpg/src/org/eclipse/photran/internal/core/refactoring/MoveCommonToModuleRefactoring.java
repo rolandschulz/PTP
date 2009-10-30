@@ -41,10 +41,12 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
+import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
 /**
  * Refactoring to move a COMMON block into a module.
- * 
+ *
  * @author Jeff Overbey
  */
 public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
@@ -56,11 +58,6 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
     private String newModuleName = null;
     private Set<IFile> affectedFiles = null;
 
-    public MoveCommonToModuleRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
-    
     @Override
     public String getName()
     {
@@ -74,32 +71,33 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
     public String getSuggestedNewModuleName()
     {
         assert commonBlockToMove != null && nameOfCommonBlockToMove != null;
-        
+
         return nameOfCommonBlockToMove.equals("") ? "common" : nameOfCommonBlockToMove;
     }
-    
+
+    @UserInputString(label="Create a module named ", defaultValueMethod="getSuggestedNewModuleName")
     public void setNewModuleName(String name)
     {
         assert name != null;
-        
+
         this.newModuleName = name;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        
+
         findEnclosingCommonBlock();
         determineEnclosingCommonBlockName();
         determineAffectedFiles();
-        
+
         // TODO: Require implicit none?
-        
+
         // TODO: Make sure all uses of this common block are identical (names, types)
         // so that USE-ing the module will not cause naming conflicts
     }
@@ -109,17 +107,17 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
         Token enclosingToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (enclosingToken == null)
             fail("Please select a variable or block in a COMMON statement.");
-        
+
         commonBlockToMove = enclosingToken.findNearestAncestor(ASTCommonBlockNode.class);
         if (commonBlockToMove == null)
             fail("Please select a variable or block in a COMMON statement.");
     }
-    
+
     private void determineEnclosingCommonBlockName()
     {
         nameOfCommonBlockToMove = getCommonBlockName(commonBlockToMove);
     }
-    
+
     private String getCommonBlockName(ASTCommonBlockNode commonBlockToMove)
     {
         ASTCommonBlockNameNode commonBlockNameToken = commonBlockToMove.getName();
@@ -128,7 +126,7 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
         else
             return "";
     }
-    
+
     private void determineAffectedFiles() throws PreconditionFailure
     {
         affectedFiles = new HashSet<IFile>();
@@ -139,33 +137,33 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
     // Final Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         assert commonBlockToMove != null && nameOfCommonBlockToMove != null && affectedFiles != null;
         assert newModuleName != null;
-        
+
         if (!isValidIdentifier(newModuleName)) fail(newModuleName + " is not a valid identifier");
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Change
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
         assert commonBlockToMove != null && nameOfCommonBlockToMove != null && affectedFiles != null;
         assert newModuleName != null;
-        
+
         try
         {
             for (IFile file : affectedFiles)
             {
                 if (file.equals(fileInEditor))
                     createModule();
-    
+
                 replaceCommonBlockWithModuleUseIn(file);
                 addChangeFromModifiedAST(file, pm);
             }
@@ -179,10 +177,10 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
     private void createModule()
     {
         ASTModuleNode module = createEmptyModule();
-        
+
         for (ASTCommonBlockObjectNode obj : commonBlockToMove.getCommonBlockObjectList())
             populateModuleWithDeclarations(module, obj.getVariableName());
-        
+
         addModuleAtBeginningOfFile(module);
     }
 
@@ -213,36 +211,37 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
     private List<ISpecificationPartConstruct> findSpecificationStmtsFor(Definition def)
     {
         List<ISpecificationPartConstruct> result = new LinkedList<ISpecificationPartConstruct>();
-        
+
         ASTTypeDeclarationStmtNode typeDecl = def.getTokenRef().findToken().findNearestAncestor(ASTTypeDeclarationStmtNode.class);
         if (typeDecl != null)
-            result.add(typeDecl);
+            result.add((ISpecificationPartConstruct)typeDecl.clone());
 
         for (PhotranTokenRef tokRef : def.findAllReferences(false))
         {
             ISpecificationStmt enclosingSpecStmt = tokRef.findToken().findNearestAncestor(ISpecificationStmt.class);
             if (enclosingSpecStmt != null && !(enclosingSpecStmt instanceof ASTCommonStmtNode))
-                result.add(enclosingSpecStmt);
+                result.add((ISpecificationPartConstruct)enclosingSpecStmt.clone());
         }
-        
+
         return result;
     }
 
     private void addModuleAtBeginningOfFile(ASTModuleNode module)
     {
         astOfFileInEditor.getRoot().getProgramUnitList().add(0, module);
+        Reindenter.reindent(module, astOfFileInEditor, Strategy.REINDENT_EACH_LINE);
     }
 
     private void replaceCommonBlockWithModuleUseIn(IFile file)
     {
         IFortranAST ast = vpg.acquireTransientAST(file);
-        
+
         for (ASTCommonBlockNode commonBlock : findCommonBlocksWithCorrectNameIn(ast))
         {
             removeSpecificationStmtsForCommonBlockVars(commonBlock);
-            
+
             ASTCommonStmtNode enclosingCommonStmt = commonBlock.findNearestAncestor(ASTCommonStmtNode.class);
-            
+
             addUseStmtAtBeginningOfScopeContaining(enclosingCommonStmt, ast);
 
             if (commonStmtContainsOnlyOneCommonBlock(enclosingCommonStmt))
@@ -251,12 +250,12 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
                 commonBlock.removeFromTree();
         }
     }
-    
+
     private List<ASTCommonBlockNode> findCommonBlocksWithCorrectNameIn(IFortranAST ast)
     {
         // Note that we must traverse the tree *before* we start changing it
         // to prevent ConcurrentModificationExceptions on list nodes
-        
+
         final List<ASTCommonBlockNode> result = new LinkedList<ASTCommonBlockNode>();
         ast.accept(new GenericASTVisitor()
         {
@@ -269,27 +268,34 @@ public class MoveCommonToModuleRefactoring extends SingleFileFortranRefactoring
         });
         return result;
     }
-    
+
     private void removeSpecificationStmtsForCommonBlockVars(ASTCommonBlockNode commonBlock)
     {
         // TODO: Should only remove this variable, not the entire spec statement
         //   common a, b
         //   integer :: a, b
         // will cause an IllegalStateException since the decl statement will be removed twice
-        
+
         for (ASTCommonBlockObjectNode obj : commonBlock.getCommonBlockObjectList())
             for (ISpecificationPartConstruct specStmt : findSpecificationStmtsFor(obj.getVariableName()))
+                try
+        {
                 specStmt.removeFromTree();
+        }
+        catch (IllegalStateException e)
+        {
+            // FIXME HACK -- Ignore
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void addUseStmtAtBeginningOfScopeContaining(ASTCommonStmtNode enclosingCommonStmt, IFortranAST ast)
     {
         ASTUseStmtNode useStmt = (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName);
-        
+
         ScopingNode enclosingScope = enclosingCommonStmt.findNearestAncestor(ScopingNode.class);
         ((IASTListNode<IASTNode>)enclosingScope.getBody()).add(0, useStmt);
-        
+
         Reindenter.reindent(useStmt, ast);
     }
 

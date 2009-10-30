@@ -40,11 +40,6 @@ public class RenameRefactoring extends SingleFileFortranRefactoring
     private String oldName = null, newName = null;
     private boolean shouldBindInterfacesAndExternals = true;
 
-    public RenameRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
-
     @Override
     public String getName()
     {

@@ -1,6 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <!--==============-->
+   <!-- Refactorings -->
+   <!--==============-->
+
+   <extension
+         point="org.eclipse.rephraserengine.ui.refactoring.refactorings">
+      <resourceFilter class="org.eclipse.photran.internal.ui.PhotranResourceFilter" />
+
+      <!-- Define the Refactor menu -->
+
+      <group description="Rename and Move">
+         <editorRefactoring command="org.eclipse.photran.ui.RenameRefactoringCommand" />
+      </group>
+      <group description="Extract XYZ">
+         <editorRefactoring command="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand" />
+         <editorRefactoring command="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand" />
+      </group>
+      <group>
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring"
+         />
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"
+         />
+      </group>
+      <group>
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
+         />
+      </group>
+      <group description="Refactorings for USE statements">
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring"
+             inputPage="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage"
+         />
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.MinOnlyListRefactoring"
+         />
+      </group>
+      <group description="Refactorings for COMMON blocks">
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.CommonVarNamesRefactoring"
+             inputPage="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesInputPage"
+         />
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring"
+         />
+         <!--editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.MoveCommonToModuleRefactoring"
+         /-->
+      </group>
+      <group description="Refactorings for performance/loop transformations">
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"
+         />
+      </group>
+      <group description="Refactorings that reformat code">
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
+         />
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.KeywordCaseRefactoring"
+             inputPage="org.eclipse.photran.internal.refactoring.ui.KeywordCaseInputPage"
+         />
+      </group>
+      <!--group description="Test Refactorings">
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring"
+         />
+      </group-->
+   </extension>
+
+   <!--=====================================-->
+   <!-- Advanced Refactoring Configurations -->
+   <!--=====================================-->
+
+   <!-- If a refactoring was contributed as a "command" above... -->
+   <!-- (usually, this is just so that we can associate a keybinding with it) -->
+
+   <!-- 1. Define the command -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Fortran Refactoring Commands"
+            id="org.eclipse.photran.ui.RefactoringCategory">
+      </category>
+
+      <command
+            name="Rename..."
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.RenameRefactoringCommand">
+      </command>
+      <command
+            name="Extract Procedure..."
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
+      </command>
+      <command
+            name="Extract Local Variable..."
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
+      </command>
+   </extension>
+
+   <!-- 2. Optionally associate the command with an accelerator key -->
+   <extension
+         point="org.eclipse.ui.bindings">
+     <key
+            sequence="M3+M2+R"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.RenameRefactoringCommand"
+     />
+     <key
+            sequence="M3+M2+M"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
+     />
+     <key
+            sequence="M3+M2+L"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
+     />
+   </extension>
+
+   <!-- 3. Add the command to Photran's Refactoring action set -->
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Fortran Refactorings"
+            description="Fortran Refactorings"
+            visible="false"
+            id="org.eclipse.photran.ui.RefactoringActionSet">
+
+         <action
+               label="Re&amp;name..."
+               definitionId="org.eclipse.photran.ui.RenameRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
+               id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+         <action
+               label="E&amp;xtract Procedure..."
+               definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
+               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
+         <action
+               label="Extract &amp;Local Variable..."
+               definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
+               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
+      </actionSet>
+   </extension>
+
+   <!-- Associate the Refactoring action set with the Fortran perspective & editor -->
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+         <actionSet id="org.eclipse.photran.ui.RefactoringActionSet"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation targetID="org.eclipse.photran.ui.RefactoringActionSet">
+         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
+         <!--part id="org.eclipse.photran.ui.FixedFormFortranEditor"/-->
+      </actionSetPartAssociation>
+   </extension>
+
+   <!--==========================================-->
+   <!-- Contribution to the Rephraser Engine UI -->
+   <!--=========================================-->
+   <!-- This will automatically add some actions to the (Debugging) sub-menu of the Refactor
+        menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc. -->
+   <extension
+         point="org.eclipse.rephraserengine.ui.vpg.vpg">
+      <vpg
+         id="org.eclipse.photran.ui.vpg"
+         name="Fortran"
+         class="org.eclipse.photran.internal.ui.PhotranVPGContribution" />
+   </extension>
+
    <!--=========================================-->
    <!-- Fortran-specific project property pages -->
    <!--=========================================-->
@@ -313,27 +494,73 @@
    <!--=======================================-->
    <!-- Debugging Actions in Refactoring Menu -->
    <!--=======================================-->
-   <!--extension
-         point="org.eclipse.ui.commands">
-      <category
-            name="Fortran Refactoring Debugging Commands"
-            id="org.eclipse.photran.ui.DebuggingCategory">
-      </category>
-      <command
-            name="Select Enclosing Scope"
-            categoryId="org.eclipse.photran.ui.DebuggingCategory"
-            id="org.eclipse.photran.ui.SelectEnclosingScopeCommand">
-      </command>
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Fortran Debug Actions"
+            description="Fortran Debug Actions"
+            visible="false"
+            id="org.eclipse.photran.ui.DebugActionSet">
+         <menu
+               label="Refac&amp;tor"
+               path="edit"
+               id="org.eclipse.jdt.ui.refactoring.menu">
+            <separator name="scriptGroup"/>
+         </menu>
+
+         <menu
+               label="(&amp;Debugging)"
+               path="org.eclipse.jdt.ui.refactoring.menu/scriptGroup"
+               id="debugging">
+            <separator name="debugging"/>
+            <separator name="debugginginterfaces"/>
+            <separator name="vpgstats"/>
+            <separator name="vpgdb"/>
+         </menu>
+         <action
+               label=""
+               definitionId="org.eclipse.photran.ui.EasterEggCommand"
+               class="org.eclipse.photran.ui.vpg.EasterEggAction"
+               id="org.eclipse.photran.ui.EasterEggAction"/>
+         <!-- -->
+         <action
+               label="Find Matching &amp;Interface Declarations"
+               class="org.eclipse.photran.internal.ui.actions.FindMatchingInterfaceDeclarations"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugginginterfaces"
+               id="org.eclipse.photran.ui.FindMatchingInterfaceDeclarationsAction"/>
+         <action
+               label="Resolve &amp;Interface Binding"
+               class="org.eclipse.photran.internal.ui.actions.ResolveInterfaceBinding"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugginginterfaces"
+               id="org.eclipse.photran.ui.ResolveInterfaceBindingAction"/>
+         <!-- -->
+         <action
+               label="Select &amp;Enclosing Scope"
+               class="org.eclipse.photran.internal.ui.actions.SelectEnclosingScope"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"
+               id="org.eclipse.photran.ui.FindEnclosingScopeAction"/>
+         <action
+               label="&amp;Find All Declarations in Scope"
+               class="org.eclipse.photran.internal.ui.actions.FindAllDeclarationsInScope"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"
+               id="org.eclipse.photran.ui.FindAllDeclarationsInScopeAction"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplaySymbolTable"
+               id="org.eclipse.photran.ui.DisplaySymbolTableAction"
+               label="Display Symbol &amp;Table for Current File"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"/>
+         <!-- -->
+         <action
+               class="org.eclipse.photran.internal.ui.actions.ResetBinderStatistics"
+               id="org.eclipse.photran.ui.ResetBinderStatisticsAction"
+               label="&amp;Reset Binder Statistics"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplayBinderStatistics"
+               id="org.eclipse.photran.ui.DisplayBinderStatisticsAction"
+               label="Display Binder &amp;Statistics"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
+      </actionSet>
    </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-     <key
-            sequence="M3+M2+M1+D"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.SelectEnclosingScopeCommand"
-     />
-   </extension-->
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -353,93 +580,6 @@
             commandId="org.eclipse.photran.ui.EasterEggCommand"
      />
    </extension>
-   <extension point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="Fortran Debug Actions"
-            description="Fortran Debug Actions"
-            visible="false"
-            id="org.eclipse.photran.ui.DebugActionSet">
-         <menu
-               label="Refac&amp;tor"
-               path="edit"
-               id="org.eclipse.jdt.ui.refactoring.menu">
-            <separator name="scriptGroup"/>
-         </menu>
-
-         <menu
-               label="(&amp;Debugging)"
-               path="org.eclipse.jdt.ui.refactoring.menu/scriptGroup"
-               id="org.eclipse.photran.ui.AnalysisDebuggingMenu">
-            <separator name="debugging"/>
-            <separator name="debugginginterfaces"/>
-            <separator name="vpgstats"/>
-            <separator name="vpgdb"/>
-         </menu>
-         <action
-               label=""
-               definitionId="org.eclipse.photran.ui.EasterEggCommand"
-               class="org.eclipse.photran.ui.vpg.EasterEggAction"
-               id="org.eclipse.photran.ui.EasterEggAction"/>
-         <action
-               label="Find Matching &amp;Interface Declarations"
-               class="org.eclipse.photran.internal.ui.actions.FindMatchingInterfaceDeclarations"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugginginterfaces"
-               id="org.eclipse.photran.ui.FindMatchingInterfaceDeclarationsAction"/>
-         <action
-               label="Resolve &amp;Interface Binding"
-               class="org.eclipse.photran.internal.ui.actions.ResolveInterfaceBinding"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugginginterfaces"
-               id="org.eclipse.photran.ui.ResolveInterfaceBindingAction"/>
-         <action
-               label="Select &amp;Enclosing Scope"
-               class="org.eclipse.photran.internal.ui.actions.SelectEnclosingScope"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
-               definitionId="org.eclipse.photran.ui.SelectEnclosingScopeCommand"
-               id="org.eclipse.photran.ui.FindEnclosingScopeAction"/>
-         <action
-               label="&amp;Find All Declarations in Scope"
-               class="org.eclipse.photran.internal.ui.actions.FindAllDeclarationsInScope"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
-               id="org.eclipse.photran.ui.FindAllDeclarationsInScopeAction"/>
-         <action
-               class="org.eclipse.photran.internal.ui.actions.DisplaySymbolTable"
-               id="org.eclipse.photran.ui.DisplaySymbolTableAction"
-               label="Display Symbol &amp;Table for Current File"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
-         <action
-               class="org.eclipse.photran.internal.ui.actions.DisplayVPGErrorLog"
-               id="org.eclipse.photran.ui.DisplayVPGErrorLogAction"
-               label="Display VPG &amp;Error/Warning Log"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
-         <!-- -->
-         <action
-               class="org.eclipse.photran.internal.ui.actions.ResetVPGStatistics"
-               id="org.eclipse.photran.ui.ResetVPGStatisticsAction"
-               label="&amp;Reset VPG Statistics"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgstats"/>
-         <action
-               class="org.eclipse.photran.internal.ui.actions.DisplayVPGStatistics"
-               id="org.eclipse.photran.ui.DisplayVPGStatisticsAction"
-               label="Display VPG &amp;Statistics"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgstats"/>
-         <!-- -->
-         <action
-               class="org.eclipse.photran.internal.ui.actions.ClearVPGDatabase"
-               id="org.eclipse.photran.ui.ClearVPGDatabaseAction"
-               label="Clear and Rebuild VPG Database"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgdb"/>
-         <action
-               class="org.eclipse.photran.internal.ui.actions.RefreshVPGDatabase"
-               id="org.eclipse.photran.ui.RefreshVPGDatabaseAction"
-               label="Refresh VPG Database"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgdb"/>
-         <action
-               class="org.eclipse.photran.internal.ui.actions.DisplayVPGDatabase"
-               id="org.eclipse.photran.ui.DisplayVPGDatabaseAction"
-               label="Display VPG Database"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/vpgdb"/>
-      </actionSet>
-   </extension>
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.DebugActionSet">
@@ -451,413 +591,6 @@
    <!--==============-->
    <!-- Refactorings -->
    <!--==============-->
-
-   <!-- Please put the refactorings in the same order in each section -->
-
-   <!-- 1. Define a command -->
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            name="Fortran Refactoring Commands"
-            id="org.eclipse.photran.ui.RefactoringCategory">
-      </category>
-      <command
-            name="Replace Obsolete Operators"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand">
-      </command>
-      <command
-            name="Unify Keyword Case"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand">
-      </command>
-      <command
-            name="Interchange Loops"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand">
-      </command>
-      <command
-            name="Extract Common Block to Module"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand">
-      </command>
-      <command
-            name="Move Saved Variables to Global Common Block"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand">
-      </command>
-      <command
-            name="Encapsulate Variable"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.EncapsulateVariableRefactoringCommand">
-      </command>
-      <command
-            name="Introduce Implicit None"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand">
-      </command>
-      <command
-            name="Extract Local Variable"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
-      </command>
-      <command
-            name="Extract Procedure"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
-      </command>
-      <command
-            name="Rename"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.RenameRefactoringCommand">
-      </command>
-      <command
-      		name="Make COMMON variable names consistent"
-      		categoryId="org.eclipse.photran.ui.RefactoringCategory"
-      		id="org.eclipse.photran.ui.CommonVarNamesRefactoringCommand">
-      </command>
-      <command
-            name="Make Private Entity Public"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringCommand">
-      </command>
-      <command
-            name="Add ONLY clause to USE Statement"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringCommand">
-      </command>
-      <command
-            name="Minimize ONLY list for selected module"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
-            id="org.eclipse.photran.ui.MinOnlyListRefactoringCommand">
-      </command>
-   </extension>
-   <!-- 2. Optionally associate the command with an accelerator key -->
-   <extension
-         point="org.eclipse.ui.bindings">
-     <key
-            sequence="M3+M2+M"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
-     />
-     <key
-            sequence="M3+M2+L"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
-     />
-     <key
-            sequence="M3+M2+I"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
-     />
-     <key
-            sequence="M3+M2+R"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.RenameRefactoringCommand"
-     />
-     <key
-            sequence="M3+M2+S"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
-     />
-   </extension>
-   <!-- 3. Add the refactoring to the Refactoring dropdown menu (in the menu bar) -->
-   <extension point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="Fortran Refactorings"
-            description="Fortran Refactorings"
-            visible="false"
-            id="org.eclipse.photran.ui.RefactoringActionSet">
-         <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
-              http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
-         <menu
-               label="Refac&amp;tor"
-               path="edit"
-               id="org.eclipse.jdt.ui.refactoring.menu">
-                                                          <!-- JAVA REFACTORINGS IN THIS GROUP: -->
-                                                          <!-- ================================ -->
-            <separator name="reorgGroup"/>                <!-- Rename, Move -->
-            <separator name="codingGroup"/>               <!-- Change Signature, Extract Var/Method, Inline -->
-            <separator name="reorgGroup2"/>               <!-- Convert -->
-            <separator name="typeGroup"/>                 <!-- Extract Superclass, Pull Up, Push Down -->
-            <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
-            <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
-            <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
-            <separator name="photranUseStmtGroup"/>
-            <separator name="photranCommonBlockGroup"/>
-            <separator name="photranOptimizationGroup"/>
-            <separator name="photranFormattingGroup"/>
-            <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
-         </menu>
-         <!-- Note that actions are listed in REVERSE order by group -->
-         <action
-               label="Replace Obsolete &amp;Operators..."
-               definitionId="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranFormattingGroup"
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringCommand"/>
-         <action
-               label="&amp;Unify Keyword Case..."
-               definitionId="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranFormattingGroup"
-               id="org.eclipse.photran.ui.KeywordCaseRefactoringCommand"/>
-         <!-- -->
-         <action
-               label="Interchange L&amp;oops (Unchecked)..."
-               definitionId="org.eclipse.photran.ui.InterchangeLoopsRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranOptimizationGroup"
-               id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
-         <!-- -->
-         <!--action
-               label="Extract Common Block to Mo&amp;dule..."
-               definitionId="org.eclipse.photran.ui.MoveCommonToModuleRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
-               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
-         <action
-               label="Move &amp;Saved Variables to Common Block..."
-               definitionId="org.eclipse.photran.ui.MoveSavedToCommonBlockRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
-         <action
-         	   label="Make COMMON Variable Names Consistent..."
-         	   definitionId="org.eclipse.photran.ui.CommonVarNamesRefactoringCommand"
-         	   class="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesAction"
-         	   menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranCommonBlockGroup"
-         	   id="org.eclipse.photran.ui.CommonVarNamesRefactoringAction"/>          
-         <!-- -->
-         <action
-               label="Minimize ONLY List for Selected Module..."
-               definitionId="org.eclipse.photran.uui.MinOnlyListRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranUseStmtGroup"
-               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
-         <action
-               label="Add ONLY clause to USE statement..."
-               definitionId="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/photranUseStmtGroup"
-               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
-         <!-- -->
-         <action
-               label="Encapsulate Variable..."
-               definitionId="org.eclipse.photran.ui.EncapsulateVariableRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup2"
-               id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
-         <!-- -->
-         <action
-               label="Make Private Entity Public..."
-               definitionId="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
-               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
-         <action
-               label="&amp;Introduce Implicit None..."
-               definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
-               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
-         <!-- -->
-         <action
-               label="Extract &amp;Local Variable..."
-               definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
-               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
-         <action
-               label="E&amp;xtract Procedure..."
-               definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
-               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
-         <!-- -->
-         <action
-               label="Re&amp;name..."
-               definitionId="org.eclipse.photran.ui.RenameRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
-               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
-               id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-      </actionSet>
-   </extension>
-   <!--extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
-         <actionSet id="org.eclipse.photran.ui.RefactoringActionSet"/>
-      </perspectiveExtension>
-   </extension-->
-   <extension
-         point="org.eclipse.ui.actionSetPartAssociations">
-      <actionSetPartAssociation targetID="org.eclipse.photran.ui.RefactoringActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <!--part id="org.eclipse.photran.ui.FixedFormFortranEditor"/-->
-      </actionSetPartAssociation>
-   </extension>
-   <!-- 4. Add the refactoring to the editor's popup menu. -->
-   <!-- **** DO NOT list a refactoring here if it is listed in #5 below **** -->
-   <!-- **** (i.e., it is added to the Package Explorer's context menu) **** -->
-   <extension point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-            targetID="#FreeFormFortranEditorContextMenu"
-            id="org.eclipse.photran.refactoring.refactoringEditorContribution">
-         <menu
-               id="org.eclipse.photran.ui.RefactoringMenu"
-               label="Refac&amp;tor"
-               path="group.reorganize"><!-- See IContextMenuConstants -->
-                                                          <!-- JAVA REFACTORINGS IN THIS GROUP: -->
-                                                          <!-- ================================ -->
-            <separator name="reorgGroup"/>                <!-- Rename, Move -->
-            <separator name="codingGroup"/>               <!-- Change Signature, Extract Var/Method, Inline -->
-            <separator name="reorgGroup2"/>               <!-- Convert -->
-            <separator name="typeGroup"/>                 <!-- Extract Superclass, Pull Up, Push Down -->
-            <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
-            <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
-            <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
-            <separator name="photranUseStmtGroup"/>
-            <separator name="photranCommonBlockGroup"/>
-            <separator name="photranOptimizationGroup"/>
-            <separator name="photranFormattingGroup"/>
-            <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
-         </menu>
-         <action
-               label="Interchange L&amp;oops (Unchecked)..."
-               class="org.eclipse.photran.internal.refactoring.ui.InterchangeLoopsAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranOptimizationGroup"
-               id="org.eclipse.photran.ui.InterchangeLoopsAction"/>
-         <!-- -->
-         <!--action
-               label="Extract Common Block to Mo&amp;dule"
-               class="org.eclipse.photran.internal.refactoring.ui.MoveCommonToModuleAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
-               id="org.eclipse.photran.ui.MoveCommonToModuleRefactoringAction"/-->
-         <action
-               label="Move &amp;Saved Variables to Global Common Block..."
-               class="org.eclipse.photran.internal.refactoring.ui.MoveSavedToCommonBlockAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
-               id="org.eclipse.photran.ui.MoveSavedToCommonBlockAction"/>
-         <action
-         	   label="&amp;Make COMMON Variable Names Consistent..."
-         	   class="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesAction"
-         	   menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranCommonBlockGroup"
-         	   id="org.eclipse.photran.ui.CommonVarNamesRefactoringAction"/>
-         <!-- -->
-         <action
-               label="&amp;Minimize ONLY List for Selected Module..."
-               class="org.eclipse.photran.internal.refactoring.ui.MinOnlyListAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranUseStmtGroup"
-               id="org.eclipse.photran.ui.MinOnlyListRefactoringAction"/>
-         <action
-               label="&amp;Add ONLY clause to USE Statement..."
-               class="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranUseStmtGroup"
-               id="org.eclipse.photran.ui.AddOnlyToUseStmtRefactoringAction"/>
-         <!-- -->
-         <action
-               label="Encapsulate Variable..."
-               class="org.eclipse.photran.internal.refactoring.ui.EncapsulateVariableAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup2"
-               id="org.eclipse.photran.ui.EncapsulateVariableAction"/>
-         <!-- -->
-         <action 
-               label="Extract &amp;Local Variable..." 
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
-               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
-         <action 
-               label="E&amp;xtract Procedure..." 
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/codingGroup" 
-               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
-         <!-- -->
-         <action
-               label="&amp;Make Private Entity Public..."
-               class="org.eclipse.photran.internal.refactoring.ui.MakePrivateEntityPublicAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup"
-               id="org.eclipse.photran.ui.MakePrivateEntityPublicRefactoringAction"/>
-         <!-- -->
-         <action 
-               label="&amp;Rename..." 
-               class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/reorgGroup" 
-               id="org.eclipse.photran.ui.RenameRefactoringAction"/>
-      </viewerContribution>
-   </extension>
-   <!-- 5. Add multi-file refactorings to the context menu for files selected in the Package Explorer or elsewhere -->
-   <!-- **** DO NOT list a refactoring here if it is listed in #4 above **** -->
-   <!-- **** (i.e., it is added to the Fortran editor's context menu) **** -->
-   <extension point="org.eclipse.ui.popupMenus">
-   <objectContribution
-   		adaptable="true"
-   		objectClass="org.eclipse.core.resources.IResource"
-   		nameFilter="*"
-   		id="org.eclipse.photran.ui.FortranFileRefactoring">
-          <!--enablement>
-            <or>
-                <instanceof value="org.eclipse.core.resources.IFile" />
-                <instanceof value="org.eclipse.core.resources.IFolder" />
-                <and>
-                   <instanceof value="org.eclipse.core.resources.IProject" />
-                   <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.cdt.core.cnature"/>
-                </and>
-            </or>
-          </enablement-->
-          <visibility>
-            <or>
-               <objectState
-                  name="contentTypeId"
-                  value="org.eclipse.photran.core.freeFormFortranSource"/>
-               <objectClass
-                  name="org.eclipse.core.resources.IFolder" />
-               <objectClass 
-                  name="org.eclipse.core.resources.IProject" />
-            </or>
-         </visibility>
-         <menu
-               id="org.eclipse.photran.ui.RefactoringMenu"
-               label="Refac&amp;tor"
-               path="group.reorganize"><!-- See IContextMenuConstants -->
-                                                          <!-- JAVA REFACTORINGS IN THIS GROUP: -->
-                                                          <!-- ================================ -->
-            <separator name="reorgGroup"/>                <!-- Rename, Move -->
-            <separator name="codingGroup"/>               <!-- Change Signature, Extract Var/Method, Inline -->
-            <separator name="reorgGroup2"/>               <!-- Convert -->
-            <separator name="typeGroup"/>                 <!-- Extract Superclass, Pull Up, Push Down -->
-            <separator name="typeGroup2"/>                <!-- Extract Class, Intro Parameter Obj -->
-            <separator name="codingGroup2"/>              <!-- Introduce Factory, Encapsulate -->
-            <separator name="typeGroup3"/>                <!-- Generalize Type, Infer Generics -->
-            <separator name="photranUseStmtGroup"/>
-            <separator name="photranCommonBlockGroup"/>
-            <separator name="photranOptimizationGroup"/>
-            <separator name="photranFormattingGroup"/>
-            <separator name="scriptGroup"/>               <!-- Create/Apply Script, History -->
-         </menu>
-         <action
-               label="Replace Obsolete &amp;Operators..."
-               class="org.eclipse.photran.internal.refactoring.ui.RepObsOpersAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranFormattingGroup"
-               id="org.eclipse.photran.ui.RepObsOpersRefactoringAction"/>
-         <action
-               label="&amp;Unify Keyword Case..."
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/photranFormattingGroup"
-               class="org.eclipse.photran.internal.refactoring.ui.KeywordCaseAction"
-               id="org.eclipse.photran.ui.KeywordCaseFileRefactoringAction">
-         </action>
-         <!-- -->
-         <action
-               label="&amp;Introduce Implicit None..."
-               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
-               menubarPath="org.eclipse.photran.ui.RefactoringMenu/typeGroup"
-               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
-   	</objectContribution>
-   	</extension>
 
    <!--==========================================-->
    <!-- Experimental Editor with VPG Integration -->

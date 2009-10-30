@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,24 +23,19 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFile
 
 /**
  * Refactoring to unify case of all keywords in Fortran files.
- * 
+ *
  * @author Kurt Hendle
  */
 public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
 {
     private boolean lowerCase = true;   //true for lower case, false for upper case
-    
-    public KeywordCaseRefactoring(ArrayList<IFile> myFiles)
-    {
-        super(myFiles);
-    }
-    
+
     @Override
     public String getName()
     {
-        return "Unify case of all Keywords";
+        return "Change Keyword Case";
     }
-    
+
     public void setLowerCase(boolean value)
     {
         this.lowerCase = value;
@@ -74,7 +67,7 @@ public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
         finally
         {
             vpg.releaseAllASTs();
-        }    
+        }
     }
 
     /** modeled after RepObsOpersRefactoring.java */
@@ -83,7 +76,7 @@ public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
         try
         {
             if (ast == null) return;
-            
+
             CaseChangingVisitor replacer = new CaseChangingVisitor();
             replacer.lowerCase = this.lowerCase;
             ast.accept(replacer);
@@ -95,27 +88,27 @@ public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
             throw new Error(e);
         }
     }
-    
+
     /** borrowed from RepObsOpersRefactoring.java */
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
     }
-    
+
     private static final class CaseChangingVisitor extends GenericASTVisitor
     {
         private boolean changedAST = false;
         private boolean lowerCase;
-        
-        @Override 
+
+        @Override
         public void visitToken(Token node)
         {
             Terminal term = node.getTerminal();
-            
-            if (term == Terminal.T_IDENT || term == Terminal.T_PCON || 
-                term == Terminal.T_FCON || term == Terminal.T_BCON || 
+
+            if (term == Terminal.T_IDENT || term == Terminal.T_PCON ||
+                term == Terminal.T_FCON || term == Terminal.T_BCON ||
                 term == Terminal.T_ZCON || term == Terminal.T_SCON ||
-                term == Terminal.T_DCON || term == Terminal.T_XCON || 
+                term == Terminal.T_DCON || term == Terminal.T_XCON ||
                 term == Terminal.T_OCON || term == Terminal.T_HCON)
             {
                 //ignore these 10 terminals (identifiers and constants)
@@ -130,7 +123,7 @@ public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
                 node.findFirstToken().setText(node.getText().toLowerCase());
             else
                 node.findFirstToken().setText(node.getText().toUpperCase());
-            
+
             changedAST = true;
         }
     }

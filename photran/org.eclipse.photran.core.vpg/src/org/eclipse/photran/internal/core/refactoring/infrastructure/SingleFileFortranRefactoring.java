@@ -15,40 +15,40 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 
 /**
- * This is a base class for all Photran refactorings that apply to a single file 
+ * This is a base class for all Photran refactorings that apply to a single file
  * and possibly require user input/selection
  * @author Jeff Overbey, Timofey Yuvashev
  */
-public abstract class SingleFileFortranRefactoring extends AbstractFortranRefactoring
+public abstract class SingleFileFortranRefactoring extends AbstractFortranRefactoring implements IEditorRefactoring
 {
     protected IFile fileInEditor = null;
     protected ITextSelection selectedRegionInEditor = null;
     protected IFortranAST astOfFileInEditor = null;
     protected final boolean inFixedFormEditor = false;
-    
-    
-    public SingleFileFortranRefactoring(IFile file, ITextSelection selection)
+
+    public void initialize(IFile file, ITextSelection selection)
     {
         assert file != null && file.isAccessible();
         assert selection != null;
 
         this.vpg = PhotranVPG.getInstance();
-        
+
         this.fileInEditor = file;
         this.selectedRegionInEditor = selection;
     }
 
-    public SingleFileFortranRefactoring(IFile file)
+    public void initialize(IFile file)
     {
         assert file != null && file.isAccessible();
 
         this.vpg = PhotranVPG.getInstance();
-        
+
         this.fileInEditor = file;
     }
-    
+
     @Override
     protected RefactoringStatus getAbstractSyntaxTree(RefactoringStatus status)
     {
@@ -64,7 +64,7 @@ public abstract class SingleFileFortranRefactoring extends AbstractFortranRefact
         }
         return status;
     }
-    
+
     @Override
     protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
     {

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.refactoring.ui;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
@@ -30,7 +30,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 /**
  * Handles the Extract Local Variable action in the Fortran editor's Refactoring popup menu
  * and in the Refactor menu in the workbench menu bar.
- * 
+ *
  * @author Jeff Overbey
  */
 public class ExtractLocalVariableAction
@@ -41,19 +41,21 @@ public class ExtractLocalVariableAction
     {
         super(ExtractLocalVariableRefactoring.class, FortranExtractLocalVariableRefactoringWizard.class);
     }
-    
+
     @Override
-    protected AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files)
+    protected AbstractFortranRefactoring getRefactoring(List<IFile> files)
     {
-        return new ExtractLocalVariableRefactoring(
+        ExtractLocalVariableRefactoring r = new ExtractLocalVariableRefactoring();
+        r.initialize(
             getFortranEditor().getIFile(),
             getFortranEditor().getSelection());
+        return r;
     }
-    
+
     public static class FortranExtractLocalVariableRefactoringWizard extends AbstractFortranRefactoringWizard
     {
         protected ExtractLocalVariableRefactoring extractRefactoring;
-        
+
         public FortranExtractLocalVariableRefactoringWizard(ExtractLocalVariableRefactoring r)
         {
             super(r);
@@ -65,17 +67,17 @@ public class ExtractLocalVariableAction
             addPage(new UserInputWizardPage(extractRefactoring.getName())
             {
                 protected Text nameField, typeField;
-        
+
                 public void createControl(Composite parent)
                 {
                     Composite group = new Composite(parent, SWT.NONE);
                     initializeDialogUnits(group);
                     setControl(group);
                     group.setLayout(new GridLayout(2, false));
-                
+
                     GridData twoCol = new GridData();
                     twoCol.horizontalSpan = 2;
-                    
+
                     Label lbl = new Label(group, SWT.NONE);
                     lbl.setText("Type:");
 
@@ -93,7 +95,7 @@ public class ExtractLocalVariableAction
 
                     Label lbl2 = new Label(group, SWT.NONE);
                     lbl2.setText("Name:");
-                    
+
                     nameField = new Text(group, SWT.BORDER);
                     nameField.setText("");
                     nameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -109,7 +111,7 @@ public class ExtractLocalVariableAction
                     // Call once for sure, just in case the user doesn't modify the text
                     extractRefactoring.setType(typeField.getText());
                     extractRefactoring.setName(nameField.getText());
-                    
+
                     typeField.setFocus();
                 }
             });

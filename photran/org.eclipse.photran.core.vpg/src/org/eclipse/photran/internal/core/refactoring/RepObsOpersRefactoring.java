@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,17 +25,12 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFile
 
 /**
  * Refactoring to replace obsolete operators in Fortran files.
- * 
+ *
  * @author Bruno B. Boniati
  * @author Jeff Overbey
  */
 public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
 {
-    public RepObsOpersRefactoring(ArrayList<IFile> myFiles)
-    {
-        super(myFiles);
-    }
-    
     @Override
     public String getName()
     {
@@ -68,7 +61,7 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
         finally
         {
             vpg.releaseAllASTs();
-        }    
+        }
     }
 
     private void makeChangesTo(IFile file, IFortranAST ast, RefactoringStatus status, IProgressMonitor pm) throws Error
@@ -76,7 +69,7 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
         try
         {
             if (ast == null) return;
-            
+
             OperatorReplacingVisitor replacer = new OperatorReplacingVisitor();
             ast.accept(replacer);
             if (replacer.changedAST) // Do not include the file in the list of changes unless it actually changed
@@ -87,17 +80,17 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
             throw new Error(e);
         }
     }
-    
+
     private static final class OperatorReplacingVisitor extends GenericASTVisitor
     {
         private boolean changedAST = false;
-        
-        @Override 
+
+        @Override
         public void visitASTNode(IASTNode node)
         {
             if (node instanceof ASTOperatorNode)
                 replaceOperatorIn((ASTOperatorNode)node);
-            
+
             traverseChildren(node);
         }
 
@@ -110,14 +103,14 @@ public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
             if (op.hasGtOp()) setText(op, ">");
             if (op.hasGeOp()) setText(op, ">=");
         }
-        
+
         private void setText(ASTOperatorNode op, String newText)
         {
             op.findFirstToken().setText(newText);
             changedAST = true;
         }
     }
-    
+
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {

@@ -10,34 +10,22 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.actions;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
+import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
+import org.eclipse.rephraserengine.ui.actions.VPGWindowActionDelegate;
 
 /**
  * Implements the Reset VPG Statistics action in the Refactor/(Debugging) menu
- * 
+ *
  * @author Jeff Overbey
  */
-public class ResetVPGStatistics extends FortranEditorActionDelegate
+public class ResetBinderStatistics extends VPGWindowActionDelegate
 {
-    public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {
-        try
-        {
-        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
-            PhotranVPG.getDatabase().resetStatistics();
-            Binder.resetStatistics();
-        }
-        catch (Exception e)
-        {
-            throw new InvocationTargetException(e);
-        }
-        finally
-        {
-        	progressMonitor.done();
-        }
+        Binder.resetStatistics();
     }
 }

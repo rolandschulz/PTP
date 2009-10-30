@@ -13,11 +13,9 @@ package org.eclipse.photran.internal.core.refactoring;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
@@ -41,9 +39,9 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 
 /**
  * Refactoring to extract an expression into a local (temporary) variable.
- * 
+ *
  * INCOMPLETE
- * 
+ *
  * @author Jeff Overbey
  */
 public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactoring
@@ -51,21 +49,16 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     ///////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////
-    
+
     private IExpr selectedExpr;
     private IActionStmt enclosingStmt;
     @SuppressWarnings("unchecked") private IASTListNode enclosingStmtList;
     private ScopingNode enclosingScope;
-    
+
     private String name = null, type = null;
-    
+
     private ASTTypeDeclarationStmtNode declToInsert = null;
 
-    public ExtractLocalVariableRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
-    
     @Override
     public String getName()
     {
@@ -79,45 +72,45 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     public void setName(String name)
     {
         assert name != null;
-        
+
         this.name = name;
     }
-    
+
     public String getType()
     {
         assert type != null;
-        
+
         return this.type;
     }
 
     public void setType(String type)
     {
         assert type != null;
-        
+
         this.type = type;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
-    
+
     @SuppressWarnings("unchecked")
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-    
+
         IASTNode selection = this.findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selection == null || !(selection instanceof IExpr))
             fail("Please select an expression to extract.");
-        
+
         if (!nodeExactlyEnclosesRegion(selection, this.astOfFileInEditor, this.selectedRegionInEditor))
             fail("You have selected part of an expression, but either (1) the part you have selected is not an " +
                  "expression by itself, or (2) extracting that portion of the expression could change the " +
                  "meaning of the larger expression, due to a change in associativity or precedence.");
-        
+
         selectedExpr = (IExpr)selection;
-        
+
         enclosingStmt = selectedExpr.findNearestAncestor(IActionStmt.class);
         if (enclosingStmt == null)
             fail("Variables can only be extracted from action statements (e.g., assignments, print statements, etc.).");
@@ -129,7 +122,7 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
         enclosingScope = enclosingStmt.findNearestAncestor(ScopingNode.class);
         if (enclosingScope == null) // Should never happen since <ActionStmt> only under <Body>
             fail("Variables can only be extracted from action statements inside functions, subroutines, and main programs.");
-        
+
         Type exprType = TypeChecker.getTypeOf(selectedExpr);
         if (exprType == Type.TYPE_ERROR)
             type = "";
@@ -146,46 +139,46 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     {
         assert name != null;
         assert type != null;
-        
+
         status.addWarning("If any functions in the original or extracted expression have side effects, this " +
                           "refactoring may not preserve behavior.");
-        
+
         // Simple checks -- input validation
-        
+
         if (name.trim().equals(""))
             fail("Please enter a name for the extracted variable.");
-        
+
         if (!isValidIdentifier(name))
             fail(name + " is not a valid identifier");
-        
+
         if (type.trim().equals(""))
             fail("Please enter a type for the extracted variable.");
-        
+
         if (type.contains(";") || type.contains("!") || type.contains("&"))
             fail("A variable cannot be declared with the given type \"" + type + "\".");
-        
+
         IBodyConstruct decl = parseLiteralStatementNoFail(type + " :: " + name);
         if (decl == null || !(decl instanceof ASTTypeDeclarationStmtNode))
             fail("A variable cannot be declared with the given type \"" + type + "\".");
-        
+
         declToInsert = (ASTTypeDeclarationStmtNode)decl;
-        
+
         // Complex checks -- require program analysis
-        
+
         checkForConflictingBindings(status);
     }
 
-    
+
     private void checkForConflictingBindings(RefactoringStatus status)
     {
         Definition def = arbitraryDefinitionInScope();
-        
+
         checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
             def,
             Collections.<PhotranTokenRef>emptyList(),
             name);
     }
-    
+
     private Definition arbitraryDefinitionInScope()
     {
         List<Definition> allDefs = enclosingScope.getAllDefinitions();
@@ -235,13 +228,13 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
         assert name != null;
         assert type != null;
         assert declToInsert != null;
-        
+
         try
         {
             insertDeclaration();
             insertAssignment();
             replaceExpression();
-            
+
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
         }
         finally
@@ -263,7 +256,7 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
         int lastTypeDeclStmt = -1;
         int lastSpecStmt = -1;
         int lastUseStmt = -1;
-        
+
         for (int i = 0; i < body.size(); i++)
         {
             IASTNode thisStmt = body.get(i);
@@ -274,7 +267,7 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
             if (thisStmt instanceof ASTUseStmtNode)
                 lastUseStmt = i;
         }
-        
+
         if (lastTypeDeclStmt >= 0)
             return lastTypeDeclStmt + 1;
         else if (lastSpecStmt >= 0)

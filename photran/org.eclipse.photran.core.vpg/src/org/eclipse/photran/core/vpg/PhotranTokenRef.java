@@ -16,8 +16,7 @@ import java.io.OutputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.Token;
-
-import bz.over.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.TokenRef;
 
 /**
  * A reference to a token in a Fortran AST (used by the VPG).

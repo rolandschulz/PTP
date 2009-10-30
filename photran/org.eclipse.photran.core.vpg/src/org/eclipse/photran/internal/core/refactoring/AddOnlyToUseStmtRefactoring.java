@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.core.IFortranAST;
@@ -59,11 +58,6 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     private ArrayList<String> entitiesInModule = new ArrayList<String>();
     private HashMap<Integer, String> entitiesToAdd = new HashMap<Integer, String>();
     private Set<PhotranTokenRef> allReferences = null;
-
-    public AddOnlyToUseStmtRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
 
     public ArrayList<String> getModuleEntityList()
     {
@@ -378,7 +372,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     @Override
     public String getName()
     {
-        return "Add ONLY clause to USE statement";
+        return "Add ONLY Clause to USE Statement";
     }
 
     //borrowed (slightly modified) from RenameRefactoring.java

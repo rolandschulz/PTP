@@ -10,9 +10,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-
-import bz.over.vpg.db.caching.CachingDB;
-import bz.over.vpg.db.cdt.CDTDB;
+import org.eclipse.rephraserengine.core.vpg.db.caching.CachingDB;
+import org.eclipse.rephraserengine.core.vpg.db.cdt.CDTDB;
 
 public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>
 {

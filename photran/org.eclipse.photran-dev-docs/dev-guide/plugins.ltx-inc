@@ -143,6 +143,27 @@ Hilliard at Intel.
 
 \end{itemize}
 
+\section{Rephraser Engine}
+
+The following plug-ins comprise the Rephraser Engine, a language-independent indexing and
+refactoring infrastructure that serves as the basis for Photran's refactoring engine.
+The Rephraser Engine will contribute a Rephraser Engine Plug-in Developer Guide to the runtime
+workbench (sourced in org.eclipse.rephraserengine.doc.isv); this provides more information about
+these plug-ins.  Starred plug-ins are not distributed to end users.
+
+\begin{itemize}
+\item \textbf{org.eclipse.rephraserengine-support}*
+\item \textbf{org.eclipse.rephraserengine.core}
+\item \textbf{org.eclipse.rephraserengine.core.refactoring}
+\item \textbf{org.eclipse.rephraserengine.core.vpg}
+\item \textbf{org.eclipse.rephraserengine.core.vpg.tests}*
+\item \textbf{org.eclipse.rephraserengine.doc.isv}*
+\item \textbf{org.eclipse.rephraserengine.examples.text}*
+\item \textbf{org.eclipse.rephraserengine.ui}
+\item \textbf{org.eclipse.rephraserengine.ui.refactoring}
+\item \textbf{org.eclipse.rephraserengine.ui.vpg}
+\end{itemize}
+
 \section{Non-plug-in projects}
 
 The following projects are in CVS but are not distributed to users:

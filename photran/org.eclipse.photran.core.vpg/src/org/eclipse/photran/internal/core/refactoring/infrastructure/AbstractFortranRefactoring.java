@@ -71,11 +71,10 @@ import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
+import org.eclipse.rephraserengine.core.refactorings.IRefactoring;
+import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.text.edits.ReplaceEdit;
-
-import bz.over.vpg.TokenRef;
-import bz.over.vpg.VPGLog;
 
 /**
  * Superclass for all refactorings in Photran.
@@ -85,7 +84,7 @@ import bz.over.vpg.VPGLog;
  *
  * @author Jeff Overbey, Timofey Yuvashev
  */
-public abstract class AbstractFortranRefactoring extends Refactoring
+public abstract class AbstractFortranRefactoring extends Refactoring implements IRefactoring
 {
     // Preconditions toward bottom of file
 
@@ -791,7 +790,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
      * references; if so, the given callback is invoked to record an error or
      * warning.
      * <p>
-     * This is the fundamental precondition check for {@link RenameRefactoring}.
+     * This is the fundamental precondition check for Photran's Rename refactoring.
      */
     protected void checkForConflictingBindings(
         IConflictingBindingCallback callback,
@@ -809,7 +808,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
      * references; if so, the given callback is invoked to record an error or
      * warning.
      * <p>
-     * This is the fundamental precondition check for {@link RenameRefactoring}.
+     * This is the fundamental precondition check for Photran's Rename refactoring.
      */
     protected void checkForConflictingBindings(
         IProgressMonitor pm,
@@ -828,7 +827,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
      * references; if so, the given callback is invoked to record an error or
      * warning.
      * <p>
-     * This is the fundamental precondition check for {@link RenameRefactoring}.
+     * This is the fundamental precondition check for Photran's Rename refactoring.
      */
     protected void checkForConflictingBindings(
         IProgressMonitor pm,
@@ -856,25 +855,25 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                 {
                     throw new Notification(Boolean.FALSE);
                 }
-    
+
                 public void addConflictWarning(List<Conflict> conflictingDef)
                 {
                     throw new Notification(Boolean.FALSE);
                 }
-    
+
                 public void addReferenceWillChangeError(String newName, Token reference)
                 {
                     throw new Notification(Boolean.FALSE);
                 }
             };
-            
+
             new CheckForConflictBindings(scope, Collections.singleton(name)).check(pm, callback);
         }
         catch (Notification n)
         {
             return (Boolean)n.getResult();
         }
-        
+
         return true;
     }
 
@@ -904,7 +903,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             this.allReferences = Collections.emptySet();
             this.newNames = newNames;
         }
-        
+
         public void check(IProgressMonitor pm, IConflictingBindingCallback callback)
         {
             this.pm = pm;
@@ -1072,7 +1071,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
             {
                 ScopingNode scopeOfDefinitionToRename = reference.findScopeDeclaringOrImporting(definitionToCheck);
                 if (scopeOfDefinitionToRename == null) return;
-                
+
                 for (String newName : newNames)
                 {
                     for (PhotranTokenRef existingBinding : new FakeToken(reference, newName).manuallyResolveBinding())
@@ -1095,7 +1094,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring
                         for (PhotranTokenRef existingBinding : new FakeToken(reference, newName).manuallyResolveBinding())
                         {
                             ScopingNode scopeOfExistingBinding = existingBinding.findToken().getEnclosingScope();
-    
+
                             boolean willReferenceRenamedDefinition = scopeOfExistingBinding.isParentScopeOf(scopeOfDefinitionToCheck);
                             if (shouldReferenceRenamedDefinition != willReferenceRenamedDefinition)
                                 callback.addReferenceWillChangeError(newName, reference);

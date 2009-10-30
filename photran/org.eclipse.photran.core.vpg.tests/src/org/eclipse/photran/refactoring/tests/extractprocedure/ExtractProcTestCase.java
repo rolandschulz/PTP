@@ -28,7 +28,7 @@ public class ExtractProcTestCase extends RefactoringTestCase
     private static final String DIR = "extract-proc-test-code";
 
     private static NullProgressMonitor pm = new NullProgressMonitor();
-    
+
     protected String filename = null;
     protected ITextSelection selectionToExtract = null;
 
@@ -43,7 +43,7 @@ public class ExtractProcTestCase extends RefactoringTestCase
     protected void doRefactoring() throws Exception
     {
         String description = "Attempt to extract procedure from " + filename;
-        
+
         ExtractProcedureRefactoring refactoring = createRefactoring(filename);
 
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
@@ -51,19 +51,19 @@ public class ExtractProcTestCase extends RefactoringTestCase
 
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());
-        
+
         refactoring.setName("new_procedure");
-        
+
         status = refactoring.checkFinalConditions(pm);
         assertTrue(description + " failed final precondition check: " + status.toString(), !status.hasError());
-        
+
         Change change = refactoring.createChange(pm);
         assertNotNull(description + " returned null Change object", change);
         assertTrue(description + " returned invalid Change object", change.isValid(pm).isOK());
         change.perform(pm);
-        
+
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        
+
         String after = compileAndRunFortranProgram();
         System.out.println(after);
         assertEquals(before, after);
@@ -72,20 +72,22 @@ public class ExtractProcTestCase extends RefactoringTestCase
     private ExtractProcedureRefactoring createRefactoring(final String filename) throws Exception
     {
         final IFile thisFile = importFile(DIR, filename);
-        return new ExtractProcedureRefactoring(thisFile, selectionToExtract);
+        ExtractProcedureRefactoring r = new ExtractProcedureRefactoring();
+        r.initialize(thisFile, selectionToExtract);
+        return r;
     }
 
     @Override protected String readTestFile(String srcDir, String filename) throws IOException, URISyntaxException
     {
         String result = super.readTestFile(srcDir, filename);
-        
+
         int startOffset = result.lastIndexOf('\n', result.indexOf("!<<<<<START")) + 1;
         int endOffset = result.indexOf("!<<<<<END");
         if (startOffset <= 0 || endOffset < 0 || endOffset <= startOffset)
             throw new Error("Malformed test case");
-        
+
         selectionToExtract = new TextSelection(startOffset, endOffset-startOffset);
-        
+
         return result;
     }
 
@@ -96,12 +98,12 @@ public class ExtractProcTestCase extends RefactoringTestCase
 
     /**
      * Given an array with all of the positions of identifiers that should be renamed together, try applying the Rename refactoring to
-     * each, and make sure all the others change with it. 
+     * each, and make sure all the others change with it.
      */
     public void test() throws Exception
     {
         if (filename == null) return; // when JUnit invokes this outside a test suite
-        
+
         doRefactoring();
         assertEquals(
             readTestFile(filename + ".result").replaceAll("\\r", ""), // expected result

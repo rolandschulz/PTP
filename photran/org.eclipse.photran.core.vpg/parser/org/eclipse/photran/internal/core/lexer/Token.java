@@ -25,8 +25,7 @@ import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeUtil;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
-
-import bz.over.vpg.VPGEdge;
+import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**
  * Implementation of <code>IToken</code> used by the Fortran parser.

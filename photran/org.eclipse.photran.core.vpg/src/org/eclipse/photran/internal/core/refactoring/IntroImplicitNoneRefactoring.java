@@ -37,16 +37,11 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 /**
  * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all
  * implicitly-declared variables into a scope and all nested scopes (where needed).
- * 
+ *
  * @author Jeff Overbey, Timofey Yuvashev
  */
 public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
 {
-    public IntroImplicitNoneRefactoring(ArrayList<IFile> myFiles)
-    {
-        super(myFiles);
-    }
-
     @Override
     public String getName()
     {
@@ -160,7 +155,7 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
     private int findIndexOfLastUseStmtIn(IASTListNode<IASTNode> body)
     {
         int result = -1;
-        
+
         for (int i = 0; i < body.size(); i++)
         {
             if (body.get(i) instanceof ASTUseStmtNode)
@@ -168,7 +163,7 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
             else
                 break; // USE statements precede all other statements, so we can stop here
         }
-        
+
         return result;
     }
 

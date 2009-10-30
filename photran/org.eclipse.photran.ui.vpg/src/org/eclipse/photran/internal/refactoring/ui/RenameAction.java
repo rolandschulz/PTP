@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.refactoring.ui;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
@@ -33,7 +33,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 /**
  * Handles the Rename action in the Fortran editor's Refactoring popup menu
  * and in the Refactor menu in the workbench menu bar.
- * 
+ *
  * @author Jeff Overbey
  */
 public class RenameAction
@@ -44,19 +44,21 @@ public class RenameAction
     {
         super(RenameRefactoring.class, FortranRenameRefactoringWizard.class);
     }
-    
+
     @Override
-    protected AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files)
+    protected AbstractFortranRefactoring getRefactoring(List<IFile> files)
     {
-        return new RenameRefactoring(
+        RenameRefactoring r = new RenameRefactoring();
+        r.initialize(
             getFortranEditor().getIFile(),
             getFortranEditor().getSelection());
+        return r;
     }
 
     public static class FortranRenameRefactoringWizard extends AbstractFortranRefactoringWizard
     {
         protected RenameRefactoring renameRefactoring;
-        
+
         public FortranRenameRefactoringWizard(RenameRefactoring r)
         {
             super(r);
@@ -69,19 +71,19 @@ public class RenameAction
             {
                 protected Text newNameField;
                 protected Button shouldBindInterfacesAndExternals;
-        
+
                 public void createControl(Composite parent)
                 {
                     Composite top = new Composite(parent, SWT.NONE);
                     initializeDialogUnits(top);
                     setControl(top);
-                
+
                     top.setLayout(new GridLayout(2, false));
-                
+
                     Composite group = top;
                     Label lbl = new Label(group, SWT.NONE);
                     lbl.setText("Rename " + renameRefactoring.getOldNameOfIdentifier() + " to ");
-                    
+
                     newNameField = new Text(group, SWT.BORDER);
                     newNameField.setText(renameRefactoring.getOldNameOfIdentifier());
                     newNameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -95,9 +97,9 @@ public class RenameAction
                     });
                     // Call once for sure, just in case the user doesn't modify the text
                     renameRefactoring.setNewNameForIdentifier(newNameField.getText());
-                    
+
                     new Label(group, SWT.NONE).setText("");
-                    
+
                     shouldBindInterfacesAndExternals = new Button(group, SWT.CHECK);
                     shouldBindInterfacesAndExternals.setText("Match external subprograms with interfaces and external declarations");
                     shouldBindInterfacesAndExternals.setSelection(true);
@@ -113,9 +115,9 @@ public class RenameAction
                             boolean isChecked = shouldBindInterfacesAndExternals.getSelection();
                             renameRefactoring.setShouldBindInterfacesAndExternals(isChecked);
                         }
-                        
+
                     });
-                    
+
                     newNameField.setFocus();
                 }
             });

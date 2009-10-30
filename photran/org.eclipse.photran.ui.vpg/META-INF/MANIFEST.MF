@@ -20,7 +20,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.search,
  org.eclipse.photran.cdtinterface,
  org.eclipse.cdt.core,
- org.eclipse.cdt.ui
+ org.eclipse.cdt.ui,
+ org.eclipse.rephraserengine.core.vpg,
+ org.eclipse.rephraserengine.ui.refactoring,
+ org.eclipse.rephraserengine.core,
+ org.eclipse.rephraserengine.core.refactoring,
+ org.eclipse.rephraserengine.ui,
+ org.eclipse.rephraserengine.ui.vpg
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.photran.internal.refactoring.ui,
  org.eclipse.photran.internal.ui.actions,

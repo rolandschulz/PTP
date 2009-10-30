@@ -27,5 +27,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.debug.ui,
  org.eclipse.cdt.core,
  org.eclipse.debug.ui,
- org.eclipse.ptp.debug.ui;resolution:=optional
+ org.eclipse.ptp.debug.ui;resolution:=optional,
+ org.eclipse.rephraserengine.ui.refactoring;resolution:=optional
 Eclipse-LazyStart: true

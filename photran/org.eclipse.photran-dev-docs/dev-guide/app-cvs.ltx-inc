@@ -1,7 +1,7 @@
 % Getting the Photran Sources from CVS
 
 \emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.5} (Galileo)
-and a \textbf{Java 5} or later JVM. We recommend the 
+and a \textbf{Java 5} or later JVM. We recommend the
 \href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.}
 
 \newcounter{running_counter}
@@ -25,9 +25,9 @@ and a \textbf{Java 5} or later JVM. We recommend the
 	       \end{itemize}
 	\item  Right-click on ``org.eclipse.cdt''
 	\item  Select ``Configure Branches and Versions\ldots''
-	\item  Under ``Browse files for tags'', expand ``all'', then expand 	
+	\item  Under ``Browse files for tags'', expand ``all'', then expand
 	       ``org.eclipse.cdt'', then click on the .project file
-	\item  Under ``New tags found in the selected files'', click on the Deselect 
+	\item  Under ``New tags found in the selected files'', click on the Deselect
 	       All button, then check cdt\_6\_0 in the list above it
   \item	 Click Add Checked Tags
 	\item	 Click OK
@@ -61,7 +61,7 @@ and a \textbf{Java 5} or later JVM. We recommend the
 	    photran
 	\item  Click on the first entry under ``photran''
 	       (it should be org.eclipse.photran-dev-docs), then shift-click on the last entry
-	       under ``photran'' (it should be org.eclipse.photran.xlf-feature).
+	       under ``photran'' (it should be org.eclipse.rephraserengine.ui.vpg).
 	       All of the intervening plug-ins should now be selected.
 	       Right-click on any of the selected plug-ins, and select
 	       Check Out from the pop-up menu.
@@ -82,8 +82,8 @@ The sources should all compile (albeit with lots of warnings).
 	\item Select ``Run'' to run the tests. To run the tests again, just launch the ``Photran-Tests'' configuration from the Eclipse Run menu.
 
 	\vspace{.5em}
-	\noindent\textit{\textbf{Note.} Some JUnit tests for the parser and      
-	refactoring engine require closed-source code that is not available in CVS. 
+	\noindent\textit{\textbf{Note.} Some JUnit tests for the parser and
+	refactoring engine require closed-source code that is not available in CVS.
 	A warning will appear in the JUnit runner if this code is not available.}
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}

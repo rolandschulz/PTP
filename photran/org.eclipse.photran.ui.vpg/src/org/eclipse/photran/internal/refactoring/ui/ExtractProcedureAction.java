@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.refactoring.ui;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
@@ -30,7 +30,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 /**
  * Handles the Extract Procedure action in the Fortran editor's Refactoring popup menu
  * and in the Refactor menu in the workbench menu bar.
- * 
+ *
  * @author Jeff Overbey
  */
 public class ExtractProcedureAction
@@ -41,19 +41,21 @@ public class ExtractProcedureAction
     {
         super(ExtractProcedureRefactoring.class, FortranExtractProcedureRefactoringWizard.class);
     }
-    
+
     @Override
-    protected AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files)
+    protected AbstractFortranRefactoring getRefactoring(List<IFile> files)
     {
-        return new ExtractProcedureRefactoring(
+        ExtractProcedureRefactoring r = new ExtractProcedureRefactoring();
+        r.initialize(
             getFortranEditor().getIFile(),
             getFortranEditor().getSelection());
+        return r;
     }
-    
+
     public static class FortranExtractProcedureRefactoringWizard extends AbstractFortranRefactoringWizard
     {
         protected ExtractProcedureRefactoring extractRefactoring;
-        
+
         public FortranExtractProcedureRefactoringWizard(ExtractProcedureRefactoring r)
         {
             super(r);
@@ -65,19 +67,19 @@ public class ExtractProcedureAction
             addPage(new UserInputWizardPage(extractRefactoring.getName())
             {
                 protected Text newNameField;
-        
+
                 public void createControl(Composite parent)
                 {
                     Composite top = new Composite(parent, SWT.NONE);
                     initializeDialogUnits(top);
                     setControl(top);
-                
+
                     top.setLayout(new GridLayout(2, false));
-                
+
                     Composite group = top;
                     Label lbl = new Label(group, SWT.NONE);
                     lbl.setText("Extract selected code to a subroutine named ");
-                    
+
                     newNameField = new Text(group, SWT.BORDER);
                     newNameField.setText("");
                     newNameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -89,10 +91,10 @@ public class ExtractProcedureAction
                             extractRefactoring.setName(newNameField.getText());
                         }
                     });
-                    
+
                     // Call once for sure, just in case the user doesn't modify the text
                     extractRefactoring.setName(newNameField.getText());
-                    
+
                     newNameField.setFocus();
                 }
             });

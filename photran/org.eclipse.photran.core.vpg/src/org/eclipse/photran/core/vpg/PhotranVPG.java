@@ -10,11 +10,13 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.photran.cdtinterface.natures.ProjectNatures;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.util.LRUCache;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
@@ -35,9 +37,8 @@ import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-
-import bz.over.vpg.VPGLog;
-import bz.over.vpg.eclipse.EclipseVPG;
+import org.eclipse.rephraserengine.core.vpg.VPGLog;
+import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 
 /**
  * Photran's Virtual Program Graph.
@@ -179,12 +180,14 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		return System.getenv("TESTING") != null;
 	}
 
-	protected String describeEdgeType(int edgeType)
+    @Override
+	public String describeEdgeType(int edgeType)
 	{
 		return edgeTypeDescriptions[edgeType];
 	}
 
-	protected String describeAnnotationType(int annotationType)
+	@Override
+	public String describeAnnotationType(int annotationType)
 	{
 		return annotationTypeDescriptions[annotationType];
 	}
@@ -216,6 +219,28 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		else
 			return ast.findTokenByFileOffsetLength(getIFileForFilename(tokenRef.getFilename()), tokenRef.getOffset(), tokenRef.getLength());
 	}
+
+    @Override
+    public boolean shouldProcessFile(IFile file)
+    {
+        String filename = file.getName();
+        return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
+    }
+
+    @Override
+    public boolean shouldProcessProject(IProject project)
+    {
+        try
+        {
+            if (!project.isAccessible()) return false;
+            if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID)) return false;
+            return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
+        }
+        catch (CoreException e)
+        {
+            throw new Error(e);
+        }
+    }
 
 	@Override
 	protected PhotranTokenRef getTokenRef(Token forToken)

@@ -17,17 +17,17 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.rephraserengine.internal.ui.UIUtil;
 
 /**
  * Implements the Display Symbol Table action in the Refactor/(Debugging) menu
- * 
+ *
  * @author Jeff Overbey
  */
 public class DisplaySymbolTable extends FortranEditorASTActionDelegate
@@ -38,27 +38,27 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
         {
         	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
-            File temp = createTempFile();
-            final PrintStream ps = createPrintStream(temp);
+            File temp = UIUtil.createTempFile();
+            final PrintStream ps = UIUtil.createPrintStream(temp);
 
             ps.println("SYMBOL TABLE - Derived from Virtual Program Graph");
-            
+
         	getAST().accept(new GenericASTVisitor()
         	{
         		private int indentation = 0;
-        		
+
 				@Override public void visitASTNode(IASTNode node)
 				{
 					if (!(node instanceof ScopingNode)) { traverseChildren(node); return; }
 					if (node instanceof ASTExecutableProgramNode && node.getParent() != null) { traverseChildren(node); return; }
-					
+
 					ScopingNode scope = (ScopingNode)node;
-					
+
 					ps.println();
 					describeScope(scope);
-					
+
 					indentation += 4;
-					
+
 					try
 					{
 						for (Definition d : scope.getAllDefinitions())
@@ -69,7 +69,7 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 						println("EXCEPTION: " + e.getClass().getName() + ": " + e.getMessage());
 						e.printStackTrace(ps);
 					}
-					
+
 					traverseChildren(node);
 
 					indentation -= 4;
@@ -78,41 +78,41 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 				private void describeScope(ScopingNode scope)
 				{
 					PhotranTokenRef representativeToken = scope.getRepresentativeToken();
-					
+
 					if (representativeToken.getOffset() < 0)
 						print("(Global Scope)");
 					else
 						print("Scope: " + representativeToken.getText());
-					
+
 					if (scope.isInternal()) ps.print(" (Internal Subprogram)");
-					
+
 					if (scope.isDefaultVisibilityPrivate()) ps.print(" - Default Visibility is PRIVATE");
-					
+
 					ImplicitSpec implicitSpec = scope.getImplicitSpec();
 					if (implicitSpec == null)
 						ps.print(" - Implicit None");
 					else
 						ps.print(" - " + implicitSpec.toString());
-					
+
 					ps.println();
 				}
-        		
+
 				private void print(String text)
 				{
 					for (int i = 0; i < indentation; i++)
 						ps.print(' ');
 					ps.print(text);
 				}
-				
+
 				private void println(String text)
 				{
 					print(text);
 					ps.println();
 				}
         	});
-            
+
             ps.close();
-            openHtmlViewerOn("Symbol Table", temp);
+            UIUtil.openHtmlViewerOn("Symbol Table", temp);
         }
         catch (Exception e)
         {

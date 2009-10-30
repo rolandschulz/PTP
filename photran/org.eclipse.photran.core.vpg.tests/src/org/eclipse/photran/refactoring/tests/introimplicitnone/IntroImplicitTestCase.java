@@ -77,7 +77,9 @@ public class IntroImplicitTestCase extends RefactoringTestCase
         //project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); // Runs in separate thread... grrr...
         ArrayList<IFile> files = new ArrayList<IFile>();
         files.add(thisFile);
-        return new IntroImplicitNoneRefactoring(files);//thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
+        IntroImplicitNoneRefactoring r = new IntroImplicitNoneRefactoring();
+        r.initialize(files);//thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
+        return r;
     }
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException

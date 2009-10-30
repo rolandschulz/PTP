@@ -110,7 +110,9 @@ public class AddOnlyToUseTestCase extends RefactoringTestCase
         final IFile file = importFile(DIR, filenames[0]);
         Document doc = new Document(readFileToString(DIR+"/"+filenames[0]));
         TextSelection text = new TextSelection(doc, getLineColOffset(filenames[0], lineCol), length);
-        return new AddOnlyToUseStmtRefactoring(file, text);
+        AddOnlyToUseStmtRefactoring r = new AddOnlyToUseStmtRefactoring();
+        r.initialize(file, text);
+        return r;
     }
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException

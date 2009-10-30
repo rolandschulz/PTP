@@ -10,11 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Terminal;
@@ -39,7 +37,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 
 /**
- * 
+ *
  * @author Kurt Hendle
  */
 public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefactoring
@@ -64,12 +62,7 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
     //private statement by itself
     private ASTAccessStmtNode lonePrivateNode = null;
     private boolean entireProgramPriv = false;
-    
-    public MakePrivateEntityPublicRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
-    
+
     @Override
     public String getName()
     {
@@ -81,15 +74,15 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
         throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        
+
         Token token = findEnclosingToken();
-        
+
         checkForUnsupportedType(token);
-        
+
         identName = this.selectedRegionInEditor.getText();
         if(identName.equals(""))
             fail("Please select a private entity name.");
-        
+
         //see if any of the supported type of nodes exist and get their info
         accessNode = token.findNearestAncestor(ASTAccessStmtNode.class);
         if(accessNode != null)
@@ -100,29 +93,29 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
         }
         else
             readDeclarationStmtNode(token);
-        
+
         if(declarationStmtNode == null && accessNode == null)
             checkForSubroutineStmtNode(token);
-        
+
         if(subroutineNode == null && accessNode == null)
             checkForFunctionStmtNode(token);
-        
+
         if(accessNodeSpec == null)
             fail("No private entities selected.");
-        
+
         if(accessNodeSpec.isPublic())
             fail("Public entity is selected. Please select a Private entity.");
     }
-    
+
     //modified from RenameRefactoring.java
     private Token findEnclosingToken() throws PreconditionFailure
     {
         Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
-        if (selectedToken == null) 
+        if (selectedToken == null)
             fail("Please select a private entity name (highlight the entity name)");
         return selectedToken;
     }
-    
+
     //checks for intrinsics, externals, and interfaces - unsupported types
     private void checkForUnsupportedType(Token token) throws PreconditionFailure
     {
@@ -130,7 +123,7 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
         ASTIntrinsicStmtNode intrinsic = token.findNearestAncestor(ASTIntrinsicStmtNode.class);
         ASTExternalStmtNode external = token.findNearestAncestor(ASTExternalStmtNode.class);
         ASTInterfaceBlockNode interfaceNode = token.findNearestAncestor(ASTInterfaceBlockNode.class);
-        
+
         if(intrinsic != null)
             fail("Refactoring does not support Intrinsic entities.");
         else if(external != null)
@@ -138,18 +131,18 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
         else if(interfaceNode != null)
             fail("Refactoring does not support Interface declarations.");
     }
-    
+
     //parses information from a declaration statement
     private void readDeclarationStmtNode(Token token) throws PreconditionFailure
     {
         selectedVarType = vpg.getDefinitionFor(token.getTokenRef()).getType().toString();
-        
+
         declarationStmtNode = token.findNearestAncestor(ASTTypeDeclarationStmtNode.class);
         entDeclNode = token.findNearestAncestor(ASTEntityDeclNode.class);
-        
+
         if(declarationStmtNode == null || entDeclNode == null)
             return;//fail("Could not find private entity declaration.");
-        
+
         if(declarationStmtNode.getAttrSpecSeq() != null)
         {
             for(ASTAttrSpecSeqNode attrNode : declarationStmtNode.getAttrSpecSeq())
@@ -160,42 +153,42 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
                     varSpecAttrs += ",";
                     varSpecAttrs += specNode.toString();
                 }
-            
+
                 if(specNode.getAccessSpec() != null)
                     accessNodeSpec = specNode.getAccessSpec();
             }
         }
-        
+
         if(accessNodeSpec == null)
             checkIfEntireProgramPriv(token); //see if a PRIVATE statement exists alone
-        
+
         identNameNode = token.findNearestAncestor(ASTObjectNameNode.class);
         if(accessNodeSpec != null || entireProgramPriv)
             numPrivateEnt = declarationStmtNode.getEntityDeclList().size();
     }
-    
+
     private void checkForSubroutineStmtNode(Token token) throws PreconditionFailure
     {
         subroutineNode = token.findNearestAncestor(ASTSubroutineSubprogramNode.class);
-        
+
         if(subroutineNode != null)
         {
             checkIfEntireProgramPriv(token);
             numPrivateEnt = 1;
         }
     }
-    
+
     private void checkForFunctionStmtNode(Token token)
     {
         functionNode = token.findNearestAncestor(ASTFunctionSubprogramNode.class);
-        
+
         if(functionNode != null)
         {
             checkIfEntireProgramPriv(token);
             numPrivateEnt = 1;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private void checkIfEntireProgramPriv(Token token)
     {
@@ -217,7 +210,7 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
             else
                 progBody = (ASTListNode)functionNode.getParent();
         }
-        
+
         for(int i=0; i<progBody.size(); i++)
         {
             if(progBody.get(i) instanceof ASTAccessStmtNode)
@@ -229,7 +222,7 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
                     lonePrivateNode = node;
                     entireProgramPriv = true;
                 }
-                    
+
             }
         }
     }
@@ -240,7 +233,7 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
     {
         IFortranAST ast = vpg.acquirePermanentAST(fileInEditor);
         if(ast == null) return;
-        
+
         if(numPrivateEnt == 1)
             changePrivateToPublic(ast);
         else if(numPrivateEnt > 1)
@@ -248,11 +241,11 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
             createPublicNode(ast);
             removeIdentifierFromPrivateList();
         }
-        
+
         addChangeFromModifiedAST(fileInEditor, pm);
         vpg.releaseAST(fileInEditor);
     }
-    
+
     private void changePrivateToPublic(IFortranAST ast)
     {
         if(entireProgramPriv)
@@ -264,24 +257,24 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
             Token newToken = new Token(Terminal.T_PUBLIC, "public");
             accessNodeSpec.setIsPrivate(null);
             accessNodeSpec.setIsPublic(newToken);
-        
+
             if(accessNode != null)
                 Reindenter.reindent(accessNode, ast);
             else
                 Reindenter.reindent(declarationStmtNode, ast);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private void handleDeclarationSubroutineOrFunction(IFortranAST ast)
     {
         if(declarationStmtNode != null)
         {
-            ASTTypeDeclarationStmtNode newStmtNode = 
+            ASTTypeDeclarationStmtNode newStmtNode =
                 (ASTTypeDeclarationStmtNode) parseLiteralStatement(selectedVarType + ", public" +
                     varSpecAttrs + " :: " + identNameNode.getObjectName().getText() +
                     System.getProperty("line.separator"));
-            
+
             ASTListNode body = (ASTListNode)declarationStmtNode.getParent();
             body.replaceChild(declarationStmtNode, newStmtNode);
             Reindenter.reindent(newStmtNode, ast);
@@ -290,22 +283,22 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
         {
             ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " +
                 identName + System.getProperty("line.separator"));
-            
+
             ASTListNode body = (ASTListNode)lonePrivateNode.getParent();
             body.insertAfter(lonePrivateNode, newStmtNode);
             Reindenter.reindent(newStmtNode, ast);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private void createPublicNode(IFortranAST ast)
     {
         if(accessNode != null)
         {
             //make a new public ASTAccessStmtNode
-            ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " + 
+            ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " +
                 identifierNode.getGenericName().getText()+System.getProperty("line.separator"));
-        
+
             //insert the public node into the program body in AST
             ASTListNode body = (ASTListNode)accessNode.getParent();
             body.insertAfter(accessNode, newStmtNode);
@@ -313,17 +306,17 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
         }
         else
         {
-            ASTTypeDeclarationStmtNode newStmtNode = 
+            ASTTypeDeclarationStmtNode newStmtNode =
                 (ASTTypeDeclarationStmtNode) parseLiteralStatement(selectedVarType + ", public" +
                     varSpecAttrs + " :: " + identNameNode.getObjectName().getText() +
                     System.getProperty("line.separator"));
-            
+
             ASTListNode body = (ASTListNode)declarationStmtNode.getParent();
             body.insertAfter(declarationStmtNode, newStmtNode);
             Reindenter.reindent(newStmtNode, ast);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private void removeIdentifierFromPrivateList()
     {
@@ -338,7 +331,7 @@ public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefacto
             list.remove(entDeclNode);
         }
     }
-    
+
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure

@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -22,8 +21,7 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-
-import bz.over.vpg.eclipse.VPGJob;
+import org.eclipse.rephraserengine.core.vpg.eclipse.VPGJob;
 
 public class FortranEditorTasks
 {

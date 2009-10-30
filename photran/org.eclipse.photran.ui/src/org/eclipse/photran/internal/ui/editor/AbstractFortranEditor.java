@@ -18,6 +18,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IDocument;
@@ -50,6 +52,7 @@ import org.eclipse.photran.cdtinterface.ui.editor.CDTBasedTextEditor;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.ui.FortranUIPlugin;
+import org.eclipse.rephraserengine.ui.menus.RefactorMenu;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.PaintEvent;
@@ -75,7 +78,7 @@ import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 
 /**
  * Base class for the fixed and free-form Fortran editors
- * 
+ *
  * @author Jeff Overbey
  * @author Kurt Hendle - folding support
  */
@@ -87,32 +90,32 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
 
     protected static final String SOURCE_VIEWER_CONFIG_EXTENSION_POINT_ID =
         "org.eclipse.photran.ui.sourceViewerConfig";
-    
+
     public static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
-    
+
     protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
-    
+
     protected static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
-    
+
     protected static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Public Fields - Custom Reconciler Task Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /** @see org.eclipse.photran.internal.ui.editor_vpg.FortranVPGReconcilingStrategy */
     public Object reconcilerTasks = null;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     protected IPreferenceStore fCombinedPreferenceStore;
     protected Composite fMainComposite;
     protected FortranHorizontalRuler fHRuler;
     protected Color verticalLineColor;
     protected boolean contentTypeMismatch;
-    
+
     // More fields in Folding, below
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +128,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         setSourceViewerConfiguration(createSourceViewerConfiguration());
         setRangeIndicator(new DefaultRangeIndicator());
         useCDTDocumentProvider();
-        
+
         // This has to be set to be notified of changes to preferences
         // Without this, the editor will not auto-update
         IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
@@ -136,10 +139,10 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         WorkbenchChainedTextFontFieldEditor.startPropagate(store, JFaceResources.TEXT_FONT);
 
         useCDTRulerContextMenuID();
-        
+
         contentTypeMismatch = false;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // JFace Text Overrides
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,12 +150,12 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     protected void doSetInput(IEditorInput input) throws CoreException
     {
         super.doSetInput(input);
-        
+
         IDocument document = this.getDocumentProvider().getDocument(input);
         if (document == null) return;
-        
+
         configurePartitionScanner(document);
-        
+
         if (input instanceof FileEditorInput)
             checkForContentTypeMismatch((FileEditorInput)input);
     }
@@ -181,12 +184,12 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         {
             installProjectionSupport();
         }
-        
+
         createLightGrayLines();
-        
+
         addWatermark(parent);
     }
-    
+
     /*
      * TODO: The code above for drawing a horizontal ruler doesn't work when projection support
      * (folding) is enabled, since it uses a ProjectionViewer and the ugly "childComp = ..."
@@ -194,11 +197,34 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
      * editor and folding in the free-form editor.
      */
     protected abstract boolean shouldDisplayHorizontalRulerRatherThanFolding();
-    
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Context Menu Contribution
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @see org.eclipse.ui.texteditor.AbstractTextEditor#editorContextMenuAboutToShow(org.eclipse.jface.action.IMenuManager)
+     */
+    //@Override
+    public void editorContextMenuAboutToShow(IMenuManager menu)
+    {
+        try
+        {
+            MenuManager refactorSubmenu = new MenuManager("Refactor");
+            refactorSubmenu.add(new RefactorMenu());
+            menu.add(refactorSubmenu);
+        }
+        catch (Throwable x)
+        {
+            // The RefactorMenu class is contributed through an optional dependency;
+            // if it's not present, it's not a problem
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Editor Folding
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     //protected ProjectionSupport projectionSupport;
     //protected Annotation[] oldAnnotations;
     protected ProjectionAnnotationModel annotationModel;
@@ -207,28 +233,28 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     {
         //fAnnotationAccess = createAnnotationAccess();
         //fOverviewRuler = createOverviewRuler(getSharedColors());
-        
+
         ISourceViewer sourceViewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
 
         getSourceViewerDecorationSupport(sourceViewer); // Ensure decoration support has been created and configured
-    
+
         return sourceViewer;
     }
-    
+
     private void installProjectionSupport()
     {
         ProjectionViewer viewer =(ProjectionViewer)getSourceViewer();
-        
+
         ProjectionSupport projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors());
         projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.error");
         projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.warning");
         projectionSupport.install();
-        
+
         viewer.doOperation(ProjectionViewer.TOGGLE); // Turn projection mode on
-        
+
         annotationModel = viewer.getProjectionAnnotationModel();
     }
-    
+
     public void updateFoldingStructure(ArrayList/*<Position>*/ positions)
     {
         try
@@ -261,13 +287,13 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     private void checkForContentTypeMismatch(FileEditorInput input)
     {
         contentTypeMismatch = false;
-        
+
         IFile file = input.getFile();
         if (file == null || file.getProject() == null || file.getName() == null) return;
-        
+
         String contentType = CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
         if (contentType == null) return;
-        
+
         boolean expectedSourceForm = this.isFixedForm();
         boolean actualSourceForm = contentType.equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE);
         if (actualSourceForm != expectedSourceForm)
@@ -283,7 +309,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
             painter.addPainter(new WatermarkPainter());
         }
     }
-    
+
     public final class WatermarkPainter implements IPainter
     {
         private boolean active = false;
@@ -303,7 +329,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
                     public void paintControl(PaintEvent e)
                     {
                         if (widget == null || contentTypeMismatch == false) return;
-                        
+
 //                        String msg = "WARNING: This file is open in a "
 //                                   + (isFixedForm() ? "fixed-form" : "free-form")
 //                                   + " editor,\nbut the platform content type "
@@ -322,7 +348,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
                 widget.addPaintListener(listener);
             }
         }
-        
+
         public void dispose()
         {
             if (listener != null)
@@ -330,7 +356,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
                 widget.removePaintListener(listener);
                 listener = null;
             }
-            
+
             widget = null;
         }
 
@@ -341,7 +367,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Ctrl+/ Block Commenting Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     protected void initializeKeyBindingScopes()
     {
         setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID });
@@ -374,19 +400,19 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Gray Vertical Lines
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Display a light gray line between columns 6/7 and 72/73
      */
     protected void createLightGrayLines()
     {
         verticalLineColor = new Color(null, VERTICAL_LINE_COLOR);
-        
+
         ISourceViewer sourceViewer = getSourceViewer();
         if (sourceViewer instanceof ITextViewerExtension2)
         {
             ITextViewerExtension2 painter = (ITextViewerExtension2)sourceViewer;
-            
+
             int[] columns = getColumnsToDrawVerticalLinesOn();
             for (int i = 0; i < columns.length; i++)
             {
@@ -413,7 +439,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         return FortranPreferences.respondToPreferenceChange(event.getProperty())
                || super.affectsTextPresentation(event);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Extensible SourceViewerConfiguration (permits Declaration View, content assist, etc.)
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -460,12 +486,12 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     public static class FortranSourceViewerConfiguration extends CDTBasedSourceViewerConfiguration
     {
         protected PresentationReconciler reconciler;
-        
+
         public FortranSourceViewerConfiguration(AbstractFortranEditor editor)
         {
             super(editor);
         }
-        
+
         /**
          * Returns a list of the possible partitions' content types.
          * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
@@ -484,14 +510,14 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
             if (reconciler == null)
             {
                 reconciler = new PresentationReconciler();
-        
+
                 // Set up a damager-repairer for each content type
-                
+
                 DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getTokenScanner());
                 reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
                 reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
             }
-   
+
             return reconciler;
         }
 
@@ -506,7 +532,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     public abstract boolean isFixedForm();
-    
+
     public IFile getIFile()
     {
         IEditorInput input = getEditorInput();
@@ -517,24 +543,24 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     {
         IEditorInput input = getEditorInput();
         if (input == null) return null;
-        
+
         IDocumentProvider dp = getDocumentProvider();
         if (dp == null) return null;
-        
+
         return dp.getDocument(input);
     }
-    
+
     public ITextSelection getSelection()
     {
         ISelectionProvider provider = getSelectionProvider();
         if (provider == null) return null;
-        
+
         ISelection sel = provider.getSelection();
         if (!(sel instanceof ITextSelection)) return null;
-        
+
         return (ITextSelection)sel;
     }
-    
+
     public Shell getShell()
     {
         return getSite().getShell();
@@ -544,7 +570,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     {
         return super.getSourceViewer();
     }
-    
+
     public IReconciler getReconciler()
     {
         return getSourceViewerConfiguration().getReconciler(getSourceViewer());

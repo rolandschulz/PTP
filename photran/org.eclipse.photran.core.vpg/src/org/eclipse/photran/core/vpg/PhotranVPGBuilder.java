@@ -17,11 +17,8 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.photran.cdtinterface.natures.ProjectNatures;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.SyntaxException;
@@ -38,10 +35,8 @@ import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-
-import bz.over.vpg.VPGDependency;
-import bz.over.vpg.VPGEdge;
+import org.eclipse.rephraserengine.core.vpg.VPGDependency;
+import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**
  * The <code>PhotranVPGBuilder</code> provides methods for manipulating the
@@ -175,28 +170,6 @@ public class PhotranVPGBuilder extends PhotranVPG
     protected boolean shouldListFileInIndexerProgressMessages(String filename)
     {
         return !isVirtualFile(filename);
-    }
-
-    @Override
-    protected boolean shouldProcessFile(IFile file)
-    {
-        String filename = file.getName();
-        return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
-    }
-
-    @Override
-    protected boolean shouldProcessProject(IProject project)
-    {
-        try
-        {
-            if (!project.isAccessible()) return false;
-            if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID)) return false;
-            return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
-        }
-        catch (CoreException e)
-        {
-            throw new Error(e);
-        }
     }
 
     @Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)

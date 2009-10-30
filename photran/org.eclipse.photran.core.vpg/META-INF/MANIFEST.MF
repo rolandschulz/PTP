@@ -11,12 +11,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.ltk.core.refactoring,
  org.eclipse.photran.core,
- org.eclipse.photran.cdtinterface
+ org.eclipse.photran.cdtinterface,
+ org.eclipse.rephraserengine.core.vpg,
+ org.eclipse.rephraserengine.core,
+ org.eclipse.rephraserengine.core.refactoring
 Eclipse-LazyStart: true
-Export-Package: bz.over.vpg,
- bz.over.vpg.db.cdt,
- bz.over.vpg.eclipse,
- org.eclipse.photran.core,
+Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.core.vpg,
  org.eclipse.photran.core.vpg.util,
  org.eclipse.photran.internal.core,
@@ -30,6 +30,4 @@ Export-Package: bz.over.vpg,
  org.eclipse.photran.internal.core.properties,
  org.eclipse.photran.internal.core.refactoring,
  org.eclipse.photran.internal.core.refactoring.infrastructure
-Bundle-ClassPath: cdtdb-4.0.3-eclipse.jar,
- vpg-eclipse.jar,
- .
+Bundle-ClassPath: .

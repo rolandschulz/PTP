@@ -8,19 +8,23 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.core.vpg;
+package org.eclipse.photran.internal.ui;
 
-import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
+import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
+import org.eclipse.rephraserengine.ui.IEclipseVPGFactory;
 
 /**
- * The error/warning log for Photran's VPG.
- * <p>
- * Specializes EclipseVPGLog to be parameterized with Photran's token type
- * 
+ * This class gives the Rephraser Engine's common UI actions access to
+ * Photran's VPG.
+ *
  * @author Jeff Overbey
  */
-public class PhotranVPGLog extends EclipseVPGLog<Token, PhotranTokenRef>
+public class PhotranVPGContribution implements IEclipseVPGFactory
 {
-
+    @SuppressWarnings("unchecked")
+    public EclipseVPG getVPG()
+    {
+        return PhotranVPG.getInstance();
+    }
 }

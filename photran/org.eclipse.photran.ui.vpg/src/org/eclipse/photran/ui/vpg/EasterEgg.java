@@ -24,24 +24,42 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 
 /**
+ * An Easter egg  :-)
+ * <p>
+ * When the cursor is moved over a statement like
+ * <pre>
+ *     print *, "Hi"
+ * </pre>
+ * (where "Hi" can be any literal string) and the user presses Ctrl+Alt+Command+Shift+6, the
+ * statement is transformed into seven print statements using a banner font, i.e.,
+ * <pre>
+ *    print *, "HH    HH IIIIIIII "
+ *    print *, "HH    HH    II    "
+ *    print *, "HH    HH    II    "
+ *    print *, "HHHHHHHH    II    "
+ *    print *, "HH    HH    II    "
+ *    print *, "HH    HH    II    "
+ *    print *, "HH    HH IIIIIIII "
+ * </pre>
+ * <p>
+ * The project must have analysis/refactoring enabled.
+ * <p>
+ * Since the key combination requires the Command key to be pressed, this is effectively available
+ * only on Macs.
+ *
  * @author Jeff Overbey
  */
 public class EasterEgg extends SingleFileFortranRefactoring
 {
     private ASTPrintStmtNode printStmt = null;
     private String string = null;
-    
-    public EasterEgg(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
-    
+
     @Override
     public String getName()
     {
         return "Easter Egg";
     }
-    
+
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
@@ -49,27 +67,28 @@ public class EasterEgg extends SingleFileFortranRefactoring
             status.addFatalError("The selected operation is not available."); // Bogus but common error message
     }
 
+    @SuppressWarnings("unchecked")
     private boolean canRunEasterEgg()
     {
         if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(fileInEditor)) return false;
-        
+
         Token token = this.findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (token == null) return false;
-        
+
         printStmt = token.findNearestAncestor(ASTPrintStmtNode.class);
         if (printStmt == null) return false;
-        
+
         if (printStmt.getOutputItemList() == null
             || printStmt.getOutputItemList().getSingleExpr() == null
             || !(printStmt.getOutputItemList().getSingleExpr() instanceof ASTStringConstNode))
             return false;
-        
+
         ASTStringConstNode stringConst = (ASTStringConstNode)printStmt.getOutputItemList().getSingleExpr();
         if (stringConst.getSubstringRange() != null)
             return false;
-        
+
         if (!(printStmt.getParent() instanceof IASTListNode)) return false;
-        
+
         string = removeQuotes(stringConst.getStringConst().getText());
         return true;
     }
@@ -99,14 +118,14 @@ public class EasterEgg extends SingleFileFortranRefactoring
                 newStmts[i] = (ASTPrintStmtNode)printStmt.clone();
                 ASTStringConstNode stringConst = (ASTStringConstNode)newStmts[i].getOutputItemList().getSingleExpr();
                 stringConst.getStringConst().setText("\"" + rasterize(i, string) + "\"");
-                
+
                 if (i != 0)
                     removeAllWhitetextExceptIndentation(newStmts[i].findFirstToken());
-                
+
                 ((IASTListNode)printStmt.getParent()).insertAfter(printStmt, newStmts[i]);
             }
             printStmt.removeFromTree();
-            
+
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
         }
         finally
@@ -125,7 +144,7 @@ public class EasterEgg extends SingleFileFortranRefactoring
 
     private static final int FONT_WIDTH = 9;
     private static final int FONT_HEIGHT = 7;
-    
+
     private static String[] font = new String[]
     {
     //12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678",
@@ -137,7 +156,7 @@ public class EasterEgg extends SingleFileFortranRefactoring
      "         AA    AA BB    BB  CC    C DD   DD  EE       FF        GG   GG HH    HH    II    JJ    JJ KK   KK  LL       MM    MM NN  NNNN  OO  OO  PP        QQ  QQ  RR   RR        SS    TT    UU    UU   VVVV   WWW  WWW  XX  XX     YY     ZZ         11    22       33    33       44 5     55  66   66  77      88    88      99   00  00  ...                        ",
      "         AA    AA BBBBBBB    CCCCC  DDDDDD   EEEEEEEE FF         GGGGG  HH    HH IIIIIIII  JJJJJ   KK    KK LLLLLLLL MM    MM NN   NNN   OOOO   PP         QQQQ Q RR    RR SSSSSSS     TT     UUUUUU     VV    WW    WW XX    XX    YY    ZZZZZZZZ 11111111 22222222  333333        44  555555    6666   77        888888    9999     0000   ...         !!       ??    ",
     };
-    
+
     private static int index(char ch)
     {
         switch (Character.toUpperCase(ch))
@@ -184,7 +203,7 @@ public class EasterEgg extends SingleFileFortranRefactoring
             default:  return 0;
         }
     }
-    
+
     private static String rasterize(int line, String string)
     {
         StringBuilder sb = new StringBuilder(string.length() * FONT_WIDTH);
@@ -192,7 +211,7 @@ public class EasterEgg extends SingleFileFortranRefactoring
             sb.append(rasterize(line, string.charAt(i)));
         return sb.toString();
     }
-    
+
     private static String rasterize(int line, char ch)
     {
         int start = index(ch) * FONT_WIDTH;

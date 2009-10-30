@@ -79,7 +79,9 @@ public class MakePrivateEntityPublicTestCase extends RefactoringTestCase
         final IFile file = importFile(DIR, filename);
         Document doc = new Document(readFileToString(DIR+"/"+filename));
         TextSelection text = new TextSelection(doc, getLineColOffset(filename, lineCol), length);
-        return new MakePrivateEntityPublicRefactoring(file, text);
+        MakePrivateEntityPublicRefactoring r = new MakePrivateEntityPublicRefactoring();
+        r.initialize(file, text);
+        return r;
     }
 
     private String readFileToString(final String path) throws IOException

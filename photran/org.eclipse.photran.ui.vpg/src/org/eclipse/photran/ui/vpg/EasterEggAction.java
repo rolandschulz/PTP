@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.ui.vpg;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
@@ -30,24 +30,26 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 public class EasterEggAction
     extends AbstractFortranRefactoringActionDelegate
     implements IWorkbenchWindowActionDelegate, IEditorActionDelegate
-{   
+{
     public EasterEggAction()
     {
         super(EasterEgg.class, EasterEggWizard.class);
     }
-    
+
     @Override
-    protected AbstractFortranRefactoring getRefactoring(ArrayList<IFile> files)
+    protected AbstractFortranRefactoring getRefactoring(List<IFile> files)
     {
-        return new EasterEgg(
+        EasterEgg r = new EasterEgg();
+        r.initialize(
             getFortranEditor().getIFile(),
             getFortranEditor().getSelection());
+        return r;
     }
-    
+
     public static class EasterEggWizard extends AbstractFortranRefactoringWizard
     {
         protected EasterEgg transformation;
-        
+
         public EasterEggWizard(EasterEgg r)
         {
             super(r);
@@ -63,9 +65,9 @@ public class EasterEggAction
                     Composite top = new Composite(parent, SWT.NONE);
                     initializeDialogUnits(top);
                     setControl(top);
-                
+
                     top.setLayout(new GridLayout(1, false));
-                
+
                     Label lbl = new Label(top, SWT.NONE);
                     lbl.setText("Congratulations!  You found an Easter Egg.");
                 }

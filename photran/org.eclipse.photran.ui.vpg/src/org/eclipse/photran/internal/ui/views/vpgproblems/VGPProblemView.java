@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.MouseEvent;
@@ -47,9 +48,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
-
-import bz.over.vpg.VPGLog;
-
 
 public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
 {

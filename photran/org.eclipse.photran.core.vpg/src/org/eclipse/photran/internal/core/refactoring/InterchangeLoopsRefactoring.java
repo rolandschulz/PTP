@@ -36,11 +36,6 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
     private ASTProperLoopConstructNode outerLoop = null;
     private ASTProperLoopConstructNode innerLoop = null;
 
-    public InterchangeLoopsRefactoring(IFile file, ITextSelection selection)
-    {
-        super(file, selection);
-    }
-
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
@@ -91,7 +86,7 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
         Reindenter.reindent(outerLoop, this.astOfFileInEditor, Strategy.REINDENT_EACH_LINE);
 
         this.addChangeFromModifiedAST(this.fileInEditor, pm);
-        
+
         vpg.releaseAST(this.fileInEditor);
     }
 

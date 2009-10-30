@@ -50,8 +50,7 @@ import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-
-import bz.over.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.TokenRef;
 
 /**
  * A declaration of a variable, subprogram, main program, interface,
