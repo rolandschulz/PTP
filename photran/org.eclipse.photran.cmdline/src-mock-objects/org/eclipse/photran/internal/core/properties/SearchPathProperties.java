@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.core.properties;
 
 import java.io.File;
@@ -11,11 +21,11 @@ public class SearchPathProperties
 {
     private static final String modulePaths = ".";
     private static final String includePaths = ".";
-    
+
     public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG";
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
-    
+
     /** @return the value of the given property for the project containing the given file */
     public static String getProperty(IFile file, String propertyName)
     {

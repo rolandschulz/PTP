@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="jar">
+<target name="jar">
+
+      <jar destfile="../distrib/photran-cmdline.jar">
+        <fileset dir=".."
+          includes="about.html"
+        />
+
+      	<fileset dir="../bin"
+          includes="org/**/*"
+        />
+        <fileset dir="../src-util"
+          includes="**/*"
+        />
+        <fileset dir="../src-mock-objects"
+          includes="**/*"
+        />
+        <fileset dir="../src-copied"
+          includes="**/*"
+        />
+      </jar>
+
+</target>
+</project>

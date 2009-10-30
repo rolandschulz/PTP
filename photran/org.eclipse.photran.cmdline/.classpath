@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src-samples"/>
-	<classpathentry kind="src" path="src-mock-objects"/>
-	<classpathentry kind="src" path="src-copied-vpg-photran"/>
 	<classpathentry kind="src" path="src-util"/>
+	<classpathentry kind="src" path="src-mock-objects"/>
+	<classpathentry kind="src" path="src-copied"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="distrib/photran-cmdline.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

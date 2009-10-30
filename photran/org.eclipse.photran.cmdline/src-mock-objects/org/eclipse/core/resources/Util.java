@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.core.resources;
 
 import java.io.BufferedInputStream;
@@ -47,24 +57,29 @@ public class Util
                     throw new Error(e);
                 }
             }
-            
+
+            public File toFile()
+            {
+                return file;
+            }
+
             public String toString()
             {
                 return toOSString();
             }
-            
+
             @Override public int hashCode()
             {
                 return toOSString().hashCode();
             }
-            
+
             @Override public boolean equals(Object o)
             {
                 return o instanceof IPath && toOSString().equals(((IPath)o).toOSString());
             }
         };
     }
-    
+
     public static IFile fileFor(final File file)
     {
         return new IFile()
@@ -114,16 +129,21 @@ public class Util
                 return Util.pathFor(file);
             }
 
+            public IPath getLocation()
+            {
+                return Util.pathFor(file);
+            }
+
             public boolean isAccessible()
             {
                 return file.exists() && file.canRead();
             }
-            
+
             @Override public int hashCode()
             {
                 return getFullPath().hashCode();
             }
-            
+
             @Override public boolean equals(Object o)
             {
                 return o instanceof IFile && getFullPath().equals(((IFile)o).getFullPath());
@@ -154,7 +174,7 @@ public class Util
             {
                 return getFullPath().hashCode();
             }
-            
+
             @Override public boolean equals(Object o)
             {
                 return o instanceof IFolder && getFullPath().equals(((IFolder)o).getFullPath());

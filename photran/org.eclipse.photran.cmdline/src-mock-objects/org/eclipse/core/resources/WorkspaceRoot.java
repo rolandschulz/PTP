@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.core.resources;
 
 import java.io.File;
@@ -9,7 +19,7 @@ public class WorkspaceRoot implements IWorkspaceRoot
 {
     public static final File WORKSPACE_ROOT_DIR = new File(".");
     public static final File WORKSPACE_STATE_DIR = new File(".db-");
-    
+
     public void accept(IResourceVisitor resourceVisitor) throws CoreException
     {
         Util.traverse(WORKSPACE_ROOT_DIR, resourceVisitor);
@@ -28,7 +38,7 @@ public class WorkspaceRoot implements IWorkspaceRoot
     {
         return WORKSPACE_ROOT_DIR.getName();
     }
-    
+
     public IPath getFullPath()
     {
         return Util.pathFor(WORKSPACE_ROOT_DIR);

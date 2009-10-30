@@ -1,10 +1,10 @@
-This is a very rough first attempt at extracting Photran's parser and virtual
-program graph (VPG) to run outside Eclipse, based on a pre-4.0b4 version of
-the Photran AST and VPG.
+This is a very rough attempt at extracting Photran's parser and virtual program graph (VPG)
+to run outside Eclipse in an ordinary Java command line tool, without any Eclipse infrastructure.
 
 Two disclaimers.
-(1) Photran is fairly well-tested (1500+ test cases), but obviously this
-    un-Eclipsed code is NOT, since I hacked it together in one morning.
+(1) Photran is fairly well-tested, but this un-Eclipsed code is NOT.  Most of it
+    was hacked together in one morning in 2007.  We only use it to run some
+    research experiments and to test the indexer's performance.
     It will have bugs that aren't present in Photran.  When it breaks, tell me.
 (2) The AST design is NOT final.  The parts we actually use are generally
     in decent shape.  Others have never been touched and need work.
@@ -12,15 +12,17 @@ Two disclaimers.
     If parts of it are difficult to use, we should fix them.
     In other words, please give me feedback; don't just put up with
     things you don't like.
+(3) This uses mock objects to emulate a minimal Eclipse API, enough that Photran's
+    VPG source code will compile verbatim.  These are extremely incomplete and are
+    modified when necessary to allow the VPG code to compile and run the sample
+    programs.  Consequently, they are a very likely source of bugs.
 
-Contents:
-=========
+Sample Programs (in samples/ and src-samples/):
+==============================================
 
-listdefs*
-src-samples/
-test/
+listdefs
 	listdefs lists all of the declarations/definitions in a file.
-	The listdefs shell script puts the bin directory on the class path and runs
+	The listdefs shell script puts the Photran JAR on the class path and runs
 	the ListDefs command line tool from the src-samples directory.
 	To use it,
 		cd test
@@ -35,19 +37,14 @@ test/
 	the Eclipse GUI in Photran); they're hard-coded into some of the classes
 	in src-mock-objects for now.
 
-bin/
-	Compiled class files are stored here.  When you write your
-	own code, put this on the classpath.
+Contents:
+========
 
-src-copied-vpg-photran/
-	Photran's lexer, parser, and VPG, and support code from CDT
-	and VPG.  (VPG is a separate project of mine that happens to be
-	used in Photran.)  All of the sources in these folders are copied
-	verbatim from the originals.
-
-src-copied-vpg-photran/fortran95.bnf
-	The parsing grammar with AST annotations.  This is critical for
-	navigating the hundreds of classes in the Fortran AST.
+build/build.xml
+distrib/photran-cmdline.jar
+	Ant script and resulting JAR with Photran's parser and VPG, support code
+	from CDT and the Rephraser Engine, and mock objects from the
+	src-mock-objects/ folder which emulate a minimal Eclipse-like API.
 
 src-mock-objects/
 	Mock objects imitating just enough of the Eclipse framework,
@@ -56,10 +53,9 @@ src-mock-objects/
 	together this morning and they are not well-tested.  If you
 	get random NullPointerExceptions or CoreExceptions,
 	it is probably because I did not implement one of these well enough.
-	(The VPG and AST are fairly robust in Eclipse.  Really.)
 
 --
-Jeff Overbey  10/22/07, updated 07/01/08
+Jeff Overbey  10/22/07, updated 07/01/08, 10/13/09
 overbey2@illinois.edu
 
 Photran, CDT, and VPG are distributed under the Eclipse Public License v1.0.
