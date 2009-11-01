@@ -53,7 +53,7 @@ public class ServiceProviderConfigurationDialog extends Dialog {
 	 */
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText(Messages.NewServiceModelWidgetDialog_title);
+		newShell.setText(Messages.ServiceProviderConfigurationDialog_title);
 	}
 	
 	/* (non-Javadoc)
