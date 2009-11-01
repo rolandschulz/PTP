@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.ui.dialogs.ServiceProviderConfigurationDialog;
+import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -67,7 +68,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		setLayout(bodyLayout);
 
 		fNewConfigButton = new Button(this, SWT.RADIO);
-		fNewConfigButton.setText("Create a new Service Configuration"); //$NON-NLS-1$
+		fNewConfigButton.setText(Messages.AddServiceConfigurationWidget_0); 
 		fNewConfigButton.setLayoutData(new GridData());
 		fNewConfigButton.addSelectionListener(new SelectionAdapter() {
 			@Override public void widgetSelected(SelectionEvent e) {
@@ -106,7 +107,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		newComp.setLayout(layout);
 		
 		final Label label = new Label(newComp, SWT.NONE);
-		label.setText("Configuration Name:"); //$NON-NLS-1$
+		label.setText(Messages.AddServiceConfigurationWidget_1); 
 		label.setLayoutData(new GridData());
 		
 		fNewConfigNameText = new Text(newComp, SWT.BORDER);
@@ -114,7 +115,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		fNewConfigNameText.setLayoutData(data);
 		
 		fExistingConfigButton = new Button(this, SWT.RADIO);
-		fExistingConfigButton.setText("Add to an existing Service Configuration"); //$NON-NLS-1$
+		fExistingConfigButton.setText(Messages.AddServiceConfigurationWidget_2); 
 		fExistingConfigButton.setLayoutData(new GridData());
 		fExistingConfigButton.setEnabled(true);
 		
@@ -140,7 +141,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		fAdvancedButton = new Button(this, SWT.PUSH);
 		data = new GridData(SWT.END, SWT.TOP, true, true);
 		fAdvancedButton.setLayoutData(data);
-		fAdvancedButton.setText("Advanced Settings..."); //$NON-NLS-1$
+		fAdvancedButton.setText(Messages.AddServiceConfigurationWidget_3); 
 		fAdvancedButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				ServiceProviderConfigurationDialog dialog = new ServiceProviderConfigurationDialog(getShell(), getServiceConfiguration());
