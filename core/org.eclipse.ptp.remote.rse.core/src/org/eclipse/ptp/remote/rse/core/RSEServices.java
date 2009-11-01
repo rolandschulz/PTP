@@ -117,12 +117,12 @@ public class RSEServices implements IRemoteServicesDelegate {
 			try {
 				RSECorePlugin.waitForInitCompletion();
 			} catch (InterruptedException e) {
-				Activator.log(e);
+				RSEAdapterCorePlugin.log(e);
 			}
 			if (RSECorePlugin.isTheSystemRegistryActive()) {
 				registry = RSECorePlugin.getTheSystemRegistry();
 			} else {
-				Activator.log(Messages.RSEServices_0);
+				RSEAdapterCorePlugin.log(Messages.RSEServices_0);
 			}
 		}
 	}
