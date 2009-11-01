@@ -17,12 +17,17 @@ public class Messages extends NLS {
 
 	private static final String BUNDLE_NAME= "org.eclipse.ptp.services.ui.messages.messages";//$NON-NLS-1$
 	
+	public static String AddServiceConfigurationWidget_0;
+	public static String AddServiceConfigurationWidget_1;
+	public static String AddServiceConfigurationWidget_2;
+	public static String AddServiceConfigurationWidget_3;
+
 	public static String NewServiceConfigurationProjectWizard_0;
 
-	public static String NewServiceModelWidget_0;
-	public static String NewServiceModelWidget_1;
-	public static String NewServiceModelWidget_2;
-	public static String NewServiceModelWidget_3;
+	public static String ServiceProviderConfigurationWidget_0;
+	public static String ServiceProviderConfigurationWidget_1;
+	public static String ServiceProviderConfigurationWidget_2;
+	public static String ServiceProviderConfigurationWidget_3;
 
 	public static String RemoveServiceConfigurationAction_0;
 	public static String RemoveServiceConfigurationAction_1;
@@ -79,40 +84,27 @@ public class Messages extends NLS {
 	public static String ServiceConfigurationSelectionWidget_2;
 	public static String ServiceConfigurationSelectionWidget_3;
 	public static String ServiceConfigurationSelectionWidget_4;
+	public static String ServiceConfigurationSelectionWidget_5;
+	public static String ServiceConfigurationSelectionWidget_6;
+	public static String ServiceConfigurationSelectionWidget_7;
+	public static String ServiceConfigurationSelectionWidget_8;
 	public static String ServiceConfigurationSelectionWidget_9;
 	public static String ServiceConfigurationSelectionWidget_10;
 	public static String ServiceConfigurationSelectionWidget_11;
 	public static String ServiceConfigurationSelectionWidget_12;
 	public static String ServiceConfigurationSelectionWidget_13;
-
 	public static String ServiceConfigurationSelectionWidget_14;
 
-	public static String ServiceConfigurationSelectionWidget_5;
-
-	public static String ServiceConfigurationSelectionWidget_6;
-
-	public static String ServiceConfigurationSelectionWidget_7;
-
-	public static String ServiceConfigurationSelectionWidget_8;
-
 	public static String ServiceConfigurationSelectionWizardPage_0;
-
 	public static String ServiceConfigurationSelectionWizardPage_1;
-
 	public static String ServiceConfigurationSelectionWizardPage_2;
-
 	public static String ServiceConfigurationSelectionWizardPage_3;
-
 	public static String ServiceConfigurationSelectionWizardPage_4;
-
 	public static String ServiceConfigurationSelectionWizardPage_5;
 	
 	public static String ServiceConfigurationWidget_0;
-
 	public static String ServiceConfigurationWidget_1;
-
 	public static String ServiceConfigurationWidget_2;
-
 	public static String ServiceConfigurationWidget_3;
 
 	public static String ServiceConfigurationWizard_0;
@@ -136,10 +128,10 @@ public class Messages extends NLS {
 
 	public static String ServiceModelWidget_8;
 	
-	public static String NewServiceModelWidgetDialog_title;
+	public static String ServiceProviderConfigurationDialog_title;
 
-	public static String ServicesDialog_0;
-	public static String ServicesDialog_1;
+	public static String ServiceSelectionDialog_0;
+	public static String ServiceSelectionDialog_1;
 	
 	static {
 		// initialize resource bundle

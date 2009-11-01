@@ -144,7 +144,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		GridData labelData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		labelData.horizontalSpan = 2;
 		label.setLayoutData(labelData);
-		label.setText(Messages.NewServiceModelWidget_0);
+		label.setText(Messages.ServiceProviderConfigurationWidget_0);
 		
 		servicesTree = new Tree(this, SWT.BORDER  | SWT.SINGLE);
 		GridData servicesTreeData = new GridData(SWT.FILL, SWT.FILL, false, true);
@@ -171,7 +171,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		selectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		
 		enabledCheckbox = new Button(selectionComposite, SWT.CHECK);
-		enabledCheckbox.setText(Messages.NewServiceModelWidget_1);
+		enabledCheckbox.setText(Messages.ServiceProviderConfigurationWidget_1);
 		enabledCheckbox.setLayoutData(new GridData());
 		enabledCheckbox.addSelectionListener(new SelectionAdapter() {
 			@Override public void widgetSelected(SelectionEvent e) {
@@ -182,7 +182,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		enabledCheckbox.setEnabled(false);
 		
 		Label provider = new Label(selectionComposite, SWT.NONE);
-		provider.setText(Messages.NewServiceModelWidget_2);
+		provider.setText(Messages.ServiceProviderConfigurationWidget_2);
 		provider.setLayoutData(new GridData());
 		provider.setEnabled(false);
 		
@@ -312,7 +312,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	
 	private TreeItem createTreeCategory(Tree parent, IServiceCategory category) {
 		TreeItem item = new TreeItem(servicesTree, SWT.NONE);
-		item.setText(category == null ? Messages.NewServiceModelWidget_3 : category.getName());
+		item.setText(category == null ? Messages.ServiceProviderConfigurationWidget_3 : category.getName());
 		item.setImage(configIcon);
 		return item;
 	}

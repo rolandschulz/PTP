@@ -55,8 +55,8 @@ public class ServiceSelectionDialog extends TitleAreaDialog {
 		GridLayout layout = new GridLayout(1, false);
 		container.setLayout(layout);
 
-		setTitle(Messages.ServicesDialog_0);
-		setMessage(Messages.ServicesDialog_1);
+		setTitle(Messages.ServiceSelectionDialog_0);
+		setMessage(Messages.ServiceSelectionDialog_1);
 
 		fTable = new Table(container, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
 		fTable.setLinesVisible(false);
