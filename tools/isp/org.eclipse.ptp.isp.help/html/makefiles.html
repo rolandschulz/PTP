@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+    <title>Makefile Support</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>Makefile Support</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<p>
+The ISP plugin supports CDT Makefile projects with a minimum effort required on the part of the programmer.
+Just some minor modifications to your project's Makefiles and you'll be able to run ISP on your Makefile 
+Projects as well as your Managed Build Projects.
+
+
+<h2>Makefile Modification Steps</h2>
+<p>
+The following are the necessary procedures to modify your CDT Makefile Project so that it can be verified and
+analyzed by the ISP plugin. If you are creating a project from scratch, make sure to start with a new <b>Makefile Project</b>
+and not a <b>Managed-Build Project</b>!
+</p>
+<ul>
+    <li>
+        <b>Change the compiler to ispcc. This is a wrapper for mpicc that allow ISP's Profiler to intercept MPI calls at runtime</b>
+        <pre>
+        # Which compiler to use
+        # CC = mpicc
+        CC = ispcc
+        </pre>
+    </li>
+    <li>
+        <b>
+            The ISP plugin requires the fully qualified path to all source code in order to do the code analyzing. ISP uses
+            the __FILE__ and __LINE__ macros in generating a runtime log. Your Makefiles will have to pass the source files to
+            ispcc (gcc) at compile time in order to get that back in the same form. This is accomplished by the following being
+            added to your Makefiles
+        </b>
+        <pre>
+        SOURCEPATH = $(shell pwd)   # define this this will grab the present working directory and store it
+        $(CC) $(CFLAGS) -c $(SOURCEPATH)/$*.c   # add this to your build rules
+        </pre>
+    </li>
+    <li>
+        <b>Change the extension of the generated executables to <i>".isp"</i></b>
+        <pre>
+        $(BINDIR)/mtest.isp$(VERNUM): $(MESHTESTOBJS) $(ISPOBJS)
+        </pre>
+    </li>
+</ul>    
+    
+    
+<h2>Setting Your Projects up to Build</h2>
+<ul>
+    <li>
+        Create make targets for your Makefile Project
+        <p>&nbsp;</p>
+        <img src="images/makeTargets.jpg">
+        <p>&nbsp;</p>
+    </li>
+    <li>
+        Now simply double click the make target you need.<br>
+        <i>You may have to do a little debugging to get everything just right</i>
+        <p>&nbsp;</p>
+    </li>    
+</ul>
+
+<h2>Running ISP on the Generated Executables</h2>
+<ul>    
+    <li>
+        Locate the executable(s) with ".isp" extension in the Project Explorer
+        <p>&nbsp;</p>
+        <img src="images/ispExtension.jpg">
+        <p>&nbsp;</p>
+    </li>
+        <li>
+        Set the number of processes for the next run of ISP.<br>
+        Find these instructions in the section in the corresponding section 
+        of the <a href="analyzerView.html">Analyzer View Help page</a>
+        <p>&nbsp;</p>
+    </li>  
+    <li>
+        Right click on an executable with ".isp" extension in the Project Explorer
+        <p>&nbsp;</p>
+        <img src="images/executablePopUp.jpg">
+        <p>&nbsp;</p>
+    </li>
+    <li>
+        This should bring up the Analyzer View if it isn't already, and then run ISP as it does in any Managed Build Project.<br>
+        Please see the <a href="analyzerView.html">Analyzer View Help page</a> from info.
+    </li>  
+</ul>
+<p>&nbsp;</p>
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+
+</html>

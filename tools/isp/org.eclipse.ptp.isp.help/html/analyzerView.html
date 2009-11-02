@@ -3,7 +3,7 @@
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="help.css">
-	<title>Code Analyzer View</title>
+	<title>Analyzer View</title>
 </head>
 
 <body>
@@ -14,7 +14,7 @@
             <img src="images/trident_transparent.png">
         </td>
         <td>
-            <h1>Code Analyzer View</h1>
+            <h1>Analyzer View</h1>
         </td>
     </tr>
 </table>
@@ -104,9 +104,9 @@ an easy to use <b>Rank Locking</b> feature.
 </p>
 
 <p>
-The source code analyzer also allows examination of flagged errors with one click. The <b>Go to Call <i>n/m</i></b>
-feature will highlight each of the problem lines in the source code within the Eclipse editor. In addition, it offers
-features to browse calls by rank and by interleaving as well as listing any resource leaks found in the
+The source code analyzer also allows examination of flagged errors with one click. The <b>Browse Errors</b>
+feature will open a shell that allows highlighting of individual source code lines involved with the error within the Eclipse editor.
+In addition, it offers features to browse calls by rank and by interleaving as well as listing any resource leaks found in the
 source code. One click on the flagged leak in the <b>Resource Leak Browser</b> takes the user to the suspect line
 of code in the Eclipse editor.
 </p>
@@ -197,7 +197,15 @@ for examining all processes at once and their interactions on a more global leve
 <p>
 <img height="16" src="images/browse.gif" width="16" /> <b>Browse MPI Calls</b><br>
 This opens a new window that shows all MPI Calls and groups them first by the rank that issued
-them and then by the Interleaving they are found in.<br><br>
+them and then by the Interleaving they are found in.<br>
+<ul>
+    <li>
+        Blue highlighted lines represent calls that are currently highlighted in the code windows.
+    </li>
+    <li>
+        Red highlighted lines represent calls that did NOT complete due to an error.
+    </li>
+</ul>
 <img src="images/callBrowser.jpg"><br>
 </p>
 
@@ -211,11 +219,10 @@ the leak is found will be selected (this is done to help you find and fix the pr
 </p>
 
 <p>
-<img height="16" src="images/goto-error.gif" width="16" /> <b>Go to Call <i>n/m</i></b><br>
-This button is also disabled if there were no assertion violations or deadlocks, and clicking on it brings the
-source code up in the editor with the line where the error is found selected.  Some errors like
-deadlocks involve multiple lines of code.  In this situation, clicking this button will
-allow the user to visit each call involved with the error in the Eclipse editor.
+<img height="16" src="images/goto-error.gif" width="16" /> <b>Browse Errors</b><br>
+This button is also disabled if there were no assertion violations or deadlocks. Clicking on it brings up
+a shell that allows highlighting of individual source code lines involved with the error within the Eclipse editor. 
+Some errors like deadlocks involve multiple lines of code.
 </p>
 
 <h3>Code Windows</h3>

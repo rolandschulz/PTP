@@ -5,9 +5,10 @@
     <topic label="Overview"  href="html/overview.html"/>
     <topic label="ISP Plug-in Prerequisites"  href="html/prereqs.html"/> 
     <topic label="ISP Plug-in Preferences"  href="html/preferences.html"/>
-    <topic label="Console View"  href="html/consoleView.html"/>
     <topic label="Understanding ISP Console Output" href="html/output.html" />
+    <topic label="Console View"  href="html/consoleView.html"/>    
+    <topic label="Analyzer View" href="html/analyzerView.html" />
     <topic label="Java GUI" href="html/javaGui.html" />
-    <topic label="Code Analyzer View"  href="html/analyzerView.html"/>
+    <topic label="Makefile Support" href="html/makefiles.html" />
     <topic label="Troubleshooting the ISP Plug-in"  href="html/troubleshooting.html"/>
 </toc>
