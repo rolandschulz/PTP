@@ -77,10 +77,10 @@ public class ISPConsole extends ViewPart {
 	public void createPartControl(Composite parent) {
 
 		// Initializations
-		this.msgConsole = new MessageConsole(Messages.ISPConsole_0, null);
+		this.msgConsole = new MessageConsole("ISP Console", null); //$NON-NLS-1$
 		this.txtConViewer = new TextConsoleViewer(parent, msgConsole);
 		this.txtConViewer.setInput(getViewSite());
-		this.txtConViewer.setFont(new Font(null, Messages.ISPConsole_1, 10, SWT.NORMAL));
+		this.txtConViewer.setFont(new Font(null, "Courier", 10, SWT.NORMAL)); //$NON-NLS-1$
 
 		// Create actions and connect them to buttons and the context menu
 		makeActions();
@@ -136,7 +136,7 @@ public class ISPConsole extends ViewPart {
 				ISPConsole.this.msgConsole.clearConsole();
 			}
 		};
-		this.clrConsole.setToolTipText(Messages.ISPConsole_2);
+		this.clrConsole.setToolTipText(Messages.ISPConsole_5);
 		this.clrConsole.setImageDescriptor(ISPPlugin
 				.getImageDescriptor("icons/clear-console.gif")); //$NON-NLS-1$
 
@@ -149,9 +149,9 @@ public class ISPConsole extends ViewPart {
 				int result = fc.showSaveDialog(frame);
 
 				if (result == JFileChooser.CANCEL_OPTION) {
-					showMessage(Messages.ISPConsole_3, 0);
+					showMessage(Messages.ISPConsole_7, 0);
 				} else if (result == JFileChooser.APPROVE_OPTION) {
-					showMessage(Messages.ISPConsole_4, 1);
+					showMessage(Messages.ISPConsole_8, 1);
 					File chosenFile = fc.getSelectedFile();
 					String add = ".txt"; //$NON-NLS-1$
 					if (isTxtFile(chosenFile.toString())) {
@@ -160,11 +160,11 @@ public class ISPConsole extends ViewPart {
 					File file = new File(chosenFile + add);
 					saveToFile(file);
 				} else if (result == JFileChooser.ERROR_OPTION) {
-					showMessage(Messages.ISPConsole_5, 2);
+					showMessage(Messages.ISPConsole_11, 2);
 				}
 			}
 		};
-		this.writeToFile.setToolTipText(Messages.ISPConsole_6);
+		this.writeToFile.setToolTipText(Messages.ISPConsole_12);
 		this.writeToFile.setImageDescriptor(PlatformUI.getWorkbench()
 				.getSharedImages().getImageDescriptor(
 						ISharedImages.IMG_ETOOL_SAVE_EDIT));
@@ -175,7 +175,7 @@ public class ISPConsole extends ViewPart {
 						"/org.eclipse.ptp.isp.help/html/output.html"); //$NON-NLS-1$
 			}
 		};
-		this.getHelp.setToolTipText(Messages.ISPConsole_7);
+		this.getHelp.setToolTipText(Messages.ISPConsole_14);
 		this.getHelp.setImageDescriptor(PlatformUI.getWorkbench()
 				.getSharedImages().getImageDescriptor(
 						ISharedImages.IMG_LCL_LINKTO_HELP));
@@ -212,11 +212,11 @@ public class ISPConsole extends ViewPart {
 	 */
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(this.clrConsole);
-		this.clrConsole.setText(Messages.ISPConsole_2);
+		this.clrConsole.setText(Messages.ISPConsole_16);
 		manager.add(this.writeToFile);
-		this.writeToFile.setText(Messages.ISPConsole_6);
+		this.writeToFile.setText(Messages.ISPConsole_17);
 		manager.add(this.getHelp);
-		this.getHelp.setText(Messages.ISPConsole_8);
+		this.getHelp.setText(Messages.ISPConsole_18);
 		manager.add(new Separator());
 
 		// Other plug-ins can contribute there actions here
@@ -228,11 +228,11 @@ public class ISPConsole extends ViewPart {
 	 */
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(this.clrConsole);
-		this.clrConsole.setText(Messages.ISPConsole_2);
+		this.clrConsole.setText(Messages.ISPConsole_19);
 		manager.add(this.writeToFile);
-		this.writeToFile.setText(Messages.ISPConsole_6);
+		this.writeToFile.setText(Messages.ISPConsole_20);
 		manager.add(this.getHelp);
-		this.getHelp.setText(Messages.ISPConsole_8);
+		this.getHelp.setText(Messages.ISPConsole_21);
 
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -266,9 +266,8 @@ public class ISPConsole extends ViewPart {
 			writer.println("\n\n"); //$NON-NLS-1$
 			writer.flush();
 		} catch (IOException e) {
-			IspUtilities.showExceptionDialog(null, e);
-			IspUtilities.logError(Messages.ISPConsole_9,
-					e);
+			IspUtilities.showExceptionDialog(Messages.ISPConsole_23, e);
+			IspUtilities.logError(Messages.ISPConsole_24, e);
 		}
 	}
 
@@ -280,11 +279,11 @@ public class ISPConsole extends ViewPart {
 		case 0:
 			break;
 		case 1:
-			JOptionPane.showMessageDialog(null, message, Messages.ISPConsole_10,
+			JOptionPane.showMessageDialog(null, message, "Success", //$NON-NLS-1$
 					JOptionPane.INFORMATION_MESSAGE);
 			break;
 		case 2:
-			JOptionPane.showMessageDialog(null, message, Messages.ISPConsole_11,
+			JOptionPane.showMessageDialog(null, message, "Error", //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}

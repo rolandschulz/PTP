@@ -24,14 +24,6 @@ import org.eclipse.ptp.isp.messages.Messages;
  */
 public class NumProcsValidator implements IInputValidator {
 
-	/**
-	 * Checks if the new value for number of procs is valid.
-	 * 
-	 * @param newText
-	 *            The new value that we will check.
-	 * @return String The current Value which is the newText unless it was
-	 *         invalid.
-	 */
 	public String isValid(String newText) {
 		int num = -1;
 		try {

@@ -630,10 +630,8 @@ public class Transitions {
 				this.numRanks = Integer.parseInt(line);
 				fileReadSuccess = true;
 			} catch (NumberFormatException nfe) {
-				IspUtilities.showExceptionDialog(null, nfe);
-				IspUtilities.logError(
-						Messages.Transitions_0,
-						nfe);
+				IspUtilities.showExceptionDialog(Messages.Transitions_2, nfe);
+				IspUtilities.logError(Messages.Transitions_3, nfe);
 			}
 			if (fileReadSuccess) {
 				for (int i = 0; i < this.numRanks; i++) {
@@ -817,9 +815,8 @@ public class Transitions {
 			this.currentTransition = -1;
 
 		} catch (FileNotFoundException fnfe) {
-			IspUtilities.showExceptionDialog(null, fnfe);
-			IspUtilities.logError(
-					Messages.Transitions_1, fnfe);
+			IspUtilities.showExceptionDialog(Messages.Transitions_16, fnfe);
+			IspUtilities.logError(Messages.Transitions_17, fnfe);
 		}
 	}
 

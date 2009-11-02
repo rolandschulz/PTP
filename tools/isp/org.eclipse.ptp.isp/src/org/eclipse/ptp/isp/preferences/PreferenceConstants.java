@@ -16,34 +16,35 @@
 
 package org.eclipse.ptp.isp.preferences;
 
+
 /**
  * Constant definitions for ISP plug-in preference page.
  */
 public class PreferenceConstants {
 
-	// Command line options
-	public static final String ISP_PREF_FIB_OPTION = "fibPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_MPICALLS_OPTION = "mpicallsPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_OPENMP_OPTION = "openmpPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_BLOCK_OPTION = "blockingsendsPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_REPORT_OPTION = "reportPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_VERBOSE = "verbosePreference"; //$NON-NLS-1$
+    // Command line options
+    public static final String ISP_PREF_FIB_OPTION = "fibPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_MPICALLS_OPTION = "mpicallsPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_OPENMP_OPTION = "openmpPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_BLOCK_OPTION = "blockingsendsPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_REPORT_OPTION = "reportPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_VERBOSE = "verbosePreference"; //$NON-NLS-1$
 
-	// Miscellaneous options
-	public static final String ISP_PREF_PORTNUM = "portPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_NUMPROCS = "numprocsPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_REPORTNUM = "reportnumPreference"; //$NON-NLS-1$
-	public static final String ISP_PREF_CLRCON = "clrconPreference"; //$NON-NLS-1$
+    // Miscellaneous options
+    public static final String ISP_PREF_PORTNUM = "portPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_NUMPROCS = "numprocsPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_REPORTNUM = "reportnumPreference"; //$NON-NLS-1$
+    public static final String ISP_PREF_CLRCON = "clrconPreference"; //$NON-NLS-1$
 
-	// ISP paths, scripts and file names
-	public static final String ISP_PREF_ISPEXE_PATH = "ispPath"; //$NON-NLS-1$
-	public static final String ISP_PREF_ISPCC_PATH = "ispccPath"; //$NON-NLS-1$
-	public static final String ISP_PREF_UI_PATH = "uiPath"; //$NON-NLS-1$
+    // ISP paths, scripts and file names
+    public static final String ISP_PREF_ISPEXE_PATH = "ispPath"; //$NON-NLS-1$
+    public static final String ISP_PREF_ISPCC_PATH = "ispccPath"; //$NON-NLS-1$
+    public static final String ISP_PREF_UI_PATH = "uiPath"; //$NON-NLS-1$
 
-	// Hidden preference for the order MPI calls are stepped
-	public static final String ISP_PREF_STEP_ORDER = "steporderPreference"; //$NON-NLS-1$
+    // Hidden preference for the order MPI calls are stepped
+    public static final String ISP_PREF_STEP_ORDER = "steporderPreference"; //$NON-NLS-1$
 
-	// Hidden preference for last open file to be accessed
-	public static final String ISP_PREF_LAST_FILE = "lastFile"; //$NON-NLS-1$
+    // Hidden preference for last open file to be accessed
+    public static final String ISP_PREF_LAST_FILE = "lastFile"; //$NON-NLS-1$
 
 }

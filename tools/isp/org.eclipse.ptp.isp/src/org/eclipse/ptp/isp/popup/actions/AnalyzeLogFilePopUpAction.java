@@ -16,9 +16,6 @@
 
 package org.eclipse.ptp.isp.popup.actions;
 
-import java.io.File;
-import java.util.Scanner;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IAction;
@@ -32,6 +29,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 public class AnalyzeLogFilePopUpAction implements IObjectActionDelegate {
@@ -62,33 +60,23 @@ public class AnalyzeLogFilePopUpAction implements IObjectActionDelegate {
 		IFile f = (IFile) this.selection.getFirstElement();
 		IPath s = f.getLocation();
 		String logFilePath = s.toPortableString();
+		String sourceFilePath = IspUtilities.getSourcePathFromLog(logFilePath);
 
-		// Check if the src file is where we expect it to be
-		Scanner scanner; // Just used to get the src file path
+		// Find the active file
+		IWorkbenchWindow window = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		IWorkbenchPage page = window.getActivePage();
+
+		// Open the Analyzer View
 		try {
-			scanner = new Scanner(new File(logFilePath));
-			scanner.nextLine();
-			String sourceFilePath = scanner.nextLine();
-			sourceFilePath = sourceFilePath.substring(sourceFilePath
-					.indexOf("/"), sourceFilePath.lastIndexOf(".") + 2); //$NON-NLS-1$ //$NON-NLS-2$
-			File file = new File(sourceFilePath);
-			if (!file.exists()) {
-				IspUtilities.showExceptionDialog(
-						Messages.AnalyzeLogFilePopUpAction_0, null);
-			}
-
-			// Find the active file
-			IWorkbenchWindow window = PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow();
-			IWorkbenchPage page = window.getActivePage();
-
-			// Open the Analyzer View
 			page.showView(ISPAnalyze.ID);
-			IspUtilities.activateAnalyzer(sourceFilePath, logFilePath, false);
-		} catch (Exception pie) {
-			IspUtilities.logError(
+		} catch (PartInitException pie) {
+			IspUtilities.showExceptionDialog(
 					Messages.AnalyzeLogFilePopUpAction_1, pie);
+			IspUtilities.logError(Messages.AnalyzeLogFilePopUpAction_1, pie);
 		}
+		IspUtilities
+				.activateAnalyzer(sourceFilePath, logFilePath, false, false);
 	}
 
 	/**

@@ -174,9 +174,8 @@ public class ISPPlugin extends AbstractUIPlugin {
 			try {
 				this.ispPrefs.flush();
 			} catch (BackingStoreException bse) {
-				IspUtilities.showExceptionDialog(null, bse);
-				IspUtilities.logError(
-						Messages.ISPPlugin_0, bse);
+				IspUtilities.showExceptionDialog(Messages.ISPPlugin_2, bse);
+				IspUtilities.logError(Messages.ISPPlugin_3, bse);
 			}
 		}
 	}

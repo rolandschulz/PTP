@@ -84,9 +84,8 @@ public class IspHandler extends AbstractHandler {
 			try {
 				page.showView(ISPConsole.ID);
 			} catch (PartInitException pie) {
-				IspUtilities.showExceptionDialog(null, pie);
-				IspUtilities.logError(
-						Messages.IspHandler_0, pie);
+				IspUtilities.showExceptionDialog(Messages.IspHandler_3, pie);
+				IspUtilities.logError(Messages.IspHandler_4, pie);
 			}
 			return null;
 		}
@@ -97,8 +96,8 @@ public class IspHandler extends AbstractHandler {
 		if (editor == null) {
 			sourceFilePath = IspUtilities.getLastFile();
 			if (sourceFilePath.equals("")) { //$NON-NLS-1$
-				IspUtilities.showErrorDialog(Messages.IspHandler_1,
-						Messages.IspHandler_2);
+				IspUtilities.showErrorDialog(Messages.IspHandler_6,
+						Messages.IspHandler_7);
 				return null;
 			}
 		} else {
@@ -114,7 +113,8 @@ public class IspHandler extends AbstractHandler {
 		// Filter extensions
 		int dotIndex = sourceFilePath.lastIndexOf("."); //$NON-NLS-1$
 		if (dotIndex == -1) {
-			IspUtilities.showErrorDialog(Messages.IspHandler_3, Messages.IspHandler_2);
+			IspUtilities.showErrorDialog(Messages.IspHandler_9,
+					Messages.IspHandler_10);
 			return null;
 		}
 		String extension = sourceFilePath.substring(dotIndex);
@@ -143,9 +143,8 @@ public class IspHandler extends AbstractHandler {
 			try {
 				page.showView(ISPConsole.ID);
 			} catch (PartInitException pie) {
-				IspUtilities.showExceptionDialog(null, pie);
-				IspUtilities.logError(
-						Messages.IspHandler_4, pie);
+				IspUtilities.showExceptionDialog(Messages.IspHandler_17, pie);
+				IspUtilities.logError(Messages.IspHandler_18, pie);
 			}
 
 			String logFilePath = IspUtilities.getLogFile(sourceFilePath);
@@ -153,17 +152,16 @@ public class IspHandler extends AbstractHandler {
 			// Open the Analyzer View
 			try {
 				page.showView(ISPAnalyze.ID);
-				IspUtilities
-						.activateAnalyzer(sourceFilePath, logFilePath, true);
+				IspUtilities.activateAnalyzer(sourceFilePath, logFilePath,
+						true, false);
 			} catch (PartInitException pie) {
-				IspUtilities.showExceptionDialog(null, pie);
-				IspUtilities.logError(
-						Messages.IspHandler_4, pie);
+				IspUtilities.showExceptionDialog(Messages.IspHandler_19, pie);
+				IspUtilities.logError(Messages.IspHandler_20, pie);
 			}
 
 		} else {
-			IspUtilities.showErrorDialog(Messages.IspHandler_5,
-					Messages.IspHandler_2);
+			IspUtilities.showErrorDialog(Messages.IspHandler_21,
+					Messages.IspHandler_22);
 		}
 		return null;
 	}

@@ -34,16 +34,12 @@ public class CommandThread implements Runnable {
 		this.command = cmd;
 	}
 
-	/*
-	 * Runs the specified command in this Thread.
-	 */
 	public void run() {
 		try {
 			Runtime.getRuntime().exec(this.command);
 		} catch (IOException ioe) {
-			IspUtilities.showExceptionDialog(null, ioe);
-			IspUtilities.logError(
-					Messages.CommandThread_0, ioe);
+			IspUtilities.showExceptionDialog(Messages.CommandThread_0, ioe);
+			IspUtilities.logError(Messages.CommandThread_1, ioe);
 		}
 
 	}

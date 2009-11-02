@@ -18,9 +18,11 @@ package org.eclipse.ptp.isp.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
@@ -104,17 +106,16 @@ public class IspUtilities {
 		if (ispcc != "") { //$NON-NLS-1$
 			ispcc += "/"; //$NON-NLS-1$
 		}
-		ispcc += "ispcc -o " + exePath + ".exe " + sourceFilePath; //$NON-NLS-1$ //$NON-NLS-2$
+		ispcc += "ispcc -o " + exePath + ".isp " + sourceFilePath; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Run the command and return whether or not it worked
 		int error = runCommand(ispcc);
 
 		// if ispcc ran smoothly
 		if (error == 1) {
-			File executable = new File(exePath + ".exe"); //$NON-NLS-1$
+			File executable = new File(exePath + ".isp"); //$NON-NLS-1$
 			if (!executable.canRead()) {
-				showErrorDialog(
-						Messages.IspUtilities_2,
+				showErrorDialog(Messages.IspUtilities_2,
 						Messages.IspUtilities_3);
 				return -1;
 			}
@@ -136,15 +137,23 @@ public class IspUtilities {
 
 		// Create our isp directory to hold the generated log file
 		File ispdir = new File(getFilePath(sourceFilePath) + "/isp"); //$NON-NLS-1$
-		if (!ispdir.exists()) {
-			ispdir.mkdir();
-			doIspcc(sourceFilePath);
+		ispdir.mkdir();
+
+		File executable = null;
+		String filename = ""; //$NON-NLS-1$
+
+		if (!sourceFilePath.endsWith(".isp")) { //$NON-NLS-1$
+			// doIspcc(sourceFilePath);
+			filename = getFileName(sourceFilePath);
+			executable = new File(ispdir.getAbsolutePath() + "/" + filename //$NON-NLS-1$
+					+ ".isp"); //$NON-NLS-1$
+			filename += ".isp"; //$NON-NLS-1$
+		} else {
+			filename = getFullFileName(sourceFilePath);
+			executable = new File(sourceFilePath);
 		}
 
-		// Start building our string to pass to isp
-		String filename = getFileName(sourceFilePath);
-		File executable = new File(ispdir.getAbsolutePath() + "/" + filename //$NON-NLS-1$
-				+ ".exe"); //$NON-NLS-1$
+		// Start building our string to pass to ISP
 		String exePath = executable.toString();
 
 		int numprocs = pstore.getInt(PreferenceConstants.ISP_PREF_NUMPROCS);
@@ -167,12 +176,6 @@ public class IspUtilities {
 			isp += "/"; //$NON-NLS-1$
 		}
 
-		// Check if the file exists
-		boolean exists = false;
-		while (!exists) {
-			exists = executable.exists();
-		}
-
 		// Find an available port to use
 		boolean available = isPortAvailable(portnum);
 		while (!available) {
@@ -192,19 +195,17 @@ public class IspUtilities {
 		String ispCmd = isp + "isp -n " + numprocs + " -p " + portnum; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Now add command line options
-		ispCmd = ispCmd + " " + ((blockingsendsPreference) ? "-block " : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ ((mpicallsPreference) ? "-mpicalls " : "") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ((verbosePreference) ? "-verbose " : "") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ((openmpPreference) ? "-env " : "") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ((reportPreference) ? "-rpt_progress " : "") //$NON-NLS-1$ //$NON-NLS-2$
+		ispCmd = ispCmd
+				+ " " + ((blockingsendsPreference) ? "-b " : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ((mpicallsPreference) ? "-m " : "") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ((verbosePreference) ? "-O " : "") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ((openmpPreference) ? "-s " : "") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ((reportPreference) ? "-r " : "") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ((reportPreference) ? reportnum + " " : "") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ((fibPreference) ? "-fib " : "") + "-log " + exePath //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ ".log " + exePath; //$NON-NLS-1$
+				+ ((fibPreference) ? "-f " : "") + "-l " + ispdir.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "/" + filename + ".log " + exePath; //$NON-NLS-1$ //$NON-NLS-2$
 
 		runCommand(ispCmd);
-
-		// Cleanup the executable file (leave the log file for later use)
-		executable.delete();
 	}
 
 	/**
@@ -231,7 +232,7 @@ public class IspUtilities {
 		// Check if the file exists
 		String filename = getFileName(sourceFilePath);
 		File logfile = new File(ispdir.getAbsolutePath() + "/" + filename //$NON-NLS-1$
-				+ ".exe.log"); //$NON-NLS-1$
+				+ ".isp.log"); //$NON-NLS-1$
 		String logpath = logfile.getAbsolutePath();
 		if (!logfile.exists()) {
 			showInformationDialog(Messages.IspUtilities_4,
@@ -285,6 +286,51 @@ public class IspUtilities {
 	}
 
 	/**
+	 * Returns only the full name of the file.
+	 * 
+	 * @param sourceFilePath
+	 *            The source file with absolute path.
+	 * @return String The name of the source code file.
+	 */
+	public static String getFullFileName(String sourceFilePath) {
+		int lastSlash = sourceFilePath.lastIndexOf('/');
+		int lastDot = sourceFilePath.lastIndexOf('.');
+
+		// If there is no dot
+		if (lastDot == -1) {
+			return sourceFilePath.substring(lastSlash + 1);
+		}
+		return sourceFilePath.substring(lastSlash + 1);
+	}
+
+	/**
+	 * Returns the path
+	 * 
+	 */
+	public static String getSourcePathFromLog(String logFilePath) {
+		// Check if the log file is where we expect it to be
+		Scanner scanner = null;
+		String sourceFilePath = ""; //$NON-NLS-1$
+
+		try {
+			scanner = new Scanner(new File(logFilePath));
+		} catch (FileNotFoundException pie) {
+			IspUtilities.showExceptionDialog(
+					Messages.AnalyzeLogFilePopUpAction_0, pie);
+			IspUtilities.logError(Messages.AnalyzeLogFilePopUpAction_0, pie);
+		}
+		scanner.nextLine();
+		sourceFilePath = scanner.nextLine();
+		sourceFilePath = sourceFilePath.substring(sourceFilePath.indexOf("/"), //$NON-NLS-1$
+				sourceFilePath.lastIndexOf(".") + 2); //$NON-NLS-1$
+		File file = new File(sourceFilePath);
+		if (!file.exists()) {
+			IspUtilities.showExceptionDialog(Messages.IspUtilities_14, null);
+		}
+		return sourceFilePath;
+	}
+
+	/**
 	 * Runs the specified command as a thread.
 	 * 
 	 * @param command
@@ -321,25 +367,25 @@ public class IspUtilities {
 	 * Activates the ISP Analyzer by sending it the source and log files
 	 * 
 	 * @param src
-	 *            The source code file.
+	 *            The source file.
 	 * @param log
 	 *            The log file.
 	 * @return void
 	 */
 	public static void activateAnalyzer(String sourceFilePath,
-			String logFilePath, boolean runISP) {
+			String logFilePath, boolean compile, boolean runIsp) {
 
 		// Tell the Analyzer where to find the source and log files
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
 		IViewPart ISPViewPart = window.getActivePage().findView(ISPAnalyze.ID);
 		ISPAnalyze analyzer = (ISPAnalyze) ISPViewPart;
-		analyzer.start(sourceFilePath, logFilePath, runISP);
+		analyzer.start(sourceFilePath, logFilePath, compile, runIsp);
 	}
 
 	/**
 	 * Given the absolute path of the source file, this returns where the log
-	 * file Should be located.
+	 * file should be located.
 	 * 
 	 * @param location
 	 *            The location of the log file.
@@ -350,7 +396,7 @@ public class IspUtilities {
 		// get the name of the file
 		String name = getFileName(sourceFilePath);
 		String path = getFilePath(sourceFilePath);
-		return path + "/isp/" + name + ".exe.log"; //$NON-NLS-1$ //$NON-NLS-2$
+		return path + "/isp/" + name + ".isp.log"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -423,11 +469,10 @@ public class IspUtilities {
 	}
 
 	/**
-	 * Saves the path of the last used file relative to the workspace to the
-	 * preference store.
+	 * Saves the full path of the last used file to the preference store.
 	 * 
 	 * @param none
-	 * @return The path of the last used file relative to the workspace.
+	 * @return The path of the last used file inthe workspace.
 	 */
 	public static void saveLastFile(String relativePath) {
 		IPreferenceStore pstore = ISPPlugin.getDefault().getPreferenceStore();

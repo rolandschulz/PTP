@@ -23,8 +23,8 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.ptp.isp.ISPPlugin;
 import org.eclipse.ptp.isp.messages.Messages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -61,26 +61,26 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements
 
 		// Create group for BooleanFieldEditors
 		Group prefsGroup = new Group(fieldEditorParent, SWT.NULL);
-		prefsGroup.setText(Messages.IspPreferencePage_0);
+		prefsGroup.setText("Command Line Options"); //$NON-NLS-1$
 
 		// Create BooleanFieldEditors for command line options.
 		addField(new BooleanFieldEditor(
-				PreferenceConstants.ISP_PREF_FIB_OPTION, Messages.IspPreferencePage_1,
+				PreferenceConstants.ISP_PREF_FIB_OPTION, "Enable FIB", //$NON-NLS-1$
 				prefsGroup));
 		addField(new BooleanFieldEditor(
 				PreferenceConstants.ISP_PREF_MPICALLS_OPTION,
-				Messages.IspPreferencePage_2, prefsGroup));
+				"Log Total MPI Calls", prefsGroup)); //$NON-NLS-1$
 		addField(new BooleanFieldEditor(
-				PreferenceConstants.ISP_PREF_OPENMP_OPTION, Messages.IspPreferencePage_3,
+				PreferenceConstants.ISP_PREF_OPENMP_OPTION, "Enable OpenMP", //$NON-NLS-1$
 				prefsGroup));
 		addField(new BooleanFieldEditor(
 				PreferenceConstants.ISP_PREF_BLOCK_OPTION,
-				Messages.IspPreferencePage_4, prefsGroup));
+				"Use Blocking sends", prefsGroup)); //$NON-NLS-1$
 		addField(new BooleanFieldEditor(
-				PreferenceConstants.ISP_PREF_REPORT_OPTION, Messages.IspPreferencePage_5,
+				PreferenceConstants.ISP_PREF_REPORT_OPTION, "Report Progress", //$NON-NLS-1$
 				prefsGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.ISP_PREF_VERBOSE,
-				Messages.IspPreferencePage_6, prefsGroup));
+				"Verbose Mode", prefsGroup)); //$NON-NLS-1$
 
 		// Vertical spacer
 		new Label(fieldEditorParent, SWT.NULL).setLayoutData(new GridData(
@@ -88,16 +88,16 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements
 
 		// Create group of miscellaneous FieldEditors
 		Group miscGroup = new Group(fieldEditorParent, SWT.NULL);
-		miscGroup.setText(Messages.IspPreferencePage_7);
+		miscGroup.setText("Miscellaneous Options"); //$NON-NLS-1$
 
 		addField(new IntegerFieldEditor(PreferenceConstants.ISP_PREF_PORTNUM,
-				Messages.IspPreferencePage_8, miscGroup));
+				"Port:", miscGroup)); //$NON-NLS-1$
 		addField(new IntegerFieldEditor(PreferenceConstants.ISP_PREF_NUMPROCS,
-				Messages.IspPreferencePage_9, miscGroup));
+				"Number of Processes:", miscGroup)); //$NON-NLS-1$
 		addField(new IntegerFieldEditor(PreferenceConstants.ISP_PREF_REPORTNUM,
-				Messages.IspPreferencePage_10, miscGroup));
+				"Report Progress Every (n) MPI Calls:", miscGroup)); //$NON-NLS-1$
 		addField(new BooleanFieldEditor(PreferenceConstants.ISP_PREF_CLRCON,
-				Messages.IspPreferencePage_11, miscGroup));
+				"Clear ISP Console on Each Run", miscGroup)); //$NON-NLS-1$
 
 		// Vertical spacer
 		new Label(fieldEditorParent, SWT.NULL).setLayoutData(new GridData(
@@ -105,16 +105,16 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements
 
 		// Create group for ISP-path FieldEditors
 		Group ispPathsGroup = new Group(fieldEditorParent, SWT.NULL);
-		ispPathsGroup.setText(Messages.IspPreferencePage_12);
+		ispPathsGroup.setText("ISP Paths"); //$NON-NLS-1$
 
 		addField(new DirectoryFieldEditor(
-				PreferenceConstants.ISP_PREF_ISPEXE_PATH, Messages.IspPreferencePage_13,
+				PreferenceConstants.ISP_PREF_ISPEXE_PATH, "isp executable:", //$NON-NLS-1$
 				ispPathsGroup));
 		addField(new DirectoryFieldEditor(
-				PreferenceConstants.ISP_PREF_ISPCC_PATH, Messages.IspPreferencePage_14,
+				PreferenceConstants.ISP_PREF_ISPCC_PATH, "ispcc script:", //$NON-NLS-1$
 				ispPathsGroup));
 		addField(new DirectoryFieldEditor(PreferenceConstants.ISP_PREF_UI_PATH,
-				Messages.IspPreferencePage_15, ispPathsGroup));
+				"ispUI script:", ispPathsGroup)); //$NON-NLS-1$
 
 		// Do the grid layout work for each group.
 		doLayoutAndData(prefsGroup, 1, 300);
@@ -129,8 +129,10 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements
 				"icons/help-contents.gif").createImage()); //$NON-NLS-1$
 		helpButton.setToolTipText(Messages.IspPreferencePage_17);
 
-		helpButton.addSelectionListener(new SelectionAdapter() {
-			@Override
+		helpButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
 			public void widgetSelected(SelectionEvent e) {
 				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(
 						"/org.eclipse.ptp.isp.help/html/preferences.html"); //$NON-NLS-1$

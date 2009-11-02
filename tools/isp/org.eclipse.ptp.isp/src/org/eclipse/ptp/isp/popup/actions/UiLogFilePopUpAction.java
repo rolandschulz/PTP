@@ -60,7 +60,8 @@ public class UiLogFilePopUpAction implements IObjectActionDelegate {
 
 		// Make sure the file is valid
 		if (this.selection.toString().equals("<empty selection>")) { //$NON-NLS-1$
-			IspUtilities.showErrorDialog(Messages.UiLogFilePopUpAction_0, Messages.UiLogFilePopUpAction_1);
+			IspUtilities.showErrorDialog(Messages.UiLogFilePopUpAction_1,
+					Messages.UiLogFilePopUpAction_2);
 		}
 		String ispUI = ISPPlugin.getDefault().getPreferenceStore().getString(
 				PreferenceConstants.ISP_PREF_UI_PATH);

@@ -7,7 +7,7 @@
    <extension 
         point="org.eclipse.ui.popupMenus">
         
-      <!-- Verification Menu Group -->  
+      <!-- Managed Build Verification Menu Group -->  
       <objectContribution
             adaptable="true"
             id="org.eclipse.ptp.isp.verificationPopupMenu"
@@ -55,6 +55,28 @@
                id="org.eclipse.ptp.isp.AnalyzeFromLogPopUpAction"
                label="Analyze Log File"
                menubarPath="logfileMenu/logfileGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+      
+      <!-- Makefile Executable Verification Menu Group -->        
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.isp.executablePopup"
+            nameFilter="*.isp"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="ISP"
+               path="additions"
+               id="executableMenu">
+            <separator name="executableGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.isp.popup.actions.AnalyzePopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.isp.executablePopup"
+               label="Formally Verify MPI Executable"
+               menubarPath="executableMenu/executableGroup"
                icon="icons/trident.gif">
          </action>
       </objectContribution>

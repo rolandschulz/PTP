@@ -686,8 +686,7 @@ public class Envelope {
 				|| MPICall.equalsIgnoreCase("MPI_Scatterv") //$NON-NLS-1$
 				|| MPICall.equalsIgnoreCase("MPI_Finalize") //$NON-NLS-1$
 				|| MPICall.equalsIgnoreCase("MPI_Reduce_scatter") //$NON-NLS-1$
-				|| MPICall.equalsIgnoreCase("MPI_Bcast") //$NON-NLS-1$
-				|| MPICall.equals("MPI_Scan")) { //$NON-NLS-1$
+				|| MPICall.equalsIgnoreCase("MPI_Bcast") || MPICall.equals("MPI_Scan")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return true;
 		}
 		return false;
@@ -718,9 +717,8 @@ public class Envelope {
 	 */
 	private static void parseCommunicator(Envelope env, String value) {
 		if (value == null) {
-			IspUtilities.showErrorDialog(
-					Messages.Envelope_0,
-					Messages.Envelope_1);
+			IspUtilities.showErrorDialog(Messages.Envelope_53,
+					Messages.Envelope_54);
 			return;
 		}
 

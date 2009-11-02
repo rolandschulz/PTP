@@ -16,8 +16,6 @@
 
 package org.eclipse.ptp.isp.popup.actions;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IAction;
@@ -26,6 +24,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.isp.messages.Messages;
 import org.eclipse.ptp.isp.util.IspUtilities;
 import org.eclipse.ptp.isp.views.ISPAnalyze;
+import org.eclipse.ptp.isp.views.ISPConsole;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
@@ -63,58 +62,43 @@ public class AnalyzePopUpAction implements IObjectActionDelegate {
 		IPath s = f.getLocation();
 		String sourceFilePath = s.toPortableString();
 
-		// Make sure the file is valid
+		// Make sure the file selection is valid
 		if (this.selection.toString().equals("<empty selection>")) { //$NON-NLS-1$
-			IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_0, Messages.AnalyzePopUpAction_1);
+			IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_0,
+					Messages.AnalyzePopUpAction_1);
 		} else {
-			int dotIndex = sourceFilePath.lastIndexOf("."); //$NON-NLS-1$
-			if (dotIndex == -1) {
-				IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_0,
-						Messages.AnalyzePopUpAction_1);
+			String id = action.getId();
+			IspUtilities.saveLastFile(sourceFilePath);
+
+			// Check if the log file exists
+			String logFilePath = IspUtilities.getLogFile(sourceFilePath);
+
+			// Find the active page
+			IWorkbenchWindow window = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow();
+			IWorkbenchPage page = window.getActivePage();
+
+			// Open the Console View
+			try {
+				page.showView(ISPConsole.ID);
+			} catch (PartInitException pie) {
+				IspUtilities.showExceptionDialog(Messages.AnalyzePopUpAction_2,
+						pie);
+				IspUtilities.logError(Messages.AnalyzePopUpAction_2, pie);
 			}
 
-			// Filter extensions
-			String extension = sourceFilePath.substring(dotIndex);
-			if (extension.equals(".c") || extension.equals(".cpp")) { //$NON-NLS-1$ //$NON-NLS-2$
-
-				// Now that we have a valid path, save it to the one step
-				// history
-				IspUtilities.saveLastFile(sourceFilePath);
-
-				if (IspUtilities.doIspcc(sourceFilePath) != -1) {
-					IspUtilities.doIsp(sourceFilePath);
-
-					// Check if the file exists
-					String logFilePath = IspUtilities
-							.getLogFile(sourceFilePath);
-					File file = new File(logFilePath);
-					boolean exists = false;
-					while (!exists) {
-						exists = file.exists();
-					}
-
-					// Find the active file
-					IWorkbenchWindow window = PlatformUI.getWorkbench()
-							.getActiveWorkbenchWindow();
-					IWorkbenchPage page = window.getActivePage();
-
-					// Open the Analyzer View
-					try {
-						page.showView(ISPAnalyze.ID);
-						IspUtilities.activateAnalyzer(sourceFilePath,
-								logFilePath, true);
-					} catch (PartInitException pie) {
-						IspUtilities.showExceptionDialog(null, pie);
-						IspUtilities.logError(
-								Messages.AnalyzePopUpAction_2,
-								pie);
-					}
-					IspUtilities.activateAnalyzer(sourceFilePath, logFilePath,
-							true);
-				} else {
-					IspUtilities.showErrorDialog(Messages.AnalyzePopUpAction_3,
-							Messages.AnalyzePopUpAction_1);
-				}
+			// Open the Analyzer View
+			try {
+				page.showView(ISPAnalyze.ID);
+				IspUtilities
+						.activateAnalyzer(
+								sourceFilePath,
+								logFilePath,
+								id.equals("org.eclipse.ptp.isp.analyzePopup"), id.equals("org.eclipse.ptp.isp.executablePopup")); //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (PartInitException pie) {
+				IspUtilities.showExceptionDialog(Messages.AnalyzePopUpAction_2,
+						pie);
+				IspUtilities.logError(Messages.AnalyzePopUpAction_2, pie);
 			}
 		}
 	}

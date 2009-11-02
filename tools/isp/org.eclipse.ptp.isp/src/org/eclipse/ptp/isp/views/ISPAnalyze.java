@@ -164,13 +164,15 @@ public class ISPAnalyze extends ViewPart {
 	// Paths needed for various operations
 	private String globalSourceFilePath;
 	private String globalLogFilePath;
+	private boolean globalCompile;
+	private boolean globalRunIsp;
 
-	// Thread
-	Thread runISPasThread;
-	Thread enableEndEarly;
+	// Threads
+	private Thread runISPasThread;
+	private Thread enableEndEarly;
 
 	// Misc
-	Shell errShell;
+	private Shell errShell;
 
 	// Listens for doubleclicks and jump to that line of code
 	private class DoubleClickListener implements IDoubleClickListener {
@@ -211,7 +213,7 @@ public class ISPAnalyze extends ViewPart {
 		try {
 			this.transitions = new Transitions(logFilePath);
 		} catch (ParseException pe) {
-			IspUtilities.showExceptionDialog(null, pe);
+			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_0, pe);
 			IspUtilities.logError(Messages.ISPAnalyze_0, pe);
 		}
 		// Reset local values
@@ -319,10 +321,7 @@ public class ISPAnalyze extends ViewPart {
 		} catch (java.io.FileNotFoundException f) {
 			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_1
 					+ leftSourceFilePath, f);
-			IspUtilities
-					.logError(
-							Messages.ISPAnalyze_2,
-							f);
+			IspUtilities.logError(Messages.ISPAnalyze_2, f);
 			leftViewer.add(new ListElement("", Messages.ISPAnalyze_3, -1, //$NON-NLS-1$
 					false));
 		}
@@ -347,10 +346,7 @@ public class ISPAnalyze extends ViewPart {
 		} catch (Exception e) {
 			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_4
 					+ rightSourceFilePath, e);
-			IspUtilities
-					.logError(
-							Messages.ISPAnalyze_5,
-							e);
+			IspUtilities.logError(Messages.ISPAnalyze_5, e);
 			this.rightViewer.add(new ListElement("", Messages.ISPAnalyze_6, //$NON-NLS-1$
 					-1, false));
 		}
@@ -389,11 +385,8 @@ public class ISPAnalyze extends ViewPart {
 			}
 
 		} catch (Exception e) {
-			IspUtilities.showExceptionDialog(null, e);
-			IspUtilities
-					.logError(
-							Messages.ISPAnalyze_7,
-							e);
+			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_7, e);
+			IspUtilities.logError(Messages.ISPAnalyze_7, e);
 		}
 	}
 
@@ -401,20 +394,20 @@ public class ISPAnalyze extends ViewPart {
 	 * Creates a log file from the specified source file by running ISP
 	 * 
 	 * @param sourceFilePath
-	 *            , location of the source file
+	 *            The location of the source file.
+	 * @param compile
+	 *            Whether or not to run ispcc.
 	 * @return void
 	 */
-	public void generateLogFile(String sourceFilePath) {
-		if (IspUtilities.doIspcc(sourceFilePath) != -1) {
-			IspUtilities.doIsp(sourceFilePath);
-
-			// Check if the file exists
-			String logFilePath = IspUtilities.getLogFile(sourceFilePath);
-			File file = new File(logFilePath);
-			boolean exists = false;
-			while (!exists) {
-				exists = file.exists();
+	public void generateLogFile(String sourceFilePath, boolean compile) {
+		if (compile) {
+			if (IspUtilities.doIspcc(sourceFilePath) != -1) {
+				IspUtilities.doIsp(sourceFilePath);
 			}
+		} else {
+			String exePath = ISPPlugin.getDefault().getPreferenceStore()
+					.getString(PreferenceConstants.ISP_PREF_LAST_FILE);
+			IspUtilities.doIsp(exePath);
 		}
 	}
 
@@ -423,19 +416,29 @@ public class ISPAnalyze extends ViewPart {
 	 * initializing everything.
 	 * 
 	 * @param sourceFilePath
+	 *            The fully qualified path to the source file.
 	 * @param logFilePath
-	 * @param runISP
+	 *            The fully qualified path to the log file.
+	 * @param compile
+	 *            Whether or not to run ispcc.
 	 * @return void
 	 */
-	public void start(String sourceFilePath, String logFilePath, boolean runISP) {
+	public void start(String sourceFilePath, String logFilePath,
+			boolean compile, boolean runIsp) {
 		globalSourceFilePath = sourceFilePath;
 		globalLogFilePath = logFilePath;
+		globalCompile = compile;
+		globalRunIsp = runIsp;
 
 		runISPasThread = new Thread() {
 			public void run() {
 				// These need to be done by a Thread
-				generateLogFile(globalSourceFilePath);
+				if (globalCompile || globalRunIsp) {
+					generateLogFile(globalSourceFilePath, globalCompile);
+				}
 				parseLogFile(globalLogFilePath);
+				globalSourceFilePath = IspUtilities
+						.getSourcePathFromLog(globalLogFilePath);
 				parseSourceFile(globalSourceFilePath, globalSourceFilePath);
 				initTransitions(globalLogFilePath);
 				endEarlyButton.setEnabled(false);
@@ -448,15 +451,9 @@ public class ISPAnalyze extends ViewPart {
 			}
 		};
 
-		if (runISP) {
-			// syncExec blocks until next one starts
-			Display.getDefault().syncExec(enableEndEarly);
-			Display.getDefault().asyncExec(runISPasThread);
-		} else {
-			parseLogFile(globalLogFilePath);
-			parseSourceFile(globalSourceFilePath, globalSourceFilePath);
-			initTransitions(globalLogFilePath);
-		}
+		// syncExec blocks until next one starts
+		Display.getDefault().syncExec(enableEndEarly);
+		Display.getDefault().asyncExec(runISPasThread);
 	}
 
 	/**
@@ -488,9 +485,10 @@ public class ISPAnalyze extends ViewPart {
 				int index = fileName.lastIndexOf("/"); //$NON-NLS-1$
 				fileName = fileName.substring(index + 1, fileName.length());
 				this.rightViewer.add(new ListElement(currEnv.getFilename(),
-						fileName + Messages.ISPAnalyze_8 + currEnv.getLinenumber()
-								+ Messages.ISPAnalyze_9 + currEnv.getRank(), currEnv
-								.getLinenumber(), false));
+						fileName + Messages.ISPAnalyze_8
+								+ currEnv.getLinenumber()
+								+ Messages.ISPAnalyze_9 + currEnv.getRank(),
+						currEnv.getLinenumber(), false));
 			}
 		}
 	}
@@ -583,7 +581,8 @@ public class ISPAnalyze extends ViewPart {
 				+ this.transitions.getTotalInterleavings());
 
 		// Transition Label
-		this.transitionsGroup.setText(Messages.ISPAnalyze_11 + transitionIndex + "/" //$NON-NLS-1$
+		this.transitionsGroup.setText(Messages.ISPAnalyze_11 + transitionIndex
+				+ "/" //$NON-NLS-1$
 				+ this.transitionCount);
 
 		// Error message label
@@ -598,7 +597,7 @@ public class ISPAnalyze extends ViewPart {
 				for (int i = 0; i < deadlockList.size(); i++) {
 					String num = deadlockList.get(i).toString();
 					deadlocks += (i != deadlockList.size() - 1) ? num + ", " //$NON-NLS-1$
-							: num;
+					: num;
 				}
 			}
 			String errorMsg = Messages.ISPAnalyze_12;
@@ -606,20 +605,17 @@ public class ISPAnalyze extends ViewPart {
 			this.errorMessageLabel.setText(errorMsg + deadlocks);
 		} else if (transitions.hasAssertion()) {
 			this.errorMessageLabel.setForeground(RED);
-			this.errorMessageLabel
-					.setText(Messages.ISPAnalyze_13
-							+ this.transitions.getTotalInterleavings());
+			this.errorMessageLabel.setText(Messages.ISPAnalyze_13
+					+ this.transitions.getTotalInterleavings());
 		} else {
 			this.errorMessageLabel.setForeground(GREEN);
-			this.errorMessageLabel
-					.setText(Messages.ISPAnalyze_14);
+			this.errorMessageLabel.setText(Messages.ISPAnalyze_14);
 		}
 
 		// Resource leak label
 		if (this.transitions.hasResourceLeak()) {
 			this.resourcLeakLabel.setForeground(RED);
-			this.resourcLeakLabel
-					.setText(Messages.ISPAnalyze_15);
+			this.resourcLeakLabel.setText(Messages.ISPAnalyze_15);
 		} else {
 			this.resourcLeakLabel.setForeground(GREEN);
 			this.resourcLeakLabel.setText(Messages.ISPAnalyze_16);
@@ -645,7 +641,7 @@ public class ISPAnalyze extends ViewPart {
 
 		CLabel numProcsLabel = new CLabel(shell, SWT.BORDER_SOLID);
 		numProcsLabel.setImage(ISPPlugin.getImage(ISPPlugin
-				.getImageDescriptor("icons/process.gif"))); //$NON-NLS-1$
+				.getImageDescriptor("icons/processes.gif"))); //$NON-NLS-1$
 		numProcsLabel.setText(Messages.ISPAnalyze_18 + this.numRanks);
 		numProcsLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -674,7 +670,8 @@ public class ISPAnalyze extends ViewPart {
 			currInterleaving = s.nextInt();
 			if (currInterleaving > prevInterleaving) {
 				interleavingItem = new TreeItem(tree, SWT.NULL);
-				interleavingItem.setText(Messages.ISPAnalyze_19 + currInterleaving);
+				interleavingItem.setText(Messages.ISPAnalyze_19
+						+ currInterleaving);
 				prevInterleaving = currInterleaving;
 				currRank = 0;
 				prevRank = -1;
@@ -806,9 +803,8 @@ public class ISPAnalyze extends ViewPart {
 
 		CLabel hintLabel = new CLabel(shell, SWT.BORDER_SOLID);
 		hintLabel.setImage(ISPPlugin.getImage(ISPPlugin
-				.getImageDescriptor("icons/expanded-tree.gif"))); //$NON-NLS-1$
-		hintLabel
-				.setText(Messages.ISPAnalyze_23);
+				.getImageDescriptor("icons/expand-tree.gif"))); //$NON-NLS-1$
+		hintLabel.setText(Messages.ISPAnalyze_23);
 		hintLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Tree tree = new Tree(shell, SWT.BORDER);
@@ -836,7 +832,8 @@ public class ISPAnalyze extends ViewPart {
 			String name = sourceFilePath.substring(base.length());
 
 			fileItem = new TreeItem(leakItem, SWT.NULL);
-			fileItem.setText(name + Messages.ISPAnalyze_25 + env.getLinenumber());
+			fileItem.setText(name + Messages.ISPAnalyze_25
+					+ env.getLinenumber());
 		}
 
 		// Create a listener to allow "jumps" to the Editor
@@ -851,8 +848,8 @@ public class ISPAnalyze extends ViewPart {
 					int lineNum = Integer.parseInt(lineString);
 					String fileName = e.item.toString();
 					fileName = fileName.substring(fileName.indexOf("{") + 1); //$NON-NLS-1$
-					fileName = fileName.substring(0,
-							fileName.indexOf(Messages.ISPAnalyze_27) - 1);
+					fileName = fileName.substring(0, fileName
+							.indexOf(Messages.ISPAnalyze_27) - 1);
 					openEditor(lineNum, fileName);
 				}
 			}
@@ -893,9 +890,8 @@ public class ISPAnalyze extends ViewPart {
 
 		CLabel hintLabel = new CLabel(shell, SWT.BORDER_SOLID);
 		hintLabel.setImage(ISPPlugin.getImage(ISPPlugin
-				.getImageDescriptor("icons/expanded-tree.gif"))); //$NON-NLS-1$
-		hintLabel
-				.setText(Messages.ISPAnalyze_29);
+				.getImageDescriptor("icons/expand-tree.gif"))); //$NON-NLS-1$
+		hintLabel.setText(Messages.ISPAnalyze_29);
 		hintLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Tree tree = new Tree(shell, SWT.BORDER);
@@ -919,7 +915,8 @@ public class ISPAnalyze extends ViewPart {
 			String name = sourceFilePath.substring(base.length());
 
 			fileItem = new TreeItem(tree, SWT.NULL);
-			fileItem.setText(env.getFunctionName() + "   \t" + name + Messages.ISPAnalyze_30 //$NON-NLS-1$
+			fileItem.setText(env.getFunctionName()
+					+ "   \t" + name + Messages.ISPAnalyze_30 //$NON-NLS-1$
 					+ env.getLinenumber());
 		}
 
@@ -935,8 +932,8 @@ public class ISPAnalyze extends ViewPart {
 					int lineNum = Integer.parseInt(lineString);
 					String fileName = e.item.toString();
 					fileName = fileName.substring(fileName.indexOf("\t") + 2); //$NON-NLS-1$
-					fileName = fileName.substring(0,
-							fileName.indexOf(Messages.ISPAnalyze_32) - 1);
+					fileName = fileName.substring(0, fileName
+							.indexOf(Messages.ISPAnalyze_32) - 1);
 					openEditor(lineNum, fileName);
 					errShell.forceFocus();
 				}
@@ -1003,7 +1000,7 @@ public class ISPAnalyze extends ViewPart {
 				return call.trim();
 			}
 		} catch (Exception e) {
-			IspUtilities.showExceptionDialog(null, e);
+			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_34, e);
 			String msg = Messages.ISPAnalyze_34;
 			IspUtilities.logError(msg, e);
 			return Messages.ISPAnalyze_35;
@@ -1118,11 +1115,9 @@ public class ISPAnalyze extends ViewPart {
 			if (env.getFunctionName().equals("MPI_Abort")) { //$NON-NLS-1$
 				this.rightCodeWindowLabel.setText(""); //$NON-NLS-1$
 			} else if (this.transitions.hasDeadlock()) {
-				this.rightCodeWindowLabel
-						.setText(Messages.ISPAnalyze_36);
+				this.rightCodeWindowLabel.setText(Messages.ISPAnalyze_36);
 			} else {
-				rightCodeWindowLabel
-						.setText(Messages.ISPAnalyze_37);
+				rightCodeWindowLabel.setText(Messages.ISPAnalyze_37);
 			}
 		}
 	}
@@ -1164,7 +1159,8 @@ public class ISPAnalyze extends ViewPart {
 					total += temp.indexOf(",") + 1; //$NON-NLS-1$
 					temp = temp.substring(temp.indexOf(",") + 1); //$NON-NLS-1$
 				}
-				ranks = Messages.ISPAnalyze_39 + ranks.substring(0, total - 1) + "..." //$NON-NLS-1$
+				ranks = Messages.ISPAnalyze_39 + ranks.substring(0, total - 1)
+						+ "..." //$NON-NLS-1$
 						+ "\n"; //$NON-NLS-1$
 			} else {
 				ranks = Messages.ISPAnalyze_40 + ranks + "\n"; //$NON-NLS-1$
@@ -1189,14 +1185,14 @@ public class ISPAnalyze extends ViewPart {
 		int[] intMessenger = new int[1];
 		String result = ""; //$NON-NLS-1$
 		if (isLeft) {
-			result = ranks + Messages.ISPAnalyze_44 + filename + Messages.ISPAnalyze_45 + this.leftIndex
-					+ "\n" //$NON-NLS-1$
+			result = ranks + Messages.ISPAnalyze_44 + filename
+					+ Messages.ISPAnalyze_45 + this.leftIndex + "\n" //$NON-NLS-1$
 					+ assembleSourceLine(call, this.leftIndex, intMessenger);
 			this.leftUp = intMessenger[0]; // this.leftUp is used by the
 			// highlighting method to highlight all lines for this call
 		} else {
-			result = ranks + Messages.ISPAnalyze_46 + filename + Messages.ISPAnalyze_47 + this.rightIndex
-					+ "\n" //$NON-NLS-1$
+			result = ranks + Messages.ISPAnalyze_46 + filename
+					+ Messages.ISPAnalyze_47 + this.rightIndex + "\n" //$NON-NLS-1$
 					+ assembleSourceLine(call, this.rightIndex, intMessenger);
 			this.rightUp = intMessenger[0]; // this.leftUp is used by the
 			// highlighting method to highlight all lines for this call
@@ -1212,7 +1208,8 @@ public class ISPAnalyze extends ViewPart {
 		final String[] ranks = new String[this.numRanks + 1];
 		ranks[0] = Messages.ISPAnalyze_48;
 		for (int i = 1; i <= this.numRanks; i++) {
-			ranks[i] = (Messages.ISPAnalyze_49 + (Integer) (i - 1)) + Messages.ISPAnalyze_50;
+			ranks[i] = (Messages.ISPAnalyze_49 + (Integer) (i - 1))
+					+ Messages.ISPAnalyze_50;
 		}
 		this.lockRanksComboList.setItems(ranks);
 		this.lockRanksComboList.setText(Messages.ISPAnalyze_51);
@@ -1255,6 +1252,8 @@ public class ISPAnalyze extends ViewPart {
 				&& transitions.getTotalInterleavings() != 1);
 		this.browseCallsButton.setEnabled(true);
 		this.browseCallsButton.setText(Messages.ISPAnalyze_52);
+		this.browseCallsButton.setImage(ISPPlugin.getImage(ISPPlugin
+				.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
 		this.launchIspUIButton.setEnabled(true);
 
 		// Browse resource leaks button
@@ -1322,9 +1321,8 @@ public class ISPAnalyze extends ViewPart {
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNum);
 			org.eclipse.ui.ide.IDE.gotoMarker(editor, marker);
 		} catch (Exception e) {
-			IspUtilities.showExceptionDialog(null, e);
-			IspUtilities.logError(
-					Messages.ISPAnalyze_56, e);
+			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_56, e);
+			IspUtilities.logError(Messages.ISPAnalyze_56, e);
 		}
 	}
 
@@ -1435,8 +1433,7 @@ public class ISPAnalyze extends ViewPart {
 		// Group and FormLayout data for transition buttons and labels
 		this.transitionsGroup = new Group(parent, SWT.SHADOW_IN);
 		this.transitionsGroup.setText(Messages.ISPAnalyze_59);
-		this.transitionsGroup
-				.setToolTipText(Messages.ISPAnalyze_60);
+		this.transitionsGroup.setToolTipText(Messages.ISPAnalyze_60);
 		FormData transitionsFormData = new FormData();
 		transitionsFormData.left = new FormAttachment(0, 5);
 		transitionsFormData.bottom = new FormAttachment(100, -5);
@@ -1493,8 +1490,7 @@ public class ISPAnalyze extends ViewPart {
 		this.lockRanksComboList.setFont(lockRanksComboFont);
 		String[] items = new String[] { Messages.ISPAnalyze_65 };
 		this.lockRanksComboList.setItems(items);
-		this.lockRanksComboList
-				.setToolTipText(Messages.ISPAnalyze_66);
+		this.lockRanksComboList.setToolTipText(Messages.ISPAnalyze_66);
 		FormData lockRanksFormData = new FormData();
 		lockRanksFormData.left = new FormAttachment(this.lastTransitionButton,
 				15);
@@ -1522,8 +1518,7 @@ public class ISPAnalyze extends ViewPart {
 		// Group and FormLayout data for interleaving buttons and labels
 		this.interleavingsGroup = new Group(parent, SWT.SHADOW_IN);
 		this.interleavingsGroup.setText(Messages.ISPAnalyze_67);
-		this.interleavingsGroup
-				.setToolTipText(Messages.ISPAnalyze_68);
+		this.interleavingsGroup.setToolTipText(Messages.ISPAnalyze_68);
 		FormData interleavingsFormData = new FormData();
 		interleavingsFormData.bottom = new FormAttachment(100, -5);
 		interleavingsFormData.left = new FormAttachment(this.transitionsGroup,
@@ -1601,8 +1596,7 @@ public class ISPAnalyze extends ViewPart {
 		// Group and FormLayout data for step order radio buttons
 		stepOrderGroup = new Group(parent, SWT.SHADOW_IN);
 		stepOrderGroup.setText(Messages.ISPAnalyze_74);
-		stepOrderGroup
-				.setToolTipText(Messages.ISPAnalyze_75);
+		stepOrderGroup.setToolTipText(Messages.ISPAnalyze_75);
 		FormData stepOrderFormData = new FormData();
 		stepOrderFormData.left = new FormAttachment(interleavingsGroup, 20);
 		stepOrderFormData.bottom = new FormAttachment(100, -5);
@@ -1612,12 +1606,10 @@ public class ISPAnalyze extends ViewPart {
 		// Step order radio buttons
 		this.internalIssueOrderButton = new Button(stepOrderGroup, SWT.RADIO);
 		this.internalIssueOrderButton.setText(Messages.ISPAnalyze_76);
-		this.internalIssueOrderButton
-				.setToolTipText(Messages.ISPAnalyze_77);
+		this.internalIssueOrderButton.setToolTipText(Messages.ISPAnalyze_77);
 		this.programOrderButton = new Button(stepOrderGroup, SWT.RADIO);
 		this.programOrderButton.setText(Messages.ISPAnalyze_78);
-		this.programOrderButton
-				.setToolTipText(Messages.ISPAnalyze_79);
+		this.programOrderButton.setToolTipText(Messages.ISPAnalyze_79);
 
 		// Choose which one is to be enabled from the Preference Store setting
 		String stepOrder = ISPPlugin.getDefault().getPreferenceStore()
@@ -1636,8 +1628,7 @@ public class ISPAnalyze extends ViewPart {
 		// Put the monitor/ISP-kill button to the right of step-order group
 		this.endEarlyButton = new Button(parent, SWT.PUSH);
 		this.endEarlyButton.setImage(endEarlyImage);
-		this.endEarlyButton
-				.setToolTipText(Messages.ISPAnalyze_81);
+		this.endEarlyButton.setToolTipText(Messages.ISPAnalyze_81);
 		this.endEarlyButton.setEnabled(false);
 		FormData endEarlyButtonFormData = new FormData();
 		endEarlyButtonFormData.bottom = new FormAttachment(100, -10);
@@ -1651,8 +1642,6 @@ public class ISPAnalyze extends ViewPart {
 	 */
 	private void createRuntimeGroup(Composite parent) {
 		// Get images for buttons from image cache
-		Image browseImage = ISPPlugin.getImage(ISPPlugin
-				.getImageDescriptor("icons/browse.gif")); //$NON-NLS-1$
 		Image noErrorImage = ISPPlugin.getImage(ISPPlugin
 				.getImageDescriptor("icons/no-error.gif")); //$NON-NLS-1$
 		Image uiImage = ISPPlugin.getImage(ISPPlugin
@@ -1712,10 +1701,9 @@ public class ISPAnalyze extends ViewPart {
 
 		// Browse calls button
 		this.browseCallsButton = new Button(runtimeInfoGroup, SWT.PUSH);
-		this.browseCallsButton.setImage(browseImage);
+		this.browseCallsButton.setImage(noErrorImage);
 		this.browseCallsButton.setText(Messages.ISPAnalyze_87);
-		this.browseCallsButton
-				.setToolTipText(Messages.ISPAnalyze_88);
+		this.browseCallsButton.setToolTipText(Messages.ISPAnalyze_88);
 		this.browseCallsButton.setEnabled(false);
 		FormData browseCallsFormData = new FormData();
 		browseCallsFormData.right = new FormAttachment(this.browseLeaksButton,
@@ -1727,8 +1715,7 @@ public class ISPAnalyze extends ViewPart {
 		this.launchIspUIButton = new Button(runtimeInfoGroup, SWT.PUSH);
 		this.launchIspUIButton.setImage(uiImage);
 		this.launchIspUIButton.setText(Messages.ISPAnalyze_89);
-		this.launchIspUIButton
-				.setToolTipText(Messages.ISPAnalyze_90);
+		this.launchIspUIButton.setToolTipText(Messages.ISPAnalyze_90);
 		this.launchIspUIButton.setEnabled(false);
 		FormData launchIspUIFormData = new FormData();
 		launchIspUIFormData.right = new FormAttachment(this.browseCallsButton,
@@ -1743,8 +1730,7 @@ public class ISPAnalyze extends ViewPart {
 		String[] items = new String[] {};
 		this.setRankComboList.setItems(items);
 		this.setRankComboList.setText(" "); //$NON-NLS-1$
-		this.setRankComboList
-				.setToolTipText(Messages.ISPAnalyze_91);
+		this.setRankComboList.setToolTipText(Messages.ISPAnalyze_91);
 		FormData setRankFormData = new FormData();
 		setRankFormData.width = 50;
 		setRankFormData.right = new FormAttachment(this.launchIspUIButton, -5);
@@ -2123,21 +2109,6 @@ public class ISPAnalyze extends ViewPart {
 				}
 
 				launchErrorBrowser();
-
-				/*
-				 * // Get the current error call Envelope Envelope env =
-				 * (Envelope) errorCalls[errorIndex]; if (env == null) {
-				 * IspUtilities.showErrorDialog("No error information found.",
-				 * "Error Message"); return; } errorIndex++;
-				 * examineErrorsButton.setText("Go to Call " + errorIndex + "/"
-				 * + errorCount + " ");
-				 * 
-				 * // Get the path from the workspace and use it to open the
-				 * editor String base = ResourcesPlugin.getWorkspace().getRoot()
-				 * .getLocation().toPortableString(); String sourceFilePath =
-				 * env.getFilename().substring( base.length());
-				 * openEditor(env.getLinenumber(), sourceFilePath);
-				 */
 			}
 		});
 
@@ -2192,7 +2163,7 @@ public class ISPAnalyze extends ViewPart {
 
 		if (this.examineErrorsButton.isEnabled()) {
 			this.examineErrorsButton.setImage(ISPPlugin.getImage(ISPPlugin
-					.getImageDescriptor("icons/goto-error.gif"))); //$NON-NLS-1$
+					.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
 
 			// Get the number of error calls for the interleaving
 			this.errorCount = this.transitions.getErrorCallsList().get(
@@ -2317,8 +2288,8 @@ public class ISPAnalyze extends ViewPart {
 				env = this.transitions.previousTransition(this.lockedRank);
 
 				if (env == null) {
-					IspUtilities.showInformationDialog(
-							Messages.ISPAnalyze_116, Messages.ISPAnalyze_117);
+					IspUtilities.showInformationDialog(Messages.ISPAnalyze_116,
+							Messages.ISPAnalyze_117);
 					return;
 				}
 				// If there was only one finalize go back to it
