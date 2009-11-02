@@ -12,7 +12,6 @@ import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.cdt.internal.ui.cview.CViewLabelProvider;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,6 +21,7 @@ import org.eclipse.swt.graphics.Image;
  * 
  * @author Matt Scarpino
  */
+@SuppressWarnings("restriction")
 public class FViewLabelProvider extends CViewLabelProvider
 {
     public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";

@@ -25,6 +25,12 @@ import org.eclipse.core.runtime.CoreException;
  * This interface must be implemented by any Fortran DOM parser.
  * <p>
  * See the org.eclipse.photran.cdtinterface.domparser extension point.
+ * <p>
+ * A DOM parser would parse a Fortran file and return an abstract syntax tree that is compatible
+ * with CDT's DOM.  Photran does not, by default, provide a DOM parser; it uses its own abstract
+ * syntax tree (see the VPG plug-ins).  This interface and extension point are provided in case
+ * a CDT-compliant DOM becomes available in the future.  (A Fortran DOM parser was prototyped at IBM
+ * Research but, at the time of writing, is incomplete and not publicly available.)
  * 
  * @author Jeff Overbey
  */

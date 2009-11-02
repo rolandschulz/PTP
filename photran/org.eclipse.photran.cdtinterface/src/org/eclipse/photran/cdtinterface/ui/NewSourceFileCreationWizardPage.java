@@ -14,6 +14,14 @@ import org.eclipse.cdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.photran.core.FortranCorePlugin;
 
+/**
+ * Wizard page for the Create New Fortran Source File wizard ({@link NewSourceFileCreationWizard}).
+ * 
+ * @author Jeff Overbey
+ * 
+ * @see NewSourceFileCreationWizard
+ */
+@SuppressWarnings("restriction")
 public class NewSourceFileCreationWizardPage extends org.eclipse.cdt.internal.ui.wizards.filewizard.NewSourceFileCreationWizardPage {
 	protected Template[] getApplicableTemplates() {
 		return StubUtility.getFileTemplatesForContentTypes(

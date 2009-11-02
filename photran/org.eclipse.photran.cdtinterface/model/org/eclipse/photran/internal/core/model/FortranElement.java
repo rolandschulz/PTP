@@ -21,21 +21,23 @@ import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
 import org.eclipse.photran.internal.core.lexer.IToken;
 
 /**
- * Photran inherits from its CDT heritage the C Model, which is a tree representing a C workspace.
- * Projects are just beneath the root, and they have folders and translation units (files) beneath
- * them. The model also knows the high-level structure of each translation unit. E.g., it knows the
- * modules, functions, classes (C++), and fields (C++) in each file, but does not know about
- * individual statements, local variables, etc.
- * 
- * Every model element beneath a Fortran translation unit is a subclass of
+ * An Fortran element in the C Model.
+ * <p>
+ * Every model element beneath a Fortran Translation Unit is a subclass of
  * <code>FortranElement</code>. The <code>FortranElement</code> hierarchy is a Fortran-specific
  * extension of <code>ICElement</code>.
  * 
+ * @author Jeff Overbey
+ * 
+ * @see ICElement
+ * @see Parent
+ */
+/*
  * Every subclass of <code>FortranElement</code> should be written as an inner class of
  * <code>FortranElement</code>. Why? Because (1) the subclasses are all tiny, and (2) prefixing
  * every instance with <code>FortranElement.</code> will make it very clear that we're working in
  * our (customized) part of the <code>ICElement</code>/model hierarchy.
- * 
+ *
  * <code>FortranElement</code> was originally a subclass of <code>SourceManipulation</code>,
  * but that wasn't right since we don't support parse tree rewriting via the
  * <code>ISourceManipulation</code> interface. So we are subclassing <code>Parent</code> instead
@@ -43,16 +45,8 @@ import org.eclipse.photran.internal.core.lexer.IToken;
  * a few methods by copying them directly from <code>SourceManipulation</code>. See also
  * <code>FortranElementInfo</code>, which also has a few methods copied from
  * <code>SourceManipulationInfo</code>.
- * 
- * NOTE-Jeff: If we inherit from Parent instead, use the commented-out methods, and use
- * FortranElementInfo, pieces of the Outline view seem to be missing (things beyond two levels
- * deep?) WTF?!
- * 
- * @author Jeff Overbey
- * @see ICElement
- * @see Parent
- * @see FortranElementInfo
  */
+@SuppressWarnings("restriction")
 public abstract class FortranElement extends SourceManipulation // Parent
     implements ICElement, IParent, ISourceReference, IContributedCElement
 {
@@ -148,6 +142,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
 	    return CDTInterfacePlugin.getImageDescriptor("icons/model/" + filename);
 	}
 	
+    /**
+     * Returns an <code>ImageDescriptor</code> for elements that don't have a dedicated icon.
+     * 
+     * @return <code>ImageDescriptor</code>
+     */
     public static ImageDescriptor unknownImageDescriptor()
     {
         return getImageDescriptorForIcon("unknown.gif");
@@ -156,7 +155,10 @@ public abstract class FortranElement extends SourceManipulation // Parent
 	// --- Concrete Subclasses -------------------------------------------
 
     /**
-     * An element for any random thing that you want in the Outline view
+     * An element for anything that is not covered by one of the specific classes below.
+     * <p>
+     * One of these elements can be added to the model, for example, to display an informative
+     * message in the Outline view.
      */
     public static class UnknownNode extends FortranElement
     {
@@ -172,7 +174,8 @@ public abstract class FortranElement extends SourceManipulation // Parent
     }
 
     /**
-     * An element representing an error; will display as an error message in the Outline view
+     * An element representing an error; will display as an error message with an corresponding icon
+     * in the Outline view.
      */
     public static class ErrorNode extends FortranElement
     {
@@ -187,6 +190,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a main program (PROGRAM X ... END PROGRAM).
+     */
     public static class MainProgram extends FortranElement
     {
         public MainProgram(Parent parent, IToken nameToken)
@@ -205,6 +211,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a module (MODULE X ... END MODULE).
+     */
     public static class Module extends FortranElement
     {
         public Module(Parent parent, IToken nameToken)
@@ -223,6 +232,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a derived type (TYPE X ... END TYPE).
+     */
     public static class DerivedType extends FortranElement
     {
         public DerivedType(Parent parent, IToken nameToken)
@@ -241,6 +253,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a function (FUNCTION X ... END FUNCTION).
+     */
     public static class Function extends FortranElement
     {
         public Function(Parent parent, IToken nameToken)
@@ -259,6 +274,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a subroutine (SUBROUTINE X ... END SUBROUTINE).
+     */
     public static class Subroutine extends FortranElement
     {
         public Subroutine(Parent parent, IToken nameToken)
@@ -277,6 +295,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing an interface declaration (INTERFACE ... END INTERFACE).
+     */
     public static class Interface extends FortranElement
     {
         public Interface(Parent parent, IToken nameToken)
@@ -295,6 +316,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a block data subprogram (BLOCK DATA X ... END BLOCK DATA).
+     */
     public static class BlockData extends FortranElement
     {
         public BlockData(Parent parent, IToken nameToken)
@@ -313,6 +337,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    /**
+     * An element representing a variable declaration.
+     */
     public static class Variable extends FortranElement
     {
         public Variable(Parent parent, IToken nameToken)

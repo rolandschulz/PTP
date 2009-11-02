@@ -22,17 +22,24 @@ import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
- * The Fortran model builder calls a <code>FortranModelBuildingVisitor</code> to create the model
- * you see in the (normal) Outline view.
- *
+ * This is a Fortran model builder which uses the Fortran parser to construct the model.
+ * See {@link IFortranModelBuilder}.
+ * <p>
+ * This is Photran's default model builder, assuming the VPG plug-ins are available, so the model
+ * you see in the Outline view is probably constructed by this model builder.  There is also
+ * {@link org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder}, a simpler model
+ * builder which is based solely on the Fortran lexer.
+ * <p>
  * Editors can force the model builder to use fixed or free format for a given file by calling
- * {@link #setIsFixedForm(boolean)}.  Otherwise, the format is determined by content type (i.e., by the
- * filename extension and the user's workspace preferences).
+ * {@link #setIsFixedForm(boolean)}.  Otherwise, the format is determined by content type (i.e., by
+ * the filename extension and the user's workspace preferences).
+ * <p>
+ * Internally, this model builder uses a {@link FortranModelBuildingVisitor} to construct the model
+ * by visiting the Fortran AST.
  *
- * All CDT extension languages are expected to supply a model builder.
+ * @author Jeff Ooverbey
  *
- * @author joverbey
- *
+ * @see IFortranModelBuilder
  * @see IContributedModelBuilder
  */
 @SuppressWarnings("restriction")
@@ -224,9 +231,11 @@ public class FortranModelBuilder implements IFortranModelBuilder
 //    }
 
     /**
-     * Called by the <code>FortranModelBuildingVisitor</code> to add nodes to the model
+     * Callback method invoked by the {@link FortranModelBuildingVisitor} to add nodes to the model.
+     * 
      * @param element
-     * @return
+     * @return element
+     * 
      * @throws CModelException
      */
     public FortranElement addF90Element(FortranElement element) throws CModelException

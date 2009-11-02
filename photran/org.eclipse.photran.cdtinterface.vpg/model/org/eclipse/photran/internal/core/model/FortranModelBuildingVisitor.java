@@ -27,12 +27,16 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
- * This parse tree visitor is used by the <code>FortranModelBuilder</code> to create the model you
- * see in the (normal) Outline view. When it encounters a program, module, function, or other entity
- * that should be displayed in the model, it calls the <code>FortranModelBuilder</code> back and
- * asks it to add the appropriate node.
+ * THIS IS AN INTERNAL CLASS.
+ * <p>
+ * This AST visitor is used by the {@link FortranModelBuilder} to construct the C model of a
+ * particular file.
+ * <p>
+ * Internally, when this visitor encounters a program, module, function, or other entity that should
+ * be displayed in the model, it calls back to the {@link FortranModelBuilder} and asks it to add an
+ * appropriate node to the model (via {@link FortranModelBuilder#addF90Element(FortranElement)}).
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 @SuppressWarnings("restriction")
 public final class FortranModelBuildingVisitor extends GenericASTVisitor

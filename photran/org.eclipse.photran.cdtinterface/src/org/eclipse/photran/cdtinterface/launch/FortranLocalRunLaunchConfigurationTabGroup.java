@@ -21,6 +21,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.eclipse.swt.widgets.Composite;
 
+@SuppressWarnings("restriction")
 public class FortranLocalRunLaunchConfigurationTabGroup extends LocalRunLaunchConfigurationTabGroup
 {
     /*@Override*/ public void createTabs(ILaunchConfigurationDialog dialog, String mode)  {

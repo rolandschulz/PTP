@@ -25,6 +25,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * 
  * @author Jeff Overbey
  */
+@SuppressWarnings("restriction")
 public abstract class CDTBasedSourceViewerConfiguration extends SourceViewerConfiguration
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////

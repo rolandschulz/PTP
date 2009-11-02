@@ -23,6 +23,9 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
 /**
+ * Implements the "Convert to Fortran Project" action, which can be invoked by right-clicking on
+ * a C/C++ Project in the Fortran Projects view.
+ * 
  * @author Matt Scarpino
  */
 public class ProjectConversionAction implements IViewActionDelegate

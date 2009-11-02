@@ -13,7 +13,6 @@ package org.eclipse.photran.cdtinterface.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.cdt.internal.ui.wizards.CWizardRegistry;
 import org.eclipse.cdt.internal.ui.wizards.OpenNewWizardAction;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -28,6 +27,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author C.E.Rasmussen
  */
+@SuppressWarnings("restriction")
 public class FortranWizardRegistry { //extends CWizardRegistry {
 
 	public final static String FORTRAN_WIZARD_CATEGORY_ID = "org.eclipse.photran.ui.newFortranWizards"; //$NON-NLS-1$
@@ -372,7 +372,7 @@ public class FortranWizardRegistry { //extends CWizardRegistry {
 				if (element.getName().equals(TAG_WIZARD)) {
 				    String category = element.getAttribute(ATT_CATEGORY);
 				    if (category != null && category.equals(FORTRAN_WIZARD_CATEGORY_ID)) {
-			            String id = element.getAttribute(TAG_ID);
+			            //String id = element.getAttribute(TAG_ID);
 			            elemList.add(element);
 				    }
 				}

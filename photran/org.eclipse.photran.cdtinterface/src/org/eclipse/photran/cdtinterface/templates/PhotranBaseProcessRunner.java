@@ -26,8 +26,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * Base class for a {@link ProcessRunner} that modified a project's
- * MBS configuration.
+ * Base class for a {@link ProcessRunner} that modifies a project's Managed Build configuration.
+ * <p>
+ * This class simply contains code that is common between {@link AddAllBinaryParsersProcessRunner}
+ * and {@link AddFortranErrorParsersProcessRunner}.
  *
  * @author Jeff Overbey
  */

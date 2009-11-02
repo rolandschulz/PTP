@@ -18,6 +18,7 @@ import org.eclipse.jface.action.IAction;
  * 
  * @author C.E.Rasmussen
  */
+@SuppressWarnings("restriction")
 public class NewFileDropDownAction extends AbstractWizardDropDownAction
 {
 	public NewFileDropDownAction()

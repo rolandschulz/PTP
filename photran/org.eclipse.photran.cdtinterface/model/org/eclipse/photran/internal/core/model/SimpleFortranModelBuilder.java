@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -34,21 +33,24 @@ import org.eclipse.photran.internal.core.lexer.SimpleTokenFactory;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 
 /**
- * This is a minimal Fortran model builder (which populates the model
- * you see in the Outline view) based only on lexical analysis.
- * The preferred model builder (based on the parser) is in the
- * cdtinterface.vpg plug-in.
+ * This is a minimal Fortran model builder based only on lexical analysis.  See
+ * {@link IFortranModelBuilder}.
+ * <p>
+ * <i>This is probably <b>not</b> the model builder you are looking for.</i>  Generally, Photran
+ * uses a parser-based model builder from the cdtinterface.vpg plug-in instead.  This one is used
+ * only if the VPG plug-ins are not available, or if the user specifically chooses to use this
+ * model builder instead (in the workspace preferences).
  * <p>
  * Editors can force the model builder to use fixed or free format for a given file by calling
- * {@link #setIsFixedForm(boolean)}.  Otherwise, the format is determined by content type (i.e., by the
- * filename extension and the user's workspace preferences).
- * <p>
- * All CDT extension languages are expected to supply a model builder.
+ * {@link #setIsFixedForm(boolean)}.  Otherwise, the format is determined by content type (i.e., by
+ * the filename extension and the user's workspace preferences).
  * 
  * @author Jeff Overbey
- * 
+ *
+ * @see IFortranModelBuilder
  * @see IContributedModelBuilder
  */
+@SuppressWarnings("restriction")
 public class SimpleFortranModelBuilder implements IFortranModelBuilder
 {
     private TranslationUnit translationUnit = null;
@@ -134,25 +136,25 @@ public class SimpleFortranModelBuilder implements IFortranModelBuilder
 
     }
 
-    private void addF90Elements(Map elts) throws CModelException
-    {
-        // Add all top-level elements (those with no parent) and recurse
-        addF90ElementsFor(null, elts);
-    }
-
-    private void addF90ElementsFor(Parent parent, Map elts) throws CModelException
-    {
-        Iterator it = elts.keySet().iterator();
-        while (it.hasNext())
-        {
-            FortranElement e = (FortranElement)it.next();
-            if (e.getParent() == parent)
-            {
-                e.setIdentifier(e.getIdentifier()); // It seems to forget position info
-                addF90ElementsFor(e, elts);
-            }
-        }
-    }
+//    private void addF90Elements(Map elts) throws CModelException
+//    {
+//        // Add all top-level elements (those with no parent) and recurse
+//        addF90ElementsFor(null, elts);
+//    }
+//
+//    private void addF90ElementsFor(Parent parent, Map elts) throws CModelException
+//    {
+//        Iterator it = elts.keySet().iterator();
+//        while (it.hasNext())
+//        {
+//            FortranElement e = (FortranElement)it.next();
+//            if (e.getParent() == parent)
+//            {
+//                e.setIdentifier(e.getIdentifier()); // It seems to forget position info
+//                addF90ElementsFor(e, elts);
+//            }
+//        }
+//    }
     
     // --NODE HIERARCHY--------------------------------------------------
     

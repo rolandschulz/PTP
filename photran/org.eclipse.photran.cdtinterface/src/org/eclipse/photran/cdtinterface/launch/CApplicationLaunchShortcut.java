@@ -249,7 +249,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 	 * Convenience method to get the window that owns this action's Shell.
 	 */
 	protected Shell getShell() {
-       IWorkbenchWindow w = CDebugUIPlugin.getDefault().getActiveWorkbenchWindow();
+       IWorkbenchWindow w = CDebugUIPlugin.getActiveWorkbenchWindow();
         if (w != null) {
             return w.getShell();
         }

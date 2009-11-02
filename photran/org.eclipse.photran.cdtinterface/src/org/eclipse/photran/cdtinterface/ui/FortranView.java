@@ -11,7 +11,6 @@
 package org.eclipse.photran.cdtinterface.ui;
 
 import org.eclipse.cdt.internal.ui.cview.CView;
-import org.eclipse.cdt.internal.ui.cview.CViewLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
@@ -22,6 +21,7 @@ import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
  * @author Jeff Overbey
  * @author Matt Scarpino - 7/20/2009 - Updated to access Fortran-specific label provider.
  */
+@SuppressWarnings("restriction")
 public class FortranView extends CView
 {
     public static final String FORTRAN_VIEW_ID = "org.eclipse.photran.ui.FortranView";

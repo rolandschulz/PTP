@@ -20,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author C.E.Rasmussen
  */
+@SuppressWarnings("restriction")
 public class NewProjectDropDownAction extends AbstractWizardDropDownAction
 {
 	public NewProjectDropDownAction()

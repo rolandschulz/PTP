@@ -22,6 +22,17 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
  */
 public interface IFortranModelBuilder extends IContributedModelBuilder
 {
+    /**
+     * Tells the model builder which translation unit to parse when {@link #parse(boolean)} is
+     * invoked.
+     * <p>
+     * This method will always be called before {@link #parse(boolean)}. 
+     */
     void setTranslationUnit(ITranslationUnit tu);
+    
+    /**
+     * Tells the model builder to ignore the platform content type of a file and, instead, parse it
+     * as either free or fixed form according to the <code>isFixedForm</code> argument.
+     */
     void setIsFixedForm(boolean isFixedForm);
 }

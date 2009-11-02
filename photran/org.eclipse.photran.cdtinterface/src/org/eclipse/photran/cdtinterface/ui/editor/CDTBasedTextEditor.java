@@ -59,6 +59,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  *
  * @author Jeff Overbey, mostly copied from {@link CEditor}
  */
+@SuppressWarnings("restriction")
 public abstract class CDTBasedTextEditor extends TextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +118,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
         }
         if (required == IShowInTargetList.class) {
             return new IShowInTargetList() {
+                @SuppressWarnings("deprecation")
                 public String[] getShowInTargetIds() {
                     return new String[] { CUIPlugin.CVIEW_ID, IPageLayout.ID_OUTLINE, IPageLayout.ID_RES_NAV };
                 }

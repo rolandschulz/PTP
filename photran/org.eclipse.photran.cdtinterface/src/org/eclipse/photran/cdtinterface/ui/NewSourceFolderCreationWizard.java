@@ -12,7 +12,11 @@ package org.eclipse.photran.cdtinterface.ui;
 
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
 
-/** Wizard to create a new source folder */
+/**
+ * Wizard to create a new Fortran source folder.
+ * 
+ * @author Jeff Overbey
+ */
 public class NewSourceFolderCreationWizard extends org.eclipse.cdt.ui.wizards.NewSourceFolderCreationWizard
 {
 	public NewSourceFolderCreationWizard()

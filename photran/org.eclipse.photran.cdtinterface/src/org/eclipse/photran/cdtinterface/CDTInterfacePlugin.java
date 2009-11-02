@@ -15,7 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 
 /**
- * Main plug-in class for the Photran CDT Interface plug-in
+ * Plug-in activator class.
  * 
  * @author (generated)
  */

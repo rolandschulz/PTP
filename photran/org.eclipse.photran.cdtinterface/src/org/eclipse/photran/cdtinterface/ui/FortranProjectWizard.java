@@ -30,12 +30,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.core.FProjectNature;
 
 /**
+ * Wizard to create a new Fortran project.
+ * 
  * @author ???
  * @author Matt Scarpino - 7/20/2009 - Updated to include Fortran nature in project
  */
 public class FortranProjectWizard extends CDTCommonProjectWizard
 {
-
 	public FortranProjectWizard()
 	{
 //		super(UIMessages.getString("Fortran Project"),  //$NON-NLS-1$

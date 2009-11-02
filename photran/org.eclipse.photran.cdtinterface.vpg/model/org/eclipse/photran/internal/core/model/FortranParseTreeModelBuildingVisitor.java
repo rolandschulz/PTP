@@ -12,12 +12,15 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
- * This visitor is used to build the Outline view when the user chooses the (debugging) option to
- * have the <i>entire parse tree</i> displayed instead of the normal Outline view.
+ * THIS IS AN INTERNAL CLASS.
+ * <p>
+ * This AST visitor is used to build the model (i.e., Outline view) when the user chooses the
+ * "(Debugging) Show entire abstract syntax tree rather than Outline view" option in the workspace
+ * preferences.
+ * <p>
+ * The normal Outline view is created by a {@link FortranModelBuildingVisitor} instead.
  * 
- * The normal Outline view is created by a <code>FortranModelBuildingVisitor</code> instead.
- * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 @SuppressWarnings("restriction")
 public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisitorWithLoops

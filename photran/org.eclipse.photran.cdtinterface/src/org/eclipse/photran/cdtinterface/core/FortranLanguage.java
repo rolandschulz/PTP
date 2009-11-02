@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.AbstractLanguage;
 import org.eclipse.cdt.core.model.IContributedModelBuilder;
+import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.IParserLogService;
@@ -35,9 +36,11 @@ import org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
- * CDT extension language for Fortran
+ * CDT extension language for Fortran.
  * 
  * @author Jeff Overbey
+ * 
+ * @see ILanguage
  */
 public class FortranLanguage extends AbstractLanguage
 {

@@ -16,10 +16,13 @@ import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
 
 /**
- * Wizard to create a new source file
+ * Wizard to create a new source file.
  * 
  * Based on {@link org.eclipse.cdt.ui.wizards.NewSourceFileCreationWizard}
+ * 
+ * @author Jeff Overbey
  */
+@SuppressWarnings("restriction")
 public class NewSourceFileCreationWizard extends AbstractFileCreationWizard
 {
     public NewSourceFileCreationWizard()
