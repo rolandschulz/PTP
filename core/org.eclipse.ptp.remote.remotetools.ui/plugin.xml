@@ -5,7 +5,7 @@
          point="org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate">
       <control
             class="org.eclipse.ptp.remote.remotetools.ui.environment.Environment"
-            name="Remote Host">
+            name="PTP Remote Host">
       </control>
    </extension>
    <extension

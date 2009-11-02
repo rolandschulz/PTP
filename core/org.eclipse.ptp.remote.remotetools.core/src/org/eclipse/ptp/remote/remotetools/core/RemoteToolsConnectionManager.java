@@ -22,26 +22,18 @@ import org.eclipse.ptp.remote.remotetools.core.environment.PTPTargetControl;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
-import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
+import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
-	private TargetTypeElement remoteHost = null;
-	private Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
-	
+	private final TargetTypeElement remoteHost;
+	private final Map<String, IRemoteConnection> connections = new HashMap<String, IRemoteConnection>();
+
 	public RemoteToolsConnectionManager() {
-		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
-		for (Object obj : targetMgr.getTypeElements()) {
-			TargetTypeElement element = (TargetTypeElement)obj;
-			if (element.getName().equals("Remote Host")) { //$NON-NLS-1$
-				remoteHost = element;
-				break;
-			}
-		}
+		remoteHost = RemoteToolsServices.getTargetTypeElement();
 		refreshConnections();
 	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
@@ -49,13 +41,23 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		refreshConnections();
 		return connections.get(name);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
 		return connections.values().toArray(new IRemoteConnection[connections.size()]);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java.lang.String, java.util.Map)
+	 */
+	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException {
+		String id = EnvironmentPlugin.getDefault().getEnvironmentUniqueID();
+		TargetElement element = new TargetElement(remoteHost, name, attributes, id);
+		remoteHost.addElement(element);
+		return createConnection(element);
 	}
 	
 	/* (non-Javadoc)
@@ -65,29 +67,6 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		connections.remove(conn);
 	}
 
-	/**
-	 * Refresh the list of connections that we know about. Deals with connection that are added or deleted
-	 * by another entity.
-	 */
-	private void refreshConnections() {
-		if (remoteHost != null) {
-			Map<String, IRemoteConnection> newConns = new HashMap<String, IRemoteConnection>();
-			for (Object obj : remoteHost.getElements()) {
-				ITargetElement element = (ITargetElement)obj;
-				IRemoteConnection conn = connections.get(element.getName());
-				if (conn == null) {
-					try {
-						conn = createConnection(element);
-					} catch (RemoteConnectionException e) {
-					}
-				}
-				newConns.put(element.getName(), conn);
-			}
-			connections.clear();
-			connections.putAll(newConns);
-		}
-	}
-	
 	/**
 	 * Create a connection using information from the target element.
 	 * 
@@ -110,6 +89,29 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 			return conn;
 		} catch (CoreException e) {
 			throw new RemoteConnectionException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Refresh the list of connections that we know about. Deals with connection that are added or deleted
+	 * by another entity.
+	 */
+	private void refreshConnections() {
+		if (remoteHost != null) {
+			Map<String, IRemoteConnection> newConns = new HashMap<String, IRemoteConnection>();
+			for (Object obj : remoteHost.getElements()) {
+				ITargetElement element = (ITargetElement)obj;
+				IRemoteConnection conn = connections.get(element.getName());
+				if (conn == null) {
+					try {
+						conn = createConnection(element);
+					} catch (RemoteConnectionException e) {
+					}
+				}
+				newConns.put(element.getName(), conn);
+			}
+			connections.clear();
+			connections.putAll(newConns);
 		}
 	}
 }

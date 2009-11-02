@@ -10,26 +10,40 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+import java.util.Map;
+
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+
 
 
 public interface IRemoteConnectionManager {	
 	/**
-	 * Find a remote connection given its name
+	 * Gets the remote connection corresponding to the supplied name.
 	 * 
-	 * @param name
-	 * @return remote connection
+	 * @param name name of the connection (as returned by {@link IRemoteConnection#getName()})
+	 * @return remote connection or null if no connection exists
 	 */
 	public IRemoteConnection getConnection(String name);
 
 	/**
-	 * Get known connections
+	 * Get all the connections for this service provider.
 	 * 
 	 * @return connections that we know about
 	 */
 	public IRemoteConnection[] getConnections();
 	
 	/**
-	 * Remove a connection and all resources associated with it
+	 * Creates a remote connection using the supplied attributes. The attributes are specific
+	 * to the remote service provider and can be obtained using {@link IRemoteConnection#getAttributes()}.
+	 * 
+	 * @param name name of the connection
+	 * @param attributes map containing attributes used to create the connection
+	 * @return a new connection or null if the creation failed for some reason
+	 */
+	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException;
+	
+	/**
+	 * Remove a connection and all resources associated with it.
 	 * 
 	 * @param connection connection to remove
 	 */

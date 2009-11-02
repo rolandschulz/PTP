@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -34,13 +37,14 @@ import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShellServiceSubSystem;
 
 public class RSEConnection implements IRemoteConnection {
-	private IHost rseHost;
-	private IFileSystem fileSystem;
 	private IShellService shellService = null;
 	private ISubSystem subSystem = null;
+	
+	private final IHost rseHost;
+	private final IFileSystem fileSystem;
 	private final IRemoteConnection connection = this;
 	private final ListenerList listeners = new ListenerList();
-
+	
 	private ICommunicationsListener commsListener = new ICommunicationsListener() {
 
 		public void communicationsStateChange(CommunicationsEvent event) {
@@ -91,7 +95,7 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		
 	};
-	
+
 	public RSEConnection(IHost host, IFileSystem fileSystem) {
 		this.rseHost = host;
 		this.fileSystem = fileSystem;
@@ -115,7 +119,7 @@ public class RSEConnection implements IRemoteConnection {
 			}
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -131,7 +135,7 @@ public class RSEConnection implements IRemoteConnection {
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
@@ -139,7 +143,7 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -147,14 +151,35 @@ public class RSEConnection implements IRemoteConnection {
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getAddress()
 	 */
 	public String getAddress() {
 		return rseHost.getHostName();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
+	 */
+	public Map<String, String> getAttributes() {
+		// TODO implement
+		return new HashMap<String, String>();
+	}
 
+	/**
+	 * Get the DStore connector service for this connection.
+	 * 
+	 * @return connector service for DStores or null if this connection does not support DStore
+	 */
+	public DataStore getDataStore() {
+		IConnectorService connector = DStoreConnectorServiceManager.getInstance().getConnectorService(rseHost, IDStoreService.class);
+		if (connector != null && connector instanceof DStoreConnectorService) {
+			return ((DStoreConnectorService) connector).getDataStore();
+		}
+		return null;
+	}
+	
 	/**
 	 * Get the file system for this connection
 	 * 
@@ -172,14 +197,14 @@ public class RSEConnection implements IRemoteConnection {
 	public IHost getHost() {
 		return rseHost;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
 	public String getName() {
 		return rseHost.getAliasName();
 	}
-
+	
 	/**
 	 * Get the shell service for this connection
 	 * 
@@ -187,19 +212,6 @@ public class RSEConnection implements IRemoteConnection {
 	 */
 	public IShellService getRemoteShellService() {
 		return shellService;
-	}
-	
-	/**
-	 * Get the DStore connector service for this connection.
-	 * 
-	 * @return connector service for DStores or null if this connection does not support DStore
-	 */
-	public DataStore getDataStore() {
-		IConnectorService connector = DStoreConnectorServiceManager.getInstance().getConnectorService(rseHost, IDStoreService.class);
-		if (connector != null && connector instanceof DStoreConnectorService) {
-			return ((DStoreConnectorService) connector).getDataStore();
-		}
-		return null;
 	}
 	
 	/* (non-Javadoc)

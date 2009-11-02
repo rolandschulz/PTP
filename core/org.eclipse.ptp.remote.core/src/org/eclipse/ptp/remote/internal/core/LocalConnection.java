@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.internal.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -24,6 +27,7 @@ public class LocalConnection implements IRemoteConnection {
 	private String address;
 	private String username;
 	private boolean connected;
+	
 	private final IRemoteConnection connection = this;
 	private final ListenerList listeners = new ListenerList();
 	
@@ -33,7 +37,7 @@ public class LocalConnection implements IRemoteConnection {
 		this.username = System.getProperty("user.name"); //$NON-NLS-1$
 		this.connected = true;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
@@ -60,7 +64,7 @@ public class LocalConnection implements IRemoteConnection {
 			});
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -98,6 +102,13 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public String getAddress() {
 		return address;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
+	 */
+	public Map<String, String> getAttributes() {
+		return new HashMap<String, String>();
 	}
 	
 	/* (non-Javadoc)
