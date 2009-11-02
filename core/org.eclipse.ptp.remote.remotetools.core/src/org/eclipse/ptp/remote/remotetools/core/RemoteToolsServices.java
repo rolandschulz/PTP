@@ -17,9 +17,14 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
+import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
+import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
 
 public class RemoteToolsServices implements IRemoteServicesDelegate {
+	private static String TARGET_ELEMENT_NAME = "PTP Remote Host"; //$NON-NLS-1$
+	
 	private static RemoteToolsServices instance = new RemoteToolsServices();
 	private static RemoteToolsConnectionManager connMgr = null;
 
@@ -88,5 +93,21 @@ public class RemoteToolsServices implements IRemoteServicesDelegate {
 	public boolean isInitialized() {
 		initialize();
 		return connMgr != null;
+	}
+	
+	/**
+	 * Find the target type element for the PTP remote services target type.
+	 * 
+	 * @return PTP target type element or null if none can be found (shouldn't happen)
+	 */
+	public static TargetTypeElement getTargetTypeElement() {
+		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
+		for (Object obj : targetMgr.getTypeElements()) {
+			TargetTypeElement element = (TargetTypeElement)obj;
+			if (element.getName().equals(TARGET_ELEMENT_NAME)) {
+				return element;
+			}
+		}
+		return null;
 	}
 }

@@ -10,13 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.internal.core;
 
+import java.util.Map;
+
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 
 public class LocalConnectionManager implements IRemoteConnectionManager {
 	private IRemoteConnection localConnection = new LocalConnection();
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
@@ -29,6 +32,14 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 */
 	public IRemoteConnection[] getConnections() {
 		return new IRemoteConnection[]{localConnection};
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java.lang.String, java.util.Map)
+	 */
+	public IRemoteConnection newConnection(String name,
+			Map<String, String> attributes) throws RemoteConnectionException {
+		return localConnection;
 	}
 
 	/* (non-Javadoc)

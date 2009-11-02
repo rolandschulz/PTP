@@ -17,29 +17,20 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.remotetools.ui.messages.Messages;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
-import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
 import org.eclipse.swt.widgets.Shell;
 
 
 public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManager {
-	private TargetTypeElement remoteHost = null;
-	private IRemoteConnectionManager connMgr = null;
+	private final TargetTypeElement remoteHost;
+	private final IRemoteConnectionManager connMgr;
 	
 	public RemoteToolsUIConnectionManager(IRemoteServices services) {
-		this.connMgr = services.getConnectionManager();
-		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
-		for (Object obj : targetMgr.getTypeElements()) {
-			TargetTypeElement element = (TargetTypeElement)obj;
-			if (element.getName().equals(Messages.RemoteToolsUIConnectionManager_0)) {
-				remoteHost = element;
-				break;
-			}
-		}
+		connMgr = services.getConnectionManager();
+		remoteHost = RemoteToolsServices.getTargetTypeElement();
 	}
 
 	/* (non-Javadoc)

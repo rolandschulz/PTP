@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -78,6 +80,17 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		return control.createExecutionManager();
 	}
 	
+	/**
+	 * Notify all listeners when this connection's status changes.
+	 * 
+	 * @param event
+	 */
+	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -136,7 +149,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		}
 		return -1;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
@@ -204,6 +217,13 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
+	 */
+	public Map<String, String> getAttributes() {
+		return control.getAttributes();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getName()
 	 */
 	public String getName() {
@@ -220,7 +240,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public synchronized boolean isOpen() {
 		return control.query() == ITargetStatus.RESUMED;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
 	 */
@@ -252,7 +272,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setUsername(java.lang.String)
 	 */
@@ -265,16 +285,5 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return true;
-	}
-	
-	/**
-	 * Notify all listeners when this connection's status changes.
-	 * 
-	 * @param event
-	 */
-	public void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
-			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
-		}
 	}
 }

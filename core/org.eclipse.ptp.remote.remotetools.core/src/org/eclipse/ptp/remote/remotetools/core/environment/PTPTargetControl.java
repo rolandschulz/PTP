@@ -12,6 +12,8 @@
 package org.eclipse.ptp.remote.remotetools.core.environment;
 
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -84,10 +86,6 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		currentTargetConfig = configFactory.createTargetConfig();
 	}
 
-	public void setConnection(RemoteToolsConnection conn) {
-		this.connection = conn;
-	}
-	
 	/**
 	 * Connect to the remote host. On every error or possible failure, an exception
 	 * (CoreException) is thrown, whose (multi)status describe the error(s) that prevented creating the target control.
@@ -173,6 +171,19 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		return true;
 	}
 	
+	/**
+	 * Create a new execution manager. This is required for script execution
+	 * because KillableExecution closes the channel after execution.
+	 * 
+	 * @return new execution manager;
+	 */
+	public IRemoteExecutionManager createExecutionManager() throws RemoteConnectionException {
+		if (!isConnected()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
+		return super.createRemoteExecutionManager();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#createTargetSocket(int)
 	 */
@@ -197,6 +208,13 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 	}
 
 	/**
+	 * @return
+	 */
+	public Map<String, String> getAttributes() {
+		return targetElement.getAttributes();
+	}
+	
+	/**
 	 * Get the main execution manager for this control.
 	 * 
 	 * @return execution manager
@@ -204,32 +222,12 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 	public IRemoteExecutionManager getExecutionManager() {
 		return executionManager;
 	}
-	
-	/**
-	 * Create a new execution manager. This is required for script execution
-	 * because KillableExecution closes the channel after execution.
-	 * 
-	 * @return new execution manager;
-	 */
-	public IRemoteExecutionManager createExecutionManager() throws RemoteConnectionException {
-		if (!isConnected()) {
-			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
-		}
-		return super.createRemoteExecutionManager();
-	}
 
 	/**
 	 * @return
 	 */
 	public String getName() {
 		return targetElement.getName();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#getPluginId()
-	 */
-	protected String getPluginId() {
-		return RemoteToolsAdapterCorePlugin.PLUGIN_ID;
 	}
 
 	/* (non-Javadoc)
@@ -293,14 +291,11 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
 				Messages.TargetControl_resume_CannotResume, null));
 	}
-	
-	/**
-	 * @param state
-	 */
-	private synchronized void setState(int state) {
-		this.state = state;
-	}
 
+	public void setConnection(RemoteToolsConnection conn) {
+		this.connection = conn;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#stop(org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -316,5 +311,19 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 		//targetElement.setName(name);
 		configFactory = new ConfigFactory(targetElement.getAttributes());
 		currentTargetConfig = configFactory.createTargetConfig();
+	}
+
+	/**
+	 * @param state
+	 */
+	private synchronized void setState(int state) {
+		this.state = state;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#getPluginId()
+	 */
+	protected String getPluginId() {
+		return RemoteToolsAdapterCorePlugin.PLUGIN_ID;
 	}
 }

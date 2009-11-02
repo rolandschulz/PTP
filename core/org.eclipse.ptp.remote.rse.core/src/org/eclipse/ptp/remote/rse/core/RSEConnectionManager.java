@@ -18,14 +18,16 @@ import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
 
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private IFileSystem fileSystem = null;
-	private ISystemRegistry registry;
-	private Map<String, RSEConnection> connections = new HashMap<String, RSEConnection>();
+	
+	private final ISystemRegistry registry;
+	private final Map<String, RSEConnection> connections = new HashMap<String, RSEConnection>();
 	
 	public RSEConnectionManager(ISystemRegistry registry) {
 		this.registry = registry;
@@ -46,13 +48,22 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
 		return connections.values().toArray(new IRemoteConnection[connections.size()]);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java.lang.String, java.util.Map)
+	 */
+	public IRemoteConnection newConnection(String name,
+			Map<String, String> attributes) throws RemoteConnectionException {
+		// TODO implement
+		return null;
 	}
 	
 	/**
@@ -72,7 +83,8 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 				}
 				newConns.put(host.getAliasName(), conn);
 			}
-			connections = newConns;
+			connections.clear();
+			connections.putAll(newConns);
 		}
 	}
 

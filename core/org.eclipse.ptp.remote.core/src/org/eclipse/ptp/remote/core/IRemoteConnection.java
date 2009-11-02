@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
@@ -86,6 +88,16 @@ public interface IRemoteConnection {
 	public String getAddress();
 
 	/**
+	 * Get the attributes for the connection. This includes everything needed to recreate the connection
+	 * using the {@link IRemoteConnectionManager#newConnection(Map)} method.
+	 * 
+	 * NOTE: the attributes do not include any security related information (e.g. username, key, password, etc.)
+	 * 
+	 * @return a map containing the connection attributes
+	 */
+	public Map<String, String> getAttributes();
+	
+	/**
 	 * Get unique name for this connection.
 	 * 
 	 * @return connection name
@@ -105,7 +117,7 @@ public interface IRemoteConnection {
 	 * @return true if connection is open.
 	 */
 	public boolean isOpen();
-	
+
 	/**
 	 * Open the connection. Must be called before the connection can be used.
 	 * 
@@ -115,7 +127,7 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException;
-
+	
 	/**
 	 * Remove a listener that will be notified when this connection's status changes.
 	 * 
@@ -143,4 +155,5 @@ public interface IRemoteConnection {
 	 * @return true if TCP port forwarding is supported
 	 */
 	public boolean supportsTCPPortForwarding();
+
 }
