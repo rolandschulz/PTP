@@ -11,10 +11,10 @@
 
       <!-- Define the Refactor menu -->
 
-      <group description="Rename and Move">
+      <group><!-- Rename and Move -->
          <editorRefactoring command="org.eclipse.photran.ui.RenameRefactoringCommand" />
       </group>
-      <group description="Extract XYZ">
+      <group><!-- Extract XYZ -->
          <editorRefactoring command="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand" />
          <editorRefactoring command="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand" />
       </group>
@@ -31,7 +31,7 @@
              class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
          />
       </group>
-      <group description="Refactorings for USE statements">
+      <group><!-- Refactorings for USE statements -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring"
              inputPage="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage"
@@ -40,7 +40,7 @@
              class="org.eclipse.photran.internal.core.refactoring.MinOnlyListRefactoring"
          />
       </group>
-      <group description="Refactorings for COMMON blocks">
+      <group><!-- Refactorings for COMMON blocks -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.CommonVarNamesRefactoring"
              inputPage="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesInputPage"
@@ -52,12 +52,12 @@
              class="org.eclipse.photran.internal.core.refactoring.MoveCommonToModuleRefactoring"
          /-->
       </group>
-      <group description="Refactorings for performance/loop transformations">
+      <group><!-- Refactorings for performance/loop transformations -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"
          />
       </group>
-      <group description="Refactorings that reformat code">
+      <group><!-- Refactorings that reformat code -->
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
          />
@@ -66,11 +66,12 @@
              inputPage="org.eclipse.photran.internal.refactoring.ui.KeywordCaseInputPage"
          />
       </group>
-      <!--group description="Test Refactorings">
+      <group><!-- Test Refactorings -->
          <editorRefactoring
+             require_env="PHOTRAN_INCLUDE_TEST_REFACTORINGS"
              class="org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring"
          />
-      </group-->
+      </group>
    </extension>
 
    <!--=====================================-->

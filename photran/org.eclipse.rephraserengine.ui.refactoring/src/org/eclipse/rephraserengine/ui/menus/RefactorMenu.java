@@ -131,7 +131,7 @@ public final class RefactorMenu extends CompoundContributionItem
     {
         if (selection.someFilesAreSelected())
         {
-            if (elt.getAttribute("class") != null)
+            if (elt.getAttribute("class") != null && environmentOK(elt))
             {
                 IResourceRefactoring refactoring = (IResourceRefactoring)elt.createExecutableExtension("class");
                 String label = elt.getAttribute("label");
@@ -158,7 +158,7 @@ public final class RefactorMenu extends CompoundContributionItem
     {
         if (selection.editingAnIFile() && selection.isTextSelectedInEditor())
         {
-            if (elt.getAttribute("class") != null)
+            if (elt.getAttribute("class") != null && environmentOK(elt))
             {
                 IEditorRefactoring refactoring = (IEditorRefactoring)elt.createExecutableExtension("class");
                 String label = elt.getAttribute("label");
@@ -178,6 +178,14 @@ public final class RefactorMenu extends CompoundContributionItem
                 result.add(commandContribution(elt.getAttribute("command")));
             }
         }
+    }
+    
+    private boolean environmentOK(IConfigurationElement elt)
+    {
+        if (elt.getAttribute("require_env") != null)
+            return System.getenv(elt.getAttribute("require_env")) != null;
+        else
+            return true;
     }
 
     private void addCommand(IConfigurationElement elt, LinkedList<IContributionItem> result)

@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
@@ -46,6 +45,8 @@ import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
 /**
  * Refactoring to move a COMMON block into a module.
+ * <p>
+ * THIS REFACTORING IS INCOMPLETE.  IT *DOES NOT* WORK CORRECTLY YET.
  *
  * @author Jeff Overbey
  */
