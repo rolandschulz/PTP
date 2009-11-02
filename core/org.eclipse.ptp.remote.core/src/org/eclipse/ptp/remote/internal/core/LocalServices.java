@@ -16,30 +16,37 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 
-public class LocalServices implements IRemoteServicesDelegate {
+public class LocalServices implements IRemoteServices {
 	public static final String LocalServicesId = "org.eclipse.ptp.remote.LocalServices"; //$NON-NLS-1$
 
 	private IRemoteConnectionManager connMgr = new LocalConnectionManager();
 	private IRemoteFileManager fileMgr = new LocalFileManager();
 	
+	private final IRemoteServicesDescriptor fDescriptor;
+	
+	public LocalServices(IRemoteServicesDescriptor descriptor) {
+		fDescriptor = descriptor;
+	}
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getConnectionManager()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getConnectionManager()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		return connMgr;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public String getDirectorySeparator(IRemoteConnection conn) {
 		return System.getProperty("file.separator", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
 		if (!(conn instanceof LocalConnection)) {
@@ -47,23 +54,44 @@ public class LocalServices implements IRemoteServicesDelegate {
 		}
 		return fileMgr;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getId()
+	 */
+	public String getId() {
+		return fDescriptor.getId();
+	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getName()
+	 */
+	public String getName() {
+		return fDescriptor.getName();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
 		return new LocalProcessBuilder(conn, command);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
 		return new LocalProcessBuilder(conn, command);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getScheme()
+	 */
+	public String getScheme() {
+		return fDescriptor.getScheme();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
 	 */
 	@SuppressWarnings("unchecked")
 	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
@@ -71,14 +99,14 @@ public class LocalServices implements IRemoteServicesDelegate {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#initialize()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#initialize()
 	 */
 	public void initialize() {
 		// No initialization to do
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#isInitialized()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
 	 */
 	public boolean isInitialized() {
 		return true;

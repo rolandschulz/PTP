@@ -10,18 +10,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.core;
 
-import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
 
 public class RSEServicesFactory implements IRemoteServicesFactory {
 	private static RSEServices services = null;
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesFactory#getServices()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesFactory#getServices(org.eclipse.ptp.remote.core.IRemoteServicesDescriptor)
 	 */
-	public IRemoteServicesDelegate getServices() {
+	public IRemoteServices getServices(IRemoteServicesDescriptor descriptor) {
 		if (services == null) {
-			services = new RSEServices();
+			services = new RSEServices(descriptor);
 		}
 		return services;
 	}

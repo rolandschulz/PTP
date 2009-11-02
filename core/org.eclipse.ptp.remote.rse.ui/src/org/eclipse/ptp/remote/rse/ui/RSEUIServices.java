@@ -11,15 +11,29 @@
 package org.eclipse.ptp.remote.rse.ui;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.rse.core.RSEServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 
 
-public class RSEUIServices extends RSEServices implements IRemoteUIServicesDelegate {
-	private static RSEUIServices instance = new RSEUIServices();
-	private IRemoteServices services;
+public class RSEUIServices implements IRemoteUIServices {
+	private static RSEUIServices fInstance = null;
+	
+	private final IRemoteServices fServices;
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getId()
+	 */
+	public String getId() {
+		return fServices.getId();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getName()
+	 */
+	public String getName() {
+		return fServices.getName();
+	}
 
 	/**
 	 * Get shared instance of this class
@@ -27,30 +41,27 @@ public class RSEUIServices extends RSEServices implements IRemoteUIServicesDeleg
 	 * @return instance
 	 */
 	public static RSEUIServices getInstance(IRemoteServices services) {
-		instance.setServices(services);
-		return instance;
+		if (fInstance == null) {
+			fInstance = new RSEUIServices(services);
+		}
+		return fInstance;
+	}
+	
+	public RSEUIServices(IRemoteServices services) {
+		fServices = services;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager()
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIConnectionManager()
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager() {
-		return new RSEUIConnectionManager(services);
+		return new RSEUIConnectionManager(fServices);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager()
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIFileManager()
 	 */
 	public IRemoteUIFileManager getUIFileManager() {
-		return new RSEUIFileManager(services);
-	}
-	
-	/**
-	 * Set remote services for this provider
-	 * 
-	 * @param services
-	 */
-	private void setServices(IRemoteServices services) {
-		this.services = services;
+		return new RSEUIFileManager(fServices);
 	}
 }

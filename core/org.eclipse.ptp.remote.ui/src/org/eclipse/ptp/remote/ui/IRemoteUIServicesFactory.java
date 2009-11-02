@@ -17,5 +17,5 @@ public interface IRemoteUIServicesFactory {
 	 * @param services remote services
 	 * @return remote services delegate
 	 */
-	public IRemoteUIServicesDelegate getServices(IRemoteServices services);
+	public IRemoteUIServices getServices(IRemoteServices services);
 }

@@ -8,17 +8,22 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.rse.ui;
+package org.eclipse.ptp.remote.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIServicesFactory;
 
-public class RSEUIServicesFactory implements IRemoteUIServicesFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesFactory#getServices(org.eclipse.ptp.remote.core.IRemoteServices)
+
+public interface IRemoteUIServicesDescriptor {
+	/**
+	 * Get unique ID of this service. Can be used as a lookup key.
+	 * 
+	 * @return unique ID
 	 */
-	public IRemoteUIServices getServices(IRemoteServices services) {
-		return RSEUIServices.getInstance(services);
-	}
+	public String getId();
+	
+	/**
+	 * Get display name of this service.
+	 * 
+	 * @return display name
+	 */
+	public String getName();
 }

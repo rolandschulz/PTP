@@ -16,7 +16,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.messages.Messages;
 
-public class RemoteUIServicesProxy implements IRemoteUIServices {
+public class RemoteUIServicesProxy implements IRemoteUIServicesDescriptor {
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
@@ -35,9 +35,8 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 	private final IConfigurationElement configElement;
 	private final String id;
 	private final String name;
-	private IRemoteUIServicesFactory factory = null;
-	private IRemoteUIServicesDelegate delegate = null;
-	private IRemoteServices services = null;
+	private IRemoteUIServicesFactory fFactory = null;
+	private IRemoteUIServices fDelegate = null;
 	
 	public RemoteUIServicesProxy(IConfigurationElement configElement) {
 		this.configElement = configElement;
@@ -52,11 +51,11 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 	 * @return instance of the factory
 	 */
 	public IRemoteUIServicesFactory getFactory() {
-		if (factory != null) {
-			return factory;
+		if (fFactory != null) {
+			return fFactory;
 		}
 		try {
-			factory = (IRemoteUIServicesFactory)configElement.createExecutableExtension(ATTR_CLASS);
+			fFactory = (IRemoteUIServicesFactory)configElement.createExecutableExtension(ATTR_CLASS);
 		} catch (Exception e) {
 			PTPRemoteCorePlugin.log(
 					NLS.bind(Messages.RemoteUIServicesProxy_2,
@@ -66,7 +65,7 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 						configElement.getDeclaringExtension().getNamespaceIdentifier()
 					}));
 		}
-		return factory;
+		return fFactory;
 	}
 	
 	/* (non-Javadoc)
@@ -82,46 +81,25 @@ public class RemoteUIServicesProxy implements IRemoteUIServices {
 	public String getName() {
 		return name;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
-	 */
-	public IRemoteUIConnectionManager getUIConnectionManager() {
-		loadServices();
-		if (delegate == null) {
-			return null;
-		}
-		return delegate.getUIConnectionManager();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager()
-	 */
-	public IRemoteUIFileManager getUIFileManager() {
-		loadServices();
-		if (delegate == null) {
-			return null;
-		}
-		return delegate.getUIFileManager();
-	}
 
 	/**
-	 * Set the remote services associated with this proxy.
+	 * Get the remote UI services implementation for this descriptor.
 	 * 
-	 * @param services
+	 * @return the remote UI services implementation, or null if initialization failed
 	 */
-	public void setServices(IRemoteServices services) {
-		this.services = services;
+	public IRemoteUIServices getUIServices(IRemoteServices services) {
+		loadServices(services);
+		return fDelegate;
 	}
 	
 	/**
 	 * Create and initialize the remote UI services factory
 	 */
-	private void loadServices() {
-		if (delegate == null) {
+	private void loadServices(IRemoteServices services) {
+		if (fDelegate == null) {
 			IRemoteUIServicesFactory factory = getFactory();
 			if (factory != null) {
-				delegate = factory.getServices(services);
+				fDelegate = factory.getServices(services);
 			}
 		}
 	}

@@ -12,8 +12,10 @@ package org.eclipse.ptp.remote.core;
 
 public interface IRemoteServicesFactory {
 	/**
-	 * @param rm
-	 * @return
+	 * Return the remote services implementation for the given descriptor
+	 * 
+	 * @param descriptor descriptor for the remote services
+	 * @return the remote services implementation, or null if initialization failed
 	 */
-	public IRemoteServicesDelegate getServices();
+	public IRemoteServices getServices(IRemoteServicesDescriptor descriptor);
 }

@@ -100,11 +100,10 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		 * Find the UI services corresponding to services.
 		 */
 		RemoteUIServicesProxy proxy = remoteUIServices.get(services.getId());
-		if (proxy == null) {
-			return null;
+		if (proxy != null) {
+			return proxy.getUIServices(services);
 		}
-		proxy.setServices(services);
-		return proxy;
+		return null;
 	}
 	
 	/**
@@ -173,8 +172,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		for (IExtension ext : extensions) {
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
 		
-			for (IConfigurationElement ce : elements)
-			{
+			for (IConfigurationElement ce : elements) {
 				RemoteUIServicesProxy proxy = new RemoteUIServicesProxy(ce);
 				services.put(proxy.getId(), proxy);
 			}

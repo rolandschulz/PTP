@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
-public interface IRemoteUIServices extends IRemoteUIServicesDelegate {
+public interface IRemoteUIServices extends IRemoteUIServicesDescriptor {
 	/**
-	 * Get unique ID of this service. Can be used as a lookup key.
+	 * Get a UI connection manager for managing connections
 	 * 
-	 * @return unique ID
+	 * @return UI connection manager or null if no connection manager operations are supported
 	 */
-	public String getId();
+	public IRemoteUIConnectionManager getUIConnectionManager();
 	
 	/**
-	 * Get display name of this service.
+	 * Get a UI file manager for managing remote files.
 	 * 
-	 * @return display name
+	 * @return UI file manager or null if no file manager operations are supported
 	 */
-	public String getName();
+	public IRemoteUIFileManager getUIFileManager();
 }
