@@ -23,14 +23,14 @@ public interface IRemoteProcessBuilder {
 	 * 
 	 * @return the connection used by this process builder
 	 */
-	public abstract IRemoteConnection connection();
+	public IRemoteConnection connection();
 
 	/**
 	 * Sets this process builder's connection.
 	 * 
 	 * @return This process builder
 	 */
-	public abstract IRemoteProcessBuilder connection(
+	public IRemoteProcessBuilder connection(
 			IRemoteConnection conn);
 
 	/**
@@ -38,7 +38,7 @@ public interface IRemoteProcessBuilder {
 	 * 
 	 * @return a list containing the program and arguments
 	 */
-	public abstract List<String> command();
+	public List<String> command();
 
 	/**
 	 * Sets this process builder's operating system program and arguments.
@@ -46,7 +46,7 @@ public interface IRemoteProcessBuilder {
 	 * @param command
 	 * @return This process builder
 	 */
-	public abstract IRemoteProcessBuilder command(List<String> command);
+	public IRemoteProcessBuilder command(List<String> command);
 
 	/**
 	 * Sets this process builder's operating system program and arguments.
@@ -54,14 +54,14 @@ public interface IRemoteProcessBuilder {
 	 * @param command
 	 * @return this process builder
 	 */
-	public abstract IRemoteProcessBuilder command(String... command);
+	public IRemoteProcessBuilder command(String... command);
 
 	/**
 	 * Returns this process builder's working directory.
 	 * 
 	 * @return an IFileStore reference to the working directory
 	 */
-	public abstract IFileStore directory();
+	public IFileStore directory();
 
 	/**
 	 * Sets this process builder's working directory.
@@ -69,7 +69,7 @@ public interface IRemoteProcessBuilder {
 	 * @param directory
 	 * @return This process builder
 	 */
-	public abstract IRemoteProcessBuilder directory(IFileStore directory);
+	public IRemoteProcessBuilder directory(IFileStore directory);
 
 	/**
 	 * Returns a string map view of this process builder's environment. The returned map
@@ -77,7 +77,7 @@ public interface IRemoteProcessBuilder {
 	 * 
 	 * @return the process builder's environment
 	 */
-	public abstract Map<String, String> environment();
+	public Map<String, String> environment();
 
 	/**
 	 * Tells whether this process builder merges standard error and standard
@@ -85,7 +85,7 @@ public interface IRemoteProcessBuilder {
 	 * 
 	 * @return true if standard error and standard output will be merged
 	 */
-	public abstract boolean redirectErrorStream();
+	public boolean redirectErrorStream();
 
 	/**
 	 * Sets this process builder's redirectErrorStream property.
@@ -93,7 +93,7 @@ public interface IRemoteProcessBuilder {
 	 * @param redirectErrorStream
 	 * @return This process builder
 	 */
-	public abstract IRemoteProcessBuilder redirectErrorStream(
+	public IRemoteProcessBuilder redirectErrorStream(
 			boolean redirectErrorStream);
 
 	/**
@@ -102,5 +102,5 @@ public interface IRemoteProcessBuilder {
 	 * @return remote process object
 	 * @throws IOException
 	 */
-	public abstract IRemoteProcess start() throws IOException;
+	public IRemoteProcess start() throws IOException;
 }
