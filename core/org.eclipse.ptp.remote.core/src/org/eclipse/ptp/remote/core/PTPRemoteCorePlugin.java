@@ -154,9 +154,9 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}    
 
 	// Active remote services plugins (not necessarily loaded)
-	private Map<String, RemoteServicesProxy> allRemoteServicesById;	
-	private Map<String, RemoteServicesProxy> allRemoteServicesByScheme;	
-	
+	private final Map<String, RemoteServicesProxy> allRemoteServicesById = new HashMap<String, RemoteServicesProxy>();	
+	private final Map<String, RemoteServicesProxy> allRemoteServicesByScheme = new HashMap<String, RemoteServicesProxy>();	
+
 	// Default remote services for new RM wizard
 	private IRemoteServices defaultRemoteServices;
 	
@@ -173,7 +173,11 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 */
 	public synchronized IRemoteServices[] getAllRemoteServices() {
 		retrieveRemoteServices();
-		IRemoteServices[] services = allRemoteServicesById.values().toArray(new IRemoteServices[allRemoteServicesById.size()]);
+		IRemoteServices[] services = new IRemoteServices[allRemoteServicesById.size()];
+		int i = 0;
+		for (RemoteServicesProxy proxy : allRemoteServicesById.values()) {
+			services[i++] = proxy.getServices();
+		}
 		Arrays.sort(services, new RemoteServicesSorter());
 		return services;
 	}
@@ -206,13 +210,29 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 	
 	/**
-	 * Get the remote services identified by id
+	 * Get the remote services descriptor identified by id
 	 * 
-	 * @return services
+	 * @param id id of the remote services
+	 * @return remote services descriptor
+	 */
+	public IRemoteServicesDescriptor getRemoteServicesDescriptor(String id) {
+		retrieveRemoteServices();
+		return allRemoteServicesById.get(id);
+	}
+	
+	/**
+	 * Get the remote services implementation identified by id
+	 * 
+	 * @param id id of the remote services
+	 * @return remote services
 	 */
 	public synchronized IRemoteServices getRemoteServices(String id) {
 		retrieveRemoteServices();
-		return allRemoteServicesById.get(id);
+		RemoteServicesProxy proxy = allRemoteServicesById.get(id);
+		if (proxy != null) {
+			return proxy.getServices();
+		}
+		return null;
 	}
 	
 	/**
@@ -225,7 +245,10 @@ public class PTPRemoteCorePlugin extends Plugin {
 		retrieveRemoteServices();
 		String scheme = uri.getScheme();
 		if (scheme != null) {
-			return allRemoteServicesByScheme.get(uri.getScheme());
+			RemoteServicesProxy proxy = allRemoteServicesByScheme.get(uri.getScheme());
+			if (proxy != null) {
+				return proxy.getServices();
+			}
 		}
 		return null;
 	}
@@ -253,10 +276,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 * Find and load all remoteServices plugins.
 	 */
 	private void retrieveRemoteServices() {
-		if (allRemoteServicesById == null) {
-			allRemoteServicesById = new HashMap<String, RemoteServicesProxy>();
-			allRemoteServicesByScheme = new HashMap<String, RemoteServicesProxy>();
-			
+		if (allRemoteServicesById.isEmpty()) {
 	    	IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
 			final IExtension[] extensions = extensionPoint.getExtensions();

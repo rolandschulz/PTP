@@ -8,22 +8,27 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.ui;
+package org.eclipse.ptp.remote.core;
 
-
-
-public interface IRemoteUIServicesDelegate {
+public interface IRemoteServicesDescriptor {
 	/**
-	 * Get a UI connection manager for managing connections
+	 * Get unique ID of this service. Can be used as a lookup key.
 	 * 
-	 * @return UI connection manager or null if no connection manager operations are supported
+	 * @return unique ID
 	 */
-	public IRemoteUIConnectionManager getUIConnectionManager();
+	public String getId();
 	
 	/**
-	 * Get a UI file manager for managing remote files.
+	 * Get display name of this service.
 	 * 
-	 * @return UI file manager or null if no file manager operations are supported
+	 * @return display name
 	 */
-	public IRemoteUIFileManager getUIFileManager();
+	public String getName();
+	
+	/**
+	 * Get the EFS scheme provided by this service.
+	 * 
+	 * @return display name
+	 */
+	public String getScheme();
 }

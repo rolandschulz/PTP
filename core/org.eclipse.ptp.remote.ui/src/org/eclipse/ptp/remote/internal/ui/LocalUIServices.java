@@ -13,11 +13,11 @@ package org.eclipse.ptp.remote.internal.ui;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 
-public class LocalUIServices implements IRemoteUIServicesDelegate {
-	private static LocalUIServices instance = new LocalUIServices();
-	private static LocalUIFileManager fileMgr = null;
+public class LocalUIServices implements IRemoteUIServices {
+	private static LocalUIServices fInstance = null;
+	private final static LocalUIFileManager fFileMgr = new LocalUIFileManager();
 
 	/**
 	 * Get shared instance of this class
@@ -25,21 +25,43 @@ public class LocalUIServices implements IRemoteUIServicesDelegate {
 	 * @return instance
 	 */
 	public static LocalUIServices getInstance(IRemoteServices services) {
-		fileMgr = new LocalUIFileManager();
-		return instance;
+		if (fInstance == null) {
+			fInstance = new LocalUIServices(services);
+		}
+		return fInstance;
+	}
+
+	private final IRemoteServices fServices;
+
+	public LocalUIServices(IRemoteServices services) {
+		fServices = services;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getId()
+	 */
+	public String getId() {
+		return fServices.getId();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getName()
+	 */
+	public String getName() {
+		return fServices.getName();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIConnectionManager(org.eclipse.ptp.remote.core.IRemoteConnectionManager)
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager() {
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteUIFileManager getUIFileManager() {
-		return fileMgr;
+		return fFileMgr;
 	}
 }

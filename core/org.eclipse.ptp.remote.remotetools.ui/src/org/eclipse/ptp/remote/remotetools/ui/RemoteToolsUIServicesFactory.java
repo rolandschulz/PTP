@@ -11,14 +11,14 @@
 package org.eclipse.ptp.remote.remotetools.ui;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIServicesFactory;
 
 public class RemoteToolsUIServicesFactory implements IRemoteUIServicesFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesFactory#getServices(org.eclipse.ptp.remote.core.IRemoteServices)
 	 */
-	public IRemoteUIServicesDelegate getServices(IRemoteServices services) {
+	public IRemoteUIServices getServices(IRemoteServices services) {
 		return RemoteToolsUIServices.getInstance(services);
 	}
 }

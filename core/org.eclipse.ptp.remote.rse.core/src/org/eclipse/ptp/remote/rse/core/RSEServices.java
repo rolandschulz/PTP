@@ -17,17 +17,45 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
 import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
 
-public class RSEServices implements IRemoteServicesDelegate {
+public class RSEServices implements IRemoteServices {
 	private ISystemRegistry registry = null;
 	private IRemoteConnectionManager connMgr = null;
 	
+	private final IRemoteServicesDescriptor fDescriptor;
+	
+	public RSEServices(IRemoteServicesDescriptor descriptor) {
+		fDescriptor = descriptor;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getId()
+	 */
+	public String getId() {
+		return fDescriptor.getId();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getName()
+	 */
+	public String getName() {
+		return fDescriptor.getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getScheme()
+	 */
+	public String getScheme() {
+		return fDescriptor.getScheme();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
 	 */
@@ -95,7 +123,7 @@ public class RSEServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#getServicesExtension(java.lang.Class)
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getServicesExtension(java.lang.Class)
 	 */
 	@SuppressWarnings("unchecked")
 	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
@@ -128,7 +156,7 @@ public class RSEServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDelegate#isInitialized()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
 	 */
 	public boolean isInitialized() {
 		initialize();

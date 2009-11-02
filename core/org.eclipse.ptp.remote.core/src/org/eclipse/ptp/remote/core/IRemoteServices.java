@@ -10,27 +10,56 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+import java.util.List;
 
-
-public interface IRemoteServices extends IRemoteServicesDelegate {
+public interface IRemoteServices extends IRemoteServicesDescriptor {
 	/**
-	 * Get unique ID of this service. Can be used as a lookup key.
+	 * Get a connection manager for managing remote connections. 
 	 * 
-	 * @return unique ID
+	 * @return connection manager or null if services are not initialized
 	 */
-	public String getId();
+	public IRemoteConnectionManager getConnectionManager();
 	
 	/**
-	 * Get display name of this service.
+	 * Gets the directory separator on the target system.
 	 * 
-	 * @return display name
+	 * @return String
 	 */
-	public String getName();
+	public String getDirectorySeparator(IRemoteConnection conn);
 	
 	/**
-	 * Get the EFS scheme provided by this service.
+	 * Get a file manager for managing remote files
 	 * 
-	 * @return display name
+	 * @param conn connection to use for managing files
+	 * @return file manager or null if services are not initialized
 	 */
-	public String getScheme();
+	public IRemoteFileManager getFileManager(IRemoteConnection conn);
+	
+	/**
+	 * Get a process builder for creating remote processes
+	 * 
+	 * @param conn connection to use for creating remote processes
+	 * @return process builder or null if services are not initialized
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command);
+	
+	/**
+	 * Get a process builder for creating remote processes
+	 * 
+	 * @param conn connection to use for creating remote processes
+	 * @return process builder or null if services are not initialized
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
+	
+	/**
+	 * Start initializing the remote service.
+	 */
+	public void initialize();
+	
+	/**
+	 * Check if the remote service is initialized
+	 * 
+	 * @return true if successfully initialized, false otherwise
+	 */
+	public boolean isInitialized();
 }

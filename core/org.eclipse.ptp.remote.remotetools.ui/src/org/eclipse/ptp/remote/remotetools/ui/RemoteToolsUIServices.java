@@ -13,43 +13,55 @@ package org.eclipse.ptp.remote.remotetools.ui;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 
 
-public class RemoteToolsUIServices implements IRemoteUIServicesDelegate {
-	private static RemoteToolsUIServices instance = new RemoteToolsUIServices();
-	private IRemoteServices services;
-
+public class RemoteToolsUIServices implements IRemoteUIServices {
+	private static RemoteToolsUIServices fInstance = null;
+	
 	/**
 	 * Get shared instance of this class
 	 * 
 	 * @return instance
 	 */
 	public static RemoteToolsUIServices getInstance(IRemoteServices services) {
-		instance.setServices(services);
-		return instance;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIConnectionManager()
-	 */
-	public IRemoteUIConnectionManager getUIConnectionManager() {
-		return new RemoteToolsUIConnectionManager(services);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDelegate#getUIFileManager()
-	 */
-	public IRemoteUIFileManager getUIFileManager() {
-		return new RemoteToolsUIFileManager(services);
+		if (fInstance == null) {
+			fInstance = new RemoteToolsUIServices(services);
+		}
+		return fInstance;
 	}
 
-	/**
-	 * Set remote services for this provider
-	 * 
-	 * @param services
+	private final IRemoteServices fServices;
+
+	public RemoteToolsUIServices(IRemoteServices services) {
+		fServices = services;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getId()
 	 */
-	private void setServices(IRemoteServices services) {
-		this.services = services;
+	public String getId() {
+		return fServices.getId();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getName()
+	 */
+	public String getName() {
+		return fServices.getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIConnectionManager()
+	 */
+	public IRemoteUIConnectionManager getUIConnectionManager() {
+		return new RemoteToolsUIConnectionManager(fServices);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIFileManager()
+	 */
+	public IRemoteUIFileManager getUIFileManager() {
+		return new RemoteToolsUIFileManager(fServices);
 	}
 }
