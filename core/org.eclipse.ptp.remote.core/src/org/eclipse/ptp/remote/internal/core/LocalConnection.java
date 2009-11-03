@@ -23,38 +23,32 @@ import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.core.messages.Messages;
 
 public class LocalConnection implements IRemoteConnection {
-	private String name;
-	private String address;
-	private String username;
-	private boolean connected;
+	private final String fName = Messages.LocalConnection_0;
 	
-	private final IRemoteConnection connection = this;
-	private final ListenerList listeners = new ListenerList();
+	private String fAddress = Messages.LocalConnection_1;
+	private String fUsername = System.getProperty("user.name"); //$NON-NLS-1$
+	private boolean fConnected = true;
 	
-	public LocalConnection() {
-		this.name = Messages.LocalConnection_0;
-		this.address = Messages.LocalConnection_1;
-		this.username = System.getProperty("user.name"); //$NON-NLS-1$
-		this.connected = true;
-	}
-	
+	private final IRemoteConnection fConnection = this;
+	private final ListenerList fListeners = new ListenerList();
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
 	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.add(listener);
+		fListeners.add(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
 	public void close() {
-		if (connected) {
-			connected = false;
+		if (fConnected) {
+			fConnected = false;
 			
 			fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 				public IRemoteConnection getConnection() {
-					return connection;
+					return fConnection;
 				}
 	
 				public int getType() {
@@ -64,7 +58,7 @@ public class LocalConnection implements IRemoteConnection {
 			});
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -72,7 +66,7 @@ public class LocalConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -80,7 +74,7 @@ public class LocalConnection implements IRemoteConnection {
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
@@ -88,7 +82,7 @@ public class LocalConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -101,7 +95,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAddress()
 	 */
 	public String getAddress() {
-		return address;
+		return fAddress;
 	}
 	
 	/* (non-Javadoc)
@@ -112,36 +106,57 @@ public class LocalConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv()
+	 */
+	public Map<String, String> getEnv() {
+		return System.getenv();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv(java.lang.String)
+	 */
+	public String getEnv(String name) {
+		return System.getenv(name);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getName()
 	 */
 	public String getName() {
-		return name;
+		return fName;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String)
+	 */
+	public String getProperty(String key) {
+		return System.getProperty(key);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getUsername()
 	 */
 	public String getUsername() {
-		return username;
+		return fUsername;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#isOpen()
 	 */
 	public boolean isOpen() {
-		return connected;
+		return fConnected;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
 	 */
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
-		if (!connected) {
-			connected = true;
+		if (!fConnected) {
+			fConnected = true;
 			
 			fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
 				public IRemoteConnection getConnection() {
-					return connection;
+					return fConnection;
 				}
 	
 				public int getType() {
@@ -156,21 +171,21 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.remove(listener);
+		fListeners.remove(listener);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
-		this.address = address;
+		fAddress = address;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setUsername(java.lang.String)
 	 */
 	public void setUsername(String username) {
-		this.username = username;
+		fUsername = username;
 	}
 
 	/* (non-Javadoc)
@@ -186,7 +201,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @param event
 	 */
 	private void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
+		for (Object listener : fListeners.getListeners()) {
 			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
 		}
 	}

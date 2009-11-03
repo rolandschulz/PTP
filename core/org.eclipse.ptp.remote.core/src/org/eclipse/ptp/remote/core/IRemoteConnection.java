@@ -52,7 +52,7 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public int forwardLocalPort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
-
+	
 	/**
 	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. When a connection is made to remotePort
 	 * on the remote machine, it is forwarded via this IRemoteConnection to fwdPort on machine fwdAddress.
@@ -79,14 +79,14 @@ public interface IRemoteConnection {
 	 * @throws RemoteConnectionException
 	 */
 	public int forwardRemotePort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException;
-	
+
 	/**
 	 * Gets the implementation dependent address for this connection
 	 * 
 	 * return address
 	 */
 	public String getAddress();
-
+	
 	/**
 	 * Get the attributes for the connection. This includes everything needed to recreate the connection
 	 * using the {@link IRemoteConnectionManager#newConnection(Map)} method.
@@ -96,6 +96,21 @@ public interface IRemoteConnection {
 	 * @return a map containing the connection attributes
 	 */
 	public Map<String, String> getAttributes();
+
+	/**
+	 * Returns an unmodifiable string map view of the remote environment.
+	 * 
+	 * @return the remote environment
+	 */
+	public Map<String, String> getEnv();
+	
+	/**
+	 * Returns the value of an environment variable.
+	 * 
+	 * @param name name of the environment variable
+	 * @return value of the environment variable or null if the variable is not defined
+	 */
+	public String getEnv(String name);
 	
 	/**
 	 * Get unique name for this connection.
@@ -104,6 +119,26 @@ public interface IRemoteConnection {
 	 */
 	public String getName();
 	
+	/**
+	 * Gets the remote system property indicated by the specified key.
+	 * 
+	 * The following keys are supported:
+	 * 
+	 * os.name			Operating system name 
+	 * os.arch			Operating system architecture
+	 * os.version		Operating system version
+	 * file.separator	File separator ("/" on UNIX)
+	 * path.separator	Path separator (":" on UNIX)
+	 * line.separator	Line separator ("\n" on UNIX)
+	 * user.name		User's account name
+	 * user.home		User's home directory
+	 * user.dir			User's current working directory
+	 * 
+	 * @param key the name of the property
+	 * @return the string value of the property, or null if no property has that key
+	 */
+	public String getProperty(String key);
+
 	/**
 	 * Gets the username for this connection
 	 * 
@@ -117,7 +152,7 @@ public interface IRemoteConnection {
 	 * @return true if connection is open.
 	 */
 	public boolean isOpen();
-
+	
 	/**
 	 * Open the connection. Must be called before the connection can be used.
 	 * 
@@ -148,12 +183,11 @@ public interface IRemoteConnection {
 	 * @param username
 	 */
 	public void setUsername(String username);
-	
+
 	/**
 	 * Test if this connection supports forwarding of TCP connections
 	 * 
 	 * @return true if TCP port forwarding is supported
 	 */
 	public boolean supportsTCPPortForwarding();
-
 }
