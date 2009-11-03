@@ -66,10 +66,10 @@ proxy_serialize_msg(proxy_msg *m, char **result, int *result_len)
 	 * Header length includes leading space and separators.
 	 * Body length include encoded strings and separators.
 	 */
-	hdr_len = MSG_ID_SIZE + MSG_TRANS_ID_SIZE + MSG_NARGS_SIZE + 3;
+	hdr_len = PTP_MSG_ID_SIZE + PTP_MSG_TRANS_ID_SIZE + PTP_MSG_NARGS_SIZE + 3;
 
 	for (i = 0; i < m->num_args; i++) {
-		len += strlen(m->args[i]) + MSG_ARG_LEN_SIZE + 2;
+		len += strlen(m->args[i]) + PTP_MSG_ARG_LEN_SIZE + 2;
 	}
 
 	/*
@@ -78,16 +78,16 @@ proxy_serialize_msg(proxy_msg *m, char **result, int *result_len)
 	packet = p = (char *)malloc(hdr_len + len);
 
 	*p++ = ' ';
-	int_to_hex_str(m->msg_id, p, MSG_ID_SIZE, &p);
+	int_to_hex_str(m->msg_id, p, PTP_MSG_ID_SIZE, &p);
 	*p++ = ':';
-	int_to_hex_str(m->trans_id, p, MSG_TRANS_ID_SIZE, &p);
+	int_to_hex_str(m->trans_id, p, PTP_MSG_TRANS_ID_SIZE, &p);
 	*p++ = ':';
-	int_to_hex_str(m->num_args, p, MSG_NARGS_SIZE, &p);
+	int_to_hex_str(m->num_args, p, PTP_MSG_NARGS_SIZE, &p);
 
 	for (i = 0; i < m->num_args; i++) {
 		arg_len = strlen(m->args[i]);
 		*p++ = ' ';
-		int_to_hex_str(arg_len, p, MSG_ARG_LEN_SIZE, &p);
+		int_to_hex_str(arg_len, p, PTP_MSG_ARG_LEN_SIZE, &p);
 		*p++ = ':';
 		memcpy(p, m->args[i], arg_len);
 		p += arg_len;
@@ -152,7 +152,7 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 
 	if (packet == NULL ||
 			*packet != ' ' ||
-			packet_len < MSG_ID_SIZE + MSG_TRANS_ID_SIZE + MSG_NARGS_SIZE + 3) {
+			packet_len < PTP_MSG_ID_SIZE + PTP_MSG_TRANS_ID_SIZE + PTP_MSG_NARGS_SIZE + 3) {
 		return -1;
 	}
 
@@ -160,27 +160,27 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	 * message ID
 	 */
 	packet++; /* Skip space */
-	msg_id = hex_str_to_int(packet, MSG_ID_SIZE, &end);
+	msg_id = hex_str_to_int(packet, PTP_MSG_ID_SIZE, &end);
 	end++; /* Skip separator */
 
 	/*
 	 * transaction ID
 	 */
 	packet = end;
-	trans_id = hex_str_to_int(packet, MSG_TRANS_ID_SIZE, &end);
+	trans_id = hex_str_to_int(packet, PTP_MSG_TRANS_ID_SIZE, &end);
 	end++;
 
 	/*
 	 * number of args
 	 */
 	packet = end;
-	num_args = hex_str_to_int(packet, MSG_NARGS_SIZE, &end);
+	num_args = hex_str_to_int(packet, PTP_MSG_NARGS_SIZE, &end);
 	end++;
 
 	m = new_proxy_msg(msg_id, trans_id);
 
 	packet = end;
-	packet_len -= (MSG_ID_SIZE + MSG_TRANS_ID_SIZE + MSG_NARGS_SIZE + 3);
+	packet_len -= (PTP_MSG_ID_SIZE + PTP_MSG_TRANS_ID_SIZE + PTP_MSG_NARGS_SIZE + 3);
 
 	for (i = 0; i < num_args; i++) {
 		if (proxy_msg_decode_string(packet, packet_len, &arg, &end) < 0) {
@@ -209,14 +209,14 @@ proxy_msg_decode_string(char *str, int len, char **arg, char **end)
 	char *	ep;
 	char *	p;
 
-	if (len < MSG_ARG_LEN_SIZE + 1) {
+	if (len < PTP_MSG_ARG_LEN_SIZE + 1) {
 		return -1;
 	}
 
-	arg_len = hex_str_to_int(str, MSG_ARG_LEN_SIZE, &ep);
+	arg_len = hex_str_to_int(str, PTP_MSG_ARG_LEN_SIZE, &ep);
 	ep++;
 
-	if (len < MSG_ARG_LEN_SIZE + arg_len + 1) {
+	if (len < PTP_MSG_ARG_LEN_SIZE + arg_len + 1) {
 		return -1;
 	}
 

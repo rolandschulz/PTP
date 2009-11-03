@@ -113,7 +113,7 @@ proxy_stdio_svr_init(proxy_svr *svr, void **data)
 	conn->svr = svr;
 	*data = (void *)conn;
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -124,7 +124,7 @@ proxy_stdio_svr_init(proxy_svr *svr, void **data)
 static int
 proxy_stdio_svr_create(proxy_svr *svr, int port)
 {
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -139,10 +139,10 @@ proxy_stdio_svr_connect(proxy_svr *svr, char *host, int port)
 	conn->sess_out = 1;
 
 	RegisterFileHandler(conn->sess_in, READ_FILE_HANDLER, proxy_stdio_svr_recv_msgs, (void *)svr);
-	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_stdio_svr_event_callback, (void *)svr);
-	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_stdio_svr_cmd_callback, (void *)svr);
+	RegisterEventHandler(PTP_PROXY_EVENT_HANDLER, proxy_stdio_svr_event_callback, (void *)svr);
+	RegisterEventHandler(PTP_PROXY_CMD_HANDLER, proxy_stdio_svr_cmd_callback, (void *)svr);
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -170,13 +170,13 @@ proxy_stdio_svr_finish(proxy_svr *svr)
 static void
 proxy_stdio_svr_process_cmds()
 {
-	CallEventHandlers(PROXY_CMD_HANDLER, NULL);
+	CallEventHandlers(PTP_PROXY_CMD_HANDLER, NULL);
 }
 
 static void
 proxy_stdio_svr_process_events(proxy_msg *msg, void *data)
 {
-	CallEventHandlers(PROXY_EVENT_HANDLER, (void *)msg);
+	CallEventHandlers(PTP_PROXY_EVENT_HANDLER, (void *)msg);
 }
 
 /**
@@ -214,7 +214,7 @@ proxy_stdio_svr_progress(proxy_svr *svr)
 				continue;
 
 			perror("socket");
-			return PROXY_RES_ERR;
+			return PTP_PROXY_RES_ERR;
 
 		case 0:
 			/* Timeout. */
@@ -222,7 +222,7 @@ proxy_stdio_svr_progress(proxy_svr *svr)
 
 		default:
 			if (CallFileHandlers(&rfds, &wfds, &efds) < 0)
-				return PROXY_RES_ERR;
+				return PTP_PROXY_RES_ERR;
 		}
 
 		break;
@@ -252,13 +252,13 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 	DEBUG_PRINT("SVR received <%s>\n", msg);
 
 	if (proxy_deserialize_msg(msg, len, &m) < 0) {
-		proxy_msg *err = new_proxy_msg(0, PROXY_EV_MESSAGE);
+		proxy_msg *err = new_proxy_msg(0, PTP_PROXY_EV_MESSAGE);
 		proxy_msg_add_int(err, 3); /* 3 attributes */
-		proxy_msg_add_keyval_string(err, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
-		proxy_msg_add_keyval_int(err, MSG_CODE_ATTR, PROXY_ERR_PROTO);
-		proxy_msg_add_int(err, ERROR_MALFORMED_COMMAND);
+		proxy_msg_add_keyval_string(err, PTP_MSG_LEVEL_ATTR, PTP_MSG_LEVEL_FATAL);
+		proxy_msg_add_keyval_int(err, PTP_MSG_CODE_ATTR, PTP_PROXY_ERR_PROTO);
+		proxy_msg_add_int(err, PTP_ERROR_MALFORMED_COMMAND);
 		asprintf(&err_str, "malformed command, len is %d", len);
-		proxy_msg_add_keyval_string(err, MSG_TEXT_ATTR, err_str);
+		proxy_msg_add_keyval_string(err, PTP_MSG_TEXT_ATTR, err_str);
 		free(err_str);
 		proxy_queue_msg(svr->svr_events, err);
 		return 0;
@@ -272,13 +272,13 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 			(void)cmd(m->trans_id, m->num_args, m->args);
 		}
 	} else {
-		proxy_msg *err = new_proxy_msg(0, PROXY_EV_MESSAGE);
+		proxy_msg *err = new_proxy_msg(0, PTP_PROXY_EV_MESSAGE);
 		proxy_msg_add_int(err, 3); /* 3 attributes */
-		proxy_msg_add_keyval_string(err, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
-		proxy_msg_add_keyval_int(err, MSG_CODE_ATTR, PROXY_ERR_PROTO);
-		proxy_msg_add_int(err, ERROR_MALFORMED_COMMAND);
+		proxy_msg_add_keyval_string(err, PTP_MSG_LEVEL_ATTR, PTP_MSG_LEVEL_FATAL);
+		proxy_msg_add_keyval_int(err, PTP_MSG_CODE_ATTR, PTP_PROXY_ERR_PROTO);
+		proxy_msg_add_int(err, PTP_ERROR_MALFORMED_COMMAND);
 		asprintf(&err_str, "malformed command, len is %d", len);
-		proxy_msg_add_keyval_string(err, MSG_TEXT_ATTR, err_str);
+		proxy_msg_add_keyval_string(err, PTP_MSG_TEXT_ATTR, err_str);
 		free(err_str);
 		proxy_queue_msg(svr->svr_events, err);
 	}

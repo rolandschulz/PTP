@@ -807,7 +807,7 @@ int PE_start_daemon(int trans_id, int nargs, char *args[])
 #endif
     send_ok_event(trans_id);
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 int PE_define_model(int trans_id, int nargs, char *args[])
@@ -840,7 +840,7 @@ int PE_define_model(int trans_id, int nargs, char *args[])
     send_local_default_attrs(trans_id);
     send_ok_event(trans_id);
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 int PE_start_events(int trans_id, int nargs, char *args[])
@@ -886,7 +886,7 @@ int PE_start_events(int trans_id, int nargs, char *args[])
         queue_id = generate_id();
         sprintf(base_id_str, "%d", base_id);
         sprintf(id_str, "%d", machine_id);
-        enqueue_event(proxy_new_machine_event(trans_id, base_id_str, id_str, "default", MACHINE_STATE_UP));
+        enqueue_event(proxy_new_machine_event(trans_id, base_id_str, id_str, "default", PTP_MACHINE_STATE_UP));
         sprintf(id_str, "%d", queue_id);
         enqueue_event(proxy_new_queue_event(trans_id, base_id_str, id_str, "default", 0));
         /*
@@ -904,7 +904,7 @@ int PE_start_events(int trans_id, int nargs, char *args[])
      * state machine.
      */
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 int PE_submit_job(int trans_id, int nargs, char *args[])
@@ -1134,16 +1134,16 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             if (cp != NULL) {
                 *cp = '\0';
                 cp = cp + 1;
-                if (strcmp(args[i], JOB_SUB_ID_ATTR) == 0) {
+                if (strcmp(args[i], PTP_JOB_SUB_ID_ATTR) == 0) {
                     jobid = strdup(cp);
                 }
-                else if (strcmp(args[i], JOB_EXEC_NAME_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_EXEC_NAME_ATTR) == 0) {
                     execname = strdup(cp);
                 }
-                else if (strcmp(args[i], JOB_WORKING_DIR_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_WORKING_DIR_ATTR) == 0) {
                     cwd = strdup(cp);
                 }
-                else if (strcmp(args[i], JOB_PROG_ARGS_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_PROG_ARGS_ATTR) == 0) {
                     argp[argp_count] = strdup(cp);
                     argp_count = argp_count + 1;
                     if (argp_count >= argp_limit) {
@@ -1152,18 +1152,18 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                         malloc_check(argp, __FUNCTION__, __LINE__);
                     }
                 }
-                else if (strcmp(args[i], JOB_EXEC_PATH_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_EXEC_PATH_ATTR) == 0) {
                     execdir = strdup(cp);
                 }
-                else if (strcmp(args[i], JOB_ENV_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_ENV_ATTR) == 0) {
                 }
-                else if (strcmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_DEBUG_EXEC_NAME_ATTR) == 0) {
                     debugger_name = strdup(cp);
                 }
-                else if (strcmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_DEBUG_EXEC_PATH_ATTR) == 0) {
                     debugger_path = strdup(cp);
                 }
-                else if (strcmp(args[i], JOB_DEBUG_ARGS_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_DEBUG_ARGS_ATTR) == 0) {
                     debug_args[debug_arg_count] = strdup(cp);
                     debug_arg_count = debug_arg_count + 1;
                     if (debug_arg_count >= debug_arg_limit) {
@@ -1172,7 +1172,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                         malloc_check(debug_args, __FUNCTION__, __LINE__);
                     }
                 }
-                else if (strcmp(args[i], JOB_DEBUG_FLAG_ATTR) == 0) {
+                else if (strcmp(args[i], PTP_JOB_DEBUG_FLAG_ATTR) == 0) {
                     debug_sdm_mode = 1;
                 }
                 else if (strcmp(args[i], "debugStopInMain") == 0) {
@@ -1182,7 +1182,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         }
     }
     if (jobid == NULL) {
-        post_error(trans_id, PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
+        post_error(trans_id, PTP_PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
     }
     if (cwd != NULL) {
         status = chdir(cwd);
@@ -1192,7 +1192,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                 free(current_hostlist);
             }
             TRACE_EXIT;
-            return PROXY_RES_OK;
+            return PTP_PROXY_RES_OK;
         }
     }
     if (mp_buffer_mem_set) {
@@ -1209,7 +1209,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             free(current_hostlist);
         }
         TRACE_EXIT;
-        return PROXY_RES_OK;
+        return PTP_PROXY_RES_OK;
     }
     if (execname == NULL) {
         post_submitjob_error(trans_id, jobid, "No executable specified");
@@ -1217,7 +1217,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             free(current_hostlist);
         }
         TRACE_EXIT;
-        return PROXY_RES_OK;
+        return PTP_PROXY_RES_OK;
     }
     job = (jobinfo *) malloc(sizeof(jobinfo));
     malloc_check(job, __FUNCTION__, __LINE__);
@@ -1236,7 +1236,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             if (current_hostlist != NULL) {
                 free(current_hostlist);
             }
-            return PROXY_RES_OK;
+            return PTP_PROXY_RES_OK;
         }
         else {
             asprintf(&debugger_full_path, "%s/%s", debugger_path, debugger_name);
@@ -1247,7 +1247,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             if (current_hostlist != NULL) {
                 free(current_hostlist);
             }
-            return PROXY_RES_OK;
+            return PTP_PROXY_RES_OK;
         }
 
         debugger_job = (jobinfo *) malloc(sizeof(jobinfo));
@@ -1273,7 +1273,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
              */
             asprintf(&debugger_args[a++], "--jobid=%d", getpid());
             for (i = 0; i < nargs; i++) {
-                if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
+                if (strncmp(args[i], PTP_JOB_DEBUG_ARGS_ATTR, strlen(PTP_JOB_DEBUG_ARGS_ATTR)) == 0) {
                     debugger_args[a++] = strchr(args[i], '=') + 1;
                 }
             }
@@ -1311,7 +1311,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         }
         else if (pid == -1) {
             post_submitjob_error(trans_id, jobid, "Debugger fork failed");
-            return PROXY_RES_OK;
+            return PTP_PROXY_RES_OK;
         }
         /* Parent continues on... */
         /* Augment the application's environment to include a debug marker based upon the poe pid of the debugger. */
@@ -1336,7 +1336,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             free(current_hostlist);
         }
         TRACE_EXIT;
-        return PROXY_RES_OK;
+        return PTP_PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stdout FD %d %d\n", stdout_pipe[0], stdout_pipe[1]);
     status = setup_stderr_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd),
@@ -1347,7 +1347,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             free(current_hostlist);
         }
         TRACE_EXIT;
-        return PROXY_RES_OK;
+        return PTP_PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
     job->submit_jobid = jobid;
@@ -1455,10 +1455,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
 #endif
             post_submitjob_error(trans_id, jobid, "Fork failed");
-            if (current_hostlist != NULL) {
-                free(current_hostlist);
-            }
-            return PROXY_RES_OK;
+            return PTP_PROXY_RES_OK;
         }
         else {
 #ifdef PE_DUAL_POE_DEBUG
@@ -1485,7 +1482,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     }
     send_ok_event(trans_id);
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 int PE_halt_events(int trans_id, int nargs, char *args[])
@@ -1502,7 +1499,7 @@ int PE_halt_events(int trans_id, int nargs, char *args[])
     send_ok_event(start_events_transid);
     send_ok_event(trans_id);
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 int PE_terminate_job(int trans_id, int nargs, char *args[])
@@ -1523,7 +1520,7 @@ int PE_terminate_job(int trans_id, int nargs, char *args[])
     SetList(jobs);
     job = GetListElement(jobs);
     for (i = 0; i < nargs; i++) {
-        if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
+        if (proxy_test_attribute(PTP_JOB_ID_ATTR, args[i])) {
             job_ident = proxy_get_attribute_value_int(args[i]);
         }
     }
@@ -1553,7 +1550,7 @@ int PE_terminate_job(int trans_id, int nargs, char *args[])
     pthread_mutex_unlock(&job_lock);
     send_ok_event(trans_id);
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 int PE_quit(int trans_id, int nargs, char *args[])
@@ -1576,7 +1573,7 @@ int PE_quit(int trans_id, int nargs, char *args[])
     }
     shutdown_requested = 1;
     TRACE_EXIT;
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 /*************************************************************************/
@@ -1612,7 +1609,7 @@ void job_enqueue(jobinfo *job, pid_t pid)
     jobname[sizeof jobname - 1] = '\0';
     sprintf(queue_id_str, "%d", queue_id);
     sprintf(jobid_str, "%d", job->proxy_jobid);
-    enqueue_event(proxy_new_job_event(start_events_transid, queue_id_str, jobid_str, jobname, JOB_STATE_STARTING,
+    enqueue_event(proxy_new_job_event(start_events_transid, queue_id_str, jobid_str, jobname, PTP_JOB_STATE_STARTING,
             job->submit_jobid));
 }
 
@@ -1951,11 +1948,11 @@ startup_monitor(void *job_ident)
                 sprintf(procid_str, "%d", taskp[i].proxy_taskid);
                 AddToList(taskid_list, strdup(procid_str));
                 sprintf(procname, "task_%d", i);
-                proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
-                proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_generated_node_id);
+                proxy_add_process(msg, procid_str, procname, PTP_PROC_STATE_STARTING, 3);
+                proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, node->proxy_generated_node_id);
                 AddToList(taskid_list, &(node->proxy_generated_node_id));
-                proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
-                proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
+                proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, i);
+                proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, taskp[i].task_pid);
             }
         }
 #endif
@@ -1982,10 +1979,10 @@ startup_monitor(void *job_ident)
                 sprintf(procid_str, "%d", taskp[i].proxy_taskid);
                 AddToList(taskid_list, strdup(procid_str));
                 sprintf(procname, "task_%d", i);
-                proxy_add_process(msg, procid_str, procname, PROC_STATE_STARTING, 3);
-                proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node->proxy_nodeid);
-                proxy_add_int_attribute(msg, PROC_INDEX_ATTR, i);
-                proxy_add_int_attribute(msg, PROC_PID_ATTR, taskp[i].task_pid);
+                proxy_add_process(msg, procid_str, procname, PTP_PROC_STATE_STARTING, 3);
+                proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, node->proxy_nodeid);
+                proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, i);
+                proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, taskp[i].task_pid);
             }
         }
     }
@@ -2004,7 +2001,7 @@ startup_monitor(void *job_ident)
 
         start_msg = proxy_process_change_event(start_events_transid, proxy_taskid, 1);
         free(proxy_taskid);
-        proxy_add_string_attribute(start_msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
+        proxy_add_string_attribute(start_msg, PTP_PROC_STATE_ATTR, PTP_PROC_STATE_RUNNING);
         enqueue_event(start_msg);
         proxy_taskid = GetListElement(taskid_list);
     }
@@ -2012,13 +2009,13 @@ startup_monitor(void *job_ident)
 #endif
     sprintf(task_range, "%d-%d", base_taskid, base_taskid + numtasks - 1);
     msg = proxy_process_change_event(start_events_transid, task_range, 1);
-    proxy_add_string_attribute(msg, PROC_STATE_ATTR, PROC_STATE_RUNNING);
+    proxy_add_string_attribute(msg, PTP_PROC_STATE_ATTR, PTP_PROC_STATE_RUNNING);
     enqueue_event(msg);
     /*
      * attach.cfg file is complete and has been parsed. Notify the
      * front end that the job is running
      */
-    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_RUNNING);
+    send_job_state_change_event(start_events_transid, job->proxy_jobid, PTP_JOB_STATE_RUNNING);
     RUN_GET_TIME("Completed sending task running messages, elapsed time", &current_time);
     /*
      * Now that all task pids are known, I/O from the application can be
@@ -2061,7 +2058,7 @@ startup_monitor(void *job_ident)
         }
         else {
             if (sdm_pid == -1) {
-                return PROXY_RES_OK;
+                return PTP_PROXY_RES_OK;
             }
             else {
                 /*
@@ -2116,8 +2113,8 @@ zombie_reaper(void *arg)
         while (job != NULL) {
             if ((job->discovered_job) && (kill(job->poe_pid, 0) != 0)) {
                 TRACE_DETAIL_V("+++ poe process %d Exited with unknown status\n", job->poe_pid);
-                send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_COMPLETED);
-                send_process_state_change_event(start_events_transid, job, PROC_STATE_COMPLETED);
+                send_job_state_change_event(start_events_transid, job->proxy_jobid, PTP_JOB_STATE_COMPLETED);
+                send_process_state_change_event(start_events_transid, job, PTP_PROC_STATE_COMPLETED);
                 if (job->tasks != NULL) {
                     if (!use_load_leveler) {
                         update_node_refcounts(job->numtasks, job->tasks);
@@ -2156,14 +2153,14 @@ zombie_reaper(void *arg)
                  */
                 if (status <= 128) {
                     TRACE_DETAIL_V("+++ %d Exited with status %08x\n", terminated_pmd, status);
-                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_COMPLETED);
-                    send_process_state_change_event(start_events_transid, job, PROC_STATE_COMPLETED);
+                    send_job_state_change_event(start_events_transid, job->proxy_jobid, PTP_JOB_STATE_COMPLETED);
+                    send_process_state_change_event(start_events_transid, job, PTP_PROC_STATE_COMPLETED);
                 }
                 else {
                     TRACE_DETAIL_V("+++ %d signalled with status %08x\n", terminated_pmd,
                             status - 128);
-                    send_job_state_change_event(start_events_transid, job->proxy_jobid, JOB_STATE_COMPLETED);
-                    send_process_state_change_event(start_events_transid, job, PROC_STATE_COMPLETED);
+                    send_job_state_change_event(start_events_transid, job->proxy_jobid, PTP_JOB_STATE_COMPLETED);
+                    send_process_state_change_event(start_events_transid, job, PTP_PROC_STATE_COMPLETED);
                 }
                 /*
                  * Since the job is terminated, the stdio file descriptor
@@ -3841,7 +3838,7 @@ load_load_leveler_library(int trans_id)
         sendErrorEvent(trans_id, RTEV_ERROR_LL_INIT,
                 "dlopen failed for LoadLeveler shared library");
 #endif
-        return PROXY_RES_ERR;
+        return PTP_PROXY_RES_ERR;
     }
     else {
         print_message(INFO_MESSAGE, "dlopen %s successful.\n", ibmll_libpath_name);
@@ -3874,13 +3871,13 @@ load_load_leveler_library(int trans_id)
 #if 0
         sendErrorEvent(trans_id, RTEV_ERROR_LL_INIT, "LoadLeveler symbols not located");
 #endif
-        return PROXY_RES_ERR;
+        return PTP_PROXY_RES_ERR;
     }
     else {
         print_message(INFO_MESSAGE,
                 "Successfully located all of the required LoadLeveler functions via dlsym.\n");
     }
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
 }
 
 /*************************************************************************
@@ -4047,7 +4044,7 @@ sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_object, NodeOb
     proxy_msg *msg;
     char proxy_generated_cluster_id_string[256];
     char proxy_generated_node_id_string[256];
-    char *node_state_to_report = NODE_STATE_UNKNOWN;
+    char *node_state_to_report = PTP_NODE_STATE_UNKNOWN;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. node=%s. state=%d.\n",
             __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name,
@@ -4059,13 +4056,13 @@ sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_object, NodeOb
 
     switch (node_object->node_state) {
         case MY_STATE_UP:
-        node_state_to_report = NODE_STATE_UP;
+        node_state_to_report = PTP_NODE_STATE_UP;
         break;
         case MY_STATE_DOWN:
-        node_state_to_report = NODE_STATE_DOWN;
+        node_state_to_report = PTP_NODE_STATE_DOWN;
         break;
         default:
-        node_state_to_report = NODE_STATE_UNKNOWN;
+        node_state_to_report = PTP_NODE_STATE_UNKNOWN;
         break;
     }
 
@@ -4085,7 +4082,7 @@ sendNodeChangeEvent(int gui_transmission_id, ClusterObject * cluster_object,
 {
     proxy_msg *msg;
     char proxy_generated_node_id_string[256];
-    char *node_state_to_report = NODE_STATE_UNKNOWN;
+    char *node_state_to_report = PTP_NODE_STATE_UNKNOWN;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. node=%s. state=%d.\n",
             __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name,
@@ -4095,13 +4092,13 @@ sendNodeChangeEvent(int gui_transmission_id, ClusterObject * cluster_object,
 
     switch (node_object->node_state) {
         case MY_STATE_UP:
-        node_state_to_report = NODE_STATE_UP;
+        node_state_to_report = PTP_NODE_STATE_UP;
         break;
         case MY_STATE_DOWN:
-        node_state_to_report = NODE_STATE_DOWN;
+        node_state_to_report = PTP_NODE_STATE_DOWN;
         break;
         default:
-        node_state_to_report = NODE_STATE_UNKNOWN;
+        node_state_to_report = PTP_NODE_STATE_UNKNOWN;
         break;
     }
 
@@ -4122,7 +4119,7 @@ sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObje
     char proxy_generated_job_id_string[256];
     char proxy_generated_queue_id_string[256];
     char job_name_string[256];
-    char *job_state_to_report = JOB_STATE_STARTING;
+    char *job_state_to_report = PTP_JOB_STATE_STARTING;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
             __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
@@ -4135,19 +4132,19 @@ sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObje
 
     switch (job_object->job_state) {
         case MY_STATE_IDLE:
-        job_state_to_report = JOB_STATE_STARTING;
+        job_state_to_report = PTP_JOB_STATE_STARTING;
         break;
         case MY_STATE_RUNNING:
-        job_state_to_report = JOB_STATE_RUNNING;
+        job_state_to_report = PTP_JOB_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        job_state_to_report = JOB_STATE_STARTING;
+        job_state_to_report = PTP_JOB_STATE_STARTING;
         break;
         case MY_STATE_TERMINATED:
-        job_state_to_report = JOB_STATE_COMPLETED;
+        job_state_to_report = PTP_JOB_STATE_COMPLETED;
         break;
         default:
-        job_state_to_report = JOB_STATE_STARTING;
+        job_state_to_report = PTP_JOB_STATE_STARTING;
         break;
     }
 
@@ -4171,7 +4168,7 @@ sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
     proxy_msg *msg;
     char proxy_generated_job_id_string[256];
     char job_state_string[256];
-    char *job_state_to_report = JOB_STATE_STARTING;
+    char *job_state_to_report = PTP_JOB_STATE_STARTING;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__,
             __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster,
@@ -4182,25 +4179,25 @@ sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
 
     switch (job_object->job_state) {
         case MY_STATE_IDLE:
-        job_state_to_report = JOB_STATE_STARTING;
+        job_state_to_report = PTP_JOB_STATE_STARTING;
         break;
         case MY_STATE_RUNNING:
-        job_state_to_report = JOB_STATE_RUNNING;
+        job_state_to_report = PTP_JOB_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        job_state_to_report = JOB_STATE_STARTING;
+        job_state_to_report = PTP_JOB_STATE_STARTING;
         break;
         case MY_STATE_TERMINATED:
-        job_state_to_report = JOB_STATE_COMPLETED;
+        job_state_to_report = PTP_JOB_STATE_COMPLETED;
         break;
         default:
-        job_state_to_report = JOB_STATE_STARTING;
+        job_state_to_report = PTP_JOB_STATE_STARTING;
         break;
     }
 
     msg = proxy_job_change_event(gui_transmission_id, proxy_generated_job_id_string, 1);
     sprintf(job_state_string, "%d", job_object->job_state);
-    proxy_add_string_attribute(msg, JOB_STATE_ATTR, job_state_to_report);
+    proxy_add_string_attribute(msg, PTP_JOB_STATE_ATTR, job_state_to_report);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
@@ -4238,7 +4235,7 @@ sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObj
     char proxy_generated_job_id_string[256];
     char proxy_generated_task_id_string[256];
     char ll_task_id_string[256];
-    char *task_state_to_report = PROC_STATE_STARTING;
+    char *task_state_to_report = PTP_PROC_STATE_STARTING;
     NodeObject *node_object = NULL;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. node=%s. task=%d.\n",
@@ -4255,27 +4252,27 @@ sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObj
 
     switch (task_object->task_state) {
         case MY_STATE_IDLE:
-        task_state_to_report = PROC_STATE_STARTING;
+        task_state_to_report = PTP_PROC_STATE_STARTING;
         break;
         case MY_STATE_RUNNING:
-        task_state_to_report = PROC_STATE_RUNNING;
+        task_state_to_report = PTP_PROC_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        task_state_to_report = PROC_STATE_SUSPENDED;
+        task_state_to_report = PTP_PROC_STATE_SUSPENDED;
         break;
         case MY_STATE_TERMINATED:
-        task_state_to_report = PROC_STATE_COMPLETED;
+        task_state_to_report = PTP_PROC_STATE_COMPLETED;
         break;
         default:
-        task_state_to_report = PROC_STATE_STARTING;
+        task_state_to_report = PTP_PROC_STATE_STARTING;
         break;
     }
 
     proxy_add_process(msg, proxy_generated_task_id_string, ll_task_id_string, task_state_to_report, 2);
 
     node_object = get_node_in_hash(cluster_object->node_hash, task_object->node_name);
-    proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node_object->proxy_generated_node_id);
-    proxy_add_int_attribute(msg, PROC_INDEX_ATTR, task_object->ll_task_id);
+    proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, node_object->proxy_generated_node_id);
+    proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, task_object->ll_task_id);
 
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
@@ -4290,7 +4287,7 @@ sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
 {
     proxy_msg *msg;
     char proxy_generated_task_id_string[256];
-    char *task_state_to_report = PROC_STATE_STARTING;
+    char *task_state_to_report = PTP_PROC_STATE_STARTING;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
     memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string));
@@ -4299,23 +4296,23 @@ sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
 
     switch (task_object->task_state) {
         case MY_STATE_IDLE:
-        task_state_to_report = PROC_STATE_STARTING;
+        task_state_to_report = PTP_PROC_STATE_STARTING;
         break;
         case MY_STATE_RUNNING:
-        task_state_to_report = PROC_STATE_RUNNING;
+        task_state_to_report = PTP_PROC_STATE_RUNNING;
         break;
         case MY_STATE_STOPPED:
-        task_state_to_report = PROC_STATE_SUSPENDED;
+        task_state_to_report = PTP_PROC_STATE_SUSPENDED;
         break;
         case MY_STATE_TERMINATED:
-        task_state_to_report = PROC_STATE_COMPLETED;
+        task_state_to_report = PTP_PROC_STATE_COMPLETED;
         break;
         default:
-        task_state_to_report = PROC_STATE_STARTING;
+        task_state_to_report = PTP_PROC_STATE_STARTING;
         break;
     }
 
-    proxy_add_string_attribute(msg, PROC_STATE_ATTR, task_state_to_report);
+    proxy_add_string_attribute(msg, PTP_PROC_STATE_ATTR, task_state_to_report);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
@@ -4348,7 +4345,7 @@ sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
 {
     proxy_msg *msg;
     char proxy_generated_cluster_id_string[256];
-    char *machine_state_to_report = MACHINE_STATE_UNKNOWN;
+    char *machine_state_to_report = PTP_MACHINE_STATE_UNKNOWN;
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. state=%d.\n", __FUNCTION__,
             __LINE__, cluster_object->cluster_name, cluster_object->cluster_state);
@@ -4360,13 +4357,13 @@ sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_object)
     machine_id = cluster_object->proxy_generated_cluster_id;
     switch (cluster_object->cluster_state) {
         case MY_STATE_UP:
-        machine_state_to_report = MACHINE_STATE_UP;
+        machine_state_to_report = PTP_MACHINE_STATE_UP;
         break;
         case MY_STATE_DOWN:
-        machine_state_to_report = MACHINE_STATE_DOWN;
+        machine_state_to_report = PTP_MACHINE_STATE_DOWN;
         break;
         default:
-        machine_state_to_report = MACHINE_STATE_UNKNOWN;
+        machine_state_to_report = PTP_MACHINE_STATE_UNKNOWN;
         break;
     }
     msg =
@@ -5140,7 +5137,7 @@ void add_discovered_job(char *pid)
     snprintf(jobname, sizeof jobname, "%s.run_%s", userinfo->pw_name, pid);
     jobname[sizeof jobname - 1] = '\0';
     AddToList(jobs, job);
-    enqueue_event(proxy_new_job_event(start_events_transid, queueid_str, jobid_str, jobname, JOB_STATE_STARTING,
+    enqueue_event(proxy_new_job_event(start_events_transid, queueid_str, jobid_str, jobname, PTP_JOB_STATE_STARTING,
             job->submit_jobid));
     /*
      * Start a thread to watch for the attach.cfg file for this job
@@ -5268,7 +5265,7 @@ void send_stdout(jobinfo * job, char *buf)
         task = 0;
         outp = buf;
     }
-    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, PROC_STDOUT_ATTR, outp);
+    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, PTP_PROC_STDOUT_ATTR, outp);
 }
 
 void send_stderr(jobinfo * job, char *buf)
@@ -5300,14 +5297,14 @@ void send_stderr(jobinfo * job, char *buf)
             msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
             job->poe_taskid = generate_id();
             sprintf(jobid_str, "%d", job->poe_taskid);
-            proxy_add_process(msg, jobid_str, "poe", PROC_STATE_STARTING, 3);
-            proxy_add_int_attribute(msg, PROC_NODEID_ATTR, 0);
-            proxy_add_int_attribute(msg, PROC_INDEX_ATTR, 0);
-            proxy_add_int_attribute(msg, PROC_PID_ATTR, job->poe_pid);
+            proxy_add_process(msg, jobid_str, "poe", PTP_PROC_STATE_STARTING, 3);
+            proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, 0);
+            proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, 0);
+            proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, job->poe_pid);
             enqueue_event(msg);
             job->numtasks = 0;
         }
-        send_process_state_output_event(start_events_transid, job->poe_taskid, PROC_STDERR_ATTR, buf);
+        send_process_state_output_event(start_events_transid, job->poe_taskid, PTP_PROC_STDERR_ATTR, buf);
     }
     else {
         /*
@@ -5320,13 +5317,13 @@ void send_stderr(jobinfo * job, char *buf)
             int is_aix_msgid;
 
             fprintf(job->stderr_file, "%s", buf);
-            is_aix_msgid = regexec(&msgid_regex, buf, 0, NULL, 0);
-            if (is_aix_msgid == 0) {
-                send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PROC_STDERR_ATTR, buf);
+            match = regexec(&msgid_regex, buf, 0, NULL, 0);
+            if (match == 0) {
+                send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PTP_PROC_STDERR_ATTR, buf);
             }
         }
         else {
-            send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PROC_STDERR_ATTR, buf);
+            send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PTP_PROC_STDERR_ATTR, buf);
         }
     }
 }
@@ -5384,7 +5381,7 @@ proxy_attr_def_int_limits_event(int trans_id, char *id, char *name, char *desc, 
 {
     proxy_msg *msg;
 
-    msg = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
+    msg = new_proxy_msg(PTP_PROXY_EV_RT_ATTR_DEF, trans_id);
     proxy_msg_add_int(msg, 1);
     proxy_msg_add_int(msg, 8);
     proxy_msg_add_string(msg, id);
@@ -5405,7 +5402,7 @@ proxy_attr_def_long_int_limits_event(int trans_id, char *id, char *name, char *d
     proxy_msg *msg;
     char num_str[22];
 
-    msg = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
+    msg = new_proxy_msg(PTP_PROXY_EV_RT_ATTR_DEF, trans_id);
     proxy_msg_add_int(msg, 1);
     proxy_msg_add_int(msg, 8);
     proxy_msg_add_string(msg, id);
@@ -5427,7 +5424,7 @@ proxy_attr_def_enum_event(int trans_id, char *id, char *name, char *desc, int di
 {
     proxy_msg *msg;
 
-    msg = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
+    msg = new_proxy_msg(PTP_PROXY_EV_RT_ATTR_DEF, trans_id);
     proxy_msg_add_int(msg, 1);
     proxy_msg_add_int(msg, count + 6);
     proxy_msg_add_string(msg, id);
@@ -5452,7 +5449,7 @@ void send_new_node_list(int trans_id, int machine_ident, List * new_nodes)
     noderef = GetListElement(new_nodes);
     while (noderef != NULL) {
         sprintf(id_string, "%d", noderef->proxy_nodeid);
-        proxy_add_node(msg, id_string, noderef->key, NODE_STATE_UP, 0);
+        proxy_add_node(msg, id_string, noderef->key, PTP_NODE_STATE_UP, 0);
         noderef = GetListElement(new_nodes);
     }
     pthread_mutex_unlock(&node_lock);
@@ -5466,7 +5463,7 @@ void send_job_state_change_event(int trans_id, int proxy_jobid, char *state)
 
     sprintf(jobid_str, "%d", proxy_jobid);
     msg = proxy_job_change_event(trans_id, jobid_str, 1);
-    proxy_msg_add_keyval_string(msg, JOB_STATE_ATTR, state);
+    proxy_msg_add_keyval_string(msg, PTP_JOB_STATE_ATTR, state);
     enqueue_event(msg);
 }
 
@@ -5526,7 +5523,7 @@ void send_process_state_change_event(int trans_id, jobinfo * job, char *state)
             snprintf(range, sizeof range, "%d-%d", start_task, next_task - 1);
             range[sizeof range - 1] = '\0';
             msg = proxy_process_change_event(trans_id, range, 1);
-            proxy_msg_add_keyval_string(msg, PROC_STATE_ATTR, state);
+            proxy_msg_add_keyval_string(msg, PTP_PROC_STATE_ATTR, state);
             enqueue_event(msg);
             task_index = -1;
         }
@@ -5572,7 +5569,7 @@ int main(int argc, char *argv[])
     char *host = "localhost";
     char *proxy_str = DEFAULT_PROXY;
     int ch;
-    int port = PROXY_TCP_PORT;
+    int port = PTP_PROXY_TCP_PORT;
     int rc;
     int debug;
     char *cp;
@@ -5861,18 +5858,18 @@ int server(char *name, char *host, int port)
     struct timeval timeout = { 0, 20000 };
 
     jobs = NewList();
-    if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &pe_proxy) != PROXY_RES_OK)
+    if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &pe_proxy) != PTP_PROXY_RES_OK)
         return 0;
 
     rc = proxy_svr_connect(pe_proxy, host, port);
-    if (rc != PROXY_RES_OK) {
+    if (rc != PTP_PROXY_RES_OK) {
         print_message(INFO_MESSAGE, "proxy_connect fails with %d status.\n", rc);
         return 0;
     }
     print_message(INFO_MESSAGE, "Running IBMPE proxy to host %s via port %d\n", host, port);
 
     while (ptp_signal_exit == 0 && !shutdown_requested) {
-        if ((proxy_svr_progress(pe_proxy) != PROXY_RES_OK)) {
+        if ((proxy_svr_progress(pe_proxy) != PTP_PROXY_RES_OK)) {
             print_message(TRACE_DETAIL_MESSAGE, "Loop ending\n");
             break;
         }

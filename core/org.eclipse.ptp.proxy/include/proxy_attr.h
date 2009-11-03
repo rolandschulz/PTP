@@ -19,99 +19,99 @@
 /*
  * Element attributes
  */
-#define ELEMENT_ID_ATTR				"id"
-#define ELEMENT_NAME_ATTR			"name"
+#define PTP_ELEMENT_ID_ATTR				"id"
+#define PTP_ELEMENT_NAME_ATTR			"name"
 
 /*
  * Filter attributes
  */
-#define FILTER_CHILDREN_ATTR		"filterChildren"
+#define PTP_FILTER_CHILDREN_ATTR		"filterChildren"
 /*
  * Machine attributes
  */
-#define MACHINE_STATE_ATTR			"machineState"
-#define 	MACHINE_STATE_UNKNOWN		"UNKNOWN"
-#define 	MACHINE_STATE_UP			"UP"
-#define 	MACHINE_STATE_DOWN			"DOWN"
-#define 	MACHINE_STATE_ALERT			"ALERT"
+#define PTP_MACHINE_STATE_ATTR			"machineState"
+#define 	PTP_MACHINE_STATE_UNKNOWN		"UNKNOWN"
+#define 	PTP_MACHINE_STATE_UP			"UP"
+#define 	PTP_MACHINE_STATE_DOWN			"DOWN"
+#define 	PTP_MACHINE_STATE_ALERT			"ALERT"
 
 /*
  * Job attributes
  */
-#define JOB_STATE_ATTR				"jobState"
-#define 	JOB_STATE_STARTING			"STARTING"
-#define 	JOB_STATE_RUNNING			"RUNNING"
-#define 	JOB_STATE_SUSPENDED			"SUSPENDED"
-#define 	JOB_STATE_COMPLETED			"COMPLETED"
-#define JOB_STATUS_ATTR				"jobStatus"
-#define JOB_SUB_ID_ATTR				"jobSubId"
-#define JOB_ID_ATTR					"jobId"
-#define JOB_NUM_PROCS_ATTR			"jobNumProcs"
-#define JOB_EXEC_NAME_ATTR			"execName"
-#define JOB_EXEC_PATH_ATTR			"execPath"
-#define JOB_WORKING_DIR_ATTR		"workingDir"
-#define JOB_PROG_ARGS_ATTR			"progArgs"
-#define JOB_ENV_ATTR				"env"
-#define JOB_DEBUG_EXEC_NAME_ATTR	"debugExecName"
-#define JOB_DEBUG_EXEC_PATH_ATTR	"debugExecPath"
-#define JOB_DEBUG_ARGS_ATTR			"debugArgs"
-#define JOB_DEBUG_FLAG_ATTR			"debug"
+#define PTP_JOB_STATE_ATTR				"jobState"
+#define 	PTP_JOB_STATE_STARTING			"STARTING"
+#define 	PTP_JOB_STATE_RUNNING			"RUNNING"
+#define 	PTP_JOB_STATE_SUSPENDED			"SUSPENDED"
+#define 	PTP_JOB_STATE_COMPLETED			"COMPLETED"
+#define PTP_JOB_STATUS_ATTR				"jobStatus"
+#define PTP_JOB_SUB_ID_ATTR				"jobSubId"
+#define PTP_JOB_ID_ATTR					"jobId"
+#define PTP_JOB_NUM_PROCS_ATTR			"jobNumProcs"
+#define PTP_JOB_EXEC_NAME_ATTR			"execName"
+#define PTP_JOB_EXEC_PATH_ATTR			"execPath"
+#define PTP_JOB_WORKING_DIR_ATTR		"workingDir"
+#define PTP_JOB_PROG_ARGS_ATTR			"progArgs"
+#define PTP_JOB_ENV_ATTR				"env"
+#define PTP_JOB_DEBUG_EXEC_NAME_ATTR	"debugExecName"
+#define PTP_JOB_DEBUG_EXEC_PATH_ATTR	"debugExecPath"
+#define PTP_JOB_DEBUG_ARGS_ATTR			"debugArgs"
+#define PTP_JOB_DEBUG_FLAG_ATTR			"debug"
 
 /*
  * Node attributes
  */
-#define NODE_STATE_ATTR				"nodeState"
-#define 	NODE_STATE_UP				"UP"
-#define 	NODE_STATE_DOWN				"DOWN"
-#define 	NODE_STATE_ERROR			"ERROR"
-#define 	NODE_STATE_UNKNOWN			"UNKNOWN"
-#define NODE_NUMBER_ATTR			"nodeNumber"
+#define PTP_NODE_STATE_ATTR				"nodeState"
+#define 	PTP_NODE_STATE_UP				"UP"
+#define 	PTP_NODE_STATE_DOWN				"DOWN"
+#define 	PTP_NODE_STATE_ERROR			"ERROR"
+#define 	PTP_NODE_STATE_UNKNOWN			"UNKNOWN"
+#define PTP_NODE_NUMBER_ATTR			"nodeNumber"
 
 /*
  * Queue attributes
  */
-#define QUEUE_STATUS_ATTR			"queueStatus"
-#define QUEUE_ID_ATTR				"queueId"
+#define PTP_QUEUE_STATUS_ATTR			"queueStatus"
+#define PTP_QUEUE_ID_ATTR				"queueId"
 
 /*
  * Process attributes
  */
-#define PROC_STATE_ATTR				"processState"
-#define		PROC_STATE_STARTING			"STARTING"
-#define 	PROC_STATE_RUNNING			"RUNNING"
-#define		PROC_STATE_SUSPENDED		"SUSPENDED"
-#define		PROC_STATE_COMPLETED		"COMPLETED"
-#define PROC_STATUS_ATTR			"processStatus"
-#define PROC_NODEID_ATTR			"processNodeId"
-#define PROC_PID_ATTR				"processPID"
-#define PROC_INDEX_ATTR				"processIndex"
-#define PROC_STDOUT_ATTR			"processStdout"
-#define PROC_STDERR_ATTR			"processStderr"
-#define PROC_EXITCODE_ATTR			"processExitCode"
-#define PROC_SIGNALNAME_ATTR		"processSignalName"
+#define PTP_PROC_STATE_ATTR				"processState"
+#define		PTP_PROC_STATE_STARTING			"STARTING"
+#define 	PTP_PROC_STATE_RUNNING			"RUNNING"
+#define		PTP_PROC_STATE_SUSPENDED		"SUSPENDED"
+#define		PTP_PROC_STATE_COMPLETED		"COMPLETED"
+#define PTP_PROC_STATUS_ATTR			"processStatus"
+#define PTP_PROC_NODEID_ATTR			"processNodeId"
+#define PTP_PROC_PID_ATTR				"processPID"
+#define PTP_PROC_INDEX_ATTR				"processIndex"
+#define PTP_PROC_STDOUT_ATTR			"processStdout"
+#define PTP_PROC_STDERR_ATTR			"processStderr"
+#define PTP_PROC_EXITCODE_ATTR			"processExitCode"
+#define PTP_PROC_SIGNALNAME_ATTR		"processSignalName"
 
 /*
  * Message attributes
  */
-#define MSG_LEVEL_ATTR				"messageLevel"
-#define		MSG_LEVEL_FATAL				"FATAL"
-#define		MSG_LEVEL_ERROR				"ERROR"
-#define		MSG_LEVEL_WARNING			"WARNING"
-#define		MSG_LEVEL_INFO				"INFO"
-#define MSG_CODE_ATTR				"messageCode"
-#define MSG_TEXT_ATTR				"messageText"
+#define PTP_MSG_LEVEL_ATTR				"messageLevel"
+#define		PTP_MSG_LEVEL_FATAL				"FATAL"
+#define		PTP_MSG_LEVEL_ERROR				"ERROR"
+#define		PTP_MSG_LEVEL_WARNING			"WARNING"
+#define		PTP_MSG_LEVEL_INFO				"INFO"
+#define PTP_MSG_CODE_ATTR				"messageCode"
+#define PTP_MSG_TEXT_ATTR				"messageText"
 
 /*
  * ERROR attributes
  */
-#define ERROR_CODE_ATTR				"errorCode"
-#define ERROR_MSG_ATTR				"errorMsg"
+#define PTP_ERROR_CODE_ATTR				"errorCode"
+#define PTP_ERROR_MSG_ATTR				"errorMsg"
 
 /*
  * Miscellaneous attributes
  */
-#define PROTOCOL_VERSION_ATTR		"version"
-#define BASE_ID_ATTR				"baseId"
+#define PTP_PROTOCOL_VERSION_ATTR		"version"
+#define PTP_BASE_ID_ATTR				"baseId"
 
 extern int		proxy_test_attribute(char *key, char *attr_str);
 extern char *	proxy_copy_attribute_name(char *attr_str);

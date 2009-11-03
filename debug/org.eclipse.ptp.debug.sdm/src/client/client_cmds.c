@@ -169,7 +169,7 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, 
 	/*
 	 * Initialize proxy
 	 */
-	if (proxy_svr_init(name, &tv, funcs, cmds, &dbg_proxy) != PROXY_RES_OK) {
+	if (proxy_svr_init(name, &tv, funcs, cmds, &dbg_proxy) != PTP_PROXY_RES_OK) {
 		DbgSetError(DBGERR_DEBUGGER, proxy_get_error_str());
 		return DBGRES_ERR;
 	}
@@ -187,7 +187,7 @@ DbgClntCreateSession(int num, char *host, int port)
 	else
 		res = proxy_svr_create(dbg_proxy, port);
 
-	if (res == PROXY_RES_ERR) {
+	if (res == PTP_PROXY_RES_ERR) {
 		DbgSetError(DBGERR_DEBUGGER, proxy_get_error_str());
 		return DBGRES_ERR;
 	}
@@ -1017,7 +1017,7 @@ DbgClntProgress(void)
 	 * Check for proxy events
 	 */
 
-	return proxy_svr_progress(dbg_proxy) == PROXY_RES_OK ? DBGRES_OK : DBGRES_ERR;
+	return proxy_svr_progress(dbg_proxy) == PTP_PROXY_RES_OK ? DBGRES_OK : DBGRES_ERR;
 }
 
 #if 0

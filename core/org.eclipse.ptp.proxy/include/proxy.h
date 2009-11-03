@@ -28,16 +28,16 @@
 #include "proxy_event.h"
 #include "proxy_attr.h"
 
-#define PROXY_RES_OK		0
-#define PROXY_RES_ERR		-1
+#define PTP_PROXY_RES_OK			0
+#define PTP_PROXY_RES_ERR			-1
 
-#define PROXY_ERR_CLIENT	0
-#define PROXY_ERR_SERVER	1
-#define PROXY_ERR_PROTO		2
-#define PROXY_ERR_SYSTEM	3
+#define PTP_PROXY_ERR_CLIENT		0
+#define PTP_PROXY_ERR_SERVER		1
+#define PTP_PROXY_ERR_PROTO			2
+#define PTP_PROXY_ERR_SYSTEM		3
 
-#define PROXY_EVENT_HANDLER		1
-#define PROXY_CMD_HANDLER		2
+#define PTP_PROXY_EVENT_HANDLER		1
+#define PTP_PROXY_CMD_HANDLER		2
 
 struct proxy;
 struct proxy_clnt;

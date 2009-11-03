@@ -622,7 +622,7 @@ sendNewMachineEvent(int trans_id, int id, char *name)
 	asprintf(&rm_id, "%d", gBaseID);	
 	asprintf(&machine_id, "%d", id);	
 	
-	proxy_svr_queue_msg(conn, proxy_new_machine_event(trans_id, rm_id, machine_id, name, MACHINE_STATE_UP));
+	proxy_svr_queue_msg(conn, proxy_new_machine_event(trans_id, rm_id, machine_id, name, PTP_MACHINE_STATE_UP));
 	
 	free(machine_id);
 	free(rm_id);
@@ -638,7 +638,7 @@ sendNewQueueEvent(int trans_id, int id, char *name, struct attrl *attrs)
 	asprintf(&rm_id, "%d", gBaseID);
 	asprintf(&queue_id, "%d", id);
 
-	m = proxy_new_queue_event(trans_id, rm_id, queue_id, name, QUEUE_STATE_NORMAL, get_pbs_attr_count(attrs));
+	m = proxy_new_queue_event(trans_id, rm_id, queue_id, name, PTP_QUEUE_STATE_NORMAL, get_pbs_attr_count(attrs));
 	add_pbs_attributes(m, attrs);
 	proxy_svr_queue_msg(conn, m);
 
@@ -662,7 +662,7 @@ static void
 add_node_attrs(proxy_msg *m, ptp_node *node)
 {
 	if (node->number >= 0)
-		proxy_add_int_attribute(m, NODE_NUMBER_ATTR, node->number);
+		proxy_add_int_attribute(m, PTP_NODE_NUMBER_ATTR, node->number);
 }
 
 static ptp_filter *
@@ -753,7 +753,7 @@ sendNewJobEvent(int trans_id, ptp_job *j)
 	asprintf(&job_id, "%d", j->ptp_jobid);
 	asprintf(&queue_id, "%d", j->queue->id);
 
-	m = proxy_new_job_event(trans_id, queue_id, job_id, j->pbs_jobid, JOB_STATE_INIT, j->jobsubid);
+	m = proxy_new_job_event(trans_id, queue_id, job_id, j->pbs_jobid, PTP_JOB_STATE_INIT, j->jobsubid);
 	proxy_svr_queue_msg(conn, m);
 
 	free(job_id);
@@ -798,9 +798,9 @@ sendNewProcessEvent(int trans_id, int jobid, ptp_process *p, char *state)
 	
 	m = proxy_new_process_event(trans_id, job_id, 1);
 	proxy_add_process(m, proc_id, name, state, 3);
-	proxy_add_int_attribute(m, PROC_NODEID_ATTR, p->node_id);	
-	proxy_add_int_attribute(m, PROC_INDEX_ATTR, p->task_id);	
-	proxy_add_int_attribute(m, PROC_PID_ATTR, p->pid);
+	proxy_add_int_attribute(m, PTP_PROC_NODEID_ATTR, p->node_id);
+	proxy_add_int_attribute(m, PTP_PROC_INDEX_ATTR, p->task_id);
+	proxy_add_int_attribute(m, PTP_PROC_PID_ATTR, p->pid);
 	
 	proxy_svr_queue_msg(conn, m);
 	
@@ -818,7 +818,7 @@ sendProcessStateChangeEvent(int trans_id, ptp_job *j, char *state)
 		return;
 		
 	m = proxy_process_change_event(trans_id, rangeset_to_string(j->set), 1);
-	proxy_add_string_attribute(m, PROC_STATE_ATTR, state);
+	proxy_add_string_attribute(m, PTP_PROC_STATE_ATTR, state);
 	proxy_svr_queue_msg(conn, m);
 }
 
@@ -859,7 +859,7 @@ sendJobStateChangeEvent(int trans_id, int jobid, char *state)
 	asprintf(&job_id, "%d", jobid);
 
 	m = proxy_job_change_event(trans_id, job_id, 1);
-	proxy_add_string_attribute(m, JOB_STATE_ATTR, state);
+	proxy_add_string_attribute(m, PTP_JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(conn, m);
 	
 	free(job_id);
@@ -893,11 +893,11 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 		}
 		if (p->task_id != task_id) {
 			p->task_id = task_id;
-			proxy_add_int_attribute(m, PROC_INDEX_ATTR, task_id);	
+			proxy_add_int_attribute(m, PTP_PROC_INDEX_ATTR, task_id);
 		}
 		if (p->pid != pid) {
 			p->pid = pid;
-			proxy_add_int_attribute(m, PROC_PID_ATTR, pid);	
+			proxy_add_int_attribute(m, PTP_PROC_PID_ATTR, pid);
 		}
 		
 		proxy_svr_queue_msg(conn, m);
@@ -919,7 +919,7 @@ sendProcessOutputEvent(int trans_id, int procid, char *output)
 	asprintf(&proc_id, "%d", procid);
 	
 	m = proxy_process_change_event(trans_id, proc_id, 1);
-	proxy_add_string_attribute(m, PROC_STDOUT_ATTR, output);
+	proxy_add_string_attribute(m, PTP_PROC_STDOUT_ATTR, output);
 	proxy_svr_queue_msg(conn, m);
 	
 	free(proc_id);	
@@ -958,7 +958,7 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 	
 	if (proxy_state != STATE_INIT) {
 		sendErrorEvent(trans_id, RTEV_ERROR_INIT, "already initialized");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	/*
@@ -968,7 +968,7 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 		if (proxy_test_attribute(PROTOCOL_VERSION_ATTR, args[i])) {
 			if (strcmp(proxy_get_attribute_value_str(args[i]), WIRE_PROTOCOL_VERSION) != 0) {
 				sendErrorEvent(trans_id, RTEV_ERROR_INIT, "wire protocol version \"%s\" not supported", args[0]);
-				return PROXY_RES_OK;
+				return PTP_PROXY_RES_OK;
 			}
 		} else if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
 			gBaseID = proxy_get_attribute_value_int(args[i]);
@@ -980,19 +980,19 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 	 */
 	if (gBaseID < 0) {
 		sendErrorEvent(trans_id, RTEV_ERROR_INIT, "no base ID supplied");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	stream = pbs_connect(NULL);
 	if (stream < 0) {
 		sendErrorEvent(trans_id, RTEV_ERROR_INIT, "could not connect to PBS daemon");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	status = pbs_statserver(stream, NULL, NULL);
 	if (status == NULL) {
 		sendErrorEvent(trans_id, RTEV_ERROR_INIT, pbs_geterrmsg(stream));
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	/*
@@ -1008,7 +1008,7 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 	status = pbs_statque(stream, NULL, NULL, NULL);
 	if (status == NULL) {
 		sendErrorEvent(trans_id, RTEV_ERROR_INIT, pbs_geterrmsg(stream));
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	for (s=status; s != NULL; s = s->next) {
@@ -1022,7 +1022,7 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 		
 	sendOKEvent(trans_id);
 		
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -1042,7 +1042,7 @@ PBS_ModelDef(int trans_id, int nargs, char **args)
 	 * Send default filters
 	 */
 	sendOKEvent(trans_id);
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -1058,7 +1058,7 @@ PBS_StopEvents(int trans_id, int nargs, char **args)
 	sendOKEvent(gTransID);
 	gTransID = 0;
 	sendOKEvent(trans_id);
-	return PROXY_RES_OK;	
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -1097,23 +1097,23 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 		if (debug_level > 0) {
 			fprintf(stderr, "\t%s\n", args[i]);
 		}
-		if (proxy_test_attribute(JOB_SUB_ID_ATTR, args[i])) {
+		if (proxy_test_attribute(PTP_JOB_SUB_ID_ATTR, args[i])) {
 			jobsubid = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(QUEUE_ID_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_QUEUE_ID_ATTR, args[i])) {
 			queue_name = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(JOB_EXEC_NAME_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_EXEC_NAME_ATTR, args[i])) {
 			pgm_name = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(JOB_EXEC_PATH_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_EXEC_PATH_ATTR, args[i])) {
 			exec_path = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(JOB_WORKING_DIR_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_WORKING_DIR_ATTR, args[i])) {
 			cwd = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(JOB_PROG_ARGS_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_PROG_ARGS_ATTR, args[i])) {
 			num_args++;
-		} else if (proxy_test_attribute(JOB_ENV_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_ENV_ATTR, args[i])) {
 			num_env++;
-		} else if (proxy_test_attribute(JOB_DEBUG_ARGS_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_DEBUG_ARGS_ATTR, args[i])) {
 			debug_argc++;
-		} else if (proxy_test_attribute(JOB_DEBUG_FLAG_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_JOB_DEBUG_FLAG_ATTR, args[i])) {
 			debug = proxy_get_attribute_value_bool(args[i]);
 		}
 	}
@@ -1124,27 +1124,27 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 	
 	if (jobsubid == NULL) {
 		sendErrorEvent(trans_id, RTEV_ERROR_SUBMIT, "missing ID on job submission");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	if (proxy_state != STATE_RUNNING) {
 		sendJobSubErrorEvent(trans_id, jobsubid, "must call INIT first");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	if (queue_name == NULL) {
 		sendJobSubErrorEvent(trans_id, jobsubid, "no queue specified");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	if ((queue = find_queue_by_name(queue_name)) == NULL) {
 		sendJobSubErrorEvent(trans_id, jobsubid, "unknown queue specified");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	if (nargs < 1) {
 		sendJobSubErrorEvent(trans_id, jobsubid, "incorrect arg count");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	/*
@@ -1153,7 +1153,7 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 	 
 	if (pgm_name == NULL) {
 		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify a program name");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	/*
@@ -1163,7 +1163,7 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 	if (num_env > 0) {
 		env = (char **)malloc((num_env + 1) * sizeof(char *));
 		for (i = 0, a = 0; i < nargs; i++) {
-			if (proxy_test_attribute(JOB_ENV_ATTR, args[i]))
+			if (proxy_test_attribute(PTP_JOB_ENV_ATTR, args[i]))
 				env[a++] = strdup(proxy_get_attribute_value_str(args[i]));
 		}
 		env[a] = NULL;
@@ -1180,18 +1180,18 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 	
 	if (access(full_path, X_OK) < 0) {
 		sendJobSubErrorEvent(trans_id, jobsubid, strerror(errno));
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	if (debug) {		
 		debug_argc++;
 		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
 		for (i = 0, a = 1; i < nargs; i++) {
-			if (proxy_test_attribute(JOB_DEBUG_ARGS_ATTR, args[i])) {
+			if (proxy_test_attribute(PTP_JOB_DEBUG_ARGS_ATTR, args[i])) {
 				debug_args[a++] = proxy_get_attribute_value_str(args[i]);
-			} else if (proxy_test_attribute(JOB_DEBUG_EXEC_NAME_ATTR, args[i])) {
+			} else if (proxy_test_attribute(PTP_JOB_DEBUG_EXEC_NAME_ATTR, args[i])) {
 				debug_exec_name = proxy_get_attribute_value_str(args[i]);
-			} else if (proxy_test_attribute(JOB_DEBUG_EXEC_PATH_ATTR, args[i])) {
+			} else if (proxy_test_attribute(PTP_JOB_DEBUG_EXEC_PATH_ATTR, args[i])) {
 				debug_exec_path = proxy_get_attribute_value_str(args[i]);
 			}
 		}
@@ -1208,7 +1208,7 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 		
 		if (access(debug_full_path, X_OK) < 0) {
 			sendJobSubErrorEvent(trans_id, jobsubid, strerror(errno));
-			return PROXY_RES_OK;
+			return PTP_PROXY_RES_OK;
 		}
 
 		debug_args[0] = strdup(debug_full_path);
@@ -1218,7 +1218,7 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 	
 	if (pbs_jobid == NULL) {
 		sendJobSubErrorEvent(trans_id, jobsubid, pbs_geterrmsg(stream));
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	new_job(0, false, queue, jobsubid, pbs_jobid);
@@ -1228,7 +1228,7 @@ PBS_SubmitJob(int trans_id, int nargs, char **args)
 	 */	
 	sendOKEvent(trans_id);
 	
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /* 
@@ -1243,24 +1243,24 @@ PBS_TerminateJob(int trans_id, int nargs, char **args)
 	
 	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "Must call INIT first");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
+		if (proxy_test_attribute(PTP_JOB_ID_ATTR, args[i])) {
 			jobid = proxy_get_attribute_value_int(args[i]);
 		}
 	}
 	
 	if (jobid < 0) {
 		sendJobTerminateErrorEvent(trans_id, jobid, "Invalid job ID");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 	
 	if ((j = find_job_by_id(jobid)) != NULL) {
 		if (j->state == JOB_TERMINATING) {
 			sendJobTerminateErrorEvent(trans_id, jobid, "Job termination already requested");
-			return PROXY_RES_OK;
+			return PTP_PROXY_RES_OK;
 		}
 		
 		j->state = JOB_TERMINATING;
@@ -1270,7 +1270,7 @@ PBS_TerminateJob(int trans_id, int nargs, char **args)
 		sendOKEvent(trans_id);
 	}
 	
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /*
@@ -1293,7 +1293,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 
 	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_START_EVENTS, "must call INIT first");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	gTransID = trans_id;
@@ -1304,7 +1304,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	status = pbs_statserver(stream, NULL, NULL);
 	if (status == NULL) {
 		sendErrorEvent(trans_id, RTEV_ERROR_START_EVENTS, pbs_geterrmsg(stream));
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	sendRMAttributesEvent(trans_id, status->attribs);
@@ -1324,7 +1324,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 	status = pbs_statque(stream, NULL, NULL, NULL);
 	if (status == NULL) {
 		sendErrorEvent(trans_id, RTEV_ERROR_START_EVENTS, pbs_geterrmsg(stream));
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	for (s=status; s != NULL; s = s->next) {
@@ -1340,7 +1340,7 @@ PBS_StartEvents(int trans_id, int nargs, char **args)
 		fprintf(stderr, "  end PBS_StartEvents (%d):\n", trans_id); fflush(stderr);
 	}
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 int
@@ -1360,7 +1360,7 @@ PBS_Quit(int trans_id, int nargs, char **args)
 	
 	sendShutdownEvent(trans_id);
 	
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 int
@@ -1378,9 +1378,9 @@ PBS_FilterEvents(int trans_id, int nargs, char **args)
 	f = new_filter();
 
 	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(ELEMENT_ID_ATTR, args[i])) {
+		if (proxy_test_attribute(PTP_ELEMENT_ID_ATTR, args[i])) {
 			id = atoi(proxy_get_attribute_value_str(args[i]));
-		} else if (proxy_test_attribute(FILTER_CHILDREN_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_FILTER_CHILDREN_ATTR, args[i])) {
 			filter_children = proxy_get_attribute_value_bool(args[i]);
 		} else {
 			add_filter_attribute(f, args[i]);
@@ -1389,14 +1389,14 @@ PBS_FilterEvents(int trans_id, int nargs, char **args)
 
 	if (id == 0) {
 		sendErrorEvent(trans_id, RTEV_ERROR_FILTER, "no element ID specified");
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	f->children = filter_children;
 
 	update_filter(id, f);
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 static int
@@ -1445,7 +1445,7 @@ poll_pbs()
 	for (HashSet(gJobHash); (h = HashGet(gJobHash)) != NULL; ) {
 		j = (ptp_job *)h->h_data;
 		if (HashFind(tmpJobHash, j->pbs_jobid) == NULL) {
-			sendJobStateChangeEvent(gTransID, j->ptp_jobid, JOB_STATE_TERMINATED);
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, PTP_JOB_STATE_TERMINATED);
 			//sendRemoveJobEvent(gTransID, j);
 			removed_jobs++;
 		}
@@ -1520,14 +1520,14 @@ server(char *name, char *host, int port)
 	
 	initialize();
 	
-	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &conn) != PROXY_RES_OK) {
+	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &conn) != PTP_PROXY_RES_OK) {
 		if (debug_level > 0) {
 			fprintf(stderr, "proxy failed to initialized\n"); fflush(stderr);
 		}
 		return 0;
 	}
 	
-	if (proxy_svr_connect(conn, host, port) == PROXY_RES_OK) {
+	if (proxy_svr_connect(conn, host, port) == PTP_PROXY_RES_OK) {
 		if (debug_level > 0) {
 			fprintf(stderr, "proxy connected\n"); fflush(stderr);
 		}
@@ -1537,14 +1537,14 @@ server(char *name, char *host, int port)
 				proxy_state = STATE_SHUTDOWN;
 			}
 			if (gTransID > 0) {
-				if ((poll_timeout -= PROXY_TIMEOUT) <= 0) {
+				if ((poll_timeout -= PTP_PROXY_TIMEOUT) <= 0) {
 					if (poll_pbs() < 0) {
 						break;
 					}
 					poll_timeout = PBS_POLL_INTERVAL;
 				}
 			}
-			if (proxy_svr_progress(conn) != PROXY_RES_OK) {
+			if (proxy_svr_progress(conn) != PTP_PROXY_RES_OK) {
 				break;
 			}
 		}
@@ -1585,7 +1585,7 @@ int
 main(int argc, char *argv[])
 {
 	int				ch;
-	int				port = PROXY_TCP_PORT;
+	int				port = PTP_PROXY_TCP_PORT;
 	char *			host = DEFAULT_HOST;
 	char *			proxy_str = DEFAULT_PROXY;
 	int				rc;

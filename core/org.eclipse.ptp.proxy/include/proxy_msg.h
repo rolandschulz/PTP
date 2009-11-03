@@ -23,19 +23,19 @@
 #include "list.h"
 #include "bitset.h"
 
-#define MSG_ID_SIZE			4
-#define MSG_ID_MASK			0xffff
-#define MSG_TRANS_ID_SIZE	8
-#define MSG_TRANS_ID_MASK	0xffffffff
-#define MSG_NARGS_SIZE		8
-#define MSG_NARGS_MASK		0xffffffff
-#define MSG_ARG_LEN_SIZE	8
-#define MSG_ARG_LEN_MASK	0xffffffff
+#define PTP_MSG_ID_SIZE			4
+#define PTP_MSG_ID_MASK			0xffff
+#define PTP_MSG_TRANS_ID_SIZE	8
+#define PTP_MSG_TRANS_ID_MASK	0xffffffff
+#define PTP_MSG_NARGS_SIZE		8
+#define PTP_MSG_NARGS_MASK		0xffffffff
+#define PTP_MSG_ARG_LEN_SIZE	8
+#define PTP_MSG_ARG_LEN_MASK	0xffffffff
 
 /*
  * Proxy errors
  */
-#define ERROR_MALFORMED_COMMAND	0
+#define PTP_ERROR_MALFORMED_COMMAND	0
 
 struct proxy_msg {
 	int		msg_id;
