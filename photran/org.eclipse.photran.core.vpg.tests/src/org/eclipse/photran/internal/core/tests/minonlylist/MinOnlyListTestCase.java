@@ -109,6 +109,13 @@ public class MinOnlyListTestCase extends RefactoringTestCase
 
         doRefactoring();
         if(!shouldFailPreconditionCheck)
-            assertEquals(readTestFile(filenames[0] + ".result"), readWorkspaceFile(filenames[0]));
+            assertEquals(
+                sanitize(readTestFile(filenames[0] + ".result")),
+                sanitize(readWorkspaceFile(filenames[0])));
+    }
+
+    public String sanitize(String dirtyString)
+    {
+        return dirtyString.replaceAll("\r", "");
     }
 }
