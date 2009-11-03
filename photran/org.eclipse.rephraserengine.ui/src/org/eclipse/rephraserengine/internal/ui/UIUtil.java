@@ -83,7 +83,7 @@ public class UIUtil
                     // This is cheating, but it works
                     //new URLHyperlink(new Region(0, 0), filPath).open();
 
-                    PlatformUI.getWorkbench().getBrowserSupport().createBrowser(0, null, title, null).openURL(file.toURL());
+                    PlatformUI.getWorkbench().getBrowserSupport().createBrowser(0, null, title, null).openURL(file.toURI().toURL());
                 }
                 catch (final Throwable e)
                 {
