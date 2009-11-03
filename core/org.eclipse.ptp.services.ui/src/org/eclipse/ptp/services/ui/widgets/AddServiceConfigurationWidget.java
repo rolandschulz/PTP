@@ -27,6 +27,8 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.ui.dialogs.ServiceProviderConfigurationDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -113,6 +115,11 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		fNewConfigNameText = new Text(newComp, SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		fNewConfigNameText.setLayoutData(data);
+		fNewConfigNameText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				fDefaultConfig.setName(fNewConfigNameText.getText());
+			}
+		});
 		
 		fExistingConfigButton = new Button(this, SWT.RADIO);
 		fExistingConfigButton.setText(Messages.AddServiceConfigurationWidget_2); 
