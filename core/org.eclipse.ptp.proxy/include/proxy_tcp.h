@@ -22,9 +22,9 @@
 
 #include "compat.h"
 
-#define PROXY_TCP_PORT		12345
-#define MSG_LEN_SIZE		8
-#define MSG_LENGTH_MASK		0xffffffff
+#define PTP_PROXY_TCP_PORT		12345
+#define PTP_MSG_LEN_SIZE		8
+#define PTP_MSG_LENGTH_MASK		0xffffffff
 
 struct proxy_tcp_conn {
 	proxy_clnt *	clnt;

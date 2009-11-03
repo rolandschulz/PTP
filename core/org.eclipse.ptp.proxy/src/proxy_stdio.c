@@ -82,9 +82,9 @@ stdio_read(proxy_stdio_conn *conn)
 fprintf(stderr, " read %d \"%s\"\n", n, &conn->buf[conn->buf_pos]);
 	if (n <= 0) {
 		if (n < 0)
-			proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+			proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
 		else
-			proxy_set_error(PROXY_ERR_PROTO, "connection terminated");
+			proxy_set_error(PTP_PROXY_ERR_PROTO, "connection terminated");
 
 		conn->connected = 0;
 		return -1;
@@ -126,12 +126,12 @@ stdio_write(proxy_stdio_conn *conn, char *buf, int len)
 int
 proxy_stdio_send_msg(proxy_stdio_conn *conn, char *message, int len)
 {
-	char 	buf[MSG_LEN_SIZE+1];
+	char 	buf[PTP_MSG_LEN_SIZE+1];
 
 	/*
 	 * Send message length first
 	 */
-	sprintf(buf, "%0*x", MSG_LEN_SIZE, len & MSG_LENGTH_MASK);
+	sprintf(buf, "%0*x", PTP_MSG_LEN_SIZE, len & PTP_MSG_LENGTH_MASK);
 
 	if (stdio_write(conn, buf, strlen(buf)) < 0) {
 		return -1;
@@ -152,7 +152,7 @@ proxy_stdio_get_msg_len(proxy_stdio_conn *conn)
 	/*
 	 * If we haven't read enough then return for more...
 	 */
-	if (conn->total_read < MSG_LEN_SIZE)
+	if (conn->total_read < PTP_MSG_LEN_SIZE)
 		return 0;
 
 	conn->msg_len = strtol(conn->buf, &end, 16);
@@ -161,7 +161,7 @@ proxy_stdio_get_msg_len(proxy_stdio_conn *conn)
 	 * check if we've received the length
 	 */
 	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
-		proxy_set_error(PROXY_ERR_PROTO, "could not understand message");
+		proxy_set_error(PTP_PROXY_ERR_PROTO, "could not understand message");
 		return -1;
 	}
 
@@ -174,15 +174,15 @@ proxy_stdio_copy_msg(proxy_stdio_conn *conn, char **result)
 	int	n = conn->msg_len;
 
 	*result = (char *)malloc(conn->msg_len + 1);
-	memcpy(*result, &conn->buf[MSG_LEN_SIZE], conn->msg_len);
+	memcpy(*result, &conn->buf[PTP_MSG_LEN_SIZE], conn->msg_len);
 	(*result)[conn->msg_len] = '\0';
 
 	/*
 	 * Move rest of buffer down if necessary
 	 */
-	if (conn->total_read > conn->msg_len + MSG_LEN_SIZE) {
-		conn->total_read -= conn->msg_len + MSG_LEN_SIZE;
-		memmove(conn->buf, &conn->buf[conn->msg_len + MSG_LEN_SIZE], conn->total_read);
+	if (conn->total_read > conn->msg_len + PTP_MSG_LEN_SIZE) {
+		conn->total_read -= conn->msg_len + PTP_MSG_LEN_SIZE;
+		memmove(conn->buf, &conn->buf[conn->msg_len + PTP_MSG_LEN_SIZE], conn->total_read);
 	} else {
 		conn->buf_pos = 0;
 		conn->total_read = 0;
@@ -199,7 +199,7 @@ proxy_stdio_get_msg_body(proxy_stdio_conn *conn, char **result)
 	/*
 	 * If we haven't read enough then return for more...
 	 */
-	if (conn->total_read - MSG_LEN_SIZE < conn->msg_len)
+	if (conn->total_read - PTP_MSG_LEN_SIZE < conn->msg_len)
 		return 0;
 
 	return proxy_stdio_copy_msg(conn, result);
@@ -253,15 +253,15 @@ proxy_stdio_decode_string(char *str, char **arg, char **end)
 	char *	ep;
 	char *	p;
 
-	if (str_len < MSG_ARG_LEN_SIZE + 1) {
+	if (str_len < PTP_MSG_ARG_LEN_SIZE + 1) {
 		return -1;
 	}
 
-	ep = str + MSG_ARG_LEN_SIZE;
+	ep = str + PTP_MSG_ARG_LEN_SIZE;
 	*ep++ = '\0';
 	arg_len = strtol(str, NULL, 16);
 
-	if (str_len < MSG_ARG_LEN_SIZE + arg_len + 1) {
+	if (str_len < PTP_MSG_ARG_LEN_SIZE + arg_len + 1) {
 		return -1;
 	}
 
@@ -270,7 +270,7 @@ proxy_stdio_decode_string(char *str, char **arg, char **end)
 	p[arg_len] = '\0';
 
 	*arg = p;
-	*end = str + MSG_ARG_LEN_SIZE + arg_len + 1;
+	*end = str + PTP_MSG_ARG_LEN_SIZE + arg_len + 1;
 
 	return 0;
 }

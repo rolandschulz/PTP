@@ -594,7 +594,7 @@ DbgRegisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *),
 {
 	s->sess_event_handler = event_callback;
 	s->sess_event_data = data;
-	RegisterEventHandler(PROXY_EVENT_HANDLER, session_event_handler, (void *)s);
+	RegisterEventHandler(PTP_PROXY_EVENT_HANDLER, session_event_handler, (void *)s);
 	//s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, session_event_handler, (void *)s);
 }
 
@@ -605,7 +605,7 @@ void
 DbgUnregisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *))
 {
 	s->sess_event_handler = NULL;
-	UnregisterEventHandler(PROXY_EVENT_HANDLER, session_event_handler);
+	UnregisterEventHandler(PTP_PROXY_EVENT_HANDLER, session_event_handler);
 }
 
 /**

@@ -102,7 +102,7 @@ proxy_tcp_clnt_init(proxy_clnt *pc, void **data, char *attr, va_list ap)
 
 	*data = (void *)conn;
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /**
@@ -118,15 +118,15 @@ proxy_tcp_clnt_connect(proxy_clnt *pc)
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)pc->clnt_data;
 
 	if (conn->host == NULL) {
-		proxy_set_error(PROXY_ERR_CLIENT, "no host specified");
-		return PROXY_RES_ERR;
+		proxy_set_error(PTP_PROXY_ERR_CLIENT, "no host specified");
+		return PTP_PROXY_RES_ERR;
 	}
 
 	hp = gethostbyname(conn->host);
 
 	if (hp == (struct hostent *)NULL) {
-		proxy_set_error(PROXY_ERR_CLIENT, "could not find host");
-		return PROXY_RES_ERR;
+		proxy_set_error(PTP_PROXY_ERR_CLIENT, "could not find host");
+		return PTP_PROXY_RES_ERR;
 	}
 
 	haddr = ((hp->h_addr[0] & 0xff) << 24) |
@@ -136,8 +136,8 @@ proxy_tcp_clnt_connect(proxy_clnt *pc)
 
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
-		return PROXY_RES_ERR;
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
+		return PTP_PROXY_RES_ERR;
 	}
 
 	memset (&scket,0,sizeof(scket));
@@ -147,19 +147,19 @@ proxy_tcp_clnt_connect(proxy_clnt *pc)
 
 	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
 	{
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 	}
 
 	conn->sess_sock = sd;
 	conn->connected++;
 
-	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_tcp_clnt_event_callback, (void *)pc);
-	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_tcp_clnt_cmd_callback, (void *)pc);
+	RegisterEventHandler(PTP_PROXY_EVENT_HANDLER, proxy_tcp_clnt_event_callback, (void *)pc);
+	RegisterEventHandler(PTP_PROXY_CMD_HANDLER, proxy_tcp_clnt_cmd_callback, (void *)pc);
 	RegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)pc);
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 static int
@@ -172,8 +172,8 @@ proxy_tcp_clnt_create(proxy_clnt *pc)
 
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
-		return PROXY_RES_ERR;
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
+		return PTP_PROXY_RES_ERR;
 	}
 
 	memset (&sname, 0, sizeof(sname));
@@ -183,35 +183,35 @@ proxy_tcp_clnt_create(proxy_clnt *pc)
 
 	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
 	{
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 	}
 
 	slen = sizeof(sname);
 
 	if ( getsockname(sd, (struct sockaddr *)&sname, &slen) == SOCKET_ERROR )
 	{
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 	}
 
 	if ( listen(sd, 5) == SOCKET_ERROR )
 	{
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 	}
 
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
 
 	RegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)pc);
-	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_tcp_clnt_event_callback, (void *)pc);
-	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_tcp_clnt_cmd_callback, (void *)pc);
+	RegisterEventHandler(PTP_PROXY_EVENT_HANDLER, proxy_tcp_clnt_event_callback, (void *)pc);
+	RegisterEventHandler(PTP_PROXY_CMD_HANDLER, proxy_tcp_clnt_cmd_callback, (void *)pc);
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 static int
@@ -226,8 +226,8 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
 	if (ns < 0) {
-		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
-		return PROXY_RES_ERR;
+		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
+		return PTP_PROXY_RES_ERR;
 	}
 
 	/*
@@ -235,7 +235,7 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	 */
 	if (conn->sess_sock != INVALID_SOCKET) {
 		CLOSE_SOCKET(ns); // reject
-		return PROXY_RES_OK;
+		return PTP_PROXY_RES_OK;
 	}
 
 	conn->sess_sock = ns;
@@ -244,26 +244,26 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	RegisterFileHandler(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)pc);
 
 	if (pc->clnt_helper_funcs->eventhandler != NULL) {
-		proxy_msg *m = new_proxy_msg(PROXY_EV_CONNECTED, 0); // TODO trans id should NOT be 0
+		proxy_msg *m = new_proxy_msg(PTP_PROXY_EV_CONNECTED, 0); // TODO trans id should NOT be 0
 		proxy_queue_msg(pc->clnt_events, m);
 		pc->clnt_helper_funcs->eventhandler(m, pc->clnt_helper_funcs->eventdata);
 		free_proxy_msg(m);
 	}
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 
 }
 
 static void
 proxy_tcp_clnt_process_cmds()
 {
-	CallEventHandlers(PROXY_CMD_HANDLER, NULL);
+	CallEventHandlers(PTP_PROXY_CMD_HANDLER, NULL);
 }
 
 static void
 proxy_tcp_clnt_process_events(proxy_msg *msg, void *data)
 {
-	CallEventHandlers(PROXY_EVENT_HANDLER, (void *)msg);
+	CallEventHandlers(PTP_PROXY_EVENT_HANDLER, (void *)msg);
 }
 
 static int
@@ -297,7 +297,7 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 				continue;
 
 			perror("socket");
-			return PROXY_RES_ERR;
+			return PTP_PROXY_RES_ERR;
 
 		case 0:
 			/* Timeout. */
@@ -305,7 +305,7 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 
 		default:
 			if (CallFileHandlers(&rfds, &wfds, &efds) < 0)
-				return PROXY_RES_ERR;
+				return PTP_PROXY_RES_ERR;
 		}
 
 		break;
@@ -313,7 +313,7 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 
 	proxy_tcp_clnt_process_cmds();
 
-	return PROXY_RES_OK;
+	return PTP_PROXY_RES_OK;
 }
 
 /*
@@ -333,11 +333,11 @@ proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 		return;
 
 	if (proxy_deserialize_msg(result, len, &m) < 0) {
-		m = new_proxy_msg(PROXY_EV_MESSAGE, 0); // TODO trans id should NOT be 0
+		m = new_proxy_msg(PTP_PROXY_EV_MESSAGE, 0); // TODO trans id should NOT be 0
 		proxy_msg_add_int(m, 3); /* 3 attributes */
-		proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
-		proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, PROXY_ERR_PROTO);
-		proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, "Could not covert to event");
+		proxy_msg_add_keyval_string(m, PTP_MSG_LEVEL_ATTR, PTP_MSG_LEVEL_FATAL);
+		proxy_msg_add_keyval_int(m, PTP_MSG_CODE_ATTR, PTP_PROXY_ERR_PROTO);
+		proxy_msg_add_keyval_string(m, PTP_MSG_TEXT_ATTR, "Could not covert to event");
 	}
 
 	free(result);

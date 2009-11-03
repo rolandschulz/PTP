@@ -30,7 +30,7 @@
 
 #include "proxy.h"
 
-static int 			proxy_errno = PROXY_RES_OK;
+static int 			proxy_errno = PTP_PROXY_RES_OK;
 static char *		proxy_errstr = NULL;
 
 static char * proxy_error_tab[] = {

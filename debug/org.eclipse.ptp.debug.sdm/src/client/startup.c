@@ -94,7 +94,7 @@ int
 main(int argc, char *argv[])
 {
 	int 			ch;
-	int				port = PROXY_TCP_PORT;
+	int				port = PTP_PROXY_TCP_PORT;
 	char *			host = NULL;
 	char *			debugger_str = DEFAULT_BACKEND;
 	char *			proxy_str = DEFAULT_PROXY;

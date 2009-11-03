@@ -41,7 +41,7 @@ proxy_clnt_init(char *name, struct timeval *timeout, proxy_clnt_helper_funcs *cf
 	void *		data;
 	
 	if (find_proxy(name, &p) < 0)
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 		
 	pc = (proxy_clnt *)malloc(sizeof(proxy_clnt));
 	pc->proxy = p;
@@ -55,7 +55,7 @@ proxy_clnt_init(char *name, struct timeval *timeout, proxy_clnt_helper_funcs *cf
 	
 	if (p->clnt_funcs->init(pc, &data, attr, ap) < 0) {
 		free(pc);
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 	}
 
 	pc->clnt_data = data;
@@ -63,7 +63,7 @@ proxy_clnt_init(char *name, struct timeval *timeout, proxy_clnt_helper_funcs *cf
 	
 	*clnt = pc;
 	
-	return PROXY_RES_OK;	
+	return PTP_PROXY_RES_OK;
 }
 
 int 
@@ -72,7 +72,7 @@ proxy_clnt_connect(proxy_clnt *pc)
 	if (pc != NULL)
 		return pc->proxy->clnt_funcs->connect(pc);
 		
-	return PROXY_RES_ERR;
+	return PTP_PROXY_RES_ERR;
 }
 
 int 
@@ -81,7 +81,7 @@ proxy_clnt_create(proxy_clnt *pc)
 	if (pc != NULL)
 		return pc->proxy->clnt_funcs->create(pc);
 		
-	return PROXY_RES_ERR;
+	return PTP_PROXY_RES_ERR;
 }
 
 int
@@ -90,7 +90,7 @@ proxy_clnt_progress(proxy_clnt *pc)
 	if (pc != NULL)
 		return pc->proxy->clnt_funcs->progress(pc);
 		
-	return PROXY_RES_ERR;
+	return PTP_PROXY_RES_ERR;
 }
 
 void

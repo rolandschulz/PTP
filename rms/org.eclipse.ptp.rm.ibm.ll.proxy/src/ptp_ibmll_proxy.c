@@ -511,7 +511,7 @@ int command_initialize(int gui_transmission_id, int nargs, char *args[])
   print_message_args(nargs, args);
 
   for (i = 0; i < nargs; i++) {
-  	if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
+  	if (proxy_test_attribute(PTP_BASE_ID_ATTR, args[i])) {
   		ibmll_proxy_base_id = proxy_get_attribute_value_int(args[i]);      /* the base id established by gui front end */
   	}
   }  
@@ -528,7 +528,7 @@ int command_initialize(int gui_transmission_id, int nargs, char *args[])
   if (ibmll_libpath_handle == NULL) {
     print_message(ERROR_MESSAGE, "dlopen of %s failed with errno=%d.\n", ibmll_libpath_name, my_errno);
     sendErrorEvent(gui_transmission_id, RTEV_ERROR_LL_INIT, "dlopen failed for LoadLeveler shared library");
-    return PROXY_RES_ERR;
+    return PTP_PROXY_RES_ERR;
   } else {
     print_message(INFO_MESSAGE, "dlopen %s successful.\n", ibmll_libpath_name);
   }
@@ -558,7 +558,7 @@ int command_initialize(int gui_transmission_id, int nargs, char *args[])
       || (LL_SYMS.ll_submit_job == NULL)) {
     print_message(ERROR_MESSAGE, "One or more LoadLeveler symbols could not be located in %s.\n", ibmll_libpath_name);
     sendErrorEvent(gui_transmission_id, RTEV_ERROR_LL_INIT, "LoadLeveler symbols not located");
-    return PROXY_RES_ERR;
+    return PTP_PROXY_RES_ERR;
   } else {
     print_message(INFO_MESSAGE, "Successfully located all of the required LoadLeveler functions via dlsym.\n");
   }
@@ -566,7 +566,7 @@ int command_initialize(int gui_transmission_id, int nargs, char *args[])
   sendOkEvent(gui_transmission_id);
 
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
-  return PROXY_RES_OK;
+  return PTP_PROXY_RES_OK;
 }
 
 /************************************************************************* 
@@ -618,7 +618,7 @@ int command_define_model(int gui_transmission_id, int nargs, char *args[])
      * send longs                                                            * 
      *-----------------------------------------------------------------------*/
   for (i = 0; i < (sizeof(long_int_attrs) / sizeof(long_int_launch_attr)); i++) {
-    msg = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, gui_transmission_id);
+    msg = new_proxy_msg(PTP_PROXY_EV_RT_ATTR_DEF, gui_transmission_id);
     proxy_msg_add_int(msg, 1);
     proxy_msg_add_int(msg, 8);
     proxy_msg_add_string(msg, long_int_attrs[i].id);
@@ -656,7 +656,7 @@ int command_define_model(int gui_transmission_id, int nargs, char *args[])
   /*
    * Create the enumeration attribute definition header
    */
-    msg = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, gui_transmission_id);
+    msg = new_proxy_msg(PTP_PROXY_EV_RT_ATTR_DEF, gui_transmission_id);
     proxy_msg_add_int(msg, 1);
     proxy_msg_add_int(msg, n + 6);
     proxy_msg_add_string(msg, enum_attrs[i].id);
@@ -696,7 +696,7 @@ int command_define_model(int gui_transmission_id, int nargs, char *args[])
   sendOkEvent(gui_transmission_id);
 
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
-  return PROXY_RES_OK;
+  return PTP_PROXY_RES_OK;
 }
 
 /************************************************************************* 
@@ -732,7 +732,7 @@ int command_start_events(int gui_transmission_id, int nargs, char *args[])
   print_message(INFO_MESSAGE, "remapped thread id for nodes is %ul->%i and for jobs is %ul->%i\n", monitor_LoadLeveler_nodes_thread, find_thread(monitor_LoadLeveler_nodes_thread), monitor_LoadLeveler_jobs_thread, find_thread(monitor_LoadLeveler_jobs_thread));
 
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
-  return PROXY_RES_OK;
+  return PTP_PROXY_RES_OK;
 }
 
 /************************************************************************* 
@@ -802,12 +802,12 @@ int command_submit_job(int gui_transmission_id, int nargs, char *args[])
      /*-----------------------------------------------------------------------* 
       * General PTP launch configuration variables and environment vars       * 
       *-----------------------------------------------------------------------*/
-    if (strncmp(args[i], JOB_SUB_ID_ATTR "=", strlen(JOB_SUB_ID_ATTR) + 1) == 0) {
+    if (strncmp(args[i], PTP_JOB_SUB_ID_ATTR "=", strlen(PTP_JOB_SUB_ID_ATTR) + 1) == 0) {
       cp = strchr(args[i], '=');
       job_sub_id = strdup(cp + 1);      /* pick up the val part of the job id */
     }
 
-    if (strncmp(args[i], JOB_ENV_ATTR "=", strlen(JOB_ENV_ATTR) + 1) == 0) {
+    if (strncmp(args[i], PTP_JOB_ENV_ATTR "=", strlen(PTP_JOB_ENV_ATTR) + 1) == 0) {
       cp = strchr(args[i], '=');        /* pick up the val part of env= which is a keyword=value pair */
       cp++;                     /* first char of keyword=value */
       memset(incoming, '\0', sizeof(incoming));
@@ -998,7 +998,7 @@ int command_submit_job(int gui_transmission_id, int nargs, char *args[])
   }
   
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
-  return PROXY_RES_OK;
+  return PTP_PROXY_RES_OK;
 }
 
 /************************************************************************* 
@@ -1013,7 +1013,7 @@ int command_halt_events(int gui_transmission_id, int nargs, char *args[])
   state_events_active = 0;      /* events are now inactive */
   sendOkEvent(gui_transmission_id);     /* close out the halt events command */
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
-  return PROXY_RES_OK;
+  return PTP_PROXY_RES_OK;
 }
 
 /************************************************************************* 
@@ -1063,13 +1063,13 @@ int command_terminate(int gui_transmission_id, int nargs, char *args[])
     sendShutdownEvent(gui_transmission_id);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     pthread_mutex_unlock(&master_lock);
-    return PROXY_RES_ERR;
+    return PTP_PROXY_RES_ERR;
   } else {
     print_message(INFO_MESSAGE, "dlclose %s successful.\n", ibmll_libpath_name);
     sendShutdownEvent(gui_transmission_id);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     pthread_mutex_unlock(&master_lock);
-    return PROXY_RES_OK;
+    return PTP_PROXY_RES_OK;
   }
   pthread_mutex_unlock(&master_lock);
 }
@@ -1921,7 +1921,7 @@ void sendErrorEvent(int gui_transmission_id, int type, char *msgtext)
  * Send an error message to the front end
  */
   proxy_msg *msg;
-  msg = new_proxy_msg(PROXY_EV_ERROR, gui_transmission_id);
+  msg = new_proxy_msg(PTP_PROXY_EV_ERROR, gui_transmission_id);
   proxy_msg_add_int(msg, type);
   proxy_msg_add_string(msg, msgtext);
   enqueue_event_to_proxy_server(msg);
@@ -1954,7 +1954,7 @@ static int sendAttrDefIntEvent(int gui_transmission_id, char *attribute_id, char
   proxy_msg *msg;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. id=%s. name=%s. description=%s. default=%d. value1=%d. value2=%d.\n", __FUNCTION__, __LINE__, attribute_id, attribute_shortname, attribute_description, attribute_default_value, attribute_llimit, attribute_ulimit);
-  msg = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, gui_transmission_id);
+  msg = new_proxy_msg(PTP_PROXY_EV_RT_ATTR_DEF, gui_transmission_id);
   proxy_msg_add_int(msg, 1);
   proxy_msg_add_int(msg, 8);
   proxy_msg_add_string(msg, attribute_id);
@@ -2058,7 +2058,7 @@ static int sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_
 {
   proxy_msg *msg;
   char proxy_generated_cluster_id_string[256];
-  char *machine_state_to_report = MACHINE_STATE_UNKNOWN;
+  char *machine_state_to_report = PTP_MACHINE_STATE_UNKNOWN;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. state=%d.\n", __FUNCTION__, __LINE__, cluster_object->cluster_name, cluster_object->cluster_state);
   memset(proxy_generated_cluster_id_string, '\0', sizeof(proxy_generated_cluster_id_string));   /* zero the area */
@@ -2066,13 +2066,13 @@ static int sendMachineAddEvent(int gui_transmission_id, ClusterObject * cluster_
 
   switch (cluster_object->cluster_state) {
     case MY_STATE_UP:
-      machine_state_to_report = MACHINE_STATE_UP;
+      machine_state_to_report = PTP_MACHINE_STATE_UP;
       break;
     case MY_STATE_DOWN:
-      machine_state_to_report = MACHINE_STATE_DOWN;
+      machine_state_to_report = PTP_MACHINE_STATE_DOWN;
       break;
     default:
-      machine_state_to_report = MACHINE_STATE_UNKNOWN;
+      machine_state_to_report = PTP_MACHINE_STATE_UNKNOWN;
       break;
   }
   msg = proxy_new_machine_event(gui_transmission_id, ibmll_proxy_base_id_string, proxy_generated_cluster_id_string, cluster_object->cluster_name, machine_state_to_report);
@@ -2114,7 +2114,7 @@ static int sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
   proxy_msg *msg;
   char proxy_generated_cluster_id_string[256];
   char proxy_generated_node_id_string[256];
-  char *node_state_to_report = NODE_STATE_UNKNOWN;
+  char *node_state_to_report = PTP_NODE_STATE_UNKNOWN;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. node=%s. state=%d.\n", __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name, node_object->node_state);
   memset(proxy_generated_cluster_id_string, '\0', sizeof(proxy_generated_cluster_id_string));   /* zero the area */
@@ -2124,13 +2124,13 @@ static int sendNodeAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
 
   switch (node_object->node_state) {
     case MY_STATE_UP:
-      node_state_to_report = NODE_STATE_UP;
+      node_state_to_report = PTP_NODE_STATE_UP;
       break;
     case MY_STATE_DOWN:
-      node_state_to_report = NODE_STATE_DOWN;
+      node_state_to_report = PTP_NODE_STATE_DOWN;
       break;
     default:
-      node_state_to_report = NODE_STATE_UNKNOWN;
+      node_state_to_report = PTP_NODE_STATE_UNKNOWN;
       break;
   }
 
@@ -2148,7 +2148,7 @@ static int sendNodeChangeEvent(int gui_transmission_id, ClusterObject * cluster_
 {
   proxy_msg *msg;
   char proxy_generated_node_id_string[256];
-  char *node_state_to_report = NODE_STATE_UNKNOWN;
+  char *node_state_to_report = PTP_NODE_STATE_UNKNOWN;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. cluster=%s. node=%s. state=%d.\n", __FUNCTION__, __LINE__, cluster_object->cluster_name, node_object->node_name, node_object->node_state);
   memset(proxy_generated_node_id_string, '\0', sizeof(proxy_generated_node_id_string)); /* zero the area */
@@ -2156,13 +2156,13 @@ static int sendNodeChangeEvent(int gui_transmission_id, ClusterObject * cluster_
 
   switch (node_object->node_state) {
     case MY_STATE_UP:
-      node_state_to_report = NODE_STATE_UP;
+      node_state_to_report = PTP_NODE_STATE_UP;
       break;
     case MY_STATE_DOWN:
-      node_state_to_report = NODE_STATE_DOWN;
+      node_state_to_report = PTP_NODE_STATE_DOWN;
       break;
     default:
-      node_state_to_report = NODE_STATE_UNKNOWN;
+      node_state_to_report = PTP_NODE_STATE_UNKNOWN;
       break;
   }
 
@@ -2200,7 +2200,7 @@ static int sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_obje
   char proxy_generated_job_id_string[256];
   char proxy_generated_queue_id_string[256];
   char job_name_string[256];
-  char *job_state_to_report = JOB_STATE_INIT;
+  char *job_state_to_report = PTP_JOB_STATE_INIT;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, job_object->job_state);
   memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));   /* zero the area */
@@ -2211,19 +2211,19 @@ static int sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_obje
 
   switch (job_object->job_state) {
     case MY_STATE_IDLE:
-      job_state_to_report = JOB_STATE_INIT;
+      job_state_to_report = PTP_JOB_STATE_INIT;
       break;
     case MY_STATE_RUNNING:
-      job_state_to_report = JOB_STATE_RUNNING;
+      job_state_to_report = PTP_JOB_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      job_state_to_report = JOB_STATE_INIT;
+      job_state_to_report = PTP_JOB_STATE_INIT;
       break;
     case MY_STATE_TERMINATED:
-      job_state_to_report = JOB_STATE_TERMINATED;
+      job_state_to_report = PTP_JOB_STATE_TERMINATED;
       break;
     default:
-      job_state_to_report = JOB_STATE_INIT;
+      job_state_to_report = PTP_JOB_STATE_INIT;
       break;
   }
 
@@ -2242,7 +2242,7 @@ static int sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
   proxy_msg *msg;
   char proxy_generated_job_id_string[256];
   char job_state_string[256];
-  char *job_state_to_report = JOB_STATE_STARTING;
+  char *job_state_to_report = PTP_JOB_STATE_STARTING;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, job_object->job_state);
   memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));   /* zero the area */
@@ -2251,22 +2251,22 @@ static int sendJobChangeEvent(int gui_transmission_id, JobObject * job_object)
 
   switch (job_object->job_state) {
     case MY_STATE_IDLE:
-      job_state_to_report = JOB_STATE_STARTING;
+      job_state_to_report = PTP_JOB_STATE_STARTING;
       break;
     case MY_STATE_RUNNING:
-      job_state_to_report = JOB_STATE_RUNNING;
+      job_state_to_report = PTP_JOB_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      job_state_to_report = JOB_STATE_SUSPENDED;
+      job_state_to_report = PTP_JOB_STATE_SUSPENDED;
       break;
     case MY_STATE_TERMINATED:
-      job_state_to_report = JOB_STATE_COMPLETED;
+      job_state_to_report = PTP_JOB_STATE_COMPLETED;
       break;
   }
 
   msg = proxy_job_change_event(gui_transmission_id, proxy_generated_job_id_string, 1);
   sprintf(job_state_string, "%d", job_object->job_state);
-  proxy_add_string_attribute(msg, JOB_STATE_ATTR, job_state_to_report);
+  proxy_add_string_attribute(msg, PTP_JOB_STATE_ATTR, job_state_to_report);
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return 0;
@@ -2299,7 +2299,7 @@ static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
   char proxy_generated_job_id_string[256];
   char proxy_generated_task_id_string[256];
   char ll_task_id_string[256];
-  char *task_state_to_report = PROC_STATE_STOPPED;
+  char *task_state_to_report = PTP_PROC_STATE_STOPPED;
   NodeObject *node_object = NULL;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. node=%s. task=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, task_object->node_name, task_object->ll_task_id);
@@ -2313,19 +2313,19 @@ static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
 
   switch (task_object->task_state) {
     case MY_STATE_IDLE:
-      task_state_to_report = PROC_STATE_STARTING;
+      task_state_to_report = PTP_PROC_STATE_STARTING;
       break;
     case MY_STATE_RUNNING:
-      task_state_to_report = PROC_STATE_RUNNING;
+      task_state_to_report = PTP_PROC_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      task_state_to_report = PROC_STATE_STOPPED;
+      task_state_to_report = PTP_PROC_STATE_STOPPED;
       break;
     case MY_STATE_TERMINATED:
-      task_state_to_report = PROC_STATE_EXITED;
+      task_state_to_report = PTP_PROC_STATE_EXITED;
       break;
     default:
-      task_state_to_report = PROC_STATE_STARTING;
+      task_state_to_report = PTP_PROC_STATE_STARTING;
       break;
   }
 
@@ -2333,8 +2333,8 @@ static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
   proxy_add_process(msg, proxy_generated_task_id_string, ll_task_id_string, task_state_to_report, 2);   /* 2=extra attrs */
 
   node_object = get_node_in_hash(cluster_object->node_hash, task_object->node_name);
-  proxy_add_int_attribute(msg, PROC_NODEID_ATTR, node_object->proxy_generated_node_id); /* proxy node id */
-  proxy_add_int_attribute(msg, PROC_INDEX_ATTR, task_object->ll_task_id);       /* loadleveler task id */
+  proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, node_object->proxy_generated_node_id); /* proxy node id */
+  proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, task_object->ll_task_id);       /* loadleveler task id */
 
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
@@ -2348,7 +2348,7 @@ static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, 
 {
   proxy_msg *msg;
   char proxy_generated_task_id_string[256];
-  char *task_state_to_report = PROC_STATE_STARTING;
+  char *task_state_to_report = PTP_PROC_STATE_STARTING;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
   memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string)); /* zero the area */
@@ -2357,20 +2357,20 @@ static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, 
 
   switch (task_object->task_state) {
     case MY_STATE_IDLE:
-      task_state_to_report = PROC_STATE_STARTING;
+      task_state_to_report = PTP_PROC_STATE_STARTING;
       break;
     case MY_STATE_RUNNING:
-      task_state_to_report = PROC_STATE_RUNNING;
+      task_state_to_report = PTP_PROC_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      task_state_to_report = PROC_STATE_SUSPENDED;
+      task_state_to_report = PTP_PROC_STATE_SUSPENDED;
       break;
     case MY_STATE_TERMINATED:
-      task_state_to_report = PROC_STATE_COMPLETED;
+      task_state_to_report = PTP_PROC_STATE_COMPLETED;
       break;
   }
 
-  proxy_add_string_attribute(msg, PROC_STATE_ATTR, task_state_to_report);
+  proxy_add_string_attribute(msg, PTP_PROC_STATE_ATTR, task_state_to_report);
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return 0;
@@ -2438,7 +2438,7 @@ int main(int argc, char *argv[])
   char *host = "localhost";
   char *proxy_str = DEFAULT_PROXY;
   int ch;
-  int port = PROXY_TCP_PORT;
+  int port = PTP_PROXY_TCP_PORT;
   int rc;
   struct passwd *pwd;
   int i = 0;
@@ -2930,14 +2930,14 @@ int server(char *name, char *host, int port, char *user_libpath)
    * continue proxy initialization                                         *
    *-----------------------------------------------------------------------*/
   events = NewList();
-  if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &ll_proxy) != PROXY_RES_OK) {
+  if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &ll_proxy) != PTP_PROXY_RES_OK) {
     return 0;
   }
 
-  if ((connect_rc = proxy_svr_connect(ll_proxy, host, port)) == PROXY_RES_OK) {
+  if ((connect_rc = proxy_svr_connect(ll_proxy, host, port)) == PTP_PROXY_RES_OK) {
   print_message(INFO_MESSAGE, "Running proxy on port %d.\n", port);
   while (ptp_signal_exit == 0 && state_shutdown_requested == 0) {
-    if ((proxy_svr_progress(ll_proxy) != PROXY_RES_OK)) {
+    if ((proxy_svr_progress(ll_proxy) != PTP_PROXY_RES_OK)) {
       print_message(INFO_MESSAGE, "Ending node monitor loop\n");
       break;
     }

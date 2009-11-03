@@ -47,7 +47,7 @@ proxy_svr_init(char *name, struct timeval *timeout, proxy_svr_helper_funcs *sf, 
 	void *		data;
 	
 	if (find_proxy(name, &p) < 0)
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 		
 	ps = (proxy_svr *)malloc(sizeof(proxy_svr));
 	ps->proxy = p;
@@ -62,7 +62,7 @@ proxy_svr_init(char *name, struct timeval *timeout, proxy_svr_helper_funcs *sf, 
 	
 	if (p->svr_funcs->init(ps, &data) < 0) {
 		free(ps);
-		return PROXY_RES_ERR;
+		return PTP_PROXY_RES_ERR;
 	}
 
 	ps->svr_data = data;
@@ -70,7 +70,7 @@ proxy_svr_init(char *name, struct timeval *timeout, proxy_svr_helper_funcs *sf, 
 	
 	*svr = ps;
 	
-	return PROXY_RES_OK;	
+	return PTP_PROXY_RES_OK;
 }
 
 int
@@ -79,7 +79,7 @@ proxy_svr_create(proxy_svr *ps, int port)
 	if (ps != NULL)
 		return ps->proxy->svr_funcs->create(ps, port);
 		
-	return PROXY_RES_ERR;
+	return PTP_PROXY_RES_ERR;
 }
 
 int
@@ -88,7 +88,7 @@ proxy_svr_connect(proxy_svr *ps, char *host, int port)
 	if (ps != NULL)
 		return ps->proxy->svr_funcs->connect(ps, host, port);
 		
-	return PROXY_RES_ERR;
+	return PTP_PROXY_RES_ERR;
 }
 
 int
@@ -97,7 +97,7 @@ proxy_svr_progress(proxy_svr *ps)
 	if (ps != NULL)
 		return ps->proxy->svr_funcs->progress(ps);
 	
-	return PROXY_RES_ERR;
+	return PTP_PROXY_RES_ERR;
 }
 
 void

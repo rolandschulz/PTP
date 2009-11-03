@@ -32,8 +32,8 @@
 #include "list.h"
 #include "proxy.h"
 
-#define DBGRES_OK			PROXY_RES_OK
-#define DBGRES_ERR			PROXY_RES_ERR
+#define DBGRES_OK			PTP_PROXY_RES_OK
+#define DBGRES_ERR			PTP_PROXY_RES_ERR
 
 /*
  * Session control

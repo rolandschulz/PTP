@@ -50,7 +50,7 @@ main(int argc, char *argv[])
 		exe = argv[1];
 	}
 	
-	if (DbgInit(&s, "tcp", "port", PROXY_TCP_PORT, NULL) < 0) {
+	if (DbgInit(&s, "tcp", "port", PTP_PROXY_TCP_PORT, NULL) < 0) {
 		fprintf(stderr, "DbgInit failed\n");
 		exit(1);
 	}
