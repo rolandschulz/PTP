@@ -107,7 +107,7 @@ public class RSEConnection implements IRemoteConnection {
 	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
@@ -119,7 +119,7 @@ public class RSEConnection implements IRemoteConnection {
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -127,7 +127,7 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -158,7 +158,7 @@ public class RSEConnection implements IRemoteConnection {
 	public String getAddress() {
 		return rseHost.getHostName();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
 	 */
@@ -166,7 +166,7 @@ public class RSEConnection implements IRemoteConnection {
 		// TODO implement
 		return new HashMap<String, String>();
 	}
-
+	
 	/**
 	 * Get the DStore connector service for this connection.
 	 * 
@@ -179,7 +179,23 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv()
+	 */
+	public Map<String, String> getEnv() {
+		// TODO implement
+		return new HashMap<String, String>();
+	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv(java.lang.String)
+	 */
+	public String getEnv(String name) {
+		// TODO implement
+		return null;
+	}
+
 	/**
 	 * Get the file system for this connection
 	 * 
@@ -197,12 +213,20 @@ public class RSEConnection implements IRemoteConnection {
 	public IHost getHost() {
 		return rseHost;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
 	public String getName() {
 		return rseHost.getAliasName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String)
+	 */
+	public String getProperty(String key) {
+		// TODO implement
+		return null;
 	}
 	
 	/**
