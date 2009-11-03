@@ -12,13 +12,13 @@ package org.eclipse.photran.internal.core.analysis.dependence;
 
 import java.util.ArrayList;
 
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.dependence.VariableReference.LinearFunction;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTIntConstNode;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * A utility class describing a perfect nest of DO-loops.

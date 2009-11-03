@@ -8,11 +8,11 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
 import org.eclipse.photran.internal.core.model.FortranElement;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.swt.graphics.Image;
 
 class FortranCompletionProposalComputer

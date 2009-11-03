@@ -2,11 +2,11 @@ package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.ArrayList;
 
-import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.util.IterableWrapper;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
 

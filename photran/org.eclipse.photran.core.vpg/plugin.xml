@@ -3,7 +3,7 @@
 <plugin>
    <!-- Load the VPG plug-in at startup -->
    <extension point="org.eclipse.ui.startup">
-     <startup class="org.eclipse.photran.core.vpg.PhotranVPGStartup" />
+     <startup class="org.eclipse.photran.internal.core.vpg.PhotranVPGStartup" />
   </extension>
 
    <!-- Markers for displaying the VPG error/warning log -->

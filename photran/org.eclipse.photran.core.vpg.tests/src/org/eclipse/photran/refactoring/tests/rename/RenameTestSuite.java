@@ -15,7 +15,7 @@ import java.util.Set;
 
 import junit.framework.TestSuite;
 
-import org.eclipse.photran.core.vpg.util.LineCol;
+import org.eclipse.photran.internal.core.util.LineCol;
 
 public abstract class RenameTestSuite extends TestSuite
 {

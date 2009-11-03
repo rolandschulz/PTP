@@ -16,10 +16,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
@@ -66,7 +66,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
     
     private static class OpenDeclarationASTTask implements IFortranEditorASTTask
     {
-        private AbstractFortranEditor editor;
+        @SuppressWarnings("unused") private AbstractFortranEditor editor;
         private TextSelection selection;
         private Shell shell;
         private IWorkbenchPage page;

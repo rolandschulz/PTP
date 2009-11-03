@@ -16,9 +16,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -29,6 +26,9 @@ import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 
 /**
  * Phase 5 of name-binding analysis.

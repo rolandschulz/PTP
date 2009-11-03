@@ -18,7 +18,7 @@ package org.eclipse.photran.refactoring.tests.movesavedtocommonblock;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.photran.core.vpg.util.LineCol;
+import org.eclipse.photran.internal.core.util.LineCol;
 
 public class MoveSavedToCommonBlockTestSuite extends TestSuite
 {

@@ -27,7 +27,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.photran.ui.vpg.Activator;
+import org.eclipse.photran.internal.ui.vpg.Activator;
 import org.eclipse.search.ui.ISearchPage;
 import org.eclipse.search.ui.ISearchPageContainer;
 import org.eclipse.search.ui.NewSearchUI;

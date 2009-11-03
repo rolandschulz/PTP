@@ -16,7 +16,7 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
  * A <code>Type</code> corresponding to a derived type with a particular name.

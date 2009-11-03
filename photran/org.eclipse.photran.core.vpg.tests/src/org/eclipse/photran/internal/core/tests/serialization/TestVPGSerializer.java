@@ -17,13 +17,13 @@ import java.io.Serializable;
 
 import junit.framework.TestCase;
 
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
 import org.eclipse.photran.internal.core.analysis.types.DerivedType;
 import org.eclipse.photran.internal.core.analysis.types.FunctionType;
 import org.eclipse.photran.internal.core.analysis.types.Type;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
  * Tests serialization and deserialization using the {@link PhotranVPGSerializer}

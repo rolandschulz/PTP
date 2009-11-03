@@ -21,8 +21,8 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.photran.core.vpg.util.LineCol;
 import org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring;
+import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 /**

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.core.vpg;singleton:=true
 Bundle-Version: 5.0.0.qualifier
-Bundle-Activator: org.eclipse.photran.core.vpg.Activator
+Bundle-Activator: org.eclipse.photran.internal.core.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -15,10 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.rephraserengine.core.vpg,
  org.eclipse.rephraserengine.core,
  org.eclipse.rephraserengine.core.refactoring
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.photran.core,
- org.eclipse.photran.core.vpg,
- org.eclipse.photran.core.vpg.util,
+ org.eclipse.photran.internal.core.vpg,
  org.eclipse.photran.internal.core,
  org.eclipse.photran.internal.core.analysis.binding,
  org.eclipse.photran.internal.core.analysis.dependence,
@@ -29,5 +28,7 @@ Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.internal.core.parser,
  org.eclipse.photran.internal.core.properties,
  org.eclipse.photran.internal.core.refactoring,
- org.eclipse.photran.internal.core.refactoring.infrastructure
+ org.eclipse.photran.internal.core.refactoring.infrastructure,
+ org.eclipse.photran.internal.core.util
 Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

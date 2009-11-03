@@ -21,8 +21,8 @@ import java.util.HashMap;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.util.LineCol;
+import org.eclipse.photran.internal.core.util.LineCol;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 public abstract class RefactoringTestCase extends BaseTestFramework
 {

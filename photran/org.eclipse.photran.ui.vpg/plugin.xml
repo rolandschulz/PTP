@@ -7,7 +7,7 @@
 
    <extension
          point="org.eclipse.rephraserengine.ui.refactoring.refactorings">
-      <resourceFilter class="org.eclipse.photran.internal.ui.PhotranResourceFilter" />
+      <resourceFilter class="org.eclipse.photran.internal.ui.vpg.PhotranResourceFilter" />
 
       <!-- Define the Refactor menu -->
 
@@ -34,7 +34,7 @@
       <group><!-- Refactorings for USE statements -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring"
-             inputPage="org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage"
+             inputPage="org.eclipse.photran.internal.ui.refactoring.AddOnlyToUseStmtInputPage"
          />
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.MinOnlyListRefactoring"
@@ -43,7 +43,7 @@
       <group><!-- Refactorings for COMMON blocks -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.CommonVarNamesRefactoring"
-             inputPage="org.eclipse.photran.internal.refactoring.ui.CommonVarNamesInputPage"
+             inputPage="org.eclipse.photran.internal.ui.refactoring.CommonVarNamesInputPage"
          />
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring"
@@ -63,7 +63,7 @@
          />
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.KeywordCaseRefactoring"
-             inputPage="org.eclipse.photran.internal.refactoring.ui.KeywordCaseInputPage"
+             inputPage="org.eclipse.photran.internal.ui.refactoring.KeywordCaseInputPage"
          />
       </group>
       <group><!-- Test Refactorings -->
@@ -140,17 +140,17 @@
          <action
                label="Re&amp;name..."
                definitionId="org.eclipse.photran.ui.RenameRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
+               class="org.eclipse.photran.internal.ui.refactoring.RenameAction"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
          <action
                label="E&amp;xtract Procedure..."
                definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
+               class="org.eclipse.photran.internal.ui.refactoring.ExtractProcedureAction"
                id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
          <action
                label="Extract &amp;Local Variable..."
                definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
-               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
+               class="org.eclipse.photran.internal.ui.refactoring.ExtractLocalVariableAction"
                id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
       </actionSet>
    </extension>
@@ -180,7 +180,7 @@
       <vpg
          id="org.eclipse.photran.ui.vpg"
          name="Fortran"
-         class="org.eclipse.photran.internal.ui.PhotranVPGContribution" />
+         class="org.eclipse.photran.internal.ui.vpg.PhotranVPGContribution" />
    </extension>
 
    <!--=========================================-->
@@ -520,7 +520,7 @@
          <action
                label=""
                definitionId="org.eclipse.photran.ui.EasterEggCommand"
-               class="org.eclipse.photran.ui.vpg.EasterEggAction"
+               class="org.eclipse.photran.internal.ui.actions.EasterEggAction"
                id="org.eclipse.photran.ui.EasterEggAction"/>
          <!-- -->
          <action

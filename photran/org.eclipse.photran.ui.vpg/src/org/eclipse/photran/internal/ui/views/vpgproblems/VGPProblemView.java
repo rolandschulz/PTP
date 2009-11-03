@@ -32,7 +32,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;

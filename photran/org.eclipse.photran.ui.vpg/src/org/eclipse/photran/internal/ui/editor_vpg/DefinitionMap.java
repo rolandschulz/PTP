@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
@@ -26,6 +24,8 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 
 public abstract class DefinitionMap<T>
 {

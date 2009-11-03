@@ -12,8 +12,8 @@ package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import java.util.ArrayList;
 
-import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.FortranAST;
 import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;

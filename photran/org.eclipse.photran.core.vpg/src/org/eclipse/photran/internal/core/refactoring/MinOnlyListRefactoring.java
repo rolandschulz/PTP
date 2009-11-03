@@ -20,8 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
@@ -32,6 +30,8 @@ import org.eclipse.photran.internal.core.parser.Parser.ASTSeparatedListNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  *

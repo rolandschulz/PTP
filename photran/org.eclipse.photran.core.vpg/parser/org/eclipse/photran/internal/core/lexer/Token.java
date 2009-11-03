@@ -17,14 +17,14 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.util.OffsetLength;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeUtil;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.util.OffsetLength;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**

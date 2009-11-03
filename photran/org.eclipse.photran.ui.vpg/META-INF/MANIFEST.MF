@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.ui.vpg;singleton:=true
 Bundle-Version: 5.0.0.qualifier
-Bundle-Activator: org.eclipse.photran.ui.vpg.Activator
+Bundle-Activator: org.eclipse.photran.internal.ui.vpg.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -27,9 +27,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.rephraserengine.core.refactoring,
  org.eclipse.rephraserengine.ui,
  org.eclipse.rephraserengine.ui.vpg
-Eclipse-LazyStart: true
-Export-Package: org.eclipse.photran.internal.refactoring.ui,
- org.eclipse.photran.internal.ui.actions,
+Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.photran.internal.ui.actions,
  org.eclipse.photran.internal.ui.properties,
- org.eclipse.photran.internal.ui.search,
- org.eclipse.photran.ui.vpg
+ org.eclipse.photran.internal.ui.refactoring,
+ org.eclipse.photran.internal.ui.search
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

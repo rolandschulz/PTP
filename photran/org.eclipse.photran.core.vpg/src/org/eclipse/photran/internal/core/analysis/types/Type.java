@@ -17,9 +17,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.photran.core.vpg.IPhotranSerializable;
-import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
  * An incomplete representation of the type of a Fortran expression or variable.

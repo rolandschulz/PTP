@@ -12,11 +12,11 @@ package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.util.List;
 
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.IAccessId;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
 /**
  * Abstract superclass that visits PUBLIC and PRIVATE specification statements

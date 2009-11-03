@@ -12,7 +12,6 @@ package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.util.List;
 
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAllocatableStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTArrayAllocationNode;
@@ -39,6 +38,7 @@ import org.eclipse.photran.internal.core.parser.ASTVariableNameNode;
 import org.eclipse.photran.internal.core.parser.ASTVolatileStmtNode;
 import org.eclipse.photran.internal.core.parser.IBindEntity;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
 /**
  * Phase 4 of name-binding analysis.

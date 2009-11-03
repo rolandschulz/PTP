@@ -16,11 +16,11 @@ import java.io.IOException;
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
-import org.eclipse.photran.core.vpg.util.SemanticError;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.util.SemanticError;
 
 /**
  * A test case for parsing a single file.  Created by <code>ParserTestSuite</code>.

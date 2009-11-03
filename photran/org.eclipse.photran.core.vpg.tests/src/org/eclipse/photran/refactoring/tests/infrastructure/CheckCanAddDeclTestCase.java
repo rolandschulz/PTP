@@ -18,11 +18,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 /**

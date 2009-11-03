@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
  * A <code>Type</code> corresponding to a derived type with a particular name.

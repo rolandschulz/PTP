@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.photran.core.vpg.util.LineCol;
 import org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring;
+import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 public class MoveSavedToCommonBlockTestCase extends RefactoringTestCase

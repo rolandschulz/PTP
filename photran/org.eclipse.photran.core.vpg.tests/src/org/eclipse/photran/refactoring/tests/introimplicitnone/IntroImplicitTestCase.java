@@ -19,8 +19,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.photran.core.vpg.util.LineCol;
 import org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring;
+import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 public class IntroImplicitTestCase extends RefactoringTestCase

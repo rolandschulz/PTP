@@ -13,7 +13,7 @@ package org.eclipse.photran.refactoring.tests.introimplicitnone;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.photran.core.vpg.util.LineCol;
+import org.eclipse.photran.internal.core.util.LineCol;
 
 public class IntroImplicitTestSuite extends TestSuite
 {

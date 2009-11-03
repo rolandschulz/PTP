@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.loops.GenericASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Describes a reference to a scalar variable or a reference into an array variable where

@@ -18,10 +18,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 public class ReindenterTestCase extends RefactoringTestCase

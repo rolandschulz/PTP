@@ -12,8 +12,6 @@ package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.util.List;
 
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAcImpliedDoNode;
@@ -87,6 +85,8 @@ import org.eclipse.photran.internal.core.parser.ASTVariableNode;
 import org.eclipse.photran.internal.core.parser.ASTWaitSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWaitStmtNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Phase 6 of name-binding analysis.

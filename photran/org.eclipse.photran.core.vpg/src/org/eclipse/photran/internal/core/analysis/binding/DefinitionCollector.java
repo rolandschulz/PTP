@@ -11,8 +11,6 @@
 package org.eclipse.photran.internal.core.analysis.binding;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
@@ -58,6 +56,8 @@ import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 
 /**
  * Phase 3 of name-binding analysis.

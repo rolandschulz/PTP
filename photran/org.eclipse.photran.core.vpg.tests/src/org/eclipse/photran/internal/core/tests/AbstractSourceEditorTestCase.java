@@ -15,9 +15,9 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.eclipse.photran.core.vpg.util.SemanticError;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
+import org.eclipse.photran.internal.core.util.SemanticError;
 
 public abstract class AbstractSourceEditorTestCase extends TestCase
 {

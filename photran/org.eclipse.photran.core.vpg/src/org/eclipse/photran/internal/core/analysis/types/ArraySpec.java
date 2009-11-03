@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.photran.core.vpg.IPhotranSerializable;
-import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedShapeSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedSizeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTDeferredShapeSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
  * An array specification: A "smart" representation of an ArraySpec AST node.

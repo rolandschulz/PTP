@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.refactoring.tests.RefactoringTestCase;
 
 /**

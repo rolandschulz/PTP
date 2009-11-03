@@ -16,13 +16,13 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.rephraserengine.internal.ui.UIUtil;
 
 /**

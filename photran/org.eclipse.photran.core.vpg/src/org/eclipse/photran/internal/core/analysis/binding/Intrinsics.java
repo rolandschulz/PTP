@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.binding;
 
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Collection of all intrinsic functions in Fortran.  A static method

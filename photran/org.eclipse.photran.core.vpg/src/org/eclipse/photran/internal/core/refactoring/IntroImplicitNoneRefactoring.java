@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.util.Notification;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.types.Type;
@@ -33,6 +32,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
+import org.eclipse.photran.internal.core.util.Notification;
 
 /**
  * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all

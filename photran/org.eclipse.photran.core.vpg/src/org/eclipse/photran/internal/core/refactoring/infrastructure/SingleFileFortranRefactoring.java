@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 
 /**

@@ -22,11 +22,6 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.photran.core.vpg.IPhotranSerializable;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
-import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
-import org.eclipse.photran.core.vpg.PhotranVPGSerializer;
 import org.eclipse.photran.internal.core.analysis.types.ArraySpec;
 import org.eclipse.photran.internal.core.analysis.types.DerivedType;
 import org.eclipse.photran.internal.core.analysis.types.FunctionType;
@@ -50,6 +45,11 @@ import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 
 /**

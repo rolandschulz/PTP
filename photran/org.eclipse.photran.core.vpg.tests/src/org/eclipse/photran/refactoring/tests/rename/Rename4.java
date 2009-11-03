@@ -2,7 +2,7 @@ package org.eclipse.photran.refactoring.tests.rename;
 
 import junit.framework.Test;
 
-import org.eclipse.photran.core.vpg.util.LineCol;
+import org.eclipse.photran.internal.core.util.LineCol;
 
 public class Rename4 extends RenameTestSuite
 {

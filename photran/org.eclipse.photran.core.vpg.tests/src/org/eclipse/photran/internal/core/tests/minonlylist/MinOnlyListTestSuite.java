@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.tests.minonlylist;
 
-import org.eclipse.photran.core.vpg.util.LineCol;
+import org.eclipse.photran.internal.core.util.LineCol;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
