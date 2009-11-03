@@ -24,11 +24,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IServiceConstants;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -87,6 +89,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			setControl(composite);
 		}
 
+		public String getRMDesc() {
+			return descText.getText();
+		}
+		
+		public String getRMName() {
+			return nameText.getText();
+		}
+		
 		private void createRMControl(Composite container) {
 			Group nameGroup = new Group(container, SWT.SHADOW_ETCHED_IN);
 			GridLayout layout = new GridLayout();
@@ -167,14 +177,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			setPageComplete(true);
 		}
 		
-		public String getRMDesc() {
-			return descText.getText();
-		}
-		
-		public String getRMName() {
-			return nameText.getText();
-		}
-		
 		private void setAutoStart(boolean flag) {
 			autoStartButton.setSelection(flag);
 		}
@@ -218,13 +220,21 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	        serviceConfigWidget.setLayoutData(data);
 	        serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(SelectionChangedEvent event) {
-					setServiceConfiguration(serviceConfigWidget.getServiceConfiguration());
 					setPageComplete(getServiceConfiguration() != null);
 				}
 	        });
 
 			setControl(composite);
 			setPageComplete(false);
+		}
+		
+		/**
+		 * Get the service configuration selected in the widget.
+		 * 
+		 * @return service configuration
+		 */
+		public IServiceConfiguration getServiceConfiguration() {
+			return serviceConfigWidget.getServiceConfiguration();
 		}
 		
 		/**
@@ -333,7 +343,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	public RMServicesConfigurationWizard() {
 		setForcePreviousAndNextButtons(true);
 		setWizardPages(null);
-		setServiceConfiguration(fModelManager.newServiceConfiguration(EMPTY_STRING));
 	}
 
 	/*
@@ -420,8 +429,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			fResourceManagerPage.setNameAndDescription(getConfiguration());
 			fResourceManagerPage.setEnabled(!fUseDefaultNameAndDesc);
 			fResourceManagerPage.setAutoStart(getConfiguration().getAutoStart());
-		}
-		if (nextPage instanceof SelectServiceConfigurationPage) {
+		} else if (nextPage instanceof SelectServiceConfigurationPage) {
 			IServiceConfiguration config = fModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
 			fSelectServiceConfigurationPage.setDefaultConfiguration(config);
 		}
@@ -451,7 +459,15 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		if (fUsingWorkingCopy) {
 			((IServiceProviderWorkingCopy)getServiceProvider()).save();
 		} else {
-			IServiceConfiguration config = getServiceConfiguration();
+			IServiceConfiguration config = fSelectServiceConfigurationPage.getServiceConfiguration();
+			IServiceProvider provider = config.getServiceProvider(fLaunchService);
+			if (provider != null) {
+				boolean replace = MessageDialog.openQuestion(getShell(), Messages.RMServicesConfigurationWizard_15, 
+						NLS.bind(Messages.RMServicesConfigurationWizard_16, provider.getName()));
+				if (!replace) {
+					return false;
+				}
+			}
 			config.setServiceProvider(fLaunchService, getServiceProvider());
 			fModelManager.addConfiguration(config);
 		}
@@ -468,22 +484,8 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	/**
 	 * @return
 	 */
-	private IServiceConfiguration getServiceConfiguration() {
-		return fServiceConfiguration;
-	}
-	
-	/**
-	 * @return
-	 */
 	private IServiceProvider getServiceProvider() {
 		return fServiceProvider;
-	}
-	
-	/**
-	 * @param config
-	 */
-	private void setServiceConfiguration(IServiceConfiguration config) {
-		fServiceConfiguration = config;
 	}
 	
 	/**
