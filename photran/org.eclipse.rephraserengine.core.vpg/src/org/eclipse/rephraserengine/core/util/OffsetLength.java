@@ -8,16 +8,17 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.util;
+package org.eclipse.rephraserengine.core.util;
 
-import org.eclipse.photran.internal.core.lexer.Token;
 
 /**
  * An <b>offset</b> and a <b>length</b> (simply two integers, typically non-negative).
- * 
+ *
  * <code>OffsetLength</code>s are frequently used to store the position of a piece of text in a file.
- * 
+ *
  * @author Jeff Overbey
+ *
+ * @since 1.0
  */
 public final class OffsetLength
 {
@@ -37,7 +38,7 @@ public final class OffsetLength
         return thisOffset <= otherOffset
             && getPositionPastEnd(otherOffset, otherLength) <= getPositionPastEnd(thisOffset, thisLength);
     }
-    
+
     /** @return true iff every character in the "other" region is also in "this" region */
     public static boolean contains(int thisOffset, int thisLength, OffsetLength other)
     {
@@ -64,7 +65,7 @@ public final class OffsetLength
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Accessor/Mutator Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /** @return the offset */
     public int getOffset()
     {
@@ -98,23 +99,17 @@ public final class OffsetLength
     {
         return getPositionPastEnd(offset, length);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Inquiry & Comparison Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
    /** @return true iff every character in the "other" region is also in this region */
     public boolean contains(OffsetLength other)
     {
         return contains(this.offset, this.length, other);
     }
-    
-    /** @return true iff every character in the given token is also in this region */
-    public boolean containsFileRange(Token token)
-    {
-        return contains(this.offset, this.length, token.getFileOffset(), token.getLength());
-    }
-    
+
     /** @return true iff both the offset and length are equal to those of the supplied <code>OffsetLength</code> */
     public boolean equals(OffsetLength other)
     {
@@ -136,7 +131,7 @@ public final class OffsetLength
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // toString
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     public String toString()
     {
         return "offset " + offset + ", length " + length;

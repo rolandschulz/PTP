@@ -22,9 +22,9 @@ import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeUtil;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
-import org.eclipse.photran.internal.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.util.OffsetLength;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**
