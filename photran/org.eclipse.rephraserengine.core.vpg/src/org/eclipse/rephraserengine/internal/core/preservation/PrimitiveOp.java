@@ -48,7 +48,7 @@ public abstract class PrimitiveOp
     // Abstract Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public abstract Interval offset(Interval i);
+    public abstract Interval ioffset(Interval i);
 
     public abstract Interval inorm(Interval i);
 
@@ -66,7 +66,7 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval offset(Interval i)
+        public Interval ioffset(Interval i)
         {
             if (i.isLessThan(j))
                 return i;
@@ -77,7 +77,7 @@ public abstract class PrimitiveOp
         @Override
         public Interval inorm(Interval i)
         {
-            return offset(i);
+            return ioffset(i);
         }
 
         @Override public String toString()
@@ -100,7 +100,7 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval offset(Interval i)
+        public Interval ioffset(Interval i)
         {
             if (i.isLessThan(j))
                 return i;
@@ -114,7 +114,7 @@ public abstract class PrimitiveOp
             if (i.isSubsetOf(j))
                 return k;
             else
-                return offset(i);
+                return ioffset(i);
         }
 
         @Override public String toString()
