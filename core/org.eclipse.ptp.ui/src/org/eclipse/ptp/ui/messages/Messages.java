@@ -124,11 +124,6 @@ public class Messages extends NLS {
 	public static String RMPreferencesPage_1;
 	public static String RMServicesConfigurationWizard_0;
 	public static String RMServicesConfigurationWizard_1;
-	public static String RMServicesConfigurationWizard_10;
-	public static String RMServicesConfigurationWizard_11;
-	public static String RMServicesConfigurationWizard_12;
-	public static String RMServicesConfigurationWizard_13;
-	public static String RMServicesConfigurationWizard_14;
 	public static String RMServicesConfigurationWizard_2;
 	public static String RMServicesConfigurationWizard_3;
 	public static String RMServicesConfigurationWizard_4;
@@ -137,6 +132,13 @@ public class Messages extends NLS {
 	public static String RMServicesConfigurationWizard_7;
 	public static String RMServicesConfigurationWizard_8;
 	public static String RMServicesConfigurationWizard_9;
+	public static String RMServicesConfigurationWizard_10;
+	public static String RMServicesConfigurationWizard_11;
+	public static String RMServicesConfigurationWizard_12;
+	public static String RMServicesConfigurationWizard_13;
+	public static String RMServicesConfigurationWizard_14;
+	public static String RMServicesConfigurationWizard_15;
+	public static String RMServicesConfigurationWizard_16;
 	public static String SelectDefaultResourceManagerAction_0;
 	public static String StartResourceManagersObjectActionDelegate_0;
 	public static String StartResourceManagersObjectActionDelegate_1;
