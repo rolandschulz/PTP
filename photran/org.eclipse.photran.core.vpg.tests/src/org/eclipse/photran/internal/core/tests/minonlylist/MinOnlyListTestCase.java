@@ -14,9 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -90,7 +87,7 @@ public class MinOnlyListTestCase extends RefactoringTestCase
         final IFile file = importFile(DIR, filenames[0]);
         Document doc = new Document(readFileToString(DIR+"/"+filenames[0]));
         TextSelection text = new TextSelection(doc, getLineColOffset(filenames[0], lineCol), length);
-        MinOnlyListRefactoring r = new MinOnlyListRefactoring();
+        MinOnlyListRefactoring r = new MinOnlyListRefactoring(file, text);
         r.initialize(file, text);
         return r;
     }

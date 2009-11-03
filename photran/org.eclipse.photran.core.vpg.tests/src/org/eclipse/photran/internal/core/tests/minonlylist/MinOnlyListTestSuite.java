@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.tests.minonlylist;
 
-import org.eclipse.photran.internal.core.util.LineCol;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.photran.internal.core.util.LineCol;
 /**
  *
  * @author Kurt Hendle
@@ -27,11 +26,11 @@ public class MinOnlyListTestSuite extends TestSuite
 
         //1. functionality test - all module entities used, remove list
         String[] test1Files = {"test1.f90", "module.f90"};
-        // FIXME JO suite.addTest(successTest(test1Files, new LineCol(2,9), 6));
+        suite.addTest(successTest(test1Files, new LineCol(2,9), 6));
 
         //2. functionality test - remove the unused module entity from the list
         String[] test2Files = {"test2.f90", "module.f90"};
-        // FIXME JO suite.addTest(successTest(test2Files, new LineCol(2,9), 6));
+        suite.addTest(successTest(test2Files, new LineCol(2,9), 6));
 
         //3. functionality test - no module entities used, remove the use statement
         String[] test3Files = {"test3.f90", "module.f90"};
@@ -51,6 +50,18 @@ public class MinOnlyListTestSuite extends TestSuite
         //7. precondition test - select entity which is not module
         String[] test7Files = {"test7.f90", "module.f90"};
         suite.addTest(preconditionTest(test7Files, new LineCol(4,16), 1));
+        
+        //8. functionality test - renamed module var, module same file
+        String[] test8Files = {"program3.f90"};
+        suite.addTest(successTest(test8Files, new LineCol(6,9), 1));
+        
+        //9. functionality test - remove an unused entity, module same file
+        String[] test9Files = {"program2.f90"};
+        suite.addTest(successTest(test9Files, new LineCol(6,9), 1));
+        
+        //10. functionality test - no only list, 1 unused, module same file
+        String[] test10Files = {"program1.f90"};
+        suite.addTest(successTest(test10Files, new LineCol(6,9), 1));
 
         return suite;
     }
