@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.ui.dialogs.ServiceProviderConfigurationDialog;
 import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -44,6 +45,30 @@ import org.eclipse.swt.widgets.Text;
  * perform any additional configuration that may be required.
  */
 public class AddServiceConfigurationWidget extends Composite implements ISelectionProvider {
+	private class ConfigurationSelectionEvent implements IStructuredSelection {
+		private Object selection = getServiceConfiguration();
+		public Object getFirstElement() {
+			return isEmpty() ? null : toArray()[0];
+		}
+		public boolean isEmpty() {
+			return toArray().length == 0;
+		}
+		@SuppressWarnings("unchecked")
+		public Iterator iterator() {
+			return toList().iterator();
+		}
+		public int size() {
+			return toArray().length;
+		}
+		public Object[] toArray() {
+			return (selection == null) ? new Object[0] : new Object[] {selection};
+		}
+		@SuppressWarnings("unchecked")
+		public List toList() {
+			return Arrays.asList(selection);
+		}
+	}
+		
 	private Text fNewConfigNameText;
 	private Button fNewConfigButton;
 	private Button fExistingConfigButton;
@@ -75,29 +100,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		fNewConfigButton.addSelectionListener(new SelectionAdapter() {
 			@Override public void widgetSelected(SelectionEvent e) {
 				doSelectionUpdate();
-				notifySelection(new IStructuredSelection() {
-					private Object selection = fServiceConfig;
-					public Object getFirstElement() {
-						return isEmpty() ? null : toArray()[0];
-					}
-					public boolean isEmpty() {
-						return toArray().length == 0;
-					}
-					@SuppressWarnings("unchecked")
-					public Iterator iterator() {
-						return toList().iterator();
-					}
-					public int size() {
-						return toArray().length;
-					}
-					public Object[] toArray() {
-						return (selection == null) ? new Object[0] : new Object[] {selection};
-					}
-					@SuppressWarnings("unchecked")
-					public List toList() {
-						return Arrays.asList(selection);
-					}
-				});
+				notifySelection(new ConfigurationSelectionEvent());
 			}
 		});
 		fNewConfigButton.setEnabled(false);
@@ -124,7 +127,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		fExistingConfigButton = new Button(this, SWT.RADIO);
 		fExistingConfigButton.setText(Messages.AddServiceConfigurationWidget_2); 
 		fExistingConfigButton.setLayoutData(new GridData());
-		fExistingConfigButton.setEnabled(true);
+		fExistingConfigButton.setEnabled(configurationCount(excluded) != 0);
 		
 		Composite existingComp = new Composite(this, SWT.NONE);
 		layout = new GridLayout(1, false);
@@ -156,7 +159,15 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 			}
 		});
 		
-		updateButtons(false);
+		updateButtons(true);
+	}
+	
+	private int configurationCount(Set<IServiceConfiguration> excluded) {
+		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
+		if (excluded != null) {
+			configs.removeAll(excluded);
+		}
+		return configs.size();
 	}
 	
 	/* (non-Javadoc)
@@ -214,6 +225,7 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		if (fDefaultConfig != null) {
 			updateButtons(newButtonSelected);
 			doSelectionUpdate();
+			notifySelection(new ConfigurationSelectionEvent());
 		}
 	}
 	
@@ -252,8 +264,18 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		}
 	}
 	
+	/**
+	 * Update the button selection status. If the existing config button
+	 * is disabled, then this always sets the new config button.
+	 * 
+	 * @param newSelected new config button status
+	 */
 	private void updateButtons(boolean newSelected) {
-		fNewConfigButton.setSelection(newSelected);
-		fExistingConfigButton.setSelection(!newSelected);
+		if (fExistingConfigButton.isEnabled()) {
+			fNewConfigButton.setSelection(newSelected);
+			fExistingConfigButton.setSelection(!newSelected);
+		} else {
+			fNewConfigButton.setSelection(true);
+		}
 	}
 }
