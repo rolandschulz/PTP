@@ -12,7 +12,7 @@ package org.eclipse.photran.internal.core.preferences;
 
 import java.lang.reflect.Field;
 
-import org.eclipse.photran.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.swt.graphics.RGB;
 
 /**

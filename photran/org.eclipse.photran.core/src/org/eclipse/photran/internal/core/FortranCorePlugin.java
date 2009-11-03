@@ -8,13 +8,13 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.core;
+package org.eclipse.photran.internal.core;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The main plug-in class for the Photran Core plug-in
+ * Activator class for the Photran Core plug-in.
  * 
  * @author (generated)
  */

@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 /**
- * A <code>TokenFactory</code> that creates tokens used in the AST.
+ * A {@link TokenFactory} that creates tokens used in the AST.
  * 
  * @author Jeff Overbey
  */

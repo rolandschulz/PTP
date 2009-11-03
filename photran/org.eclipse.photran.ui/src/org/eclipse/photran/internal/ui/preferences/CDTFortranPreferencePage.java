@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
-import org.eclipse.photran.cdtinterface.core.FortranLanguage;
+import org.eclipse.photran.internal.cdtinterface.core.FortranLanguage;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**

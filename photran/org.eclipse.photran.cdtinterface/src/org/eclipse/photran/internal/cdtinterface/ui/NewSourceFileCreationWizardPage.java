@@ -12,7 +12,7 @@ package org.eclipse.photran.internal.cdtinterface.ui;
 
 import org.eclipse.cdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jface.text.templates.Template;
-import org.eclipse.photran.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 
 /**
  * Wizard page for the Create New Fortran Source File wizard ({@link NewSourceFileCreationWizard}).

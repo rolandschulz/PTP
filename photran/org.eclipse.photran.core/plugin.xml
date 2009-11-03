@@ -11,7 +11,7 @@
          name="Photran Error Parser for Absoft Fortran"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.AbsoftErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.AbsoftErrorParser">
       </errorparser>
    </extension>
    <!--extension
@@ -27,7 +27,7 @@
          name="%FDTGFortranErrorParser.name"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.GFortranErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.GFortranErrorParser">
       </errorparser>
    </extension>
    <extension
@@ -35,7 +35,7 @@
          name="Photran Error Parser for Intel Fortran 8.1"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.IntelFortranErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.IntelFortranErrorParser">
       </errorparser>
    </extension>
    <extension
@@ -43,7 +43,7 @@
          name="Photran Error Parser for Lahey/Fujitsu Fortran 7.1"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.LaheyFortranErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.LaheyFortranErrorParser">
       </errorparser>
    </extension>
    <extension
@@ -51,7 +51,7 @@
          name="Photran Error Parser for G95 Fortran"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.G95FortranErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.G95FortranErrorParser">
       </errorparser>
    </extension>
    <extension
@@ -59,7 +59,7 @@
          name="Photran Error Parser for NAG Fortran"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.NAGErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.NAGErrorParser">
       </errorparser>
    </extension>
    <extension
@@ -67,7 +67,7 @@
          name="Photran Error Parser for PGI Fortran"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.PGIErrorParser">
+            class="org.eclipse.photran.internal.core.errorparsers.PGIErrorParser">
       </errorparser>
    </extension>
 
@@ -138,7 +138,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.photran.core.FProjectNature">
+               class="org.eclipse.photran.internal.core.FProjectNature">
          </run>
       </runtime>
    </extension>

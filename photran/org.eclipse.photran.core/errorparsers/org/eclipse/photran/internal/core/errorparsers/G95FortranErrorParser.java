@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.errorparsers;
+package org.eclipse.photran.internal.core.errorparsers;
 
 import java.util.Stack;
 

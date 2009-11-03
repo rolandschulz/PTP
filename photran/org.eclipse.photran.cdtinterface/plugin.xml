@@ -183,7 +183,7 @@
             category="org.eclipse.photran.ui.newFortranWizards"
             finalPerspective="org.eclipse.photran.ui.FortranPerspective"
             id="org.eclipse.photran.ui.wizards.NewSourceFileCreationWizard">
-         <class class="org.eclipse.photran.cdtinterface.ui.NewSourceFileCreationWizard">
+         <class class="org.eclipse.photran.internal.cdtinterface.ui.NewSourceFileCreationWizard">
             <parameter name="cfile" value="true"/>
          </class>
          <description>
@@ -209,7 +209,7 @@
             category="org.eclipse.photran.ui.newFortranWizards"
             finalPerspective="org.eclipse.photran.ui.FortranPerspective"
             id="org.eclipse.photran.ui.wizards.NewSourceFolderCreationWizard">
-         <class class="org.eclipse.photran.cdtinterface.ui.NewSourceFolderCreationWizard">
+         <class class="org.eclipse.photran.internal.cdtinterface.ui.NewSourceFolderCreationWizard">
             <parameter name="cfolder" value="true"/>
          </class>
          <description>

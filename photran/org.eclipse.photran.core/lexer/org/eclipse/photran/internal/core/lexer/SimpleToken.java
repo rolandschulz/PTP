@@ -15,6 +15,10 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * A minimal implementation of <code>IToken</code>.
+ * <p>
+ * <b>This is probably not the {@link IToken} implementation you're looking for.</b>  The Fortran
+ * parser uses a different implementation (<code>Token</code>); this one is only used if the lexer
+ * is used in isolation.
  * 
  * @author Jeff Overbey
  */

@@ -27,7 +27,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.photran.core.FProjectNature;
+import org.eclipse.photran.internal.core.FProjectNature;
 
 /**
  * Wizard to create a new Fortran project.

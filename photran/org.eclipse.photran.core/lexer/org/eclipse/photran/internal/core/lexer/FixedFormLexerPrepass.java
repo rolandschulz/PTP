@@ -16,13 +16,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
- * FixedFormLexerPrepass preprocesses the input stream. It discards all
- * whitespaces and comment lines and concatenates continuation lines. Additional
- * it holds a mapping to the character-positions in the file (for correct
- * start/end line/col in the Token objects).
+ * Preprocesses the input stream, discarding all whitespaces and comment lines and concatenating
+ * continuation lines.  Additionally, it holds a mapping to the character-positions in the file (for
+ * correct start/end line/col in the {@link IToken} objects).
  * 
  * @author Dirk Rossow
  */

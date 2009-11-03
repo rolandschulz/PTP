@@ -8,14 +8,15 @@
  * Contributors:
  *     LANL - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.errorparsers;
+package org.eclipse.photran.internal.core.errorparsers;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.ErrorParserManager;
 import org.eclipse.cdt.core.IErrorParser;
 import org.eclipse.cdt.core.IMarkerGenerator;
 import org.eclipse.core.resources.IFile;
-
-import java.util.regex.*;
 
 /**
 * PGI Fortran Error Parser -- An error parser for the Portland Group compiler

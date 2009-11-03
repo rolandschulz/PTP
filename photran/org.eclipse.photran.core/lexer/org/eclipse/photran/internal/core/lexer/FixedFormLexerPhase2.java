@@ -16,7 +16,7 @@ import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 
 /**
- * This is the lexical analyzer that is used directly in the Fortran parser.
+ * Fixed form wrapper for {@link FreeFormLexerPhase2}.
  * 
  * @author Dirk Rossow
  * 

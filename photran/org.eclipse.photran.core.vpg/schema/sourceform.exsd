@@ -69,7 +69,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  A class extending &lt;code&gt;org.eclipse.photran.cdtinterface.dom.IFortranDOMParser&lt;/code&gt;.
+                  A class extending &lt;code&gt;org.eclipse.photran.internal.cdtinterface.dom.IFortranDOMParser&lt;/code&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.photran.internal.core.lexer.SourceForm:"/>

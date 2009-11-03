@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Wraps another <code>InputStream</code>.  If the wrapped stream does not end
- * with an end-of-line character, the OS-dependent end-of-line sequence is appended
- * at the end of the stream.
+ * Wraps another <code>InputStream</code>, and, if the wrapped stream does not end
+ * with an end-of-line character, appends the OS-dependent end-of-line sequence to
+ * the end of the stream.
  * 
  * @author Jeff Overbey
  */

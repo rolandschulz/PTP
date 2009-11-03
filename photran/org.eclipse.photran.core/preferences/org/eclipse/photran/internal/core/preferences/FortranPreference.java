@@ -11,13 +11,18 @@
 package org.eclipse.photran.internal.core.preferences;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.photran.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 
 /**
- * Parent class for preferences that should be set in Photran's Core plug-in.
+ * Superclass for a workspace preference that will be set in Photran's Core plug-in.
  * 
  * @author Jeff Overbey
  * 
+ * @see FortranStringPreference
+ * @see FortranBooleanPreference
+ * @see FortranRGBPreference
+ */
+/*
  * JAVA5: This should be parameterized by type, and type-based subclasses like
  * <code>FortranStringPreference</code> and <code>FortranBooleanPreference</code> should be
  * eliminated once we start using Java 5.

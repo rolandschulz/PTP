@@ -11,7 +11,11 @@
 package org.eclipse.photran.internal.core.lexer;
 
 /**
- * A <code>TokenFactory</code> that generates <code>SimpleToken</code>s.
+ * A {@link TokenFactory} that generates {@link SimpleToken} objects.
+ * <p>
+ * <b>This is probably not the {@link TokenFactory} you're looking for.</b>  The Fortran parser uses
+ * a different factory (<code>ASTTokenFactory</code>); this one is only used if the lexer is used
+ * in isolation.
  * 
  * @author Jeff Overbey
  */

@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.core.preferences;
 
 /**
- * Parent class for preferences which hold a string value.
+ * A preference which hold a string value.
  * 
  * @author Jeff Overbey
  */

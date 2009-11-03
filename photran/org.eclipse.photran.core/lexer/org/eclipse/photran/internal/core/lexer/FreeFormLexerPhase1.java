@@ -31,8 +31,7 @@
 package org.eclipse.photran.internal.core.lexer;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 
 

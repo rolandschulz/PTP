@@ -11,10 +11,10 @@
 package org.eclipse.photran.internal.core.lexer;
 
 /**
- * {@link IPreprocessorReplacement} for tokens from fixed form source code that have spaces in them
+ * {@link IPreprocessorReplacement} for tokens from fixed form source code that have spaces in them.
  * <p>
  * For example, <tt>in t E g eR</tt> is recognized as a token of type {@link Terminal#T_INTEGER}
- * with "intEgeR" as its token text ({@link IToken#getText()}) and "in t E g eR" as its preprocessor2
+ * with "intEgeR" as its token text ({@link IToken#getText()}) and "in t E g eR" as its preprocessor
  * directive ({@link IToken#getPreprocessorDirective()}).
  * <p>
  * Technically, this is an abuse of that field -- this isn't a situation resulting from a bona fide

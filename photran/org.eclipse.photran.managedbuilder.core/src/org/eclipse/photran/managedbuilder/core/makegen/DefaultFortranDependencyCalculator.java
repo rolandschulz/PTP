@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.photran.cdtinterface.core.FortranLanguage;
+import org.eclipse.photran.internal.cdtinterface.core.FortranLanguage;
 
 /**
  *  This class implements the Dependency Manager and Output Name Provider interfaces

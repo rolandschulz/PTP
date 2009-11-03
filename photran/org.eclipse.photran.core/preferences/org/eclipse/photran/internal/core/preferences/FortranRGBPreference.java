@@ -15,7 +15,7 @@ import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * Parent class for preferences which hold an <code>RGB</code> (color) value.
+ * A preference which hold an <code>RGB</code> (color) value.
  * 
  * @author Jeff Overbey
  */

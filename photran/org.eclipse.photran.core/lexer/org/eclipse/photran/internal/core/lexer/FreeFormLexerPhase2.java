@@ -21,21 +21,20 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 
 /**
- * This is the lexical analyzer that is used directly in the Fortran parser.
+ * Phase 2 of lexical analysis: Distinguishes keywords and identifiers.
+ * <p>
+ * Phase 1 is a "dumb" JFlex lexer ({@link FreeFormLexerPhase1}) which tokenizates the input
+ * assuming that every entry in its keyword/keyphrase list is NOT an identifier.  Unfortunately,
+ * this isn't correct: Fortran has no problem with variables named "if" and arrays named "function".
+ * Additionally, a token like "len=" will be recognized in an assignment statement like "len=3", in
+ * which case it should be split into two tokens (T_IDENT T_EQUALS).
+ * <p>
+ * <code>FreeFormLexerPhase2</code> is responsible for deciding which keywords should really be
+ * identifiers.  It reads an entire statement from the JFlex lexer, then uses a combination of
+ * Sale's algorithm and some additional analyses to make these decisions.  It then passes on the
+ * (modified) tokens to the parser.
  * 
- * This lexer uses a "dumb" JFlex lexer (FreeFormLexerPhase1) for tokenization.
- * The JFlex lexer, however, assumes that every entry in its
- * keyword/keyphrase list is not an identifier.  Unfortunately, this isn't correct: 
- * Fortran has no problem with variables named "if" and arrays named "function".
- * Additionally, a token like "len=" will be recognized in an assignment statement
- * like "len=3", in which case it should be split into two tokens (T_IDENT T_EQUALS).
- * 
- * FreeFormLexerPhase2 is responsible for deciding which keywords should really
- * be identifiers.  It reads an entire statement from the JFlex lexer, then
- * uses a combination of Sale's algorithm and some additional analyses to make
- * these decisions.  It then passes on the (modified) tokens to the parser.
- * 
- * @author Jeffrey Overbey
+ * @author Jeff Overbey
  * 
  * @see FreeFormLexerPhase1
  */
