@@ -453,6 +453,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		} else {
 			IServiceConfiguration config = getServiceConfiguration();
 			config.setServiceProvider(fLaunchService, getServiceProvider());
+			fModelManager.addConfiguration(config);
 		}
 		return true;
 	}
