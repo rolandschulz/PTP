@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Contributing Refactorings</title>
+</head>
+
+<body>
+<h1>Contributing Refactorings</h1>
+
+TODO
+
+org.eclipse.rephraserengine.ui.refactoring.refactorings extension point
+
+<h2>Examples</h2>
+
+<pre>
+   &lt;extension
+         point=&quot;org.eclipse.rephraserengine.ui.refactoring.refactorings&quot;&gt;
+
+      &lt;!-- The resource filter determines what must be selected for these refactorings to be visible --&gt;
+      &lt;resourceFilter class=&quot;org.eclipse.rephraserengine.examples.text.TextFileResourceFilter&quot; /&gt;
+
+      &lt;!-- Each group defines a new (separated) section in the Refactor menu --&gt;
+      &lt;group&gt;
+
+         &lt;!-- A resource refactoring which uses an auto-generated user interface --&gt;
+         &lt;resourceRefactoring
+            class=&quot;org.eclipse.rephraserengine.examples.text.ConvertTabsToSpacesRefactoring&quot; /&gt;
+
+         &lt;!-- An editor refactoring which uses an auto-generated user interface --&gt;
+         &lt;editorRefactoring
+             class=&quot;org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring&quot; /&gt;
+
+         &lt;!-- Same as previous, except the given label (&quot;Increase Visibility&quot;) will appear in the menu;
+              when the label attribute is absent, the label will be whatever is returned by the refactoring&apos;s
+              #getName method --&gt;
+         &lt;editorRefactoring
+             label=&quot;Increase Visibility&quot;
+             class=&quot;org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring&quot; /&gt;
+
+         &lt;!-- An editor refactoring which uses a custom user interface --&gt;
+         &lt;editorRefactoring
+             class=&quot;org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring&quot;
+             inputPage=&quot;org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage&quot; /&gt;
+
+         &lt;!-- A command which is contributed as an editor refactoring --&gt;
+         &lt;!-- Note that this is the only way to give a refactoring a key binding --&gt;
+         &lt;editorRefactoring command=&quot;org.eclipse.photran.ui.RenameRefactoringCommand&quot; /&gt;
+
+         &lt;!-- An editor refactoring which only appears in the menu when the
+              PHOTRAN_INCLUDE_TEST_REFACTORINGS environment variable is set to a non-null value --&gt;
+         &lt;editorRefactoring
+             require_env=&quot;PHOTRAN_INCLUDE_TEST_REFACTORINGS&quot;
+             class=&quot;org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring&quot; /&gt;
+
+      &lt;/group&gt;
+   &lt;/extension&gt;
+</pre>
+
+</body>
+</html>

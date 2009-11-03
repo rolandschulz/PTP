@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Contributing a Virtual Program Graph</title>
+</head>
+
+<body>
+<h1>Contributing a Virtual Program Graph</h1>
+
+TODO
+
+<h2>Example</h2>
+
+<pre>
+   &lt;!-- This will automatically add some actions to the (Debugging) sub-menu of the Refactor
+        menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc. --&gt;
+   &lt;extension
+         point=&quot;org.eclipse.rephraserengine.ui.vpg.vpg&quot;&gt;
+      &lt;vpg
+         id=&quot;org.eclipse.photran.ui.vpg&quot;
+         name=&quot;Fortran&quot;
+         class=&quot;org.eclipse.photran.internal.ui.PhotranVPGContribution&quot; /&gt;
+   &lt;/extension&gt;
+</pre>
+
+</body>
+</html>

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.rephraserengine.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.rephraserengine.ui.vpg" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.rephraserengine.ui" id="vpg" name="VPG"/>
+         <meta.schema plugin="org.eclipse.rephraserengine.ui.vpg" id="vpg" name="VPG"/>
       </appInfo>
       <documentation>
          Allows plug-ins to contribute a VPG to the common Rephraser Engine action set.
@@ -23,21 +23,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -52,21 +52,21 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.ui.IEclipseVPGFactory"/>
@@ -81,7 +81,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         1.0
       </documentation>
    </annotation>
 
@@ -90,7 +90,16 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+            &lt;!-- This will automatically add some actions to the (Debugging) sub-menu of the Refactor
+        menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc. --&gt;
+   &lt;extension
+         point=&quot;org.eclipse.rephraserengine.ui.vpg.vpg&quot;&gt;
+      &lt;vpg
+         id=&quot;org.eclipse.photran.ui.vpg&quot;
+         name=&quot;Fortran&quot;
+         class=&quot;org.eclipse.photran.internal.ui.PhotranVPGContribution&quot; /&gt;
+   &lt;/extension&gt;
+
       </documentation>
    </annotation>
 

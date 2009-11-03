@@ -3,5 +3,6 @@
 
 <toc label="Concepts" link_to="toc.xml#concepts">
     <topic label="Introduction"  href="html/concepts/introduction.html" />
-    <topic label="Architecture"  href="html/concepts/architecture.html" />
+    <topic label="Contributing Refactorings"  href="html/concepts/refactorings.html" />
+    <topic label="Contributing a Virtual Program Graph"  href="html/concepts/vpg.html" />
 </toc>

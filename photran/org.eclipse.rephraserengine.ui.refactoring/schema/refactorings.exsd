@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.rephraserengine.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.rephraserengine.ui.refactoring" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.rephraserengine.ui" id="refactorings" name="Refactorings"/>
+         <meta.schema plugin="org.eclipse.rephraserengine.ui.refactoring" id="refactorings" name="Refactorings"/>
       </appinfo>
       <documentation>
-         Allows plug-ins to contribute to the Refactor menu in the menu bar.
+         Allows plug-ins to contribute to the Refactor menu.
       </documentation>
    </annotation>
 
@@ -31,21 +31,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -60,7 +60,7 @@
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring"/>
@@ -70,14 +70,14 @@
          <attribute name="label" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="command" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
@@ -87,7 +87,7 @@
          <attribute name="inputPage" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.rephraserengine.ui.refactoring.CustomUserInputPage:"/>
@@ -97,7 +97,7 @@
          <attribute name="require_env" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -109,7 +109,7 @@
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring"/>
@@ -119,14 +119,14 @@
          <attribute name="label" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="command" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
@@ -136,7 +136,7 @@
          <attribute name="inputPage" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.rephraserengine.ui.refactoring.CustomUserInputPage:"/>
@@ -146,7 +146,7 @@
          <attribute name="require_env" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -170,7 +170,7 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
@@ -185,7 +185,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.core.refactorings.IResourceFilter"/>
@@ -200,7 +200,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         1.0
       </documentation>
    </annotation>
 
@@ -209,27 +209,51 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+   &lt;extension
+         point=&quot;org.eclipse.rephraserengine.ui.refactoring.refactorings&quot;&gt;
+
+      &lt;!-- The resource filter determines what must be selected for these refactorings to be visible --&gt;
+      &lt;resourceFilter class=&quot;org.eclipse.rephraserengine.examples.text.TextFileResourceFilter&quot; /&gt;
+
+      &lt;!-- Each group defines a new (separated) section in the Refactor menu --&gt;
+      &lt;group&gt;
+
+         &lt;!-- A resource refactoring which uses an auto-generated user interface --&gt;
+         &lt;resourceRefactoring
+            class=&quot;org.eclipse.rephraserengine.examples.text.ConvertTabsToSpacesRefactoring&quot; /&gt;
+
+         &lt;!-- An editor refactoring which uses an auto-generated user interface --&gt;
+         &lt;editorRefactoring
+             class=&quot;org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring&quot; /&gt;
+
+         &lt;!-- Same as previous, except the given label (&quot;Increase Visibility&quot;) will appear in the menu;
+              when the label attribute is absent, the label will be whatever is returned by the refactoring&apos;s
+              #getName method --&gt;
+         &lt;editorRefactoring
+             label=&quot;Increase Visibility&quot;
+             class=&quot;org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring&quot; /&gt;
+
+         &lt;!-- An editor refactoring which uses a custom user interface --&gt;
+         &lt;editorRefactoring
+             class=&quot;org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring&quot;
+             inputPage=&quot;org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage&quot; /&gt;
+
+         &lt;!-- A command which is contributed as an editor refactoring --&gt;
+         &lt;!-- Note that this is the only way to give a refactoring a key binding --&gt;
+         &lt;editorRefactoring command=&quot;org.eclipse.photran.ui.RenameRefactoringCommand&quot; /&gt;
+
+         &lt;!-- An editor refactoring which only appears in the menu when the
+              PHOTRAN_INCLUDE_TEST_REFACTORINGS environment variable is set to a non-null value --&gt;
+         &lt;editorRefactoring
+             require_env=&quot;PHOTRAN_INCLUDE_TEST_REFACTORINGS&quot;
+             class=&quot;org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring&quot; /&gt;
+
+      &lt;/group&gt;
+   &lt;/extension&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="apiinfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>

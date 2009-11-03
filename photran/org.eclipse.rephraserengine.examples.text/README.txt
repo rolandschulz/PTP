@@ -1,3 +1,5 @@
+REPHRASER ENGINE - TEXT EXAMPLE
+
 This is a simple example of how to contribute a refactoring to the Rephraser Refactoring UI.
 (Note that this does *not* use the VPG components of the Rephraser engine.)
 
