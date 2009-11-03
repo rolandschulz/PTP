@@ -1028,7 +1028,7 @@ int command_cancel_job(int gui_transmission_id, int nargs, char *args[])
   print_message_args(nargs, args);
 
   for (i = 0; i < nargs; i++) {
-    if (proxy_test_attribute(JOB_ID_ATTR, args[i])) {
+    if (proxy_test_attribute(PTP_JOB_ID_ATTR, args[i])) {
 	  job_ident = proxy_get_attribute_value_int(args[i]);
     }
   }
@@ -2200,7 +2200,7 @@ static int sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_obje
   char proxy_generated_job_id_string[256];
   char proxy_generated_queue_id_string[256];
   char job_name_string[256];
-  char *job_state_to_report = PTP_JOB_STATE_INIT;
+  char *job_state_to_report = PTP_JOB_STATE_STARTING;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. state=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, job_object->job_state);
   memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));   /* zero the area */
@@ -2211,19 +2211,19 @@ static int sendJobAddEvent(int gui_transmission_id, ClusterObject * cluster_obje
 
   switch (job_object->job_state) {
     case MY_STATE_IDLE:
-      job_state_to_report = PTP_JOB_STATE_INIT;
+      job_state_to_report = PTP_JOB_STATE_STARTING;
       break;
     case MY_STATE_RUNNING:
       job_state_to_report = PTP_JOB_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      job_state_to_report = PTP_JOB_STATE_INIT;
+      job_state_to_report = PTP_JOB_STATE_SUSPENDED;
       break;
     case MY_STATE_TERMINATED:
-      job_state_to_report = PTP_JOB_STATE_TERMINATED;
+      job_state_to_report = PTP_JOB_STATE_COMPLETED;
       break;
     default:
-      job_state_to_report = PTP_JOB_STATE_INIT;
+      job_state_to_report = PTP_JOB_STATE_STARTING;
       break;
   }
 
@@ -2299,7 +2299,7 @@ static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
   char proxy_generated_job_id_string[256];
   char proxy_generated_task_id_string[256];
   char ll_task_id_string[256];
-  char *task_state_to_report = PTP_PROC_STATE_STOPPED;
+  char *task_state_to_report = PTP_PROC_STATE_SUSPENDED;
   NodeObject *node_object = NULL;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. node=%s. task=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, task_object->node_name, task_object->ll_task_id);
@@ -2319,10 +2319,10 @@ static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
       task_state_to_report = PTP_PROC_STATE_RUNNING;
       break;
     case MY_STATE_STOPPED:
-      task_state_to_report = PTP_PROC_STATE_STOPPED;
+      task_state_to_report = PTP_PROC_STATE_SUSPENDED;
       break;
     case MY_STATE_TERMINATED:
-      task_state_to_report = PTP_PROC_STATE_EXITED;
+      task_state_to_report = PTP_PROC_STATE_COMPLETED;
       break;
     default:
       task_state_to_report = PTP_PROC_STATE_STARTING;
