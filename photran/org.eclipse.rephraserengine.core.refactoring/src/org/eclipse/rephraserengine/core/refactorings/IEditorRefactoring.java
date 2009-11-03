@@ -30,6 +30,8 @@ import org.eclipse.jface.text.ITextSelection;
  *
  * @see IResourceRefactoring
  * @see IRefactoring
+ * 
+ * @since 1.0
  */
 public interface IEditorRefactoring extends IRefactoring
 {

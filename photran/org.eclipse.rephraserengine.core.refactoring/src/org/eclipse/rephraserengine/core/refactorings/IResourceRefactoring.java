@@ -31,6 +31,8 @@ import org.eclipse.core.resources.IFile;
  *
  * @see IEditorRefactoring
  * @see IRefactoring
+ * 
+ * @since 1.0
  */
 public interface IResourceRefactoring extends IRefactoring
 {

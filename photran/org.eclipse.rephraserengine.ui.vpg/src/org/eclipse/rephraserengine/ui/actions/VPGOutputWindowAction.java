@@ -22,6 +22,8 @@ import org.eclipse.rephraserengine.internal.ui.UIUtil;
  * user to view.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public abstract class VPGOutputWindowAction extends VPGWindowActionDelegate
 {

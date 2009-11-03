@@ -56,6 +56,8 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * </ul>
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 @SuppressWarnings("restriction")
 public final class RefactorMenu extends CompoundContributionItem

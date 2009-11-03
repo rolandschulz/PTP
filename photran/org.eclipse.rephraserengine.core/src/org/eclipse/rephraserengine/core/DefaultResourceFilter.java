@@ -19,6 +19,8 @@ import org.eclipse.core.resources.IResource;
  *
  * @see IResourceFilter
  * @see IResource#isAccessible()
+ * 
+ * @since 1.0
  */
 public class DefaultResourceFilter implements IResourceFilter
 {

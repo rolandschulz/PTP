@@ -16,6 +16,8 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
  * Interface implemented by classes contributed to the <i>vpg</i> extension point.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public interface IEclipseVPGFactory
 {

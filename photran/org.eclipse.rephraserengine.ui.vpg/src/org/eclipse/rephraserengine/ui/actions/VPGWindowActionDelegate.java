@@ -50,6 +50,8 @@ import org.eclipse.ui.progress.IProgressService;
  * workspace; this guarantees that only one such action will be accessing the VPG at a time.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 @SuppressWarnings("unchecked")
 public abstract class VPGWindowActionDelegate

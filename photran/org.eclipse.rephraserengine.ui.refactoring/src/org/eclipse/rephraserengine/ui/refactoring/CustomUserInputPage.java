@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.Composite;
  * @author Jeff Overbey
  *
  * @param R the type of refactoring for which this wizard page provides input
+ * 
+ * @since 1.0
  */
 public abstract class CustomUserInputPage<R extends Refactoring> extends UserInputWizardPage
 {

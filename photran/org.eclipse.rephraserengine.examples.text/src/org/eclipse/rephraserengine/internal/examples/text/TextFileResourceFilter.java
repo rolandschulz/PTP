@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.rephraserengine.examples.text;
+package org.eclipse.rephraserengine.internal.examples.text;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;

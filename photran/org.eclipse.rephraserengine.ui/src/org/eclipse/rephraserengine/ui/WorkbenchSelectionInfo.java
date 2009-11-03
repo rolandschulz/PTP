@@ -45,6 +45,8 @@ import org.eclipse.ui.internal.Workbench;
  * should be created and then immediately used and disposed of.
  *
  * @author Jeff Overbey, Tim Yuvashev
+ * 
+ * @since 1.0
  */
 @SuppressWarnings("restriction")
 public class WorkbenchSelectionInfo
