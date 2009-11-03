@@ -7,7 +7,7 @@
    <extension
          point="org.eclipse.cdt.core.language">
       <language
-            class="org.eclipse.photran.cdtinterface.core.FortranLanguage"
+            class="org.eclipse.photran.internal.cdtinterface.core.FortranLanguage"
             id="fortran"
             name="Fortran">
          <contentType id="org.eclipse.photran.core.fixedFormFortranSource"/>
@@ -44,7 +44,7 @@
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             type="org.eclipse.photran.launch.localCLaunch"
-            class="org.eclipse.photran.cdtinterface.launch.FortranLocalRunLaunchConfigurationTabGroup"
+            class="org.eclipse.photran.internal.cdtinterface.launch.FortranLocalRunLaunchConfigurationTabGroup"
             id="org.eclipse.photran.launch.localRunLaunchTabGroup">
       </launchConfigurationTabGroup>
    </extension>
@@ -55,7 +55,7 @@
             label="Local Fortran Application"
             icon="icons/obj16/f_app.gif"
             modes="run, debug"
-            class="org.eclipse.photran.cdtinterface.launch.CApplicationLaunchShortcut"
+            class="org.eclipse.photran.internal.cdtinterface.launch.CApplicationLaunchShortcut"
             id="org.eclipse.photran.debug.ui.localCShortcut">
          <contextualLaunch>
            <enablement>
@@ -104,7 +104,7 @@
       <perspective
             name="Fortran"
             icon="icons/etool16/f_pers.gif"
-            class="org.eclipse.photran.cdtinterface.ui.FortranPerspectiveFactory"
+            class="org.eclipse.photran.internal.cdtinterface.ui.FortranPerspectiveFactory"
             id="org.eclipse.photran.ui.FortranPerspective">
       </perspective>
    </extension>
@@ -146,7 +146,7 @@
             name="Fortran Projects"
             icon="icons/etool16/fview.gif"
             category="org.eclipse.photran.ui.views"
-            class="org.eclipse.photran.cdtinterface.ui.FortranView"
+            class="org.eclipse.photran.internal.cdtinterface.ui.FortranView"
             id="org.eclipse.photran.ui.FortranView">
       </view>
    </extension>
@@ -164,7 +164,7 @@
        <wizard
              canFinishEarly="false"
              category="org.eclipse.photran.ui.newFortranWizards"
-             class="org.eclipse.photran.cdtinterface.ui.FortranProjectWizard"
+             class="org.eclipse.photran.internal.cdtinterface.ui.FortranProjectWizard"
              finalPerspective="org.eclipse.photran.ui.FortranPerspective"
              hasPages="true"
              icon="icons/etool16/newfortran_app.gif"
@@ -238,7 +238,7 @@
             label="Fortran Element Creation"
             visible="false">
          <action
-               class="org.eclipse.photran.cdtinterface.ui.NewFileDropDownAction"
+               class="org.eclipse.photran.internal.cdtinterface.ui.NewFileDropDownAction"
                icon="icons/etool16/newfortranfile_wiz.gif"
                id="org.eclipse.photran.cdtinterface.actions.NewFileDropDown"
                label="&amp;Source File..."
@@ -246,7 +246,7 @@
                toolbarPath="Normal/FortranWizards"
                tooltip="New Source File"/>
          <action
-               class="org.eclipse.photran.cdtinterface.ui.NewFolderDropDownAction"
+               class="org.eclipse.photran.internal.cdtinterface.ui.NewFolderDropDownAction"
                icon="icons/etool16/newsrcfldr_wiz.gif"
                id="org.eclipse.photran.cdtinterface.actions.NewFolderDropDown"
                label="&amp;Source Folder..."
@@ -254,7 +254,7 @@
                toolbarPath="Normal/FortranWizards"
                tooltip="New Source Folder"/>
          <action
-               class="org.eclipse.photran.cdtinterface.ui.NewProjectDropDownAction"
+               class="org.eclipse.photran.internal.cdtinterface.ui.NewProjectDropDownAction"
                icon="icons/etool16/newfortran_app.gif"
                id="org.eclipse.photran.cdtinterface.actions.NewProjectDropDown"
                label="&amp;Project..."
@@ -307,11 +307,11 @@
    <extension point="org.eclipse.cdt.core.templateProcessTypes">
       <processType
             name="addFortranErrorParsers"
-            processRunner="org.eclipse.photran.cdtinterface.templates.AddFortranErrorParsersProcessRunner">
+            processRunner="org.eclipse.photran.internal.cdtinterface.templates.AddFortranErrorParsersProcessRunner">
       </processType>
       <processType
             name="addAllBinaryParsers"
-            processRunner="org.eclipse.photran.cdtinterface.templates.AddAllBinaryParsersProcessRunner">
+            processRunner="org.eclipse.photran.internal.cdtinterface.templates.AddAllBinaryParsersProcessRunner">
       </processType>
    </extension>
 
@@ -355,7 +355,7 @@
             label="Convert to Fortran Project"
             menubarPath="additions"
             icon="icons/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.cdtinterface.ui.ProjectConversionAction" />
+            class="org.eclipse.photran.internal.cdtinterface.ui.ProjectConversionAction" />
       </viewerContribution>
    </extension>
 

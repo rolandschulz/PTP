@@ -4,17 +4,17 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.cdtinterface; singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-ClassPath: cdtinterface.jar
-Bundle-Activator: org.eclipse.photran.cdtinterface.CDTInterfacePlugin
+Bundle-Activator: org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Export-Package: org.eclipse.photran.cdtinterface,
- org.eclipse.photran.cdtinterface.core,
- org.eclipse.photran.cdtinterface.dom,
- org.eclipse.photran.cdtinterface.launch,
- org.eclipse.photran.cdtinterface.natures,
- org.eclipse.photran.cdtinterface.templates,
- org.eclipse.photran.cdtinterface.ui,
- org.eclipse.photran.cdtinterface.ui.editor,
+Export-Package: org.eclipse.photran.internal.cdtinterface,
+ org.eclipse.photran.internal.cdtinterface.core,
+ org.eclipse.photran.internal.cdtinterface.dom,
+ org.eclipse.photran.internal.cdtinterface.launch,
+ org.eclipse.photran.internal.cdtinterface.natures,
+ org.eclipse.photran.internal.cdtinterface.templates,
+ org.eclipse.photran.internal.cdtinterface.ui,
+ org.eclipse.photran.internal.cdtinterface.ui.editor,
  org.eclipse.photran.internal.core.model
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

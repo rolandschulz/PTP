@@ -17,7 +17,7 @@ import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
+import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
 import org.eclipse.photran.internal.core.lexer.IToken;
 
 /**
