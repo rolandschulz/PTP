@@ -14,11 +14,15 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.rephraserengine.core.preservation.ResetOffsetLength;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
 
 /**
- * An adapter factory (registered in plugin.xml) that adapts {@link IASTNode} objects to
- * {@link OffsetLength} objects.
+ * An adapter factory (registered in plugin.xml) that adapts {@link IASTNode} objects to:
+ * <ul>
+ * <li> {@link OffsetLength}
+ * <li> {@link ResetOffsetLength}
+ * </ul>
  *
  * @author Jeff Overbey
  */
@@ -29,17 +33,37 @@ public class ASTNodeAdapterFactory implements IAdapterFactory
 
     public Class[] getAdapterList()
     {
-        return new Class[] { OffsetLength.class };
+        return new Class[]
+        {
+            OffsetLength.class,
+            ResetOffsetLength.class
+        };
     }
 
     public Object getAdapter(Object adaptableObject, Class adapterType)
     {
         if (!IASTNode.class.isAssignableFrom(adaptableObject.getClass())) return null;
-        if (!adapterType.equals(OffsetLength.class)) return null;
-
         IASTNode node = (IASTNode)adaptableObject;
 
-        return getOffsetLength(node, findRoot(node));
+        if (adapterType.equals(OffsetLength.class))
+            return getOffsetLength(node, findRoot(node));
+        else if (adapterType.equals(ResetOffsetLength.class))
+            return reset(node);
+        else
+            return null;
+    }
+    
+    private ResetOffsetLength reset(IASTNode node)
+    {
+        node.accept(new GenericASTVisitor()
+        {
+            @Override public void visitToken(Token token)
+            {
+                token.setFileOffset(-1);
+            }
+        });
+        
+        return ResetOffsetLength.RESET;
     }
 
     private IASTNode findRoot(IASTNode node)
@@ -77,7 +101,8 @@ public class ASTNodeAdapterFactory implements IAdapterFactory
                 if (thisToken == target)
                     result = lastToken;
 
-                if (thisToken.getFileOffset() >= 0) // Skip tokens added in markAlpha above
+                // Skip tokens from added subtrees (i.e., subtrees adapted to ResetOffsetLength)
+                if (thisToken.getFileOffset() >= 0)
                     lastToken = thisToken;
             }
         }

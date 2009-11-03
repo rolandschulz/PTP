@@ -501,4 +501,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 //                                    + dependentFilename);
         super.processingDependent(filename, dependentFilename);
     }
+    
+    /** Forces the database to be updated based on the current in-memory AST for the given file */
+    public void commitChangeFromAST(IFile file)
+    {
+        commitChangeFromAST(getFilenameForIFile(file));
+    }
 }

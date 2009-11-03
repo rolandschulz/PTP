@@ -10,28 +10,23 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
-import org.eclipse.rephraserengine.internal.core.preservation.Model;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
 
 /**
  * Refactoring to add an empty subroutine to a Fortran program.
@@ -47,8 +42,8 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
     private ScopingNode enclosingScope;
 
     private String newName = null;
-
-    private List<PrimitiveOp> primitiveOps;
+    
+    private PreservationAnalysis preservation = new PreservationAnalysis(PhotranVPG.getInstance());
 
     @Override
     public String getName()
@@ -72,7 +67,6 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
@@ -99,6 +93,34 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
     {
         assert newName != null;
         assert enclosingScope != null;
+
+        try
+        {
+            //Platform.getAdapterManager().registerAdapters(new ASTNodeAdapterFactory(), IASTNode.class);
+            
+            preservation.startMonitoring(fileInEditor);
+            createNewSubprogram();
+            preservation.finishMonitoring(fileInEditor);
+            
+            pm.subTask("Entering hypothetical mode");
+            PhotranVPG.getDatabase().enterHypotheticalMode();
+            
+            vpg.commitChangeFromAST(fileInEditor);
+            preservation.checkForPreservation(status, fileInEditor);
+
+            pm.subTask("Leaving hypothetical mode");
+            PhotranVPG.getDatabase().leaveHypotheticalMode();
+
+            this.addChangeFromModifiedAST(this.fileInEditor, pm);
+        }
+        catch (IOException e)
+        {
+            throw new Error(e);
+        }
+        finally
+        {
+            vpg.releaseAllASTs();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -108,51 +130,6 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
-        assert newName != null;
-        assert enclosingScope != null;
-
-        try
-        {
-            Model initial = new Model(vpg, PhotranVPG.getFilenameForIFile(fileInEditor));
-            System.out.println("INITIAL MODEL:");
-            System.out.println(initial);
-
-            primitiveOps = new LinkedList<PrimitiveOp>();
-            ASTSubroutineSubprogramNode newSubprogram = createNewSubprogram();
-
-            System.out.println("BEFORE ALPHA MERGE:");
-            System.out.println(primitiveOps);
-
-            System.out.println("AFTER ALPHA MERGE:");
-            mergeAlphas();
-            System.out.println(primitiveOps);
-
-            assert primitiveOps.size() == 1; // FIXME HACK
-
-            initial.inormalize(primitiveOps.get(0));
-            System.out.println("NORMALIZED INITIAL MODEL:");
-            System.out.println(initial);
-
-            this.addChangeFromModifiedAST(this.fileInEditor, pm);
-        }
-        finally
-        {
-            vpg.releaseAllASTs();
-        }
-    }
-
-    private void mergeAlphas() // FIXME HACK
-    {
-        Alpha alpha1 = (Alpha)primitiveOps.get(0);
-        Alpha alpha2 = (Alpha)primitiveOps.get(1);
-        if (alpha1.j.lb != alpha2.j.lb) return;
-
-        primitiveOps.remove(1);
-        primitiveOps.remove(0);
-
-        primitiveOps.add(0, PrimitiveOp.alpha(
-            alpha1.j.lb,
-            alpha1.j.lb+alpha1.j.cardinality()+alpha2.j.cardinality()));
     }
 
     // from ExtractProcedureRefactoring
@@ -198,7 +175,7 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
             ASTContainsStmtNode containsStmt = createContainsStmt();
             program.setContainsStmt(containsStmt);
             containsStmt.setParent(program);
-            markAlpha(program.getContainsStmt(), program);
+            preservation.markAlpha(program.getContainsStmt());
         }
 
         if (program.getInternalSubprograms() == null)
@@ -210,84 +187,10 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
 
         program.getInternalSubprograms().add(subprogram);
         subprogram.setParent(program.getInternalSubprograms());
-        markAlpha(subprogram, program);
+        preservation.markAlpha(subprogram);
 
         //Reindenter.reindent(subprogram, this.astOfFileInEditor);
 
         return subprogram;
-    }
-
-    private void markAlpha(IASTNode node, IASTNode inAST)
-    {
-        assert primitiveOps != null;
-
-        if (node == null) return;
-
-        assert inAST != null;
-
-        Token first = node.findFirstToken();
-        Token last = node.findLastToken();
-        if (first == null || last == null) return;
-
-        Token previous = findLastTokenBefore(first, inAST);
-        Token next = findFirstTokenAfter(last, inAST);
-        if (previous == null || next == null) return; // FIXME should handle BOF, EOF
-
-        int offset = previous.getFileOffset() + previous.getLength() + previous.getWhiteAfter().length();
-        int length = node.toString().length();
-        primitiveOps.add(PrimitiveOp.alpha(offset, offset+length));
-
-        node.accept(new GenericASTVisitor()
-        {
-            @Override public void visitToken(Token token)
-            {
-                token.setFileOffset(-1);
-            }
-        });
-    }
-
-    private Token findLastTokenBefore(final Token target, IASTNode inAST)
-    {
-        class TokenFinder extends GenericASTVisitor
-        {
-            private Token lastToken = null;
-            private Token result = null;
-
-            @Override public void visitToken(Token thisToken)
-            {
-                if (thisToken == target)
-                    result = lastToken;
-
-                if (thisToken.getFileOffset() >= 0) // Skip tokens added in markAlpha above
-                    lastToken = thisToken;
-            }
-        }
-
-        TokenFinder t = new TokenFinder();
-        inAST.accept(t);
-        return t.result;
-    }
-
-    // from Definition
-
-    private Token findFirstTokenAfter(final Token target, IASTNode inAST)
-    {
-        class TokenFinder extends GenericASTVisitor
-        {
-            private Token lastToken = null;
-            private Token result = null;
-
-            @Override public void visitToken(Token thisToken)
-            {
-                if (lastToken == target)
-                    result = thisToken;
-
-                lastToken = thisToken;
-            }
-        }
-
-        TokenFinder t = new TokenFinder();
-        inAST.accept(t);
-        return t.result;
     }
 }

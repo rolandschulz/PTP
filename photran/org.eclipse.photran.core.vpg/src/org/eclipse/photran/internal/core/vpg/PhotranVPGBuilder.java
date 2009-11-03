@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.vpg;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -292,9 +293,24 @@ public class PhotranVPGBuilder extends PhotranVPG
             }
         }
     }
+    
+    @Override
+    public void commitChangeFromAST(String filename)
+    {
+        IFortranAST ast = acquireTransientAST(filename);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
+        ast.getRoot().printOn(new PrintStream(out), null);
+        ast = parse(filename, new ByteArrayInputStream(out.toByteArray()));
+        super.commitChangeFromAST(filename, ast);
+    }
 
     @Override
     protected IFortranAST parse(final String filename)
+    {
+        return parse(filename, null);
+    }
+
+    private IFortranAST parse(final String filename, InputStream stream)
     {
         if (filename == null || isVirtualFile(filename)) return null;
 
@@ -302,7 +318,8 @@ public class PhotranVPGBuilder extends PhotranVPG
         SourceForm sourceForm = determineSourceForm(filename);
         try
         {
-            IAccumulatingLexer lexer = LexerFactory.createLexer(file, sourceForm, true);
+            if (stream == null) stream = file.getContents(true);
+            IAccumulatingLexer lexer = LexerFactory.createLexer(stream, file, filename, sourceForm, true);
             long start = System.currentTimeMillis();
             ASTExecutableProgramNode ast = parser.parse(lexer);
             debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);

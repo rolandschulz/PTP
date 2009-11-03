@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.vpg;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -80,6 +81,14 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
     /** Removes ALL data from the database; also clears the error/warning log. */
     abstract public void clearDatabase();
+
+    // HYPOTHETICAL UPDATING ///////////////////////////////////////////////////
+    
+    abstract public void enterHypotheticalMode() throws IOException;
+    
+    abstract public void leaveHypotheticalMode() throws IOException;
+    
+    abstract public boolean isInHypotheticalMode();
 
     // FILES ///////////////////////////////////////////////////////////////////
 

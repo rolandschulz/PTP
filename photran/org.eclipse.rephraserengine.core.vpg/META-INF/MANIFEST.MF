@@ -4,7 +4,8 @@ Bundle-Name: Rephraser Engine Core VPG Plug-in
 Bundle-SymbolicName: org.eclipse.rephraserengine.core.vpg
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Eclipse.org - Photran
-Export-Package: org.eclipse.rephraserengine.core.util,
+Export-Package: org.eclipse.rephraserengine.core.preservation,
+ org.eclipse.rephraserengine.core.util,
  org.eclipse.rephraserengine.core.vpg,
  org.eclipse.rephraserengine.core.vpg.db.caching,
  org.eclipse.rephraserengine.core.vpg.db.cdt,
@@ -20,5 +21,6 @@ Bundle-ClassPath: cdtdb-4.0.3-eclipse.jar,
 Import-Package: org.eclipse.core.runtime
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.rephraserengine.core,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.ltk.core.refactoring
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -11,10 +11,13 @@
 package org.eclipse.rephraserengine.core.vpg.db.cdt;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,10 +50,13 @@ import org.eclipse.rephraserengine.internal.core.vpg.db.cdt.InternalCDTDB.IntVec
  *
  * @param <A> AST type
  * @param <T> token type
+ * @param <R> TokenRef type
+ * @param <L> log type
  */
-public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>> extends VPGDB<A, T, R, L>
+public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
+              extends VPGDB<A, T, R, L>
 {
-    private final InternalCDTDB db;
+    private InternalCDTDB db;
 
     public CDTDB(String filename)
     {
@@ -113,6 +119,52 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         {
             getVPG().log.logError(e);
         }
+    }
+
+    // HYPOTHETICAL UPDATING ///////////////////////////////////////////////////
+    
+    private InternalCDTDB origDB = null;
+    
+    @Override public void enterHypotheticalMode() throws IOException
+    {
+        assert !isInHypotheticalMode();
+        
+        try
+        {
+            db.flush();
+            File copy = copyFile(db.getFile());
+            
+            origDB = db;
+            db = new InternalCDTDB(copy);
+        }
+        catch (CoreException e)
+        {
+            throw new Error(e);
+        }
+    }
+    
+    private static File copyFile(File orig) throws IOException
+    {
+        File tempFile = File.createTempFile("rephraser-tmp", "db");
+        FileChannel from = new FileInputStream(orig).getChannel();
+        FileChannel to = new FileOutputStream(tempFile).getChannel();
+        to.transferFrom(from, 0, from.size());
+        from.close();
+        to.close();
+        return tempFile;
+    }
+    
+    @Override public void leaveHypotheticalMode()
+    {
+        assert isInHypotheticalMode();
+        
+        db = origDB;
+        origDB = null;
+    }
+    
+    @Override public boolean isInHypotheticalMode()
+    {
+        return origDB != null;
     }
 
     // FILES ///////////////////////////////////////////////////////////////////

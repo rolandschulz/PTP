@@ -59,6 +59,7 @@ public class InternalCDTDB
     static final int REVERSE_EDGE_BTREE_ROOT       = Database.DATA_AREA + 16;
     static final int ANNOTATION_BTREE_ROOT         = Database.DATA_AREA + 20;
 
+    protected File file;
     protected Database db;
 
     public final Files files;
@@ -68,6 +69,8 @@ public class InternalCDTDB
 
     public InternalCDTDB(File file) throws CoreException
     {
+        this.file = file;
+
         db = new Database(file, new ChunkCache(), 0, false);
         db.setExclusiveLock();
 
@@ -75,6 +78,11 @@ public class InternalCDTDB
         dependencies = new Dependencies();
         edges = new Edges();
         annotations = new Annotations();
+    }
+    
+    public File getFile()
+    {
+        return file;
     }
 
     public void flush() throws CoreException

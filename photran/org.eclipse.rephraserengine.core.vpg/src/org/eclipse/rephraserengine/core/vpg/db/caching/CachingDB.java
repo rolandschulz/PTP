@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.vpg.db.caching;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -141,6 +142,25 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
     {
         clearCache();
         db.clearDatabase();
+    }
+
+    // HYPOTHETICAL UPDATING ///////////////////////////////////////////////////
+    
+    @Override public void enterHypotheticalMode() throws IOException
+    {
+        clearCache();
+        db.enterHypotheticalMode();
+    }
+    
+    @Override public void leaveHypotheticalMode() throws IOException
+    {
+        clearCache();
+        db.leaveHypotheticalMode();
+    }
+    
+    @Override public boolean isInHypotheticalMode()
+    {
+        return db.isInHypotheticalMode();
     }
 
     // FILES ///////////////////////////////////////////////////////////////////
