@@ -84,7 +84,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnectionManager_2);
 		}
 		try {
-			RemoteToolsConnection conn = new RemoteToolsConnection(element.getName(), address, user, (PTPTargetControl)element.getControl());
+			RemoteToolsConnection conn = new RemoteToolsConnection(element.getName(), address, user, element);
 			((PTPTargetControl)element.getControl()).setConnection(conn);
 			return conn;
 		} catch (CoreException e) {

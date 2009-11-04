@@ -32,60 +32,37 @@ import org.eclipse.rse.core.subsystems.CommunicationsEvent;
 import org.eclipse.rse.core.subsystems.ICommunicationsListener;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.ISubSystem;
+import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.dstore.IDStoreService;
 import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShellServiceSubSystem;
 
 public class RSEConnection implements IRemoteConnection {
 	private IShellService shellService = null;
+
 	private ISubSystem subSystem = null;
-	
+	private Map<String, String> fEnv = null;
+	private Map<String, String> fProperties = null;
 	private final IHost rseHost;
+	
 	private final IFileSystem fileSystem;
-	private final IRemoteConnection connection = this;
-	private final ListenerList listeners = new ListenerList();
+	private final IRemoteConnection fConnection = this;
+	private final ListenerList fListeners = new ListenerList();
 	
 	private ICommunicationsListener commsListener = new ICommunicationsListener() {
 
 		public void communicationsStateChange(CommunicationsEvent event) {
 			switch (event.getState()) {
 			case CommunicationsEvent.AFTER_CONNECT:
-				fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-					public IRemoteConnection getConnection() {
-						return connection;
-					}
-
-					public int getType() {
-						return IRemoteConnectionChangeEvent.CONNECTION_OPENED;
-					}
-					
-				});		
+				fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_OPENED);		
 				break;
 				
 			case CommunicationsEvent.AFTER_DISCONNECT:
-				fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-					public IRemoteConnection getConnection() {
-						return connection;
-					}
-
-					public int getType() {
-						return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
-					}
-					
-				});		
+				fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_CLOSED);		
 				break;
 				
 			case CommunicationsEvent.CONNECTION_ERROR:
-				fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-					public IRemoteConnection getConnection() {
-						return connection;
-					}
-
-					public int getType() {
-						return IRemoteConnectionChangeEvent.CONNECTION_ABORTED;
-					}
-					
-				});		
+				fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_ABORTED);		
 				break;
 			}
 		}
@@ -95,19 +72,19 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		
 	};
-
+	
 	public RSEConnection(IHost host, IFileSystem fileSystem) {
 		this.rseHost = host;
 		this.fileSystem = fileSystem;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
 	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.add(listener);
+		fListeners.add(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#close()
 	 */
@@ -127,7 +104,7 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -135,7 +112,7 @@ public class RSEConnection implements IRemoteConnection {
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
@@ -143,7 +120,7 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -151,7 +128,7 @@ public class RSEConnection implements IRemoteConnection {
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.RSEConnection_noPortFwd);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getAddress()
 	 */
@@ -166,11 +143,11 @@ public class RSEConnection implements IRemoteConnection {
 		// TODO implement
 		return new HashMap<String, String>();
 	}
-	
+
 	/**
-	 * Get the DStore connector service for this connection.
+	 * Get the DStore connector service for this fConnection.
 	 * 
-	 * @return connector service for DStores or null if this connection does not support DStore
+	 * @return connector service for DStores or null if this fConnection does not support DStore
 	 */
 	public DataStore getDataStore() {
 		IConnectorService connector = DStoreConnectorServiceManager.getInstance().getConnectorService(rseHost, IDStoreService.class);
@@ -179,32 +156,47 @@ public class RSEConnection implements IRemoteConnection {
 		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv()
 	 */
 	public Map<String, String> getEnv() {
-		// TODO implement
-		return new HashMap<String, String>();
+		if (fEnv == null) {
+			fEnv = new HashMap<String, String>();
+			
+			try {
+				String[] env = shellService.getHostEnvironment();
+				for (String var : env) {
+					String[] kv = var.split("="); //$NON-NLS-1$
+					if (kv.length == 2) {
+						fEnv.put(kv[0], kv[1]);
+					}
+				}
+			} catch (SystemMessageException e) {
+			}
+		}
+		return fEnv;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv(java.lang.String)
 	 */
 	public String getEnv(String name) {
-		// TODO implement
-		return null;
+		if (fEnv == null) {
+			getEnv();
+		}
+		return fEnv.get(name);
 	}
-
+	
 	/**
-	 * Get the file system for this connection
+	 * Get the file system for this fConnection
 	 * 
 	 * @return
 	 */
 	public IFileSystem getFileSystem() {
 		return fileSystem;
 	}
-	
+
 	/**
 	 * Get RSE host object 
 	 * 
@@ -220,17 +212,17 @@ public class RSEConnection implements IRemoteConnection {
 	public String getName() {
 		return rseHost.getAliasName();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String)
 	 */
 	public String getProperty(String key) {
-		// TODO implement
-		return null;
+		loadProperties();
+		return fProperties.get(key);
 	}
-	
+
 	/**
-	 * Get the shell service for this connection
+	 * Get the shell service for this fConnection
 	 * 
 	 * @return shell service
 	 */
@@ -278,14 +270,21 @@ public class RSEConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		listeners.remove(listener);
+		fListeners.remove(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
 		rseHost.setHostName(address);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setName(java.lang.String)
+	 */
+	public void setName(String name) {
+		rseHost.setAliasName(name);
 	}
 
 	/* (non-Javadoc)
@@ -303,13 +302,30 @@ public class RSEConnection implements IRemoteConnection {
 	}
 
 	/**
-	 * Notify all listeners when this connection's status changes.
+	 * Notify all fListeners when this fConnection's status changes.
 	 * 
 	 * @param event
 	 */
-	private void fireConnectionChangeEvent(IRemoteConnectionChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
+	private void fireConnectionChangeEvent(final int type) {
+		IRemoteConnectionChangeEvent event = new IRemoteConnectionChangeEvent() {
+			public IRemoteConnection getConnection() {
+				return fConnection;
+			}
+			public int getType() {
+				return type;
+			}
+		};	
+		for (Object listener : fListeners.getListeners()) {
 			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
+		}
+	}
+	
+	private void loadProperties() {
+		if (fProperties == null) {
+			fProperties = new HashMap<String, String>();
+			fProperties.put(FILE_SERPARATOR_PROPERTY, "/"); //$NON-NLS-1$
+			fProperties.put(PATH_SERPARATOR_PROPERTY, ":"); //$NON-NLS-1$
+			fProperties.put(LINE_SERPARATOR_PROPERTY, "\n"); //$NON-NLS-1$
 		}
 	}
 	
@@ -321,7 +337,7 @@ public class RSEConnection implements IRemoteConnection {
 	}
 	
 	/**
-	 * Initialize the connection
+	 * Initialize the fConnection
 	 * 
 	 * @return true if initialization succeeded
 	 */

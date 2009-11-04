@@ -29,51 +29,24 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final static 	String EXIT_CMD = "exit"; //$NON-NLS-1$
 	private final static 	String CMD_DELIMITER = ";"; //$NON-NLS-1$
 	
-	private RSEConnection connection;
-	private Map<String, String> remoteEnv = new HashMap<String, String>();
+	private RSEConnection fConnection;
+	private Map<String, String> fRemoteEnv = new HashMap<String, String>();
 
 	public RSEProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
-		this.connection = (RSEConnection)conn;
-		
-		IShellService shellService = connection.getRemoteShellService();
-		
-		try {
-			String[] env = shellService.getHostEnvironment();
-			populateEnvironmentMap(env);
-			
-		} catch (SystemMessageException e) {
-		}
+		fConnection = (RSEConnection)conn;
+		fRemoteEnv = conn.getEnv();
 	}
 
-	/**
-	 * Convert environment strings into a map
-	 * 
-	 * @param env array containing environment variables
-	 */
-	private void populateEnvironmentMap(String[] env) {
-		// env is of the form "var=value"
-		
-		for(int k = 0; k < env.length; k++) {
-			
-			// get the index of the "="
-			int pos = env[k].indexOf("="); //$NON-NLS-1$
-			assert(pos != -1);
-			
-			remoteEnv.put(env[k].substring(0, pos), env[k].substring(pos + 1));
-		}
-		
-	}
-	
 	/**
 	 * Convert environment map back to environment strings.
 	 * 
 	 * @return array of environment variables
 	 */
 	private String[] getEnvironment() {
-		String[] env = new String[remoteEnv.size()];
+		String[] env = new String[fRemoteEnv.size()];
 		int pos = 0;
-		for (Map.Entry<String, String> entry: remoteEnv.entrySet()) {
+		for (Map.Entry<String, String> entry: fRemoteEnv.entrySet()) {
 			env[pos++] = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 		}
 		return env;
@@ -88,7 +61,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	 */
 	@Override
 	public Map<String, String> environment() {
-		return remoteEnv;
+		return fRemoteEnv;
 	}
 
 	/* (non-Javadoc)
@@ -114,7 +87,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		remoteCmd += CMD_DELIMITER + EXIT_CMD;
 		
-		IShellService shellService = connection.getRemoteShellService();
+		IShellService shellService = fConnection.getRemoteShellService();
 		if (shellService == null) {
 			throw new IOException(Messages.RSEProcessBuilder_0);
 		}
