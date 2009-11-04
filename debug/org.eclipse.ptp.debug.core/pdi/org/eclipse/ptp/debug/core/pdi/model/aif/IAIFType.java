@@ -20,13 +20,15 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents type of AIF object
+ * 
  * @author clement
  *
  */
 public interface IAIFType {
 	/**
-	 * Returns size of this AIF type
-	 * @return size of this AIF type
+	 * Returns size of this AIF type in bytes
+	 * 
+	 * @return size the type
 	 */
-	int sizeof();
+	public int sizeof();
 }
