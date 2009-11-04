@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.io.IOException;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -39,11 +37,11 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
     // Fields
     ///////////////////////////////////////////////////////////////////////////
 
+    private PreservationAnalysis preservation = null;
+
     private ScopingNode enclosingScope;
 
     private String newName = null;
-    
-    private PreservationAnalysis preservation = new PreservationAnalysis(PhotranVPG.getInstance());
 
     @Override
     public String getName()
@@ -96,26 +94,15 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
 
         try
         {
-            //Platform.getAdapterManager().registerAdapters(new ASTNodeAdapterFactory(), IASTNode.class);
-            
-            preservation.startMonitoring(fileInEditor);
+            preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm,
+                PhotranVPG.BINDING_EDGE_TYPE);
+
+            preservation.monitor(fileInEditor);
             createNewSubprogram();
-            preservation.finishMonitoring(fileInEditor);
-            
-            pm.subTask("Entering hypothetical mode");
-            PhotranVPG.getDatabase().enterHypotheticalMode();
-            
-            vpg.commitChangeFromAST(fileInEditor);
+            vpg.commitChangesFromAST(fileInEditor);
             preservation.checkForPreservation(status, fileInEditor);
 
-            pm.subTask("Leaving hypothetical mode");
-            PhotranVPG.getDatabase().leaveHypotheticalMode();
-
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
-        }
-        catch (IOException e)
-        {
-            throw new Error(e);
         }
         finally
         {
@@ -168,14 +155,18 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
             return insertAsInternalSubprogramOf((ASTMainProgramNode)enclosingScope, newSubroutine);
     }
 
-    private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(ASTMainProgramNode program, ASTSubroutineSubprogramNode subprogram)
+    private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(
+        ASTMainProgramNode program,
+        ASTSubroutineSubprogramNode subprogram)
     {
+        assert preservation != null;
+
         if (program.getContainsStmt() == null)
         {
             ASTContainsStmtNode containsStmt = createContainsStmt();
             program.setContainsStmt(containsStmt);
             containsStmt.setParent(program);
-            preservation.markAlpha(program.getContainsStmt());
+            preservation.markAlpha(fileInEditor, program.getContainsStmt());
         }
 
         if (program.getInternalSubprograms() == null)
@@ -187,7 +178,7 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
 
         program.getInternalSubprograms().add(subprogram);
         subprogram.setParent(program.getInternalSubprograms());
-        preservation.markAlpha(subprogram);
+        preservation.markAlpha(fileInEditor, subprogram);
 
         //Reindenter.reindent(subprogram, this.astOfFileInEditor);
 

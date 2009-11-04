@@ -10,11 +10,18 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.preservation;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdapterManager;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ltk.core.refactoring.FileStatusContext;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -35,68 +42,61 @@ public class PreservationAnalysis
     private IAdapterManager adapterManager;
 
     private EclipseVPG vpg;
+    private IProgressMonitor progressMonitor;
 
-    private Model initialModel = null;
-    private boolean normalized = false;
+    private Map<String, Model> initialModels = new HashMap<String, Model>();
+
     private List<PrimitiveOp> primitiveOps = new LinkedList<PrimitiveOp>();
 
-    public PreservationAnalysis(EclipseVPG vpg)
+    private Set<Integer> preserveEdgeTypes = Collections.<Integer>emptySet();
+
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, int... edgeTypes)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
+        this.progressMonitor = pm;
+
+        preserveEdgeTypes = new HashSet<Integer>(edgeTypes.length);
+        for (int type : edgeTypes)
+            preserveEdgeTypes.add(type);
     }
 
-    private static void debug(Object msg)
+    public void monitor(IFile file)
     {
-        System.err.println(msg.toString());
-    }
-
-    public void startMonitoring(IFile file)
-    {
-        debug("Preservation engine is now monitoring changes to " + file.getName());
-
-        initialModel = new Model(vpg, EclipseVPG.getFilenameForIFile(file));
-
-        debug("INITIAL MODEL:");
-        debug(initialModel);
-    }
-
-    public void finishMonitoring(IFile file)
-    {
-        debug("Preservation engine is done monitoring changes to " + file.getName());
-
-        initialModel.inormalize(primitiveOps);
-        normalized = true;
-
-        debug("NORMALIZED INITIAL MODEL:");
-        debug(initialModel);
-    }
-
-    public void markAlpha(Object node)
-    {
-        if (normalized) throw new IllegalStateException("Cannot add operation after normalization");
-
-        OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
-        if (offsetLength == null)
+        if (!vpg.db.isInHypotheticalMode())
         {
-            debug("Unable to get OffsetLength adapter for " + node.getClass().getName());
-            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+            try
+            {
+                progressMonitor.subTask("Please wait; switching database to hypothetical mode");
+                vpg.db.enterHypotheticalMode();
+            }
+            catch (IOException e)
+            {
+                throw new Error(e);
+            }
         }
 
+        progressMonitor.subTask("Computing initial model");
+        String filename = EclipseVPG.getFilenameForIFile(file);
+        initialModels.put(filename, new Model(vpg, filename));
+    }
+
+    public void markAlpha(IFile file, Object node)
+    {
+        String filename = EclipseVPG.getFilenameForIFile(file);
+        OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
+        if (offsetLength == null)
+            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+
         Alpha alpha = PrimitiveOp.alpha(
+            filename,
             offsetLength.getOffset(),
             offsetLength.getPositionPastEnd());
 
         if (needToMergeAlpha(alpha))
-        {
-            debug("Merging " + alpha);
             mergeAlpha(alpha);
-        }
         else
-        {
-            debug("Adding " + alpha);
             addAlpha(alpha);
-        }
 
         adapterManager.getAdapter(node, ResetOffsetLength.class);
     }
@@ -105,7 +105,9 @@ public class PreservationAnalysis
     {
         return !primitiveOps.isEmpty()
             && lastOp() instanceof Alpha
+            && ((Alpha)lastOp()).filename.equals(alpha.filename)
             && ((Alpha)lastOp()).j.lb == alpha.j.lb;
+            //&& ((Alpha)lastOp()).preserveEdgeTypes.equals(alpha.preserveEdgeTypes);
     }
 
     private PrimitiveOp lastOp()
@@ -118,8 +120,10 @@ public class PreservationAnalysis
         Alpha alpha1 = (Alpha)primitiveOps.remove(primitiveOps.size()-1);
 
         Alpha newAlpha = PrimitiveOp.alpha(
+            alpha1.filename,
             alpha1.j.lb,
             alpha1.j.lb + alpha1.j.cardinality() + alpha2.j.cardinality());
+            //alpha1.preserveEdgeTypes);
 
         addAlpha(newAlpha);
     }
@@ -136,20 +140,30 @@ public class PreservationAnalysis
 
     public void checkForPreservation(RefactoringStatus status, IFile file)
     {
-        debug("Checking for preservation in " + file.getName());
+        String filename = EclipseVPG.getFilenameForIFile(file);
 
+        progressMonitor.subTask("Normalizing initial model");
+        initialModels.get(filename).inormalize(primitiveOps, preserveEdgeTypes);
+
+        progressMonitor.subTask("Computing derivative model");
         Model derivativeModel = new Model(vpg, EclipseVPG.getFilenameForIFile(file));
 
-        debug("DERIVATIVE MODEL:");
-        debug(derivativeModel);
+        progressMonitor.subTask("Normalizing derivative model");
+        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
 
-        derivativeModel.dnormalize(primitiveOps);
-
-        debug("NORMALIZED DERIVATIVE MODEL:");
-        debug(derivativeModel);
-
-        ModelDiff diff = initialModel.compareAgainst(derivativeModel);
+        progressMonitor.subTask("Differencing initial and derivative models");
+        ModelDiff diff = initialModels.get(filename).compareAgainst(derivativeModel);
         describeDifferences(status, diff, file);
+
+        try
+        {
+            progressMonitor.subTask("Switching database out of hypothetical mode");
+            vpg.db.leaveHypotheticalMode();
+        }
+        catch (IOException e)
+        {
+            throw new Error(e);
+        }
     }
 
     private void describeDifferences(final RefactoringStatus status, ModelDiff diff, final IFile file)

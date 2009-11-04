@@ -23,7 +23,7 @@ public class NormalizationTestCase extends TestCase
 {
     public void testOffset()
     {
-        PrimitiveOp.Alpha alpha = PrimitiveOp.alpha(3, 6);
+        PrimitiveOp.Alpha alpha = PrimitiveOp.alpha("", 3, 6);
         assertEquals(3, alpha.j.cardinality());
 
         Interval before = new Interval(0, 3);

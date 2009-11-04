@@ -10,13 +10,19 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.internal.core.preservation;
 
+
 /**
  *
  * @author Jeff Overbey
  */
 public abstract class PrimitiveOp
 {
-    private PrimitiveOp() {} // Force all subclasses to be defined as inner classes
+    public final String filename;
+
+    private PrimitiveOp(String filename) // Force all subclasses to be defined as inner classes
+    {
+        this.filename = filename;
+    }
 
     @Override public abstract String toString();
 
@@ -24,24 +30,24 @@ public abstract class PrimitiveOp
     // Factory Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static Alpha alpha(Interval j)
+    public static Alpha alpha(String filename, Interval j)
     {
-        return new Alpha(j);
+        return new Alpha(filename, j);
     }
 
-    public static Alpha alpha(int j_lb, int j_ub)
+    public static Alpha alpha(String filename, int j_lb, int j_ub)
     {
-        return new Alpha(new Interval(j_lb, j_ub));
+        return new Alpha(filename, new Interval(j_lb, j_ub));
     }
 
-    public static Rho rho(Interval j, Interval k)
+    public static Rho rho(String filename, Interval j, Interval k)
     {
-        return new Rho(j, k);
+        return new Rho(filename, j, k);
     }
 
-    public static Rho rho(int j_lb, int j_ub, int k_lb, int k_ub)
+    public static Rho rho(String filename, int j_lb, int j_ub, int k_lb, int k_ub)
     {
-        return new Rho(new Interval(j_lb, j_ub), new Interval(k_lb, k_ub));
+        return new Rho(filename, new Interval(j_lb, j_ub), new Interval(k_lb, k_ub));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +70,9 @@ public abstract class PrimitiveOp
     {
         public final Interval j;
 
-        private Alpha(Interval j)
+        private Alpha(String filename, Interval j)
         {
+            super(filename);
             this.j = j;
         }
 
@@ -106,8 +113,10 @@ public abstract class PrimitiveOp
     {
         public final Interval j, k;
 
-        private Rho(Interval j, Interval k)
+        private Rho(String filename, Interval j, Interval k)
         {
+            super(filename);
+
             if (j.lb != k.lb)
                 throw new IllegalArgumentException("Rho-operation has mismatched lower bounds");
 

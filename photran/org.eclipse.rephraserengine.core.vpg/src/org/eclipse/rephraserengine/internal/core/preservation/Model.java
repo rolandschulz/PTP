@@ -12,6 +12,7 @@ package org.eclipse.rephraserengine.internal.core.preservation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
@@ -29,15 +30,19 @@ public class Model
 {
     private static final class Entry implements Comparable<Entry>
     {
+        private String sourceFilename;
         private Interval source;
+        private String sinkFilename;
         private Interval sink;
         private int edgeType;
 
-        public Entry(Interval source, Interval sink, int edgeType)
+        public Entry(String sourceFilename, Interval source, String sinkFilename, Interval sink, int edgeType)
         {
             if (source == null || sink == null) throw new IllegalArgumentException();
 
+            this.sourceFilename = sourceFilename;
             this.source = source;
+            this.sinkFilename = sinkFilename;
             this.sink = sink;
             this.edgeType = edgeType;
         }
@@ -47,7 +52,9 @@ public class Model
             if (!o.getClass().equals(this.getClass())) return false;
 
             Entry that = (Entry)o;
-            return this.source.equals(that.source)
+            return this.sourceFilename.equals(that.sourceFilename)
+                && this.source.equals(that.source)
+                && this.sinkFilename.equals(that.sinkFilename)
                 && this.sink.equals(that.sink)
                 && this.edgeType == that.edgeType;
         }
@@ -60,13 +67,21 @@ public class Model
         public int compareTo(Entry that)
         {
             // Lexicographic comparison
-            int result = this.source.compareTo(that.source);
+            int result = this.sourceFilename.compareTo(that.sourceFilename);
             if (result == 0)
             {
-                result = this.sink.compareTo(that.sink);
+                result = this.sinkFilename.compareTo(that.sinkFilename);
                 if (result == 0)
                 {
-                    return that.edgeType - this.edgeType;
+                    result = this.source.compareTo(that.source);
+                    if (result == 0)
+                    {
+                        result = this.sink.compareTo(that.sink);
+                        if (result == 0)
+                        {
+                            return that.edgeType - this.edgeType;
+                        }
+                    }
                 }
             }
             return result;
@@ -90,40 +105,58 @@ public class Model
 
             edgeList.add(
                 new Entry(
+                    source.getFilename(),
                     new Interval(source.getOffset(), source.getEndOffset()),
+                    sink.getFilename(),
                     new Interval(sink.getOffset(), sink.getEndOffset()),
                     edge.getType()));
         }
     }
 
-    public void inormalize(PrimitiveOp op)
+    public void inormalize(PrimitiveOp op, Set<Integer> preserveEdgeTypes)
     {
+        TreeSet<Entry> revisedList = new TreeSet<Entry>();
+
         for (Entry entry : edgeList)
         {
-            entry.source = op.inorm(entry.source);
-            entry.sink = op.inorm(entry.sink);
+            if (preserveEdgeTypes.contains(entry.edgeType))
+            {
+                entry.source = op.inorm(entry.source);
+                entry.sink = op.inorm(entry.sink);
+                revisedList.add(entry);
+            }
         }
+
+        edgeList = revisedList;
     }
 
-    public void inormalize(List<PrimitiveOp> primitiveOps)
+    public void inormalize(List<PrimitiveOp> primitiveOps, Set<Integer> preserveEdgeTypes)
     {
         for (PrimitiveOp op : primitiveOps)
-            inormalize(op);
+            inormalize(op, preserveEdgeTypes);
     }
 
-    public void dnormalize(PrimitiveOp op)
+    public void dnormalize(PrimitiveOp op, Set<Integer> preserveEdgeTypes)
     {
+        TreeSet<Entry> revisedList = new TreeSet<Entry>();
+
         for (Entry entry : edgeList)
         {
-            entry.source = op.dnorm(entry.source);
-            entry.sink = op.dnorm(entry.sink);
+            if (preserveEdgeTypes.contains(entry.edgeType))
+            {
+                entry.source = op.dnorm(entry.source);
+                entry.sink = op.dnorm(entry.sink);
+                revisedList.add(entry);
+            }
         }
+
+        edgeList = revisedList;
     }
 
-    public void dnormalize(List<PrimitiveOp> primitiveOps)
+    public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Integer> preserveEdgeTypes)
     {
         for (PrimitiveOp op : primitiveOps)
-            dnormalize(op);
+            dnormalize(op, preserveEdgeTypes);
     }
 
     public ModelDiff compareAgainst(Model that)
@@ -134,11 +167,16 @@ public class Model
         {
             if (!that.edgeList.contains(entry))
             {
-                Interval newSink = findNewSink(entry, that.edgeList);
-                if (newSink != null)
-                    diff.add(new EdgeSinkChanged(entry.source, entry.sink, newSink, entry.edgeType));
+                Entry otherEntry = findEntryWithNewSink(entry, that.edgeList);
+                if (otherEntry != null)
+                {
+                    that.edgeList.remove(otherEntry);
+                    diff.add(new EdgeSinkChanged(entry.source, entry.sink, otherEntry.sink, entry.edgeType));
+                }
                 else
+                {
                     diff.add(new EdgeDeleted(entry.source, entry.sink, entry.edgeType));
+                }
             }
         }
 
@@ -153,11 +191,11 @@ public class Model
         return diff;
     }
 
-    private Interval findNewSink(Entry entry, TreeSet<Entry> otherEdgeList)
+    private Entry findEntryWithNewSink(Entry entry, TreeSet<Entry> otherEdgeList)
     {
         for (Entry otherEntry : otherEdgeList)
             if (otherEntry.source.equals(entry.source) && otherEntry.edgeType == entry.edgeType)
-                return otherEntry.sink;
+                return otherEntry;
 
         return null;
     }
@@ -171,6 +209,8 @@ public class Model
     {
         StringBuilder sb = new StringBuilder();
 
+        sb.append(filename);
+        sb.append(": ");
         sb.append(edgeList.size());
         sb.append(" edges\n\n");
 
