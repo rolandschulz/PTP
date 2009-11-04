@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+
 /**
  * Base class for a Virtual Program Graph.  <a href="../../../overview-summary.html#VPG">More Information</a>
  * <p>
@@ -100,7 +103,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 
 	private A acquireTransientAST(String filename, boolean forceRecomputationOfEdgesAndAnnotations)
 	{
-		if (!shouldProcessFile(filename)) return null;
+		if (isVirtualFile(filename) || !shouldProcessFile(filename)) return null;
 
 		A ast = null;
 
@@ -191,6 +194,59 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         db.updateModificationStamp(filename);
         db.flush();
         return System.currentTimeMillis()-start;
+    }
+
+    public ArrayList<String> sortFilesAccordingToDependencies(final ArrayList<String> files, final IProgressMonitor monitor)
+    {
+        // Enqueue the reflexive transitive closure of the dependencies
+        for (int i = 0; i < files.size(); i++)
+        {
+            if (monitor.isCanceled()) throw new OperationCanceledException();
+            monitor.subTask("Sorting files according to dependencies - enqueuing dependents (" + i + " of " + files.size() + ")");
+
+            enqueueNewDependents(files.get(i), files);
+        }
+
+        // Topological Sort -- from Cormen et al. pp. 550, 541
+        class DFS
+        {
+            final Integer WHITE = 0, GRAY = 1, BLACK = 2;
+
+            final int numFiles = files.size();
+            ArrayList<String> result = new ArrayList<String>(numFiles);
+            HashMap<String, Integer> color = new HashMap<String, Integer>();
+            int time;
+
+            DFS()
+            {
+                for (String filename : files)
+                    color.put(filename, WHITE);
+
+                time = 0;
+
+                for (String filename : files)
+                    if (color.get(filename) == WHITE)
+                        dfsVisit(filename);
+            }
+
+            private void dfsVisit(String u)
+            {
+                if (monitor.isCanceled()) throw new OperationCanceledException();
+                monitor.subTask("Sorting files according to dependencies - sorting dependents of " + u + " (" + time + " of " + files.size() + ")");
+
+                color.put(u, GRAY);
+                time++;
+
+                for (String v : db.getIncomingDependenciesTo(u))
+                    if (color.get(v) == WHITE)
+                        dfsVisit(v);
+
+                color.put(u, BLACK);
+                result.add(0, u);
+            }
+        }
+
+        return new DFS().result;
     }
 
     protected void processingDependent(String filename, String dependentFilename)
@@ -324,6 +380,14 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
      * @param filename (non-null)
      */
     abstract protected void calculateDependencies(String filename);
+
+    /**
+     * Returns <code>true</code> iff the given filename refers to a virtual file, i.e., a symbolic
+     * name that does not represent an actual file on disk.
+     * @param filename (non-null)
+     * @return <code>true</code> iff the given filename refers to a virtual file
+     */
+    public abstract boolean isVirtualFile(String filename);
 
 	/**
 	 * Parses the given file.

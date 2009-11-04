@@ -11,6 +11,7 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ltk.core.refactoring.FileStatusContext;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -64,6 +66,37 @@ public class PreservationAnalysis
 
     public void monitor(IFile file)
     {
+        ensureDatabaseIsInHypotheticalMode();
+        
+        ArrayList<String> singleton = new ArrayList<String>();
+        singleton.add(EclipseVPG.getFilenameForIFile(file));
+        monitor(vpg.sortFilesAccordingToDependencies(singleton, new NullProgressMonitor()));
+    }
+
+    private void monitor(ArrayList<String> files)
+    {
+        for (String filename : files)
+        {
+            if (!vpg.isVirtualFile(filename))
+            {
+                progressMonitor.subTask("Computing initial model - " + lastSegment(filename));
+                initialModels.put(filename, new Model(vpg, filename));
+            }
+        }
+    }
+
+    private String lastSegment(String filename)
+    {
+        int lastSlash = filename.lastIndexOf('/');
+        int lastBackslash = filename.lastIndexOf('\\');
+        if (lastSlash < 0 && lastBackslash < 0)
+            return filename;
+        else
+            return filename.substring(Math.max(lastSlash+1, lastBackslash+1));
+    }
+
+    private void ensureDatabaseIsInHypotheticalMode() throws Error
+    {
         if (!vpg.db.isInHypotheticalMode())
         {
             try
@@ -76,10 +109,6 @@ public class PreservationAnalysis
                 throw new Error(e);
             }
         }
-
-        progressMonitor.subTask("Computing initial model");
-        String filename = EclipseVPG.getFilenameForIFile(file);
-        initialModels.put(filename, new Model(vpg, filename));
     }
 
     public void markAlpha(IFile file, Object node)
@@ -156,23 +185,16 @@ public class PreservationAnalysis
         return primitiveOps.toString();
     }
 
-    public void checkForPreservation(RefactoringStatus status, IFile file)
+    public void checkForPreservation(RefactoringStatus status)
     {
-        String filename = EclipseVPG.getFilenameForIFile(file);
+        for (String filename : initialModels.keySet())
+            checkForPreservation(status, filename);
 
-        progressMonitor.subTask("Normalizing initial model");
-        initialModels.get(filename).inormalize(primitiveOps, preserveEdgeTypes);
+        leaveHypotheticalMode();
+    }
 
-        progressMonitor.subTask("Computing derivative model");
-        Model derivativeModel = new Model(vpg, EclipseVPG.getFilenameForIFile(file));
-
-        progressMonitor.subTask("Normalizing derivative model");
-        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
-
-        progressMonitor.subTask("Differencing initial and derivative models");
-        ModelDiff diff = initialModels.get(filename).compareAgainst(derivativeModel);
-        describeDifferences(status, diff, file);
-
+    private void leaveHypotheticalMode() throws Error
+    {
         try
         {
             progressMonitor.subTask("Switching database out of hypothetical mode");
@@ -182,6 +204,22 @@ public class PreservationAnalysis
         {
             throw new Error(e);
         }
+    }
+
+    private void checkForPreservation(RefactoringStatus status, String filename)
+    {
+        progressMonitor.subTask("Normalizing initial model - " + lastSegment(filename));
+        initialModels.get(filename).inormalize(primitiveOps, preserveEdgeTypes);
+
+        progressMonitor.subTask("Computing derivative model - " + lastSegment(filename));
+        Model derivativeModel = new Model(vpg, filename);
+
+        progressMonitor.subTask("Normalizing derivative model - " + lastSegment(filename));
+        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
+
+        progressMonitor.subTask("Differencing initial and derivative models - " + lastSegment(filename));
+        ModelDiff diff = initialModels.get(filename).compareAgainst(derivativeModel);
+        describeDifferences(status, diff, EclipseVPG.getIFileForFilename(filename));
     }
 
     private void describeDifferences(final RefactoringStatus status, ModelDiff diff, final IFile file)
@@ -195,7 +233,8 @@ public class PreservationAnalysis
             public void processEdgeAdded(EdgeAdded addition)
             {
                 String msg = "Completing this transformation will introduce an unexpected "
-                    + vpg.describeEdgeType(addition.edgeType).toLowerCase();
+                    + vpg.describeEdgeType(addition.edgeType).toLowerCase()
+                    + " (" + addition + ")";
 
                 status.addError(msg,
                     new PostTransformationContext(
@@ -209,7 +248,8 @@ public class PreservationAnalysis
             {
                 String msg = "Completing this transformation will cause an existing "
                     + vpg.describeEdgeType(deletion.edgeType).toLowerCase()
-                    + " to disappear";
+                    + " to disappear"
+                    + " (" + deletion + ")";
 
                 status.addError(msg,
                     new FileStatusContext(
@@ -222,7 +262,8 @@ public class PreservationAnalysis
             {
                 String msg = "Completing this transformation will cause an existing "
                     + vpg.describeEdgeType(change.edgeType).toLowerCase()
-                    + " to change";
+                    + " to change"
+                    + " (" + change + ")";
 
                 status.addError(msg,
                     new PostTransformationContext(

@@ -100,7 +100,7 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
             preservation.monitor(fileInEditor);
             createNewSubprogram();
             vpg.commitChangesFromAST(fileInEditor);
-            preservation.checkForPreservation(status, fileInEditor);
+            preservation.checkForPreservation(status);
 
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
         }

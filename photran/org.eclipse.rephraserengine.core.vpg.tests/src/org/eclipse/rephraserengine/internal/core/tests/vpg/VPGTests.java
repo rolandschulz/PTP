@@ -60,6 +60,12 @@ public class VPGTests extends TestCase
         }
 
         @Override
+        public boolean isVirtualFile(String filename)
+        {
+            return false;
+        }
+        
+        @Override
         protected void calculateDependencies(String filename)
         {
         }

@@ -55,7 +55,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         @Override
         protected long getModificationStamp(String filename)
         {
-            if (PhotranVPGBuilder.isVirtualFile(filename)) return Long.MIN_VALUE;
+            if (getVPG().isVirtualFile(filename)) return Long.MIN_VALUE;
             
             IFile ifile = PhotranVPG.getIFileForFilename(filename);
             return ifile == null ? Integer.MIN_VALUE : ifile.getLocalTimeStamp();
@@ -108,7 +108,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         // corresponding "real" file (whatever.f90) is parsed.
         // We should not delete them here, because populateVPG()
         // will not reconstruct them.
-        if (!PhotranVPGBuilder.isVirtualFile(filename))
+        if (!getVPG().isVirtualFile(filename))
             super.deleteAllEdgesAndAnnotationsFor(filename);
     }
 }

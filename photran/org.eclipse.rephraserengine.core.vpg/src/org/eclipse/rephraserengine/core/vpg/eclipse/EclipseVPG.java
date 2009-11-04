@@ -207,58 +207,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
     protected abstract boolean shouldListFileInIndexerProgressMessages(String filename);
 
-    private ArrayList<String> sortFilesAccordingToDependencies(final ArrayList<String> files, final IProgressMonitor monitor)
-    {
-        // Enqueue the reflexive transitive closure of the dependencies
-        for (int i = 0; i < files.size(); i++)
-        {
-            if (monitor.isCanceled()) throw new OperationCanceledException();
-            monitor.subTask("Sorting files according to dependencies - enqueuing dependents (" + i + " of " + files.size() + ")");
-
-            enqueueNewDependents(files.get(i), files);
-        }
-
-        // Topological Sort -- from Cormen et al. pp. 550, 541
-        class DFS
-        {
-            final Integer WHITE = 0, GRAY = 1, BLACK = 2;
-
-            final int numFiles = files.size();
-            ArrayList<String> result = new ArrayList<String>(numFiles);
-            HashMap<String, Integer> color = new HashMap<String, Integer>();
-            int time;
-
-            DFS()
-            {
-                for (String filename : files)
-                    color.put(filename, WHITE);
-
-                time = 0;
-
-                for (String filename : files)
-                    if (color.get(filename) == WHITE)
-                        dfsVisit(filename);
-            }
-
-            private void dfsVisit(String u)
-            {
-                if (monitor.isCanceled()) throw new OperationCanceledException();
-                monitor.subTask("Sorting files according to dependencies - sorting dependents of " + u + " (" + time + " of " + files.size() + ")");
-
-                color.put(u, GRAY);
-                time++;
-
-                for (String v : db.getIncomingDependenciesTo(u))
-                    if (color.get(v) == WHITE)
-                        dfsVisit(v);
-
-                color.put(u, BLACK);
-                result.add(0, u);
-            }
-        }
-
-        return new DFS().result;
-    }
+    //public ArrayList<String> sortFilesAccordingToDependencies(final ArrayList<String> files, final IProgressMonitor monitor)
 
     ///////////////////////////////////////////////////////////////////////////
     // Resource Change Listener

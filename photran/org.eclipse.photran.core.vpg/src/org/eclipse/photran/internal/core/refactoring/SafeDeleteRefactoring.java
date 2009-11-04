@@ -85,7 +85,7 @@ public class SafeDeleteRefactoring extends SingleFileFortranRefactoring
             preservation.monitor(fileInEditor);
             deleteScope();
             vpg.commitChangesFromAST(fileInEditor);
-            preservation.checkForPreservation(status, fileInEditor);
+            preservation.checkForPreservation(status);
 
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
         }

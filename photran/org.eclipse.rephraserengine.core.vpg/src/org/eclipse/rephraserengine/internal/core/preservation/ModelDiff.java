@@ -62,6 +62,11 @@ public class ModelDiff implements Iterable<ModelDiff.DiffEntry>
         {
             processor.processEdgeAdded(this);
         }
+        
+        @Override public String toString()
+        {
+            return source + " -> " + sink;
+        }
     }
 
     public static final class EdgeDeleted extends DiffEntry
@@ -74,6 +79,11 @@ public class ModelDiff implements Iterable<ModelDiff.DiffEntry>
         @Override protected void accept(ModelDiffProcessor processor)
         {
             processor.processEdgeDeleted(this);
+        }
+        
+        @Override public String toString()
+        {
+            return source + " -> " + sink;
         }
     }
 
@@ -90,6 +100,11 @@ public class ModelDiff implements Iterable<ModelDiff.DiffEntry>
         @Override protected void accept(ModelDiffProcessor processor)
         {
             processor.processEdgeSinkChanged(this);
+        }
+        
+        @Override public String toString()
+        {
+            return source + " -> " + sink + " will become " + source + " -> " + newSink;
         }
     }
 

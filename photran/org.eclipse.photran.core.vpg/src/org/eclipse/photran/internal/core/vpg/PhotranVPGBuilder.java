@@ -162,7 +162,8 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
     }
 
-    static boolean isVirtualFile(String filename)
+    @Override
+    public boolean isVirtualFile(String filename)
     {
         return filename.startsWith("module:") || filename.startsWith("common:") || filename.startsWith("subprogram:");
     }
