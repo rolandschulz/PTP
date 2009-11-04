@@ -183,7 +183,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 //		return computeTime;
 //	}
 
-    private long computeEdgesAndAnnotations(String filename, A ast)
+    protected long computeEdgesAndAnnotations(String filename, A ast)
     {
         long start = System.currentTimeMillis();
         db.deleteAllEdgesAndAnnotationsFor(filename);
@@ -350,17 +350,18 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	/** Dereferences the given TokenRef, returning a pointer to that token in an
 	 *  AST, or <code>null</code> if it could not be found. */
 	abstract public T findToken(R tokenRef);
-    
+
     /** Forces the database to be updated based on the current in-memory AST for the given file */
     public void commitChangeFromAST(String filename)
     {
-        commitChangeFromAST(filename, acquireTransientAST(filename));
+        computeEdgesAndAnnotations(filename, acquireTransientAST(filename));
     }
-    
-    /** Forces the database to be updated based on the current in-memory AST for the given file */
-    public void commitChangeFromAST(String filename, A ast)
+
+    /** @return source code for the given AST (which may have been modified), or <code>null</code>
+     *  if this capability is not supported */
+    public String getSourceCodeFromAST(A ast)
     {
-        computeEdgesAndAnnotations(filename, ast);
+        return null;
     }
 
     ////////////////////////////////////////////////////////////////////////////

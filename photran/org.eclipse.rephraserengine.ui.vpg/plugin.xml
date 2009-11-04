@@ -91,4 +91,17 @@
       </perspectiveExtension>
    </extension>
 
+   <!--=========================================================================-->
+   <!-- Refactoring Status Context Viewer for PostTransformationContext Objects -->
+   <!--=========================================================================-->
+   <extension
+         point="org.eclipse.ltk.ui.refactoring.statusContextViewers">
+      <statusContextViewer
+            class="org.eclipse.rephraserengine.internal.ui.preservation.PostTransformationStatusContextViewer"
+            id="org.eclipse.rephraserengine.ui.vpg.postTransformationStatusContextViewer">
+         <enablement>
+            <instanceof value="org.eclipse.rephraserengine.core.preservation.PostTransformationContext"/>
+         </enablement>
+      </statusContextViewer>
+   </extension>
 </plugin>

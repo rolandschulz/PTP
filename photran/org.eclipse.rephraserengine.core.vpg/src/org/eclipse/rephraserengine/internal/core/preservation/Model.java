@@ -11,12 +11,15 @@
 package org.eclipse.rephraserengine.internal.core.preservation;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
+import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
+import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeAdded;
+import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeDeleted;
+import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSinkChanged;
 
 /**
  *
@@ -70,11 +73,13 @@ public class Model
         }
     }
 
-    private VPG<?,?,?,?,?> vpg;
-    private Collection<Entry> edgeList = new TreeSet<Entry>();
+    private EclipseVPG<?,?,?,?,?> vpg;
+    private String filename;
+    private TreeSet<Entry> edgeList = new TreeSet<Entry>();
 
-    public Model(VPG<?,?,?,?,?> vpg, String filename)
+    public Model(EclipseVPG<?,?,?,?,?> vpg, String filename)
     {
+        this.filename = filename;
         this.vpg = vpg;
 
         // TODO: Ignores filenames
@@ -98,6 +103,63 @@ public class Model
             entry.source = op.inorm(entry.source);
             entry.sink = op.inorm(entry.sink);
         }
+    }
+
+    public void inormalize(List<PrimitiveOp> primitiveOps)
+    {
+        for (PrimitiveOp op : primitiveOps)
+            inormalize(op);
+    }
+
+    public void dnormalize(PrimitiveOp op)
+    {
+        for (Entry entry : edgeList)
+        {
+            entry.source = op.dnorm(entry.source);
+            entry.sink = op.dnorm(entry.sink);
+        }
+    }
+
+    public void dnormalize(List<PrimitiveOp> primitiveOps)
+    {
+        for (PrimitiveOp op : primitiveOps)
+            dnormalize(op);
+    }
+
+    public ModelDiff compareAgainst(Model that)
+    {
+        ModelDiff diff = new ModelDiff();
+
+        for (Entry entry : this.edgeList)
+        {
+            if (!that.edgeList.contains(entry))
+            {
+                Interval newSink = findNewSink(entry, that.edgeList);
+                if (newSink != null)
+                    diff.add(new EdgeSinkChanged(entry.source, entry.sink, newSink, entry.edgeType));
+                else
+                    diff.add(new EdgeDeleted(entry.source, entry.sink, entry.edgeType));
+            }
+        }
+
+        for (Entry entry : that.edgeList)
+        {
+            if (!this.edgeList.contains(entry))
+            {
+                diff.add(new EdgeAdded(entry.source, entry.sink, entry.edgeType));
+            }
+        }
+
+        return diff;
+    }
+
+    private Interval findNewSink(Entry entry, TreeSet<Entry> otherEdgeList)
+    {
+        for (Entry otherEntry : otherEdgeList)
+            if (otherEntry.source.equals(entry.source) && otherEntry.edgeType == entry.edgeType)
+                return otherEntry.sink;
+
+        return null;
     }
 
     @Override public String toString()

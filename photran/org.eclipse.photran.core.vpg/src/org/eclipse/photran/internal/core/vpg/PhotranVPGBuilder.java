@@ -293,7 +293,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             }
         }
     }
-    
+
     @Override
     public void commitChangeFromAST(String filename)
     {
@@ -301,7 +301,12 @@ public class PhotranVPGBuilder extends PhotranVPG
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         ast.getRoot().printOn(new PrintStream(out), null);
         ast = parse(filename, new ByteArrayInputStream(out.toByteArray()));
-        super.commitChangeFromAST(filename, ast);
+        computeEdgesAndAnnotations(filename, ast);
+    }
+
+    @Override public String getSourceCodeFromAST(IFortranAST ast)
+    {
+        return ast.getRoot().toString();
     }
 
     @Override

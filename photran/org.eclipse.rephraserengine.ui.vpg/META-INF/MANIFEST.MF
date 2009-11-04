@@ -10,6 +10,10 @@ Require-Bundle: org.eclipse.rephraserengine.core.vpg,
  org.eclipse.rephraserengine.ui,
  org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources
+ org.eclipse.core.resources,
+ org.eclipse.ltk.ui.refactoring,
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.jface.text,
+ org.eclipse.core.filebuffers
 Export-Package: org.eclipse.rephraserengine.ui,
  org.eclipse.rephraserengine.ui.actions

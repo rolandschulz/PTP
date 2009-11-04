@@ -87,7 +87,7 @@ public class MinOnlyListTestCase extends RefactoringTestCase
         final IFile file = importFile(DIR, filenames[0]);
         Document doc = new Document(readFileToString(DIR+"/"+filenames[0]));
         TextSelection text = new TextSelection(doc, getLineColOffset(filenames[0], lineCol), length);
-        MinOnlyListRefactoring r = new MinOnlyListRefactoring(file, text);
+        MinOnlyListRefactoring r = new MinOnlyListRefactoring();
         r.initialize(file, text);
         return r;
     }
