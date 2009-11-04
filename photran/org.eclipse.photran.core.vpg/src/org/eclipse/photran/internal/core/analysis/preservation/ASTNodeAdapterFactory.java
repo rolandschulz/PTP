@@ -81,10 +81,8 @@ public class ASTNodeAdapterFactory implements IAdapterFactory
         if (first == null || last == null) return EMPTY_OFFSET_LENGTH;
 
         Token previous = findLastTokenBefore(first, inAST);
-        Token next = findFirstTokenAfter(last, inAST);
-        if (previous == null || next == null) return EMPTY_OFFSET_LENGTH; // FIXME should handle BOF, EOF
 
-        int offset = previous.getFileOffset() + previous.getLength() + previous.getWhiteAfter().length();
+        int offset = (previous == null ? 0 : previous.getFileOffset() + previous.getLength() + previous.getWhiteAfter().length());
         int length = node.toString().length();
         return new OffsetLength(offset, length);
     }
@@ -104,29 +102,6 @@ public class ASTNodeAdapterFactory implements IAdapterFactory
                 // Skip tokens from added subtrees (i.e., subtrees adapted to ResetOffsetLength)
                 if (thisToken.getFileOffset() >= 0)
                     lastToken = thisToken;
-            }
-        }
-
-        TokenFinder t = new TokenFinder();
-        inAST.accept(t);
-        return t.result;
-    }
-
-    // from Definition
-
-    private Token findFirstTokenAfter(final Token target, IASTNode inAST)
-    {
-        class TokenFinder extends GenericASTVisitor
-        {
-            private Token lastToken = null;
-            private Token result = null;
-
-            @Override public void visitToken(Token thisToken)
-            {
-                if (lastToken == target)
-                    result = thisToken;
-
-                lastToken = thisToken;
             }
         }
 

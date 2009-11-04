@@ -35,6 +35,7 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeDele
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSinkChanged;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.ModelDiffProcessor;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
+import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Epsilon;
 
 @SuppressWarnings("unchecked")
 public class PreservationAnalysis
@@ -131,6 +132,23 @@ public class PreservationAnalysis
     private void addAlpha(Alpha alpha)
     {
         primitiveOps.add(alpha);
+    }
+
+    public void markEpsilon(IFile file, Object node)
+    {
+        String filename = EclipseVPG.getFilenameForIFile(file);
+        OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
+        if (offsetLength == null)
+            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+
+        Epsilon epsilon = PrimitiveOp.epsilon(
+            filename,
+            offsetLength.getOffset(),
+            offsetLength.getPositionPastEnd());
+
+        primitiveOps.add(epsilon);
+
+        adapterManager.getAdapter(node, ResetOffsetLength.class);
     }
 
     @Override public String toString()

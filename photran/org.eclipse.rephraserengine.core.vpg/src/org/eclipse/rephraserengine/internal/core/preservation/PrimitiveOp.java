@@ -17,15 +17,6 @@ package org.eclipse.rephraserengine.internal.core.preservation;
  */
 public abstract class PrimitiveOp
 {
-    public final String filename;
-
-    private PrimitiveOp(String filename) // Force all subclasses to be defined as inner classes
-    {
-        this.filename = filename;
-    }
-
-    @Override public abstract String toString();
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Factory Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +29,16 @@ public abstract class PrimitiveOp
     public static Alpha alpha(String filename, int j_lb, int j_ub)
     {
         return new Alpha(filename, new Interval(j_lb, j_ub));
+    }
+
+    public static Epsilon epsilon(String filename, Interval j)
+    {
+        return new Epsilon(filename, j);
+    }
+
+    public static Epsilon epsilon(String filename, int j_lb, int j_ub)
+    {
+        return new Epsilon(filename, new Interval(j_lb, j_ub));
     }
 
     public static Rho rho(String filename, Interval j, Interval k)
@@ -54,13 +55,26 @@ public abstract class PrimitiveOp
     // Abstract Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
+    public final String filename;
+
+    private PrimitiveOp(String filename) // Force all subclasses to be defined as inner classes
+    {
+        this.filename = filename;
+    }
+
+    @Override public abstract String toString();
+
     public abstract Interval ioffset(Interval i);
 
     public abstract Interval inorm(Interval i);
 
+    public abstract Interval iaff();
+
     public abstract Interval doffset(Interval i);
 
     public abstract Interval dnorm(Interval i);
+
+    public abstract Interval daff();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Concrete Subclasses
@@ -92,6 +106,12 @@ public abstract class PrimitiveOp
         }
 
         @Override
+        public Interval iaff()
+        {
+            return new Interval(j.lb, j.lb+1);
+        }
+
+        @Override
         public Interval doffset(Interval i)
         {
             return i;
@@ -103,9 +123,70 @@ public abstract class PrimitiveOp
             return doffset(i);
         }
 
+        @Override
+        public Interval daff()
+        {
+            return j;
+        }
+
         @Override public String toString()
         {
             return "alpha(" + j + ")";
+        }
+    }
+
+    public static class Epsilon extends PrimitiveOp
+    {
+        public final Interval j;
+
+        private Epsilon(String filename, Interval j)
+        {
+            super(filename);
+            this.j = j;
+        }
+
+        @Override
+        public Interval ioffset(Interval i)
+        {
+            if (i.isLessThan(j))
+                return i;
+            else
+                return i.minus(j.cardinality());
+        }
+
+        @Override
+        public Interval inorm(Interval i)
+        {
+            return ioffset(i);
+        }
+
+        @Override
+        public Interval iaff()
+        {
+            return j;
+        }
+
+        @Override
+        public Interval doffset(Interval i)
+        {
+            return i;
+        }
+
+        @Override
+        public Interval dnorm(Interval i)
+        {
+            return doffset(i);
+        }
+
+        @Override
+        public Interval daff()
+        {
+            return new Interval(j.lb, j.lb+1);
+        }
+
+        @Override public String toString()
+        {
+            return "epsilon(" + j + ")";
         }
     }
 
@@ -143,6 +224,12 @@ public abstract class PrimitiveOp
         }
 
         @Override
+        public Interval iaff()
+        {
+            return j;
+        }
+
+        @Override
         public Interval doffset(Interval i)
         {
             return i;
@@ -155,6 +242,12 @@ public abstract class PrimitiveOp
                 return k;
             else
                 return doffset(i);
+        }
+
+        @Override
+        public Interval daff()
+        {
+            return k;
         }
 
         @Override public String toString()

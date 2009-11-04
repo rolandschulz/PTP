@@ -71,6 +71,10 @@
              require_env="PHOTRAN_INCLUDE_TEST_REFACTORINGS"
              class="org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring"
          />
+         <editorRefactoring
+             require_env="PHOTRAN_INCLUDE_TEST_REFACTORINGS"
+             class="org.eclipse.photran.internal.core.refactoring.SafeDeleteRefactoring"
+         />
       </group>
    </extension>
 

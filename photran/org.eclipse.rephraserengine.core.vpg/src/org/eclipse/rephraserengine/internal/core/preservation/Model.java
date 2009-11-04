@@ -47,6 +47,12 @@ public class Model
             this.edgeType = edgeType;
         }
 
+        public boolean isEntirelyContainedIn(Interval interval)
+        {
+            // FIXME: What about filenames?
+            return source.isSubsetOf(interval) && sink.isSubsetOf(interval);
+        }
+
         @Override public boolean equals(Object o)
         {
             if (!o.getClass().equals(this.getClass())) return false;
@@ -119,7 +125,8 @@ public class Model
 
         for (Entry entry : edgeList)
         {
-            if (preserveEdgeTypes.contains(entry.edgeType))
+            if (preserveEdgeTypes.contains(entry.edgeType)
+                && !entry.isEntirelyContainedIn(op.iaff()))
             {
                 entry.source = op.inorm(entry.source);
                 entry.sink = op.inorm(entry.sink);
@@ -142,7 +149,8 @@ public class Model
 
         for (Entry entry : edgeList)
         {
-            if (preserveEdgeTypes.contains(entry.edgeType))
+            if (preserveEdgeTypes.contains(entry.edgeType)
+                && !entry.isEntirelyContainedIn(op.daff()))
             {
                 entry.source = op.dnorm(entry.source);
                 entry.sink = op.dnorm(entry.sink);

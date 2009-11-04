@@ -42,7 +42,7 @@ public class SourcePrinter
         // When we read in the AST, we use a LineAppendingInputStream so that the
         // user does not have to have a final carriage return in their file.  However,
         // we should chop that off here.
-        result = result.substring(0, result.length() - EOL.length());
+        result = result.substring(0, Math.max(0, result.length() - EOL.length()));
         
         return result;
     }

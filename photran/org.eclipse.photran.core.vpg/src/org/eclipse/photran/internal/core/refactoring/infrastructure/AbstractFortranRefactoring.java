@@ -349,6 +349,8 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
     }
     private Parser parser = null;
 
+    // NODE CREATION //////////////////////////////////////////////////////////
+
     // USER INTERACTION ///////////////////////////////////////////////////////
 
     protected String describeToken(Token token)
