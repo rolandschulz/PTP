@@ -151,8 +151,8 @@
 		<symlink link="${copyToDir}/latest" resource="${copyToDir}/${buildType}.${buildId}" overwrite="true"/>
 		<symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/>
 		<symlink link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${ptpMasterFile}" overwrite="true"/>
-		<symlink action="delete" link="${copyToDir}/rdt-server-unix-1.0-latest.tar" failonerror="false"/>
-		<symlink link="${copyToDir}/rdt-server-unix-1.0-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-1.0.tar" overwrite="true"/>
+		<symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/>
+		<symlink link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
 	</target>
 	
 	<target name="tagone">
@@ -569,23 +569,5 @@
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature"/>
 		</antcall>
-        <antcall target="tagone">
-            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core"/>
-        </antcall>
-        <antcall target="tagone">
-            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.refactoring"/>
-        </antcall>
-        <antcall target="tagone">
-            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.vpg"/>
-        </antcall>
-        <antcall target="tagone">
-            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui"/>
-        </antcall>
-        <antcall target="tagone">
-            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui.refactoring"/>
-        </antcall>
-        <antcall target="tagone">
-            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui.vpg"/>
-        </antcall>
 	</target>
 </project>
