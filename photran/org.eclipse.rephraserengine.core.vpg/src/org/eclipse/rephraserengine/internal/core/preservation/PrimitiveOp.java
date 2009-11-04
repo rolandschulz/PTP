@@ -64,13 +64,11 @@ public abstract class PrimitiveOp
 
     @Override public abstract String toString();
 
-    public abstract Interval ioffset(Interval i);
+    public abstract Interval offset(Interval i);
 
     public abstract Interval inorm(Interval i);
 
     public abstract Interval iaff();
-
-    public abstract Interval doffset(Interval i);
 
     public abstract Interval dnorm(Interval i);
 
@@ -91,7 +89,7 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval ioffset(Interval i)
+        public Interval offset(Interval i)
         {
             if (i.isLessThan(j))
                 return i;
@@ -102,7 +100,7 @@ public abstract class PrimitiveOp
         @Override
         public Interval inorm(Interval i)
         {
-            return ioffset(i);
+            return offset(i);
         }
 
         @Override
@@ -112,15 +110,9 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval doffset(Interval i)
-        {
-            return i;
-        }
-
-        @Override
         public Interval dnorm(Interval i)
         {
-            return doffset(i);
+            return i;
         }
 
         @Override
@@ -146,7 +138,7 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval ioffset(Interval i)
+        public Interval offset(Interval i)
         {
             if (i.isLessThan(j))
                 return i;
@@ -157,7 +149,7 @@ public abstract class PrimitiveOp
         @Override
         public Interval inorm(Interval i)
         {
-            return ioffset(i);
+            return offset(i);
         }
 
         @Override
@@ -167,15 +159,9 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval doffset(Interval i)
-        {
-            return i;
-        }
-
-        @Override
         public Interval dnorm(Interval i)
         {
-            return doffset(i);
+            return i;
         }
 
         @Override
@@ -206,7 +192,7 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval ioffset(Interval i)
+        public Interval offset(Interval i)
         {
             if (i.isLessThan(j))
                 return i;
@@ -220,7 +206,7 @@ public abstract class PrimitiveOp
             if (i.isSubsetOf(j))
                 return k;
             else
-                return ioffset(i);
+                return offset(i);
         }
 
         @Override
@@ -230,18 +216,12 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval doffset(Interval i)
-        {
-            return i;
-        }
-
-        @Override
         public Interval dnorm(Interval i)
         {
             if (i.isSubsetOf(j))
                 return k;
             else
-                return doffset(i);
+                return i;
         }
 
         @Override

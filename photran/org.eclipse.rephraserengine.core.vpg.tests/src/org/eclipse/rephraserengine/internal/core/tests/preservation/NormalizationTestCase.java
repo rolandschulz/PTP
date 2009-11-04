@@ -30,8 +30,8 @@ public class NormalizationTestCase extends TestCase
         Interval overlapped = new Interval(3, 7);
         Interval after = new Interval(7, 11);
 
-        assertEquals(before, alpha.ioffset(before));
-        assertEquals(new Interval(3+3, 7+3), alpha.ioffset(overlapped));
-        assertEquals(new Interval(7+3, 11+3), alpha.ioffset(after));
+        assertEquals(before, alpha.offset(before));
+        assertEquals(new Interval(3+3, 7+3), alpha.offset(overlapped));
+        assertEquals(new Interval(7+3, 11+3), alpha.offset(after));
     }
 }

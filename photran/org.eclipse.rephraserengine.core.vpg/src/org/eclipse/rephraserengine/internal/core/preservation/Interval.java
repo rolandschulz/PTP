@@ -34,18 +34,10 @@ public class Interval implements Comparable<Interval>
     {
         return lb == ub;
     }
-
-    public int cardinality()
+    
+    public boolean contains(int n)
     {
-        if (isEmpty())
-            return 0;
-        else
-            return ub - lb;
-    }
-
-    public boolean isLessThan(Interval other)
-    {
-        return this.ub <= other.lb && !this.equals(other);
+        return lb <= n && n < ub;
     }
 
     public boolean isSubsetOf(Interval other)
@@ -56,6 +48,31 @@ public class Interval implements Comparable<Interval>
             return false;
         else
             return other.lb <= this.lb && this.ub <= other.ub;
+    }
+    
+// THESE DEFINITIONS ARE **WRONG**!
+//    public Interval union(Interval that)
+//    {
+//        return new Interval(
+//            Math.min(this.lb, that.lb),
+//            Math.max(this.ub, that.ub));
+//    }
+//    
+//    public Interval intersection(Interval that)
+//    {
+//        return new Interval(
+//            Math.max(this.lb, that.lb),
+//            Math.min(this.ub, that.ub));
+//    }
+
+    public int cardinality()
+    {
+        return ub - lb;
+    }
+
+    public boolean isLessThan(Interval other)
+    {
+        return this.ub <= other.lb && !this.equals(other);
     }
 
     public Interval plus(int offset)
