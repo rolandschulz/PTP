@@ -19,7 +19,9 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents struct type in IAIFType
+ * Represents a structure type. A structure conains an ordered
+ * collection of fields that can be arbitrary types.
+ * 
  * @author clement
  *
  */

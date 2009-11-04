@@ -19,26 +19,33 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents range type in IAIFType
+ * Represents a range type. A range contains a lower and upper bound
+ * (which are included in the range) and a base type.
+ * 
  * @author clement
  *
  */
 public interface IAIFTypeRange {
 	/**
-	 * Returns the lowest index of this type
-	 * @return the lowest index of this type
+	 * Returns the lower bound of the range
+	 * 
+	 * @return lower bound
 	 */
-	int getLower();
+	public int getLower();
 	
 	/**
-	 * Returns the highest index of this type
-	 * @return the highest index of this type
+	 * Returns the upper bound of the range
+	 * 
+	 * @return upper bound
 	 */
-	int getUpper();
+	public int getUpper();
 	
 	/**
-	 * Return internal type of this type or null if no internal type
-	 * @return internal type of this type
+	 * Return the base type of the range.
+	 * 
+	 * TODO: rename to getBaseType()
+	 * 
+	 * @return base type
 	 */
-	IAIFType getInternalType();
+	public IAIFType getInternalType();
 }

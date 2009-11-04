@@ -19,14 +19,16 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents derived type
+ * Represents a derived type
+ * 
  * @author clement
  *
  */
 public interface ITypeDerived extends IAIFType {
 	/**
 	 * Returns base type of this type
+	 * 
 	 * @return base type of this type
 	 */
-	IAIFType getBaseType();
+	public IAIFType getBaseType();
 }

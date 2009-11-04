@@ -19,46 +19,55 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents a type of aggregate
+ * Represents an aggregate type (i.e. a collection of other types)
+ * 
  * @author clement
  *
  */
 public interface ITypeAggregate extends IAIFType {
 	/**
-	 * Returns name of this type
+	 * Returns name of this type (e.g. the name of a struct)
+	 * 
 	 * @return name of this type
 	 */
-	String getName();
+	public String getName();
 	
 	/**
-	 * Returns an array of field names of this type
+	 * Returns an array containing the field names of this type
+	 * 
 	 * @return array of field names 
 	 */
-	String[] getFields();
+	public String[] getFields();
 	
 	/**
-	 * Returns an array of this type or empty of array if nothing
+	 * Returns an array containing the types of each field
+	 * 
 	 * @return array of this type
 	 */
-	IAIFType[] getTypes();
+	public IAIFType[] getTypes();
 	
 	/**
-	 * Returns field name of this type by given position
-	 * @param index position of this type
-	 * @return field name of this type by given position
+	 * Returns field name by given position. Fields are numbered
+	 * starting from 0.
+	 * 
+	 * @param index field position
+	 * @return field name by given position
 	 */
-	String getField(int index);
+	public String getField(int index);
 	
 	/**
-	 * Returns IAIFType of this type by given position
-	 * @param index position of type
-	 * @return IAIFType of this type by given position
+	 * Returns the type of a field by given position. Fields are numbered
+	 * starting from 0.
+	 * 
+	 * @param index field position
+	 * @return field type by given position
 	 */
-	IAIFType getType(int index);
+	public IAIFType getType(int index);
 	
 	/**
-	 * Returns number of children of this type
-	 * @return number of children of this type
+	 * Returns number of children (fields)
+	 * 
+	 * @return number of children
 	 */
-	int getNumberOfChildren();
+	public int getNumberOfChildren();
 }

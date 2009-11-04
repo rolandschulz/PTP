@@ -19,14 +19,16 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents named type in IAIFType
+ * Represents a named type.
+ * 
  * @author clement
  *
  */
 public interface IAIFTypeNamed extends ITypeDerived {
 	/**
 	 * Returns name of this type
+	 * 
 	 * @return name of this type
 	 */
-	String getName();
+	public String getName();
 }

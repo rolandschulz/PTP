@@ -19,15 +19,18 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents aggresgate value
+ * Represents the value of an aggregate type
+ * 
  * @author clement
  *
  */
 public interface IValueAggregate extends IValueParent {
 	/**
-	 * Return IAIFValue of this value by given position or null if nothing found
-	 * @param index position of this value
-	 * @return IAIFValue of this value
+	 * Return the value contained at the given position. Aggregate
+	 * fields are numbered starting from 0.
+	 * 
+	 * @param index field position
+	 * @return value of the corresponding field
 	 */
-	IAIFValue getValue(int index);
+	public IAIFValue getValue(int index);
 }

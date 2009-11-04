@@ -20,26 +20,31 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents value and type of the variable in AIF format  
+ * Represents the value and type of the variable in AIF format 
+ *  
  * @author clement
  *
  */
 public interface IAIF {
 	/**
-	 * Returns IAIFType of this AIF
-	 * @return IAIFType of this AIF
+	 * Returns the declared type of this AIF object
+	 * 
+	 * @return declared type
 	 */
-	IAIFType getType();
+	public IAIFType getType();
 	
 	/**
-	 * Returns IAIFValue of this AIF
-	 * @return IAIFValue of this AIF
+	 * Returns the value of this AIF object
+	 * 
+	 * @return value
 	 */
-	IAIFValue getValue();
+	public IAIFValue getValue();
 	
 	/**
 	 * Returns description of this AIF
+	 * 
 	 * @return description of this AIF
+	 * @deprecated
 	 */
-	String getDescription();
+	public String getDescription();
 }

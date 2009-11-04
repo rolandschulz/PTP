@@ -19,14 +19,16 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents pointer type in IAIFType
+ * Represents a pointer type. 
+ * 
  * @author clement
  *
  */
 public interface IAIFTypePointer extends ITypeDerived {
 	/**
-	 * Returns address type of this type
-	 * @return address type of this type
+	 * Returns the type of the pointer address
+	 * 
+	 * @return address type
 	 */
-	IAIFTypeAddress getAddressType();
+	public IAIFTypeAddress getAddressType();
 }

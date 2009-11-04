@@ -19,7 +19,8 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents address type in IAIFType
+ * Represents an address type
+ * 
  * @author clement
  *
  */

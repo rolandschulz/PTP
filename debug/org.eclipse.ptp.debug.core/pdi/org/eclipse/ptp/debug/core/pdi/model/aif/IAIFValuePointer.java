@@ -21,21 +21,27 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 import java.math.BigInteger;
 
 /**
- * Represents pointer value in IAIFValue
+ * Represents the value of a pointer type (i.e. the object
+ * pointed to by the pointer)
+ * 
  * @author clement
  *
  */
 public interface IAIFValuePointer extends IValueParent {
 	/**
-	 * Returns value of this value
-	 * @return value of this value
+	 * Returns the address of the pointer as a BigInteger
+	 * 
+	 * TODO: rename to getAddressValue()
+	 * 
+	 * @return address of the pointer
 	 * @throws AIFException on failure
 	 */
-	BigInteger pointerValue() throws AIFException;
+	public BigInteger pointerValue() throws AIFException;
 	
 	/**
-	 * Returns IAIFValue of this value or null if nothing
-	 * @return IAIFValue of this value
+	 * Returns object pointed to by the pointer
+	 * 
+	 * @return value of the pointer
 	 */
-	IAIFValue getValue();
+	public IAIFValue getValue();
 }

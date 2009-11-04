@@ -19,7 +19,10 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents union type in IAIFType
+ * Represents a union type. A union is similar to a structure, but all fields
+ * begin at the same location in memory.
+ * 
+ * 
  * @author clement
  *
  */

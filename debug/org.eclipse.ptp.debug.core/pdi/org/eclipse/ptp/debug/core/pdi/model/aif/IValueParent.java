@@ -19,20 +19,23 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents parent on AIFIValue
+ * Represents value that has a parent
+ * 
  * @author clement
  *
  */
 public interface IValueParent extends IAIFValue {
 	/**
-	 * Returns IValueParent of this value
-	 * @return IValueParent of this value
+	 * Returns the parent of this value
+	 * 
+	 * @return parent of this value
 	 */
-	IValueParent getParent();
+	public IValueParent getParent();
 	
 	/**
-	 * Sets IValueParent to this value
-	 * @param parent IValueParent going to set to this value
+	 * Sets parent this value
+	 * 
+	 * @param parent parent of this this value
 	 */
-	void setParent(IValueParent parent);	
+	public void setParent(IValueParent parent);	
 }
