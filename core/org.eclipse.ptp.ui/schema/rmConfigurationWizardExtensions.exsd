@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.uis" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.ptp.uis" id="rmConfigurationWizardExtensions" name="Resouce Manager Configuration Wizard Extensions"/>
+         <meta.schema plugin="org.eclipse.ptp.uis" id="rmConfigurationWizardExtensions" name="Resource Manager Configuration Wizard Extensions"/>
       </appinfo>
       <documentation>
          This extension point allows extra wizard pages to be added to resource manager configuration wizards. This enables tools to contribute wizard pages that enable tool configuration when creating a new resource manager.
