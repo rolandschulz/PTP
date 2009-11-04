@@ -16,6 +16,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public interface IRemoteConnection {
+	public final static String OS_NAME_PROPERTY = "os.name"; //$NON-NLS-1$
+	public final static String OS_VERSION_PROPERTY = "os.version"; //$NON-NLS-1$
+	public final static String OS_ARCH_PROPERTY = "os.arch"; //$NON-NLS-1$
+	public final static String FILE_SERPARATOR_PROPERTY = "file.separator"; //$NON-NLS-1$
+	public final static String PATH_SERPARATOR_PROPERTY = "path.separator"; //$NON-NLS-1$
+	public final static String LINE_SERPARATOR_PROPERTY = "line.separator"; //$NON-NLS-1$
+
 	/**
 	 * Register a listener that will be notified when this connection's status changes.
 	 * 
@@ -98,14 +105,16 @@ public interface IRemoteConnection {
 	public Map<String, String> getAttributes();
 
 	/**
-	 * Returns an unmodifiable string map view of the remote environment.
+	 * Returns an unmodifiable string map view of the remote environment. The connection must be open
+	 * prior to calling this method.
 	 * 
 	 * @return the remote environment
 	 */
 	public Map<String, String> getEnv();
 	
 	/**
-	 * Returns the value of an environment variable.
+	 * Returns the value of an environment variable. The connection must be open
+	 * prior to calling this method.
 	 * 
 	 * @param name name of the environment variable
 	 * @return value of the environment variable or null if the variable is not defined
@@ -120,7 +129,8 @@ public interface IRemoteConnection {
 	public String getName();
 	
 	/**
-	 * Gets the remote system property indicated by the specified key.
+	 * Gets the remote system property indicated by the specified key. The connection must be open
+	 * prior to calling this method.
 	 * 
 	 * The following keys are supported:
 	 * 
@@ -130,9 +140,6 @@ public interface IRemoteConnection {
 	 * file.separator	File separator ("/" on UNIX)
 	 * path.separator	Path separator (":" on UNIX)
 	 * line.separator	Line separator ("\n" on UNIX)
-	 * user.name		User's account name
-	 * user.home		User's home directory
-	 * user.dir			User's current working directory
 	 * 
 	 * @param key the name of the property
 	 * @return the string value of the property, or null if no property has that key
@@ -176,6 +183,13 @@ public interface IRemoteConnection {
 	 * @param address
 	 */
 	public void setAddress(String address);
+	
+	/**
+	 * Set the name for this connection
+	 * 
+	 * @param name
+	 */
+	public void setName(String name);
 	
 	/**
 	 * Set the username for this connection

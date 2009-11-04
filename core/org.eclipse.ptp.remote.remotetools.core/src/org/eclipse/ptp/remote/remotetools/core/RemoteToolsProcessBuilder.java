@@ -12,7 +12,6 @@ package org.eclipse.ptp.remote.remotetools.core;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,13 +24,13 @@ import org.eclipse.ptp.remotetools.core.IRemoteScript;
 import org.eclipse.ptp.remotetools.core.RemoteProcess;
 
 public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
-	private RemoteToolsConnection connection;
-	private Map<String, String> remoteEnv = new HashMap<String, String>();
+	private final RemoteToolsConnection fConnection;
+	private final Map<String, String> fRemoteEnv;
 
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, List<String> command) {
 		super(conn, command);
-//		remoteEnv.putAll(System.getenv());
-		this.connection = conn;
+		fConnection = conn;
+		fRemoteEnv = conn.getEnv();
 	}
 	
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, String... command) {
@@ -43,7 +42,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	 */
 	@Override
 	public Map<String, String> environment() {
-		return remoteEnv;
+		return fRemoteEnv;
 	}
 
 	/* (non-Javadoc)
@@ -68,7 +67,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		}
 		
 		try {
-			IRemoteExecutionManager exeMgr = connection.createExecutionManager();
+			IRemoteExecutionManager exeMgr = fConnection.createExecutionManager();
 			IRemoteExecutionTools exeTools = exeMgr.getExecutionTools();
 			IRemoteScript script = exeTools.createScript();
 			if(directory() != null) {
@@ -78,7 +77,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 				script.setScript(remoteCmd);
 			}
 			
-			for (Entry<String,String>  entry : environment().entrySet()) {
+			for (Entry<String,String> entry : environment().entrySet()) {
 				script.addEnvironment(entry.getKey()+"="+entry.getValue()); //$NON-NLS-1$
 			}
 

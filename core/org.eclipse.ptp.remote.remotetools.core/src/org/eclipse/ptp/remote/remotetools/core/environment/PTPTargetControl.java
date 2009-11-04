@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsConnection;
@@ -141,16 +140,7 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 			setState(CONNECTED);
 			
 			if (connection != null) {
-				connection.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-					public IRemoteConnection getConnection() {
-						return connection;
-					}
-		
-					public int getType() {
-						return IRemoteConnectionChangeEvent.CONNECTION_OPENED;
-					}
-					
-				});
+				connection.fireConnectionChangeEvent(connection, IRemoteConnectionChangeEvent.CONNECTION_OPENED);
 			}
 			
 			monitor.worked(1);
@@ -248,16 +238,7 @@ public class PTPTargetControl extends SSHTargetControl implements ITargetVariabl
 			setState(NOT_OPERATIONAL);
 			
 			if (connection != null) {
-				connection.fireConnectionChangeEvent(new IRemoteConnectionChangeEvent(){
-					public IRemoteConnection getConnection() {
-						return connection;
-					}
-		
-					public int getType() {
-						return IRemoteConnectionChangeEvent.CONNECTION_CLOSED;
-					}
-					
-				});	
+				connection.fireConnectionChangeEvent(connection, IRemoteConnectionChangeEvent.CONNECTION_CLOSED);	
 			}
 		}
 		return true;

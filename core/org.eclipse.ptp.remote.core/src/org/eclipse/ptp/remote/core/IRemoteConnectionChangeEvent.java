@@ -14,17 +14,22 @@ public interface IRemoteConnectionChangeEvent {
 	/**
 	 * Event indicating that the connection was closed.
 	 */
-	public static final int CONNECTION_CLOSED = 1;
+	public static final int CONNECTION_CLOSED = 1 << 0;
 	
 	/**
 	 * Event indicating that the connection was opened.
 	 */
-	public static final int CONNECTION_OPENED = 2;
+	public static final int CONNECTION_OPENED = 1 << 1;
 	
 	/**
 	 * Event indicating that the connection was closed abnormally.
 	 */
-	public static final int CONNECTION_ABORTED = 4;
+	public static final int CONNECTION_ABORTED = 1 << 2;
+
+	/**
+	 * Event indicating that the connection name was changed.
+	 */
+	public static final int CONNECTION_RENAMED = 1 << 3;
 
 	/**
 	 * Get the connection that has changed.
@@ -34,12 +39,15 @@ public interface IRemoteConnectionChangeEvent {
 	public IRemoteConnection getConnection();
 	
 	/**
-	 * Returns the type of event being reported.
+	 * Returns the type of event being reported. This type
+	 * is obtained by bitwise OR'ing the event types together.
+	 * 
+	 * {@link #CONNECTION_CLOSED}
+	 * {@link #CONNECTION_OPENED}
+	 * {@link #CONNECTION_ABORTED}
+	 * {@link #CONNECTION_RENAMED}
 	 *
-	 * @return one of the event type constants
-	 * @see #CONNECTION_CLOSED
-	 * @see #CONNECTION_OPENED
-	 * @see #CONNECTION_ABORTED
+	 * @return a bitwise OR of event type constants
 	 */
 	public int getType();
 }
