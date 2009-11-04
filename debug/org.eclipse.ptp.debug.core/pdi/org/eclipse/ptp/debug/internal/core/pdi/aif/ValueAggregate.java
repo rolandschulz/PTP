@@ -41,6 +41,10 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 		super(parent, type);
 		parse(buffer);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
 	protected void parse(SimpleByteBuffer buffer) {
 		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
 		int num_children = typeAggregate.getNumberOfChildren();
@@ -51,15 +55,24 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 			size += val.sizeof();
 		}
 	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#getChildrenNumber()
+	 */
 	public int getChildrenNumber() throws AIFException {
 		return values.size();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = getString();
 		}
 		return result;
 	}
+	
 	private String getString() throws AIFException {
 		String content = "{";
 		int length = values.size();
@@ -72,7 +85,11 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 		}
 		return content + "}";
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IValueAggregate#getValue(int)
+	 */
 	public IAIFValue getValue(int index) {
-		return (IAIFValue)values.get(index);
+		return values.get(index);
 	}
 }
