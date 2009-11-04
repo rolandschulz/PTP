@@ -12,6 +12,7 @@
 package org.eclipse.ptp.remotetools.environment.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -77,20 +78,16 @@ public class TargetEnvironmentManager {
 		storedCypherEnvToKeyMap = new HashMap<String, Set<String>>();
 			
 		File file = EnvironmentPlugin.getDefault().getStateLocation().append(EnvironmentPlugin.FILENAME).toFile();
-		XMLMemento memento;
-		try {		
-			if (!file.exists()) file.createNewFile();
-			FileReader reader = new FileReader(file);
+		if (file.exists()) {
 			try {
-				memento = XMLMemento.createReadRoot(reader);
+				FileReader reader = new FileReader(file);
+				XMLMemento memento = XMLMemento.createReadRoot(reader);
 				targets = initContentFromFile(memento, targets, cypherEnvTypeMap);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			} catch (WorkbenchException e) {
+				throw new RuntimeException(e);
 			}
-			catch (WorkbenchException exc) {
-				memento = XMLMemento.createWriteRoot(ENVIRONMENTS);
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
 		}
 		
 		Set<String> cipherKeySet = new HashSet<String>();
