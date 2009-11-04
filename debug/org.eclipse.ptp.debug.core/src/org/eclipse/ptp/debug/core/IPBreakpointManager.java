@@ -31,10 +31,20 @@ public interface IPBreakpointManager {
 	public void addSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints);
 
 	/**
-	 * @param tasks
-	 * @param breakpoints
+	 * Called when tasks are removed from a task set. This causes the
+	 * breakpoints to be removed from the tasks that are no longer in the set.
+	 * 
+	 * @param tasks tasks being removed from the set
+	 * @param breakpoints breakpoints that are to be updated
 	 */
 	public void deleteSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints);
+
+	/**
+	 * Delete a breakpoint. Removes the breakpoint and its marker.
+	 * 
+	 * @param breakpoint breakpoint to remove
+	 */
+	public void deleteBreakpoint(IPBreakpoint breakpoint);
 
 	/**
 	 * @param pdiBpt
