@@ -19,14 +19,16 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents array value of IAIFValue
+ * Represents the values of an array type
+ * 
  * @author clement
  *
  */
 public interface IAIFValueArray extends IValueDerived {
 	/**
-	 * Returns a list of IAIFValues of this value
-	 * @return a list of IAIFValues of this value
+	 * Returns the array elements
+	 * 
+	 * @return array elements
 	 */
-	IAIFValue[] getValues();
+	public IAIFValue[] getValues();
 }

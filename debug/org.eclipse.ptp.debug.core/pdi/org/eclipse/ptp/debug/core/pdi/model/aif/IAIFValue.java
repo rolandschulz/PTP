@@ -25,35 +25,40 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
  */
 public interface IAIFValue {
 	/**
-	 * Returns IAIFType of current value
-	 * @return IAIFType of current value
+	 * Returns IAIFType of the value
+	 * 
+	 * @return IAIFType of the value
 	 */
-	IAIFType getType();
+	public IAIFType getType();
 	
 	/**
 	 * Returns name of current value
+	 * 
 	 * @return name of current value
 	 * @throws AIFException on failure
 	 */
-	String getValueString() throws AIFException;
+	public String getValueString() throws AIFException;
 	
 	/**
 	 * Returns number of children of current value
+	 * 
 	 * @return number of children of current value
 	 * @throws AIFException on failure
 	 */
-	int getChildrenNumber() throws AIFException;
+	public int getChildrenNumber() throws AIFException;
 	
 	/**
 	 * Determines whether this value contains more than one
+	 * 
 	 * @return true if this value contains more than one
 	 * @throws AIFException on failure
 	 */
-	boolean hasChildren() throws AIFException;
+	public boolean hasChildren() throws AIFException;
 	
 	/**
 	 * Returns size of this value
+	 * 
 	 * @return size of this value
 	 */
-	int sizeof();
+	public int sizeof();
 }

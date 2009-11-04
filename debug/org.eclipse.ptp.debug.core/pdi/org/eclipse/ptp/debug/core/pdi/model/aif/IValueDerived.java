@@ -19,7 +19,8 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents derived value of IAIFValue
+ * Represents a value for a derived type
+ * 
  * @author clement
  *
  */

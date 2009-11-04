@@ -19,7 +19,8 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents class type in IAIFType
+ * Represents a class type
+ * 
  * @author clement
  *
  */

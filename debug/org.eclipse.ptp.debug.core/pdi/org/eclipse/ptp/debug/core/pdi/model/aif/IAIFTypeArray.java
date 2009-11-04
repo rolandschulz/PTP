@@ -19,64 +19,100 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents array type in IAIFType
+ * Represents array type. Multi-dimensional arrays are represented
+ * by nested IAIFTypeArray objects. 
+ * 
+ * For example:
+ * 
+ * The descriptor "[r0..5is4][r0..9is4]f4" represents a two-dimensional 
+ * array as a 6-element array containing 10-element arrays of floats.
+ * 
+ * This array type contains the range information for only the first
+ * dimension of the array, so getLow() would return 0, getHigh()
+ * would return 5, and getRange() would return 6. 
+ * 
+ * However some information is provided for the whole array, so getDimension() 
+ * would return 2, getAIFTypeArray(0) would return a type with descriptor
+ * "[r0..9is4]f4", and getAIFTypeArray(1) would return a type with descriptor "f4".
+ * 
+ * The base type of this array is the sub-array, or "[r0..9is4]f4".
+ * 
  * @author clement
  *
  */
 public interface IAIFTypeArray extends ITypeDerived {
 	/**
 	 * Returns the dimension of this array
+	 * 
 	 * @return dimension of this array
 	 */
-	int getDimension();
+	public int getDimension();
 	
 	/**
-	 * Returns an array of dimension size
-	 * @return an array of dimension size
+	 * Returns an array containing the size of each dimension of the array type
+	 * 
+	 * TODO: rename to getDimensions()
+	 * 
+	 * @return an array of dimension sizes
 	 */
-	int[] getDimensionDetails();
+	public int[] getDimensionDetails();
 	
 	/**
-	 * Determines whether this array type is dimension or not
-	 * @return true if this array type has dimension
+	 * Determines whether this array type has more than one dimension. i.e. contains
+	 * a sub-array.
+	 * 
+	 * @return true if this array type has more than one dimension
+	 * @deprecated use (getDimension() > 1)
 	 */
-	boolean isDimensionArray();
+	public boolean isDimensionArray();
 	
 	/**
-	 * Returns array type in given dimension position 
-	 * @param dim_pos dimension position of current array
+	 * Returns sub-array type of the given dimension 
+	 * 
+	 * @param dim_pos dimension position
 	 * @return array type
 	 */
-	IAIFTypeArray getAIFTypeArray(int dim_pos);
+	public IAIFTypeArray getAIFTypeArray(int dim_pos);
 	
 	/**
 	 * Returns string format in given range
+	 * 
 	 * @param range range number
 	 * @return string format of the current type
 	 */
-	String toString(int range);
+	public String toString(int range);
 	
 	/**
 	 * Returns the lowest index of this array
+	 * 
 	 * @return the lowest index of this array
+	 * @deprecated use getRange().getLower()
 	 */
-	int getLow();
+	public int getLow();
 	
 	/**
 	 * Returns the highest index of this array
+	 * 
 	 * @return the highest index of this array
+	 * @deprecated use getRange().getUpper()
 	 */
-	int getHigh();
+	public int getHigh();
 	
 	/**
-	 * Returns the range of this array
-	 * @return the range of this array
+	 * Returns the number of elements
+	 * 
+	 * TODO: change to return IAIFTypeRange
+	 * 
+	 * @return number of elements
 	 */
-	int getRange();
+	public int getRange();
 	
 	/**
 	 * Returns base type of this array 
+	 * 
+	 * TODO: rename to getBaseType()
+	 * 
 	 * @return base type of this array
 	 */
-	IAIFType getFoundationType();
+	public IAIFType getFoundationType();
 }

@@ -20,15 +20,17 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 import java.math.BigInteger;
 
 /**
- * Represents address value of IAIFValue
+ * Represents the value of an address type
+ * 
  * @author clement
  *
  */
 public interface IAIFValueAddress extends IAIFValue {
 	/**
-	 * Returns address value of this value
-	 * @return address value of this value
+	 * Returns the value of the address as a BigInteger
+	 * 
+	 * @return value of address
 	 * @throws AIFException on failure
 	 */
-	BigInteger getAddress() throws AIFException;
+	public BigInteger getAddress() throws AIFException;
 }
