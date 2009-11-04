@@ -72,7 +72,7 @@ public class MoveSavedToCommonBlockRefactoring extends SingleFileFortranRefactor
     @Override
     public String getName()
     {
-        return "Move Saved Variables to Common Block";
+        return "Move Saved Variables to COMMON Block";
     }
 
     ///////////////////////////////////////////////////////////////////////////
