@@ -159,6 +159,10 @@ public class OpenDeclarationsAction extends SelectionParseAction {
 				String symbol = (String) result.getResult();
 				reportSymbolLookupFailure(symbol);
 				break;
+			case FAILURE_INCLUDE_LOOKUP:
+				String includedPath = (String) result.getResult();
+				reportIncludeLookupFailure(includedPath);
+				break;
 			default:
 				reportSelectionMatchFailure();
 				break;
