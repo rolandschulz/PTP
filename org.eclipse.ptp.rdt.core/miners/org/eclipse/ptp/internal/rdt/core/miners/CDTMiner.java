@@ -97,6 +97,8 @@ public class CDTMiner extends Miner {
 	public static final String T_MOVE_INDEX_FILE_RESULT = "Type.Index.MoveResult";  //$NON-NLS-1$
 	
 	// indexing errors/warnings
+	public static final String C_REMOTE_LOG_LOCATION = "C_REMOTE_LOG_LOCATION"; //$NON-NLS-1$
+	public static final String T_REMOTE_LOG_LOCATION = "Type.Remote.Log.Location"; //$NON-NLS-1$
 	public static final String T_INDEXING_ERROR = "Type.Indexing.Error"; //$NON-NLS-1$
 	
 	// indexer progress
@@ -145,6 +147,8 @@ public class CDTMiner extends Miner {
 	public static String LINE_SEPARATOR;
 	
 	public static final String DELIMITER = ";;;"; //$NON-NLS-1$
+	
+	//model builder
 	public static final String C_MODEL_BUILDER = "C_MODEL_BUILDER"; //$NON-NLS-1$;
 	public static final String C_MODEL_RESULT= "C_MODEL_RESULT"; //$NON-NLS-1$;
 
@@ -599,11 +603,20 @@ public class CDTMiner extends Miner {
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			}				
+		}		
+		else if (name.equals(C_REMOTE_LOG_LOCATION)) {
+			handleGetRemoteLogLocation(status);
 		}
 		
 		return status;
 	}
 	
+	protected void handleGetRemoteLogLocation(DataElement status) {
+		String location = UniversalServerUtilities.getUserPreferencesDirectory(status.getDataStore());
+		status.getDataStore().createObject(status, T_REMOTE_LOG_LOCATION, location);		
+		statusDone(status);
+		
+	}
 	
 	protected void handleIndexFileMove(String scopeName, String newIndexLocation, DataElement status) throws IOException {
 		String actualLocation = RemoteIndexManager.getInstance().moveIndexFile(scopeName, newIndexLocation, _dataStore);
@@ -1281,6 +1294,9 @@ public class CDTMiner extends Miner {
 		
 		//get model
 		createCommandDescriptor(schemaRoot, "Get model", C_MODEL_BUILDER, false); //$NON-NLS-1$
+		
+		//get remote log location
+		createCommandDescriptor(schemaRoot, "Get remote log location", C_REMOTE_LOG_LOCATION, false); //$NON-NLS-1$
 		
 		_dataStore.refresh(schemaRoot);
 	}
