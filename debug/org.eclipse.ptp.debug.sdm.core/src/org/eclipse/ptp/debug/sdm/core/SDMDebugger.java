@@ -151,12 +151,12 @@ public class SDMDebugger implements IPDebugger {
 
 		IPDISession session = createSession(timeout, launch, corefile);
 
-		/*
-		 * Writing the routing file actually starts the SDM servers.
-		 */
-		writeRoutingFile(launch);
-
 		if (fSdmRunner != null) {
+			/*
+			 * Writing the routing file actually starts the SDM servers.
+			 */
+			writeRoutingFile(launch);
+
 			/*
 			 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions
 			 * are listening on the debugger socket.
@@ -244,12 +244,12 @@ public class SDMDebugger implements IPDebugger {
 		IResourceManagerControl rm = null;
 		rm = (IResourceManagerControl) getResourceManager(configuration);
 		
-		/*
-		 * Store information to create routing file later.
-		 */
-		prepareRoutingFile(configuration, attrMgr, monitor);
-
 		if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
+			/*
+			 * Store information to create routing file later.
+			 */
+			prepareRoutingFile(configuration, attrMgr, monitor);
+
 			/*
 			 * Create SDM master thread
 			 */
