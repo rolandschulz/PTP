@@ -37,6 +37,8 @@ public class OpenDeclarationResult implements Serializable {
 		
 		/** Could not find the symbol */
 		FAILURE_SYMBOL_LOOKUP,
+		/** Could not find the include */
+		FAILURE_INCLUDE_LOOKUP,
 		/** There was an unexpected error */
 		FAILURE_UNEXPECTED_ERROR
 	};
@@ -62,6 +64,10 @@ public class OpenDeclarationResult implements Serializable {
 	
 	public static OpenDeclarationResult failureSymbolLookup(String symbolName) {
 		return new OpenDeclarationResult(ResultType.FAILURE_SYMBOL_LOOKUP, symbolName); 
+	}
+	
+	public static OpenDeclarationResult failureIncludeLookup(String path) {
+		return new OpenDeclarationResult(ResultType.FAILURE_INCLUDE_LOOKUP, path); 
 	}
 	
 	public static OpenDeclarationResult failureUnexpectedError() {

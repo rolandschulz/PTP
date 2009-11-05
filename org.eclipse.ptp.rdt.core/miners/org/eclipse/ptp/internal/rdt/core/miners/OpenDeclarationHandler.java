@@ -122,8 +122,11 @@ public class OpenDeclarationHandler {
 		if (searchName != null) {
 			IASTNode parent = searchName.getParent();
 			if (parent instanceof IASTPreprocessorIncludeStatement) {
-				String path = ((IASTPreprocessorIncludeStatement) parent).getPath();
-				return OpenDeclarationResult.resultIncludePath(path);
+				String includedPath = ((IASTPreprocessorIncludeStatement) parent).getPath();
+				if (includedPath == null || includedPath.equals("")) //$NON-NLS-1$
+					return OpenDeclarationResult.failureIncludeLookup(selectedText);
+				else
+					return OpenDeclarationResult.resultIncludePath(includedPath);
 			}
 			
 			IBinding binding = searchName.resolveBinding();
