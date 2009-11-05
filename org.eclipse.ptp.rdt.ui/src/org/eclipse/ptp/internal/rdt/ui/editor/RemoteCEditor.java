@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.internal.rdt.ui.editor;
 
+import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
@@ -60,13 +61,19 @@ public class RemoteCEditor extends CEditor {
 	}
 	
 	/**
-	 * Returns true if the input translation unit comes from
-	 * a remote project. Also returns true if the editor
+	 * Returns true if the input element is a C element and it 
+	 * comes from a remote project. Also returns true if the editor
 	 * is opened on an external translation unit that was navigated
 	 * to from a remote resource.
 	 */
 	private boolean isRemote() {
-		IProject project = getInputCElement().getCProject().getProject();
+		ICElement element = getInputCElement();
+		if(element == null)
+			return false;
+		ICProject cProject = element.getCProject();
+		if(cProject == null)
+			return false;
+		IProject project = cProject.getProject();
 		return RemoteNature.hasRemoteNature(project);
 	}
 	
