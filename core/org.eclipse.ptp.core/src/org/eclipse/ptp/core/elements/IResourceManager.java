@@ -149,7 +149,9 @@ public interface IResourceManager extends IPElement,
 	public void removeTerminatedJobs(IPQueue queue);
 	
 	/**
-	 * Shutdown the resource manager
+	 * Shutdown the resource manager.
+	 * 
+	 * @throws CoreException this exception is thrown if the shutdown command fails
 	 */
 	public void shutdown() throws CoreException;
 
@@ -157,9 +159,14 @@ public interface IResourceManager extends IPElement,
 	 * Start up the resource manager. This could potentially take a long time (or forever),
 	 * particularly if the RM is located on a remote system.
 	 * 
+	 * Callers can assume that the operation was successful if no exception is thrown and the
+	 * monitor was not cancelled. However, the resource manager may still fail later due to some
+	 * other condition.
+	 * 
 	 * @param monitor the progress monitor to use for reporting progress to the user. It is the caller's responsibility
      *                to call done() on the given monitor. Accepts null, indicating that no progress should be
      *                reported and that the operation cannot be cancelled.
+	 * @throws CoreException this exception is thrown if the resource manager fails to start
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException;
 
@@ -203,6 +210,7 @@ public interface IResourceManager extends IPElement,
 	 * to canceling the job. For running jobs, this would mean halting its execution.
 	 * 
 	 * @param job job object representing the job to be canceled.
+	 * @throws CoreException
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
 
