@@ -388,7 +388,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		
 		Group cmdGroup = new Group(contents, SWT.SHADOW_ETCHED_IN);
 		cmdGroup.setLayout(new GridLayout(4, false));
-		cmdGroup.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+		cmdGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		cmdGroup.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_CommandGroup);
 
 		/*
@@ -396,7 +396,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		 */
 		defaultCmdButton = createCheckButton(cmdGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_UseDefaultSettings);
 		defaultCmdButton.addSelectionListener(getWidgetListener());
-		defaultCmdButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+		defaultCmdButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 
 		/*
 		 * launch cmd
@@ -406,14 +406,14 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_LaunchCommand);
 
 			launchCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
-			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			launchCmdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 			launchCmdText.addModifyListener(getWidgetListener());
 
 			label = new Label(cmdGroup, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DebugCommand);
 
 			debugCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
-			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 			debugCmdText.addModifyListener(getWidgetListener());
 		}
 
@@ -425,7 +425,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_DiscoverCommand);
 
 			discoverCmdText = new Text(cmdGroup, SWT.SINGLE | SWT.BORDER);
-			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
+			discoverCmdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 			discoverCmdText.addModifyListener(getWidgetListener());
 		}
 
@@ -444,7 +444,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_PeriodicMonitorCommandPeriod);
 
 			periodicMonitorTimeSpinner = new Spinner(cmdGroup, SWT.SINGLE | SWT.BORDER);
-			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+			periodicMonitorTimeSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 			periodicMonitorTimeSpinner.addModifyListener(getWidgetListener());
 		}
 
@@ -466,12 +466,12 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		if ((capabilities & IToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
 			Group pathGroup = new Group(contents, SWT.SHADOW_ETCHED_IN);
 			pathGroup.setLayout(new GridLayout(4, false));
-			pathGroup.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+			pathGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 			pathGroup.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationGroup);
 
 			defaultInstallButton = createCheckButton(pathGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationDefault);
 			defaultInstallButton.addSelectionListener(getWidgetListener());
-			defaultInstallButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
+			defaultInstallButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 
 			Label label = new Label(pathGroup, SWT.NONE);
 			label.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationLocation);
