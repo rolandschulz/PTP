@@ -36,6 +36,9 @@
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.launch"/>
       <import plugin="org.eclipse.ptp.debug.core"/>
+      <import plugin="org.eclipse.ptp.perf" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
