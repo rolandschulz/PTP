@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.core;
+package org.eclipse.ptp.etfw.feedback;
 
 import java.io.File;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.etfw.feedback.core.obj.IFeedbackItem;
+import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.core;
+package org.eclipse.ptp.etfw.feedback;
 
 /**
  * Feedback view Plugin constants
@@ -19,10 +19,10 @@ public interface FeedbackIDs
     String FEEDBACK_PREF_NAME    = "Feedback";
     
     /** Marker ID - markers represent the info to display in the compiler xform view and hold the info we need */
-     //String MARKER_ID       = "org.eclipse.ptp.etfw.feedback.core.XForm";
+     //String MARKER_ID       = "org.eclipse.ptp.etfw.feedback.XForm";
    
     /** View ID */
-    String FEEDBACK_VIEW_ID = "org.eclipse.ptp.etfw.feedback.core.views.feedbackView";
+    String FEEDBACK_VIEW_ID = "org.eclipse.ptp.etfw.feedback.views.feedbackView";
     
     // attribute names
     String FEEDBACK_ATTR_NAME="name";

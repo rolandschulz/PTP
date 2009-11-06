@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.core.views;
+package org.eclipse.ptp.etfw.feedback.views;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -59,8 +59,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.etfw.feedback.core.Activator;
-import org.eclipse.ptp.etfw.feedback.core.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.Activator;
+import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
