@@ -111,7 +111,7 @@ plugin@org.eclipse.ptp.perf.tau.perfdmf=@ptpTag@,:pserver:anonymous@dev.eclipse.
 plugin@org.eclipse.ptp.perf.tau.selinst=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.selinst
 plugin@org.eclipse.ptp.perf.tau.selinstfort=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.tau.selinstfort
 plugin@org.eclipse.ptp.perf.toolopts=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.toolopts
-plugin@org.eclipse.ptp.etfw.feedback.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.feedback.core
+plugin@org.eclipse.ptp.etfw.feedback.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.feedback.core
 
 ! RDT Plugins
 plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core
