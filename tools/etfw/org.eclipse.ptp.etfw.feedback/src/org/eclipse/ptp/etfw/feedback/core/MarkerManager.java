@@ -1,0 +1,360 @@
+/**********************************************************************
+ * Copyright (c) 2009 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
+package org.eclipse.ptp.etfw.feedback.core;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.ptp.etfw.feedback.core.obj.IFeedbackItem;
+import org.eclipse.ui.texteditor.MarkerUtilities;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+/**
+ * Creates markers representing IFeedbackItem objects, to be shown in the Feedback view
+ */
+public class MarkerManager {
+	private static final boolean dbg=true;
+	
+	String srcTempPathname="/Users/beth/ews/runtime-compiler-xform-test/MyHPCSTproject/src";
+	
+	static String path;
+	static String filename;
+	private static MarkerManager instance;
+	
+	private static final String SLASH=System.getProperty("file.separator");
+	
+
+	/**
+	 * Note: some Items may be parent groups and not have file, etc. info
+	 * 
+	 * Do we create markers for children that don't appear yet? think so
+	 * Or not until they are expanded? think not
+	 * 
+	 * Note: need to batch this in a single resource change event, getElements()
+	 * is being called on every marker creation.
+	 * @param itemlist
+	 */
+	public void createMarkersOld(List<IFeedbackItem> itemlist, String markerID) {
+		
+		boolean dbgTags=true;
+		// HACK we need to be able to remove markers on (all?) files in the list.
+		// What if some markers were from other things? need to use only our specific plugin's marker id.
+		IResource res1 = getResource(srcTempPathname, itemlist.get(0).getFile());
+		removeMarkers(res1,markerID);
+		
+		// for root nodes, no parent ID
+		final String parentID="";
+		int count=0;
+		Map<String, Object> attrs;
+		
+		int size=itemlist.size();
+		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
+			IFeedbackItem item = iterator.next();	
+			String filename=item.getFile();		
+			String name=item.getName()+" "+item.getID();
+			int lineNo=item.getLineNoStart();
+			String desc=item.getDescription();// more info can go here
+			String itemID=item.getID();
+			attrs=createCommonMarkers(itemID,name, parentID, filename, srcTempPathname, lineNo, /*function,*/ desc);			
+			
+			IResource resource = getResource(srcTempPathname,filename);
+			createMarker(resource, attrs,markerID);
+			if(item.hasChildren()) {
+				List<IFeedbackItem> kids=item.getChildren();
+				for (Iterator iterator2 = kids.iterator(); iterator2.hasNext();) {
+					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
+					String parentid=item.getID();
+					String namePrefix="Bottleneck: "; //HACK
+					String kname=kid.getName();
+					if(dbgTags)kname=namePrefix+kname;
+					if(dbgTags)kname+=" parent="+parentid;
+					int uid=counter++; // need something unique
+					String uidStr=Integer.toString(uid);
+					// make file/location the same as parent
+					attrs=createCommonMarkers(uidStr,kname,parentid,filename,srcTempPathname,lineNo,kid.getDescription());
+					createMarker(resource,attrs,markerID);	
+					boolean gkids=kid.hasChildren();
+					// fixme make this recursive so level of hierarchy doesn't matter
+					if(gkids) {
+						System.out.println("grandkids");
+						List<IFeedbackItem> gkidItems=kid.getChildren();
+						for(Object gkid : gkidItems) {
+							IFeedbackItem gki = (IFeedbackItem) gkid;
+							String gkNamePrefix="Solution: "; //HACK
+							attrs=createCommonMarkers(gki.getID(),gkNamePrefix+gki.getName(),uidStr,filename,srcTempPathname,lineNo,gki.getDescription());
+							createMarker(resource,attrs,markerID);
+						}
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * Remove the markers from the files we're about to add new markers to
+	 * @param sfList List of source files
+	 */
+	/*
+	public void removeMarkers(List<SourceFile> sfList) {
+		// delete existing markers, if any
+		//if(dbg)System.out.println("removeMarkers()...");
+		for (Iterator<SourceFile> iterator = sfList.iterator(); iterator.hasNext();) {
+			SourceFile sf = iterator.next();
+			String pathname=sf.getPathName();
+			IResource res=getResource(pathname, sf.getFileName());
+			try {
+				res.deleteMarkers(FeedbackIDs.MARKER_ID, true, IResource.DEPTH_INFINITE);
+			} catch (CoreException e) {
+				System.out.println("Error deleting markers on "+res.getName());
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	*/
+	public void removeMarkers(IResource res, String markerID) {
+			try {
+				res.deleteMarkers(markerID, true, IResource.DEPTH_INFINITE);
+			} catch (CoreException e) {
+				System.out.println("Error deleting markers on "+res.getName());
+				e.printStackTrace();
+			}
+	}
+
+	
+	/**
+	 * Translate /path/to/xml/file.xml to /path/to/src   to obtain a path to the presumed location of the source file
+	 * @param file
+	 * @return
+	 */
+	public String getSrcPath(File file) {
+		// hack until we can get more complete pathname from the xml
+		String docpath = null;
+		try {
+			docpath = file.getAbsolutePath();
+			int indx = docpath.lastIndexOf(SLASH);
+			String pathname = docpath.substring(0, indx);
+			indx = pathname.lastIndexOf(SLASH);
+			pathname = pathname.substring(0, indx);
+			pathname = pathname + SLASH + "src";
+			return pathname;
+		} catch (Exception e) {
+			System.out.println("Exception parsing src path from " + docpath);
+		}
+		return null;
+	}
+	/**
+	 * temporary: because the supplied xml is inconsistent about whether or not it lists the filename fully qualified or not.
+		
+	 * @param filename
+	 * @return
+	 */
+	public String stripFileNameOnly(String filename) {
+		int indx=filename.lastIndexOf(SLASH);
+		if(indx>=0) {
+			filename=filename.substring(indx+1);
+		}
+		// the original filename in the xml could have been built on *nix but is being processed on windows.
+		// if so, translate
+		else {
+			// note there is a reported bug in string.replaceAll regarding double slashes
+			String otherSlash="/";
+			if(SLASH.equals(otherSlash))otherSlash="\\";
+			StringBuffer newf=new StringBuffer();
+			int len=filename.length();
+			try {
+			for(int i=0; i<len; i++) {
+				String next=filename.substring(i,i+1);
+				if(next.equals(otherSlash)){
+					newf.append(SLASH);
+				}else{
+					newf.append(next);
+				}
+			}
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			indx = newf.lastIndexOf(SLASH);
+			if (indx >= 0) {
+				filename = newf.substring(indx + 1);
+			}
+		}
+		return filename;
+	}
+
+	String getStrAttr(NamedNodeMap attribs, String attrName) {
+		Node node = attribs.getNamedItem(attrName);
+		if(node==null)return "";
+		String val=node.getNodeValue();
+		return val;
+	}
+	int getIntAttr(NamedNodeMap attribs, String attrName) {
+		Node node = attribs.getNamedItem(attrName);
+		String val=node.getNodeValue();
+		int intVal=toInt(val);
+		return intVal;
+	}
+
+
+	
+	/**
+	 * create an int from a string
+	 * @param str
+	 * @return
+	 */
+	public int toInt(String str) {
+		int value=0;
+		try {
+		  value = Integer.parseInt(str);
+		}
+		catch(NumberFormatException e) {
+			System.out.println("NumberFormatException("+str+"): "+e.getMessage());
+			value=0;
+			
+		}
+		return value;
+	}
+
+
+	
+
+	public IResource getResource(String pathname, String filename) {
+
+		ResourcesPlugin.getWorkspace();
+		
+		   IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		   IWorkspaceRoot root = workspace.getRoot();
+		   IFile file=root.getFileForLocation(new Path(pathname+SLASH+filename));
+		   return file;
+	}
+
+
+	private static int counter=0;
+
+	/**
+	 * Create marker attributes common to all marker items.
+	 * @param itemID
+	 * @param name
+	 * @param parentID
+	 * @param filename
+	 * @param pathname
+	 * @param lineNo
+	 * @param desc
+	 * @return
+	 */
+	public Map<String, Object> createCommonMarkers(String itemID, String name, String parentID, String filename, String pathname, int lineNo, /*String function,*/ String desc){
+		Map<String, Object> attrs = new HashMap<String,Object>();
+		
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_ID, itemID);
+		attrs.put(IMarker.PRIORITY, new Integer(IMarker.PRIORITY_NORMAL));
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_NAME, name);
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_FILENAME, filename);
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_PARENT, parentID);
+		//attrs.put(FeedbackIDs.FEEDBACK_ATTR_FUNCTION, function);
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE, "");   // set to blank, may be overridden if values are available
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_PATHNAME, pathname);
+        attrs.put(IMarker.LINE_NUMBER, new Integer(lineNo));
+        
+		// later, set the marker to more precise location - but omit for now, or else lineNumber won't be used
+        //attrs.put(IMarker.CHAR_START, new Integer(ila.getColumn()));
+        //attrs.put(IMarker.CHAR_END, new Integer(ila.getColumn()+5));// hack, what is end?
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_DESC,desc);
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_LOOP_ID,""); // filled in by (only) transform attempts
+		return attrs;
+	}
+	 
+	public void createMarker(IResource resource, Map<String,Object>attrs, String markerID) {
+		try {
+			MarkerUtilities.createMarker(resource, attrs, markerID);
+			if(dbg)System.out.println("  Created marker for "+resource.getName()+" "+attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME)+" lineNo:"+attrs.get(IMarker.LINE_NUMBER)+" parentID="+attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT));
+		} catch (CoreException e) {
+			System.out.println("Error creating Xform marker: "+e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Note: some Items may be parent groups and not have file, etc. info
+	 * 
+	 * Do we create markers for children that don't appear yet? think so
+	 * Or not until they are expanded? think not
+	 * 
+	 * Note: need to batch this in a single resource change event, getElements()
+	 * is being called on every marker creation.
+	 * @param itemlist
+	 */
+	public void createMarkers(List<IFeedbackItem> itemlist, String markerID) {
+		
+		boolean dbgTags=true;
+		// HACK we need to be able to remove markers on (all?) files in the list.
+		// What if some markers were from other things? need to use only our specific plugin's marker id.
+		IResource res1 = getResource(srcTempPathname, itemlist.get(0).getFile());
+		removeMarkers(res1,markerID);
+		
+		// for root nodes, no parent ID
+		final String parentID="";
+		int count=0;
+		Map<String, Object> attrs;
+		
+		int size=itemlist.size();
+		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
+			IFeedbackItem item = iterator.next();	
+			String filename=item.getFile();		
+			String name=item.getName()+" "+item.getID();
+			int lineNo=item.getLineNoStart();
+			String desc=item.getDescription();// more info can go here
+			String itemID=item.getID();
+			attrs=createCommonMarkers(itemID,name, parentID, filename, srcTempPathname, lineNo, /*function,*/ desc);			
+			
+			IResource resource = getResource(srcTempPathname,filename);
+			createMarker(resource, attrs,markerID);
+			if(item.hasChildren()) {
+				List<IFeedbackItem> kids=item.getChildren();
+				for (Iterator iterator2 = kids.iterator(); iterator2.hasNext();) {
+					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
+					String parentid=item.getID();
+					String namePrefix="Bottleneck: "; //HACK
+					String kname=kid.getName();
+					if(dbgTags)kname=namePrefix+kname;
+					if(dbgTags)kname+=" parent="+parentid;
+					int uid=counter++; // need something unique
+					String uidStr=Integer.toString(uid);
+					// make file/location the same as parent
+					attrs=createCommonMarkers(uidStr,kname,parentid,filename,srcTempPathname,lineNo,kid.getDescription());
+					createMarker(resource,attrs,markerID);	
+					boolean gkids=kid.hasChildren();
+					// fixme make this recursive so level of hierarchy doesn't matter
+					if(gkids) {
+						System.out.println("grandkids");
+						List<IFeedbackItem> gkidItems=kid.getChildren();
+						for(Object gkid : gkidItems) {
+							IFeedbackItem gki = (IFeedbackItem) gkid;
+							String gkNamePrefix="Solution: "; //HACK
+							attrs=createCommonMarkers(gki.getID(),gkNamePrefix+gki.getName(),uidStr,filename,srcTempPathname,lineNo,gki.getDescription());
+							createMarker(resource,attrs,markerID);
+						}
+					}
+				}
+			}
+		}
+	}	 
+}
