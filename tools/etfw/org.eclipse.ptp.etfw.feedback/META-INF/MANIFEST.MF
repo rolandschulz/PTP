@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: org.eclipse.ptp.etfw.feedback.core;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.etfw.feedback;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: org.eclipse.ptp.etfw.feedback.core.Activator
+Bundle-Activator: org.eclipse.ptp.etfw.feedback.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -11,8 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide;bundle-version="3.5.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.etfw.feedback.core,
- org.eclipse.ptp.etfw.feedback.core.actions.handlers,
- org.eclipse.ptp.etfw.feedback.core.obj,
- org.eclipse.ptp.etfw.feedback.core.preferences,
- org.eclipse.ptp.etfw.feedback.core.views
+Export-Package: org.eclipse.ptp.etfw.feedback,
+ org.eclipse.ptp.etfw.feedback.actions.handlers,
+ org.eclipse.ptp.etfw.feedback.obj,
+ org.eclipse.ptp.etfw.feedback.preferences,
+ org.eclipse.ptp.etfw.feedback.views
