@@ -450,6 +450,9 @@
 			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.perf.toolopts"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.feedback.core"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core"/>
 		</antcall>
 		<antcall target="tagone">
