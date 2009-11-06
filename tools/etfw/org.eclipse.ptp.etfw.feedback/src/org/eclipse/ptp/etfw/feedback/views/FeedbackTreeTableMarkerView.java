@@ -9,17 +9,16 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.core.views;
+package org.eclipse.ptp.etfw.feedback.views;
 
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.feedback.core.Activator;
-import org.eclipse.ptp.etfw.feedback.core.Messages;
-import org.eclipse.ptp.etfw.feedback.core.FeedbackIDs;
-import org.eclipse.ptp.etfw.feedback.core.preferences.PreferenceConstants;
+import org.eclipse.ptp.etfw.feedback.Activator;
+import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
 
 
 /**

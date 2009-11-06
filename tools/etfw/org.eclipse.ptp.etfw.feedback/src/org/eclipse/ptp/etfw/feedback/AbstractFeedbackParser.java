@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.core;
+package org.eclipse.ptp.etfw.feedback;
 
 import java.util.List;
 
-import org.eclipse.ptp.etfw.feedback.core.obj.IFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.core.obj.IFeedbackParser;
+import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
+import org.eclipse.ptp.etfw.feedback.obj.IFeedbackParser;
 
 /**
  * Abstract class that may contain utility methods for parsing feedback xml

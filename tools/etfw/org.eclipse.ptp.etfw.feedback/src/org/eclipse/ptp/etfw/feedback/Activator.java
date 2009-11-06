@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.core;
+package org.eclipse.ptp.etfw.feedback;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	/** The plug-in ID */
-	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback.core";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback";
 	
 	public static final String FEEDBACK_EXTENSION_ID="feedback";
 

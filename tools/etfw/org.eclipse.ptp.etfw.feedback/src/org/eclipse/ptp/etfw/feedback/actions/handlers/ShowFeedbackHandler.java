@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.core.actions.handlers;
+package org.eclipse.ptp.etfw.feedback.actions.handlers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,10 +34,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.etfw.feedback.core.Activator;
-import org.eclipse.ptp.etfw.feedback.core.obj.IFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.core.obj.IFeedbackParser;
-import org.eclipse.ptp.etfw.feedback.core.util.ViewActivator;
+import org.eclipse.ptp.etfw.feedback.Activator;
+import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
+import org.eclipse.ptp.etfw.feedback.obj.IFeedbackParser;
+import org.eclipse.ptp.etfw.feedback.util.ViewActivator;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

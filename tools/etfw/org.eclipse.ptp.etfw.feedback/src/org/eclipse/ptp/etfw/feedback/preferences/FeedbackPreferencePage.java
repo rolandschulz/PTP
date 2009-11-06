@@ -8,10 +8,10 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.core.preferences;
+package org.eclipse.ptp.etfw.feedback.preferences;
 
 import org.eclipse.jface.preference.*;
-import org.eclipse.ptp.etfw.feedback.core.Activator;
+import org.eclipse.ptp.etfw.feedback.Activator;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbench;
 

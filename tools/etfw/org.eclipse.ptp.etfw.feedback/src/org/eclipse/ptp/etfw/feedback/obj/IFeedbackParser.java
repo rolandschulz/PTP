@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.core.obj;
+package org.eclipse.ptp.etfw.feedback.obj;
 
 import java.io.File;
 import java.util.List;
