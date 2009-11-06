@@ -23,15 +23,19 @@ public class NormalizationTestCase extends TestCase
 {
     public void testOffset()
     {
-        PrimitiveOp.Alpha alpha = PrimitiveOp.alpha("", 3, 6);
-        assertEquals(3, alpha.j.cardinality());
+        PrimitiveOp.Alpha alpha = PrimitiveOp.alpha("no_filename", 3, 6);
+        int count = alpha.k.cardinality();
+        assertEquals(3, count);
 
         Interval before = new Interval(0, 3);
         Interval overlapped = new Interval(3, 7);
         Interval after = new Interval(7, 11);
 
-        assertEquals(before, alpha.offset(before));
-        assertEquals(new Interval(3+3, 7+3), alpha.offset(overlapped));
-        assertEquals(new Interval(7+3, 11+3), alpha.offset(after));
+        assertEquals(before.lb, alpha.offset(before.lb));
+        assertEquals(before.ub-1, alpha.offset(before.ub-1));
+        assertEquals(overlapped.lb+count, alpha.offset(overlapped.lb));
+        assertEquals(overlapped.ub-1+count, alpha.offset(overlapped.ub-1));
+        assertEquals(after.lb+count, alpha.offset(after.lb));
+        assertEquals(after.ub-1+count, alpha.offset(after.ub-1));
     }
 }

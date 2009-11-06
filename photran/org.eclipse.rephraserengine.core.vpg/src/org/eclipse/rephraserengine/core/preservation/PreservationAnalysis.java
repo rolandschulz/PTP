@@ -67,7 +67,7 @@ public class PreservationAnalysis
     public void monitor(IFile file)
     {
         ensureDatabaseIsInHypotheticalMode();
-        
+
         ArrayList<String> singleton = new ArrayList<String>();
         singleton.add(EclipseVPG.getFilenameForIFile(file));
         monitor(vpg.sortFilesAccordingToDependencies(singleton, new NullProgressMonitor()));
@@ -151,8 +151,8 @@ public class PreservationAnalysis
 
         Alpha newAlpha = PrimitiveOp.alpha(
             alpha1.filename,
-            alpha1.j.lb,
-            alpha1.j.lb + alpha1.j.cardinality() + alpha2.j.cardinality());
+            alpha1.k.lb,
+            alpha1.k.lb + alpha1.k.cardinality() + alpha2.k.cardinality());
             //alpha1.preserveEdgeTypes);
 
         addAlpha(newAlpha);
@@ -208,18 +208,31 @@ public class PreservationAnalysis
 
     private void checkForPreservation(RefactoringStatus status, String filename)
     {
+        printDebug("INITIAL MODEL", initialModels.get(filename));
+
         progressMonitor.subTask("Normalizing initial model - " + lastSegment(filename));
         initialModels.get(filename).inormalize(primitiveOps, preserveEdgeTypes);
+        printDebug("NORMALIZED INITIAL MODEL", initialModels.get(filename));
 
         progressMonitor.subTask("Computing derivative model - " + lastSegment(filename));
         Model derivativeModel = new Model(vpg, filename);
+        printDebug("DERIVATIVE MODEL", derivativeModel);
 
         progressMonitor.subTask("Normalizing derivative model - " + lastSegment(filename));
         derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
+        printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel);
 
         progressMonitor.subTask("Differencing initial and derivative models - " + lastSegment(filename));
         ModelDiff diff = initialModels.get(filename).compareAgainst(derivativeModel);
         describeDifferences(status, diff, EclipseVPG.getIFileForFilename(filename));
+    }
+
+    private void printDebug(String string, Object object)
+    {
+        System.out.println();
+        System.out.println();
+        System.out.print(string); System.out.println(":");
+        System.out.println(object.toString());
     }
 
     private void describeDifferences(final RefactoringStatus status, ModelDiff diff, final IFile file)

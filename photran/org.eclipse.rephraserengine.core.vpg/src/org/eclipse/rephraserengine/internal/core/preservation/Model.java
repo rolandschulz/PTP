@@ -142,7 +142,7 @@ public class Model
         for (PrimitiveOp op : primitiveOps)
             inormalize(op, preserveEdgeTypes);
     }
-
+    
     public void dnormalize(PrimitiveOp op, Set<Integer> preserveEdgeTypes)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();

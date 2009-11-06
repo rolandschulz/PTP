@@ -34,7 +34,7 @@ public class Interval implements Comparable<Interval>
     {
         return lb == ub;
     }
-    
+
     public boolean contains(int n)
     {
         return lb <= n && n < ub;
@@ -49,7 +49,7 @@ public class Interval implements Comparable<Interval>
         else
             return other.lb <= this.lb && this.ub <= other.ub;
     }
-    
+
 // THESE DEFINITIONS ARE **WRONG**!
 //    public Interval union(Interval that)
 //    {
@@ -57,7 +57,7 @@ public class Interval implements Comparable<Interval>
 //            Math.min(this.lb, that.lb),
 //            Math.max(this.ub, that.ub));
 //    }
-//    
+//
 //    public Interval intersection(Interval that)
 //    {
 //        return new Interval(
@@ -70,9 +70,24 @@ public class Interval implements Comparable<Interval>
         return ub - lb;
     }
 
-    public boolean isLessThan(Interval other)
+    public boolean isLessThan(Interval that)
     {
-        return this.ub <= other.lb && !this.equals(other);
+        return this.ub <= that.lb && !this.equals(that);
+    }
+
+    public boolean isGreaterThan(Interval that)
+    {
+        return this.lb >= that.ub && !this.equals(that);
+    }
+
+    public boolean overlaps(Interval that)
+    {
+        return !doesNotOverlap(that);
+    }
+
+    private boolean doesNotOverlap(Interval that)
+    {
+        return this.ub <= that.lb || this.lb >= that.ub;
     }
 
     public Interval plus(int offset)

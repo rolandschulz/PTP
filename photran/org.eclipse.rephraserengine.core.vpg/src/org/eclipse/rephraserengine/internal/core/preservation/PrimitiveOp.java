@@ -10,25 +10,26 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.internal.core.preservation;
 
-
 /**
  *
  * @author Jeff Overbey
  */
 public abstract class PrimitiveOp
 {
+    public static final int UNDEFINED = Integer.MIN_VALUE;
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Factory Methods
+    // Factory Methods (alpha/epsilon methods normalize to rho-operations)
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static Alpha alpha(String filename, Interval j)
+    public static Alpha alpha(String filename, Interval k)
     {
-        return new Alpha(filename, j);
+        return new Alpha(filename, k);
     }
 
-    public static Alpha alpha(String filename, int j_lb, int j_ub)
+    public static Alpha alpha(String filename, int k_lb, int k_ub)
     {
-        return new Alpha(filename, new Interval(j_lb, j_ub));
+        return new Alpha(filename, new Interval(k_lb, k_ub));
     }
 
     public static Epsilon epsilon(String filename, Interval j)
@@ -64,7 +65,7 @@ public abstract class PrimitiveOp
 
     @Override public abstract String toString();
 
-    public abstract Interval offset(Interval i);
+    protected abstract int offset(int n);
 
     public abstract Interval inorm(Interval i);
 
@@ -77,104 +78,6 @@ public abstract class PrimitiveOp
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Concrete Subclasses
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static class Alpha extends PrimitiveOp
-    {
-        public final Interval j;
-
-        private Alpha(String filename, Interval j)
-        {
-            super(filename);
-            this.j = j;
-        }
-
-        @Override
-        public Interval offset(Interval i)
-        {
-            if (i.isLessThan(j))
-                return i;
-            else
-                return i.plus(j.cardinality());
-        }
-
-        @Override
-        public Interval inorm(Interval i)
-        {
-            return offset(i);
-        }
-
-        @Override
-        public Interval iaff()
-        {
-            return new Interval(j.lb, j.lb+1);
-        }
-
-        @Override
-        public Interval dnorm(Interval i)
-        {
-            return i;
-        }
-
-        @Override
-        public Interval daff()
-        {
-            return j;
-        }
-
-        @Override public String toString()
-        {
-            return "alpha(" + j + ")";
-        }
-    }
-
-    public static class Epsilon extends PrimitiveOp
-    {
-        public final Interval j;
-
-        private Epsilon(String filename, Interval j)
-        {
-            super(filename);
-            this.j = j;
-        }
-
-        @Override
-        public Interval offset(Interval i)
-        {
-            if (i.isLessThan(j))
-                return i;
-            else
-                return i.minus(j.cardinality());
-        }
-
-        @Override
-        public Interval inorm(Interval i)
-        {
-            return offset(i);
-        }
-
-        @Override
-        public Interval iaff()
-        {
-            return j;
-        }
-
-        @Override
-        public Interval dnorm(Interval i)
-        {
-            return i;
-        }
-
-        @Override
-        public Interval daff()
-        {
-            return new Interval(j.lb, j.lb+1);
-        }
-
-        @Override public String toString()
-        {
-            return "epsilon(" + j + ")";
-        }
-    }
 
     public static class Rho extends PrimitiveOp
     {
@@ -192,21 +95,22 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval offset(Interval i)
+        public int offset(int n)
         {
-            if (i.isLessThan(j))
-                return i;
+            if (n < j.lb)
+                return n;
+            else if (n >= j.ub)
+                return n - j.cardinality() + k.cardinality();
             else
-                return i.minus(j.cardinality()).plus(k.cardinality());
+                return UNDEFINED;
         }
 
         @Override
         public Interval inorm(Interval i)
         {
-            if (i.isSubsetOf(j))
-                return k;
-            else
-                return offset(i);
+            return new Interval(
+                offset(i.lb) != UNDEFINED ? offset(i.lb) : k.lb,
+                offset(i.ub) != UNDEFINED ? offset(i.ub) : k.ub);
         }
 
         @Override
@@ -233,6 +137,22 @@ public abstract class PrimitiveOp
         @Override public String toString()
         {
             return "rho(" + j + ", " + k + ")";
+        }
+    }
+
+    public static class Alpha extends Rho
+    {
+        private Alpha(String filename, Interval k)
+        {
+            super(filename, new Interval(k.lb, k.lb), k);
+        }
+    }
+
+    public static class Epsilon extends Rho
+    {
+        private Epsilon(String filename, Interval j)
+        {
+            super(filename, j, new Interval(j.lb, j.lb));
         }
     }
 }
