@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.rephraserengine.core.preservation.Preserve;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
@@ -31,7 +32,7 @@ public class Model
     private static final class Entry implements Comparable<Entry>
     {
         private String sourceFilename;
-        private Interval source;
+        private Interval source, origSource;
         private String sinkFilename;
         private Interval sink;
         private int edgeType;
@@ -41,16 +42,27 @@ public class Model
             if (source == null || sink == null) throw new IllegalArgumentException();
 
             this.sourceFilename = sourceFilename;
-            this.source = source;
+            this.source = this.origSource = source;
             this.sinkFilename = sinkFilename;
             this.sink = sink;
             this.edgeType = edgeType;
         }
 
-        public boolean isEntirelyContainedIn(Interval interval)
+        public boolean shouldPreserveAccordingTo(Set<Preserve> preserveEdgeTypes, Interval affected)
+        {
+            for (Preserve rule : preserveEdgeTypes)
+                if (shouldPreserveAccordingTo(rule, affected))
+                    return true;
+
+            return false;
+        }
+
+        public boolean shouldPreserveAccordingTo(Preserve rule, Interval affected)
         {
             // FIXME: What about filenames?
-            return source.isSubsetOf(interval) && sink.isSubsetOf(interval);
+            boolean incoming = sink.isSubsetOf(affected);
+            boolean outgoing = source.isSubsetOf(affected);
+            return rule.shouldPreserve(incoming, outgoing, this.edgeType);
         }
 
         @Override public boolean equals(Object o)
@@ -119,16 +131,15 @@ public class Model
         }
     }
 
-    public void inormalize(PrimitiveOp op, Set<Integer> preserveEdgeTypes)
+    public void inormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
         for (Entry entry : edgeList)
         {
-            if (preserveEdgeTypes.contains(entry.edgeType)
-                && !entry.isEntirelyContainedIn(op.iaff()))
+            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.iaff()))
             {
-                entry.source = op.inorm(entry.source);
+                entry.source = op.inorm(entry.source); // leave origSource unchanged
                 entry.sink = op.inorm(entry.sink);
                 revisedList.add(entry);
             }
@@ -137,20 +148,19 @@ public class Model
         edgeList = revisedList;
     }
 
-    public void inormalize(List<PrimitiveOp> primitiveOps, Set<Integer> preserveEdgeTypes)
+    public void inormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes)
     {
         for (PrimitiveOp op : primitiveOps)
             inormalize(op, preserveEdgeTypes);
     }
-    
-    public void dnormalize(PrimitiveOp op, Set<Integer> preserveEdgeTypes)
+
+    public void dnormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
         for (Entry entry : edgeList)
         {
-            if (preserveEdgeTypes.contains(entry.edgeType)
-                && !entry.isEntirelyContainedIn(op.daff()))
+            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.daff()))
             {
                 entry.source = op.dnorm(entry.source);
                 entry.sink = op.dnorm(entry.sink);
@@ -161,7 +171,7 @@ public class Model
         edgeList = revisedList;
     }
 
-    public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Integer> preserveEdgeTypes)
+    public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes)
     {
         for (PrimitiveOp op : primitiveOps)
             dnormalize(op, preserveEdgeTypes);
@@ -183,7 +193,7 @@ public class Model
                 }
                 else
                 {
-                    diff.add(new EdgeDeleted(entry.source, entry.sink, entry.edgeType));
+                    diff.add(new EdgeDeleted(entry.origSource, entry.sink, entry.edgeType));
                 }
             }
         }

@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
+import org.eclipse.rephraserengine.core.preservation.Preserve;
 
 /**
  * Refactoring to delete an unused declaration from a Fortran program.
@@ -80,7 +81,7 @@ public class SafeDeleteRefactoring extends SingleFileFortranRefactoring
         try
         {
             preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm,
-                PhotranVPG.BINDING_EDGE_TYPE);
+                Preserve.incoming(PhotranVPG.BINDING_EDGE_TYPE));
 
             preservation.monitor(fileInEditor);
             deleteScope();

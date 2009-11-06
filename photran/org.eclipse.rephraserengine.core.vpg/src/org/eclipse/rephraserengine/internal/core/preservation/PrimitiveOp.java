@@ -122,7 +122,7 @@ public abstract class PrimitiveOp
         @Override
         public Interval dnorm(Interval i)
         {
-            if (i.isSubsetOf(j))
+            if (i.isSubsetOf(k))
                 return k;
             else
                 return i;
@@ -136,7 +136,7 @@ public abstract class PrimitiveOp
 
         @Override public String toString()
         {
-            return "rho(" + j + ", " + k + ")";
+            return "rho<" + j + ", " + k + ">";
         }
     }
 

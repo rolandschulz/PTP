@@ -51,16 +51,16 @@ public class PreservationAnalysis
 
     private List<PrimitiveOp> primitiveOps = new LinkedList<PrimitiveOp>();
 
-    private Set<Integer> preserveEdgeTypes = Collections.<Integer>emptySet();
+    private Set<Preserve> preserveEdgeTypes = Collections.<Preserve>emptySet();
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, int... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, Preserve... edgeTypes)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
         this.progressMonitor = pm;
 
-        preserveEdgeTypes = new HashSet<Integer>(edgeTypes.length);
-        for (int type : edgeTypes)
+        preserveEdgeTypes = new HashSet<Preserve>(edgeTypes.length);
+        for (Preserve type : edgeTypes)
             preserveEdgeTypes.add(type);
     }
 
@@ -209,6 +209,7 @@ public class PreservationAnalysis
     private void checkForPreservation(RefactoringStatus status, String filename)
     {
         printDebug("INITIAL MODEL", initialModels.get(filename));
+        printDebug("NORMALIZING RELATIVE TO", primitiveOps);
 
         progressMonitor.subTask("Normalizing initial model - " + lastSegment(filename));
         initialModels.get(filename).inormalize(primitiveOps, preserveEdgeTypes);
@@ -247,7 +248,8 @@ public class PreservationAnalysis
             {
                 String msg = "Completing this transformation will introduce an unexpected "
                     + vpg.describeEdgeType(addition.edgeType).toLowerCase()
-                    + " (" + addition + ")";
+                    //+ " (" + addition + ")"
+                    ;
 
                 status.addError(msg,
                     new PostTransformationContext(
@@ -262,7 +264,8 @@ public class PreservationAnalysis
                 String msg = "Completing this transformation will cause an existing "
                     + vpg.describeEdgeType(deletion.edgeType).toLowerCase()
                     + " to disappear"
-                    + " (" + deletion + ")";
+                    //+ " (" + deletion + ")"
+                    ;
 
                 status.addError(msg,
                     new FileStatusContext(
@@ -276,7 +279,8 @@ public class PreservationAnalysis
                 String msg = "Completing this transformation will cause an existing "
                     + vpg.describeEdgeType(change.edgeType).toLowerCase()
                     + " to change"
-                    + " (" + change + ")";
+                    //+ " (" + change + ")"
+                    ;
 
                 status.addError(msg,
                     new PostTransformationContext(
