@@ -144,6 +144,7 @@ typedef struct jobinfo
     char *submit_jobid; /* Jobid used when submitted by GUI     */
     pid_t poe_pid; /* Process id for main poe process      */
     pid_t task0_pid; /* Process id for app. task 0           */
+    char *app_working_dir; /* Application working directory */
 #ifdef PE_DUAL_POE_DEBUG
     jobinfoptr debugger_job; /* reference to debugger job */
     jobinfoptr debuggee_job; /* reference to debuggee job */
@@ -158,8 +159,6 @@ typedef struct jobinfo
     int stdout_fd; /* STDOUT pipe/file descriptor          */
     int stderr_fd; /* STDERR pipe descriptor               */
     FILE *stderr_file; /* stderr file descriptor           */
-    ioinfo stdout_info; /* Stdout file buffer info              */
-    ioinfo stderr_info; /* Stderr file buffer info              */
     int numtasks; /* Number of tasks in application       */
     taskinfo *tasks; /* Tasks in this application            */
     char **current_hostlist; /* Hostlist for this job */
@@ -171,6 +170,8 @@ typedef struct jobinfo
     char stdout_redirect; /* Stdout redirected to file            */
     char stderr_redirect; /* Stderr redirected to file            */
     char discovered_job; /* Job already running at PTP startup   */
+    ioinfo stdout_info; /* Stdout file buffer info              */
+    ioinfo stderr_info; /* Stderr file buffer info              */
 } jobinfo;
 
 typedef struct NODE_REFCOUNT
@@ -1350,6 +1351,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         return PTP_PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
+    job->app_working_dir = cwd;
     job->submit_jobid = jobid;
     job->label_io = label_io;
     job->split_io = split_io;
@@ -1883,7 +1885,6 @@ startup_monitor(void *job_ident)
     taskp = tasks;
     sprintf(jobid_str, "%d", ((jobinfo *) job_ident)->proxy_jobid);
     msg = proxy_new_process_event(start_events_transid, jobid_str, numtasks);
-#if 0
     /*
      * Need to determine whether the proxy or the GUI writes the routing file.
      * If the GUI writes the routing file, that may become a problem as larger
@@ -1896,14 +1897,16 @@ startup_monitor(void *job_ident)
      */
     if (job->debugging) {
         FILE *routing_file;
+        char routing_path[_POSIX_PATH_MAX + 1];
 
         TRACE_DETAIL("\nCreating routing file\n");
-        routing_file = fopen("routing_file", "rw");
+        sprintf(routing_path, "%s/routing_file", job->app_working_dir);
+        routing_file = fopen(routing_path, "w+");
         if (routing_file != NULL) {
             fprintf(routing_file, "%d\n", numtasks);
             TRACE_DETAIL("Writing routing data\n");
             for (i = 0; i < numtasks; i++) {
-                fprintf(routing_file, "%d %s 7777\n", i, taskp[i].hostname);
+                fprintf(routing_file, "%d %s %d\n", i, taskp[i].hostname, 50000 + (rand() % 10000));
             }
             fclose(routing_file);
         }
@@ -1911,7 +1914,6 @@ startup_monitor(void *job_ident)
             TRACE_DETAIL_V("\nError writing routing file: %s\n", strerror(errno));
         }
     }
-#endif
     if (job->discovered_job) {
         /*
          * If this is a job running before the proxy started, then
@@ -3625,12 +3627,9 @@ find_node(char *key)
     int hash;
     List *node_list;
 
-    TRACE_ENTRY;
-    TRACE_DETAIL_V("+++ Looking for node '%s'\n", key);
     hash = HashCompute(key, strlen(key));
     node_list = HashSearch(nodes, hash);
     if (node_list == NULL) {
-        TRACE_EXIT;
         return NULL;
     }
     else {
@@ -3653,7 +3652,6 @@ find_node(char *key)
             node = GetListElement(node_list);
         }
         pthread_mutex_unlock(&node_lock);
-        TRACE_EXIT;
         return node;
     }
 }
