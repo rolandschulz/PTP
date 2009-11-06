@@ -7,14 +7,14 @@
          point="org.eclipse.ui.views">
       <category
             name="%category.name"
-            id="org.eclipse.ptp.etfw.feedback.core">
+            id="org.eclipse.ptp.etfw.feedback">
       </category>
       <view
             name="%view.name"
             icon="icons/sample.gif"
-            category="org.eclipse.ptp.etfw.feedback.core"
-            class="org.eclipse.ptp.etfw.feedback.core.views.FeedbackTreeTableMarkerView"
-            id="org.eclipse.ptp.etfw.feedback.core.views.feedbackView">
+            category="org.eclipse.ptp.etfw.feedback"
+            class="org.eclipse.ptp.etfw.feedback.views.FeedbackTreeTableMarkerView"
+            id="org.eclipse.ptp.etfw.feedback.views.feedbackView">
       </view>
    </extension>
    <extension
@@ -36,33 +36,33 @@
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-            markerType="org.eclipse.ptp.etfw.feedback.core.feedbackMarker"
-            name="org.eclipse.ptp.etfw.feedback.core.compilerMarkerAnnotation">
+            markerType="org.eclipse.ptp.etfw.feedback.feedbackMarker"
+            name="org.eclipse.ptp.etfw.feedback.compilerMarkerAnnotation">
       </type>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <category
             name="%category.name.0"
-            id="org.eclipse.ptp.etfw.feedback.core.actions.commands.category">
+            id="org.eclipse.ptp.etfw.feedback.actions.commands.category">
       </category>
       <command
             name="%command.name"
-            categoryId="org.eclipse.ptp.etfw.feedback.core.actions.commands.category"
-            id="org.eclipse.ptp.etfw.feedback.core.actions.commands.sampleCommand">
+            categoryId="org.eclipse.ptp.etfw.feedback.actions.commands.category"
+            id="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            commandId="org.eclipse.ptp.etfw.feedback.core.actions.commands.sampleCommand"
-            class="org.eclipse.ptp.etfw.feedback.core.actions.handlers.ShowFeedbackHandler">
+            commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
+            class="org.eclipse.ptp.etfw.feedback.actions.handlers.ShowFeedbackHandler">
       </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="org.eclipse.ptp.etfw.feedback.core.actions.commands.sampleCommand"
+            commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M1+6"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
@@ -75,23 +75,23 @@
          <menu
                label="%menu.label"
                mnemonic="%menu.mnemonic"
-               id="org.eclipse.ptp.etfw.feedback.core.actions.menus.sampleMenu">
+               id="org.eclipse.ptp.etfw.feedback.actions.menus.sampleMenu">
             <command
-                  commandId="org.eclipse.ptp.etfw.feedback.core.actions.commands.sampleCommand"
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
                   mnemonic="%command.mnemonic"
-                  id="org.eclipse.ptp.etfw.feedback.core.actions.menus.sampleCommand">
+                  id="org.eclipse.ptp.etfw.feedback.actions.menus.sampleCommand">
             </command>
          </menu>
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="org.eclipse.ptp.etfw.feedback.core.actions.toolbars.sampleToolbar">
+               id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleToolbar">
             <command
-                  commandId="org.eclipse.ptp.etfw.feedback.core.actions.commands.sampleCommand"
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
                   icon="icons/sample.gif"
                   tooltip="%command.tooltip"
-                  id="org.eclipse.ptp.etfw.feedback.core.actions.toolbars.sampleCommand">
+                  id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleCommand">
             </command>
          </toolbar>
       </menuContribution>
@@ -100,14 +100,14 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="%page.name"
-            class="org.eclipse.ptp.etfw.feedback.core.preferences.FeedbackPreferencePage"
-            id="org.eclipse.ptp.etfw.feedback.core.preferences.SamplePreferencePage">
+            class="org.eclipse.ptp.etfw.feedback.preferences.FeedbackPreferencePage"
+            id="org.eclipse.ptp.etfw.feedback.preferences.SamplePreferencePage">
       </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.eclipse.ptp.etfw.feedback.core.preferences.PreferenceInitializer">
+            class="org.eclipse.ptp.etfw.feedback.preferences.PreferenceInitializer">
       </initializer>
    </extension>
       <extension
