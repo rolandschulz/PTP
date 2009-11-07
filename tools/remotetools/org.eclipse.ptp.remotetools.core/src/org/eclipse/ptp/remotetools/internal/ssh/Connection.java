@@ -714,7 +714,12 @@ public class Connection implements IRemoteConnection {
 		 * Check SFTP channel.
 		 */
 		if (! sftpChannel.isConnected()) {
-			throw new RemoteConnectionException("SFTP connection to remote host was lost");
+			try {
+				sftpChannel = (ChannelSftp) defaultSession.openChannel("sftp"); //$NON-NLS-1$
+				sftpChannel.connect();
+			} catch (JSchException e) {
+				throw new RemoteConnectionException("SFTP connection to remote host was lost");
+			}
 		}
 
 		/*
