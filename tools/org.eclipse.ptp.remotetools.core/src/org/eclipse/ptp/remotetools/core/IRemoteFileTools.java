@@ -222,14 +222,14 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param filePath
 	 *            Absolute path to a file
-	 * @return A {@link IRemoteFile} object
+	 * @return A {@link IRemoteItem} object
 	 * @throws RemoteExecutionException
 	 *             The path does not exist on the remote host or is not a file.
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 * @throws RemoteOperationException 
 	 */
-	public IRemoteFile getFile(String filePath)
+	public IRemoteItem getFile(String filePath)
 			throws RemoteConnectionException,
 			CancelException, RemoteOperationException;
 
@@ -239,14 +239,14 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param directoryPath
 	 *            Absolute path to a directory
-	 * @return A {@link IRemoteDirectory} object
+	 * @return A {@link IRemoteItem} object
 	 * @throws RemoteExecutionException
 	 *             The path does not exist on the remote host or is not a file.
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 * @throws RemoteOperationException 
 	 */
-	public IRemoteDirectory getDirectory(String directoryPath)
+	public IRemoteItem getDirectory(String directoryPath)
 			throws RemoteConnectionException,
 			CancelException, RemoteOperationException;
 	

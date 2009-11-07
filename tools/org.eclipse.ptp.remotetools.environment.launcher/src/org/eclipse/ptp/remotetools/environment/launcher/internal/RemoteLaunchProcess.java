@@ -17,14 +17,12 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -34,11 +32,10 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
-import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
+import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.core.IRemotePathTools;
 import org.eclipse.ptp.remotetools.core.IRemoteScript;
 import org.eclipse.ptp.remotetools.core.IRemoteScriptExecution;
@@ -71,7 +68,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 
 	public ILaunchObserver observer = new NullLaunchObserver();
 	public ILaunchIntegration launchIntegration = new NullLaunchIntegration();
-	public Set progressListeners = new HashSet();
+	public ListenerList progressListeners = new ListenerList();
 	
 	OutputStream launchProcessOutputStream = null;
 	OutputStream launchProcessErrorStream = null;
@@ -81,7 +78,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 	
 	ExecutionConfiguration configuration = null;
 	ExecutionResult executionResult = null;
-	List extraSynchronizationRules = new ArrayList();
+	List<ISynchronizationRule> extraSynchronizationRules = new ArrayList<ISynchronizationRule>();
 	
 	IProcess applicationProgress;
 	TargetProcess targetProcess;
@@ -118,18 +115,14 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 
 	protected synchronized void setCurrentProgress(int newProgress) {
 		this.currentProgress = newProgress;
-		Iterator iterator = progressListeners.iterator();
-		while (iterator.hasNext()) {
-			ILaunchProgressListener listener = (ILaunchProgressListener) iterator.next();
-			listener.notifyProgress(newProgress);
+		for (Object listener : progressListeners.getListeners()) {
+			((ILaunchProgressListener)listener).notifyProgress(newProgress);
 		}
 	}
 	
 	protected synchronized void notifyInterrupt() {
-		Iterator iterator = progressListeners.iterator();
-		while (iterator.hasNext()) {
-			ILaunchProgressListener listener = (ILaunchProgressListener) iterator.next();
-			listener.notifyInterrupt();
+		for (Object listener : progressListeners.getListeners()) {
+			((ILaunchProgressListener)listener).notifyInterrupt();
 		}
 	}
 
@@ -181,8 +174,8 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		 */
 		try {
 			IRemoteFileTools fileTools = manager.getRemoteFileTools();
-			IRemoteDirectory remoteExecutable = fileTools.getDirectory(remoteDirectoryAsPath);
-			remoteExecutable.setAccessible(true);
+			IRemoteItem remoteExecutable = fileTools.getDirectory(remoteDirectoryAsPath);
+			remoteExecutable.setExecutable(true);
 			remoteExecutable.setReadable(true);
 			remoteExecutable.setWriteable(true);
 			remoteExecutable.commitAttributes();
@@ -285,7 +278,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		 */
 		try {
 			IRemoteFileTools fileTools = manager.getRemoteFileTools();
-			IRemoteFile remoteFile = fileTools.getFile(remoteExecutable);
+			IRemoteItem remoteFile = fileTools.getFile(remoteExecutable);
 			remoteFile.setReadable(true);
 			remoteFile.setExecutable(true);
 			remoteFile.commitAttributes();

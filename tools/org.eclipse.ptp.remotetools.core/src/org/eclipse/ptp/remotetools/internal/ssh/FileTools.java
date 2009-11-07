@@ -24,8 +24,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
-import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
-import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
@@ -236,14 +234,14 @@ public class FileTools implements IRemoteFileTools {
 	public boolean hasFile(String file) throws RemoteOperationException, RemoteConnectionException, CancelException {
 		test();
 		validateRemotePath(file);
-		RemoteItem item = (RemoteItem) getItem(file);
+		IRemoteItem item = getItem(file);
 		if (item == null) {
 			return false;
 		}
-		if (! item.exists()) {
+		if (!item.exists()) {
 			return false;
 		}
-		if (! item.isFile()) {
+		if (item.isDirectory()) {
 			return false;
 		}		
 		return true;
@@ -353,11 +351,7 @@ public class FileTools implements IRemoteFileTools {
 				// Ignore parent and current dir entry.
 				continue;
 			}
-			if (entry.getAttrs().isDir()) {
-				result.add(new RemoteDirectory(this, pathName, entry.getAttrs()));
-			} else {
-				result.add(new RemoteFile(this, pathName, entry.getAttrs()));
-			}
+			result.add(new RemoteItem(this, pathName, entry.getAttrs()));
 		}
 		
 		IRemoteItem [] resultArray = new IRemoteItem[result.size()];
@@ -368,15 +362,15 @@ public class FileTools implements IRemoteFileTools {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileTools#getFile(java.lang.String)
 	 */
-	public IRemoteFile getFile(String filePath) throws RemoteOperationException, RemoteConnectionException, CancelException, RemoteOperationException {
+	public IRemoteItem getFile(String filePath) throws RemoteOperationException, RemoteConnectionException, CancelException, RemoteOperationException {
 		test();
 		validateRemotePath(filePath);
 		filePath = removeTrailingSlash(filePath);
 		cacheUserData();
 				
-		RemoteFile remfile = new RemoteFile(this, filePath);
+		IRemoteItem remfile = new RemoteItem(this, filePath);
 		remfile.refreshAttributes();
-		if (! remfile.isFile()) {
+		if (remfile.isDirectory()) {
 			throw new RemoteOperationException("Not a file");
 		}
 		return remfile;
@@ -392,15 +386,15 @@ public class FileTools implements IRemoteFileTools {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileTools#getDirectory(java.lang.String)
 	 */
-	public IRemoteDirectory getDirectory(String directoryPath) throws RemoteOperationException, RemoteConnectionException, CancelException, RemoteOperationException {
+	public IRemoteItem getDirectory(String directoryPath) throws RemoteOperationException, RemoteConnectionException, CancelException, RemoteOperationException {
 		test();
 		validateRemotePath(directoryPath);
 		directoryPath = removeTrailingSlash(directoryPath);
 		cacheUserData();
 				
-		RemoteDirectory remfile = new RemoteDirectory(this, directoryPath);
+		IRemoteItem remfile = new RemoteItem(this, directoryPath);
 		remfile.refreshAttributes();
-		if (! remfile.isDirectory()) {
+		if (!remfile.isDirectory()) {
 			throw new RemoteOperationException("Not a directory");
 		}
 		return remfile;
@@ -417,11 +411,6 @@ public class FileTools implements IRemoteFileTools {
 
 		RemoteItem newitem = new RemoteItem(this, path);
 		newitem.refreshAttributes();
-		if (newitem.isDirectory()) {
-			newitem = new RemoteDirectory(newitem);
-		} else {
-			newitem = new RemoteFile(newitem);
-		}
 		return newitem;
 	}
 

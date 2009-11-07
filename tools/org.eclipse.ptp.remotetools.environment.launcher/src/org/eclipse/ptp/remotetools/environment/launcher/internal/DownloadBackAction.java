@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
+import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.environment.launcher.core.LinuxPath;
 import org.eclipse.ptp.remotetools.environment.launcher.data.ExecutionConfiguration;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -72,7 +72,7 @@ public class DownloadBackAction implements IRuleAction {
 		IRemoteCopyTools copyTools = manager.getRemoteCopyTools();
 		IRemoteFileTools fileTools = manager.getRemoteFileTools();
 				
-		IRemoteFile remoteFile = null;
+		IRemoteItem remoteFile = null;
 		try {
 			remoteFile = fileTools.getFile(remotePathAsString);
 		} catch (RemoteOperationException e) {
