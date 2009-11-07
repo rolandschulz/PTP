@@ -25,9 +25,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
-import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
@@ -142,24 +140,19 @@ public class DownloadRuleAction implements IRuleAction {
 				continue;
 			}
 			
-			if (! item.exists()) {
+			if (!item.exists()) {
 				errorWriter.println(NLS.bind(Messages.DownloadRuleAction_FailedRemotePathDoesNotExit, remotePathAsString));
 				continue;
-			} else if (item instanceof IRemoteDirectory) {
-				IRemoteDirectory remoteDirectory = (IRemoteDirectory) item;
-				downloadDirectory(remoteDirectory, localDir);
-			} else if (item instanceof IRemoteFile) {
-				IRemoteFile remoteFile = (IRemoteFile) item;
-				downloadFile(remoteFile, localDir);
+			} else if (item.isDirectory()) {
+				downloadDirectory(item, localDir);
 			} else {
-				errorWriter.println(NLS.bind(Messages.DownloadRuleAction_FailedRemotePathNoDirectoryNorFile, remotePathAsString));
-				continue;				
+				downloadFile(item, localDir);
 			}
 		}
 
 	}
 
-	private void downloadFile(IRemoteFile remoteFile, File localDir) throws RemoteConnectionException, CancelException {
+	private void downloadFile(IRemoteItem remoteFile, File localDir) throws RemoteConnectionException, CancelException {
 		Assert.isTrue(localDir.isAbsolute(), "localDir.isAbsolute()"); //$NON-NLS-1$
 		
 		IPath remoteFilePath = LinuxPath.fromString(remoteFile.getPath());
@@ -170,7 +163,7 @@ public class DownloadRuleAction implements IRuleAction {
 		doFileDownload(remoteFile, localFile);	
 	}
 
-	private void downloadDirectory(IRemoteDirectory remoteDirectory, File localDir) throws RemoteConnectionException, CancelException {
+	private void downloadDirectory(IRemoteItem remoteDirectory, File localDir) throws RemoteConnectionException, CancelException {
 		Assert.isTrue(localDir.isAbsolute(), "localDir.isAbsolute()"); //$NON-NLS-1$
 
 		outputWriter.println(NLS.bind(Messages.DownloadRuleAction_NotifyDirectoryDownload1, remoteDirectory.getPath()));
@@ -203,12 +196,10 @@ public class DownloadRuleAction implements IRuleAction {
 			IPath relativePath = remotePath.removeFirstSegments(remoteRootPathLength);
 			IPath localFilePath = localRootPath.append(relativePath);
 			File localFile = localFilePath.toFile();
-			if (remoteItem instanceof IRemoteDirectory) {
-				IRemoteDirectory directoryItem = (IRemoteDirectory) remoteItem;
-				doDirectoryDownload(directoryItem, localFile);
-			} else if (remoteItem instanceof IRemoteFile) {
-				IRemoteFile fileItem = (IRemoteFile) remoteItem;
-				doFileDownload(fileItem, localFile);
+			if (remoteItem.isDirectory()) {
+				doDirectoryDownload(remoteItem, localFile);
+			} else {
+				doFileDownload(remoteItem, localFile);
 			}
 		}
 		while (enumeration.hasMoreExceptions()) {
@@ -216,7 +207,7 @@ public class DownloadRuleAction implements IRuleAction {
 		}
 	}
 	
-	private void doFileDownload(IRemoteFile remoteFile, File localFile) throws RemoteConnectionException, CancelException {
+	private void doFileDownload(IRemoteItem remoteFile, File localFile) throws RemoteConnectionException, CancelException {
 		Assert.isTrue(localFile.isAbsolute(), "localFile.isAbsolute()"); //$NON-NLS-1$
 		
 		String remoteFileAsString = remoteFile.getPath();
@@ -299,7 +290,7 @@ public class DownloadRuleAction implements IRuleAction {
 		}
 	}
 
-	private void doDirectoryDownload(IRemoteDirectory remoteDir, File localDir) throws RemoteConnectionException, CancelException {
+	private void doDirectoryDownload(IRemoteItem remoteDir, File localDir) throws RemoteConnectionException, CancelException {
 		Assert.isTrue(localDir.isAbsolute(), "localFile.isAbsolute()"); //$NON-NLS-1$
 		
 		/*

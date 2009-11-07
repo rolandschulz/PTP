@@ -12,9 +12,7 @@
 package org.eclipse.ptp.remotetools.environment.launcher.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -27,10 +25,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
-import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
-import org.eclipse.ptp.remotetools.core.IRemoteFile;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
+import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.core.IRemoteStatusTools;
 import org.eclipse.ptp.remotetools.environment.launcher.core.LinuxPath;
 import org.eclipse.ptp.remotetools.environment.launcher.data.ExecutionConfiguration;
@@ -191,7 +188,7 @@ public class UploadRuleAction implements IRuleAction {
 			/*
 			 * Policy needs to check remote file.
 			 */
-			IRemoteFile remoteFile = null;
+			IRemoteItem remoteFile = null;
 			try {
 				remoteFile = fileTools.getFile(remotePathAsString);
 			} catch (RemoteOperationException e) {
@@ -235,7 +232,7 @@ public class UploadRuleAction implements IRuleAction {
 		/*
 		 * Fetch properties of file that was just uploaded.
 		 */
-		IRemoteFile remoteFile = null;
+		IRemoteItem remoteFile = null;
 		try {
 			remoteFile = fileTools.getFile(remotePathAsString);
 		} catch (RemoteOperationException e) {
@@ -310,7 +307,7 @@ public class UploadRuleAction implements IRuleAction {
 		/*
 		 * Fetch properties of directory that was just uploaded.
 		 */
-		IRemoteDirectory remoteDirectory = null;
+		IRemoteItem remoteDirectory = null;
 		try {
 			remoteDirectory = fileTools.getDirectory(LinuxPath.toString(remotePath));
 		} catch (RemoteOperationException e) {
@@ -329,7 +326,7 @@ public class UploadRuleAction implements IRuleAction {
 			write = false;
 		}
 		
-		remoteDirectory.setAccessible(execute);
+		remoteDirectory.setExecutable(execute);
 		remoteDirectory.setWriteable(write);
 		remoteDirectory.setReadable(read);
 		
