@@ -17,8 +17,10 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
+import org.eclipse.photran.internal.core.parser.IModuleBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
@@ -75,12 +77,11 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
         if (selection == null)
             fail("Please place the cursor inside a scope.");
 
-        enclosingScope = selection.findNearestAncestor(ScopingNode.class);
-        if (enclosingScope == null) // Should never happen since <ActionStmt> only under <Body>
-            fail("Please place the cursor inside a scope.");
-
-        if (!(enclosingScope instanceof ASTMainProgramNode))
-            fail("Please place the cursor inside a main program.");
+        enclosingScope = selection.findNearestAncestor(ASTMainProgramNode.class);
+        if (enclosingScope == null)
+            enclosingScope = selection.findNearestAncestor(ASTModuleNode.class);
+        if (enclosingScope == null)
+            fail("Please place the cursor inside a main program or module.");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -96,11 +97,11 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
         try
         {
             preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm,
+                fileInEditor,
                 Preserve.all(PhotranVPG.BINDING_EDGE_TYPE));
 
-            preservation.monitor(fileInEditor);
             createNewSubprogram();
-            vpg.commitChangesFromAST(fileInEditor);
+            vpg.commitChangesFromInMemoryASTs(fileInEditor);
             preservation.checkForPreservation(status);
 
             this.addChangeFromModifiedAST(this.fileInEditor, pm);
@@ -153,7 +154,12 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
 //        else
 //            throw new IllegalStateException();
 
+        if (enclosingScope instanceof ASTMainProgramNode)
             return insertAsInternalSubprogramOf((ASTMainProgramNode)enclosingScope, newSubroutine);
+        else if (enclosingScope instanceof ASTModuleNode)
+            return insertAsInternalSubprogramOf((ASTModuleNode)enclosingScope, newSubroutine);
+        else
+            throw new IllegalStateException();
     }
 
     private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(
@@ -184,5 +190,37 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
         //Reindenter.reindent(subprogram, this.astOfFileInEditor);
 
         return subprogram;
+    }
+
+    private ASTSubroutineSubprogramNode insertAsInternalSubprogramOf(
+        ASTModuleNode program,
+        ASTSubroutineSubprogramNode subprogram)
+    {
+        assert preservation != null;
+
+        if (!hasContainsStmt(program))
+        {
+            ASTContainsStmtNode containsStmt = createContainsStmt();
+            program.getModuleBody().add(containsStmt);
+            containsStmt.setParent(program.getModuleBody());
+            preservation.markAlpha(fileInEditor, containsStmt);
+        }
+
+        program.getModuleBody().add(subprogram);
+        subprogram.setParent(program.getModuleBody());
+        preservation.markAlpha(fileInEditor, subprogram);
+
+        //Reindenter.reindent(subprogram, this.astOfFileInEditor);
+
+        return subprogram;
+    }
+
+    private boolean hasContainsStmt(ASTModuleNode program)
+    {
+        for (IModuleBodyConstruct c : program.getModuleBody())
+            if (c instanceof ASTContainsStmtNode)
+                return true;
+
+        return false;
     }
 }

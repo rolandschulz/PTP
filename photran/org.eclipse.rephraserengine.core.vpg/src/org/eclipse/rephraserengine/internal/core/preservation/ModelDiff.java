@@ -10,12 +10,14 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.internal.core.preservation;
 
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 
 /**
  *
@@ -32,68 +34,118 @@ public class ModelDiff implements Iterable<ModelDiff.DiffEntry>
 
     public static abstract class DiffEntry
     {
+        public final String sourceFilename;
         public final Interval source;
+        public final String sinkFilename;
         public final Interval sink;
         public final int edgeType;
 
-        public DiffEntry(Interval source, Interval sink, int edgeType)
+        public DiffEntry(
+            String sourceFilename,
+            Interval source,
+            String sinkFilename,
+            Interval sink,
+            int edgeType)
         {
+            this.sourceFilename = sourceFilename;
             this.source = source;
+            this.sinkFilename = sinkFilename;
             this.sink = sink;
             this.edgeType = edgeType;
         }
 
         protected abstract void accept(ModelDiffProcessor processor);
 
+        public IFile getFileContainingRegion()
+        {
+            return EclipseVPG.getIFileForFilename(sourceFilename);
+        }
+
         public IRegion toRegion()
         {
             return new Region(source.lb, source.cardinality());
+        }
+
+        @Override public boolean equals(Object other)
+        {
+            if (!other.getClass().equals(this.getClass())) return false;
+
+            DiffEntry that = (DiffEntry)other;
+            return this.sourceFilename.equals(that.sourceFilename)
+                && this.source.equals(that.source)
+                && this.sinkFilename.equals(that.sinkFilename)
+                && this.sink.equals(that.sink)
+                && this.edgeType == that.edgeType;
+        }
+
+        @Override public int hashCode()
+        {
+            return this.getClass().hashCode()
+                + 3 * sourceFilename.hashCode()
+                + 5 * source.hashCode()
+                + 7 * sinkFilename.hashCode()
+                + 11 * sink.hashCode()
+                + 13 * edgeType;
+        }
+
+        @Override public String toString()
+        {
+            return sourceFilename + ":" + source + " -> " + sinkFilename + ":" + sink;
         }
     }
 
     public static final class EdgeAdded extends DiffEntry
     {
-        public EdgeAdded(Interval source, Interval sink, int edgeType)
+        public EdgeAdded(
+            String sourceFilename,
+            Interval source,
+            String sinkFilename,
+            Interval sink,
+            int edgeType)
         {
-            super(source, sink, edgeType);
+            super(sourceFilename, source, sinkFilename, sink, edgeType);
         }
 
         @Override protected void accept(ModelDiffProcessor processor)
         {
             processor.processEdgeAdded(this);
         }
-        
-        @Override public String toString()
-        {
-            return source + " -> " + sink;
-        }
     }
 
     public static final class EdgeDeleted extends DiffEntry
     {
-        public EdgeDeleted(Interval source, Interval sink, int edgeType)
+        public EdgeDeleted(
+            String sourceFilename,
+            Interval source,
+            String sinkFilename,
+            Interval sink,
+            int edgeType)
         {
-            super(source, sink, edgeType);
+            super(sourceFilename, source, sinkFilename, sink, edgeType);
         }
 
         @Override protected void accept(ModelDiffProcessor processor)
         {
             processor.processEdgeDeleted(this);
         }
-        
-        @Override public String toString()
-        {
-            return source + " -> " + sink;
-        }
     }
 
     public static final class EdgeSinkChanged extends DiffEntry
     {
+        public final String newSinkFilename;
         public final Interval newSink;
 
-        public EdgeSinkChanged(Interval source, Interval sink, Interval newSink, int edgeType)
+        public EdgeSinkChanged(
+            String sourceFilename,
+            Interval source,
+            String sinkFilename,
+            Interval sink,
+            String newSinkFilename,
+            Interval newSink,
+            int edgeType)
         {
-            super(source, sink, edgeType);
+            super(sourceFilename, source, sinkFilename, sink, edgeType);
+            this.newSinkFilename = newSinkFilename;
             this.newSink = newSink;
         }
 
@@ -101,14 +153,43 @@ public class ModelDiff implements Iterable<ModelDiff.DiffEntry>
         {
             processor.processEdgeSinkChanged(this);
         }
-        
+
         @Override public String toString()
         {
-            return source + " -> " + sink + " will become " + source + " -> " + newSink;
+            return
+                sourceFilename +
+                ":" +
+                source +
+                " -> " +
+                sinkFilename +
+                ":" +
+                sink +
+                " will become " +
+                sourceFilename +
+                ":" +
+                source +
+                " -> " +
+                newSinkFilename +
+                ":" +
+                newSink;
+        }
+
+        @Override public boolean equals(Object other)
+        {
+            return super.equals(other)
+                && this.newSinkFilename.equals(((EdgeSinkChanged)other).newSinkFilename)
+                && this.newSink.equals(((EdgeSinkChanged)other).newSink);
+        }
+
+        @Override public int hashCode()
+        {
+            return super.hashCode()
+                + 17 * newSinkFilename.hashCode()
+                + 19 * newSink.hashCode();
         }
     }
 
-    private List<DiffEntry> differences = new LinkedList<DiffEntry>();
+    private Set<DiffEntry> differences = new HashSet<DiffEntry>();
 
     void add(DiffEntry entry)
     {

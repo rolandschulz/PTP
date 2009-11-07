@@ -12,11 +12,14 @@ package org.eclipse.rephraserengine.core.vpg;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 /**
@@ -196,7 +199,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         return System.currentTimeMillis()-start;
     }
 
-    public ArrayList<String> sortFilesAccordingToDependencies(final ArrayList<String> files, final IProgressMonitor monitor)
+    public List<String> sortFilesAccordingToDependencies(final List<String> files, final IProgressMonitor monitor)
     {
         // Enqueue the reflexive transitive closure of the dependencies
         for (int i = 0; i < files.size(); i++)
@@ -255,7 +258,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
     }
 
     protected void enqueueNewDependents(String filename,
-                                        ArrayList<String> dependents)
+                                        List<String> dependents)
     {
         for (String f : findAllFilesDependentUpon(filename))
             if (!dependents.contains(f))
@@ -415,10 +418,18 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	 *  AST, or <code>null</code> if it could not be found. */
 	abstract public T findToken(R tokenRef);
 
-    /** Forces the database to be updated based on the current in-memory AST for the given file */
-    public void commitChangeFromAST(String filename)
+    /** Forces the database to be updated based on the current in-memory AST for the given file. */
+    public void commitChangesFromInMemoryASTs(String... filenames)
     {
-        computeEdgesAndAnnotations(filename, acquireTransientAST(filename));
+        ArrayList<String> files = new ArrayList<String>(Arrays.asList(filenames));
+        for (String thisFile : sortFilesAccordingToDependencies(files, new NullProgressMonitor()))
+            doCommitChangeFromAST(thisFile);
+    }
+
+    protected void doCommitChangeFromAST(String filename)
+    {
+        if (!isVirtualFile(filename))
+            computeEdgesAndAnnotations(filename, acquireTransientAST(filename));
     }
 
     /** @return source code for the given AST (which may have been modified), or <code>null</code>

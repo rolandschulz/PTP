@@ -12,6 +12,7 @@ package org.eclipse.rephraserengine.core.vpg.eclipse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -181,7 +182,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
         public void index(IProgressMonitor monitor)
         {
-            ArrayList<String> queue = sortFilesAccordingToDependencies(files, monitor);
+            List<String> queue = sortFilesAccordingToDependencies(files, monitor);
 
             int completed = 0, total = countFilesInQueue(queue);
             for (String filename : queue)
@@ -196,7 +197,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         }
     }
 
-    private int countFilesInQueue(ArrayList<String> queue)
+    private int countFilesInQueue(List<String> queue)
     {
         int total = 0;
         for (String filename : queue)
@@ -340,7 +341,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
         public void index(IProgressMonitor monitor)
         {
-            ArrayList<String> queue = sortFilesAccordingToDependencies(files, monitor);
+            List<String> queue = sortFilesAccordingToDependencies(files, monitor);
             int completed = 0, total = countFilesInQueue(queue);
             for (String filename : queue)
             {
@@ -450,10 +451,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 //                                    + dependentFilename);
         super.processingDependent(filename, dependentFilename);
     }
-    
+
     /** Forces the database to be updated based on the current in-memory AST for the given file */
-    public void commitChangesFromAST(IFile file)
+    public void commitChangesFromInMemoryASTs(IFile file)
     {
-        commitChangeFromAST(getFilenameForIFile(file));
+        commitChangesFromInMemoryASTs(getFilenameForIFile(file));
     }
 }

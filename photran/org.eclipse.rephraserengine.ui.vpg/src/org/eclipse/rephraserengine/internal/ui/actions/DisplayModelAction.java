@@ -45,7 +45,8 @@ public class DisplayModelAction extends VPGOutputWindowAction
                     String fileContents = readStream(lineMap, info.getFileInEditor().getContents(true));
                     ps.println(filename);
                     ps.println();
-                    ps.print(new Model(vpg, filename).toString(fileContents, lineMap));
+                    Model model = new Model(vpg, filename);
+                    ps.print(model.toString(filename, fileContents, lineMap));
                     return;
                 }
             }

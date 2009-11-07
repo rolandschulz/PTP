@@ -11,11 +11,19 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 /**
+ * Indicates one type of a semantic edge that should be preserved in a program graph and the
+ * direction(s) in which it should be preserved.
  *
  * @author Jeff Overbey
+ *
+ * @since 1.0
  */
 public final class Preserve
 {
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Factory Methods (alpha/epsilon methods normalize to rho-operations)
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     public static final Preserve incoming(int edgeType)
     {
         return new Preserve(edgeType, true, false);
@@ -31,19 +39,23 @@ public final class Preserve
         return new Preserve(edgeType, true, true);
     }
 
-    private int edgeType;
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Class Members
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    private int edgeTypeToPreserve;
     private boolean preserveIncoming, preserveOutgoing;
 
     private Preserve(int edgeType, boolean preserveIncoming, boolean preserveOutgoing)
     {
-        this.edgeType = edgeType;
+        this.edgeTypeToPreserve = edgeType;
         this.preserveIncoming = preserveIncoming;
         this.preserveOutgoing = preserveOutgoing;
     }
 
     public boolean shouldPreserve(boolean isIncoming, boolean isOutgoing, int edgeType)
     {
-        if (this.edgeType != edgeType)
+        if (edgeType != edgeTypeToPreserve)
             return false;
         else if (isIncoming && isOutgoing) // entirely contained in affected region
             return false;

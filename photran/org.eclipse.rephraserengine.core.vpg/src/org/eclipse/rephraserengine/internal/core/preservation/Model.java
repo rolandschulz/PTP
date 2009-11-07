@@ -11,10 +11,12 @@
 package org.eclipse.rephraserengine.internal.core.preservation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.rephraserengine.core.preservation.Preserve;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
@@ -48,20 +50,19 @@ public class Model
             this.edgeType = edgeType;
         }
 
-        public boolean shouldPreserveAccordingTo(Set<Preserve> preserveEdgeTypes, Interval affected)
+        public boolean shouldPreserveAccordingTo(Set<Preserve> preserveEdgeTypes, String affectedFilename, Interval affected)
         {
             for (Preserve rule : preserveEdgeTypes)
-                if (shouldPreserveAccordingTo(rule, affected))
+                if (shouldPreserveAccordingTo(rule, affectedFilename, affected))
                     return true;
 
             return false;
         }
 
-        public boolean shouldPreserveAccordingTo(Preserve rule, Interval affected)
+        public boolean shouldPreserveAccordingTo(Preserve rule, String affectedFilename, Interval affected)
         {
-            // FIXME: What about filenames?
-            boolean incoming = sink.isSubsetOf(affected);
-            boolean outgoing = source.isSubsetOf(affected);
+            boolean incoming = sinkFilename.equals(affectedFilename) && sink.isSubsetOf(affected);
+            boolean outgoing = sourceFilename.equals(affectedFilename) && source.isSubsetOf(affected);
             return rule.shouldPreserve(incoming, outgoing, this.edgeType);
         }
 
@@ -107,21 +108,31 @@ public class Model
     }
 
     private EclipseVPG<?,?,?,?,?> vpg;
-    private String filename;
-    private TreeSet<Entry> edgeList = new TreeSet<Entry>();
+    private List<String> files;
+    private Set<Entry> edges;
 
-    public Model(EclipseVPG<?,?,?,?,?> vpg, String filename)
+    public Model(EclipseVPG<?,?,?,?,?> vpg, String... filenames)
     {
-        this.filename = filename;
-        this.vpg = vpg;
+        this(vpg, Arrays.asList(filenames));
+    }
 
-        // TODO: Ignores filenames
+    public Model(EclipseVPG<?,?,?,?,?> vpg, List<String> filenames)
+    {
+        this.vpg = vpg;
+        this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames), new NullProgressMonitor());
+        this.edges = new TreeSet<Entry>();
+        for (String thisFile : files)
+            addEdges(thisFile);
+    }
+
+    private void addEdges(String filename)
+    {
         for (VPGEdge<?,?,?> edge : vpg.db.getAllEdgesFor(filename))
         {
             TokenRef<?> source = edge.getSource();
             TokenRef<?> sink = edge.getSink();
 
-            edgeList.add(
+            edges.add(
                 new Entry(
                     source.getFilename(),
                     new Interval(source.getOffset(), source.getEndOffset()),
@@ -131,21 +142,26 @@ public class Model
         }
     }
 
+    public List<String> getFiles()
+    {
+        return files;
+    }
+
     public void inormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
-        for (Entry entry : edgeList)
+        for (Entry entry : edges)
         {
-            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.iaff()))
+            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.iaff()))
             {
-                entry.source = op.inorm(entry.source); // leave origSource unchanged
-                entry.sink = op.inorm(entry.sink);
+                entry.source = op.inorm(entry.sourceFilename, entry.source); // leave origSource unchanged
+                entry.sink = op.inorm(entry.sinkFilename, entry.sink);
                 revisedList.add(entry);
             }
         }
 
-        edgeList = revisedList;
+        edges = revisedList;
     }
 
     public void inormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes)
@@ -158,17 +174,17 @@ public class Model
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
-        for (Entry entry : edgeList)
+        for (Entry entry : edges)
         {
-            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.daff()))
+            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.daff()))
             {
-                entry.source = op.dnorm(entry.source);
-                entry.sink = op.dnorm(entry.sink);
+                entry.source = op.dnorm(entry.sourceFilename, entry.source);
+                entry.sink = op.dnorm(entry.sinkFilename, entry.sink);
                 revisedList.add(entry);
             }
         }
 
-        edgeList = revisedList;
+        edges = revisedList;
     }
 
     public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes)
@@ -181,66 +197,101 @@ public class Model
     {
         ModelDiff diff = new ModelDiff();
 
-        for (Entry entry : this.edgeList)
+        for (Entry entry : this.edges)
         {
-            if (!that.edgeList.contains(entry))
+            if (!that.edges.contains(entry))
             {
-                Entry otherEntry = findEntryWithNewSink(entry, that.edgeList);
+                Entry otherEntry = findEntryWithNewSink(entry, that.edges);
                 if (otherEntry != null)
                 {
-                    that.edgeList.remove(otherEntry);
-                    diff.add(new EdgeSinkChanged(entry.source, entry.sink, otherEntry.sink, entry.edgeType));
+                    that.edges.remove(otherEntry);
+                    diff.add(
+                        new EdgeSinkChanged(
+                            entry.sourceFilename,
+                            entry.source,
+                            entry.sinkFilename,
+                            entry.sink,
+                            otherEntry.sinkFilename,
+                            otherEntry.sink,
+                            entry.edgeType));
                 }
                 else
                 {
-                    diff.add(new EdgeDeleted(entry.origSource, entry.sink, entry.edgeType));
+                    diff.add(
+                        new EdgeDeleted(
+                            entry.sourceFilename,
+                            entry.origSource,
+                            entry.sinkFilename,
+                            entry.sink,
+                            entry.edgeType));
                 }
             }
         }
 
-        for (Entry entry : that.edgeList)
+        for (Entry entry : that.edges)
         {
-            if (!this.edgeList.contains(entry))
+            if (!this.edges.contains(entry))
             {
-                diff.add(new EdgeAdded(entry.source, entry.sink, entry.edgeType));
+                diff.add(
+                    new EdgeAdded(
+                        entry.sourceFilename,
+                        entry.source,
+                        entry.sinkFilename,
+                        entry.sink,
+                        entry.edgeType));
             }
         }
 
         return diff;
     }
 
-    private Entry findEntryWithNewSink(Entry entry, TreeSet<Entry> otherEdgeList)
+    private Entry findEntryWithNewSink(Entry entry, Set<Entry> otherEdgeList)
     {
         for (Entry otherEntry : otherEdgeList)
-            if (otherEntry.source.equals(entry.source) && otherEntry.edgeType == entry.edgeType)
+        {
+            if (otherEntry.sourceFilename.equals(entry.sourceFilename)
+                && otherEntry.source.equals(entry.source)
+                && otherEntry.edgeType == entry.edgeType)
+            {
                 return otherEntry;
+            }
+        }
 
         return null;
     }
 
     @Override public String toString()
     {
-        return toString(null, null);
+        return toString(null, null, null);
     }
 
-    public String toString(CharSequence fileContents, ArrayList<Integer> lineMap)
+    public String toString(String filename, CharSequence fileContents, ArrayList<Integer> lineMap)
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(filename);
-        sb.append(": ");
-        sb.append(edgeList.size());
+        sb.append(edges.size());
         sb.append(" edges\n\n");
 
-        for (Entry entry : edgeList)
+        for (Entry entry : edges)
         {
+            if (!entry.sourceFilename.equals(filename))
+            {
+                sb.append(entry.sourceFilename);
+                sb.append(':');
+            }
             sb.append('[');
             sb.append(String.format("%5d", entry.source.lb));
             sb.append(", ");
             sb.append(String.format("%5d", entry.source.ub));
             sb.append(")  ===(");
             sb.append(entry.edgeType);
-            sb.append(")==>  [");
+            sb.append(")==>  ");
+            if (!entry.sinkFilename.equals(filename))
+            {
+                sb.append(entry.sinkFilename);
+                sb.append(':');
+            }
+            sb.append('[');
             sb.append(String.format("%5d", entry.sink.lb));
             sb.append(", ");
             sb.append(String.format("%5d", entry.sink.ub));
@@ -249,7 +300,9 @@ public class Model
             if (fileContents != null)
             {
                 sb.append("           [");
-                if (entry.source.lb >= 0 && entry.source.ub >= entry.source.lb)
+                if (!entry.sourceFilename.equals(filename))
+                    sb.append('?');
+                else if (entry.source.lb >= 0 && entry.source.ub >= entry.source.lb)
                     sb.append(fileContents.subSequence(entry.source.lb, entry.source.ub));
                 sb.append("]");
                 if (lineMap != null)
@@ -261,7 +314,9 @@ public class Model
                 sb.append("  ===(");
                 sb.append(vpg.describeEdgeType(entry.edgeType));
                 sb.append(")==>  [");
-                if (entry.sink.lb >= 0 && entry.sink.ub >= entry.sink.lb)
+                if (!entry.sinkFilename.equals(filename))
+                    sb.append('?');
+                else if (entry.sink.lb >= 0 && entry.sink.ub >= entry.sink.lb)
                     sb.append(fileContents.subSequence(entry.sink.lb, entry.sink.ub));
                 sb.append("]");
                 if (lineMap != null)

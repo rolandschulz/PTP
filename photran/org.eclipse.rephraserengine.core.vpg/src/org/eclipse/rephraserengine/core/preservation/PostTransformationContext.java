@@ -12,11 +12,19 @@ package org.eclipse.rephraserengine.core.preservation;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.ltk.core.refactoring.FileStatusContext;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 
 /**
+ * A {@link RefactoringStatusContext} that is similar to a {@link FileStatusContext} except it
+ * represents a position in a file <i>after</i> it has been modified by a refactoring.
+ * <p>
+ * The org.eclipse.rephraserengine.ui.vpg plug-in registers a viewer for this type of object; it
+ * displays the modified contents of the file and highlights the indicated region.
  *
  * @author Jeff Overbey
+ *
+ * @since 1.0
  */
 public class PostTransformationContext extends RefactoringStatusContext
 {

@@ -56,7 +56,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
 
 	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
-	public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
+	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
 	public static final int BINDING_EDGE_TYPE = 2;
     public static final int RENAMED_BINDING_EDGE_TYPE = 3;
     public static final int DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE = 4;
@@ -64,7 +64,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	{
 	    "Definition-scope relationship",
 	    "Definition-scope relationship due to module import",
-	    "Binding",
+	    "Name binding",
 	    "Renamed binding",
 	    "Definition is private in scope",
 	};

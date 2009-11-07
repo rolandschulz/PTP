@@ -81,11 +81,11 @@ public class SafeDeleteRefactoring extends SingleFileFortranRefactoring
         try
         {
             preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm,
+                fileInEditor,
                 Preserve.incoming(PhotranVPG.BINDING_EDGE_TYPE));
 
-            preservation.monitor(fileInEditor);
             deleteScope();
-            vpg.commitChangesFromAST(fileInEditor);
+            vpg.commitChangesFromInMemoryASTs(fileInEditor);
             preservation.checkForPreservation(status);
 
             this.addChangeFromModifiedAST(this.fileInEditor, pm);

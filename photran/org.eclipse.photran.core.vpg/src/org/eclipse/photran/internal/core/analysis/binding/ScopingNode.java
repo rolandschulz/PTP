@@ -724,8 +724,8 @@ public abstract class ScopingNode extends ASTNode
     	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.DEFINED_IN_SCOPE_EDGE_TYPE))
     		result.add(vpg.getDefinitionFor(t));
 
-    	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
-    		result.add(vpg.getDefinitionFor(t));
+//    	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
+//    		result.add(vpg.getDefinitionFor(t));
 
     	return result;
 	}

@@ -19,7 +19,7 @@ public abstract class PrimitiveOp
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Factory Methods (alpha/epsilon methods normalize to rho-operations)
+    // Factory Methods (alpha/epsilon methods normalize to rho-operations via subclassing)
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     public static Alpha alpha(String filename, Interval k)
@@ -53,7 +53,7 @@ public abstract class PrimitiveOp
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Abstract Methods
+    // Class Members
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     public final String filename;
@@ -63,17 +63,17 @@ public abstract class PrimitiveOp
         this.filename = filename;
     }
 
-    @Override public abstract String toString();
-
     protected abstract int offset(int n);
 
-    public abstract Interval inorm(Interval i);
+    public abstract Interval inorm(String filename, Interval i);
 
     public abstract Interval iaff();
 
-    public abstract Interval dnorm(Interval i);
+    public abstract Interval dnorm(String filename, Interval i);
 
     public abstract Interval daff();
+
+    @Override public abstract String toString();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Concrete Subclasses
@@ -106,8 +106,10 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval inorm(Interval i)
+        public Interval inorm(String filename, Interval i)
         {
+            if (!filename.equals(this.filename)) return i;
+
             return new Interval(
                 offset(i.lb) != UNDEFINED ? offset(i.lb) : k.lb,
                 offset(i.ub) != UNDEFINED ? offset(i.ub) : k.ub);
@@ -120,8 +122,10 @@ public abstract class PrimitiveOp
         }
 
         @Override
-        public Interval dnorm(Interval i)
+        public Interval dnorm(String filename, Interval i)
         {
+            if (!filename.equals(this.filename)) return i;
+
             if (i.isSubsetOf(k))
                 return k;
             else
@@ -136,7 +140,7 @@ public abstract class PrimitiveOp
 
         @Override public String toString()
         {
-            return "rho<" + j + ", " + k + ">";
+            return filename + ":" + "rho<" + j + ", " + k + ">";
         }
     }
 

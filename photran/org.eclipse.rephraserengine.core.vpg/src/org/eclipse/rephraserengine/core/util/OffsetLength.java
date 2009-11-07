@@ -14,7 +14,8 @@ package org.eclipse.rephraserengine.core.util;
 /**
  * An <b>offset</b> and a <b>length</b> (simply two integers, typically non-negative).
  * <p>
- * <code>OffsetLength</code>s are frequently used to store the position of a piece of text in a file.
+ * <code>OffsetLength</code>s are frequently used to store the location of a particular range of
+ * text in a file.
  *
  * @author Jeff Overbey
  *

@@ -11,19 +11,15 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ltk.core.refactoring.FileStatusContext;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -39,61 +35,60 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.ModelDif
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Epsilon;
 
+/**
+ * Analysis that checks for preservation of semantic edges in a program graph.
+ *
+ * @author Jeff Overbey
+ *
+ * @since 1.0
+ */
 @SuppressWarnings("unchecked")
-public class PreservationAnalysis
+public final class PreservationAnalysis
 {
     private IAdapterManager adapterManager;
 
     private EclipseVPG vpg;
     private IProgressMonitor progressMonitor;
 
-    private Map<String, Model> initialModels = new HashMap<String, Model>();
+    private Model initialModel;
+    private List<PrimitiveOp> primitiveOps;
+    private Set<Preserve> preserveEdgeTypes;
 
-    private List<PrimitiveOp> primitiveOps = new LinkedList<PrimitiveOp>();
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, IFile file, Preserve... edgeTypes)
+    {
+        this(vpg, pm, EclipseVPG.getFilenameForIFile(file), edgeTypes);
+    }
 
-    private Set<Preserve> preserveEdgeTypes = Collections.<Preserve>emptySet();
-
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, String filename, Preserve... edgeTypes)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
         this.progressMonitor = pm;
 
-        preserveEdgeTypes = new HashSet<Preserve>(edgeTypes.length);
-        for (Preserve type : edgeTypes)
-            preserveEdgeTypes.add(type);
-    }
+        this.primitiveOps = new LinkedList<PrimitiveOp>();
 
-    public void monitor(IFile file)
-    {
+        this.preserveEdgeTypes = new HashSet<Preserve>(edgeTypes.length);
+        for (Preserve type : edgeTypes)
+            this.preserveEdgeTypes.add(type);
+
+        progressMonitor.subTask("Please wait; switching database to hypothetical mode");
         ensureDatabaseIsInHypotheticalMode();
 
-        ArrayList<String> singleton = new ArrayList<String>();
-        singleton.add(EclipseVPG.getFilenameForIFile(file));
-        monitor(vpg.sortFilesAccordingToDependencies(singleton, new NullProgressMonitor()));
+        progressMonitor.subTask("Computing initial model");
+        this.initialModel = new Model(vpg, filename);
+
+        progressMonitor.subTask("Analyzer ready");
     }
 
-    private void monitor(ArrayList<String> files)
-    {
-        for (String filename : files)
-        {
-            if (!vpg.isVirtualFile(filename))
-            {
-                progressMonitor.subTask("Computing initial model - " + lastSegment(filename));
-                initialModels.put(filename, new Model(vpg, filename));
-            }
-        }
-    }
-
-    private String lastSegment(String filename)
-    {
-        int lastSlash = filename.lastIndexOf('/');
-        int lastBackslash = filename.lastIndexOf('\\');
-        if (lastSlash < 0 && lastBackslash < 0)
-            return filename;
-        else
-            return filename.substring(Math.max(lastSlash+1, lastBackslash+1));
-    }
+//    private String lastSegment(String filename)
+//    {
+//        int lastSlash = filename.lastIndexOf('/');
+//        int lastBackslash = filename.lastIndexOf('\\');
+//        if (lastSlash < 0 && lastBackslash < 0)
+//            return filename;
+//        else
+//            return filename.substring(Math.max(lastSlash+1, lastBackslash+1));
+//    }
 
     private void ensureDatabaseIsInHypotheticalMode() throws Error
     {
@@ -101,7 +96,6 @@ public class PreservationAnalysis
         {
             try
             {
-                progressMonitor.subTask("Please wait; switching database to hypothetical mode");
                 vpg.db.enterHypotheticalMode();
             }
             catch (IOException e)
@@ -176,8 +170,6 @@ public class PreservationAnalysis
             offsetLength.getPositionPastEnd());
 
         primitiveOps.add(epsilon);
-
-        adapterManager.getAdapter(node, ResetOffsetLength.class);
     }
 
     @Override public String toString()
@@ -187,8 +179,26 @@ public class PreservationAnalysis
 
     public void checkForPreservation(RefactoringStatus status)
     {
-        for (String filename : initialModels.keySet())
-            checkForPreservation(status, filename);
+        printDebug("INITIAL MODEL", initialModel);
+        printDebug("NORMALIZING RELATIVE TO", primitiveOps);
+
+        progressMonitor.subTask("Normalizing initial model");
+        initialModel.inormalize(primitiveOps, preserveEdgeTypes);
+        printDebug("NORMALIZED INITIAL MODEL", initialModel);
+
+        progressMonitor.subTask("Computing derivative model");
+        printDebug("File ordering:", initialModel.getFiles());
+        Model derivativeModel = new Model(vpg, initialModel.getFiles());
+        printDebug("DERIVATIVE MODEL", derivativeModel);
+
+        progressMonitor.subTask("Normalizing derivative model");
+        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
+        printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel);
+
+        progressMonitor.subTask("Differencing initial and derivative models");
+        ModelDiff diff = initialModel.compareAgainst(derivativeModel);
+
+        describeDifferences(status, diff);
 
         leaveHypotheticalMode();
     }
@@ -206,28 +216,6 @@ public class PreservationAnalysis
         }
     }
 
-    private void checkForPreservation(RefactoringStatus status, String filename)
-    {
-        printDebug("INITIAL MODEL", initialModels.get(filename));
-        printDebug("NORMALIZING RELATIVE TO", primitiveOps);
-
-        progressMonitor.subTask("Normalizing initial model - " + lastSegment(filename));
-        initialModels.get(filename).inormalize(primitiveOps, preserveEdgeTypes);
-        printDebug("NORMALIZED INITIAL MODEL", initialModels.get(filename));
-
-        progressMonitor.subTask("Computing derivative model - " + lastSegment(filename));
-        Model derivativeModel = new Model(vpg, filename);
-        printDebug("DERIVATIVE MODEL", derivativeModel);
-
-        progressMonitor.subTask("Normalizing derivative model - " + lastSegment(filename));
-        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
-        printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel);
-
-        progressMonitor.subTask("Differencing initial and derivative models - " + lastSegment(filename));
-        ModelDiff diff = initialModels.get(filename).compareAgainst(derivativeModel);
-        describeDifferences(status, diff, EclipseVPG.getIFileForFilename(filename));
-    }
-
     private void printDebug(String string, Object object)
     {
         System.out.println();
@@ -236,25 +224,43 @@ public class PreservationAnalysis
         System.out.println(object.toString());
     }
 
-    private void describeDifferences(final RefactoringStatus status, ModelDiff diff, final IFile file)
+    private void describeDifferences(final RefactoringStatus status, ModelDiff diff)
     {
-        Object ast = vpg.acquireTransientAST(EclipseVPG.getFilenameForIFile(file));
-        final String code = ast == null ? null : vpg.getSourceCodeFromAST(ast);
+        final HashMap<IFile, String> modifiedSourceCode = new HashMap<IFile, String>();
 
         diff.processUsing(new ModelDiffProcessor()
         {
+            private String getCode(IFile file, HashMap<IFile, String> modifiedSourceCode)
+            {
+                if (file == null)
+                    return null;
+                else if (modifiedSourceCode.containsKey(file))
+                    return modifiedSourceCode.get(file);
+                else
+                {
+                    Object ast = vpg.acquireTransientAST(EclipseVPG.getFilenameForIFile(file));
+                    if (ast == null) return null;
+
+                    String code = vpg.getSourceCodeFromAST(ast);
+                    if (code == null) return null;
+
+                    modifiedSourceCode.put(file, code);
+                    return code;
+                }
+            }
+
             @Override
             public void processEdgeAdded(EdgeAdded addition)
             {
                 String msg = "Completing this transformation will introduce an unexpected "
                     + vpg.describeEdgeType(addition.edgeType).toLowerCase()
-                    //+ " (" + addition + ")"
+                    + " (" + addition + ")"
                     ;
 
                 status.addError(msg,
                     new PostTransformationContext(
-                        file,
-                        code,
+                        addition.getFileContainingRegion(),
+                        getCode(addition.getFileContainingRegion(), modifiedSourceCode),
                         addition.toRegion()));
             }
 
@@ -263,13 +269,13 @@ public class PreservationAnalysis
             {
                 String msg = "Completing this transformation will cause an existing "
                     + vpg.describeEdgeType(deletion.edgeType).toLowerCase()
-                    + " to disappear"
-                    //+ " (" + deletion + ")"
+                    + " to be eliminated"
+                    + " (" + deletion + ")"
                     ;
 
                 status.addError(msg,
                     new FileStatusContext(
-                        file,
+                        deletion.getFileContainingRegion(),
                         deletion.toRegion()));
             }
 
@@ -279,13 +285,13 @@ public class PreservationAnalysis
                 String msg = "Completing this transformation will cause an existing "
                     + vpg.describeEdgeType(change.edgeType).toLowerCase()
                     + " to change"
-                    //+ " (" + change + ")"
+                    + " (" + change + ")"
                     ;
 
                 status.addError(msg,
                     new PostTransformationContext(
-                        file,
-                        code,
+                        change.getFileContainingRegion(),
+                        getCode(change.getFileContainingRegion(), modifiedSourceCode),
                         change.toRegion()));
             }
 

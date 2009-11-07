@@ -296,8 +296,10 @@ public class PhotranVPGBuilder extends PhotranVPG
     }
 
     @Override
-    public void commitChangeFromAST(String filename)
+    protected void doCommitChangeFromAST(String filename)
     {
+        if (isVirtualFile(filename)) return;
+
         IFortranAST ast = acquireTransientAST(filename);
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         ast.getRoot().printOn(new PrintStream(out), null);
