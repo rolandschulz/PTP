@@ -12,11 +12,9 @@
 package org.eclipse.ptp.remotetools.internal.ssh;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
-import org.eclipse.ptp.remotetools.core.IRemoteDirectory;
 import org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -27,17 +25,17 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 public class RemoteFileRecursiveEnumeration implements IRemoteFileEnumeration {
 
-	Stack directories;
+	Stack<String> directories;
 	RemoteFileEnumeration currentItems;
 	FileTools fileTools;
-	LinkedList currentExceptions = new LinkedList();
+	LinkedList<Exception> currentExceptions = new LinkedList<Exception>();
 	IRemoteItem nextRemoteItem;
 	
 	public RemoteFileRecursiveEnumeration(FileTools fileTools, String root) throws RemoteOperationException, RemoteConnectionException, CancelException {
 		this.fileTools = fileTools;
 		// dont need, getItem(root) will test
 		// fileTools.test();
-		directories = new Stack();
+		directories = new Stack<String>();
 		directories.add(root);
 		prefetchNextRemoteItem();
 	}
@@ -59,11 +57,11 @@ public class RemoteFileRecursiveEnumeration implements IRemoteFileEnumeration {
 			try {
 				currentItems = new RemoteFileEnumeration(fileTools, root);
 			} catch (CancelException e) {
-				currentExceptions = new LinkedList();
+				currentExceptions.clear();
 				currentExceptions.addLast(e);
 				return;
 			} catch (RemoteConnectionException e) {
-				currentExceptions = new LinkedList();
+				currentExceptions.clear();
 				currentExceptions.addLast(e);
 				return;
 			} catch (RemoteOperationException e) {
@@ -73,9 +71,8 @@ public class RemoteFileRecursiveEnumeration implements IRemoteFileEnumeration {
 		}
 			
 		IRemoteItem item = currentItems.nextElementAsItem();
-		if (item instanceof IRemoteDirectory) {
-			IRemoteDirectory directory = (IRemoteDirectory) item;
-			directories.add(directory.getPath());
+		if (item.isDirectory()) {
+			directories.add(item.getPath());
 		}
 		nextRemoteItem = item;
 	}
