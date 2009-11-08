@@ -19,7 +19,27 @@ public interface IRemoteUIConnectionManager {
 	 * Create a new connection. The implementation can chose to do this in any way,
 	 * but typically will use a dialog or wizard.
 	 * 
+	 * @param shell shell used to display dialogs
 	 * @return newly created remote connection
 	 */
 	public IRemoteConnection newConnection(Shell shell);
+	
+	/**
+	 * Attempt to open a connection using a progress monitor. Users should check
+	 * connection.isOpen() on return to determine if the connection was actually
+	 * opened.
+	 * 
+	 * @param shell shell used to display dialogs
+	 * @param connection connection to open
+	 */
+	public void openConnectionWithProgress(Shell shell, IRemoteConnection connection);
+	
+	/**
+	 * Change a connection configuration. The implementation can chose to do this in any way,
+	 * but typically will use a dialog or wizard.
+	 * 
+	 * @param shell shell used to display dialogs
+	 * @param connection connection to modify
+	 */
+	public void updateConnection(Shell shell, IRemoteConnection connection);
 }

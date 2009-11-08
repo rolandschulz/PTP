@@ -10,14 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.ui;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
+import org.eclipse.ptp.remote.remotetools.ui.messages.Messages;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
@@ -27,12 +36,12 @@ import org.eclipse.swt.widgets.Shell;
 public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManager {
 	private final TargetTypeElement remoteHost;
 	private final IRemoteConnectionManager connMgr;
-	
+
 	public RemoteToolsUIConnectionManager(IRemoteServices services) {
 		connMgr = services.getConnectionManager();
 		remoteHost = RemoteToolsServices.getTargetTypeElement();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
 	 */
@@ -75,5 +84,44 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 			}
 		}
 		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#openConnectionWithProgress(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public void openConnectionWithProgress(final Shell shell,
+			final IRemoteConnection connection) {
+		if (!connection.isOpen()) {
+			IRunnableWithProgress op = new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						connection.open(monitor);
+					} catch (RemoteConnectionException e) {
+						ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1,
+								Messages.RemoteToolsUIConnectionManager_2,
+								new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getMessage()));
+					}
+				}
+			};
+			try {
+				new ProgressMonitorDialog(shell).run(true, true, op);
+			} catch (InvocationTargetException e) {
+				ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1,
+						Messages.RemoteToolsUIConnectionManager_2,
+						new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getMessage()));
+			} catch (InterruptedException e) {
+				ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1,
+						Messages.RemoteToolsUIConnectionManager_2,
+						new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getMessage()));
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#updateConnection(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	public void updateConnection(Shell shell, IRemoteConnection connection) {
+		// TODO Auto-generated method stub
+		
 	}
 }

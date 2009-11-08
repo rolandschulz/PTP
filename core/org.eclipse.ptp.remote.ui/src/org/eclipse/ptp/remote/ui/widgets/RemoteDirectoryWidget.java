@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.messages.Messages;
@@ -198,16 +199,17 @@ public class RemoteDirectoryWidget extends Composite {
 	}
 	
 	private void browse() {
-		if (!fRemoteConnection.isOpen()) {
-			PTPRemoteUIPlugin.getDefault().openConnectionWithProgress(getShell(), fRemoteConnection);
-		}
-		if (fRemoteConnection.isOpen()) {
-			IRemoteUIFileManager fileMgr = getUIFileManager();
-			if (fileMgr != null) {
-				fileMgr.setConnection(fRemoteConnection);
-				String path = fileMgr.browseDirectory(getShell(), fBrowseMessage, "", 0); //$NON-NLS-1$
-				if (path != null) {
-					setLocationPath(path);
+		IRemoteUIConnectionManager connMgr = getUIConnectionManager();
+		if (connMgr != null) {
+			connMgr.openConnectionWithProgress(getShell(), fRemoteConnection);
+			if (fRemoteConnection.isOpen()) {
+				IRemoteUIFileManager fileMgr = getUIFileManager();
+				if (fileMgr != null) {
+					fileMgr.setConnection(fRemoteConnection);
+					String path = fileMgr.browseDirectory(getShell(), fBrowseMessage, "", 0); //$NON-NLS-1$
+					if (path != null) {
+						setLocationPath(path);
+					}
 				}
 			}
 		}
@@ -223,6 +225,13 @@ public class RemoteDirectoryWidget extends Composite {
 	private IRemoteUIFileManager getUIFileManager() {
 		if (fRemoteServices != null) {
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIFileManager();
+		}
+		return null;
+	}
+	
+	private IRemoteUIConnectionManager getUIConnectionManager() {
+		if (fRemoteServices != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIConnectionManager();
 		}
 		return null;
 	}
