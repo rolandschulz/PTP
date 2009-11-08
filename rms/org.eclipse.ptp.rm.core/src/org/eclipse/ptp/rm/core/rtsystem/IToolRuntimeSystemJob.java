@@ -16,9 +16,17 @@ package org.eclipse.ptp.rm.core.rtsystem;
  *
  */
 public interface IToolRuntimeSystemJob {
+	/**
+	 * Get the job ID for this job.
+	 * 
+	 * @return job id
+	 */
+	public String getJobID();
 
-	String getJobID();
-
-	AbstractToolRuntimeSystem getRtSystem();
-
+	/**
+	 * Get the runtime system that launched this job.
+	 * 
+	 * @return runtime system
+	 */
+	public AbstractToolRuntimeSystem getRtSystem();
 }
