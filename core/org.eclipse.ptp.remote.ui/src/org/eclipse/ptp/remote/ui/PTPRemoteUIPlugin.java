@@ -1,6 +1,5 @@
 package org.eclipse.ptp.remote.ui;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,17 +7,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -104,41 +94,6 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 			return proxy.getUIServices(services);
 		}
 		return null;
-	}
-	
-	/**
-	 * Attempt to open a connection using a progress monitor. Users should check
-	 * connection.isOpen() on return to determine if the connection was actually
-	 * opened.
-	 * 
-	 * @param shell shell used to display dialogs
-	 * @param connection connection to open
-	 */
-	public void openConnectionWithProgress(final Shell shell, final IRemoteConnection connection) {
-		if (!connection.isOpen()) {
-			IRunnableWithProgress op = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					try {
-						connection.open(monitor);
-					} catch (RemoteConnectionException e) {
-						ErrorDialog.openError(shell, Messages.PTPRemoteUIPlugin_0,
-								Messages.PTPRemoteUIPlugin_1,
-								new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage()));
-					}
-				}
-			};
-			try {
-				new ProgressMonitorDialog(shell).run(true, true, op);
-			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(shell, Messages.PTPRemoteUIPlugin_0,
-						Messages.PTPRemoteUIPlugin_1,
-						new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage()));
-			} catch (InterruptedException e) {
-				ErrorDialog.openError(shell, Messages.PTPRemoteUIPlugin_0,
-						Messages.PTPRemoteUIPlugin_1,
-						new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage()));
-			}
-		}
 	}
 
 	/*

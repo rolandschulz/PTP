@@ -536,9 +536,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		}
 
 		if (remUIServices != null && connection != null) {
-			if (!connection.isOpen()) {
-				PTPRemoteUIPlugin.getDefault().openConnectionWithProgress(getShell(), connection);
-			}
+			remUIServices.getUIConnectionManager().openConnectionWithProgress(getShell(), connection);
 			if (connection.isOpen()) {
 				IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
 				fileMgr.setConnection(connection);
