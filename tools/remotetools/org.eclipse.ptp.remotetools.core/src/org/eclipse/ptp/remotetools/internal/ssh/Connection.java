@@ -37,6 +37,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 
@@ -572,14 +573,33 @@ public class Connection implements IRemoteConnection {
 
 	/**
 	 * Gets the SFTP channel that may be used by the internal implementation to do file system operations
-	 * on the remote host.
-	 * @return
+	 * on the remote host. Gets a new channel if the defaul has been closed for some reason.
+	 * 
+	 * @return default channel
 	 */
-	protected ChannelSftp getDefaultSFTPChannel() {
+	protected synchronized ChannelSftp getDefaultSFTPChannel() throws RemoteConnectionException {
+		if (!sftpChannel.isConnected()) {
+			sftpChannel = getNewSFTPChannel();
+		}
 		return sftpChannel;
 	}
 
-
+	/**
+	 * Gets a new SFTP channel that may be used by the internal implementation to do file system operations
+	 * on the remote host.
+	 * 
+	 * @return new channel
+	 */
+	protected synchronized ChannelSftp getNewSFTPChannel() throws RemoteConnectionException {
+		try {
+			ChannelSftp channel = (ChannelSftp)defaultSession.openChannel("sftp"); //$NON-NLS-1$
+			channel.connect();
+			return channel;
+		} catch (JSchException e) {
+			throw new RemoteConnectionException(Messages.Connection_Connect_FailedCreateSFTPConnection, e);
+		}
+	}
+	
 	protected synchronized int createNextPIID() {
 		return ++nextInternalPID % Integer.MAX_VALUE;
 	}
@@ -698,7 +718,7 @@ public class Connection implements IRemoteConnection {
 	 *
 	 * @throws RemoteConnectionException The connection was entirely dropped or some channel got lost.
 	 */
-	protected void test() throws RemoteConnectionException {
+	protected synchronized void test() throws RemoteConnectionException {
 		/*
 		 * Check all SSH sessions
 		 */
