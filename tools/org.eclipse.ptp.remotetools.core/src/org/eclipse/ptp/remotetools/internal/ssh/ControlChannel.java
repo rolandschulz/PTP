@@ -30,13 +30,11 @@ public class ControlChannel implements ILineStreamListener {
 	/*
 	 * Patterns recognized by the observer.
 	 */
-	final static String markerPID = "<pid value=\""; //$NON-NLS-1$
-	final static String markerPIID = "<piid value=\""; //$NON-NLS-1$
-	final static String markerSSH = "<ssh_tty value=\""; //$NON-NLS-1$
-	final static String endMarker = "\"/>"; //$NON-NLS-1$
-	final Pattern pidPattern = Pattern.compile(markerPID + "(\\p{Digit}+)" + endMarker + markerPIID //$NON-NLS-1$
-			+ "(\\p{Digit}+)" + endMarker); //$NON-NLS-1$
-	final Pattern terminalPathPattern = Pattern.compile(markerSSH + "(.+)" + endMarker); //$NON-NLS-1$
+	final static String markerPID = "PID="; //$NON-NLS-1$
+	final static String markerPIID = "PIID="; //$NON-NLS-1$
+	final static String markerSSH = "SSH_TTY="; //$NON-NLS-1$
+	final Pattern pidPattern = Pattern.compile(markerPID + "(\\p{Digit}+) " + markerPIID + "(\\p{Digit}+)"); //$NON-NLS-1$ //$NON-NLS-2$
+	final Pattern terminalPathPattern = Pattern.compile(markerSSH + "(/.+)"); //$NON-NLS-1$
 
 	// OutputStream that sends input to remote process input stream.
 	OutputStream outputToControlTerminalInput;
@@ -86,7 +84,8 @@ public class ControlChannel implements ILineStreamListener {
 			outputToControlTerminalInput.write("export PS1=\n".getBytes()); //$NON-NLS-1$
 			
 			// Write terminal path on control channel, to be read by the observer
-			outputToControlTerminalInput.write(new String("echo '" + markerSSH + "'$SSH_TTY'" + endMarker + "'\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String command = "/bin/sh -c 'echo \"" + markerSSH + "$SSH_TTY\"'\n"; //$NON-NLS-1$ //$NON-NLS-2$
+			outputToControlTerminalInput.write(command.getBytes());
 			outputToControlTerminalInput.flush();
 		} catch (IOException e) {
 			throw new RemoteConnectionException(Messages.ControlChannel_Open_FailedSendInitCommands, e);
@@ -127,6 +126,7 @@ public class ControlChannel implements ILineStreamListener {
 		if (terminalPathMatcher.find()) {
 			synchronized (this) {
 				controlTerminalPath = terminalPathMatcher.group(1);
+				Debug.println2("Found control terminal path = " + controlTerminalPath);
 				this.notifyAll();
 			}
 		}
@@ -155,9 +155,9 @@ public class ControlChannel implements ILineStreamListener {
 	}
 
 	public synchronized String getKillablePrefix(int internaID) {
-		return "echo '" + markerPID + "'$$'" + endMarker //$NON-NLS-1$ //$NON-NLS-2$
-				+ markerPIID + "'" + Integer.toString(internaID) + "'" + endMarker  //$NON-NLS-1$ //$NON-NLS-2$
-				+ "' > " + controlTerminalPath; //$NON-NLS-1$
+		return "echo \"" + markerPID + "$$ " //$NON-NLS-1$ //$NON-NLS-2$
+				+ markerPIID + Integer.toString(internaID)
+				+ "\" > " + controlTerminalPath; //$NON-NLS-1$
 	}
 
 	public void close() {
