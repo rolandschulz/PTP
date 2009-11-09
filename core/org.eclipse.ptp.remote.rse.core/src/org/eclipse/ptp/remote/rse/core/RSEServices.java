@@ -12,7 +12,6 @@ package org.eclipse.ptp.remote.rse.core;
 
 import java.util.List;
 
-import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -122,21 +121,6 @@ public class RSEServices implements IRemoteServices {
 		return new RSEProcessBuilder(conn, command);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getServicesExtension(java.lang.Class)
-	 */
-	@SuppressWarnings("unchecked")
-	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
-		if (!isInitialized()) {
-			return null;
-		}
-		
-		if (extension == DataStore.class) {
-			return ((RSEConnection)conn).getDataStore();
-		}
-		return null;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
