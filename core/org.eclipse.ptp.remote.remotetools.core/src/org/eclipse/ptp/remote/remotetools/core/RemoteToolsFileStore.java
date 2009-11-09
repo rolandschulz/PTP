@@ -230,7 +230,7 @@ public class RemoteToolsFileStore extends FileStore {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					EFS.ERROR_WRONG_TYPE,
-					"A file of that name already exists", null));
+					Messages.RemoteToolsFileStore_13, null));
 		}
 		
 		return this;
@@ -251,7 +251,7 @@ public class RemoteToolsFileStore extends FileStore {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
 					EFS.ERROR_READ,
-					"File doesn't exist", null));
+					Messages.RemoteToolsFileStore_14, null));
 		}
 		
 		if (item.isDirectory()) {
