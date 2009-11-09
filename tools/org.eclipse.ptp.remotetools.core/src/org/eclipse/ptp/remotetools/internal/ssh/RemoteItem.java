@@ -151,7 +151,7 @@ class RemoteItem implements IRemoteItem {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#refreshAttributes()
 	 */
-	public void refreshAttributes() throws RemoteConnectionException, RemoteOperationException, CancelException, RemoteOperationException {
+	public void refreshAttributes() throws RemoteConnectionException, RemoteOperationException, CancelException {
 		fileTools.test();
 		SftpATTRS attrs = fileTools.fetchRemoteAttr(path);
 		parseAttrs(attrs);
@@ -262,9 +262,9 @@ class RemoteItem implements IRemoteItem {
 	 */
 	public String toString() {
 		if (exist) {
-			return "["+super.toString()+"] "+path + (isDirectory ? "(d)" : "(f)"); //$NON-NLS-1$ //$NON-NLS-2$
+			return path + (isDirectory ? "(d)" : "(f)"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
-			return "["+super.toString()+"] "+"does not exist"; //$NON-NLS-1$
+			return path + " does not exist"; //$NON-NLS-1$
 		}
 	}
 
