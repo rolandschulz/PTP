@@ -12,6 +12,7 @@ package org.eclipse.ptp.remote.remotetools.core;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +27,7 @@ import org.eclipse.ptp.remotetools.core.RemoteProcess;
 public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final RemoteToolsConnection fConnection;
 	private final Map<String, String> fRemoteEnv;
+	private Map<String, String> fNewRemoteEnv = null;
 
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, List<String> command) {
 		super(conn, command);
@@ -42,7 +44,11 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	 */
 	@Override
 	public Map<String, String> environment() {
-		return fRemoteEnv;
+		if (fNewRemoteEnv == null) {
+			fNewRemoteEnv = new HashMap<String, String>();
+			fNewRemoteEnv.putAll(fRemoteEnv);
+		}
+		return fNewRemoteEnv;
 	}
 
 	/* (non-Javadoc)
@@ -77,8 +83,16 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 				script.setScript(remoteCmd);
 			}
 			
-			for (Entry<String,String> entry : environment().entrySet()) {
-				script.addEnvironment(entry.getKey()+"="+entry.getValue()); //$NON-NLS-1$
+			/*
+			 * Only update new or changed environment variables.
+			 */
+			if (fNewRemoteEnv != null) {
+				for (Entry<String,String> entry : fNewRemoteEnv.entrySet()) {
+					String oldValue = fRemoteEnv.get(entry.getKey());
+					if (oldValue == null || !oldValue.equals(entry.getValue())) {
+						script.addEnvironment(entry.getKey() + "=" + entry.getValue()); //$NON-NLS-1$
+					}
+				}
 			}
 
 			RemoteProcess process = exeTools.executeProcess(script);
