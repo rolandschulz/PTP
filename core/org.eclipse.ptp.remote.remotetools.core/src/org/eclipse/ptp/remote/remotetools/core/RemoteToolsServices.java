@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -29,8 +31,10 @@ public class RemoteToolsServices implements IRemoteServices {
 	private static String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
 	
 	private static RemoteToolsServices instance = null;
-	private static RemoteToolsConnectionManager connMgr = null;
-
+	
+	private RemoteToolsConnectionManager connMgr = null;
+	private Map<String, RemoteToolsFileManager> fileMgrs = new HashMap<String, RemoteToolsFileManager>();
+	
 	/**
 	 * Get shared instance of this class
 	 * 
@@ -82,7 +86,12 @@ public class RemoteToolsServices implements IRemoteServices {
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
-		return new RemoteToolsFileManager((RemoteToolsConnection)conn);
+		RemoteToolsFileManager fileMgr = fileMgrs.get(conn.getName());
+		if (fileMgr == null) {
+			fileMgr = new RemoteToolsFileManager((RemoteToolsConnection)conn);
+			fileMgrs.put(conn.getName(), fileMgr);
+		}
+		return fileMgr;
 	}
 	
 	/* (non-Javadoc)
@@ -120,14 +129,6 @@ public class RemoteToolsServices implements IRemoteServices {
 		return fDescriptor.getScheme();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
-	 */
-	@SuppressWarnings("unchecked")
-	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
-		return null;
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#initialize()
 	 */
