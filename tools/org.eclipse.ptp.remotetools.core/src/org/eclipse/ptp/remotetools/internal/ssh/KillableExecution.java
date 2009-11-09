@@ -97,9 +97,29 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 		return channel;
 	}
 
+	/**
+	 * Create a killable command line that will run on any system.
+	 * 
+	 * 1. The whole command is run using /bin/sh to ensure that it will work
+	 *    on any system.
+	 * 2. The killable prefix echos the PID of the shell to the control terminal. This
+	 *    is read by the connection manager and can be used to send a kill signal
+	 *    in order to terminate the process.
+	 *    
+	 * NOTE: there is a maximum line length on most systems. If this is exceeded
+	 * the command will fail.
+	 *     
+	 * @param commandLine command line to run
+	 */
 	protected void setCommandLine(String commandLine) {
 		PIID = getExecutionManager().getConnection().createNextPIID();
-		String newCommandLine = "(" + getExecutionManager().getConnection().getKillablePrefix(this) + "); " + commandLine; //$NON-NLS-1$ //$NON-NLS-2$
+		
+		String newCommandLine = "/bin/sh -c '" //$NON-NLS-1$
+			+ getExecutionManager().getConnection().getKillablePrefix(this) 
+			+ "; " //$NON-NLS-1$
+			+ commandLine 
+			+ "'"; //$NON-NLS-1$
+		
 		Debug.println2(Messages.KillableExecution_Debug_1 + newCommandLine);
 		channel.setCommand(newCommandLine);
 	}
