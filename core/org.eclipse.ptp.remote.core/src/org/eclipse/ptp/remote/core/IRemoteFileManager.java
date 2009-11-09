@@ -67,7 +67,7 @@ public interface IRemoteFileManager {
 	 * The remote connection does not need to be open to use this method.
 	 * 
 	 * @param path path on remote system
-	 * @return URI representing path on remote system
+	 * @return URI representing path on remote system, or null if the path is invalid
 	 */
 	public URI toURI(IPath path);
 	
@@ -78,7 +78,7 @@ public interface IRemoteFileManager {
 	 * The remote connection does not need to be open to use this method.
 	 * 
 	 * @param path path on remote system
-	 * @return URI representing path on remote system
+	 * @return URI representing path on remote system, or null if the path is invalid
 	 */
 	public URI toURI(String path);
 }
