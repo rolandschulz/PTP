@@ -104,7 +104,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 			IConnectorService connectorService) {
 		super(host, connectorService);
 		generateErrorMessages();
-		// TODO Auto-generated constructor stub
+		setHidden(true);
 	}
 	
 	private void generateErrorMessages() {				
