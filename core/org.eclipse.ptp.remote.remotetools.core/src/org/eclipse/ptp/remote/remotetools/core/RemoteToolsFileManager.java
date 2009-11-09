@@ -87,7 +87,11 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
-		return RemoteToolsFileSystem.getURIFor(fConnection.getName(), path.toString());
+		try {
+			return RemoteToolsFileSystem.getURIFor(fConnection.getName(), path.toString());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
