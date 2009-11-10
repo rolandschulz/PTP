@@ -63,6 +63,7 @@
       <import plugin="org.eclipse.cdt.core.lrparser.xlc" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.ptp.remote.rse" version="2.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.make.ui"/>
    </requires>
 
    <plugin
@@ -94,6 +95,13 @@
 
    <plugin
          id="org.eclipse.ptp.rdt.xlc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rdt.make.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
