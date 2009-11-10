@@ -11,6 +11,9 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,6 +37,7 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSink
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.ModelDiffProcessor;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Epsilon;
+import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Rho;
 
 /**
  * Analysis that checks for preservation of semantic edges in a program graph.
@@ -48,22 +52,40 @@ public final class PreservationAnalysis
     private IAdapterManager adapterManager;
 
     private EclipseVPG vpg;
-    private IProgressMonitor progressMonitor;
+    //private IProgressMonitor progressMonitor;
 
     private Model initialModel;
     private List<PrimitiveOp> primitiveOps;
     private Set<Preserve> preserveEdgeTypes;
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, IFile file, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, IFile file, Preserve... edgeTypes)
     {
-        this(vpg, pm, EclipseVPG.getFilenameForIFile(file), edgeTypes);
+        this(vpg, progressMonitor, ticks, EclipseVPG.getFilenameForIFile(file), edgeTypes);
     }
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor pm, String filename, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, Collection<IFile> files, Preserve... edgeTypes)
+    {
+        this(vpg, progressMonitor, ticks, getFilenames(files), edgeTypes);
+    }
+
+    private static List<String> getFilenames(Collection<IFile> files)
+    {
+        List<String> result = new ArrayList<String>(files.size());
+        for (IFile file : files)
+            result.add(EclipseVPG.getFilenameForIFile(file));
+        return result;
+    }
+
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, String filename, Preserve... edgeTypes)
+    {
+        this(vpg, progressMonitor, ticks, Collections.singletonList(filename), edgeTypes);
+    }
+
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, List<String> filenames, Preserve... edgeTypes)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
-        this.progressMonitor = pm;
+        //this.progressMonitor = progressMonitor;
 
         this.primitiveOps = new LinkedList<PrimitiveOp>();
 
@@ -74,21 +96,8 @@ public final class PreservationAnalysis
         progressMonitor.subTask("Please wait; switching database to hypothetical mode");
         ensureDatabaseIsInHypotheticalMode();
 
-        progressMonitor.subTask("Computing initial model");
-        this.initialModel = new Model(vpg, filename);
-
-        progressMonitor.subTask("Analyzer ready");
+        this.initialModel = new Model("initial model", progressMonitor, ticks, vpg, filenames);
     }
-
-//    private String lastSegment(String filename)
-//    {
-//        int lastSlash = filename.lastIndexOf('/');
-//        int lastBackslash = filename.lastIndexOf('\\');
-//        if (lastSlash < 0 && lastBackslash < 0)
-//            return filename;
-//        else
-//            return filename.substring(Math.max(lastSlash+1, lastBackslash+1));
-//    }
 
     private void ensureDatabaseIsInHypotheticalMode() throws Error
     {
@@ -172,38 +181,50 @@ public final class PreservationAnalysis
         primitiveOps.add(epsilon);
     }
 
+    public void markRho(IFile file, Object node, int oldLength, int newLength)
+    {
+        String filename = EclipseVPG.getFilenameForIFile(file);
+        OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
+        if (offsetLength == null)
+            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+
+        Rho rho = PrimitiveOp.rho(
+            filename,
+            offsetLength.getOffset(),
+            oldLength,
+            newLength);
+
+        primitiveOps.add(rho);
+    }
+
     @Override public String toString()
     {
         return primitiveOps.toString();
     }
 
-    public void checkForPreservation(RefactoringStatus status)
+    public void checkForPreservation(RefactoringStatus status, IProgressMonitor progressMonitor, int ticks)
     {
         printDebug("INITIAL MODEL", initialModel);
         printDebug("NORMALIZING RELATIVE TO", primitiveOps);
 
-        progressMonitor.subTask("Normalizing initial model");
-        initialModel.inormalize(primitiveOps, preserveEdgeTypes);
+        initialModel.inormalize(primitiveOps, preserveEdgeTypes, progressMonitor);
         printDebug("NORMALIZED INITIAL MODEL", initialModel);
 
-        progressMonitor.subTask("Computing derivative model");
         printDebug("File ordering:", initialModel.getFiles());
-        Model derivativeModel = new Model(vpg, initialModel.getFiles());
+        Model derivativeModel = new Model("derivative model", progressMonitor, ticks+3, vpg, initialModel.getFiles());
         printDebug("DERIVATIVE MODEL", derivativeModel);
 
-        progressMonitor.subTask("Normalizing derivative model");
-        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes);
+        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes, progressMonitor);
         printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel);
 
-        progressMonitor.subTask("Differencing initial and derivative models");
-        ModelDiff diff = initialModel.compareAgainst(derivativeModel);
+        ModelDiff diff = initialModel.compareAgainst(derivativeModel, progressMonitor);
 
         describeDifferences(status, diff);
 
-        leaveHypotheticalMode();
+        leaveHypotheticalMode(progressMonitor);
     }
 
-    private void leaveHypotheticalMode() throws Error
+    private void leaveHypotheticalMode(IProgressMonitor progressMonitor) throws Error
     {
         try
         {

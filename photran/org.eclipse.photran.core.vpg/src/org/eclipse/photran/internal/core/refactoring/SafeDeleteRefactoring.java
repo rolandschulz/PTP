@@ -10,18 +10,15 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.PreservationBasedSingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
 import org.eclipse.rephraserengine.core.preservation.Preserve;
 
 /**
@@ -29,13 +26,11 @@ import org.eclipse.rephraserengine.core.preservation.Preserve;
  *
  * @author Jeff Overbey
  */
-public class SafeDeleteRefactoring extends SingleFileFortranRefactoring
+public class SafeDeleteRefactoring extends PreservationBasedSingleFileFortranRefactoring
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////
-
-    private PreservationAnalysis preservation = null;
 
     private ScopingNode enclosingScope;
 
@@ -74,41 +69,19 @@ public class SafeDeleteRefactoring extends SingleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    protected void doValidateUserInput(RefactoringStatus status) throws PreconditionFailure
     {
-        assert enclosingScope != null;
-
-        try
-        {
-            preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm,
-                fileInEditor,
-                Preserve.incoming(PhotranVPG.BINDING_EDGE_TYPE));
-
-            deleteScope();
-            vpg.commitChangesFromInMemoryASTs(fileInEditor);
-            preservation.checkForPreservation(status);
-
-            this.addChangeFromModifiedAST(this.fileInEditor, pm);
-        }
-        finally
-        {
-            vpg.releaseAllASTs();
-        }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Change
-    ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
+    protected Preserve getEdgesToPreserve()
     {
+        return Preserve.incoming(PhotranVPG.BINDING_EDGE_TYPE);
     }
 
-    private void deleteScope()
+    @Override
+    protected void doTransform() throws PreconditionFailure
     {
-        assert preservation != null;
-
         preservation.markEpsilon(fileInEditor, enclosingScope);
         enclosingScope.removeFromTree();
     }

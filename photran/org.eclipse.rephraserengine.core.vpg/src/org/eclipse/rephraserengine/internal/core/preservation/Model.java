@@ -16,9 +16,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.rephraserengine.core.preservation.Preserve;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeAdded;
@@ -107,25 +110,37 @@ public class Model
         }
     }
 
+    private String name;
     private EclipseVPG<?,?,?,?,?> vpg;
     private List<String> files;
     private Set<Entry> edges;
 
-    public Model(EclipseVPG<?,?,?,?,?> vpg, String... filenames)
+    public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<?,?,?,?,?> vpg, String... filenames)
     {
-        this(vpg, Arrays.asList(filenames));
+        this(name, pm, ticks, vpg, Arrays.asList(filenames));
     }
 
-    public Model(EclipseVPG<?,?,?,?,?> vpg, List<String> filenames)
+    public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<?,?,?,?,?> vpg, List<String> filenames)
     {
+        this.name = name;
         this.vpg = vpg;
+
+        pm.subTask("Preparing to compute " + name);
         this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames), new NullProgressMonitor());
+
+        pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Computing " + name + ":", files.size());
         this.edges = new TreeSet<Entry>();
         for (String thisFile : files)
-            addEdges(thisFile);
+        {
+            pm.subTask(VPG.lastSegmentOfFilename(thisFile));
+            addEdges(thisFile, pm);
+            pm.worked(1);
+        }
+        pm.done();
     }
 
-    private void addEdges(String filename)
+    private void addEdges(String filename, IProgressMonitor pm)
     {
         for (VPGEdge<?,?,?> edge : vpg.db.getAllEdgesFor(filename))
         {
@@ -147,10 +162,12 @@ public class Model
         return files;
     }
 
-    public void inormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes)
+    public void inormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
+        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Normalizing " + name + " by " + op, edges.size());
         for (Entry entry : edges)
         {
             if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.iaff()))
@@ -159,21 +176,25 @@ public class Model
                 entry.sink = op.inorm(entry.sinkFilename, entry.sink);
                 revisedList.add(entry);
             }
+            pm.worked(1);
         }
+        pm.done();
 
         edges = revisedList;
     }
 
-    public void inormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes)
+    public void inormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
     {
         for (PrimitiveOp op : primitiveOps)
-            inormalize(op, preserveEdgeTypes);
+            inormalize(op, preserveEdgeTypes, pm);
     }
 
-    public void dnormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes)
+    public void dnormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
+        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Normalizing " + name + " by " + op, edges.size());
         for (Entry entry : edges)
         {
             if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.daff()))
@@ -182,19 +203,25 @@ public class Model
                 entry.sink = op.dnorm(entry.sinkFilename, entry.sink);
                 revisedList.add(entry);
             }
+            pm.worked(1);
         }
+        pm.done();
 
         edges = revisedList;
     }
 
-    public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes)
+    public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
     {
         for (PrimitiveOp op : primitiveOps)
-            dnormalize(op, preserveEdgeTypes);
+            dnormalize(op, preserveEdgeTypes, pm);
     }
 
-    public ModelDiff compareAgainst(Model that)
+    public ModelDiff compareAgainst(Model that, IProgressMonitor pm)
     {
+        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Differencing " + this.name + " and " + that.name,
+            this.edges.size() + that.edges.size());
+
         ModelDiff diff = new ModelDiff();
 
         for (Entry entry : this.edges)
@@ -226,6 +253,7 @@ public class Model
                             entry.edgeType));
                 }
             }
+            pm.worked(1);
         }
 
         for (Entry entry : that.edges)
@@ -240,8 +268,10 @@ public class Model
                         entry.sink,
                         entry.edgeType));
             }
+            pm.worked(1);
         }
 
+        pm.done();
         return diff;
     }
 

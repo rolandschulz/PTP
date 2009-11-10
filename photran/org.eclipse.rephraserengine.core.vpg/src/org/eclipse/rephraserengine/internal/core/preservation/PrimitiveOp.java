@@ -52,6 +52,11 @@ public abstract class PrimitiveOp
         return new Rho(filename, new Interval(j_lb, j_ub), new Interval(k_lb, k_ub));
     }
 
+    public static Rho rho(String filename, int offset, int oldLength, int newLength)
+    {
+        return new Rho(filename, new Interval(offset, offset+oldLength), new Interval(offset, offset+newLength));
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Class Members
     ///////////////////////////////////////////////////////////////////////////////////////////////

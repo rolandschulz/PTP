@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
@@ -23,9 +21,8 @@ import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.IModuleBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.PreservationBasedSingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
 import org.eclipse.rephraserengine.core.preservation.Preserve;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
@@ -34,13 +31,11 @@ import org.eclipse.rephraserengine.core.refactorings.UserInputString;
  *
  * @author Jeff Overbey
  */
-public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
+public class AddEmptySubprogramRefactoring extends PreservationBasedSingleFileFortranRefactoring
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////
-
-    private PreservationAnalysis preservation = null;
 
     private ScopingNode enclosingScope;
 
@@ -89,36 +84,27 @@ public class AddEmptySubprogramRefactoring extends SingleFileFortranRefactoring
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    protected void doValidateUserInput(RefactoringStatus status) throws PreconditionFailure
     {
         assert newName != null;
         assert enclosingScope != null;
 
-        try
-        {
-            preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm,
-                fileInEditor,
-                Preserve.all(PhotranVPG.BINDING_EDGE_TYPE));
-
-            createNewSubprogram();
-            vpg.commitChangesFromInMemoryASTs(fileInEditor);
-            preservation.checkForPreservation(status);
-
-            this.addChangeFromModifiedAST(this.fileInEditor, pm);
-        }
-        finally
-        {
-            vpg.releaseAllASTs();
-        }
+        if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Change
-    ///////////////////////////////////////////////////////////////////////////
+    @Override
+    protected Preserve getEdgesToPreserve()
+    {
+        return Preserve.all(PhotranVPG.BINDING_EDGE_TYPE);
+    }
 
     @Override
-    protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
+    protected void doTransform() throws PreconditionFailure
     {
+        assert newName != null;
+        assert enclosingScope != null;
+
+        createNewSubprogram();
     }
 
     // from ExtractProcedureRefactoring

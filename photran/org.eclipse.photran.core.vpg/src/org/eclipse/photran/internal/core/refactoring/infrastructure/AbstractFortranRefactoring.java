@@ -185,23 +185,24 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
 	protected static class ForwardingProgressMonitor implements IProgressMonitor
 	{
 	    private IProgressMonitor pm;
+	    private String prefix = "";
 
         public ForwardingProgressMonitor(IProgressMonitor pm)
         {
             this.pm = pm;
         }
 
-        public void beginTask(String name, int totalWork) { pm.beginTask(name, totalWork); }
-        public void done() { pm.done(); }
+        public void beginTask(String name, int totalWork) { pm.beginTask(name, totalWork); pm.setTaskName(name); prefix = name + " - "; }
+        public void done() { prefix = ""; pm.setTaskName(""); pm.done(); }
         public void internalWorked(double work) { pm.internalWorked(work); }
         public boolean isCanceled() { return pm.isCanceled(); }
         public void setCanceled(boolean value) { pm.setCanceled(value); }
-        public void setTaskName(String name) { pm.setTaskName(name); }
+        public void setTaskName(String name) { pm.setTaskName(prefix + name); }
         public void worked(int work) { pm.worked(work); }
 
         public void subTask(String name)
         {
-            pm.setTaskName(name);
+            pm.setTaskName(prefix + name);
         }
     }
 

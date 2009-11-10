@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubProgressMonitor;
 
 /**
  * Base class for a Virtual Program Graph.  <a href="../../../overview-summary.html#VPG">More Information</a>
@@ -419,17 +419,40 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	abstract public T findToken(R tokenRef);
 
     /** Forces the database to be updated based on the current in-memory AST for the given file. */
-    public void commitChangesFromInMemoryASTs(String... filenames)
+    public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, String... filenames)
     {
-        ArrayList<String> files = new ArrayList<String>(Arrays.asList(filenames));
-        for (String thisFile : sortFilesAccordingToDependencies(files, new NullProgressMonitor()))
+        List<String> files = new ArrayList<String>(Arrays.asList(filenames));
+        files = sortFilesAccordingToDependencies(files, pm);
+
+        pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Post-transform analysis:", files.size());
+        for (String thisFile : files)
+        {
+            pm.subTask(lastSegmentOfFilename(thisFile));
             doCommitChangeFromAST(thisFile);
+            pm.worked(1);
+        }
+        pm.done();
     }
 
     protected void doCommitChangeFromAST(String filename)
     {
         if (!isVirtualFile(filename))
+        {
             computeEdgesAndAnnotations(filename, acquireTransientAST(filename));
+        }
+    }
+
+    public static String lastSegmentOfFilename(String filename)
+    {
+        if (filename == null) return "";
+
+        int lastSlash = filename.lastIndexOf('/');
+        int lastBackslash = filename.lastIndexOf('\\');
+        if (lastSlash < 0 && lastBackslash < 0)
+            return filename;
+        else
+            return filename.substring(Math.max(lastSlash + 1, lastBackslash + 1));
     }
 
     /** @return source code for the given AST (which may have been modified), or <code>null</code>

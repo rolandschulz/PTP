@@ -453,8 +453,8 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     }
 
     /** Forces the database to be updated based on the current in-memory AST for the given file */
-    public void commitChangesFromInMemoryASTs(IFile file)
+    public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, IFile file)
     {
-        commitChangesFromInMemoryASTs(getFilenameForIFile(file));
+        commitChangesFromInMemoryASTs(pm, ticks, getFilenameForIFile(file));
     }
 }

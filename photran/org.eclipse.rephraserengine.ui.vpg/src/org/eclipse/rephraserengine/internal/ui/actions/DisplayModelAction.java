@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.rephraserengine.internal.core.preservation.Model;
 import org.eclipse.rephraserengine.ui.WorkbenchSelectionInfo;
@@ -45,7 +46,7 @@ public class DisplayModelAction extends VPGOutputWindowAction
                     String fileContents = readStream(lineMap, info.getFileInEditor().getContents(true));
                     ps.println(filename);
                     ps.println();
-                    Model model = new Model(vpg, filename);
+                    Model model = new Model("edge model", new NullProgressMonitor(), 0, vpg, filename);
                     ps.print(model.toString(filename, fileContents, lineMap));
                     return;
                 }
