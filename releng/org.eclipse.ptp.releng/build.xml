@@ -477,6 +477,9 @@
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.xlc"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.make.ui"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests"/>
 		</antcall>
 		<antcall target="tagone">

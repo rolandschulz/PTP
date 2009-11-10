@@ -120,6 +120,7 @@ plugin@org.eclipse.ptp.rdt.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:
 plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user
 plugin@org.eclipse.ptp.rdt.managedbuilder.xlc.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui
 plugin@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.xlc
+plugin@org.eclipse.ptp.rdt.make.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.make.ui
 
 
 ! ISP Plugins
