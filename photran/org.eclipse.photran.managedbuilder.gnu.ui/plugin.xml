@@ -558,6 +558,11 @@
           </outputType>
 	  </tool>
 
+      <!--
+        -
+        - GNU Fortran on Linux/*nix Project Type
+        -
+        -->
       <projectType
             isAbstract="false"
             isTest="false"
@@ -618,14 +623,14 @@
                           superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
-		  <tool
-		      id="photran.managedbuild.tool.gnu.fortran.linker.exe.debug"
-		      superClass="photran.managedbuild.tool.gnu.fortran.linker">
-		  </tool>
-		  <tool
-		      id="photran.managedbuild.tool.gnu.assembler.exe.debug"
-		      superClass="cdt.managedbuild.tool.gnu.assembler">
-		  </tool>
+		          <tool
+        		      id="photran.managedbuild.tool.gnu.fortran.linker.exe.debug"
+        		      superClass="photran.managedbuild.tool.gnu.fortran.linker">
+        		  </tool>
+        		  <tool
+        		      id="photran.managedbuild.tool.gnu.assembler.exe.debug"
+        		      superClass="cdt.managedbuild.tool.gnu.assembler">
+        		  </tool>
 	     </toolChain>
          </configuration>
          <configuration
@@ -687,15 +692,19 @@
                       id="photran.managedbuild.tool.gnu.fortran.linker.exe.release"
                       superClass="photran.managedbuild.tool.gnu.fortran.linker">
                   </tool>
-		  <tool
-			id="photran.managedbuild.tool.gnu.assembler.exe.release"
-			superClass="cdt.managedbuild.tool.gnu.assembler">
-	          </tool>
+        		  <tool
+        			id="photran.managedbuild.tool.gnu.assembler.exe.release"
+        			superClass="cdt.managedbuild.tool.gnu.assembler">
+    	          </tool>
                </toolChain>
          </configuration>
       </projectType>
 
-
+      <!--
+        -
+        - GNU Fortran on Mac OS X Project Type
+        -
+        -->
       <projectType
             name="%TargetName.gnu.fortran.macosx.exe"
             id="photran.managedbuild.target.gnu.fortran.macosx.exe"
@@ -756,14 +765,14 @@
                           superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
-		  <tool
-		      id="photran.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
-			  superClass="photran.managedbuild.tool.macosx.fortran.linker">
-		  </tool>
-		  <tool
-			  id="photran.managedbuild.tool.gnu.assembler.macosx.exe.debug"
-			  superClass="cdt.managedbuild.tool.gnu.assembler">
-		  </tool>
+        		  <tool
+        		      id="photran.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
+        			  superClass="photran.managedbuild.tool.macosx.fortran.linker">
+        		  </tool>
+        		  <tool
+        			  id="photran.managedbuild.tool.gnu.assembler.macosx.exe.debug"
+        			  superClass="cdt.managedbuild.tool.gnu.assembler">
+        		  </tool>
                </toolChain>
          </configuration>
          <configuration
@@ -833,7 +842,11 @@
          </configuration>
 	  </projectType>
 
-
+      <!--
+        -
+        - GNU Fortran on Windows Project Type
+        -
+        -->
       <projectType
             name="%TargetName.gnu.fortran.win32.exe"
             id="photran.managedbuild.target.gnu.fortran.win32.exe"
@@ -894,6 +907,14 @@
                           superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
+                  <tool
+                      id="photran.managedbuild.tool.gnu.fortran.linker.win32.exe.debug"
+                      superClass="photran.managedbuild.tool.gnu.fortran.linker">
+                  </tool>
+                  <tool
+                      id="photran.managedbuild.tool.gnu.assembler.win32.exe.debug"
+                      superClass="cdt.managedbuild.tool.gnu.assembler">
+                  </tool>
                </toolChain>
          </configuration>
          <configuration
@@ -950,6 +971,14 @@
                           defaultValue="gnu.fortran.debugging.level.none"
                           superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
+                   </tool>
+                   <tool
+                      id="photran.managedbuild.tool.gnu.fortran.linker.win32.exe.release"
+                      superClass="photran.managedbuild.tool.gnu.fortran.linker">
+                   </tool>
+                   <tool
+                      id="photran.managedbuild.tool.gnu.assembler.win32.exe.release"
+                      superClass="cdt.managedbuild.tool.gnu.assembler">
                    </tool>
                </toolChain>
          </configuration>
