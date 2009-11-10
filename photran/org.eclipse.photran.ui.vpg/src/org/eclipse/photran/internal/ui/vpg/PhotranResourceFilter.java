@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.rephraserengine.core.IResourceFilter;
+import org.eclipse.rephraserengine.core.resources.IResourceFilter;
 
 /**
  * A resource filter that only matches accessible Fortran source files and Fortran/C/C++ projects

@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
-import org.eclipse.rephraserengine.core.IResourceFilter;
+import org.eclipse.rephraserengine.core.resources.IResourceFilter;
 
 /**
  * Resource filter that accepts any kind of text file (but not binaries) in any project or folder,

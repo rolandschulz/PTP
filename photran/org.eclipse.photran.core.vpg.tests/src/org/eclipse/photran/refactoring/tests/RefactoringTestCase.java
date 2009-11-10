@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.util.Spawner;
 
 public abstract class RefactoringTestCase extends BaseTestFramework
 {
@@ -209,47 +210,12 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         }
 
         System.out.println(toString(args));
+        String output = Spawner.run(project.getLocation().toFile(), args);
 
-        ProcessBuilder builder = new ProcessBuilder(args);
-        builder.directory(project.getLocation().toFile());
-        builder.redirectErrorStream(true);
-        Process process = builder.start();
-        ConcurrentReader output = new ConcurrentReader(process.getInputStream());
-        synchronized (output)
-        {
-            output.start();
-            int exitCode = process.waitFor();
-            if (exitCode != 0)
-                fail("Compilation exited abnormally with exit code " + exitCode + "\n" + output.toString());
-            waitFor(output);
-        }
+        System.out.println(exe);
+        String output2 = Spawner.run(project.getLocation().toFile(), exe);
 
-        builder = new ProcessBuilder(exe);
-        builder.directory(project.getLocation().toFile());
-        builder.redirectErrorStream(true);
-        process = builder.start();
-        ConcurrentReader output2 = new ConcurrentReader(process.getInputStream());
-        synchronized (output2)
-        {
-            output2.start();
-            int exitCode = process.waitFor();
-            if (exitCode != 0)
-                fail("Compilation succeeded, but execution exited abnormally with exit code " + exitCode + "\n" + output.toString() + "\n" + output2.toString());
-            waitFor(output2);
-        }
-
-        return output.toString() + "\n" + output2.toString();
-    }
-
-    private void waitFor(ConcurrentReader output)
-    {
-        try
-        {
-            output.wait();
-        }
-        catch (InterruptedException e)
-        {
-        }
+        return output + "\n" + output2;
     }
 
     private String toString(ArrayList<String> args)
@@ -258,56 +224,5 @@ public abstract class RefactoringTestCase extends BaseTestFramework
         for (int i = 0; i < args.size(); i++)
             sb.append((i == 0 ? "" : " ") + args.get(i));
         return sb.toString();
-    }
-
-    private static class ConcurrentReader extends Thread
-    {
-        private InputStream stdout;
-        private StringBuilder sb;
-
-        public ConcurrentReader(InputStream stdout)
-        {
-            this.stdout = stdout;
-            this.sb = new StringBuilder();
-        }
-
-        @Override public void run()
-        {
-            BufferedReader in = new BufferedReader(new InputStreamReader(stdout));
-            try
-            {
-                for (String line = in.readLine(); line != null; line = in.readLine())
-                {
-                    sb.append(line);
-                    sb.append('\n');
-                }
-                done();
-            }
-            catch (IOException e)
-            {
-                sb.append(e.toString());
-            }
-            finally
-            {
-                try
-                {
-                    in.close();
-                }
-                catch (IOException e)
-                {
-                    sb.append(e.toString());
-                }
-            }
-        }
-
-        private synchronized void done()
-        {
-            notifyAll();
-        }
-
-        @Override public String toString()
-        {
-            return sb.toString();
-        }
     }
 }
