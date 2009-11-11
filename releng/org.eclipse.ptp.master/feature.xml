@@ -86,15 +86,15 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.perf"
+         id="org.eclipse.ptp.etfw"
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.perf.tau"
+         id="org.eclipse.ptp.etfw.tau"
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.perf.tau.fortran"
+         id="org.eclipse.ptp.etfw.tau.fortran"
          version="0.0.0"/>
 
    <includes
