@@ -10,16 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests.parser;
 
-import java.io.ByteArrayInputStream;
-
 import junit.framework.TestCase;
-
-import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
-import org.eclipse.photran.internal.core.lexer.Terminal;
-import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
-import org.eclipse.photran.internal.core.parser.Parser;
 
 /**
  * These are meant to be used as performance tests.  When this one of the test methods in this class is run standalone with
@@ -31,7 +22,7 @@ import org.eclipse.photran.internal.core.parser.Parser;
  */
 public class HugeFile extends TestCase
 {
-    private String hugeFile = null;
+//    private String hugeFile = null;
     
     public void test() { /* Uncomment below */ }
     
