@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.perf.tau"
+      id="org.eclipse.ptp.etfw.tau"
       label="%featureName"
       version="3.0.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.perf.tau">
+      plugin="org.eclipse.ptp.etfw.tau">
 
    <description url="http://www.cs.uoregon.edu/research/tau/home.php">
       %description
@@ -29,8 +29,8 @@
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.ptp.perf.toolopts"/>
-      <import plugin="org.eclipse.ptp.perf"/>
+      <import plugin="org.eclipse.ptp.etfw.toolopts"/>
+      <import plugin="org.eclipse.ptp.etfw"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.jface.text"/>
@@ -42,41 +42,41 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.perf.tau"
+         id="org.eclipse.ptp.etfw.tau"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.tau.jars"
+         id="org.eclipse.ptp.etfw.tau.jars"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.tau.papiselect"
+         id="org.eclipse.ptp.etfw.tau.papiselect"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.tau.papitest"
+         id="org.eclipse.ptp.etfw.tau.papitest"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.tau.perfdmf"
+         id="org.eclipse.ptp.etfw.tau.perfdmf"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.tau.selinst"
+         id="org.eclipse.ptp.etfw.tau.selinst"
          download-size="0"
          install-size="0"
          version="0.0.0"

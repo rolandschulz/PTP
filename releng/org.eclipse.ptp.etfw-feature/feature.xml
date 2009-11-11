@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.perf"
+      id="org.eclipse.ptp.etfw"
       label="%featureName"
       version="3.0.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.perf">
+      plugin="org.eclipse.ptp.etfw">
 
    <description>
       %description
@@ -36,20 +36,20 @@
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.launch"/>
       <import plugin="org.eclipse.ptp.debug.core"/>
-      <import plugin="org.eclipse.ptp.perf" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.etfw" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.ide" version="3.5.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.perf"
+         id="org.eclipse.ptp.etfw"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.parallel"
+         id="org.eclipse.ptp.etfw.parallel"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -57,7 +57,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.perf.toolopts"
+         id="org.eclipse.ptp.etfw.toolopts"
          download-size="0"
          install-size="0"
          version="0.0.0"
