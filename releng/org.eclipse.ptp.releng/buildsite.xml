@@ -54,10 +54,10 @@
    <feature url="features/org.eclipse.ptp.pldt.upc_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.pldt.upc" version="3.0.0.@timeStamp@">
       <category name="Parallel Tools Platform 3.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.perf_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.perf" version="3.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.etfw_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw" version="3.0.0.@timeStamp@">
       <category name="Parallel Tools Platform 3.0"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.perf.tau_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.perf.tau" version="3.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.etfw.tau_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau" version="3.0.0.@timeStamp@">
       <category name="Parallel Tools Platform 3.0"/>
    </feature>
    <feature url="features/org.eclipse.ptp.isp_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.isp" version="3.0.0.@timeStamp@">
