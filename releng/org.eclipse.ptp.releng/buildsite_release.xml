@@ -55,10 +55,10 @@
 	<feature id="org.eclipse.ptp.pldt.upc" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.pldt.upc_3.0.0.@timeStamp@.jar&amp;r=1" version="3.0.0.@timeStamp@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature id="org.eclipse.ptp.perf" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.perf_3.0.0.@timeStamp@.jar&amp;r=1" version="3.0.0.@timeStamp@">
+	<feature id="org.eclipse.ptp.etfw" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.etfw_3.0.0.@timeStamp@.jar&amp;r=1" version="3.0.0.@timeStamp@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
-	<feature id="org.eclipse.ptp.perf.tau" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.perf.tau_3.0.0.@timeStamp@.jar&amp;r=1" version="3.0.0.@timeStamp@">
+	<feature id="org.eclipse.ptp.etfw.tau" url="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/releases/galileo/features/org.eclipse.ptp.etfw.tau_3.0.0.@timeStamp@.jar&amp;r=1" version="3.0.0.@timeStamp@">
 		<category name="Parallel Tools Platform 3.0"/>
 	</feature>
 		<feature id="org.eclipse.ptp.isp" url="features/org.eclipse.ptp.isp_3.0.0.@timeStamp@.jar" version="3.0.0.@timeStamp@">

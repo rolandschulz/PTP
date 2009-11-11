@@ -23,9 +23,9 @@ FEATURES="\
 	org.eclipse.ptp.core-feature \
 	org.eclipse.ptp.external-feature \
 	org.eclipse.ptp.master \
-	org.eclipse.ptp.perf-feature \
-	org.eclipse.ptp.perf.tau-feature \
-	org.eclipse.ptp.perf.tau.fortran-feature \
+	org.eclipse.ptp.etfw-feature \
+	org.eclipse.ptp.etfw.tau-feature \
+	org.eclipse.ptp.etfw.tau.fortran-feature \
 	org.eclipse.ptp.pldt-feature \
 	org.eclipse.ptp.pldt.lapi-feature \
 	org.eclipse.ptp.pldt.upc-feature \

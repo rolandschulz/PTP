@@ -101,7 +101,7 @@
 	<replace dir="${buildDirectory}/plugins" value="${timestamp}" token="@build@">
 		<include name="**/about.mappings" />
 	</replace>
-	<unzip src="${tauJars}" dest="${buildDirectory}/plugins/org.eclipse.ptp.perf.tau.jars"/>
+	<unzip src="${tauJars}" dest="${buildDirectory}/plugins/org.eclipse.ptp.etfw.tau.jars"/>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc/BUILD">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
