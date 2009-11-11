@@ -77,6 +77,7 @@ public class ToolParser extends DefaultHandler{
 	private static final String OPTIONPANE = "optionpane";
 	private static final String TOGOPT = "togoption";
 	private static final String LABEL = "label";
+	private static final String ID = "optid";
 	private static final String TIP = "tooltip";
 	private static final String NAME = "optname";
 	private static final String VALUE = "optvalue";
@@ -455,6 +456,10 @@ public class ToolParser extends DefaultHandler{
 			
 			actOpt.optLabel=getAttribute(LABEL, atts);
 			actOpt.optName=getAttribute(NAME,atts);
+			actOpt.optID=getAttribute(ID,atts);
+			if(actOpt.optID==null){
+				actOpt.optID=actOpt.optName;
+			}
 			actOpt.toolTip=getAttribute(TIP,atts);
 			actOpt.defState=getBooleanAttribute(DEFSTATE,false,atts);
 			actOpt.required=getBooleanAttribute(REQUIRED,false,atts);

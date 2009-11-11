@@ -95,7 +95,7 @@ public class ToolMaker {
 		{
 			return null;
 		}
-		upname = paneID+toolopt.optName.toUpperCase();
+		upname = paneID+toolopt.optID.toUpperCase();
 
 		toolopt.confArgString=upname+ToolsOptionsConstants.TOOL_CONFIG_ARGUMENT_SUFFIX;
 		toolopt.confStateString=upname+ToolsOptionsConstants.TOOL_CONFIG_STATE_SUFFIX;

@@ -76,6 +76,8 @@ public class ToolOption {
 	 */
 	protected String optName;
 	
+	protected String optID;
+	
 	/**
 	 * The default value for the argument, if any
 	 */
@@ -185,6 +187,10 @@ public class ToolOption {
 	
 	public String getName(){
 		return optName;
+	}
+	
+	public String getID(){
+		return optID;
 	}
 	
 	public boolean getSelected(){

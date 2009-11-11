@@ -199,6 +199,8 @@ public class ToolPane implements IAppInput {
 	public void OptUpdate() {
 
 		optString = new StringBuffer(this.prependOpts).append(this.encloseOpts);
+		varMap = new LinkedHashMap<String,String>();
+		
 		for (int i = 0; i < options.length; i++) {
 			if (options[i].unitCheck == null || options[i].unitCheck.getSelection()) {
 				
@@ -219,8 +221,6 @@ public class ToolPane implements IAppInput {
 						
 						if(useField){
 							varMap.put(options[i].optName,text);
-						}else{
-							varMap.remove(options[i].optName);
 						}
 					}else{
 						if(options[i].type==ToolOption.TOGGLE){
@@ -244,9 +244,6 @@ public class ToolPane implements IAppInput {
 					if(options[i].setOff!=null)
 					{
 						varMap.put(options[i].optName,options[i].setOff);
-					}
-					else{
-						varMap.remove(options[i].optName);
 					}
 				}
 			}
@@ -404,9 +401,9 @@ public class ToolPane implements IAppInput {
 		return varMap;
 	}
 
-	public ToolOption getOption(String optName) {
+	public ToolOption getOption(String optID) {
 		for (int i = 0; i < options.length; i++) {
-			if (options[i].getName().equals(optName)) {
+			if (options[i].getID().equals(optID)) {
 				return options[i];
 			}
 		}
@@ -439,6 +436,10 @@ public class ToolPane implements IAppInput {
 	// toptions.toArray(options);
 	// }
 
+	private ToolPane(){
+		this.virtual=false;
+	}
+	
 	protected ToolPane(boolean virtual) {
 		this.virtual = virtual;
 		if (!virtual) {
@@ -448,4 +449,6 @@ public class ToolPane implements IAppInput {
 			varMap = new LinkedHashMap<String,String>();
 		}
 	}
+	
+
 }
