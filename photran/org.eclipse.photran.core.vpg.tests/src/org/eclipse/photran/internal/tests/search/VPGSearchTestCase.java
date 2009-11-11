@@ -41,7 +41,6 @@ public class VPGSearchTestCase extends BaseTestFramework
 
     public VPGSearchTestCase() {;}  // when JUnit invokes a subclass outside a test suite
 
-
     public VPGSearchTestCase(String searchString, int searchFlags,
         ArrayList<Match> matches, boolean isRegex)
     {
@@ -52,12 +51,11 @@ public class VPGSearchTestCase extends BaseTestFramework
         this.matches = new ArrayList<VPGSearchMatch>(matches.size());
         scope = new ArrayList<IResource>();
         initMatches = matches;
-
-
     }
 
 
-    private IFile getFile(String filename) throws Exception {
+    private IFile getFile(String filename) throws Exception
+    {
         Scanner sc = new Scanner(Activator.getDefault().getBundle().getResource(DIR + "/" + filename).openStream());
         sc.useDelimiter("\\A");
         String contents = sc.next();
@@ -66,25 +64,28 @@ public class VPGSearchTestCase extends BaseTestFramework
     }
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         if (searchString == null) return; // when JUnit invokes this outside a test suite
         super.setUp();
+
         convertMatches();
         createProject();
     }
 
-    private void convertMatches() throws Exception {
+    private void convertMatches() throws Exception
+    {
         for (Match m : initMatches)
         {
             IFile file = getFile((String)(m.getElement()));
             matches.add(new VPGSearchMatch(file, m.getOffset(), m.getLength()));
-
-
         }
     }
 
-    private void createProject(){
-        try{
+    private void createProject()
+    {
+        try
+        {
             scope.add(getFile("foo.f90"));
             scope.add(getFile("implicitTest.f90"));
         } catch (Exception e){
@@ -92,24 +93,24 @@ public class VPGSearchTestCase extends BaseTestFramework
         }
     }
 
-    private ReferenceSearchResult runQuery(VPGSearchQuery job){
-
+    private ReferenceSearchResult runQuery(VPGSearchQuery job)
+    {
         final ISearchResult result[]= new ISearchResult[1];
 
-        IQueryListener listener= new IQueryListener() {
+        IQueryListener listener= new IQueryListener()
+        {
             public void queryAdded(ISearchQuery query) {}
-            public void queryFinished(ISearchQuery query) {
-                result[0]= query.getSearchResult();
-            }
+            public void queryFinished(ISearchQuery query) { result[0]= query.getSearchResult(); }
             public void queryRemoved(ISearchQuery query) {}
             public void queryStarting(ISearchQuery query) {}
         };
 
         NewSearchUI.addQueryListener(listener);
-        NewSearchUI.runQueryInForeground(new IRunnableContext() {
-            public void run(boolean fork, boolean cancelable,
-                    IRunnableWithProgress runnable)
-                    throws InvocationTargetException, InterruptedException {
+        NewSearchUI.runQueryInForeground(new IRunnableContext()
+        {
+            public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable)
+                throws InvocationTargetException, InterruptedException
+            {
                 runnable.run(pm);
             }
         }, job);
@@ -127,13 +128,14 @@ public class VPGSearchTestCase extends BaseTestFramework
 
         ReferenceSearchResult res = runQuery(job);
         int count = 0;
-        for(Object obj : res.getElements()) {
-            for (Match m : res.getMatches(obj)) {
+        for (Object obj : res.getElements())
+        {
+            for (Match m : res.getMatches(obj))
+            {
                 if (matches.contains((VPGSearchMatch)m))
                 {
                     count++;
                 }
-
             }
         }
         assertEquals(matches.size(),count);
