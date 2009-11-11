@@ -137,6 +137,5 @@ fragment@org.eclipse.ptp.macosx.x86=@ptpTag@,:pserver:anonymous@dev.eclipse.org:
 fragment@org.eclipse.ptp.etfw.parallel=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.parallel
 
 ! Tests
-plugin@org.eclipse.ptp.etfw.tau.papitest=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.papitest
 plugin@org.eclipse.ptp.rdt.core.tests=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests
 
