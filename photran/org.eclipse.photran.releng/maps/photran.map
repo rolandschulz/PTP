@@ -5,6 +5,7 @@ feature@org.eclipse.photran.master=@photranTag@,:pserver:anonymous@dev.eclipse.o
 feature@org.eclipse.photran=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran-feature
 feature@org.eclipse.photran.xlf=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature
 feature@org.eclipse.photran.intel=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.intel-feature
+feature@org.eclipse.rephraserengine=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine-feature
 
 ! Plugins
 plugin@org.eclipse.photran.core=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.core

@@ -43,6 +43,7 @@
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.cdt.debug.ui"/>
       <import feature="org.eclipse.cdt" version="6.0.0" match="compatible"/>
+      <import feature="org.eclipse.rephraserengine" version="1.0.0" match="compatible"/>
    </requires>
 
    <plugin
@@ -99,48 +100,6 @@
 
    <plugin
          id="org.eclipse.photran.ui.vpg"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rephraserengine.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rephraserengine.core.refactoring"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rephraserengine.core.vpg"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rephraserengine.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rephraserengine.ui.refactoring"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.rephraserengine.ui.vpg"
          download-size="0"
          install-size="0"
          version="0.0.0"
