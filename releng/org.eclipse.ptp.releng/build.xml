@@ -426,28 +426,28 @@
 			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau.jars"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.jars"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau.papiselect"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.papiselect"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau.perfdmf"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.perfdmf"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau.selinst"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinst"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau.selinstfort"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinstfort"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.toolopts"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.toolopts"/>
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.feedback"/>
@@ -507,10 +507,10 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.macosx.x86"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.parallel"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.parallel"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/perf/org.eclipse.ptp.etfw.tau.papitest"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.papitest"/>
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.services.core"/>
