@@ -62,7 +62,6 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau,org.eclipse.ptp.etfw.tau"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.jars,org.eclipse.ptp.etfw.tau.jars"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.papiselect,org.eclipse.ptp.etfw.tau.papiselect"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.papitest,org.eclipse.ptp.etfw.tau.papitest"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.perfdmf,org.eclipse.ptp.etfw.tau.perfdmf"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinst,org.eclipse.ptp.etfw.tau.selinst"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinstfort,org.eclipse.ptp.etfw.tau.selinstfort"/>
