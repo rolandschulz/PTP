@@ -112,9 +112,17 @@ public final class OffsetLength
     }
 
     /** @return true iff both the offset and length are equal to those of the supplied <code>OffsetLength</code> */
-    public boolean equals(OffsetLength other)
+    public boolean equals(Object o)
     {
+        if (o == null || !this.getClass().equals(o.getClass())) return false;
+
+        OffsetLength other = (OffsetLength)o;
         return this.offset == other.offset && this.length == other.length;
+    }
+
+    public int hashCode()
+    {
+        return 19 * offset + length;
     }
 
     /** @return true iff this offset is greater than or equal to the target offset */
