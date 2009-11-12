@@ -19,9 +19,9 @@ import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
-import org.eclipse.ptp.remotetools.core.IRemotePortForwardingTools;
 import org.eclipse.ptp.remotetools.core.IRemoteOperation;
 import org.eclipse.ptp.remotetools.core.IRemotePathTools;
+import org.eclipse.ptp.remotetools.core.IRemotePortForwardingTools;
 import org.eclipse.ptp.remotetools.core.IRemoteStatusTools;
 import org.eclipse.ptp.remotetools.core.IRemoteTunnel;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -37,12 +37,12 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	/**
 	 * Tunnels created by this manager.
 	 */
-	Set tunnels = new HashSet();
+	Set<IRemoteTunnel> tunnels = new HashSet<IRemoteTunnel>();
 
 	/**
 	 * Remote executions created by this manager.
 	 */
-	Set executions = new HashSet();
+	Set<IRemoteOperation> executions = new HashSet<IRemoteOperation>();
 	
 	/**
 	 * Connection created the execution manager.
@@ -128,9 +128,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		 * logic how to cancel. This simply broadcasts the cancel to
 		 * all running operations.
 		 */
-		Iterator operationEnum = executions.iterator();
-		while (operationEnum.hasNext()) {
-			IRemoteOperation operation = (IRemoteOperation) operationEnum.next();
+		for (IRemoteOperation operation : executions) {
 			operation.cancel();
 		}
 		cancelFlag = true;
@@ -158,8 +156,8 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		 * Close all tunnels.
 		 */
 		while (tunnels.size() > 0) {
-			Iterator iterator = tunnels.iterator();
-			IRemoteTunnel tunnel = (IRemoteTunnel) iterator.next();
+			Iterator<IRemoteTunnel> iterator = tunnels.iterator();
+			IRemoteTunnel tunnel = iterator.next();
 			try {
 				// releaseTunnel() already removes the entry from the list.
 				releaseTunnel(tunnel);
@@ -167,14 +165,12 @@ public class ExecutionManager implements IRemoteExecutionManager {
 			}
 		}
 		tunnels = null;
-		connection.forwardingPool.disconnect(this);
+		connection.getForwardingPool().disconnect(this);
 		
 		/*
 		 * Close all channels for remote executions.
 		 */
-		Iterator iterator = executions.iterator();
-		while (iterator.hasNext()) {
-			IRemoteOperation operation = (IRemoteOperation) iterator.next();
+		for (IRemoteOperation operation : executions) {
 			operation.close();
 		}
 		executions.clear();

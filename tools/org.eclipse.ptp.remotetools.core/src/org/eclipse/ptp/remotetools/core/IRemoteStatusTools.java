@@ -27,24 +27,6 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
  */
 public interface IRemoteStatusTools {
 	/**
-	 * Verifies if the given address is being used in the remote host.
-	 * 
-	 * @param addr Address that will be checked
-	 * @return True if the address is being used, false otherwise.
-	 */
-//	 TODO: Create this method
-	//public boolean checkRemoteAddressUse(InetAddress addr);
-	
-	/**
-	 * Verifies if the given mac address is being used in the remote host.
-	 * 
-	 * @param macAddr Mac address to be checked
-	 * @return True if the mac address is in use, false otherwise.
-	 */
-	// TODO: Create this method
-	//public boolean checkRemoteMacAddressUse(MacAddress macAddr);
-	
-	/**
 	 * TCP protocol identification constant
 	 */
 	public static final int PROTO_TCP = 0;
@@ -66,7 +48,7 @@ public interface IRemoteStatusTools {
 	 * @throws RemoteOperationException 
 	 * @throws CancelException 
 	 */
-	public Set getRemotePortsInUse(int protocol) throws RemoteConnectionException, RemoteOperationException, CancelException;
+	public Set<Integer> getRemotePortsInUse(int protocol) throws RemoteConnectionException, RemoteOperationException, CancelException;
 
 	/**
 	 * Return the username of the user who logged into the system.
@@ -96,7 +78,7 @@ public interface IRemoteStatusTools {
 	 * @throws RemoteOperationException 
 	 * @throws RemoteConnectionException 
 	 */
-	public Set getGroupIDSet() throws RemoteConnectionException, RemoteOperationException, CancelException;
+	public Set<Integer> getGroupIDSet() throws RemoteConnectionException, RemoteOperationException, CancelException;
 	
 	public long getTime() throws RemoteConnectionException, RemoteOperationException, CancelException;
 	/*

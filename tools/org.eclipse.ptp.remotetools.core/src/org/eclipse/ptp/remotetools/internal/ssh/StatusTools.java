@@ -14,7 +14,6 @@ package org.eclipse.ptp.remotetools.internal.ssh;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +25,6 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
-import org.eclipse.ptp.remotetools.utils.network.MacAddress;
 
 
 /**
@@ -36,8 +34,8 @@ import org.eclipse.ptp.remotetools.utils.network.MacAddress;
  *
  */
 public class StatusTools implements IRemoteStatusTools {
-	ExecutionManager manager;
-	UserInformation userInfoCache;
+	private ExecutionManager manager;
+	private UserInformation userInfoCache;
 	
 	/**
 	 * This class is responsible for caching information that is "stable" enough to be stored and retrieved
@@ -47,37 +45,46 @@ public class StatusTools implements IRemoteStatusTools {
 	 *
 	 */
 	class UserInformation {
-		Integer userID;
-		Set groupIDSet;
-		String username;
+		private Integer userID;
+		private Set<Integer> groupIDSet;
+		private String username;
 		
-		public UserInformation(Integer userID, Set groupIDSet, String username) {
+		public UserInformation(Integer userID, Set<Integer> groupIDSet, String username) {
 			this.userID = userID;
 			this.groupIDSet = groupIDSet;
 			this.username = username;
 		}
-		
-		
+
+		/**
+		 * @return the userID
+		 */
+		public Integer getUserID() {
+			return userID;
+		}
+
+		/**
+		 * @return the groupIDSet
+		 */
+		public Set<Integer> getGroupIDSet() {
+			return groupIDSet;
+		}
+
+		/**
+		 * @return the username
+		 */
+		public String getUsername() {
+			return username;
+		}
 	}
 	
 	protected StatusTools(ExecutionManager manager) {
 		this.manager = manager;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteStatusTools#checkRemoteAddressUse(java.net.InetAddress)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteStatusTools#getRemotePortsInUse(int)
 	 */
-	public boolean checkRemoteAddressUse(InetAddress addr) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean checkRemoteMacAddressUse(MacAddress macAddr) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public Set getRemotePortsInUse(int protocol) throws RemoteConnectionException, RemoteOperationException, CancelException {
+	public Set<Integer> getRemotePortsInUse(int protocol) throws RemoteConnectionException, RemoteOperationException, CancelException {
 		// Uses the following shell script to get a list of used ports in the
 		// remote host:
 		// cat /proc/net/<transport protocol>
@@ -86,7 +93,7 @@ public class StatusTools implements IRemoteStatusTools {
 		// cat /proc/net/tcp | tail -n +2 | sed -r 's/^\s+//g' | cut -d ' ' -f 2 | cut -d ':' -f 2
 
 		
-		HashSet portSet = new HashSet(); 
+		HashSet<Integer> portSet = new HashSet<Integer>(); 
 		String protoStr = null, protoStr6 = null;
 		if(protocol == IRemoteStatusTools.PROTO_UDP) {
 			protoStr = "cat /proc/net/udp"; //$NON-NLS-1$
@@ -152,12 +159,12 @@ public class StatusTools implements IRemoteStatusTools {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteStatusTools#getGroupIDSet()
 	 */
-	public Set getGroupIDSet() throws RemoteConnectionException, RemoteOperationException, CancelException {
+	public Set<Integer> getGroupIDSet() throws RemoteConnectionException, RemoteOperationException, CancelException {
 //		 If there's already information on cache, use it
 		if(userInfoCache == null) {
 			userInfoCache = fetchRemoteUserInfo();
 		}			
-		return userInfoCache.groupIDSet;
+		return userInfoCache.getGroupIDSet();
 	}
 
 	/**
@@ -170,11 +177,11 @@ public class StatusTools implements IRemoteStatusTools {
 	 * @throws RemoteOperationException
 	 * @throws CancelException
 	 */
-	private Set getGroupIDSet_CatBased() throws RemoteConnectionException, RemoteOperationException, CancelException {
+	private Set<Integer> getGroupIDSet_CatBased() throws RemoteConnectionException, RemoteOperationException, CancelException {
 		String [] passwdFields = getPasswdFields(); 
 		String username = passwdFields[PASSWD_USERNAME_FIELD].trim();
 		String strPasswdGroupID = passwdFields[PASSWD_GROUPID_FIELD].trim();
-		Set groupIDSet = new HashSet();
+		Set<Integer> groupIDSet = new HashSet<Integer>();
 		
 		// Put the the group from the passd file into the list (if not blank)
 		if(!strPasswdGroupID.trim().equals("")) { //$NON-NLS-1$
@@ -232,7 +239,7 @@ public class StatusTools implements IRemoteStatusTools {
 		if(userInfoCache == null) {
 			userInfoCache = fetchRemoteUserInfo();
 		}			
-		return userInfoCache.userID.intValue();
+		return userInfoCache.getUserID().intValue();
 	}
 	
 	/**
@@ -292,7 +299,7 @@ public class StatusTools implements IRemoteStatusTools {
 		if(userInfoCache == null) {
 			userInfoCache = fetchRemoteUserInfo();
 		}			
-		return userInfoCache.username;
+		return userInfoCache.getUsername();
 	}
 	
 	/**
@@ -331,19 +338,19 @@ public class StatusTools implements IRemoteStatusTools {
 		
 		try {
 			IRemoteCopyTools ct = manager.getRemoteCopyTools();
-			downloadExecution = ct.executeDownload("/etc/group");
+			downloadExecution = ct.executeDownload("/etc/group"); //$NON-NLS-1$
 			BufferedReader etcGroupFile = new BufferedReader(new InputStreamReader(downloadExecution.getInputStreamFromProcessRemoteFile() ));
 			
 			String line = etcGroupFile.readLine();
 
 			while (line != null) {
-				String[] fields = line.split(":");
+				String[] fields = line.split(":"); //$NON-NLS-1$
 
 				if (fields[0].trim().compareTo(username) == 0) {
 					groupList.add(new Integer(fields[2]));
 				} else if (fields.length == 4) {
 
-					String[] users = fields[3].split(",");
+					String[] users = fields[3].split(","); //$NON-NLS-1$
 					for (int i = 0; i < users.length; i++) {
 
 						if (users[i].trim().compareTo(username) == 0) {
@@ -391,16 +398,16 @@ public class StatusTools implements IRemoteStatusTools {
 			
 			IRemoteExecutionTools remExecTools = manager.getExecutionTools();
 			// Execute command to return the username, uid and the group list
-			String rawUserInfo = remExecTools.executeWithOutput("echo `id -un`:`id -u`:`id -G`");
+			String rawUserInfo = remExecTools.executeWithOutput("echo `id -un`:`id -u`:`id -G`"); //$NON-NLS-1$
 			
-			String [] userInfoFields = rawUserInfo.trim().split(":", -1); // 1st username, 2nd UID, 3rd list of groups
+			String [] userInfoFields = rawUserInfo.trim().split(":", -1);  //$NON-NLS-1$
 			
 			//With systems using BusyBox, id has no argument -G
 			//so we must parse /etc/group in this case
-			if (userInfoFields[2].trim().equalsIgnoreCase("")) {
+			if (userInfoFields[2].trim().equalsIgnoreCase("")) { //$NON-NLS-1$
 				groupList = readGroupList(userInfoFields[0]);
 			} else {
-				String[] groupFields = userInfoFields[2].split(" ", -1);
+				String[] groupFields = userInfoFields[2].split(" ", -1); //$NON-NLS-1$
 
 				groupList = new HashSet<Integer>();
 
@@ -419,7 +426,7 @@ public class StatusTools implements IRemoteStatusTools {
 	public long getTime() throws RemoteConnectionException, RemoteOperationException, CancelException {
 		try {
 			IRemoteExecutionTools execTools = manager.getExecutionTools();
-			String rawData = execTools.executeWithOutput("date +'%s'");
+			String rawData = execTools.executeWithOutput("date +'%s'"); //$NON-NLS-1$
 			rawData = rawData.trim();
 			return Long.parseLong(rawData)*1000;
 		} catch (RemoteExecutionException e) {

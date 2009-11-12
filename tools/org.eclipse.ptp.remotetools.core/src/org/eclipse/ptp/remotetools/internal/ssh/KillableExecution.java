@@ -46,7 +46,7 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 			getExecutionManager().getConnection().registerObservedExecution(this);
 			channel.connect();
 		} catch (JSchException e) {
-			throw new RemoteConnectionException(Messages.KillableExecution_ScriptExecutionConnectionException, e);
+			throw new RemoteConnectionException(e.getLocalizedMessage());
 		}
 	}
 
