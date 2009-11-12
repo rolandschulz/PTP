@@ -40,7 +40,8 @@ import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Epsilo
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Rho;
 
 /**
- * Analysis that checks for preservation of semantic edges in a program graph.
+ * Checks for preservation of semantic edges in a program graph modulo a sequence of primitive
+ * transformations.
  *
  * @author Jeff Overbey
  *
@@ -58,30 +59,38 @@ public final class PreservationAnalysis
     private PrimitiveOpList primitiveOps;
     private Set<PreservationRule> preserveEdgeTypes;
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, IFile file, PreservationRule... edgeTypes)
+    public PreservationAnalysis(
+        EclipseVPG vpg,
+        IProgressMonitor progressMonitor, int ticks,
+        IFile file,
+        PreservationRule... edgeTypes)
     {
         this(vpg, progressMonitor, ticks, EclipseVPG.getFilenameForIFile(file), edgeTypes);
     }
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, Collection<IFile> files, PreservationRule... edgeTypes)
+    public PreservationAnalysis(
+        EclipseVPG vpg,
+        IProgressMonitor progressMonitor, int ticks,
+        Collection<IFile> files,
+        PreservationRule... edgeTypes)
     {
         this(vpg, progressMonitor, ticks, getFilenames(files), edgeTypes);
     }
 
-    private static List<String> getFilenames(Collection<IFile> files)
-    {
-        List<String> result = new ArrayList<String>(files.size());
-        for (IFile file : files)
-            result.add(EclipseVPG.getFilenameForIFile(file));
-        return result;
-    }
-
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, String filename, PreservationRule... edgeTypes)
+    public PreservationAnalysis(
+        EclipseVPG vpg,
+        IProgressMonitor progressMonitor, int ticks,
+        String filename,
+        PreservationRule... edgeTypes)
     {
         this(vpg, progressMonitor, ticks, Collections.singletonList(filename), edgeTypes);
     }
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, List<String> filenames, PreservationRule... edgeTypes)
+    public PreservationAnalysis(
+        EclipseVPG vpg,
+        IProgressMonitor progressMonitor, int ticks,
+        List<String> filenames,
+        PreservationRule... edgeTypes)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
@@ -97,6 +106,14 @@ public final class PreservationAnalysis
         ensureDatabaseIsInHypotheticalMode();
 
         this.initialModel = new Model("initial model", progressMonitor, ticks, vpg, filenames);
+    }
+
+    private static List<String> getFilenames(Collection<IFile> files)
+    {
+        List<String> result = new ArrayList<String>(files.size());
+        for (IFile file : files)
+            result.add(EclipseVPG.getFilenameForIFile(file));
+        return result;
     }
 
     private void ensureDatabaseIsInHypotheticalMode() throws Error
@@ -166,7 +183,9 @@ public final class PreservationAnalysis
         return primitiveOps.toString();
     }
 
-    public void checkForPreservation(RefactoringStatus status, IProgressMonitor progressMonitor, int ticks)
+    public void checkForPreservation(
+        RefactoringStatus status,
+        IProgressMonitor progressMonitor, int ticks)
     {
         printDebug("INITIAL MODEL", initialModel);
         printDebug("NORMALIZING RELATIVE TO", primitiveOps);
@@ -175,7 +194,11 @@ public final class PreservationAnalysis
         printDebug("NORMALIZED INITIAL MODEL", initialModel);
 
         printDebug("File ordering:", initialModel.getFiles());
-        Model derivativeModel = new Model("derivative model", progressMonitor, ticks+3, vpg, initialModel.getFiles());
+        Model derivativeModel = new Model(
+            "derivative model",
+            progressMonitor, ticks+3,
+            vpg,
+            initialModel.getFiles());
         printDebug("DERIVATIVE MODEL", derivativeModel);
 
         derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes, progressMonitor);

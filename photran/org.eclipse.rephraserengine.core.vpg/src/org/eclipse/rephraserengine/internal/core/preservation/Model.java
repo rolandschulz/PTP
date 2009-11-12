@@ -29,6 +29,7 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeDele
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSinkChanged;
 
 /**
+ * A mutable, in-memory copy of part of a program graph.
  *
  * @author Jeff Overbey
  */

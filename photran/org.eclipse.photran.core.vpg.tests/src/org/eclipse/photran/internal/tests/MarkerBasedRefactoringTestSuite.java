@@ -59,6 +59,8 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
 
         for (File subdir : dir.listFiles())
         {
+            if (subdir.getName().equalsIgnoreCase("CVS")) continue;
+            
             String description = descriptionPrefix + " " + subdir.getName();
             String subdirPath = directory + "/" + subdir.getName();
 
@@ -79,7 +81,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
         for (File file : new File(subdir).listFiles())
         {
             String filename = file.getName();
-            if (!filename.endsWith(".result"))
+            if (!filename.endsWith(".result") && !filename.equalsIgnoreCase("CVS"))
             {
                 String fileContents = readTestFile(subdir, filename);
                 for (int index = fileContents.indexOf(MARKER);
@@ -231,7 +233,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
             for (File file : new File(subdir).listFiles())
             {
                 String filename = file.getName();
-                if (!filename.endsWith(".result"))
+                if (!filename.endsWith(".result") && !filename.equalsIgnoreCase("CVS"))
                 {
                     IFile thisFile = importFile(subdir, filename);
                     files.put(filename, thisFile);

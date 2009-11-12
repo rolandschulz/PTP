@@ -11,7 +11,6 @@
 package org.eclipse.rephraserengine.internal.core.preservation;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -20,10 +19,15 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 
 /**
- *
+ * An object representing the differences between two program graphs.
+ * <p>
+ * Program graphs are represented as {@link Model} objects.  Differences are described in terms of
+ * (1) added edges, (2) deleted edges, and (3) edges whose sink endpoints changed.  The list of
+ * changes is traversed via an Internal Iterator using {@link #processUsing(ModelDiffProcessor)}.
+ * 
  * @author Jeff Overbey
  */
-public final class ModelDiff implements Iterable<ModelDiff.DiffEntry>
+public final class ModelDiff
 {
     public static abstract class ModelDiffProcessor
     {
@@ -32,7 +36,7 @@ public final class ModelDiff implements Iterable<ModelDiff.DiffEntry>
         public abstract void processEdgeSinkChanged(EdgeSinkChanged change);
     }
 
-    public static abstract class DiffEntry
+    protected static abstract class DiffEntry
     {
         public final String sourceFilename;
         public final Interval source;
@@ -196,10 +200,10 @@ public final class ModelDiff implements Iterable<ModelDiff.DiffEntry>
         differences.add(entry);
     }
 
-    public Iterator<DiffEntry> iterator()
-    {
-        return differences.iterator();
-    }
+//    public Iterator<DiffEntry> iterator()
+//    {
+//        return differences.iterator();
+//    }
 
     public void processUsing(ModelDiffProcessor processor)
     {

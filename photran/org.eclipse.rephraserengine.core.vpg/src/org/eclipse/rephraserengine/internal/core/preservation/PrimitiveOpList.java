@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
 
 /**
+ * A list of {@link PrimitiveOp}s.
  *
  * @author Jeff Overbey
  */

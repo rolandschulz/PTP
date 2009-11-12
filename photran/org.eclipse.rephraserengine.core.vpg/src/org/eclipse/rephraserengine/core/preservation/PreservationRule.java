@@ -11,8 +11,8 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 /**
- * Rule indicating a type of a semantic edge that should be preserved in a program graph and the
- * direction(s) in which it should be preserved.
+ * A rule indicating that a particular type of semantic edge should be preserved in a program graph;
+ * also indicates the direction(s) in which such edges should be preserved.
  *
  * @author Jeff Overbey
  *
