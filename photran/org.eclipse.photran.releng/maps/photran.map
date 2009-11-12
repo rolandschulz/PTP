@@ -24,6 +24,7 @@ plugin@org.eclipse.photran.managedbuilder.xlf.ui=@photranTag@,:pserver:anonymous
 plugin@org.eclipse.rephraserengine.core=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.core
 plugin@org.eclipse.rephraserengine.core.refactoring=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.refactoring
 plugin@org.eclipse.rephraserengine.core.vpg=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.vpg
+plugin@org.eclipse.rephraserengine.doc.isv=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.doc.isv
 plugin@org.eclipse.rephraserengine.ui=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui
 plugin@org.eclipse.rephraserengine.ui.refactoring=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui.refactoring
 plugin@org.eclipse.rephraserengine.ui.vpg=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui.vpg

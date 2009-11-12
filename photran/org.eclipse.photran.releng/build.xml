@@ -161,6 +161,9 @@
             <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.vpg"/>
         </antcall>
         <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.doc.isv"/>
+        </antcall>
+        <antcall target="tagone">
             <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.ui"/>
         </antcall>
         <antcall target="tagone">
