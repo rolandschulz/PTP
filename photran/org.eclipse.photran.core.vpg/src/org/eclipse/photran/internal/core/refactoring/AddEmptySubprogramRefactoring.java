@@ -23,7 +23,7 @@ import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.PreservationBasedSingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.rephraserengine.core.preservation.Preserve;
+import org.eclipse.rephraserengine.core.preservation.PreservationRule;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
 /**
@@ -93,9 +93,9 @@ public class AddEmptySubprogramRefactoring extends PreservationBasedSingleFileFo
     }
 
     @Override
-    protected Preserve getEdgesToPreserve()
+    protected PreservationRule getEdgesToPreserve()
     {
-        return Preserve.all(PhotranVPG.BINDING_EDGE_TYPE);
+        return PreservationRule.preserveAll(PhotranVPG.BINDING_EDGE_TYPE);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class AddEmptySubprogramRefactoring extends PreservationBasedSingleFileFo
         sb.append(newName);
         sb.append("()\n");
 
-        sb.append("    implicit none\n");
+        //sb.append("    implicit none\n");
 
         sb.append("end subroutine\n");
 

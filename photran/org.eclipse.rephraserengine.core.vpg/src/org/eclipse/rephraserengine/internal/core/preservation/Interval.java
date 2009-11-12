@@ -18,7 +18,7 @@ package org.eclipse.rephraserengine.internal.core.preservation;
  *
  * @author Jeff Overbey
  */
-public class Interval implements Comparable<Interval>
+public final class Interval implements Comparable<Interval>
 {
     public final int lb, ub;
 

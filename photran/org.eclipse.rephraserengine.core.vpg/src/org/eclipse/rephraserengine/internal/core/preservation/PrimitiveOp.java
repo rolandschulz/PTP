@@ -80,6 +80,10 @@ public abstract class PrimitiveOp
 
     @Override public abstract String toString();
 
+    @Override public abstract int hashCode();
+
+    @Override public abstract boolean equals(Object o);
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Concrete Subclasses
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,6 +150,19 @@ public abstract class PrimitiveOp
         @Override public String toString()
         {
             return filename + ":" + "rho<" + j + ", " + k + ">";
+        }
+
+        @Override public int hashCode()
+        {
+            return 19 * j.hashCode() + k.hashCode();
+        }
+
+        @Override public boolean equals(Object o)
+        {
+            return o != null
+                && this.getClass().equals(o.getClass())
+                && this.j.equals(((Rho)o).j)
+                && this.k.equals(((Rho)o).k);
         }
     }
 

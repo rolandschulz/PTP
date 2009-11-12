@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +30,7 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.rephraserengine.internal.core.preservation.Model;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp;
+import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOpList;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeAdded;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeDeleted;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSinkChanged;
@@ -55,15 +55,15 @@ public final class PreservationAnalysis
     //private IProgressMonitor progressMonitor;
 
     private Model initialModel;
-    private List<PrimitiveOp> primitiveOps;
-    private Set<Preserve> preserveEdgeTypes;
+    private PrimitiveOpList primitiveOps;
+    private Set<PreservationRule> preserveEdgeTypes;
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, IFile file, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, IFile file, PreservationRule... edgeTypes)
     {
         this(vpg, progressMonitor, ticks, EclipseVPG.getFilenameForIFile(file), edgeTypes);
     }
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, Collection<IFile> files, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, Collection<IFile> files, PreservationRule... edgeTypes)
     {
         this(vpg, progressMonitor, ticks, getFilenames(files), edgeTypes);
     }
@@ -76,21 +76,21 @@ public final class PreservationAnalysis
         return result;
     }
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, String filename, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, String filename, PreservationRule... edgeTypes)
     {
         this(vpg, progressMonitor, ticks, Collections.singletonList(filename), edgeTypes);
     }
 
-    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, List<String> filenames, Preserve... edgeTypes)
+    public PreservationAnalysis(EclipseVPG vpg, IProgressMonitor progressMonitor, int ticks, List<String> filenames, PreservationRule... edgeTypes)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
         //this.progressMonitor = progressMonitor;
 
-        this.primitiveOps = new LinkedList<PrimitiveOp>();
+        this.primitiveOps = new PrimitiveOpList();
 
-        this.preserveEdgeTypes = new HashSet<Preserve>(edgeTypes.length);
-        for (Preserve type : edgeTypes)
+        this.preserveEdgeTypes = new HashSet<PreservationRule>(edgeTypes.length);
+        for (PreservationRule type : edgeTypes)
             this.preserveEdgeTypes.add(type);
 
         progressMonitor.subTask("Please wait; switching database to hypothetical mode");
@@ -126,44 +126,8 @@ public final class PreservationAnalysis
             offsetLength.getOffset(),
             offsetLength.getPositionPastEnd());
 
-        if (needToMergeAlpha(alpha))
-            mergeAlpha(alpha);
-        else
-            addAlpha(alpha);
-
-        adapterManager.getAdapter(node, ResetOffsetLength.class);
-    }
-
-    private boolean needToMergeAlpha(Alpha alpha)
-    {
-        return !primitiveOps.isEmpty()
-            && lastOp() instanceof Alpha
-            && ((Alpha)lastOp()).filename.equals(alpha.filename)
-            && ((Alpha)lastOp()).j.lb == alpha.j.lb;
-            //&& ((Alpha)lastOp()).preserveEdgeTypes.equals(alpha.preserveEdgeTypes);
-    }
-
-    private PrimitiveOp lastOp()
-    {
-        return primitiveOps.get(primitiveOps.size()-1);
-    }
-
-    private void mergeAlpha(Alpha alpha2)
-    {
-        Alpha alpha1 = (Alpha)primitiveOps.remove(primitiveOps.size()-1);
-
-        Alpha newAlpha = PrimitiveOp.alpha(
-            alpha1.filename,
-            alpha1.k.lb,
-            alpha1.k.lb + alpha1.k.cardinality() + alpha2.k.cardinality());
-            //alpha1.preserveEdgeTypes);
-
-        addAlpha(newAlpha);
-    }
-
-    private void addAlpha(Alpha alpha)
-    {
         primitiveOps.add(alpha);
+        adapterManager.getAdapter(node, ResetOffsetLength.class);
     }
 
     public void markEpsilon(IFile file, Object node)

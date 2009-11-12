@@ -23,7 +23,7 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
  *
  * @author Jeff Overbey
  */
-public class ModelDiff implements Iterable<ModelDiff.DiffEntry>
+public final class ModelDiff implements Iterable<ModelDiff.DiffEntry>
 {
     public static abstract class ModelDiffProcessor
     {

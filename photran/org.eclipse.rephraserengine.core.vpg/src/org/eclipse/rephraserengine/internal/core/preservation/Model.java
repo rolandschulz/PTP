@@ -19,7 +19,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.rephraserengine.core.preservation.Preserve;
+import org.eclipse.rephraserengine.core.preservation.PreservationRule;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
@@ -32,7 +32,7 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSink
  *
  * @author Jeff Overbey
  */
-public class Model
+public final class Model
 {
     private static final class Entry implements Comparable<Entry>
     {
@@ -53,16 +53,16 @@ public class Model
             this.edgeType = edgeType;
         }
 
-        public boolean shouldPreserveAccordingTo(Set<Preserve> preserveEdgeTypes, String affectedFilename, Interval affected)
+        public boolean shouldPreserveAccordingTo(Set<PreservationRule> preserveEdgeTypes, String affectedFilename, Interval affected)
         {
-            for (Preserve rule : preserveEdgeTypes)
+            for (PreservationRule rule : preserveEdgeTypes)
                 if (shouldPreserveAccordingTo(rule, affectedFilename, affected))
                     return true;
 
             return false;
         }
 
-        public boolean shouldPreserveAccordingTo(Preserve rule, String affectedFilename, Interval affected)
+        public boolean shouldPreserveAccordingTo(PreservationRule rule, String affectedFilename, Interval affected)
         {
             boolean incoming = sinkFilename.equals(affectedFilename) && sink.isSubsetOf(affected);
             boolean outgoing = sourceFilename.equals(affectedFilename) && source.isSubsetOf(affected);
@@ -162,7 +162,13 @@ public class Model
         return files;
     }
 
-    public void inormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
+    public void inormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
+    {
+        for (PrimitiveOp op : primitiveOps)
+            inormalize(op, preserveEdgeTypes, pm);
+    }
+
+    public void inormalize(PrimitiveOp op, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
@@ -183,13 +189,13 @@ public class Model
         edges = revisedList;
     }
 
-    public void inormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
+    public void dnormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         for (PrimitiveOp op : primitiveOps)
-            inormalize(op, preserveEdgeTypes, pm);
+            dnormalize(op, preserveEdgeTypes, pm);
     }
 
-    public void dnormalize(PrimitiveOp op, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
+    public void dnormalize(PrimitiveOp op, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
@@ -208,12 +214,6 @@ public class Model
         pm.done();
 
         edges = revisedList;
-    }
-
-    public void dnormalize(List<PrimitiveOp> primitiveOps, Set<Preserve> preserveEdgeTypes, IProgressMonitor pm)
-    {
-        for (PrimitiveOp op : primitiveOps)
-            dnormalize(op, preserveEdgeTypes, pm);
     }
 
     public ModelDiff compareAgainst(Model that, IProgressMonitor pm)

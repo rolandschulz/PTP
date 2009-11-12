@@ -301,9 +301,13 @@ public class PhotranVPGBuilder extends PhotranVPG
         if (isVirtualFile(filename)) return;
 
         IFortranAST ast = acquireTransientAST(filename);
+        if (ast == null)
+            throw new IllegalArgumentException(filename + " returned null AST");
+
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         ast.getRoot().printOn(new PrintStream(out), null);
         ast = parse(filename, new ByteArrayInputStream(out.toByteArray()));
+
         computeEdgesAndAnnotations(filename, ast);
     }
 

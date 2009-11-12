@@ -19,7 +19,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.PreservationBasedSingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.rephraserengine.core.preservation.Preserve;
+import org.eclipse.rephraserengine.core.preservation.PreservationRule;
 
 /**
  * Refactoring to delete an unused declaration from a Fortran program.
@@ -74,9 +74,9 @@ public class SafeDeleteRefactoring extends PreservationBasedSingleFileFortranRef
     }
 
     @Override
-    protected Preserve getEdgesToPreserve()
+    protected PreservationRule getEdgesToPreserve()
     {
-        return Preserve.incoming(PhotranVPG.BINDING_EDGE_TYPE);
+        return PreservationRule.preserveIncoming(PhotranVPG.BINDING_EDGE_TYPE);
     }
 
     @Override

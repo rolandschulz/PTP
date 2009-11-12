@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
-import org.eclipse.rephraserengine.core.preservation.Preserve;
+import org.eclipse.rephraserengine.core.preservation.PreservationRule;
 
 /**
  * Base class for {@link SingleFileFortranRefactoring}s that use a {@link PreservationAnalysis} for
@@ -38,6 +38,8 @@ public abstract class PreservationBasedSingleFileFortranRefactoring extends Sing
             doValidateUserInput(status);
             if (!status.hasFatalError())
             {
+                vpg.acquirePermanentAST(fileInEditor);
+
                 preservation = new PreservationAnalysis(PhotranVPG.getInstance(), pm, 10,
                     fileInEditor,
                     getEdgesToPreserve());
@@ -65,7 +67,7 @@ public abstract class PreservationBasedSingleFileFortranRefactoring extends Sing
 
     protected abstract void doValidateUserInput(RefactoringStatus status) throws PreconditionFailure;
 
-    protected abstract Preserve getEdgesToPreserve();
+    protected abstract PreservationRule getEdgesToPreserve();
 
     protected abstract void doTransform() throws PreconditionFailure;
 }
