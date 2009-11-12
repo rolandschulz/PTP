@@ -23,7 +23,20 @@ import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
  */
 public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 {
-    protected List<PrimitiveOp> list = new ArrayList<PrimitiveOp>();
+    protected List<PrimitiveOp> list;
+
+    public PrimitiveOpList()
+    {
+        list = new ArrayList<PrimitiveOp>();;
+    }
+
+    public PrimitiveOpList(PrimitiveOp... ops)
+    {
+        this();
+
+        for (PrimitiveOp op : ops)
+            add(op);
+    }
 
     public boolean isEmpty()
     {
@@ -95,5 +108,17 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
                     + existingOp);
 
         list.add(opToAdd);
+    }
+    
+    @Override public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (PrimitiveOp op : list)
+        {
+            if (first) first = false; else sb.append(' ');
+            sb.append(op);
+        }
+        return sb.toString();
     }
 }

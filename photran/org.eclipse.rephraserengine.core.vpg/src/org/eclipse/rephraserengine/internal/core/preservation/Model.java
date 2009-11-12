@@ -70,6 +70,12 @@ public final class Model
             return rule.shouldPreserve(incoming, outgoing, this.edgeType);
         }
 
+        public void offset(PrimitiveOp op)
+        {
+            this.source = op.inorm(this.sourceFilename, this.source);
+            this.sink = op.inorm(this.sinkFilename, this.sink);
+        }
+
         @Override public boolean equals(Object o)
         {
             if (o == null || !o.getClass().equals(this.getClass())) return false;
@@ -166,55 +172,54 @@ public final class Model
     public void inormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         for (PrimitiveOp op : primitiveOps)
-            inormalize(op, preserveEdgeTypes, pm);
-    }
-
-    public void inormalize(PrimitiveOp op, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
-    {
-        TreeSet<Entry> revisedList = new TreeSet<Entry>();
-
-        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Normalizing " + name + " by " + op, edges.size());
-        for (Entry entry : edges)
         {
-            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.iaff()))
-            {
-                entry.source = op.inorm(entry.sourceFilename, entry.source); // leave origSource unchanged
-                entry.sink = op.inorm(entry.sinkFilename, entry.sink);
-                revisedList.add(entry);
-            }
-            pm.worked(1);
-        }
-        pm.done();
+            TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
-        edges = revisedList;
+            pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+            pm.beginTask("Normalizing " + name + " by " + op, edges.size());
+            for (Entry entry : edges)
+            {
+                if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.iaff()))
+                {
+                    entry.source = op.inorm(entry.sourceFilename, entry.source); // leave origSource unchanged
+                    entry.sink = op.inorm(entry.sinkFilename, entry.sink);
+                    
+                    for (PrimitiveOp otherOp : primitiveOps)
+                        if (!otherOp.equals(op))
+                            entry.offset(otherOp);
+                    
+                    revisedList.add(entry);
+                }
+                pm.worked(1);
+            }
+            pm.done();
+
+            edges = revisedList;
+        }
     }
 
     public void dnormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         for (PrimitiveOp op : primitiveOps)
-            dnormalize(op, preserveEdgeTypes, pm);
-    }
-
-    public void dnormalize(PrimitiveOp op, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
-    {
-        TreeSet<Entry> revisedList = new TreeSet<Entry>();
-
-        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Normalizing " + name + " by " + op, edges.size());
-        for (Entry entry : edges)
         {
-            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.daff()))
-            {
-                entry.source = op.dnorm(entry.sourceFilename, entry.source);
-                entry.sink = op.dnorm(entry.sinkFilename, entry.sink);
-                revisedList.add(entry);
-            }
-            pm.worked(1);
-        }
-        pm.done();
+            TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
-        edges = revisedList;
+            pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+            pm.beginTask("Normalizing " + name + " by " + op, edges.size());
+            for (Entry entry : edges)
+            {
+                if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.daff()))
+                {
+                    entry.source = op.dnorm(entry.sourceFilename, entry.source);
+                    entry.sink = op.dnorm(entry.sinkFilename, entry.sink);
+                    revisedList.add(entry);
+                }
+                pm.worked(1);
+            }
+            pm.done();
+
+            edges = revisedList;
+        }
     }
 
     public ModelDiff compareAgainst(Model that, IProgressMonitor pm)
