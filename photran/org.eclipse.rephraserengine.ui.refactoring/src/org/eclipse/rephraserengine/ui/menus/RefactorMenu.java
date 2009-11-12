@@ -56,7 +56,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * </ul>
  *
  * @author Jeff Overbey
- * 
+ *
  * @since 1.0
  */
 @SuppressWarnings("restriction")
@@ -181,7 +181,7 @@ public final class RefactorMenu extends CompoundContributionItem
             }
         }
     }
-    
+
     private boolean environmentOK(IConfigurationElement elt)
     {
         if (elt.getAttribute("require_env") != null)
@@ -227,7 +227,7 @@ public final class RefactorMenu extends CompoundContributionItem
 
         public void fill(Menu parent, int index)
         {
-            MenuItem menuItem = new MenuItem(parent, SWT.NONE, index++);
+            MenuItem menuItem = new MenuItem(parent, SWT.NONE, index);
             menuItem.setText(label);
             menuItem.addSelectionListener(new SelectionAdapter()
             {
@@ -265,7 +265,7 @@ public final class RefactorMenu extends CompoundContributionItem
 
         public void fill(Menu parent, int index)
         {
-            MenuItem menuItem = new MenuItem(parent, SWT.NONE, index++);
+            MenuItem menuItem = new MenuItem(parent, SWT.NONE, index);
             menuItem.setText(label);
             menuItem.addSelectionListener(new SelectionAdapter()
             {
