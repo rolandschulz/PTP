@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.menus.CommandContributionItem;
-import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 /**
  * A dynamically-populated set of menu items for the Refactor menu in the menu bar and for various
@@ -197,12 +196,25 @@ public final class RefactorMenu extends CompoundContributionItem
 
     private CommandContributionItem commandContribution(String commandID)
     {
-        CommandContributionItemParameter param = new CommandContributionItemParameter(
-            Workbench.getInstance().getServiceLocator(),    // Service locator
+//        CommandContributionItemParameter param = new CommandContributionItemParameter(
+//            Workbench.getInstance().getServiceLocator(),    // Service locator
+//            null,                                           // ID
+//            commandID,                                      // Command ID
+//            CommandContributionItem.STYLE_PUSH);            // Style
+//        return new CommandContributionItem(param);
+        
+        return new CommandContributionItem(
+            Workbench.getInstance().getActiveWorkbenchWindow(), // Service locator
             null,                                           // ID
             commandID,                                      // Command ID
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             CommandContributionItem.STYLE_PUSH);            // Style
-        return new CommandContributionItem(param);
     }
 
     @SuppressWarnings("unchecked")
