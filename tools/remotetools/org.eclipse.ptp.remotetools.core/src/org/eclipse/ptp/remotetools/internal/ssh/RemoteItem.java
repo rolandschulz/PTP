@@ -58,7 +58,8 @@ class RemoteItem implements IRemoteItem {
 		this.fileTools = fileTools;
 		this.path = path;
 		
-		parseAttrs(attrs);
+		RemoteFileAttributes remoteAttrs = new RemoteFileAttributes(attrs);
+		parseAttrs(remoteAttrs);
 	}
 
 	/* (non-Javadoc)
@@ -68,7 +69,7 @@ class RemoteItem implements IRemoteItem {
 		fileTools.test();
 		if ((changes & PERMISSION) != 0) {
 			try {
-				fileTools.manager.connection.sftpChannel.chmod(permissions, path);
+				fileTools.manager.connection.getDefaultSFTPChannel().chmod(permissions, path);
 				changes &= ~PERMISSION;
 			} catch (SftpException e) {
 				throw new RemoteOperationException(NLS.bind("Failed to set permission of remote file {0} ({1})", new String[] {path, e.getMessage()}), e);
@@ -76,10 +77,10 @@ class RemoteItem implements IRemoteItem {
 		}
 		if ((changes & MODIFICATION_TIME) != 0) {
 			try {
-				fileTools.manager.connection.sftpChannel.setMtime(path, modificationTime);
+				fileTools.manager.connection.getDefaultSFTPChannel().setMtime(path, modificationTime);
 				changes &= ~MODIFICATION_TIME;
 			} catch (SftpException e) {
-				throw new RemoteOperationException(NLS.bind("Failed to set modification fime of remote file {0} ({1})", new Object[] {path, e}), e);
+				throw new RemoteOperationException(NLS.bind("Failed to set modification time of remote file {0} ({1})", new Object[] {path, e}), e);
 			}
 		}
 //		changes = 0;
@@ -153,7 +154,7 @@ class RemoteItem implements IRemoteItem {
 	 */
 	public void refreshAttributes() throws RemoteConnectionException, RemoteOperationException, CancelException {
 		fileTools.test();
-		SftpATTRS attrs = fileTools.fetchRemoteAttr(path);
+		RemoteFileAttributes attrs = fileTools.fetchRemoteAttr(path);
 		parseAttrs(attrs);
 	}
 	
@@ -209,7 +210,7 @@ class RemoteItem implements IRemoteItem {
 				permissions &= ~0400;
 			}
 		}
-		Set groupIDSet = fileTools.cachedGroupIDSet;
+		Set<Integer> groupIDSet = fileTools.cachedGroupIDSet;
 		if(groupIDSet.contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0040;
@@ -239,7 +240,7 @@ class RemoteItem implements IRemoteItem {
 				permissions &= ~0200;
 			}
 		}
-		Set groupIDSet = fileTools.cachedGroupIDSet;
+		Set<Integer> groupIDSet = fileTools.cachedGroupIDSet;
 		if(groupIDSet.contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0020;
@@ -268,7 +269,7 @@ class RemoteItem implements IRemoteItem {
 		}
 	}
 
-	private void parseAttrs(SftpATTRS attrs) {
+	private void parseAttrs(RemoteFileAttributes attrs) {
 		/*
 		 * No file found.
 		 */
@@ -303,7 +304,7 @@ class RemoteItem implements IRemoteItem {
 			}
 		} 
 				
-		Set groupIDSet = fileTools.cachedGroupIDSet;
+		Set<Integer> groupIDSet = fileTools.cachedGroupIDSet;
 		if(groupIDSet.contains(new Integer(groupID))) {
 			if ((permissions & 0040) != 0) {
 				isReadable = true;
