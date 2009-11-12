@@ -15,11 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.jsch.core.IJSchService;
 import org.eclipse.ptp.remotetools.core.AuthToken;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
 import org.eclipse.ptp.remotetools.internal.ssh.CipherTypes;
 import org.eclipse.ptp.remotetools.internal.ssh.Connection;
 import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
 
 
 /**
@@ -29,7 +31,9 @@ public class RemotetoolsPlugin extends Plugin {
 
 	//The shared instance.
 	private static RemotetoolsPlugin plugin;
-	
+	// ServiceTracker for IJschService
+	private ServiceTracker tracker;
+
 	/**
 	 * The constructor.
 	 */
@@ -42,6 +46,8 @@ public class RemotetoolsPlugin extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+	    tracker = new ServiceTracker(getBundle().getBundleContext(), IJSchService.class.getName(), null);
+	    tracker.open();
 	}
 
 	/**
@@ -59,7 +65,15 @@ public class RemotetoolsPlugin extends Plugin {
 		return plugin;
 	}
 	
-	
+	/**
+	 * Returns an instance of IJSchService from the OSGi Registry.
+	 * @return An instance of IJSchService, or <code>null</code> if no 
+	 * 		IJschService service is available.
+	 */
+    public IJSchService getJSchService() {
+        return (IJSchService)tracker.getService();
+    }
+
 	/**
 	 * Returns an instance of {@link IRemoteConnection} using a ssh connection.
 	 */
