@@ -68,20 +68,25 @@ public class IndexLocationChangeListener implements IServiceModelEventListener {
 		IServiceConfiguration config = (IServiceConfiguration) event.getSource();
 		if(config.isDisabled(service))
 			return;
+		
+		// Do nothing if the config is not actually part of the model yet.
+		Set<IProject> projects = smm.getProjectsForConfiguration(config); 
+		if(projects == null || projects.isEmpty())
+			return;
+
 		IServiceProvider sp = config.getServiceProvider(service);
 		if(!(sp instanceof IIndexServiceProvider))
 			return;
 		final IIndexServiceProvider provider = (IIndexServiceProvider) sp;
 		
-		
-		String oldIndexLocation = null;
 		IServiceProvider oldProvider = event.getOldProvider();
-		if(oldProvider instanceof IIndexServiceProvider) {
-			oldIndexLocation = ((IIndexServiceProvider)oldProvider).getIndexLocation();
-		}
+		if(!(oldProvider instanceof IIndexServiceProvider))
+			return;
+		
+		String oldIndexLocation = ((IIndexServiceProvider)oldProvider).getIndexLocation();
 			
 		// if the index location has changed
-		if(oldIndexLocation == null || !oldIndexLocation.equals(provider.getIndexLocation())) {
+		if(!oldIndexLocation.equals(provider.getIndexLocation())) {
 			final IIndexLifecycleService indexService = provider.getIndexLifeCycleService();
 			Set<IProject> scopes = smm.getProjectsForConfiguration(config);
 			for(IProject project : scopes) {
@@ -95,7 +100,7 @@ public class IndexLocationChangeListener implements IServiceModelEventListener {
 						final String actualLocation = indexService.moveIndexFile(scope, newIndexLocation, monitor);
 						
 						// if the move fails display an error pop-up
-						if(!actualLocation.equals(newIndexLocation)) {
+						if(actualLocation == null || !actualLocation.equals(newIndexLocation)) {
 							
 							// The dialog can only be launched from the UI thread so we need to create a UIJob to do it
 							UIJob uijob = new UIJob(Messages.getString("ServiceModelPropertyPage.0")) { //$NON-NLS-1$
