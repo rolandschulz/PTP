@@ -176,7 +176,7 @@ public class UIUtil
             if (editorInput instanceof IFileEditorInput)
             {
                 IFileEditorInput fileEditorInput = (IFileEditorInput)editorInput;
-                IFile file = fileEditorInput == null ? null : fileEditorInput.getFile();
+                IFile file = fileEditorInput.getFile();
                 IPath fullPath = file == null ? null : file.getFullPath();
                 if (fullPath != null && hasFile(filesToCheck, fullPath) && dirtyEditors[i].isDirty())
                 {
