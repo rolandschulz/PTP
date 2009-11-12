@@ -18,7 +18,7 @@ package org.eclipse.rephraserengine.core.vpg;
  */
 public class VPGDependency<A, T, R extends TokenRef<T>>
 {
-	@SuppressWarnings("unused") private VPG<A, T, R, ?, ?> vpg;
+	//private VPG<A, T, R, ?, ?> vpg;
 	private String dependentFile;
 	private String dependsOnFile;
 
@@ -31,7 +31,7 @@ public class VPGDependency<A, T, R extends TokenRef<T>>
 	                        String dependencyFrom,
 	                        String dependsOn)
 	{
-		this.vpg = vpg;
+		//this.vpg = vpg;
 		this.dependentFile = dependencyFrom;
 		this.dependsOnFile = dependsOn;
 	}

@@ -68,7 +68,7 @@ public final class ModelDiff implements Iterable<ModelDiff.DiffEntry>
 
         @Override public boolean equals(Object other)
         {
-            if (!other.getClass().equals(this.getClass())) return false;
+            if (other == null || !other.getClass().equals(this.getClass())) return false;
 
             DiffEntry that = (DiffEntry)other;
             return this.sourceFilename.equals(that.sourceFilename)

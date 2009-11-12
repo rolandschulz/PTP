@@ -71,7 +71,7 @@ public final class Model
 
         @Override public boolean equals(Object o)
         {
-            if (!o.getClass().equals(this.getClass())) return false;
+            if (o == null || !o.getClass().equals(this.getClass())) return false;
 
             Entry that = (Entry)o;
             return this.sourceFilename.equals(that.sourceFilename)

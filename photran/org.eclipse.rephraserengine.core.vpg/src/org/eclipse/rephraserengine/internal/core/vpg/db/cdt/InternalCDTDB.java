@@ -79,7 +79,7 @@ public class InternalCDTDB
         edges = new Edges();
         annotations = new Annotations();
     }
-    
+
     public File getFile()
     {
         return file;
@@ -1404,66 +1404,66 @@ public class InternalCDTDB
 
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void main(String[] args) throws Exception
-    {
-        InternalCDTDB db = new InternalCDTDB(new File("/Users/joverbey/Desktop/db"));
-
-        db.files.ensure("Dog");
-        db.files.ensure("Cat");
-        db.files.ensure("Mouse");
-        System.out.println(db.files);
-
-        db.files.delete("Dog");
-        System.out.println(db.files);
-
-        db.files.delete("Cat");
-        System.out.println(db.files);
-
-        db.files.delete("Mouse");
-        System.out.println(db.files);
-
-        db.files.ensure("Mouse");
-        db.files.ensure("Mouse");
-        System.out.println(db.files);
-
-        db.files.ensure("Dog");
-        db.files.ensure("Cat");
-        db.files.ensure("Mouse");
-        System.out.println(db.files);
-
-        db.dependencies.ensure("Dog", "Cat");
-        db.dependencies.ensure("Dog", "Cat");
-        System.out.println(db.dependencies);
-
-        db.dependencies.ensure("Dog", "Tiger");
-        System.out.println(db.dependencies);
-
-        db.dependencies.delete("Dog", "Cat");
-        System.out.println(db.dependencies);
-
-        db.dependencies.delete("Dog", "Coolio");
-        System.out.println(db.dependencies);
-
-        db.dependencies.delete("Dog", "Tiger");
-        db.dependencies.delete("Dog", "Tiger");
-        System.out.println(db.dependencies);
-
-        System.out.println(db.files);
-
-        db.edges.ensure("Cat", 1, 2, "Dog", 3, 4, 0);
-        db.edges.ensure("Dog", 4, 3, "Cat", 2, 1, 1);
-        System.out.println(db.edges);
-
-        db.edges.ensure("Dog", 4, 3, "Beetle", 2, 1, 6);
-        db.edges.ensure("Dog", 4, 3, "Beetle", 2, 1, 6);
-        System.out.println(db.edges);
-
-        System.out.println(db.files);
-
-        db.edges.delete("Dog", 4, 3, "Beetle", 2, 1, 6);
-        db.edges.delete("Dog", 4, 3, "Beetle", 2, 1, 6);
-        System.out.println(db.edges);
-
-        System.out.println(db.files);
-    }
+//    public static void main(String[] args) throws Exception
+//    {
+//        InternalCDTDB db = new InternalCDTDB(new File("/Users/joverbey/Desktop/db"));
+//
+//        db.files.ensure("Dog");
+//        db.files.ensure("Cat");
+//        db.files.ensure("Mouse");
+//        System.out.println(db.files);
+//
+//        db.files.delete("Dog");
+//        System.out.println(db.files);
+//
+//        db.files.delete("Cat");
+//        System.out.println(db.files);
+//
+//        db.files.delete("Mouse");
+//        System.out.println(db.files);
+//
+//        db.files.ensure("Mouse");
+//        db.files.ensure("Mouse");
+//        System.out.println(db.files);
+//
+//        db.files.ensure("Dog");
+//        db.files.ensure("Cat");
+//        db.files.ensure("Mouse");
+//        System.out.println(db.files);
+//
+//        db.dependencies.ensure("Dog", "Cat");
+//        db.dependencies.ensure("Dog", "Cat");
+//        System.out.println(db.dependencies);
+//
+//        db.dependencies.ensure("Dog", "Tiger");
+//        System.out.println(db.dependencies);
+//
+//        db.dependencies.delete("Dog", "Cat");
+//        System.out.println(db.dependencies);
+//
+//        db.dependencies.delete("Dog", "Coolio");
+//        System.out.println(db.dependencies);
+//
+//        db.dependencies.delete("Dog", "Tiger");
+//        db.dependencies.delete("Dog", "Tiger");
+//        System.out.println(db.dependencies);
+//
+//        System.out.println(db.files);
+//
+//        db.edges.ensure("Cat", 1, 2, "Dog", 3, 4, 0);
+//        db.edges.ensure("Dog", 4, 3, "Cat", 2, 1, 1);
+//        System.out.println(db.edges);
+//
+//        db.edges.ensure("Dog", 4, 3, "Beetle", 2, 1, 6);
+//        db.edges.ensure("Dog", 4, 3, "Beetle", 2, 1, 6);
+//        System.out.println(db.edges);
+//
+//        System.out.println(db.files);
+//
+//        db.edges.delete("Dog", 4, 3, "Beetle", 2, 1, 6);
+//        db.edges.delete("Dog", 4, 3, "Beetle", 2, 1, 6);
+//        System.out.println(db.edges);
+//
+//        System.out.println(db.files);
+//    }
 }

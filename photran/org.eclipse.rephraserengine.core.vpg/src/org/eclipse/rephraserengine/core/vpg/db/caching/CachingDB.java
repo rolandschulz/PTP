@@ -61,6 +61,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         {
             try
             {
+                if (o == null) return false;
                 CacheKey other = (CacheKey)o;
                 return this.tokenRef.equals(other.tokenRef)
                     && this.id == other.id;
@@ -145,19 +146,19 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
     }
 
     // HYPOTHETICAL UPDATING ///////////////////////////////////////////////////
-    
+
     @Override public void enterHypotheticalMode() throws IOException
     {
         clearCache();
         db.enterHypotheticalMode();
     }
-    
+
     @Override public void leaveHypotheticalMode() throws IOException
     {
         clearCache();
         db.leaveHypotheticalMode();
     }
-    
+
     @Override public boolean isInHypotheticalMode()
     {
         return db.isInHypotheticalMode();
