@@ -1,0 +1,7 @@
+program main
+    use module1, only: accessed_variable, assigned_variable, called_subroutine
+    implicit none
+
+    assigned_variable = accessed_variable
+    call called_subroutine
+end program main

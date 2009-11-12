@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests.refactoring.addonlytousestmt;
 
-import org.eclipse.photran.internal.core.util.LineCol;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.eclipse.photran.internal.core.util.LineCol;
 
 /**
  * 
@@ -55,7 +55,12 @@ public class AddOnlyToUseTestSuite extends TestSuite
         
         //8. precondition test - have 2 declarations of subroutine in same project
         String[] test8Files = new String[] { "test8.f90", "module4.f90" };
-        suite.addTest(finalPreconditionTest(test8Files, new LineCol(2,9), 7, "help_common4"));
+        suite.addTest(successTest(test8Files, new LineCol(2,9), 7));
+        
+        //9. success test - requires refactoring to add entities already being used i
+        //                  in the module to the ONLY list
+        String[] test9Files = new String[] { "test9.f90", "module.f90" };
+        suite.addTest(successTest(test9Files, new LineCol(2,9), 7));
         
         return suite;
     }

@@ -24,12 +24,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
@@ -52,12 +54,26 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     private int numEntitiesInList = 0;
     private ASTUseStmtNode useNode = null;
     private List<IFile> filesContainingModule = null;
+    
+    //private List<Definition> programEntities = new ArrayList<Definition>();
+    private ArrayList<String> entitiesInProgram = new ArrayList<String>();
+    
     private List<Definition> moduleEntities = new ArrayList<Definition>();
+    private ArrayList<String> entitiesInModule = new ArrayList<String>();
+    
     private List<Definition> existingOnlyList = new ArrayList<Definition>();
     private List<Definition> defsToAdd = new ArrayList<Definition>();
-    private ArrayList<String> entitiesInModule = new ArrayList<String>();
     private HashMap<Integer, String> entitiesToAdd = new HashMap<Integer, String>();
+    
     private Set<PhotranTokenRef> allReferences = null;
+    
+    public AddOnlyToUseStmtRefactoring() {
+    }
+
+    public AddOnlyToUseStmtRefactoring(IFile file, ITextSelection selection)
+    {
+        initialize(file, selection);
+    }
 
     public ArrayList<String> getModuleEntityList()
     {
@@ -128,6 +144,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
         findUseStmtNode();
         checkIfModuleExistsInProject();
         getModuleDeclaredEntities();
+        getProgramDeclaredEntities();
         readExistingOnlyList();
     }
 
@@ -187,6 +204,16 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
             fail("Please select a module name.");
         return selectedToken;
     }
+    
+    private void getProgramDeclaredEntities() throws PreconditionFailure
+    {
+        IFortranAST ast = vpg.acquirePermanentAST(this.fileInEditor);
+        if(ast == null) return;
+
+        DeclarationVisitor visitor = new DeclarationVisitor();
+        ast.accept(visitor);
+        //AST will be released later
+    }
 
     private void getModuleDeclaredEntities() throws PreconditionFailure
     {
@@ -233,6 +260,14 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
                     existingOnlyList.add(moduleEntities.get(i));
             }
         }
+        
+        //FIXME add functionality to search file for existing uses of module vars
+        //and automatically make them be added to the list
+        IFortranAST ast = vpg.acquirePermanentAST(this.fileInEditor);
+        if(ast == null) return;
+
+        TokenVisitor visitor = new TokenVisitor();
+        ast.accept(visitor);
     }
 
     /* (non-Javadoc)
@@ -374,6 +409,29 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     {
         return "Add ONLY Clause to USE Statement";
     }
+    
+    
+    private final class DeclarationVisitor extends GenericASTVisitor
+    {
+        @Override public void visitASTEntityDeclNode(ASTEntityDeclNode node)
+        {
+            String name = node.getObjectName().getObjectName().getText();
+            if(!entitiesInProgram.contains(name))
+            {
+                entitiesInProgram.add(name);
+            }
+        }
+    }
+    
+    private final class TokenVisitor extends GenericASTVisitor
+    {
+        @Override public void visitToken(Token node)
+        {
+            String name = node.getText();
+            if(entitiesInModule.contains(name))
+                addToOnlyList(name);
+        }
+    }
 
     //borrowed (slightly modified) from RenameRefactoring.java
     private final class ConflictingBindingErrorHandler implements IConflictingBindingCallback
@@ -414,9 +472,8 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
 
         public void addReferenceWillChangeError(String newName, Token reference)
         {
-          //remove conflicts with the module itself
-            IFile file = reference.getTokenRef().getFile();
-            if(!filesContainingModule.contains(file))
+            //add error for names being added conflicting with declared names in program
+            if(entitiesInProgram.contains(newName))
             {
                 // The entity with the new name will shadow the definition to which this binding resolves
                 status.addError("Adding \"" + newName + "\" to ONLY list"

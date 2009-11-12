@@ -1,3 +1,4 @@
+package org.eclipse.photran.internal.tests.refactoring.addonlytousestmt;
 /*******************************************************************************
  * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
@@ -8,7 +9,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.tests.refactoring.addonlytousestmt;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -110,7 +111,7 @@ public class AddOnlyToUseTestCase extends RefactoringTestCase
         final IFile file = importFile(DIR, filenames[0]);
         Document doc = new Document(readFileToString(DIR+"/"+filenames[0]));
         TextSelection text = new TextSelection(doc, getLineColOffset(filenames[0], lineCol), length);
-        AddOnlyToUseStmtRefactoring r = new AddOnlyToUseStmtRefactoring();
+        AddOnlyToUseStmtRefactoring r = new AddOnlyToUseStmtRefactoring(file, text);
         r.initialize(file, text);
         return r;
     }
