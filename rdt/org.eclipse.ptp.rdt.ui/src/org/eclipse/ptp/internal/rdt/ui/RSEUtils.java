@@ -26,7 +26,7 @@ import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
 
 public class RSEUtils {
 	
-	private static String DEFAULT_CONFIG_DIR_NAME = ".eclipsesettings"; //$NON-NLS-1$
+	public static String DEFAULT_CONFIG_DIR_NAME = ".eclipse"; //$NON-NLS-1$
 	
 	private RSEUtils() {}
 	
