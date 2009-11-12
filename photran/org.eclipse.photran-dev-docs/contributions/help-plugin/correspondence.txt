@@ -1,0 +1,206 @@
+From: "Matt Scarpino" <matt.scarpino@eclipseengineer.com>
+To: "jeffrey Overbey" <overbey2@illinois.edu>
+Subject: Photran help
+Date: Sun, 23 Aug 2009 20:09:28 -0700
+
+Hi Jeff,
+ 
+I uploaded an Eclipse help plug-in to Bugzilla along with a new screenshot. The plug-in doesn't contain source code (it's just XML, HTML, and images), so I didn't worry about the EPL headers or similar concerns. But if there's anything you'd like me to declare, please let me know.
+ 
+In addition to the plug-in, I've created a Java project that reads Wiki markup in text files (e.g. photran5 and photran5advanced), and creates an Eclipse help plug-in. This way, as you update your Wiki, you can create an updated plug-in by running the application.
+ 
+The project's libraries are so large that I couldn't upload the archive to Bugzilla. So I put it on my web site and you can download it here:
+http://www.eclipseengineer.com/photran/WikiToEclipse.zip
+ 
+The WikiToEclipse project is public domain. The instructions.txt file explains how to use it. Let me know if you have any questions.
+ 
+Matt
+
+====================================================================================================
+
+From: Jeffrey Overbey [mailto:overbey2@illinois.edu] 
+Sent: Friday, October 02, 2009 10:31 AM
+To: Sharon Corbett
+Cc: Matt Scarpino
+Subject: Question - Photran help
+
+ 
+
+Sharon,
+
+I have an IP question, if you don't mind.
+
+Matt Scarpino owns a consulting company (Eclipse Engineering, LLC) and
+kindly wrote a converter for us which will generate Eclipse Help content
+from the documentation we've been writing for Photran on the Eclipse Wiki.
+He generated a plug-in for us using this converter, and that's posted on
+Bugzilla - https://bugs.eclipse.org/bugs/286862
+
+We would like to continue using his generator to re-generate our online help
+as we update the wiki over time.
+
+As you can see in Matt's e-mail below, the generator was too large to post
+to Bugzilla, mostly because it uses some (large) third-party libraries.
+Those are under the Apache and BSD licenses, so provenance checking would
+probably take a while.
+
+What are the IP requirements here?  Is it OK for us to use his generator
+as-is, or will it need to be contributed to Photran or Orbit first?  I
+copied him on this e-mail, so he can help answer any questions.
+
+Jeff
+
+====================================================================================================
+
+From: "Sharon Corbett" <sharon.corbett@eclipse.org>
+To: "'Jeffrey Overbey'" <overbey2@illinois.edu>
+Cc: "'Matt Scarpino'" <matt.scarpino@eclipseengineer.com>
+Subject: RE: Question - Photran help
+Date: Fri, 2 Oct 2009 10:54:18 -0400
+
+Hi Jeff:
+
+In order to further understand before I respond, can you let me know if the
+intent is to check the content into the Eclipse repository?
+
+Thanks,
+Sharon
+
+====================================================================================================
+
+From: "Matt Scarpino" <matt.scarpino@eclipseengineer.com>
+To: "Jeffrey Overbey" <overbey2@illinois.edu>,
+        "Sharon Corbett" <sharon.corbett@eclipse.org>
+References: <007301ca4370$3834e830$5101a8c0@SharoncLaptop> <4AC62433.5080408@illinois.edu>
+In-Reply-To: <4AC62433.5080408@illinois.edu>
+Subject: Re: Question - Photran help
+Date: Fri, 2 Oct 2009 09:13:26 -0700
+
+Hi,
+
+I'd be happy to contribute the plug-in generator, but Jeffrey's main =
+concern is whether the generated plug-ins can be added to the Photran =
+codebase.
+
+As I understand it, code licensing becomes an issue if the content =
+depends on licensed code. But in this case, all of the content is being =
+generated automatically. Once the plug-in is generated, it has no =
+external dependencies.
+
+The generator depends on Apache-licensed libraries, but that dependency =
+doesn't extend to the generated plug-ins. I think Jeffrey can add the =
+plug-ins to Photran without any licensing concerns, but I'm no expert.
+
+Best,
+Matt
+
+====================================================================================================
+
+Date: Fri, 02 Oct 2009 11:02:59 -0500
+From: Jeffrey Overbey <overbey2@illinois.edu>
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.23) Gecko/20090812 Lightning/0.9 Thunderbird/2.0.0.23 Mnenhy/0.7.6.666
+MIME-Version: 1.0
+To: Sharon Corbett <sharon.corbett@eclipse.org>
+CC: 'Matt Scarpino' <matt.scarpino@eclipseengineer.com>
+Subject: Re: Question - Photran help
+
+> In order to further understand before I respond, can you let me know 
+> if the intent is to check the content into the Eclipse repository?
+>
+
+We are only interested in checking the generated help content (HTML and 
+XML) into the repository.
+
+I bet Matt would be willing to contribute the entire generator if we 
+need to (I don't know what the Foundation's rules about generating code 
+are), but if we can avoid that and only check in the generated help 
+project, that seems easiest.
+
+Thanks.
+
+Jeff
+
+====================================================================================================
+
+From: "Sharon Corbett" <sharon.corbett@eclipse.org>
+To: "'Jeffrey Overbey'" <overbey2@illinois.edu>
+Subject: RE: Question - Photran help
+Date: Mon, 5 Oct 2009 12:15:37 -0400
+
+Hi Jeff:
+
+Thanks for the info you provided as well as Matt's input.  In order to bring
+this forward for a response could I ask you to provide (in layman's terms)
+an overview statement/paragraph regarding this tool?  It will also be
+important to understand if there is any license associated with the tool
+that would impact the generated content from being licensed under the terms
+of the EPL?
+
+Regards,
+Sharon 
+
+====================================================================================================
+
+Date: Mon, 05 Oct 2009 14:23:53 -0500
+From: Jeffrey Overbey <overbey2@illinois.edu>
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.23) Gecko/20090812 Lightning/0.9 Thunderbird/2.0.0.23 Mnenhy/0.7.6.666
+MIME-Version: 1.0
+To: Sharon Corbett <sharon.corbett@eclipse.org>
+Subject: Re: Question - Photran help
+
+Hi Sharon,
+
+> provide (in layman's terms) an overview statement/paragraph regarding 
+> this tool?  It will also be important to understand if there is any 
+> license associated with the tool
+>
+
+The WikiToEclipse tool takes a page from the Eclipse Wiki and translates 
+it into an Eclipse Help plug-in.  The intention is to use this for 
+Photran's end-user documentation, which is currently on the Eclipse 
+Wiki; by translating it into an Eclipse Help plug-in, users without 
+Internet access can still read the documentation inside the Eclipse Help 
+system.
+
+The translation from Eclipse Wiki markup to Eclipse Help markup is very 
+straightforward.  The tool does the same translation we would do by 
+hand.  Since it is just translating one kind of documentation into a 
+different kind of documentation (more or less like translating a Word 
+document into a WordPerfect document), the generated result does not 
+depend on any third-party libraries.
+
+Matt has placed the WikiToEclipse project in the public domain.  It uses 
+some BSD-licensed third-party libraries to read the input, etc., but the 
+output it generates in no way depends on these libraries; again, the 
+output (an Eclipse Help plug-in) is just a straightforward translation 
+of the input (an Eclipse Wiki page).  So, from what I can tell, and from 
+what Matt has told me, there is nothing preventing us from licensing the 
+generated Eclipse Help plug-in under the EPL.
+
+Jeff
+
+====================================================================================================
+
+From: "Sharon Corbett" <sharon.corbett@eclipse.org>
+To: "'Jeffrey Overbey'" <overbey2@illinois.edu>
+Subject: RE: Question - Photran help
+Date: Mon, 9 Nov 2009 14:54:38 -0500
+
+Hi Jeff:
+
+You are good to go with respect to using the generated content in the
+Eclipse repository.  
+
+If at some point in the future, you wish to check the generator tool itself
+into the repository; you will of course need to raise CQs as would be
+required.
+
+Regards,
+Sharon
+
+ 
+
+Sharon Corbett
+
+Eclipse Foundation Inc.
+Tel:  613-224-9461 ext. 232

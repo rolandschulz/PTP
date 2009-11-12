@@ -18,4 +18,15 @@ misc-notes
 	Various notes-to-self that aren't import enough to
 	be in the developer's guide.
 
---Jeff Overbey 8/19/05, updated 8/29/08
+contributions
+    Contains correspondence and documentation related to
+    third-party contributions in Photran.
+
+eclipse-config
+    Contains settings for the Eclipse Java code formatter
+    and code templates.  These have since been hard-coded
+    into the settings for each project, so they will be
+    applied by default when code is formatted or new classes
+    are created.
+
+--Jeff Overbey 8/19/05, updated 8/29/08, 11/12/09

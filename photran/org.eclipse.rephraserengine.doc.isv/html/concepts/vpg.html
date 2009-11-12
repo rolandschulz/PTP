@@ -4,6 +4,40 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Contributing a Virtual Program Graph</title>
+<style type="text/css">
+<!--
+span.st1 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #800000;
+    }
+span.st2 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #000000;
+    }
+span.st3 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #000080;
+    }
+span.st4 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #008000;
+    }
+span.st5 
+    {
+    font-family: Times New Roman;
+    font-size: 12pt;
+    color: #000000;
+    }
+-->
+</style>
 </head>
 
 <body>
@@ -13,17 +47,19 @@ TODO
 
 <h2>Example</h2>
 
-<pre>
-   &lt;!-- This will automatically add some actions to the (Debugging) sub-menu of the Refactor
-        menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc. --&gt;
-   &lt;extension
-         point=&quot;org.eclipse.rephraserengine.ui.vpg.vpg&quot;&gt;
-      &lt;vpg
-         id=&quot;org.eclipse.photran.ui.vpg&quot;
-         name=&quot;Fortran&quot;
-         class=&quot;org.eclipse.photran.internal.ui.PhotranVPGContribution&quot; /&gt;
-   &lt;/extension&gt;
-</pre>
+<!-- http://www.sautinsoft.net/rtf-to-html-convert.aspx -->
+
+<div><span class="st1"> &nbsp;&nbsp;&lt;!-- This will automatically add some actions to the (Debugging) sub-menu of the Refactor</span></div>
+<div><span class="st2"></span><span class="st1"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc. --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;</span><span class="st3">&lt;extension</span></div>
+
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">point=</span><span class="st4">"org.eclipse.rephraserengine.ui.vpg.vpg"</span><span class="st3">&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;vpg</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">id=</span><span class="st4">"org.eclipse.photran.ui.vpg"</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">name=</span><span class="st4">"Fortran"</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">class=</span><span class="st4">"org.eclipse.photran.internal.ui.vpg.PhotranVPGContribution"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+
+<div><span class="st2"> &nbsp;&nbsp;</span><span class="st3">&lt;/extension&gt;</span></div>
 
 </body>
 </html>

@@ -4,6 +4,40 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title>Contributing Refactorings</title>
+<style type="text/css">
+<!--
+span.st1 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #800000;
+    }
+span.st2 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #000000;
+    }
+span.st3 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #000080;
+    }
+span.st4 
+    {
+    font-family: Courier New;
+    font-size: 10pt;
+    color: #008000;
+    }
+span.st5 
+    {
+    font-family: Times New Roman;
+    font-size: 12pt;
+    color: #000000;
+    }
+-->
+</style>
 </head>
 
 <body>
@@ -15,48 +49,57 @@ org.eclipse.rephraserengine.ui.refactoring.refactorings extension point
 
 <h2>Examples</h2>
 
-<pre>
-   &lt;extension
-         point=&quot;org.eclipse.rephraserengine.ui.refactoring.refactorings&quot;&gt;
+<!-- http://www.sautinsoft.net/rtf-to-html-convert.aspx -->
 
-      &lt;!-- The resource filter determines what must be selected for these refactorings to be visible --&gt;
-      &lt;resourceFilter class=&quot;org.eclipse.rephraserengine.examples.text.TextFileResourceFilter&quot; /&gt;
+<div><span class="st2"> &nbsp;&nbsp;</span><span class="st3">&lt;extension</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">point=</span><span class="st4">"org.eclipse.rephraserengine.ui.refactoring.refactorings"</span><span class="st3">&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
 
-      &lt;!-- Each group defines a new (separated) section in the Refactor menu --&gt;
-      &lt;group&gt;
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- The resource filter determines what must be selected for these refactorings to be visible --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;resourceFilter</span><span class="st2"> </span><span class="st3">class=</span><span class="st4">"org.eclipse.rephraserengine.examples.text.TextFileResourceFilter"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- Each group defines a new (separated) section in the Refactor menu --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;group&gt;</span></div>
 
-         &lt;!-- A resource refactoring which uses an auto-generated user interface --&gt;
-         &lt;resourceRefactoring
-            class=&quot;org.eclipse.rephraserengine.examples.text.ConvertTabsToSpacesRefactoring&quot; /&gt;
+<div><span class="st2"></span>&nbsp;</div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- A resource refactoring which uses an auto-generated user interface --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;resourceRefactoring</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">class=</span><span class="st4">"org.eclipse.rephraserengine.examples.text.ConvertTabsToSpacesRefactoring"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- An editor refactoring which uses an auto-generated user interface --&gt;</span></div>
 
-         &lt;!-- An editor refactoring which uses an auto-generated user interface --&gt;
-         &lt;editorRefactoring
-             class=&quot;org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring&quot; /&gt;
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;editorRefactoring</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">class=</span><span class="st4">"org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- Same as previous, except the given label ("Increase Visibility") will appear in the menu;</span></div>
+<div><span class="st2"></span><span class="st1"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when the label attribute is absent, the label will be whatever is returned by the refactoring&amp;apos;s</span></div>
 
-         &lt;!-- Same as previous, except the given label (&quot;Increase Visibility&quot;) will appear in the menu;
-              when the label attribute is absent, the label will be whatever is returned by the refactoring&apos;s
-              #getName method --&gt;
-         &lt;editorRefactoring
-             label=&quot;Increase Visibility&quot;
-             class=&quot;org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring&quot; /&gt;
+<div><span class="st2"></span><span class="st1"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#getName method --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;editorRefactoring</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">label=</span><span class="st4">"Increase Visibility"</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">class=</span><span class="st4">"org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
 
-         &lt;!-- An editor refactoring which uses a custom user interface --&gt;
-         &lt;editorRefactoring
-             class=&quot;org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring&quot;
-             inputPage=&quot;org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage&quot; /&gt;
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- An editor refactoring which uses a custom user interface --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;editorRefactoring</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">class=</span><span class="st4">"org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring"</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">inputPage=</span><span class="st4">"org.eclipse.photran.internal.refactoring.ui.AddOnlyToUseStmtInputPage"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
 
-         &lt;!-- A command which is contributed as an editor refactoring --&gt;
-         &lt;!-- Note that this is the only way to give a refactoring a key binding --&gt;
-         &lt;editorRefactoring command=&quot;org.eclipse.photran.ui.RenameRefactoringCommand&quot; /&gt;
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- A command which is contributed as an editor refactoring --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- Note that this is the only way to give a refactoring a key binding --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;editorRefactoring</span><span class="st2"> </span><span class="st3">command=</span><span class="st4">"org.eclipse.photran.ui.RenameRefactoringCommand"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st1">&lt;!-- An editor refactoring which only appears in the menu when the</span></div>
 
-         &lt;!-- An editor refactoring which only appears in the menu when the
-              PHOTRAN_INCLUDE_TEST_REFACTORINGS environment variable is set to a non-null value --&gt;
-         &lt;editorRefactoring
-             require_env=&quot;PHOTRAN_INCLUDE_TEST_REFACTORINGS&quot;
-             class=&quot;org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring&quot; /&gt;
+<div><span class="st2"></span><span class="st1"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PHOTRAN_INCLUDE_TEST_REFACTORINGS environment variable is set to a non-null value --&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;editorRefactoring</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">require_env=</span><span class="st4">"PHOTRAN_INCLUDE_TEST_REFACTORINGS"</span></div>
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">class=</span><span class="st4">"org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring"</span><span class="st2"> </span><span class="st3">/&gt;</span></div>
+<div><span class="st2"></span>&nbsp;</div>
 
-      &lt;/group&gt;
-   &lt;/extension&gt;
+<div><span class="st2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="st3">&lt;/group&gt;</span></div>
+<div><span class="st2"> &nbsp;&nbsp;</span><span class="st3">&lt;/extension&gt;</span></div>
 </pre>
 
 </body>

@@ -15,11 +15,11 @@ The Rephraser Engine is an Eclipse-based library that expedites the development 
 <li> The <i>virtual program graph (VPG)</i> component provides a language-independent program database and indexing infrastructure.
 </ul>
 
-These components are independent; some projects may choose to use the Refactoring component without using the VPG component, for example.  The dependencies among the projects comprising the Rephraser Engine are as follows.
+<p>These components are independent; some projects may choose to use the Refactoring component without using the VPG component, for example.  The dependencies among the projects comprising the Rephraser Engine are as follows.</p>
 
-<img src="../../images/architecture.png" border="0" />
+<p><img src="../../images/architecture.png" border="0" /></p>
 
-"Rephraser" is an acronym, which stands for
+<p>"Rephraser" is an acronym which stands for
 Rapid
 Eclipse
 Prototyping
@@ -28,27 +28,27 @@ Research on
 Approximate
 Semantic
 Equivalence-based
-Refactoring.
+Refactoring.</p>
 
 <h2>Features</h2>
 
 <h3>Refactoring</h3>
 
-The Refactoring component extends the Eclipse Language ToolKit (LTK) and
+<p>The Refactoring component extends the Eclipse Language ToolKit (LTK) and
 <ul>
 <li> contributes a Refactor menu to the workbench menu bar, as well as to the context menu for resource selections in the workbench;
 <li> provides an extension point that allows refactorings to be contributed to this menu; and
 <li> does not require any user interface code to be written for simple refactorings.
-</ul>
+</ul></p>
 
 <h3>VPG</h3>
 
-The VPG component
+<p>The VPG component
 <ul>
 <li> provides a set of base classes for building persistable program graphs;
 <li> provides an indexing infrastructure by registering a resource listener and automatically updating program graphs as workspace resources change; and
 <li> contributes a "(Debugging)" sub-menu to the workbench Refactoring menu, which provides various actions for viewing, analyzing, and manipulating VPG databases.
-</ul>
+</ul></p>
 
 </body>
 </html>
