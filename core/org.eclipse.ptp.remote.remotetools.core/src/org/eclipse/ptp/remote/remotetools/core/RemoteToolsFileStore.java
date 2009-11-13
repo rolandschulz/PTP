@@ -40,16 +40,19 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 public class RemoteToolsFileStore extends FileStore {
-	private static Map<URI, RemoteToolsFileStore> instanceMap = new HashMap<URI, RemoteToolsFileStore>();
+	private static Map<String, RemoteToolsFileStore> instanceMap = new HashMap<String, RemoteToolsFileStore>();
 
 	/**
 	 * Public factory method for obtaining RemoteToolsFileStore instances.
-	 * @param uri URI to get a fileStore for
+	 * 
+	 * @param uri
+	 *            URI to get a fileStore for
 	 * @return an RemoteToolsFileStore instance for the URI.
 	 */
 	public static RemoteToolsFileStore getInstance(URI uri) {
 		synchronized (instanceMap) {
-			RemoteToolsFileStore store = (RemoteToolsFileStore)instanceMap.get(uri);
+			RemoteToolsFileStore store = (RemoteToolsFileStore) instanceMap
+					.get(uri.toString());
 			if (store == null) {
 				String name = uri.getAuthority();
 				try {
@@ -59,40 +62,45 @@ public class RemoteToolsFileStore extends FileStore {
 				}
 				String path = uri.getPath();
 				store = new RemoteToolsFileStore(name, path);
-				instanceMap.put(uri, store);
+				instanceMap.put(uri.toString(), store);
 			}
 			return store;
 		}
 	}
-	
+
 	private final String fConnectionName;
 	private final IPath fRemotePath;
 
-	private IRemoteItem remoteItem = null;
-	private boolean stale = true;
-	
+	private IRemoteItem fRemoteItem = null;
+
 	public RemoteToolsFileStore(String connName, String path) {
 		fConnectionName = connName;
 		fRemotePath = new Path(path);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int, org.eclipse.core.runtime.IProgressMonitor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException {
+	public String[] childNames(int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		
+		System.out.println("CHILDNAMES: " + fRemotePath.toString()); //$NON-NLS-1$
+
 		IRemoteItem[] items;
 		try {
-			items = getExecutionManager(monitor).getRemoteFileTools().listItems(fRemotePath.toString());
+			items = getExecutionManager(monitor).getRemoteFileTools()
+					.listItems(fRemotePath.toString());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_INTERNAL, 
-					e.getMessage(), null));
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL, e
+							.getMessage(), null));
 		}
 
 		String[] names = new String[items.length];
@@ -105,69 +113,91 @@ public class RemoteToolsFileStore extends FileStore {
 		return names;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#delete(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#delete(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void delete(int options, IProgressMonitor monitor) throws CoreException {
+	public void delete(int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		System.out.println("DELETE: " + fRemotePath.toString()); //$NON-NLS-1$
 
 		IRemoteItem item = getRemoteItem(monitor);
-		
+
 		if (item.exists()) {
 			try {
-				stale = true;
-				getExecutionManager(monitor).getRemoteFileTools().removeFile(fRemotePath.toString());
+				cacheRemoteItem(null);
+				if (item.isDirectory()) {
+					getExecutionManager(monitor).getRemoteFileTools()
+							.removeDirectory(fRemotePath.toString());
+				} else {
+					getExecutionManager(monitor).getRemoteFileTools()
+							.removeFile(fRemotePath.toString());
+				}
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL,
 						Messages.RemoteToolsFileStore_0, e));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#fetchInfo(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#fetchInfo(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
+	public IFileInfo fetchInfo(int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		System.out.println("FETCHINFO: " + fRemotePath.toString()); //$NON-NLS-1$
 
 		IRemoteItem item = getRemoteItem(monitor);
-		
+
 		FileInfo info = new FileInfo(getName());
 
 		if (!item.exists()) {
 			info.setExists(false);
 			return info;
-		}	
-		
+		}
+
 		info.setExists(true);
 		info.setLastModified(item.getModificationTime());
 		info.setDirectory(item.isDirectory());
 		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !item.isWritable());
 		info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, item.isExecutable());
 		info.setLength(item.getSize());
-
 		return info;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#getChild(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#getChild(java.lang.String)
 	 */
 	@Override
 	public IFileStore getChild(String name) {
-		URI uri = RemoteToolsFileSystem.getURIFor(fConnectionName, fRemotePath.append(name).toString());
+		System.out.println("GETCHILD: " + name); //$NON-NLS-1$
+		URI uri = RemoteToolsFileSystem.getURIFor(fConnectionName, fRemotePath
+				.append(name).toString());
 		return RemoteToolsFileStore.getInstance(uri);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#getName()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#getName()
 	 */
 	@Override
 	public String getName() {
@@ -177,14 +207,14 @@ public class RemoteToolsFileStore extends FileStore {
 		return fRemotePath.lastSegment();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#getParent()
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * FIXME: should take a progress monitor as argument
-	 * FIXME: should throw a core exception
+	 * @see org.eclipse.core.filesystem.provider.FileStore#getParent()
 	 */
 	@Override
 	public IFileStore getParent() {
+		System.out.println("GETPARENT: " + fRemotePath.toString()); //$NON-NLS-1$
 		if (fRemotePath.isRoot()) {
 			return null;
 		}
@@ -192,143 +222,159 @@ public class RemoteToolsFileStore extends FileStore {
 		if (fRemotePath.segmentCount() > 0) {
 			parentPath = fRemotePath.removeLastSegments(1).toString();
 		}
-		return RemoteToolsFileStore.getInstance(RemoteToolsFileSystem.getURIFor(fConnectionName, parentPath));
+		return RemoteToolsFileStore.getInstance(RemoteToolsFileSystem
+				.getURIFor(fConnectionName, parentPath));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#mkdir(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#mkdir(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
+	public IFileStore mkdir(int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		System.out.println("MKDIR: " + fRemotePath.toString()); //$NON-NLS-1$
 
 		IRemoteItem item = getRemoteItem(monitor);
-		
+
 		if (!item.exists()) {
 			if ((options & EFS.SHALLOW) == EFS.SHALLOW) {
 				IFileStore parent = getParent();
-				if (parent != null && !parent.fetchInfo(EFS.NONE, monitor).exists()) {
+				if (parent != null
+						&& !parent.fetchInfo(EFS.NONE, monitor).exists()) {
 					throw new CoreException(new Status(IStatus.ERROR,
-							RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-							EFS.ERROR_WRITE,
-							Messages.RemoteToolsFileStore_1, null));
+							RemoteToolsAdapterCorePlugin.getDefault()
+									.getBundle().getSymbolicName(),
+							EFS.ERROR_WRITE, Messages.RemoteToolsFileStore_1,
+							null));
 				}
 			}
-			
+
 			try {
-				stale = true;
-				getExecutionManager(monitor).getRemoteFileTools().createDirectory(fRemotePath.toString());
+				getExecutionManager(monitor).getRemoteFileTools()
+						.createDirectory(fRemotePath.toString());
+				cacheRemoteItem(null);
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL,
 						Messages.RemoteToolsFileStore_2, e));
 			}
 		} else if (!item.isDirectory()) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_WRONG_TYPE,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_WRONG_TYPE,
 					Messages.RemoteToolsFileStore_13, null));
 		}
-		
+
 		return this;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openInputStream(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#openInputStream(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
+	public InputStream openInputStream(int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		System.out.println("OPENINPUTSTREAM: " + fRemotePath.toString()); //$NON-NLS-1$
 
 		IRemoteItem item = getRemoteItem(monitor);
-		
+
 		if (!item.exists()) {
+			System.out.println("OPENINPUTSTREAM: " + Messages.RemoteToolsFileStore_14); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_READ,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_READ,
 					Messages.RemoteToolsFileStore_14, null));
 		}
-		
+
 		if (item.isDirectory()) {
+			System.out.println("OPENINPUTSTREAM: " + Messages.RemoteToolsFileStore_3); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_WRONG_TYPE, 
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_WRONG_TYPE,
 					Messages.RemoteToolsFileStore_3, null));
 		}
-		
+
 		try {
-			stale = true;
-			return getExecutionManager(monitor).getRemoteFileTools().getInputStream(item.getPath(), monitor);
+			return getExecutionManager(monitor).getRemoteFileTools()
+					.getInputStream(item.getPath(), monitor);
 		} catch (Exception e) {
+			System.out.println("OPENINPUTSTREAM: " + e.getLocalizedMessage()); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_INTERNAL,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL,
 					Messages.RemoteToolsFileStore_4, e));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#openOutputStream(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#openOutputStream(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
+	public OutputStream openOutputStream(int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		
+		System.out.println("OPENOUTPUTSTREAM: " + fRemotePath.toString()); //$NON-NLS-1$
+
 		IRemoteItem item = getRemoteItem(monitor);
 
-		if (!item.exists()) {
-			try {
-				stale = true;
-				getExecutionManager(monitor).getRemoteFileTools().createFile(item.getPath());
-			} catch(Exception e) {
-				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
-						e.getMessage(), e));
-			}
-			
-			item = getRemoteItem(monitor);
-		}
-		
 		if (item.isDirectory()) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_WRONG_TYPE,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_WRONG_TYPE,
 					Messages.RemoteToolsFileStore_3, null));
 		}
-		
+
 		try {
-			// Convert from EFS option constants to IFileService option constants
+			// Convert from EFS option constants to IFileService option
+			// constants
 			if ((options & EFS.APPEND) != 0) {
 				options = IRemoteFileTools.APPEND;
 			} else {
 				options = IRemoteFileTools.NONE;
 			}
-			stale = true;
-			return getExecutionManager(monitor).getRemoteFileTools().getOutputStream(item.getPath(), options, monitor);
+			cacheRemoteItem(null);
+			return getExecutionManager(monitor).getRemoteFileTools()
+					.getOutputStream(item.getPath(), options, monitor);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_INTERNAL,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL,
 					Messages.RemoteToolsFileStore_6, e));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#putInfo(org.eclipse.ptp.remote.core.IRemoteResourceInfo, int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#putInfo(org.eclipse.core
+	 * .filesystem.IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
+	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		System.out.println("PUTINFO: " + fRemotePath.toString()); //$NON-NLS-1$
 
 		IRemoteItem item = getRemoteItem(monitor);
 
@@ -348,127 +394,144 @@ public class RemoteToolsFileStore extends FileStore {
 		if (modified) {
 			try {
 				item.commitAttributes();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
-						e.getMessage(), e));
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, e
+								.getMessage(), e));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteResource#toURI()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#toURI()
 	 */
 	@Override
 	public URI toURI() {
-		return RemoteToolsFileSystem.getURIFor(fConnectionName, fRemotePath.toString());
+		return RemoteToolsFileSystem.getURIFor(fConnectionName, fRemotePath
+				.toString());
 	}
 
 	/**
-	 * Get the remote tools execution manager associated with the connection. Will attempt to
-	 * initialize and open the connection if necessary.
+	 * Get the remote tools execution manager associated with the connection.
+	 * Will attempt to initialize and open the connection if necessary.
 	 * 
-	 * @param monitor progress monitor
+	 * @param monitor
+	 *            progress monitor
 	 * @return remote tools execution manager
 	 * @throws CoreException
 	 */
-	private IRemoteExecutionManager getExecutionManager(IProgressMonitor monitor) throws CoreException {
+	private IRemoteExecutionManager getExecutionManager(IProgressMonitor monitor)
+			throws CoreException {
 		final RemoteToolsServices services = RemoteToolsServices.getInstance();
 		if (!services.isInitialized()) {
 			services.initialize();
 			if (!services.isInitialized()) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL,
 						Messages.RemoteToolsFileStore_5, null));
 			}
 		}
-		final RemoteToolsConnectionManager connMgr = (RemoteToolsConnectionManager)services.getConnectionManager();
+		final RemoteToolsConnectionManager connMgr = (RemoteToolsConnectionManager) services
+				.getConnectionManager();
 		if (connMgr == null) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_INTERNAL,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL,
 					Messages.RemoteToolsFileStore_7, null));
 		}
-		final RemoteToolsConnection conn = (RemoteToolsConnection)connMgr.getConnection(fConnectionName);
+		final RemoteToolsConnection conn = (RemoteToolsConnection) connMgr
+				.getConnection(fConnectionName);
 		if (conn == null) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_INTERNAL,
-					NLS.bind(Messages.RemoteToolsFileStore_8, fConnectionName), null));
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(
+							Messages.RemoteToolsFileStore_8, fConnectionName),
+					null));
 		}
 		if (!conn.isOpen()) {
 			try {
 				conn.open(monitor);
 			} catch (RemoteConnectionException e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
-						e.getLocalizedMessage(), e));
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, e
+								.getLocalizedMessage(), e));
 			}
-            if (monitor.isCanceled()) {
+			if (monitor.isCanceled()) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						EFS.ERROR_INTERNAL,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL,
 						Messages.RemoteToolsFileStore_12, null));
-            }
-    		if (!conn.isOpen()) {
-    			throw new CoreException(new Status(IStatus.ERROR,
-    					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-    					EFS.ERROR_INTERNAL,
-    					NLS.bind(Messages.RemoteToolsFileStore_10, fConnectionName), null));
-    		}
+			}
+			if (!conn.isOpen()) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, NLS
+								.bind(Messages.RemoteToolsFileStore_10,
+										fConnectionName), null));
+			}
 		}
 		try {
 			return conn.createExecutionManager();
 		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
 			throw new CoreException(new Status(IStatus.ERROR,
-					RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-					EFS.ERROR_INTERNAL,
-					e.getLocalizedMessage(), e));
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL, e
+							.getLocalizedMessage(), e));
 		}
 	}
 
 	/**
-	 * Gets the remote item associated with this file store. Will open the connection
-	 * if necessary.
+	 * Gets the remote item associated with this file store. Will open the
+	 * connection if necessary.
 	 * 
-	 * @param monitor progress monitor
+	 * @param monitor
+	 *            progress monitor
 	 * @return remote item
 	 * @throws CoreException
 	 */
-	private IRemoteItem getRemoteItem(IProgressMonitor monitor) throws CoreException {
+	private IRemoteItem getRemoteItem(IProgressMonitor monitor)
+			throws CoreException {
 		final IRemoteExecutionManager mgr = getExecutionManager(monitor);
-		if (remoteItem == null) {
+		if (fRemoteItem == null) {
 			try {
 				IRemoteFileTools tools = mgr.getRemoteFileTools();
-				remoteItem = tools.getItem(fRemotePath.toString());
+				cacheRemoteItem(tools.getItem(fRemotePath.toString()));
 			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						e.getLocalizedMessage()));
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, e
+								.getLocalizedMessage(), e));
 			} catch (RemoteOperationException e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						e.getLocalizedMessage()));
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, e
+								.getLocalizedMessage(), e));
 			} catch (CancelException e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						e.getLocalizedMessage()));
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, e
+								.getLocalizedMessage(), e));
 			}
-		}
-		
-		if (stale) {
+
 			try {
-				remoteItem.refreshAttributes();
+				fRemoteItem.refreshAttributes();
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
-						RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(),
-						e.getMessage(), e));
+						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+								.getSymbolicName(), EFS.ERROR_INTERNAL, e
+								.getLocalizedMessage(), e));
 			}
 		}
 
-		return remoteItem;
+		return fRemoteItem;
+	}
+
+	private void cacheRemoteItem(IRemoteItem item) {
+		fRemoteItem = item;
 	}
 }
