@@ -104,8 +104,9 @@ public class FileTools implements IRemoteFileTools {
 //	}
 
 	protected ExecutionManager manager;
-	public int cachedUserID;
-	public Set<Integer> cachedGroupIDSet;
+	private int cachedUserID;
+	private Set<Integer> cachedGroupIDSet;
+	private String fOSName = null;
 
 	protected FileTools(ExecutionManager manager) {
 		this.manager = manager;
@@ -184,7 +185,7 @@ public class FileTools implements IRemoteFileTools {
 			createDirectory(parent);
 		}
 		
-		synchronized (manager) {
+		synchronized (this) {
 			try {
 				manager.getConnection().getDefaultSFTPChannel().mkdir(path);
 			} catch (SftpException e) {
@@ -210,7 +211,7 @@ public class FileTools implements IRemoteFileTools {
 		IRemotePathTools pathTool = manager.getRemotePathTools();
 		String path = pathTool.quote(file, true);
 		
-		synchronized (manager) {
+		synchronized (this) {
 			try {
 				OutputStream os = manager.getConnection().getDefaultSFTPChannel().put(path);
 				os.close();
@@ -285,13 +286,15 @@ public class FileTools implements IRemoteFileTools {
 		IRemoteScript script = manager.executionTools.createScript();
 		script.setScript("cat " + path); //$NON-NLS-1$
 		RemoteProcess proc = null;
-		try {
-			proc = manager.executionTools.executeProcess(script);
-		} catch (RemoteExecutionException e) {
-			throw new RemoteOperationException(e.getLocalizedMessage());
-		}
-		if (proc == null) {
-			throw new RemoteOperationException("Unable to get input stream");
+		synchronized (this) {
+			try {
+				proc = manager.executionTools.executeProcess(script);
+			} catch (RemoteExecutionException e) {
+				throw new RemoteOperationException(e.getLocalizedMessage());
+			}
+			if (proc == null) {
+				throw new RemoteOperationException("Unable to get input stream");
+			}
 		}
 		return proc.getInputStream();
 		
@@ -336,20 +339,22 @@ public class FileTools implements IRemoteFileTools {
 			monitor = new NullProgressMonitor();
 		}
 		
+		RemoteProcess proc = null;
 		IRemoteScript script = manager.executionTools.createScript();
 		if ((options & IRemoteFileTools.APPEND) == 0) {
 			script.setScript("cat > " + path); //$NON-NLS-1$
 		} else {
 			script.setScript("cat >> " + path); //$NON-NLS-1$
 		}
-		RemoteProcess proc = null;
-		try {
-			proc = manager.executionTools.executeProcess(script);
-		} catch (RemoteExecutionException e) {
-			throw new RemoteOperationException(e.getLocalizedMessage());
-		}
-		if (proc == null) {
-			throw new RemoteOperationException("Unable to get output stream");
+		synchronized (this) {
+			try {
+				proc = manager.executionTools.executeProcess(script);
+			} catch (RemoteExecutionException e) {
+				throw new RemoteOperationException(e.getLocalizedMessage());
+			}
+			if (proc == null) {
+				throw new RemoteOperationException("Unable to get output stream");
+			}
 		}
 		return proc.getOutputStream();
 
@@ -429,7 +434,7 @@ public class FileTools implements IRemoteFileTools {
 		validateRemotePath(root);
 		Vector files;
 
-		synchronized (manager) {
+		synchronized (this) {
 			try { 
 				files = manager.getConnection().getDefaultSFTPChannel().ls(root);
 			} catch (SftpException e) {
@@ -487,7 +492,7 @@ public class FileTools implements IRemoteFileTools {
 		IRemotePathTools pathTool = manager.getRemotePathTools();
 		String path = pathTool.quote(file, true);
 		
-		synchronized (manager) {
+		synchronized (this) {
 			try {
 				manager.getConnection().getDefaultSFTPChannel().rm(path);
 			} catch (SftpException e) {
@@ -513,7 +518,7 @@ public class FileTools implements IRemoteFileTools {
 		IRemotePathTools pathTool = manager.getRemotePathTools();
 		String path = pathTool.quote(dir, true);
 		
-		synchronized (manager) {
+		synchronized (this) {
 			try {
 				manager.getConnection().getDefaultSFTPChannel().rmdir(path);
 			} catch (SftpException e) {
@@ -548,10 +553,27 @@ public class FileTools implements IRemoteFileTools {
 	 * @throws RemoteExecutionException
 	 */
 	protected RemoteFileAttributes fetchRemoteAttr(String path) throws RemoteOperationException {
-		String statCmd = "stat --format \"0x%f %s %u %g %X %Y\" "; //$NON-NLS-1$
+		try {
+			test();
+		} catch (RemoteConnectionException e) {
+			throw new RemoteOperationException(e.getLocalizedMessage());
+		} catch (CancelException e) {
+			throw new RemoteOperationException(e.getLocalizedMessage());
+		}
+		validateRemotePath(path);
+		IRemotePathTools pathTool = manager.getRemotePathTools();
+		String quotedPath = pathTool.quote(path, true);
+
+		String statCmd;
+		if (checkOSName("Darwin")) { //$NON-NLS-1$
+			statCmd = "stat -f \"0%p %z %u %g %m %a\" " + quotedPath + " 2>&1"; //$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			// Assume linux
+			statCmd = "stat --format \"0x%f %s %u %g %X %Y\" " + quotedPath + " 2>&1"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		String result;
 		try {
-			result = manager.executionTools.executeWithOutput(statCmd + path);
+			result = manager.executionTools.executeWithOutput(statCmd);
 		} catch (RemoteExecutionException e) {
 			throw new RemoteOperationException(e.getLocalizedMessage());
 		} catch (RemoteConnectionException e) {
@@ -559,7 +581,7 @@ public class FileTools implements IRemoteFileTools {
 		} catch (CancelException e) {
 			throw new RemoteOperationException(e.getLocalizedMessage());
 		}
-		
+
 		return RemoteFileAttributes.getAttributes(result.trim());
 		
 //		synchronized (manager) {
@@ -574,13 +596,36 @@ public class FileTools implements IRemoteFileTools {
 //			}
 //		}
 	}
+	
+	public int getCachedUserID() {
+		return cachedUserID;
+	}
+	
+	public Set<Integer> getCachedGroupIDSet() {
+		return cachedGroupIDSet;
+	}
 
 	protected void test() throws RemoteConnectionException, CancelException {
 		manager.test();
 		manager.testCancel();
 	}
 	
-	String addTrailingSlash(String path) {
+	private boolean checkOSName(String name) {
+		if (fOSName == null) {
+			try {
+				fOSName = manager.getExecutionTools().executeWithOutput("uname").trim(); //$NON-NLS-1$
+			} catch (RemoteExecutionException e) {
+				return false;
+			} catch (RemoteConnectionException e) {
+				return false;
+			} catch (CancelException e) {
+				return false;
+			}
+		}
+		return fOSName.equals(name);
+	}
+	
+	public String addTrailingSlash(String path) {
 		if (path.endsWith("/")) { //$NON-NLS-1$
 			return path;
 		} else {
@@ -588,7 +633,7 @@ public class FileTools implements IRemoteFileTools {
 		}
 	}
 
-	String concatenateRemotePath(String p1, String p2) {
+	public String concatenateRemotePath(String p1, String p2) {
 		if (p1.endsWith("/")) { //$NON-NLS-1$
 			return p1 + p2;
 		} else {
@@ -596,14 +641,14 @@ public class FileTools implements IRemoteFileTools {
 		}
 	}
 
-	String parentOfRemotePath(String path) {
+	public String parentOfRemotePath(String path) {
 		path = removeTrailingSlash(path);
 		int index = path.lastIndexOf('/');
 		if (index == -1) return null;
 		return removeTrailingSlash(path.substring(0, index));
 	}
 
-	String removeTrailingSlash(String path) {
+	public String removeTrailingSlash(String path) {
 		if (!path.equals("/") && path.endsWith("/")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return path.substring(0, path.length() - 1);
 		} else {
@@ -611,7 +656,7 @@ public class FileTools implements IRemoteFileTools {
 		}
 	}
 
-	String suffixOfRemotePath(String path) {
+	public String suffixOfRemotePath(String path) {
 		path = removeTrailingSlash(path);
 		int index = path.lastIndexOf('/');
 		if (index == -1) return null;
@@ -624,14 +669,14 @@ public class FileTools implements IRemoteFileTools {
 	 * @throws RemoteConnectionException 
 	 * @deprecated
 	 */
-	void uploadPermissions(File file, String remoteFilePath) throws RemoteConnectionException, RemoteOperationException, CancelException {
+	public void uploadPermissions(File file, String remoteFilePath) throws RemoteConnectionException, RemoteOperationException, CancelException {
 		IRemoteItem item = getItem(remoteFilePath);
 		item.setReadable(file.canRead());
 		item.setWriteable(file.canWrite());
 		item.commitAttributes();
 	}
 	
-	void validateRemotePath(String path) throws RemoteOperationException {
+	public void validateRemotePath(String path) throws RemoteOperationException {
 		if (! path.startsWith("/")) { //$NON-NLS-1$
 			throw new RemoteOperationException(path + Messages.RemoteFileTools_ValidateRemotePath_NotValid);
 		}
