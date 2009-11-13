@@ -75,6 +75,9 @@
    <feature url="features/org.eclipse.photran.xlf_5.0.0.@timeStamp@.jar" id="org.eclipse.photran.xlf" version="5.0.0.@timeStamp@">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
+   <feature url="features/org.eclipse.rephraserengine_1.0.0.@timeStamp@.jar" id="org.eclipse.rephraserengine" version="1.0.0.@timeStamp@">
+      <category name="Fortran Development Tools (Photran)"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.rdt.xlc_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt.xlc" version="3.0.0.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
