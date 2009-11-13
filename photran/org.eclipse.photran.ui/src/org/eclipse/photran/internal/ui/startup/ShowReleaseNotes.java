@@ -46,12 +46,21 @@ public final class ShowReleaseNotes implements IStartup
         }
         else
         {
+            /*
+             * Set the preference, then make sure it was actually set.  If there was a problem
+             * saving the preference, we shouldn't show the release notes, since we might have
+             * already done that and we don't want to annoy the user
+             */
             FortranPreferences.RELEASE_NOTES_SHOWN.setValue(true);
+            if (!FortranPreferences.RELEASE_NOTES_SHOWN.getValue()) return false;
             
-            // Make sure the preference was actually set.
-            // If there was a problem saving the preference, we shouldn't show the release notes,
-            // since we might have already done that and we don't want to annoy the user
-            return FortranPreferences.RELEASE_NOTES_SHOWN.getValue();
+            /*
+            GregorianCalendar today = new GregorianCalendar();
+            if (today.after(new GregorianCalendar(2012, GregorianCalendar.JANUARY, 1)))
+                return false;
+            */
+            
+            return true;
         }
     }
 
