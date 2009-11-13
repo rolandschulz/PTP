@@ -66,7 +66,7 @@ public class ExtractLocalVariableAction
         {
             addPage(new UserInputWizardPage(extractRefactoring.getName())
             {
-                protected Text nameField, typeField;
+                protected Text declField;
 
                 public void createControl(Composite parent)
                 {
@@ -79,40 +79,27 @@ public class ExtractLocalVariableAction
                     twoCol.horizontalSpan = 2;
 
                     Label lbl = new Label(group, SWT.NONE);
-                    lbl.setText("Type:");
+                    lbl.setText("Declaration:");
 
-                    typeField = new Text(group, SWT.BORDER);
-                    typeField.setText(extractRefactoring.getType());
-                    typeField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-                    typeField.selectAll();
-                    typeField.addModifyListener(new ModifyListener()
+                    declField = new Text(group, SWT.BORDER);
+                    declField.setText(extractRefactoring.getDecl());
+                    declField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+                    declField.selectAll();
+                    declField.addModifyListener(new ModifyListener()
                     {
                         public void modifyText(ModifyEvent e)
                         {
-                            extractRefactoring.setType(typeField.getText());
-                        }
-                    });
-
-                    Label lbl2 = new Label(group, SWT.NONE);
-                    lbl2.setText("Name:");
-
-                    nameField = new Text(group, SWT.BORDER);
-                    nameField.setText("");
-                    nameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-                    nameField.selectAll();
-                    nameField.addModifyListener(new ModifyListener()
-                    {
-                        public void modifyText(ModifyEvent e)
-                        {
-                            extractRefactoring.setName(nameField.getText());
+                            extractRefactoring.setDecl(declField.getText());
                         }
                     });
 
                     // Call once for sure, just in case the user doesn't modify the text
-                    extractRefactoring.setType(typeField.getText());
-                    extractRefactoring.setName(nameField.getText());
+                    extractRefactoring.setDecl(declField.getText());
 
-                    typeField.setFocus();
+                    int offset = declField.getText().indexOf(":: ");
+                    if (offset < 0) offset = 0; else offset = offset + ":: ".length();
+                    declField.setSelection(offset, declField.getText().length());
+                    declField.setFocus();
                 }
             });
         }

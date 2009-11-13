@@ -55,9 +55,10 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     @SuppressWarnings("unchecked") private IASTListNode enclosingStmtList;
     private ScopingNode enclosingScope;
 
-    private String name = null, type = null;
+    private String decl = null;
 
     private ASTTypeDeclarationStmtNode declToInsert = null;
+    private String name;
 
     @Override
     public String getName()
@@ -69,25 +70,18 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     // User-Specified Parameters
     ///////////////////////////////////////////////////////////////////////////
 
-    public void setName(String name)
+    public void setDecl(String decl)
     {
-        assert name != null;
+        assert decl != null;
 
-        this.name = name;
+        this.decl = decl;
     }
 
-    public String getType()
+    public String getDecl()
     {
-        assert type != null;
+        assert decl != null;
 
-        return this.type;
-    }
-
-    public void setType(String type)
-    {
-        assert type != null;
-
-        this.type = type;
+        return this.decl;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -125,9 +119,14 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
 
         Type exprType = TypeChecker.getTypeOf(selectedExpr);
         if (exprType == Type.TYPE_ERROR)
-            type = "";
+        {
+            status.addWarning("The type of the expression could not be determined automatically.");
+            decl = "real :: newName";
+        }
         else
-            type = exprType.toString();
+        {
+            decl = exprType.toString() + " :: newName";
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -137,31 +136,30 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        assert name != null;
-        assert type != null;
+        assert decl != null;
 
         status.addWarning("If any functions in the original or extracted expression have side effects, this " +
                           "refactoring may not preserve behavior.");
 
         // Simple checks -- input validation
 
-        if (name.trim().equals(""))
-            fail("Please enter a name for the extracted variable.");
+        if (this.decl.trim().equals(""))
+            fail("Please enter a declaration for the extracted variable.");
 
-        if (!isValidIdentifier(name))
-            fail(name + " is not a valid identifier");
-
-        if (type.trim().equals(""))
-            fail("Please enter a type for the extracted variable.");
-
-        if (type.contains(";") || type.contains("!") || type.contains("&"))
-            fail("A variable cannot be declared with the given type \"" + type + "\".");
-
-        IBodyConstruct decl = parseLiteralStatementNoFail(type + " :: " + name);
+        IBodyConstruct decl = parseLiteralStatementNoFail(this.decl);
         if (decl == null || !(decl instanceof ASTTypeDeclarationStmtNode))
-            fail("A variable cannot be declared with the given type \"" + type + "\".");
+            fail("The text entered is not a valid type declaration statement.");
 
         declToInsert = (ASTTypeDeclarationStmtNode)decl;
+        
+        if (declToInsert.getEntityDeclList() == null
+            || declToInsert.getEntityDeclList().size() != 1)
+            fail("The declaration entered does not declare a single variable.");
+        
+        name = declToInsert.getEntityDeclList().get(0).getObjectName().getObjectName().getText();
+        
+        if (declToInsert.getEntityDeclList().get(0).getInitialization() != null)
+            fail("The declaration must not contain an initialization.");
 
         // Complex checks -- require program analysis
 
@@ -225,8 +223,6 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
-        assert name != null;
-        assert type != null;
         assert declToInsert != null;
 
         try
