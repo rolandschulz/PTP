@@ -163,14 +163,14 @@ class RemoteItem implements IRemoteItem {
 	 */
 	public void setExecutable(boolean flag) {
 		int oldPermissions = permissions;
-		if (userID == fileTools.cachedUserID) {
+		if (userID == fileTools.getCachedUserID()) {
 			if (flag) {
 				permissions |= 0100;
 			} else {
 				permissions &= ~0100;
 			}
 		}
-		if(fileTools.cachedGroupIDSet.contains(new Integer(groupID))) {
+		if(fileTools.getCachedGroupIDSet().contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0010;
 			} else {
@@ -203,14 +203,14 @@ class RemoteItem implements IRemoteItem {
 	 */
 	public void setReadable(boolean flag) {
 		int oldPermissions = permissions;
-		if (userID == fileTools.cachedUserID) {
+		if (userID == fileTools.getCachedUserID()) {
 			if (flag) {
 				permissions |= 0400;
 			} else {
 				permissions &= ~0400;
 			}
 		}
-		Set<Integer> groupIDSet = fileTools.cachedGroupIDSet;
+		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
 		if(groupIDSet.contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0040;
@@ -233,14 +233,14 @@ class RemoteItem implements IRemoteItem {
 	 */
 	public void setWriteable(boolean flag) {
 		int oldPermissions = permissions;
-		if (userID == fileTools.cachedUserID) {
+		if (userID == fileTools.getCachedUserID()) {
 			if (flag) {
 				permissions |= 0200;
 			} else {
 				permissions &= ~0200;
 			}
 		}
-		Set<Integer> groupIDSet = fileTools.cachedGroupIDSet;
+		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
 		if(groupIDSet.contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0020;
@@ -292,7 +292,7 @@ class RemoteItem implements IRemoteItem {
 		isWritable = false;
 		isExecutable = false;
 		
-		if(userID == fileTools.cachedUserID) {
+		if(userID == fileTools.getCachedUserID()) {
 			if ((permissions & 0400) != 0) {
 				isReadable = true;
 			}
@@ -304,7 +304,7 @@ class RemoteItem implements IRemoteItem {
 			}
 		} 
 				
-		Set<Integer> groupIDSet = fileTools.cachedGroupIDSet;
+		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
 		if(groupIDSet.contains(new Integer(groupID))) {
 			if ((permissions & 0040) != 0) {
 				isReadable = true;
