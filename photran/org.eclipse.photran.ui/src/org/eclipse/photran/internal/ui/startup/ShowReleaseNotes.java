@@ -14,7 +14,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.photran.ui.FortranUIPlugin;
+import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;

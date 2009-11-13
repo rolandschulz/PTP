@@ -4,14 +4,16 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.photran.ui; singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-ClassPath: photranui.jar
-Bundle-Activator: org.eclipse.photran.ui.FortranUIPlugin
+Bundle-Activator: org.eclipse.photran.internal.ui.FortranUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Export-Package: org.eclipse.photran.internal.ui.actions,
+Export-Package: org.eclipse.photran.internal.ui,
+ org.eclipse.photran.internal.ui.actions,
  org.eclipse.photran.internal.ui.editor,
  org.eclipse.photran.internal.ui.old_editor,
  org.eclipse.photran.internal.ui.preferences,
- org.eclipse.photran.ui
+ org.eclipse.photran.internal.ui.properties,
+ org.eclipse.photran.internal.ui.startup
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.intro,
  org.eclipse.ui.intro.universal,

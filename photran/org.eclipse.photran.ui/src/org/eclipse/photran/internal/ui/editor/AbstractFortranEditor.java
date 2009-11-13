@@ -51,7 +51,7 @@ import org.eclipse.photran.internal.cdtinterface.ui.editor.CDTBasedSourceViewerC
 import org.eclipse.photran.internal.cdtinterface.ui.editor.CDTBasedTextEditor;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.photran.ui.FortranUIPlugin;
+import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.rephraserengine.ui.menus.RefactorMenu;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
