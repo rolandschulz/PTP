@@ -88,11 +88,11 @@ public abstract class AbstractRemoteExecution implements IRemoteOperation {
 		/*
 		 * Block until the execution finishes or is canceled.
 		 */
-		if (!finished && !cancelled) {
+		while (!finished && !cancelled) {
 			try {
 				this.wait();
 			} catch (InterruptedException e) {
-				return;
+				// Ignore spurious interrupts
 			}
 		}
 		if (wasCanceled()) {
