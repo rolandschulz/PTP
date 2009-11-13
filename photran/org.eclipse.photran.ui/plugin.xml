@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <!--Intro Overview page addition -->
-   <extension
-         point="org.eclipse.ui.intro.configExtension">
-      <configExtension
-            content="intro/overviewContent.xml"
-            configId="org.eclipse.ui.intro.universalConfig">
-      </configExtension>
-   </extension>
-   
    <!--==========================================-->
    <!-- Free Form and Fixed Form Fortran Editors -->   
    <!--==========================================-->
@@ -275,9 +266,9 @@
       name="Source Viewer Configuration"
       schema="schema/sourceViewerConfig.exsd"/>
    	
-   <!--=============================================-->
-   <!-- Image Associated with Photran Projects      -->
-   <!--=============================================-->
+   <!--==============================================-->
+   <!-- Image Associated with Fortran Project Nature -->
+   <!--==============================================-->
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
@@ -286,4 +277,23 @@
             id="org.eclipse.photran.ui.fProjectNatureImage">
       </image>
    </extension>
+
+   <!--==============-->
+   <!-- Welcome Page -->
+   <!--==============-->
+
+   <!--Intro Overview page addition -->
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            content="intro/overviewContent.xml"
+            configId="org.eclipse.ui.intro.universalConfig">
+      </configExtension>
+   </extension>
+
+   <!-- Load the VPG plug-in at startup -->
+   <extension point="org.eclipse.ui.startup">
+     <startup class="org.eclipse.photran.internal.ui.startup.ShowReleaseNotes" />
+  </extension>
+
 </plugin>

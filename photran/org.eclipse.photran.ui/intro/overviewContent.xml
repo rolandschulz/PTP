@@ -5,10 +5,10 @@
 		<group style-id="content-group" id="orgeclipsephotran-introLink-group">
        		<link 
        		   label="Fortran Development" 
-       		   url="http://www.eclipse.org/photran" 
+       		   url="http://www.eclipse.org/photran/welcome/5.0/" 
        		   id="orgeclipsephotran-introLink" 
        		   style-id="content-link">
-          		   <text>Become familiar with Photran for Fortran Development</text>
+          		   <text>Get started using Photran for Fortran development</text>
        		</link>
        	</group>
   	</extensionContent>

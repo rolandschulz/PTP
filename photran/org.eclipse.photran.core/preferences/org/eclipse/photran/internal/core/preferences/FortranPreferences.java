@@ -31,6 +31,8 @@ import org.eclipse.swt.graphics.RGB;
  */
 public final class FortranPreferences
 {
+    public static final FortranBooleanPreference RELEASE_NOTES_SHOWN = new FortranBooleanPreference("releasenotesshown", false);
+
     public static final FortranBooleanPreference ENABLE_VPG_LOGGING = new FortranBooleanPreference("vpglogging", false);
     public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false);
     public static final FortranBooleanPreference ENABLE_FIXED_FORM_FOLDING = new FortranBooleanPreference("fixedfolding", false);
