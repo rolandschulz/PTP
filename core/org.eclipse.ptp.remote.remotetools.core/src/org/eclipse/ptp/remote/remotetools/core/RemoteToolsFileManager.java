@@ -44,6 +44,9 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory()
 	 */
 	public String getWorkingDirectory() {
+		if (!fConnection.isOpen()) {
+			return "/"; //$NON-NLS-1$
+		}
 		if (fWorkingDir == null) {
 			IRemoteExecutionManager exeMgr = null;
 			try {
@@ -60,7 +63,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 				}
 			}
 			if (fWorkingDir == null) {
-				fWorkingDir = new Path("//"); //$NON-NLS-1$
+				return "/"; //$NON-NLS-1$
 			}
 		}
 		return fWorkingDir.toString();
