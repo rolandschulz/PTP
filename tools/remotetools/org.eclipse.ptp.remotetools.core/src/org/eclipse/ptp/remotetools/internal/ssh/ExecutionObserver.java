@@ -70,6 +70,7 @@ class ExecutionObserver extends Job {
 					try {
 						fConnection.wait(100);
 					} catch (InterruptedException e) {
+						// Safe to ignore
 					}
 				}
 			}
