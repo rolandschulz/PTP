@@ -607,6 +607,10 @@ public class ISPAnalyze extends ViewPart {
 			this.errorMessageLabel.setForeground(RED);
 			this.errorMessageLabel.setText(Messages.ISPAnalyze_13
 					+ this.transitions.getTotalInterleavings());
+		} else if (this.transitions.hasError()) {
+			int temp = this.transitions.getErrorCallsList().size();
+			this.errorMessageLabel.setForeground(RED);
+			this.errorMessageLabel.setText(Messages.ISPAnalyze_120);
 		} else {
 			this.errorMessageLabel.setForeground(GREEN);
 			this.errorMessageLabel.setText(Messages.ISPAnalyze_14);
@@ -651,6 +655,7 @@ public class ISPAnalyze extends ViewPart {
 		tree.setFont(setFontSize(tree.getFont(), 8));
 
 		// Declare everything we'll be working with
+		String currFile = ""; //$NON-NLS-1$
 		TreeItem interleavingItem = null;
 		TreeItem rankItem = null;
 		int prevInterleaving = -1;
@@ -717,22 +722,16 @@ public class ISPAnalyze extends ViewPart {
 			lineNum = Integer.parseInt(logEntry.substring(lastSpaceIndex + 1,
 					logEntry.length()));
 
-			// Create leaves for the rank branches
+			// Create leaves for the rank branchesassembleSourceLine
 			TreeItem callItem = new TreeItem(rankItem, SWT.NULL);
-			String call = removeComments(this.leftViewer.getList().getItem(
-					lineNum - 1).trim());
+			String call = logContents.get(i);
+			for (int c = 0; c < 5; c++)
+				call = call.substring(call.indexOf(" ") + 1); //$NON-NLS-1$
+			call = call.substring(0, call.indexOf(" ")); //$NON-NLS-1$
 
-			// If we received line-wrapped call info, prepend the line above
-			int numLinesBack = 2;
-			while (!parenthesesMatched(call)) {
-				call = removeComments(this.leftViewer.getList().getItem(
-						lineNum - numLinesBack).trim())
-						+ " " + call.trim(); //$NON-NLS-1$
-				numLinesBack++;
-			}
 			int[] notNeeded = new int[1];
-			callItem.setText(name + Messages.ISPAnalyze_21 + lineNum + " \t" //$NON-NLS-1$
-					+ assembleSourceLine(call, lineNum, notNeeded));
+			callItem.setText(call
+					+ " \t" + name + Messages.ISPAnalyze_21 + lineNum); //$NON-NLS-1$
 
 			// Mark the current transition +1 b/c currTrans is 0-Based
 			int currentInter = this.transitions.currentInterleaving + 1;
@@ -907,6 +906,10 @@ public class ISPAnalyze extends ViewPart {
 		for (int i = 0; i < listSize; i++) {
 			Envelope env = (Envelope) errorCalls[i];
 
+			// If this error is not part of this interleaving skip it
+			if (env.getInterleaving() != transitions.getCurrentInterleaving())
+				continue;
+
 			String sourceFilePath = env.getFilename();
 
 			String base = ResourcesPlugin.getWorkspace().getRoot()
@@ -1064,6 +1067,9 @@ public class ISPAnalyze extends ViewPart {
 				.hasNextInterleaving());
 		this.lastInterleavingButton.setEnabled(this.transitions
 				.hasNextInterleaving());
+		this.deadlockInterleavingButton.setEnabled(transitions
+				.getDeadlockInterleavings() != null);
+
 	}
 
 	/*
@@ -1235,7 +1241,6 @@ public class ISPAnalyze extends ViewPart {
 	 * file)
 	 */
 	private void reset() {
-
 		// Update labels and combo lists
 		setMessageLabelText();
 		setLockRankItems();
@@ -1247,9 +1252,14 @@ public class ISPAnalyze extends ViewPart {
 		this.lockedRank = -1;
 		this.errorIndex = 1;
 
+		// TEMP
+		// int curr = transitions.getCurrentInterleaving();
+		// ArrayList<Integer> list = transitions.getDeadlockInterleavings();
+		// list.contains(curr);
+
 		// Runtime group buttons
-		this.deadlockInterleavingButton.setEnabled(transitions.hasDeadlock()
-				&& transitions.getTotalInterleavings() != 1);
+		this.deadlockInterleavingButton.setEnabled(transitions
+				.getDeadlockInterleavings() != null);
 		this.browseCallsButton.setEnabled(true);
 		this.browseCallsButton.setText(Messages.ISPAnalyze_52);
 		this.browseCallsButton.setImage(ISPPlugin.getImage(ISPPlugin
@@ -2335,5 +2345,16 @@ public class ISPAnalyze extends ViewPart {
 			}
 		}
 		return env;
+	}
+
+	/*
+	 * This method is used when another location changes the number of processes
+	 * calling this method will update the drop down so that it has the correct
+	 * number of processses displayed.
+	 */
+	public void updateDropDown() {
+		Integer nprocs = ISPPlugin.getDefault().getPreferenceStore().getInt(
+				PreferenceConstants.ISP_PREF_NUMPROCS);
+		this.setRankComboList.setText(nprocs.toString());
 	}
 }

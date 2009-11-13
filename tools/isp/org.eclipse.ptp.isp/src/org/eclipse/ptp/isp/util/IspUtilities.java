@@ -361,6 +361,13 @@ public class IspUtilities {
 		dlg.open();
 		numProcs = Integer.parseInt(dlg.getValue());
 		pstore.setValue(PreferenceConstants.ISP_PREF_NUMPROCS, dlg.getValue());
+
+		// Update the drop down in the Analyzer
+		IWorkbenchWindow window = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		IViewPart ISPViewPart = window.getActivePage().findView(ISPAnalyze.ID);
+		ISPAnalyze analyzer = (ISPAnalyze) ISPViewPart;
+		analyzer.updateDropDown();
 	}
 
 	/**

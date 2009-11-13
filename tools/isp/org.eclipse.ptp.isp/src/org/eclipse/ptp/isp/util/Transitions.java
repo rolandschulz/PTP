@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -263,7 +264,9 @@ public class Transitions {
 					currentTransition).getLinenumber();
 			int line2 = transitionList.get(currentInterleaving).get(tempIndex)
 					.getLinenumber();
-			if (line1 == line2 && rank == -1) {
+			boolean collective = transitionList.get(currentInterleaving).get(
+					currentTransition).isCollective();
+			if (line1 == line2 && rank == -1 && collective) {
 				tempIndex--;
 				continue;
 			} else if (rank == -1
@@ -691,7 +694,8 @@ public class Transitions {
 
 				// Check for calls that were not issued and add them to the
 				// interleaving's hashmap in the error list.
-				if (env.getIssueIndex() == -1) {
+				// However leaks should not be added!
+				if (env.getIssueIndex() == -1 && !env.isLeak()) {
 					if (this.errorCallsList.get(interleaving) == null) {
 						this.errorCallsList.add(interleaving,
 								new HashMap<String, Envelope>());
@@ -818,6 +822,19 @@ public class Transitions {
 			IspUtilities.showExceptionDialog(Messages.Transitions_16, fnfe);
 			IspUtilities.logError(Messages.Transitions_17, fnfe);
 		}
+	}
+
+	public boolean hasError() {
+		if (this.assertionViolation || this.deadlock)
+			return true;
+		Iterator<HashMap<String, Envelope>> itr = this.errorCallsList
+				.iterator();
+		while (itr.hasNext()) {
+			HashMap<String, Envelope> currentHash = itr.next();
+			if (currentHash != null && !currentHash.isEmpty())
+				return true;
+		}
+		return false;
 	}
 
 }

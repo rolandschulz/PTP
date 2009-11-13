@@ -180,6 +180,7 @@ public class Messages extends NLS {
 	public static String ISPAnalyze_117;
 	public static String ISPAnalyze_118;
 	public static String ISPAnalyze_119;
+	public static String ISPAnalyze_120;
 	public static String ISPConsole_0;
 	public static String ISPConsole_1;
 	public static String ISPConsole_2;
