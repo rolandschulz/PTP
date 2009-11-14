@@ -97,7 +97,11 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	 */
 	public int getOptions() {
 		try {
-			return Integer.valueOf(getString(TAG_OPTIONS, "")); //$NON-NLS-1$
+			String options = getString(TAG_OPTIONS, null);
+			if (options == null) {
+				return Integer.valueOf(options).intValue();
+			}
+			return 0;
 		}
 		catch (NumberFormatException e) {
 			return 0;
