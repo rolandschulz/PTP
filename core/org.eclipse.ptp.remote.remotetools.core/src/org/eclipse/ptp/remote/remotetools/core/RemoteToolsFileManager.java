@@ -22,7 +22,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
 public class RemoteToolsFileManager implements IRemoteFileManager {
-	private IPath fWorkingDir = null;
+	private String fWorkingDir = null;
 	private final RemoteToolsConnection fConnection;
 
 	public RemoteToolsFileManager(RemoteToolsConnection conn) {
@@ -35,7 +35,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	public IFileStore getResource(String pathStr) {
 		IPath path = new Path(pathStr);
 		if (!path.isAbsolute()) {
-			path = fWorkingDir.append(path);
+			path = new Path(getWorkingDirectory()).append(path);
 		}
 		return new RemoteToolsFileStore(fConnection.getName(), path.toString());
 	}
@@ -56,7 +56,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			}
 			if (exeMgr != null) {
 				try {
-					fWorkingDir = new Path(exeMgr.getExecutionTools().executeWithOutput("pwd").trim()); //$NON-NLS-1$
+					fWorkingDir = exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
 				} catch (RemoteExecutionException e) {
 				} catch (RemoteConnectionException e) {
 				} catch (CancelException e) {
@@ -66,15 +66,14 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 				return "/"; //$NON-NLS-1$
 			}
 		}
-		return fWorkingDir.toString();
+		return fWorkingDir;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java.lang.String)
 	 */
-	public void setWorkingDirectory(String pathStr) {
-		IPath path = new Path(pathStr);
-		if (path.isAbsolute()) {
+	public void setWorkingDirectory(String path) {
+		if (new Path(path).isAbsolute()) {
 			fWorkingDir = path;
 		}
 	}
