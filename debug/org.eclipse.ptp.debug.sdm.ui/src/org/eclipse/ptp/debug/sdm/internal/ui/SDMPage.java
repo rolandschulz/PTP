@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -25,6 +24,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -247,9 +247,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return true if path exists
 	 */
 	private boolean verifyPath(String path) {
-		IRemoteConnection rmConn = getRemoteConnection();
+		IRemoteConnection rmConn = getRemoteConnection(resourceManager);
 		if (rmConn != null) {
-			IRemoteFileManager fileManager = getRemoteServices()
+			IRemoteFileManager fileManager = getRemoteServices(resourceManager)
 					.getFileManager(rmConn);
 			if (fileManager != null &&
 				fileManager.getResource(path).fetchInfo().exists()) {
@@ -314,9 +314,17 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 				if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
 					IRemoteResourceManagerConfiguration remConfig = (IRemoteResourceManagerConfiguration) rmConfig;
-					IPath rmPath = new Path(remConfig.getProxyServerPath());
-					path = rmPath.removeLastSegments(1)
+					String proxyPath = remConfig.getProxyServerPath();
+					if (proxyPath == null || proxyPath.equals(EMPTY_STRING)) {
+						IRemoteFileManager fileMgr = getRemoteFileManager(rm);
+						if (fileMgr != null) {
+							path = new Path(fileMgr.getWorkingDirectory())
+								.append("sdm").toString(); //$NON-NLS-1$/
+						}
+					} else {
+						path = new Path(proxyPath).removeLastSegments(1)
 							.append("sdm").toString(); //$NON-NLS-1$/
+					}
 				}
 			}
 		} catch (CoreException e) {
@@ -337,11 +345,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @return path to file selected in browser
 	 */
 	private String browseFile() {
-		IRemoteUIServices remoteUISrv = getRemoteUIServices();
+		IRemoteUIServices remoteUISrv = getRemoteUIServices(resourceManager);
 		if (remoteUISrv != null) {
 			IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 			if (fileManager != null) {
-				fileManager.setConnection(getRemoteConnection());
+				fileManager.setConnection(getRemoteConnection(resourceManager));
 				return fileManager.browseFile(getShell(),
 						Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0);
 			}
@@ -359,11 +367,10 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * currently two cases:
 	 * 
 	 * 1. If port forwarding is enabled, then the address needs to be the
-	 * address of the host that is running the proxy (since this is where the
-	 * tunnel begins), but accessible from the machine running the debug server.
-	 * Since the debug server machine may be on a local network (e.g. a node in
-	 * a cluster), it will typically NOT be the same address that is used to
-	 * start the proxy.
+	 * localhost address of the host where the tunnel begins. Note this is 
+	 * different to previous versions where the debug server machine was
+	 * possibly on a local network (e.g. a node in a cluster) but not 
+	 * necessarily on the same machine as the tunnel.
 	 * 
 	 * 2. If port forwarding is not enabled, then the address will be the
 	 * address of the host running Eclipse). NOTE: this assumes that the machine
@@ -400,10 +407,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			 */
 			if (resourceManager != rm) {
 				resourceManager = rm;
-				IRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfigure();
+				IRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfiguration();
 				if (config != null) {
 					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-						return getRemoteConnection().getAddress();
+						return "localhost"; //$NON-NLS-1$
+//						return getRemoteConnection(rm).getAddress();
 					} else {
 						return config.getLocalAddress();
 					}
@@ -420,7 +428,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return AbstractRemoteResourceManagerConfiguration
 	 */
-	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfigure() {
+	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfiguration() {
 		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager
 					.getConfiguration();
@@ -437,10 +445,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return remote services
 	 */
-	private IRemoteServices getRemoteServices() {
-		if (resourceManager != null) {
-			IResourceManagerConfiguration rmConfig = resourceManager
-					.getConfiguration();
+	private IRemoteServices getRemoteServices(IResourceManagerControl rm) {
+		if (rm != null) {
+			IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 			return PTPRemoteCorePlugin.getDefault().getRemoteServices(
 					rmConfig.getRemoteServicesId());
 		}
@@ -452,8 +459,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return IRemoteUIServices
 	 */
-	private IRemoteUIServices getRemoteUIServices() {
-		IRemoteServices rsrv = getRemoteServices();
+	private IRemoteUIServices getRemoteUIServices(IResourceManagerControl rm) {
+		IRemoteServices rsrv = getRemoteServices(rm);
 		if (rsrv != null) {
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
 		}
@@ -461,15 +468,40 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	/**
-	 * Get the current remote connection selected in the RM
+	 * Get the current remote connection selected in the RM. Will open the
+	 * connection if it is closed.
 	 * 
 	 * @return IRemoteConnection
 	 */
-	private IRemoteConnection getRemoteConnection() {
-		IRemoteServices rsrv = getRemoteServices();
+	private IRemoteConnection getRemoteConnection(IResourceManagerControl rm) {
+		IRemoteServices rsrv = getRemoteServices(rm);
 		if (rsrv != null) {
-			return rsrv.getConnectionManager().getConnection(
-					resourceManager.getConfiguration().getConnectionName());
+			IRemoteConnection conn = rsrv.getConnectionManager().getConnection(
+					rm.getConfiguration().getConnectionName());
+			if (conn != null && !conn.isOpen()) {
+				IRemoteUIServices uiServices = getRemoteUIServices(rm);
+				if (uiServices != null) {
+					IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
+					if (connMgr != null) {
+						connMgr.openConnectionWithProgress(getShell(), conn);
+					}
+				}
+			}
+			return conn;
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the file manager associated with the remote connection
+	 * 
+	 * @return
+	 */
+	private IRemoteFileManager getRemoteFileManager(IResourceManagerControl rm) {
+		IRemoteServices rsrv = getRemoteServices(rm);
+		IRemoteConnection conn = getRemoteConnection(rm);
+		if (rsrv != null) {
+			return rsrv.getFileManager(conn);
 		}
 		return null;
 	}
