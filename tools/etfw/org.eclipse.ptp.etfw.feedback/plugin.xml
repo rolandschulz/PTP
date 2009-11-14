@@ -68,8 +68,10 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
    </extension>
+   <!-- Disable ETFw feedback view icon for now  
    <extension
          point="org.eclipse.ui.menus">
+         
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
@@ -96,6 +98,7 @@
          </toolbar>
       </menuContribution>
    </extension>
+   -->
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
