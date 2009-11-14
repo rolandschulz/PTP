@@ -151,7 +151,7 @@ public class SDMDebugger implements IPDebugger {
 
 		IPDISession session = createSession(timeout, launch, corefile);
 
-		if (fSdmRunner != null) {
+		if (fRoutingFileStore != null) {
 			/*
 			 * Writing the routing file actually starts the SDM servers.
 			 */
