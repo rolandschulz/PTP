@@ -91,7 +91,7 @@ public class SDMDebugger implements IPDebugger {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core.launch.IPLaunch)
 	 */
-	public void cleanup(IPLaunch launch) {
+	public synchronized void cleanup(IPLaunch launch) {
 		if (fSdmRunner != null) {
 			if (fSdmRunner.getSdmState() == SDMMasterState.RUNNING) {
 				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_8); 
@@ -135,7 +135,7 @@ public class SDMDebugger implements IPDebugger {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.core.runtime.IPath)
 	 */
-	public IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile) throws CoreException {
+	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile) throws CoreException {
 		if (fModelFactory == null) {
 			fModelFactory = new SDMModelFactory();
 		}
@@ -171,7 +171,7 @@ public class SDMDebugger implements IPDebugger {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
+	public synchronized void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
 		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
 
 		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_MASTER_ENABLED)) {
