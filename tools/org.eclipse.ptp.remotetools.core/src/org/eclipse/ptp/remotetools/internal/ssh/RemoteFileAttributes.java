@@ -139,6 +139,10 @@ public class RemoteFileAttributes {
 		extended = attrs.getExtended();
 	}
 
+	public static RemoteFileAttributes getAttributes(SftpATTRS attrs) {
+		return new RemoteFileAttributes(attrs);
+	}
+	
 	public static RemoteFileAttributes getAttributes(String buf) {
 		RemoteFileAttributes attr = new RemoteFileAttributes();
 		

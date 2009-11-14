@@ -36,6 +36,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -564,37 +565,40 @@ public class FileTools implements IRemoteFileTools {
 		IRemotePathTools pathTool = manager.getRemotePathTools();
 		String quotedPath = pathTool.quote(path, true);
 
-		String statCmd;
-		if (checkOSName("Darwin")) { //$NON-NLS-1$
-			statCmd = "stat -f \"0%p %z %u %g %m %a\" " + quotedPath + " 2>&1"; //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
-			// Assume linux
-			statCmd = "stat --format \"0x%f %s %u %g %X %Y\" " + quotedPath + " 2>&1"; //$NON-NLS-1$ //$NON-NLS-2$
+		synchronized (manager) {
+			try {
+				SftpATTRS attrs = manager.getConnection().getDefaultSFTPChannel().stat(path);
+				return RemoteFileAttributes.getAttributes(attrs);
+			} catch (SftpException e) {
+				if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+					return null;
+				}
+				if (e.id == ChannelSftp.SSH_FX_FAILURE) {
+					String statCmd;
+					if (checkOSName("Darwin")) { //$NON-NLS-1$
+						statCmd = "stat -f \"0%p %z %u %g %m %a\" " + quotedPath + " 2>&1"; //$NON-NLS-1$ //$NON-NLS-2$
+					} else {
+						// Assume linux
+						statCmd = "stat --format \"0x%f %s %u %g %X %Y\" " + quotedPath + " 2>&1"; //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					String result;
+					try {
+						result = manager.executionTools.executeWithOutput(statCmd);
+					} catch (RemoteExecutionException e1) {
+						throw new RemoteOperationException(e1.getLocalizedMessage());
+					} catch (RemoteConnectionException e1) {
+						throw new RemoteOperationException(e1.getLocalizedMessage());
+					} catch (CancelException e1) {
+						throw new RemoteOperationException(e1.getLocalizedMessage());
+					}
+	
+					return RemoteFileAttributes.getAttributes(result.trim());
+				}
+				throw new RemoteOperationException(Messages.RemoteFileTools_FetchRemoteAttr_FailedFetchAttr);
+			} catch (RemoteConnectionException e) {
+				throw new RemoteOperationException(e.getLocalizedMessage());
+			}
 		}
-		String result;
-		try {
-			result = manager.executionTools.executeWithOutput(statCmd);
-		} catch (RemoteExecutionException e) {
-			throw new RemoteOperationException(e.getLocalizedMessage());
-		} catch (RemoteConnectionException e) {
-			throw new RemoteOperationException(e.getLocalizedMessage());
-		} catch (CancelException e) {
-			throw new RemoteOperationException(e.getLocalizedMessage());
-		}
-
-		return RemoteFileAttributes.getAttributes(result.trim());
-		
-//		synchronized (manager) {
-//			try {
-//				SftpATTRS attrs = manager.getConnection().getDefaultSFTPChannel().stat(path);
-//				return attrs;
-//			} catch (SftpException e) {
-//				if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
-//					return null;
-//				}
-//				throw new RemoteOperationException(Messages.RemoteFileTools_FetchRemoteAttr_FailedFetchAttr + ": id=" + e.id);
-//			}
-//		}
 	}
 	
 	public int getCachedUserID() {
