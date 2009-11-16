@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 /**
  * This class provides images to the FortranView. Specifically, it checks for the contentType
  * of source files in the view and returns the Photran icon for files with Fortran-based content.
- * 
+ *
  * @author Matt Scarpino
  */
 @SuppressWarnings("restriction")
@@ -26,9 +26,9 @@ public class FViewLabelProvider extends CViewLabelProvider
 {
     public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
     public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
- 
+
     Image fortranFileImage;
-    
+
     public FViewLabelProvider(int textFlags, int imageFlags)
     {
         super(textFlags, imageFlags);
@@ -37,13 +37,13 @@ public class FViewLabelProvider extends CViewLabelProvider
     // This is something of a hack. Originally I tried using AdapterFactory objects and WorkspaceAdapters,
     // but they never seemed to work. This works, but it's not particularly elegant and the image only
     // shows up in the Fortran navigator.
-    public Image getImage(Object element) 
+    public Image getImage(Object element)
     {
-        if (element instanceof TranslationUnit) 
+        if (element instanceof TranslationUnit && ((TranslationUnit)element).getFile() != null)
         {
             String fileName = ((TranslationUnit)element).getFile().getName();
             IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(fileName);
-            if(contentType.getId().equals(FIXED_FORM_CONTENT_TYPE) || contentType.getId().equals(FREE_FORM_CONTENT_TYPE))          
+            if(contentType.getId().equals(FIXED_FORM_CONTENT_TYPE) || contentType.getId().equals(FREE_FORM_CONTENT_TYPE))
             {
                 if(fortranFileImage == null) {
                     fortranFileImage = CDTInterfacePlugin.getImageDescriptor("icons/obj16/f_file_obj.gif").createImage();
@@ -53,7 +53,7 @@ public class FViewLabelProvider extends CViewLabelProvider
         }
         return super.getImage(element);
     }
-    
+
     public void dispose() {
         if(fortranFileImage != null)
             fortranFileImage.dispose();
