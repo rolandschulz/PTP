@@ -529,7 +529,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		String initPath = appText.getText();
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
-			if (project == null) {
+			if (project == null || project.getLocationURI() == null) {
 				MessageDialog
 						.openInformation(
 								getShell(),
@@ -537,7 +537,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 								Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
-			initPath = getProject().getLocationURI().getPath();
+			initPath = project.getLocationURI().getPath();
 		}
 
 		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(getLaunchConfiguration());
@@ -621,7 +621,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		String initPath = localAppText.getText();
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
-			if (project == null) {
+			if (project == null || project.getLocationURI() == null) {
 				MessageDialog
 						.openInformation(
 								getShell(),
@@ -629,7 +629,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 								Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
-			initPath = getProject().getLocationURI().getPath();
+			initPath = project.getLocationURI().getPath();
 		}
 		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault()
 				.getDefaultServices();
