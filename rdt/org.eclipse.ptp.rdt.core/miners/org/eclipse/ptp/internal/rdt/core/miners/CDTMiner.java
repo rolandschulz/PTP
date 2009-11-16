@@ -1122,7 +1122,7 @@ public class CDTMiner extends Miner {
 					// If the completion node can provide us with a
 					// (usually more accurate) prefix, use that.
 					String prefix = completionNode.getPrefix();
-					if (prefix == null) {
+					if (prefix == null || prefix.equals("")) { //$NON-NLS-1$ // happens if invoked inside an inactive code branch
 						prefix = context.computeIdentifierPrefix().toString();
 					}
 					CompletionProposalComputer computer = new CompletionProposalComputer();
