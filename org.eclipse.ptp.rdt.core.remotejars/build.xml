@@ -67,7 +67,7 @@
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
-	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
+	<target name="server.all" depends="unpack.platform, jar, fetch, all.remote"/>
 	
 	<target name="jar" depends="generate.build.scripts">
 		<ant antfile="${basedir}/build.cdtminer.xml">
@@ -131,6 +131,7 @@
 		<mkdir dir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/@dot"/>
 		<javac srcdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/src"
 				destdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/@dot"
+				classpath="${platformTempDir}/eclipse/plugins/${coreRuntimeJar}:${platformTempDir}/eclipse/plugins/${equinoxJar}:${platformTempDir}/eclipse/plugins/${filesystemJar}"
 				source="1.5"
 				target="1.5"
 	  	/>
