@@ -356,6 +356,7 @@ public class RemoteCHViewPart extends ViewPart {
     	fOpenViewActionGroup= new OpenViewActionGroup(this);
     	fOpenViewActionGroup.setSuppressCallHierarchy(true);
     	fOpenViewActionGroup.setSuppressProperties(true);
+    	fOpenViewActionGroup.setSuppressTypeHierarchy(true); // TEMPORARY this should work
     	fOpenViewActionGroup.setEnableIncludeBrowser(true);
     	fSelectionSearchGroup= new SelectionSearchGroup(getSite());
 //    	fRefactoringActionGroup= new CRefactoringActionGroup(this);
