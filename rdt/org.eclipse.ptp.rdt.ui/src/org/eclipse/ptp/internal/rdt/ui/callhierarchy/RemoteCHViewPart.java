@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IFunction;
 import org.eclipse.cdt.core.model.IMethod;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -46,7 +47,7 @@ import org.eclipse.cdt.internal.ui.viewsupport.TreeNavigator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.actions.CdtActionConstants;
-import org.eclipse.cdt.ui.refactoring.actions.CRefactoringActionGroup;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -620,7 +621,19 @@ public class RemoteCHViewPart extends ViewPart {
     }
 
     protected void onRefresh() {
-        fContentProvider.recompute();
+    	Object input = fContentProvider.getInput();
+    	if (input instanceof ICElement) {
+    		ICProject cproject = ((ICElement)input).getCProject();
+    		if (cproject != null) {
+    			IProject project = cproject.getProject();
+    			if (project != null && project.isOpen()) {    		
+	    			fContentProvider.recompute();
+	        	} else {
+	        		setMessage(org.eclipse.ptp.rdt.ui.messages.Messages.getString("RemoteCHViewPart.ClosedProject.message")+"\n"+CHMessages.CHViewPart_emptyPageMessage); //$NON-NLS-1$ //$NON-NLS-2$
+	                fTreeViewer.setInput(null);
+	        	}
+    		}
+    	}
     }
     
     protected void onShowFilesInLabels(boolean show) {
