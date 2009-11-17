@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IDeclaration;
 import org.eclipse.cdt.core.model.IMember;
 import org.eclipse.cdt.core.model.IMethodDeclaration;
@@ -44,6 +45,7 @@ import org.eclipse.cdt.internal.ui.viewsupport.SelectionProviderMediator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.actions.CdtActionConstants;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -845,8 +847,20 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	}
 
     protected void onRefresh() {
-    	fModel.refresh();
-    	updateActionEnablement();
+    	if (getInput() != null) {
+	    	ICProject cproject = getInput().getCProject();
+	    	if (cproject != null){
+	    		IProject project = cproject.getProject();
+		    	if (project != null && project.isOpen()) {
+			    	fModel.refresh();
+			    	updateActionEnablement();
+		    	} else {
+		    		setMessage(org.eclipse.ptp.rdt.ui.messages.Messages.getString("RemoteTHViewPart.ClosedProject.message")+"\n"+Messages.THViewPart_instruction); //$NON-NLS-1$ //$NON-NLS-2$
+		            fHierarchyTreeViewer.setInput(null);
+		            fMemberViewer.setInput(null);
+		    	}
+	    	} 
+    	}
     }
 
     protected void onCancel() {
