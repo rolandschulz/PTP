@@ -20,7 +20,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
     {
         super(new PhotranCDTDB(), 500, 10000);
     }
-    
+
     static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGLog>
     {
         public PhotranCDTDB()
@@ -29,11 +29,11 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
                  ? createTempFile()
                  : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran50vpg");
         }
-        
+
         private PhotranCDTDB(String filename)
         {
             super(filename);
-            
+
             if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
                 System.out.println("Using Photran VPG database " + filename);
         }
@@ -51,35 +51,35 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
                 throw new Error(e);
             }
         }
-    
+
         @Override
         protected long getModificationStamp(String filename)
         {
             if (getVPG().isVirtualFile(filename)) return Long.MIN_VALUE;
-            
+
             IFile ifile = PhotranVPG.getIFileForFilename(filename);
             return ifile == null ? Integer.MIN_VALUE : ifile.getLocalTimeStamp();
         }
-        
+
         @Override protected byte[] serialize(Serializable annotation) throws IOException
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             PhotranVPGSerializer.serialize(annotation, out);
             return out.toByteArray();
-            
+
 //            ByteArrayOutputStream out = new ByteArrayOutputStream();
 //            new ObjectOutputStream(out).writeObject(annotation);
 //            return out.toByteArray();
         }
-        
+
         @Override protected Serializable deserialize(InputStream binaryStream) throws IOException, ClassNotFoundException
         {
             return PhotranVPGSerializer.deserialize(binaryStream);
-            
+
 //            return (Serializable)new ObjectInputStream(binaryStream).readObject();
         }
     }
-    
+
     public String describeEdgeType(int edgeType)
     {
         return super.describeEdgeType(edgeType);
@@ -110,5 +110,19 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         // will not reconstruct them.
         if (!getVPG().isVirtualFile(filename))
             super.deleteAllEdgesAndAnnotationsFor(filename);
+    }
+
+    // HYPOTHETICAL UPDATING ///////////////////////////////////////////////////
+
+    @Override public void enterHypotheticalMode() throws IOException
+    {
+        ((PhotranVPG)getVPG()).moduleSymTabCache.clear();
+        super.enterHypotheticalMode();
+    }
+
+    @Override public void leaveHypotheticalMode() throws IOException
+    {
+        ((PhotranVPG)getVPG()).moduleSymTabCache.clear();
+        super.leaveHypotheticalMode();
     }
 }
