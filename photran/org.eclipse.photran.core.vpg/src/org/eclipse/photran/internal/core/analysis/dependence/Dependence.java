@@ -12,7 +12,7 @@ package org.eclipse.photran.internal.core.analysis.dependence;
 
 /**
  * A dependence between two variable/array accesses.
- * 
+ *
  * @author Jeff Overbey
  * @see LoopDependences
  */
@@ -23,14 +23,14 @@ public final class Dependence
         FLOW_DEPENDENCE("Flow dependence"),
         ANTI_DEPENDENCE("Anti-dependence"),
         OUTPUT_DEPENDENCE("Output dependence");
-        
+
         private String description;
-        
+
         private Type(String description)
         {
             this.description = description;
         }
-        
+
         public static Type of(Dependence d)
         {
             if (d.from.isWrite && d.to.isWrite)
@@ -40,13 +40,13 @@ public final class Dependence
             else // (d.from.isWrite && d.to.isRead())
                 return FLOW_DEPENDENCE;
         }
-        
+
         @Override public String toString()
         {
             return description;
         }
     }
-    
+
     final VariableReference from;
     final VariableReference to;
     public final Type type;
@@ -57,7 +57,22 @@ public final class Dependence
         this.to = to;
         this.type = Type.of(this);
     }
-    
+
+    @Override public boolean equals(Object o)
+    {
+        if (!this.getClass().equals(o.getClass())) return false;
+
+        Dependence that = (Dependence)o;
+        return this.from.equals(that.from)
+            && this.to.equals(that.to)
+            && this.type.equals(that.type);
+    }
+
+    @Override public int hashCode()
+    {
+        return from.hashCode() + 13 * to.hashCode() + 19 * type.hashCode();
+    }
+
     @Override public String toString()
     {
         return type + " from " + from + " to " + to;

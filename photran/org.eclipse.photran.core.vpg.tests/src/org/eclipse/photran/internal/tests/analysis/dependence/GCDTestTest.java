@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 import org.eclipse.photran.internal.core.analysis.dependence.GCDTest;
 
 /**
- * 
+ *
  * @author Jeff Overbey
  */
 public class GCDTestTest extends TestCase
@@ -36,7 +36,7 @@ public class GCDTestTest extends TestCase
             new int[] { 1, 1 },
             new int[] { 0, 1 }));
     }
-    
+
     /**
      * DO I = 1, N
      *     A(I + 2) = A(I) + B(I)     ! S1
@@ -53,7 +53,7 @@ public class GCDTestTest extends TestCase
             new int[] { 2, 1 },
             new int[] { 0, 1 }));
     }
-    
+
     /**
      * DO I = 1, N
      *     A(2*I) = A(2*I + 1)
@@ -70,9 +70,9 @@ public class GCDTestTest extends TestCase
             new int[] { 0, 2 },
             new int[] { 1, 2 }));
     }
-    
+
     private boolean test(int n, int[] a, int[] b)
     {
-        return new GCDTest().test(n, null, null, a, b, null);
+        return new GCDTest().test(n, null, null, a, b, null).dependenceMightExist();
     }
 }

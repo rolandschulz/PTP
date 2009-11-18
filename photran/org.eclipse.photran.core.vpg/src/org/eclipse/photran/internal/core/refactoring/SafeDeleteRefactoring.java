@@ -69,7 +69,7 @@ public class SafeDeleteRefactoring extends PreservationBasedSingleFileFortranRef
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doValidateUserInput(RefactoringStatus status) throws PreconditionFailure
+    protected void doValidateUserInput(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
     }
 
@@ -80,7 +80,7 @@ public class SafeDeleteRefactoring extends PreservationBasedSingleFileFortranRef
     }
 
     @Override
-    protected void doTransform() throws PreconditionFailure
+    protected void doTransform(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         preservation.markEpsilon(fileInEditor, enclosingScope);
         enclosingScope.removeFromTree();

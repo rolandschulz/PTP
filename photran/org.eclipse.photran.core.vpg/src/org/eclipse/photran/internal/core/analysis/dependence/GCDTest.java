@@ -18,32 +18,34 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * <p>
  * Reference: Allen and Kennedy, <i>Optimizing Compilers for Modern
  * Architectures,</i> p. 96.
- * 
+ *
  * @author Jeff Overbey
  * @see IDependenceTester
  */
 public /*was package-private*/ class GCDTest implements IDependenceTester
 {
-    public boolean test(int n, int[] L, int[] U, int[] a, int[] b, Direction[] direction)
+    public Result test(int n, int[] L, int[] U, int[] a, int[] b, Direction[] direction)
     {
         assert n >= 1 && a.length == n+1 && b.length == n+1;
-        
+
         int gcd = a[1];
         for (int i = 1; i <= n; i++)
         {
             gcd = gcd(gcd, a[i]);
             gcd = gcd(gcd, b[i]);
         }
-        
-        return divides(gcd, b[0]-a[0]);
+
+        return divides(gcd, b[0]-a[0]) ? Result.POSSIBLE_DEPENDENCE : Result.NO_DEPENDENCE;
     }
 
     /** @return the greatest common divisor of n and m */
-    private static int gcd(int n, int m)
+    public static int gcd(int n, int m)
     {
         // Euclidean algorithm
+        n = Math.abs(n);
+        m = Math.abs(m);
         assert n >= 0 && m >= 0;
-        
+
         while (m != 0)
         {
             int t = m;
@@ -51,8 +53,8 @@ public /*was package-private*/ class GCDTest implements IDependenceTester
             n = t;
         }
         return n;
-    }   
-    
+    }
+
     /** @return true iff n | m */
     private static boolean divides(int n, int m)
     {

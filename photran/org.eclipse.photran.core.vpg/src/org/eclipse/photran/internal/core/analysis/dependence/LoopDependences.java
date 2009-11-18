@@ -22,38 +22,41 @@ import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
  * Computes a set of dependences in a perfect loop nest.
  * <p>
  * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
- * 
+ *
  * @author Jeff Overbey
  */
 public class LoopDependences
 {
-    private IDependenceTester tester;
+    private IDependenceTester[] testers;
     private PerfectLoopNest loopNest;
     private ArrayList<VariableReference> varRefs;
     private ArrayList<Dependence> dependences;
-    
-    private LoopDependences(ASTProperLoopConstructNode perfectLoopNest, IDependenceTester tester)
+
+    private LoopDependences(ASTProperLoopConstructNode perfectLoopNest, IDependenceTester... testers)
     {
-        this.tester = tester;
+        this.testers = testers;
         this.loopNest = new PerfectLoopNest(perfectLoopNest);
         this.varRefs = new ArrayList<VariableReference>();
         this.dependences = new ArrayList<Dependence>();
     }
-    
+
     /** Factory method */
-    public static LoopDependences computeFor(ASTProperLoopConstructNode perfectLoopNest, IDependenceTester tester) throws DependenceTestFailure
+    public static LoopDependences computeFor(
+            ASTProperLoopConstructNode perfectLoopNest,
+            IDependenceTester... testers)
+        throws DependenceTestFailure
     {
-        return new LoopDependences(perfectLoopNest, tester).collect();
+        return new LoopDependences(perfectLoopNest, testers).collect();
     }
-    
+
     private LoopDependences collect()
     {
         if (loopNest.containsDoWhileLoops())
             throw new DependenceTestFailure("The loop nest contains a do-while loop");
-        
+
         collectReadsAndWrites();
         collectDependences();
-        
+
         return this;
     }
 
@@ -65,18 +68,18 @@ public class LoopDependences
     private class Visitor extends GenericASTVisitorWithLoops
     {
         private IExecutionPartConstruct lastNodeSuccessfullyHandled = null;
-        
+
         @Override public void visitASTAssignmentStmtNode(ASTAssignmentStmtNode node)
         {
             if (node.getDerivedTypeComponentRef() != null)
                 throw new DependenceTestFailure("The loop contains an assignment to a derived type component");
-            
+
             varRefs.addAll(VariableReference.fromRHS(node));
             varRefs.add(VariableReference.fromLHS(node));
-            
+
             lastNodeSuccessfullyHandled = node;
         }
-        
+
         @Override public void visitIExecutionPartConstruct(IExecutionPartConstruct node)
         {
             if (node != lastNodeSuccessfullyHandled)
@@ -90,7 +93,7 @@ public class LoopDependences
         for (VariableReference ref : varRefs)
             if (!ref.isWrite)
                 result.add(ref);
-        
+
         return result;
     }
 
@@ -100,7 +103,7 @@ public class LoopDependences
         for (VariableReference ref : varRefs)
             if (ref.isWrite)
                 result.add(ref);
-        
+
         return result;
     }
 
@@ -128,7 +131,7 @@ public class LoopDependences
             {
                 if (from.isScalar()
                     || to.isScalar()
-                    || loopNest.testForDependenceUsing(tester, from, to, new Direction[] {}))
+                    || loopNest.testForDependenceUsing(testers, from, to, new Direction[] {}))
                 {
                     markDependence(from, to);
                 }

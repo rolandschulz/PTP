@@ -84,7 +84,7 @@ public class AddEmptySubprogramRefactoring extends PreservationBasedSingleFileFo
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void doValidateUserInput(RefactoringStatus status) throws PreconditionFailure
+    protected void doValidateUserInput(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         assert newName != null;
         assert enclosingScope != null;
@@ -99,7 +99,7 @@ public class AddEmptySubprogramRefactoring extends PreservationBasedSingleFileFo
     }
 
     @Override
-    protected void doTransform() throws PreconditionFailure
+    protected void doTransform(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         assert newName != null;
         assert enclosingScope != null;

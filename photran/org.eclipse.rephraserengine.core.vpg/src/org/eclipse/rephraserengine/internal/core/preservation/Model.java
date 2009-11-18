@@ -171,55 +171,76 @@ public final class Model
 
     public void inormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
-        for (PrimitiveOp op : primitiveOps)
-        {
-            TreeSet<Entry> revisedList = new TreeSet<Entry>();
+        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Normalizing " + name, edges.size());
 
-            pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-            pm.beginTask("Normalizing " + name + " by " + op, edges.size());
-            for (Entry entry : edges)
+        TreeSet<Entry> revisedList = new TreeSet<Entry>();
+
+        for (Entry entry : edges)
+        {
+            for (PrimitiveOp op : primitiveOps)
             {
                 if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.iaff()))
                 {
                     entry.source = op.inorm(entry.sourceFilename, entry.source); // leave origSource unchanged
                     entry.sink = op.inorm(entry.sinkFilename, entry.sink);
-                    
+
                     for (PrimitiveOp otherOp : primitiveOps)
                         if (!otherOp.equals(op))
                             entry.offset(otherOp);
-                    
-                    revisedList.add(entry);
-                }
-                pm.worked(1);
-            }
-            pm.done();
 
-            edges = revisedList;
+                    revisedList.add(entry);
+                    break;
+                }
+            }
+            pm.worked(1);
         }
+
+        edges = revisedList;
+
+        pm.done();
     }
 
     public void dnormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
-        for (PrimitiveOp op : primitiveOps)
+        pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+        pm.beginTask("Normalizing " + name, edges.size());
+
+        TreeSet<Entry> revisedList = new TreeSet<Entry>();
+
+        for (Entry entry : edges)
         {
-            TreeSet<Entry> revisedList = new TreeSet<Entry>();
-
-            pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-            pm.beginTask("Normalizing " + name + " by " + op, edges.size());
-            for (Entry entry : edges)
+            for (PrimitiveOp op : primitiveOps)
             {
-                if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.daff()))
+                Interval daff = offset(op.daff(), op, primitiveOps);
+                if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, daff))
                 {
-                    entry.source = op.dnorm(entry.sourceFilename, entry.source);
-                    entry.sink = op.dnorm(entry.sinkFilename, entry.sink);
+                    entry.source = op.dnorm(entry.sourceFilename, entry.source, daff);
+                    entry.sink = op.dnorm(entry.sinkFilename, entry.sink, daff);
                     revisedList.add(entry);
+                    break;
                 }
-                pm.worked(1);
             }
-            pm.done();
-
-            edges = revisedList;
+            pm.worked(1);
         }
+
+        edges = revisedList;
+
+        pm.done();
+    }
+
+    private Interval offset(Interval daff, PrimitiveOp op, PrimitiveOpList primitiveOps)
+    {
+        int dx = 0, dy = 0;
+        for (PrimitiveOp otherOp : primitiveOps)
+        {
+            if (!otherOp.equals(op))
+            {
+                dx += otherOp.offset(daff.lb) - daff.lb;
+                dy += otherOp.offset(daff.ub) - daff.ub;
+            }
+        }
+        return new Interval(daff.lb + dx, daff.ub + dy);
     }
 
     public ModelDiff compareAgainst(Model that, IProgressMonitor pm)

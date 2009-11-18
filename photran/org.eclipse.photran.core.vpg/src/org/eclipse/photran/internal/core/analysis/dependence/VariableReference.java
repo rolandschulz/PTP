@@ -30,8 +30,8 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  * This class is intended to describe scalar variable references as well as array references
  * such as A(3), A(I), A(3+I), A(2*I+1), A(3, 4), and A(I, J, K) where each subscript is
  * a function of the form <i>m*x+b</i> where <i>m</i> and <i>b</i> are integer constants
- * and <i>x</i> is a scalar variable. 
- * 
+ * and <i>x</i> is a scalar variable.
+ *
  * @author Jeff Overbey
  */
 public /*was package-private*/ class VariableReference
@@ -39,20 +39,20 @@ public /*was package-private*/ class VariableReference
     /**
      * Represents a linear function <i>m*x+b</i>, where <i>m</i> and <i>b</i> are integer
      * constants and <i>x</i> is a scalar variable.
-     * 
+     *
      * @author Jeff Overbey
      */
     public static class LinearFunction
     {
         /** The value of <i>m</i>, where this object represents the linear function <i>m*x+b</i> */
         public final int slope;
-        
+
         /**
          * The (canonicalized) name of the variable <i>x</i>,
          * where this object represents the linear function <i>m*x+b</i>
          */
         public final String variable;
-        
+
         /** The value of <i>b</i>, where this object represents the linear function <i>m*x+b</i> */
         public final int y_intercept;
 
@@ -63,7 +63,7 @@ public /*was package-private*/ class VariableReference
             this.variable = variable;
             this.y_intercept = y_intercept;
         }
-        
+
         /** Factory method */
         public static LinearFunction from(String slope, String variable, String y_intercept)
         {
@@ -87,7 +87,7 @@ public /*was package-private*/ class VariableReference
         public static LinearFunction[] fromList(IASTListNode<? extends IASTNode> list)
         {
             if (list == null) return null;
-            
+
             LinearFunction[] result = new LinearFunction[list.size()];
             for (int i = 0; i < list.size(); i++)
             {
@@ -120,16 +120,16 @@ public /*was package-private*/ class VariableReference
         //                                            1                           2
         //                                            ==b==         +      -      ==x==
         private static Pattern bnx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*-[ \t]*(\\w+)");
-        
+
         /** Factory method */
         public static LinearFunction fromNode(IASTNode node)
         {
             String str = node.toString().trim();
             if (str.startsWith(",")) str = str.substring(1);
             str = str.trim();
-            
+
             Matcher m;
-            
+
             m = mxb.matcher(str);
             if (m.matches()) return LinearFunction.from(m.group(3), m.group(4), m.group(5));
 
@@ -156,19 +156,19 @@ public /*was package-private*/ class VariableReference
                 return slope + "*" + variable + "+" + y_intercept;
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** The AST node representing the variable access */
     public final IASTNode node;
-    
+
     /** The (canonicalized) name of the variable being referenced */
     public final String variable;
-    
+
     /** The indices into that variable, or <code>null</code> if the variable is scalar or the indices are
      *  not linear functions of the expected form */
     public final LinearFunction[] indices;
-    
+
     /** True iff this reference is a write; false if it is a read */
     public final boolean isWrite;
 
@@ -184,13 +184,13 @@ public /*was package-private*/ class VariableReference
     public static VariableReference fromLHS(ASTAssignmentStmtNode node)
     {
         String lhsVar = PhotranVPG.canonicalizeIdentifier(node.getLhsVariable().getName().getText());
-        
+
         LinearFunction[] lhsIndices = null;
         if (node.getLhsExprList() != null)
             lhsIndices = LinearFunction.fromList(node.getLhsExprList());
         else if (node.getLhsNameList() != null)
             lhsIndices = LinearFunction.fromList(node.getLhsNameList());
-        
+
         return new VariableReference(node, lhsVar, lhsIndices, true);
     }
 
@@ -217,7 +217,7 @@ public /*was package-private*/ class VariableReference
                 {
                     return;
                 }
-                
+
                 String name = PhotranVPG.canonicalizeIdentifier(node.getName().getName().getText());
                 LinearFunction[] indices = LinearFunction.fromList(node.getPrimarySectionSubscriptList());
                 result.add(new VariableReference(node, name, indices, isWrite));
@@ -225,7 +225,7 @@ public /*was package-private*/ class VariableReference
         });
         return result;
     }
-    
+
     @Override public String toString()
     {
         StringBuilder sb = new StringBuilder();
@@ -239,7 +239,19 @@ public /*was package-private*/ class VariableReference
         }
         return sb.toString();
     }
-    
+
+    @Override public boolean equals(Object o)
+    {
+        if (!this.getClass().equals(o.getClass())) return false;
+
+        return this.toString().equals(o.toString()); // Cheat -- for testing only
+    }
+
+    @Override public int hashCode()
+    {
+        return toString().hashCode();
+    }
+
     /** @return true iff this variable reference represents a read, rather than a write, of the variable */
     public boolean isRead()
     {

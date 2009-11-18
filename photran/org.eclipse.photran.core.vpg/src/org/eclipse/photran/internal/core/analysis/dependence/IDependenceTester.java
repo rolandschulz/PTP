@@ -39,10 +39,33 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * (note that this means dependence testing is conservative).
  * <p>
  * Reference: Allen and Kennedy, <i>Optimizing Compilers for Modern Architectures,</i> pp. 95-96.
- * 
+ *
  * @author Jeff Overbey
  */
 public interface IDependenceTester
 {
-    boolean test(int n, int[] L, int[] U, int[] a, int[] b, Direction[] direction);
+    public static enum Result
+    {
+        //                  Dependence might exist?
+        //                  |       Definite result?
+        //                  |       |
+        NO_DEPENDENCE      (false,  true),
+        POSSIBLE_DEPENDENCE(true,   false),
+        DEFINITE_DEPENDENCE(true,   true);
+
+        private boolean asBoolean;
+        private boolean isDefinite;
+
+        private Result(boolean asBoolean, boolean isDefinite)
+        {
+            this.asBoolean = asBoolean;
+            this.isDefinite = isDefinite;
+        }
+
+        public boolean dependenceMightExist() { return asBoolean; }
+
+        public boolean isDefinite() { return isDefinite; }
+    }
+
+    Result test(int n, int[] L, int[] U, int[] a, int[] b, Direction[] direction);
 }

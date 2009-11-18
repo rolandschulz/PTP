@@ -17,8 +17,9 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.eclipse.photran.internal.core.SyntaxException;
-import org.eclipse.photran.internal.core.analysis.dependence.LoopDependences;
 import org.eclipse.photran.internal.core.analysis.dependence.GCDTest;
+import org.eclipse.photran.internal.core.analysis.dependence.GeneralizedGCDTest;
+import org.eclipse.photran.internal.core.analysis.dependence.LoopDependences;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.LexerException;
@@ -39,7 +40,9 @@ public abstract class BaseTestCase extends TestCase
 {
     protected LoopDependences dependences(String loop) throws IOException, LexerException, SyntaxException
     {
-        return LoopDependences.computeFor(loop(loop), new GCDTest());
+        return LoopDependences.computeFor(loop(loop),
+            new GCDTest(),
+            new GeneralizedGCDTest());
     }
 
     protected ASTProperLoopConstructNode loop(String stmt) throws IOException, LexerException, SyntaxException

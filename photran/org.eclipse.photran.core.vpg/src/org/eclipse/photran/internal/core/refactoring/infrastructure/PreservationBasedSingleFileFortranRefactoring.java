@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.core.refactoring.infrastructure;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
@@ -33,9 +34,9 @@ public abstract class PreservationBasedSingleFileFortranRefactoring extends Sing
     {
         try
         {
-            pm.beginTask("Checking final preconditions", 30);
+            pm.beginTask("Checking final preconditions", 40);
 
-            doValidateUserInput(status);
+            doValidateUserInput(status, new SubProgressMonitor(pm, 5));
             if (!status.hasFatalError())
             {
                 vpg.acquirePermanentAST(fileInEditor);
@@ -44,7 +45,7 @@ public abstract class PreservationBasedSingleFileFortranRefactoring extends Sing
                     fileInEditor,
                     getEdgesToPreserve());
 
-                doTransform();
+                doTransform(status, new SubProgressMonitor(pm, 5));
 
                 vpg.commitChangesFromInMemoryASTs(pm, 20, fileInEditor);
                 preservation.checkForPreservation(status, pm, 0);
@@ -65,9 +66,9 @@ public abstract class PreservationBasedSingleFileFortranRefactoring extends Sing
     {
     }
 
-    protected abstract void doValidateUserInput(RefactoringStatus status) throws PreconditionFailure;
+    protected abstract void doValidateUserInput(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure;
 
     protected abstract PreservationRule getEdgesToPreserve();
 
-    protected abstract void doTransform() throws PreconditionFailure;
+    protected abstract void doTransform(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure;
 }
