@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Region;
@@ -784,24 +783,6 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
         void addConflictError(List<Conflict> conflictingDef);
         void addConflictWarning(List<Conflict> conflictingDef);
         void addReferenceWillChangeError(String newName, Token reference);
-    }
-
-    /**
-     * Given a {@link Definition} and a list of references to that Definition
-     * (see {@link Definition#findAllReferences(boolean)}), checks if any of
-     * the <code>newNames</code> will conflict in the scope of any of the given
-     * references; if so, the given callback is invoked to record an error or
-     * warning.
-     * <p>
-     * This is the fundamental precondition check for Photran's Rename refactoring.
-     */
-    protected void checkForConflictingBindings(
-        IConflictingBindingCallback callback,
-        Definition definitionToCheck,
-        Collection<PhotranTokenRef> allReferences,
-        String... newNames)
-    {
-        checkForConflictingBindings(new NullProgressMonitor(), callback, definitionToCheck, allReferences, newNames);
     }
 
     /**

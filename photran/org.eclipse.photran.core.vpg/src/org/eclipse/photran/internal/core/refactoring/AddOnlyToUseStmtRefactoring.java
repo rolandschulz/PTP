@@ -54,19 +54,19 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     private int numEntitiesInList = 0;
     private ASTUseStmtNode useNode = null;
     private List<IFile> filesContainingModule = null;
-    
+
     //private List<Definition> programEntities = new ArrayList<Definition>();
     private ArrayList<String> entitiesInProgram = new ArrayList<String>();
-    
+
     private List<Definition> moduleEntities = new ArrayList<Definition>();
     private ArrayList<String> entitiesInModule = new ArrayList<String>();
-    
+
     private List<Definition> existingOnlyList = new ArrayList<Definition>();
     private List<Definition> defsToAdd = new ArrayList<Definition>();
     private HashMap<Integer, String> entitiesToAdd = new HashMap<Integer, String>();
-    
+
     private Set<PhotranTokenRef> allReferences = null;
-    
+
     public AddOnlyToUseStmtRefactoring() {
     }
 
@@ -204,7 +204,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
             fail("Please select a module name.");
         return selectedToken;
     }
-    
+
     private void getProgramDeclaredEntities() throws PreconditionFailure
     {
         IFortranAST ast = vpg.acquirePermanentAST(this.fileInEditor);
@@ -260,7 +260,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
                     existingOnlyList.add(moduleEntities.get(i));
             }
         }
-        
+
         //FIXME add functionality to search file for existing uses of module vars
         //and automatically make them be added to the list
         IFortranAST ast = vpg.acquirePermanentAST(this.fileInEditor);
@@ -293,7 +293,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
         IFortranAST ast = vpg.acquirePermanentAST(fileInEditor);
         if(ast == null) return;
 
-        checkConflictingBindings(ast, status);  //find conflicts
+        checkConflictingBindings(ast, pm, status);  //find conflicts
 
         createAndInsertUseStmt(ast);
 
@@ -306,7 +306,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
      * This method assumes that any existing only list is OK. Only checks for conflicting
      * bindings with NEW additions to only list.
      */
-    private void checkConflictingBindings(IFortranAST ast, RefactoringStatus status)
+    private void checkConflictingBindings(IFortranAST ast, IProgressMonitor pm, RefactoringStatus status)
     {
         allReferences = findModuleEntityRefs(ast);
         //removeOriginalModuleRefs(); //possibly not needed - working without
@@ -315,7 +315,8 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
         {
             for(Definition def : defsToAdd)
             {
-                checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
+                checkForConflictingBindings(pm,
+                    new ConflictingBindingErrorHandler(status),
                     def,
                     allReferences,
                     def.getCanonicalizedName());
@@ -409,8 +410,8 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     {
         return "Add ONLY Clause to USE Statement";
     }
-    
-    
+
+
     private final class DeclarationVisitor extends GenericASTVisitor
     {
         @Override public void visitASTEntityDeclNode(ASTEntityDeclNode node)
@@ -422,7 +423,7 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
             }
         }
     }
-    
+
     private final class TokenVisitor extends GenericASTVisitor
     {
         @Override public void visitToken(Token node)

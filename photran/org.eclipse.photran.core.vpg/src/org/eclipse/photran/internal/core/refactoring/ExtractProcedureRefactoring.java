@@ -286,7 +286,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        assert selection != null && selection.enclosingScope.isSubprogram();
+        assert selection != null && (selection.enclosingScope.isSubprogram() || selection.enclosingScope.isMainProgram());
         assert newName != null;
 
         checkIfSubprogramNameIsValid();
@@ -327,7 +327,7 @@ public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
-        assert selection != null && selection.enclosingScope.isSubprogram();
+        assert selection != null && (selection.enclosingScope.isSubprogram() || selection.enclosingScope.isMainProgram());
         assert newName != null;
 
         try

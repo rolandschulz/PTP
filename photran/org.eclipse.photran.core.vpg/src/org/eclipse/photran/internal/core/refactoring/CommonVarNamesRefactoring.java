@@ -172,7 +172,7 @@ public class CommonVarNamesRefactoring extends SingleFileFortranRefactoring
         }
     }
 
-    private void checkConflictingBindings(ASTCommonBlockNode node, RefactoringStatus status)
+    private void checkConflictingBindings(ASTCommonBlockNode node, IProgressMonitor pm, RefactoringStatus status)
     {
         Definition defToRename = null;
         Collection<String> newNames = newVarNames.values();
@@ -194,7 +194,8 @@ public class CommonVarNamesRefactoring extends SingleFileFortranRefactoring
 
             if(!oldName.equalsIgnoreCase(newName))
             {
-                checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
+                checkForConflictingBindings(pm,
+                    new ConflictingBindingErrorHandler(status),
                     defToRename,
                     allReferences,
                     newName);
@@ -234,7 +235,7 @@ public class CommonVarNamesRefactoring extends SingleFileFortranRefactoring
 
         try
         {
-            ConsistencyVisitor replacer = new ConsistencyVisitor(status);
+            ConsistencyVisitor replacer = new ConsistencyVisitor(pm, status);
             ast.accept(replacer);
 
             addChangeFromModifiedAST(file, pm);
@@ -250,15 +251,16 @@ public class CommonVarNamesRefactoring extends SingleFileFortranRefactoring
     /** This class is adapted/taken from the code in RenameRefactoring.java */
     private final class ConsistencyVisitor extends GenericASTVisitor
     {
-        RefactoringStatus status = null;
-        @SuppressWarnings("unused")
-        private boolean changedAST = false;
+        private IProgressMonitor pm;
+        private RefactoringStatus status;
+        @SuppressWarnings("unused") private boolean changedAST = false;
         private boolean changeNames = false;
         private HashMap<String, Integer> oldVarNameHash = new HashMap<String, Integer>();
         private HashMap<Integer, Definition> blockVarDefs = new HashMap<Integer, Definition>();
 
-        public ConsistencyVisitor(RefactoringStatus status)
+        public ConsistencyVisitor(IProgressMonitor pm, RefactoringStatus status)
         {
+            this.pm = pm;
             this.status = status;
         }
 
@@ -271,7 +273,7 @@ public class CommonVarNamesRefactoring extends SingleFileFortranRefactoring
             if((node.getName() == null && commonBlockName.equals("")) ||
                 commonBlockName.equalsIgnoreCase(node.getName().getCommonBlockName().getText()))
             {
-                checkConflictingBindings(node, status);
+                checkConflictingBindings(node, pm, status);
                 hashVarNames(node);
             }
         }

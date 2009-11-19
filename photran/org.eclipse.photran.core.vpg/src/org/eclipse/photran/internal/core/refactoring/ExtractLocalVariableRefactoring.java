@@ -151,27 +151,28 @@ public class ExtractLocalVariableRefactoring extends SingleFileFortranRefactorin
             fail("The text entered is not a valid type declaration statement.");
 
         declToInsert = (ASTTypeDeclarationStmtNode)decl;
-        
+
         if (declToInsert.getEntityDeclList() == null
             || declToInsert.getEntityDeclList().size() != 1)
             fail("The declaration entered does not declare a single variable.");
-        
+
         name = declToInsert.getEntityDeclList().get(0).getObjectName().getObjectName().getText();
-        
+
         if (declToInsert.getEntityDeclList().get(0).getInitialization() != null)
             fail("The declaration must not contain an initialization.");
 
         // Complex checks -- require program analysis
 
-        checkForConflictingBindings(status);
+        checkForConflictingBindings(pm, status);
     }
 
 
-    private void checkForConflictingBindings(RefactoringStatus status)
+    private void checkForConflictingBindings(IProgressMonitor pm, RefactoringStatus status)
     {
         Definition def = arbitraryDefinitionInScope();
 
-        checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
+        checkForConflictingBindings(pm,
+            new ConflictingBindingErrorHandler(status),
             def,
             Collections.<PhotranTokenRef>emptyList(),
             name);
