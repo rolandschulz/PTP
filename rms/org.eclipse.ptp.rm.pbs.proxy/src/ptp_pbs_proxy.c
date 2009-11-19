@@ -760,7 +760,7 @@ sendNewJobEvent(int trans_id, ptp_job *j)
 	asprintf(&job_id, "%d", j->ptp_jobid);
 	asprintf(&queue_id, "%d", j->queue->id);
 
-	m = proxy_new_job_event(trans_id, queue_id, job_id, j->pbs_jobid, PTP_JOB_STATE_INIT, j->jobsubid);
+	m = proxy_new_job_event(trans_id, queue_id, job_id, j->pbs_jobid, PTP_JOB_STATE_STARTING, j->jobsubid);
 	proxy_svr_queue_msg(conn, m);
 
 	free(job_id);
@@ -896,7 +896,7 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 		
 		if (p->node_id != node_id) {
 			p->node_id = node_id;
-			proxy_add_int_attribute(m, ELEMENT_ID_ATTR, node_id);	
+			proxy_add_int_attribute(m, PTP_ELEMENT_ID_ATTR, node_id);
 		}
 		if (p->task_id != task_id) {
 			p->task_id = task_id;
@@ -1452,7 +1452,7 @@ poll_pbs()
 	for (HashSet(gJobHash); (h = HashGet(gJobHash)) != NULL; ) {
 		j = (ptp_job *)h->h_data;
 		if (HashFind(tmpJobHash, j->pbs_jobid) == NULL) {
-			sendJobStateChangeEvent(gTransID, j->ptp_jobid, PTP_JOB_STATE_TERMINATED);
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, PTP_JOB_STATE_COMPLETED);
 			//sendRemoveJobEvent(gTransID, j);
 			removed_jobs++;
 		}
