@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
@@ -48,12 +49,19 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFo
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.refactorings.UserInputBoolean;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
 
 /**
+ * Refactoring to encapsulate a module variable.
+ * <p>
+ * This refactoring accepts a module variable declaration, makes that declaration PRIVATE, adds
+ * getter and setter procedures to the module, and then replaces accesses to the variable outside
+ * the module with calls to the getter and setter routines.
  *
- * @author Tim
+ * @author Tim Yuvashev
+ * @author Jeff Overbey
  */
 public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
 {
@@ -64,8 +72,8 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     private Set<PhotranTokenRef> allRefs = null;
     private String getterName = null;
     private String setterName = null;
-    private HashSet<IFile> modifiedFiles = new HashSet<IFile>();
     private boolean wereMethodsCreated = false;
+    private boolean replaceAccessesInDeclaringModule = false;
 
     public static final String AMBIGUOUS_DEF = "Could not find definition for this identifier, "+
                                                 "or its definition was ambiguous.";
@@ -115,15 +123,17 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         return setterName == null ? getDefaultSetterName() : setterName;
     }
 
+    @UserInputBoolean(label="Replace accesses in declaring module", defaultValue=false)
+    public void replaceAccessesInDeclaringModule(boolean replaceAccessesInDeclaringModule)
+    {
+        this.replaceAccessesInDeclaringModule = replaceAccessesInDeclaringModule;
+    }
 
     public boolean isArgument()
     {
         return isUsedAsArgument;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ltk.core.refactoring.Refactoring#getName()
-     */
     @Override
     public String getName()
     {
@@ -148,30 +158,30 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         if(term == null || term != Terminal.T_IDENT)
             fail("Please select an identifier to encapsulate");
 
-        selectedTokenDef = findUnambiguousTokenDefinition(t);
+        selectedTokenDef = findUnambiguousDeclaration(t);
         if(selectedTokenDef == null)
-        {
             fail(AMBIGUOUS_DEF);
-        }
-        canBeEncapsulated(selectedTokenDef);
 
-        Set<PhotranTokenRef> refs = selectedTokenDef.findAllReferences(true);
-        allRefs = refs;
-        processTokenRefs(refs);
+        checkCanBeEncapsulated(selectedTokenDef);
+
+        allRefs = selectedTokenDef.findAllReferences(true);
+        processTokenRefs(allRefs);
     }
 
-    protected void canBeEncapsulated(Definition def) throws PreconditionFailure
+    protected void checkCanBeEncapsulated(Definition def) throws PreconditionFailure
     {
-        if(!isDefinedInModule(def))
-            fail("Please select a variable defined in a module to encapsulate.");
+        if(!isDefinedInModule(def) ||
+                !def.getClassification().equals(Classification.VARIABLE_DECLARATION))
+            fail("The selected entity is not a variable.  " +
+                 "Please select a variable defined in a module to encapsulate.");
         if(def.isParameter())
-            fail("Can't encapsulate parameters.");
+            fail("Variables with the PARAMETER attribute cannot be encapsulated.");
         if(def.isArray())
-            fail("Can't encapsulate arrays.");
+            fail("Arrays cannot be encapsulated.");
         if(def.isPointer())
-            fail("Can't encapsulate pointers.");
+            fail("Pointers cannot be encapsulated.");
         if(def.isTarget())
-            fail("Can't encapsulate targets.");
+            fail("Variables with the TARGET attribute cannot be encapsulated.");
     }
 
     protected boolean isDefinedInModule(Definition def)
@@ -186,54 +196,94 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     protected void processTokenRefs(Set<PhotranTokenRef> refs) throws PreconditionFailure
     {
         for(PhotranTokenRef ref : refs)
-        {
             checkForFixedForm(ref.getFile());
-        }
     }
 
     protected void checkForFixedForm(IFile file) throws PreconditionFailure
     {
         if(PhotranVPG.hasFixedFormContentType(file))
         {
-            fail("Currenlty we cannot refactor any fixed-form files. " +
+            fail("Fixed form files cannot currently be refactored. " +
                     "File " + file.getName() + " is in fixed form and "+
                     " contains a reference to the variable you want to encapsulate");
         }
     }
 
-
-
     ///////////////////////////////////////////////////////////
     ///            Final Precondition check                ///
     /////////////////////////////////////////////////////////
-    /* (non-Javadoc)
-     * @see org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring#doCheckFinalConditions(org.eclipse.ltk.core.refactoring.RefactoringStatus, org.eclipse.core.runtime.IProgressMonitor)
-     */
+
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
     {
-        checkForConflictingBindings(new ConflictingBindingErrorHandler(status),
+        checkForConflictingBindings(pm,
+                                    new ConflictingBindingErrorHandler(status),
                                     selectedTokenDef,
                                     allRefs,
                                     getGetterName(),
                                     getSetterName());
 
-        for(PhotranTokenRef ref : allRefs)
+        try
         {
-            Token t = ref.findTokenOrReturnNull();
-            if(t == null)
-                fail("Could not find a token associated with the variable reference.");
+            Token varDefTok = declarationToken();
 
-            if(!isUsedAsArgument)
-                detectIfUsedAsArgument(t, status);
+            ASTModuleNode declaringModule = varDefTok.findNearestAncestor(ASTModuleNode.class);
+            if (declaringModule == null) throw new IllegalStateException();
 
-            //Should only create getters and setters once
-            replaceWithGetOrSet(t, status);
+            IFile defFile = varDefTok.getIFile();
+            vpg.acquirePermanentAST(defFile);
+
+            for (IFile file : filesIn(allRefs))
+            {
+                for (PhotranTokenRef ref : allRefs)
+                {
+                    if (ref.getFile().equals(file))
+                    {
+                        Token t = ref.findTokenOrReturnNull();
+                        if(t == null)
+                            fail("Could not find a token associated with the variable reference.");
+
+                        if(!isUsedAsArgument)
+                            detectIfUsedAsArgument(t, status);
+
+                        if(replaceAccessesInDeclaringModule || !isInModule(t, declaringModule))
+                            replaceWithGetOrSet(t, status);
+                    }
+                }
+
+                if (!file.equals(defFile))
+                    this.addChangeFromModifiedAST(file, pm);
+            }
+
+            this.addChangeFromModifiedAST(defFile, pm);
+            vpg.releaseAST(defFile);
         }
+        finally
+        {
+            vpg.releaseAllASTs();
+        }
+    }
 
-        for(IFile f : modifiedFiles)
-            this.addChangeFromModifiedAST(f, pm);
+    private Set<IFile> filesIn(Set<PhotranTokenRef> refs)
+    {
+        Set<IFile> result = new HashSet<IFile>(64);
+        for (PhotranTokenRef r : refs)
+            result.add(r.getFile());
+        return result;
+    }
+
+    private boolean isInModule(Token t, ASTModuleNode m)
+    {
+        return t.findNearestAncestor(ASTModuleNode.class) == m;
+    }
+
+    private Token declarationToken() throws PreconditionFailure
+    {
+        Token varDefTok = selectedTokenDef.getTokenRef().findTokenOrReturnNull();
+        if(varDefTok == null)
+            fail("Could not find a token corresponding to the variable definition");
+        return varDefTok;
     }
 
     protected void detectIfUsedAsArgument(Token t, RefactoringStatus status) throws PreconditionFailure
@@ -270,7 +320,6 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 setGetterAndSetter();
                 wereMethodsCreated = true;
             }
-            modifiedFiles.add(t.getIFile());
         }
         else if(isTokenWrittenTo(t))
         {
@@ -280,7 +329,6 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                 setGetterAndSetter();
                 wereMethodsCreated = true;
             }
-            modifiedFiles.add(t.getIFile());
         }
         else //Neither written nor read (i.e. Access declaration (private,public))
         {
@@ -327,9 +375,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     @SuppressWarnings("unchecked")
     protected void setGetterAndSetter() throws PreconditionFailure
     {
-        Token varDefTok = selectedTokenDef.getTokenRef().findTokenOrReturnNull();
-        if(varDefTok == null)
-            fail("Could not find a token corresponding to the variable definition");
+        Token varDefTok = declarationToken();
         ASTModuleNode mod = varDefTok.findNearestAncestor(ASTModuleNode.class);
         IASTListNode lst = mod.getBody();
 
@@ -368,7 +414,6 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     else
                         lst.insertAfter(possibleTypeDec, newAccessNode);
 
-                    modifiedFiles.add(varDefTok.getIFile());
                     Reindenter.reindent(newAccessNode,
                                         vpg.acquireTransientAST(varDefTok.getIFile()),
                                         Strategy.REINDENT_EACH_LINE);
@@ -557,7 +602,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
 
     protected ASTTypeDeclarationStmtNode createNewDeclaration(Token varDefTok, ASTTypeSpecNode typeSpec)
     {
-        String newDecl = findUnambiguousTokenDefinition(varDefTok).getType().toString() + " :: " + varDefTok.getText();
+        String newDecl = findUnambiguousDeclaration(varDefTok).getType().toString() + " :: " + varDefTok.getText();
         ASTTypeDeclarationStmtNode declNode = (ASTTypeDeclarationStmtNode)parseLiteralStatement(newDecl);
         return declNode;
     }

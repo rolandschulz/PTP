@@ -26,7 +26,7 @@ import org.osgi.framework.Version;
  * started on a particular workspace (and never again after that).
  * <p>
  * Called by Eclipse when the UI plug-in is loaded (see the org.eclipse.ui.startup extension point).
- * 
+ *
  * @author Jeff Overbey
  */
 public final class ShowReleaseNotes implements IStartup
@@ -36,10 +36,11 @@ public final class ShowReleaseNotes implements IStartup
         if (shouldShowReleaseNotes())
             openWebBrowser();
     }
-    
+
     private boolean shouldShowReleaseNotes()
     {
-        if (FortranPreferences.RELEASE_NOTES_SHOWN.getValue() == true)
+        if (FortranPreferences.RELEASE_NOTES_SHOWN.getValue() == true
+            || System.getenv("TESTING") != null)
         {
             // The release notes were already displayed once; don't show them again
             return false;
@@ -53,13 +54,13 @@ public final class ShowReleaseNotes implements IStartup
              */
             FortranPreferences.RELEASE_NOTES_SHOWN.setValue(true);
             if (!FortranPreferences.RELEASE_NOTES_SHOWN.getValue()) return false;
-            
+
             /*
             GregorianCalendar today = new GregorianCalendar();
             if (today.after(new GregorianCalendar(2012, GregorianCalendar.JANUARY, 1)))
                 return false;
             */
-            
+
             return true;
         }
     }
@@ -88,7 +89,7 @@ public final class ShowReleaseNotes implements IStartup
             }
         });
     }
-    
+
     private String getURL()
     {
         Version version = FortranUIPlugin.getDefault().getBundle().getVersion();

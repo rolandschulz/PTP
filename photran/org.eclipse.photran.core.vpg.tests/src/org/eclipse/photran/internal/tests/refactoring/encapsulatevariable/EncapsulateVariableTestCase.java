@@ -60,6 +60,7 @@ public class EncapsulateVariableTestCase extends RefactoringTestCase
 
         EncapsulateVariableRefactoring refactoring = new EncapsulateVariableRefactoring();
         refactoring.initialize(selFile, selection);
+        refactoring.replaceAccessesInDeclaringModule(true);
 
         String description = "Attempt to encapsulate variables in " + selectionFile;
         RefactoringStatus status = refactoring.checkInitialConditions(pm);

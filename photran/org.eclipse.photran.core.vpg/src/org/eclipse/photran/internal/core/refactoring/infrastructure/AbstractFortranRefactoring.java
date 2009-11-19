@@ -416,7 +416,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
 
     // TEXT<->TREE MAPPING ////////////////////////////////////////////////////
 
-    protected Definition findUnambiguousTokenDefinition(Token t)
+    protected Definition findUnambiguousDeclaration(Token t)
     {
         if(t == null)
             return null;
@@ -1119,7 +1119,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
                 {
                     @Override public void visitASTVarOrFnRefNode(ASTVarOrFnRefNode node)
                     {
-                        if (node.getName() != null)
+                        if (node.getName() != null && node.getName().getName() != null)
                             checkForConflict(node.getName().getName());
                     }
 
@@ -1131,9 +1131,10 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
 
                     private void checkForConflict(Token name)
                     {
-                        for (String newName : newNames)
-                            if (name != null && name.getText().equals(newName) && name.resolveBinding().isEmpty())
-                                conflictingDef.add(new Conflict(newName, name.getTokenRef()));
+                        if (name.getIFile() != null)
+                            for (String newName : newNames)
+                                if (name != null && name.getText().equals(newName) && name.resolveBinding().isEmpty())
+                                    conflictingDef.add(new Conflict(newName, name.getTokenRef()));
                     }
                 });
             }
