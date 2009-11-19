@@ -286,6 +286,12 @@
       <!-- Templates -->
       <template
             filterPattern=".*"
+            id="org.eclipse.photran.projects.EmptyFortranProject"
+            location="templates/EmptyFortranProject/template.xml"
+            projectType="org.eclipse.cdt.build.makefile.projectType">
+      </template>
+      <template
+            filterPattern=".*"
             id="org.eclipse.photran.projects.HelloWorldFortranProject"
             location="templates/HelloWorldFortranProject/template.xml"
             projectType="org.eclipse.cdt.build.makefile.projectType">
