@@ -70,6 +70,9 @@
 /*
  * Queue attributes
  */
+#define PTP_QUEUE_STATE_ATTR			"queueState"
+#define 	PTP_QUEUE_STATE_NORMAL			"NORMAL"
+#define		PTP_QUEUE_STATE_STOPPED			"STOPPED"
 #define PTP_QUEUE_STATUS_ATTR			"queueStatus"
 #define PTP_QUEUE_ID_ATTR				"queueId"
 
