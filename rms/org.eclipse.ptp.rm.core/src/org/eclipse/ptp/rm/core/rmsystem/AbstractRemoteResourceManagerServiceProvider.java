@@ -98,7 +98,7 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	public int getOptions() {
 		try {
 			String options = getString(TAG_OPTIONS, null);
-			if (options == null) {
+			if (options != null) {
 				return Integer.valueOf(options).intValue();
 			}
 			return 0;
