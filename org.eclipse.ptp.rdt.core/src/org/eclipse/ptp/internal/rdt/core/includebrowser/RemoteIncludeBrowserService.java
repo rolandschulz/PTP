@@ -10,16 +10,19 @@ import org.eclipse.ptp.internal.rdt.core.miners.RemoteIndexFileLocation;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 public class RemoteIncludeBrowserService extends AbstractRemoteService implements IIncludeBrowserService
 {
-	public RemoteIncludeBrowserService(IHost host, IConnectorService connectorService)
+	public RemoteIncludeBrowserService(IConnectorService connectorService)
 	{
-		super(host, connectorService);
+		super(connectorService);
 	}
 	
+	public RemoteIncludeBrowserService(ICIndexSubsystem subsystem) {
+		super(subsystem);
+	}
+
 	public IIndexIncludeValue findInclude(IInclude include, IProgressMonitor monitor) throws CoreException
 	{
 		if (include != null) 

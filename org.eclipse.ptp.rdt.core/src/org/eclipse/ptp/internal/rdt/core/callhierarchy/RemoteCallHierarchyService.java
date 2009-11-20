@@ -21,7 +21,6 @@ import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 import org.eclipse.ptp.rdt.core.RDTLog;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 /**
@@ -30,8 +29,12 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
  */
 public class RemoteCallHierarchyService extends AbstractRemoteService implements ICallHierarchyService {
 	
-	public RemoteCallHierarchyService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	public RemoteCallHierarchyService(IConnectorService connectorService) {
+		super(connectorService);
+	}
+
+	public RemoteCallHierarchyService(ICIndexSubsystem subsystem) {
+		super(subsystem);
 	}
 
 	/* (non-Javadoc)
