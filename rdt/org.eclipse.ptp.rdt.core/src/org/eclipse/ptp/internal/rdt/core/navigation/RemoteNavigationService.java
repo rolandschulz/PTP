@@ -23,16 +23,18 @@ import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 import org.eclipse.ptp.rdt.core.RDTLog;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 
 public class RemoteNavigationService extends AbstractRemoteService implements INavigationService {
 
-	public RemoteNavigationService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	public RemoteNavigationService(IConnectorService connectorService) {
+		super(connectorService);
 	}
 
+	public RemoteNavigationService(ICIndexSubsystem subsystem) {
+		super(subsystem);
+	}
 	
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
 		// go to the subsystem

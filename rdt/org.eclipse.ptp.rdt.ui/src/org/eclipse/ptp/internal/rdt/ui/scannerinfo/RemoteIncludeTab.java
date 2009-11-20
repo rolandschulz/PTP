@@ -14,6 +14,14 @@ import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.ui.newui.IncludeTab;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider2;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 
 
 /**
@@ -30,7 +38,7 @@ public class RemoteIncludeTab extends IncludeTab {
 	public ICLanguageSettingEntry doAdd() {
 		
 		RemoteIncludeDialog dlg = new RemoteIncludeDialog(usercomp.getShell(), Messages.RemoteIncludeTab_title, false);
-		
+		setRemoteConnection(dlg);
 		if(dlg.open() && dlg.getDirectory().trim().length() > 0 ) {
 			toAllCfgs = dlg.isAllConfigurations();
 			toAllLang = dlg.isAllLanguages();
@@ -46,6 +54,7 @@ public class RemoteIncludeTab extends IncludeTab {
 		
 		RemoteIncludeDialog dlg = new RemoteIncludeDialog(usercomp.getShell(), Messages.RemoteIncludeTab_title, true);
 		dlg.setPathText(ent.getValue());
+		setRemoteConnection(dlg);
 		
 		if(dlg.open()) {
 			int flags = 0;
@@ -57,5 +66,25 @@ public class RemoteIncludeTab extends IncludeTab {
 	
 	public String getHelpContextId() {
 		return RDTHelpContextIds.REMOTE_INCLUDE_TAB;
+	}
+	
+	private void setRemoteConnection(RemoteIncludeDialog dlg) {
+		IServiceModelManager manager = ServiceModelManager.getInstance();
+		IServiceConfiguration config = manager.getActiveConfiguration(page.getProject());
+		if (config != null) {
+			IService service = manager.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+			if (service != null) {
+				IServiceProvider provider = config.getServiceProvider(service);
+				if (provider != null) {
+					if (provider instanceof RemoteCIndexServiceProvider) {
+						dlg.setHost(((RemoteCIndexServiceProvider)provider).getHost());
+					} else if (provider instanceof RemoteCIndexServiceProvider2) {
+						dlg.setConnection(
+								((RemoteCIndexServiceProvider2)provider).getRemoteServices(),
+								((RemoteCIndexServiceProvider2)provider).getRemoteConnection());
+					}
+				}
+			}
+		}
 	}
 }

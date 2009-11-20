@@ -12,15 +12,18 @@ import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 public class RemoteTypeHierarchyService extends AbstractRemoteService implements ITypeHierarchyService {
 
-	public RemoteTypeHierarchyService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	public RemoteTypeHierarchyService(IConnectorService connectorService) {
+		super(connectorService);
 	}
 	
+	public RemoteTypeHierarchyService(ICIndexSubsystem subsystem) {
+		super(subsystem);
+	}
+
 	public THGraph computeGraph(Scope scope, ICElement input, IProgressMonitor monitor) throws CoreException, InterruptedException {
 		ICIndexSubsystem subsystem = getSubSystem();
 		subsystem.checkAllProjects(monitor);

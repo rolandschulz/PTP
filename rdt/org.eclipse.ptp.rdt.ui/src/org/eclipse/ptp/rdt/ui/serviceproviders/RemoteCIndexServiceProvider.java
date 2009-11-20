@@ -44,7 +44,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 			return null;
 		
 		if(fSearchService == null)
-			fSearchService = new RemoteSearchService(fHost, fConnectorService);
+			fSearchService = new RemoteSearchService(fConnectorService);
 		
 		return fSearchService;
 	}
@@ -54,7 +54,7 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 			return null;
 		
 		if(fContentAssistService == null)
-			fContentAssistService = new RemoteContentAssistService(fHost, fConnectorService);
+			fContentAssistService = new RemoteContentAssistService(fConnectorService);
 		
 		return fContentAssistService;
 	}

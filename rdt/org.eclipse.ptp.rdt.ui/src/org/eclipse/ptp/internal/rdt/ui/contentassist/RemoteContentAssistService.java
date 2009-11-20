@@ -33,7 +33,6 @@ import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 import org.eclipse.ptp.rdt.core.RDTLog;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 /**
@@ -41,8 +40,12 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
  */
 public class RemoteContentAssistService extends AbstractRemoteService implements IContentAssistService {
 
-	public RemoteContentAssistService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	public RemoteContentAssistService(IConnectorService connectorService) {
+		super(connectorService);
+	}
+
+	public RemoteContentAssistService(ICIndexSubsystem subsystem) {
+		super(subsystem);
 	}
 
 	public List<Proposal> computeCompletionProposals(Scope scope, ContentAssistInvocationContext context, ITranslationUnit unit) {

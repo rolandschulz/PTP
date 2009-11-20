@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
-import static org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPage.SERVICE_MODEL_WIDGET_PROPERTY;
+import static org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPage.CONFIG_PROPERTY;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -18,8 +18,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.core.model.CModelManager;
+import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
-import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -27,7 +27,6 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
 import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 
 /**
@@ -38,30 +37,19 @@ import org.eclipse.rse.internal.connectorservice.dstore.Activator;
  * that it will remain the same. Please do not use this API without consulting
  * with the RDT team.
  * 
- * @author crecoskie
  *
  */
 public class ServiceModelWizardPageOperation implements IRunnableWithProgress {
 
-	/**
-	 * 
-	 */
-	public ServiceModelWizardPageOperation() {
-		// TODO Auto-generated constructor stub
-	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
+
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-		monitor.beginTask("configure model services", 100); //$NON-NLS-1$
-	
-		IWizard wizard = MBSCustomPageManager.getPageData(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID).getWizardPage().getWizard();
-		IProject project = ((CDTCommonProjectWizard) wizard).getLastProject();
+		monitor.beginTask("configure model services", 100);  //$NON-NLS-1$
 		
-		ServiceProviderConfigurationWidget widget = (ServiceProviderConfigurationWidget)getMBSProperty(SERVICE_MODEL_WIDGET_PROPERTY);
-		widget.applyChangesToConfiguration();
-		IServiceConfiguration config = widget.getServiceConfiguration();
+		IWizard wizard = MBSCustomPageManager.getPageData(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID).getWizardPage().getWizard();
+		IProject project = ((ICDTCommonProjectWizard) wizard).getLastProject();
+		
+		IServiceConfiguration config = (IServiceConfiguration)getMBSProperty(CONFIG_PROPERTY);
 		
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		smm.addConfiguration(project, config);

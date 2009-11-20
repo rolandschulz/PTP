@@ -18,13 +18,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 public class RemoteModelBuilderService extends AbstractRemoteService implements IModelBuilderService {
 
-	public RemoteModelBuilderService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	public RemoteModelBuilderService(IConnectorService connectorService) {
+		super(connectorService);
+	}
+
+	public RemoteModelBuilderService(ICIndexSubsystem subsystem) {
+		super(subsystem);
 	}
 
 	public ITranslationUnit getModel(IWorkingCopy workingCopy, IProgressMonitor monitor) throws CoreException {
