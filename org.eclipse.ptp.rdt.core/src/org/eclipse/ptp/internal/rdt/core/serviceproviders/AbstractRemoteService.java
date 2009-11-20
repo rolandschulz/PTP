@@ -25,18 +25,19 @@ import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 import org.eclipse.ptp.rdt.core.RDTLog;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.ISubSystem;
 
 public class AbstractRemoteService {
 
-	protected IHost fHost;
 	protected IConnectorService fConnectorService;
 	protected ICIndexSubsystem fIndexSubsystem;
 
-	public AbstractRemoteService(IHost host, IConnectorService connectorService) {
-		fHost = host;
+	public AbstractRemoteService(ICIndexSubsystem subSystem) {
+		fIndexSubsystem = subSystem;
+	}
+
+	public AbstractRemoteService(IConnectorService connectorService) {
 		fConnectorService = connectorService;
 	}
 

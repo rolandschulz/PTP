@@ -11,6 +11,12 @@
 package org.eclipse.ptp.internal.rdt.ui.scannerinfo;
 
 
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.swt.SWT;
@@ -67,6 +73,14 @@ public class RemoteIncludeDialog extends Dialog {
 	
 	private final boolean isEdit;
 	
+	// TODO: should remove IHost and only use IRemoteServices
+	// and IRemoteConnection
+	
+	// fHost used for RSE connections
+	private IHost fHost = null;
+	// fRemoteServices and fRemoteConnection used for others
+	private IRemoteServices fRemoteServices = null;
+	private IRemoteConnection fRemoteConnection = null;
 	
 	public RemoteIncludeDialog(Shell parent, String title, boolean isEdit) {
 		
@@ -186,12 +200,29 @@ public class RemoteIncludeDialog extends Dialog {
 				shell.dispose();
 			} 
 			else if(pressed.equals(b_browse)) {
-				SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, Messages.RemoteIncludeDialog_select); 
-				folderDialog.open();
-				Object remoteObject = folderDialog.getSelectedObject();
-				if(remoteObject instanceof IRemoteFile) {
-					IRemoteFile folder = (IRemoteFile)remoteObject;
-					text.setText(folder.getCanonicalPath());
+				if (fHost != null) {
+					SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, Messages.RemoteIncludeDialog_select); 
+					folderDialog.open();
+					Object remoteObject = folderDialog.getSelectedObject();
+					if(remoteObject instanceof IRemoteFile) {
+						IRemoteFile folder = (IRemoteFile)remoteObject;
+						text.setText(folder.getCanonicalPath());
+					}
+				} else {
+					IRemoteUIConnectionManager connMgr = getUIConnectionManager();
+					if (connMgr != null) {
+						connMgr.openConnectionWithProgress(shell, fRemoteConnection);
+						if (fRemoteConnection.isOpen()) {
+							IRemoteUIFileManager fileMgr = getUIFileManager();
+							if (fileMgr != null) {
+								fileMgr.setConnection(fRemoteConnection);
+								String path = fileMgr.browseDirectory(shell, Messages.RemoteIncludeDialog_select, "", 0); //$NON-NLS-1$
+								if (path != null) {
+									text.setText(path);
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -212,4 +243,26 @@ public class RemoteIncludeDialog extends Dialog {
 		return isAllConfigurations;
 	}
 
+	public void setHost(IHost host) {
+		fHost = host;
+	}
+	
+	public void setConnection(IRemoteServices services, IRemoteConnection connection) {
+		fRemoteServices = services;
+		fRemoteConnection = connection;
+	}
+	
+	private IRemoteUIFileManager getUIFileManager() {
+		if (fRemoteServices != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIFileManager();
+		}
+		return null;
+	}
+	
+	private IRemoteUIConnectionManager getUIConnectionManager() {
+		if (fRemoteServices != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIConnectionManager();
+		}
+		return null;
+	}
 }
