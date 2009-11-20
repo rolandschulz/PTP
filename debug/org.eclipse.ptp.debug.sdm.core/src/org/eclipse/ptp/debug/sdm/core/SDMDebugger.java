@@ -93,18 +93,17 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	public synchronized void cleanup(IPLaunch launch) {
 		if (fSdmRunner != null) {
-			if (fSdmRunner.getSdmState() == SDMMasterState.RUNNING) {
-				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_8); 
-				new Thread(Messages.SDMDebugger_7) {
-					@Override
-					public void run() {
-						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_9); 
-						synchronized (this) {
-							try {
-								wait(5000);
-							} catch (InterruptedException e) {
-								// Ignore
-							}
+			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_8); 
+			new Thread(Messages.SDMDebugger_7) {
+				@Override
+				public void run() {
+					DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_9); 
+					synchronized (this) {
+						// Give the runner a chance to finish itself
+						try {
+							wait(5000);
+						} catch (InterruptedException e) {
+							// Ignore
 						}
 						if (fSdmRunner.getSdmState() == SDMMasterState.RUNNING) {
 							DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_11); 
@@ -120,8 +119,8 @@ public class SDMDebugger implements IPDebugger {
 						DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMDebugger_14);
 						fSdmRunner = null;
 					}
-				}.start();
-			}
+				}
+			}.start();
 		}
 		
 		fModelFactory = null;
