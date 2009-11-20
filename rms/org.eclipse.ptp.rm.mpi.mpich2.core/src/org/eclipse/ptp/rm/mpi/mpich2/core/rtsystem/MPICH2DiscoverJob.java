@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -36,18 +36,22 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 	MPICH2RuntimeSystem rts;
 
-	public MPICH2DiscoverJob(MPICH2RuntimeSystem rts) {
+	public MPICH2DiscoverJob(MPICH2RuntimeSystem rts, IProgressMonitor monitor) {
 		super(rts,
 				NLS.bind(Messages.MPICH2DiscoverJob_name, rts.getRmConfiguration().getName()),
 				rts.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(),
 				Messages.MPICH2DiscoverJob_interruptedErrorMessage,
 				Messages.MPICH2DiscoverJob_processErrorMessage,
-				Messages.MPICH2DiscoverJob_parsingErrorMessage);
+				Messages.MPICH2DiscoverJob_parsingErrorMessage,
+				monitor);
 		this.rts = rts;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob#parse(java.io.BufferedReader)
+	 */
 	@Override
-	protected void parse(BufferedReader output) throws CoreException {
+	protected IStatus parse(BufferedReader output) {
 		/*
 		 * MPI resource manager have only one machine and one queue.
 		 * There they are implicitly "discovered".
@@ -74,7 +78,7 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 			if (hostMap == null) {
 				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 				machine.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_HostFileParseError));
-				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage()));
+				return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage());
 			}
 
 			/*
@@ -91,7 +95,7 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 				AttributeManager attrManager = new AttributeManager();
 				if (host.getNumProcessors() != 0) {
 					try {
-						attrManager.addAttribute(MPICH2NodeAttributes.getNumberOfNodesAttributeDefinition().create(host.getNumProcessors()));
+						attrManager.addAttribute(MPICH2NodeAttributes.getNumberOfNodesAttributeDefinition().create(Integer.valueOf(host.getNumProcessors())));
 					} catch (IllegalValueException e) {
 						// This situation is not possible since host.getNumProcessors() is always valid.
 						assert false;
@@ -100,17 +104,6 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 				rts.changeNode(nodeId, attrManager);
 				rts.setNodeIDForName(host.getName(), nodeId);
 			}
-		} catch (CoreException e) {
-			/*
-			 * Show message of core exception and change machine status to error.
-			 */
-			if (e.getStatus().getSeverity() == IStatus.ERROR) {
-				AttributeManager attrManager = new AttributeManager();
-				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandFailed, e.getMessage())));
-				rts.changeMachine(machineID, attrManager);
-			}
-			throw e;
 		} catch (Exception e) {
 			/*
 			 * Show message of all other exceptions and change machine status to error.
@@ -119,6 +112,9 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
 			rts.changeMachine(machineID, attrManager);
+			return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e);
 		}
+		
+		return Status.OK_STATUS;
 	}
 }

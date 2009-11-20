@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 import java.io.BufferedReader;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -40,19 +40,20 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 	MPICH2RuntimeSystem rts;
 
-	public MPICH2PeriodicJob(MPICH2RuntimeSystem rts) {
+	public MPICH2PeriodicJob(MPICH2RuntimeSystem rts, IProgressMonitor monitor) {
 		super(rts,
 				NLS.bind(Messages.MPICH2MonitorJob_name, rts.getRmConfiguration().getName()),
 				rts.retrieveEffectiveToolRmConfiguration().getPeriodicMonitorCmd(),
 				Messages.MPICH2MonitorJob_interruptedErrorMessage,
 				Messages.MPICH2MonitorJob_processErrorMessage,
 				Messages.MPICH2MonitorJob_parsingErrorMessage,
-				rts.retrieveEffectiveToolRmConfiguration().getPeriodicMonitorTime());
+				rts.retrieveEffectiveToolRmConfiguration().getPeriodicMonitorTime(),
+				monitor);
 		this.rts = rts;
 	}
 
 	@Override
-	protected void parse(BufferedReader output) throws CoreException {
+	protected IStatus parse(BufferedReader output) {
 		/*
 		 * MPI resource manager have only one machine and one queue.
 		 * There they are implicitly "discovered".
@@ -66,7 +67,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 		 * if this is the case.
 		 */
 		if (machine == null || queue == null) {
-			return;
+			return Status.OK_STATUS;
 		}
 
 		/*
@@ -80,7 +81,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			MPICH2ListJobsParser parser = new MPICH2ListJobsParser();
 			MPICH2JobMap jobMap = parser.parse(output);
 			if (jobMap == null) {
-				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage()));
+				return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage());
 			}
 			
 			/*
@@ -97,7 +98,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 					if (process != null && process.getNode() == null) {
 						String nodeID = rts.getNodeIDforName(job.getHost());
 						if (nodeID == null) {
-							throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null));
+							return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null);
 						}
 						AttributeManager attrMrg = new AttributeManager();
 						attrMrg.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
@@ -105,17 +106,6 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 					}
 				}
 			}
-		} catch (CoreException e) {
-			/*
-			 * Show message of core exception and change machine status to error.
-			 */
-			if (e.getStatus().getSeverity() == IStatus.ERROR) {
-				AttributeManager attrManager = new AttributeManager();
-				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2MonitorJob_Exception_CommandFailed, e.getMessage())));
-				rts.changeMachine(machine.getID(), attrManager);
-			}
-			throw e;
 		} catch (Exception e) {
 			/*
 			 * Show message of all other exceptions and change machine status to error.
@@ -124,6 +114,9 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
 			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2MonitorJob_Exception_InternalError, e.getMessage())));
 			rts.changeMachine(machine.getID(), attrManager);
+			return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.MPICH2MonitorJob_Exception_InternalError, e.getMessage()), e);
 		}
+		
+		return Status.OK_STATUS;
 	}
 }
