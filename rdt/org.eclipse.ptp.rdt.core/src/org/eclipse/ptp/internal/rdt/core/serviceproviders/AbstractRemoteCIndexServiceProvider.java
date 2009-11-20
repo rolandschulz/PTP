@@ -60,7 +60,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			return null;
 		
 		if(fCallHierarchyService== null)
-			fCallHierarchyService = new RemoteCallHierarchyService(fHost, fConnectorService);
+			fCallHierarchyService = new RemoteCallHierarchyService(fConnectorService);
 		
 		return fCallHierarchyService;
 	}
@@ -77,7 +77,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			return null;
 		
 		if(fIncludeBrowserService== null)
-			fIncludeBrowserService = new RemoteIncludeBrowserService(fHost, fConnectorService);
+			fIncludeBrowserService = new RemoteIncludeBrowserService(fConnectorService);
 		
 		return fIncludeBrowserService;
 	}
@@ -87,7 +87,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			return null;
 		
 		if(fIndexLifecycleService == null)
-			fIndexLifecycleService = new RemoteIndexLifecycleService(fHost, fConnectorService);
+			fIndexLifecycleService = new RemoteIndexLifecycleService(fConnectorService);
 		
 		return fIndexLifecycleService;
 	}
@@ -97,7 +97,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			return null;
 		
 		if(fModelBuilderService== null)
-			fModelBuilderService = new RemoteModelBuilderService(fHost, fConnectorService);
+			fModelBuilderService = new RemoteModelBuilderService(fConnectorService);
 		
 		return fModelBuilderService;
 	}
@@ -107,7 +107,7 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			return null;
 		
 		if(fNavigationService== null)
-			fNavigationService = new RemoteNavigationService(fHost, fConnectorService);
+			fNavigationService = new RemoteNavigationService(fConnectorService);
 		
 		return fNavigationService;
 	}
@@ -117,12 +117,10 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 			return null;
 		
 		if(fTypeHierarchyService== null)
-			fTypeHierarchyService = new RemoteTypeHierarchyService(fHost, fConnectorService);
+			fTypeHierarchyService = new RemoteTypeHierarchyService(fConnectorService);
 		
 		return fTypeHierarchyService;
 	}
-
-
 		
 	public boolean isConfigured() {
 		return fIsConfigured;

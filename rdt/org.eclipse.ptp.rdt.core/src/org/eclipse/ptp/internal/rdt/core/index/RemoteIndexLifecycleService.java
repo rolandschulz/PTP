@@ -29,7 +29,6 @@ import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 
 /**
@@ -39,10 +38,14 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
 public class RemoteIndexLifecycleService extends AbstractRemoteService implements IIndexLifecycleService {
 	
 	private Map<String, Scope> fStringToScopeMap = new TreeMap<String, Scope>();
-	public RemoteIndexLifecycleService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	
+	public RemoteIndexLifecycleService(IConnectorService connectorService) {
+		super(connectorService);
 	}
 
+	public RemoteIndexLifecycleService(ICIndexSubsystem subsystem) {
+		super(subsystem);
+	}
 
 	public Scope getScope(String name) {
 		return fStringToScopeMap.get(name);
