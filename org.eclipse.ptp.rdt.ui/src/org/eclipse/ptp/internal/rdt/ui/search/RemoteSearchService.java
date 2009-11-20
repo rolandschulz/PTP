@@ -23,18 +23,22 @@ import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElementQuery;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchPatternQuery;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchTextSelectionQuery;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
+import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.RemoteSearchTextSelectionQueryAdapter;
 import org.eclipse.ptp.rdt.core.RDTLog;
-import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.search.ui.ISearchQuery;
 
 public class RemoteSearchService extends AbstractRemoteService implements ISearchService {
 
-	public RemoteSearchService(IHost host, IConnectorService connectorService) {
-		super(host, connectorService);
+	public RemoteSearchService(IConnectorService connectorService) {
+		super(connectorService);
 	}
 	
+	public RemoteSearchService(ICIndexSubsystem subsystem) {
+		super(subsystem);
+	}
+
 	public ISearchQuery createSearchPatternQuery(Scope indexScope, ICElement[] searchScope, String scopeDescription, String patternStr, boolean isCaseSensitive, int searchFlags) {
 		RemoteSearchPatternQuery query = new RemoteSearchPatternQuery(convertScope(searchScope), scopeDescription, patternStr, isCaseSensitive, searchFlags);
 		return new RemoteSearchPatternQueryAdapter(getSubSystem(), indexScope, query);
