@@ -16,6 +16,7 @@ static char * MPIRankVars[] = {
 	"OMPI_MCA_ns_nds_vpid", 		/* Open MPI 1.2 */
 	"PMI_RANK", 					/* MPICH2 */
 	"MP_CHILD",						/* IBM PE */
+	"SLURM_PROCID",					/* SLURM */
 	NULL
 };
 

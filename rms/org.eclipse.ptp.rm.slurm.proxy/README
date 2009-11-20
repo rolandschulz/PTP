@@ -1,4 +1,4 @@
-This project contains the source code of the SLURM proxy server. The following
+This package contains the source code of the SLURM proxy server. The following
 steps are used to set up your build environment so that the executable will be
 correctly built and installed. In order to use the server binary, it needs to 
 be installed in a fragment that corresponds to the architecture of the machine 
@@ -7,27 +7,23 @@ it will be run on.
 1. Make sure the SLURM rms is installed and ensure it work well. 
    That is, SLURM cmd utilities, such as "sinfo/srun/squeue" work as expected.
    For more detailed information about how to build and install SLURM, see
-   http://www.llnl.gov/linux/slurm/slurm.html
+   http://wwiw.llnl.gov/linux/slurm/slurm.html
+   Current implementation has been tested against slurm-1.3.4. New versions for 
+   other slurm releases will come up soon.
 
 
-2. Download PTP 2.1 for your platform. And modify proxy_attr.h using libproxy.patch:
-   (1) copy libproxy.patch to $PTPDIR/core/org.eclipse.ptp.proxy
-   (2) cd $PTPDIR/core/org.eclipse.ptp.proxy
-   (3) patch -p1 < libproxy.patch
-
-
-3. Build the corresponding "proxy" and "utils" libraries in $PTPDIR/core/org.eclipse.ptp.proxy 
+2. Build the corresponding "proxy" and "utils" libraries in $PTPDIR/core/org.eclipse.ptp.proxy 
    and $PTPDIR/core/org.eclipse.ptp.utils directory using 'configure', 'make' and 'make install' commands.
 
 
-4. Use 'configure', 'make' and 'make install' within this directory from
-   the command line to build and install the executable.
+3. Use'configure', 'make' and 'make install' within this directory 
+   to build and install the executable.
    NOTE: The 'configure' command MUST require '--with-slurm' option to specify the
    top install directory of SLURM. If such option is missed, the configure process will fail.
+   
+   If necessary, use 'aclocal', 'autoreconf --install', 'automake', 'autoconf' to generate
+   all necessray files.
 
 
-5. If any of the automake/autoconf files changes, you should just need to
-   run 'autoreconf' and it will automatically regenerate the appropriate files.
-
-
-
+4. If any of the automake/autoconf files changes,  
+   run 'autoreconf' to regenerate appropriate files.

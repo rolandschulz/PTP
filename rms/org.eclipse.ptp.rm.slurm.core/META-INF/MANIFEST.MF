@@ -18,6 +18,4 @@ Require-Bundle: org.eclipse.core.runtime,
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.slurm.core,
  org.eclipse.ptp.rm.slurm.core.rmsystem
-Import-Package: org.eclipse.ptp.remote.core,
- org.eclipse.ptp.rm.core.rmsystem,
- org.eclipse.ptp.rm.core.rtsystem
+Import-Package: org.eclipse.ptp.remote.core
