@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008,2009 
- * School of Computer, National University of Defense Technology, P.R.China
+ * Copyright (c) 2009 School of Computer Science, 
+ * National University of Defense Technology, P.R.China
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,12 +8,14 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 			Peichang Shi <pcmutates@163.com>/<pcshi@nudt.edu.cn>
+ * 		Peichang Shi <pcmutates@163.com>/<pcshi@nudt.edu.cn>
+ * 		Jie Jiang, 	National University of Defense Technology
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
 import java.util.Collection;
 
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -21,6 +23,8 @@ import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
+import org.eclipse.ptp.rm.slurm.core.SLURMNodeAttributes;
 import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMProxyRuntimeClient;
 import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMRuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
@@ -64,7 +68,7 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateJob(org.eclipse.ptp.core.elementcontrols.IPQueueControl, java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
+	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs) {	
 		return newJob(queue, jobId, attrs);
 	}
 
@@ -106,9 +110,12 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		ISLURMResourceManagerConfiguration config = (ISLURMResourceManagerConfiguration) getConfiguration();
-		/* load up the control and monitoring systems for OMPI */
+		/* load up the control and monitoring systems for SLURM */
 		SLURMProxyRuntimeClient runtimeProxy = new SLURMProxyRuntimeClient(config, SLURMRMID);
-		return new SLURMRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
+		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
+		attrDefMgr.setAttributeDefinitions(SLURMJobAttributes.getDefaultAttributeDefinitions());
+		attrDefMgr.setAttributeDefinitions(SLURMNodeAttributes.getDefaultAttributeDefinitions());
+		return new SLURMRuntimeSystem(runtimeProxy, attrDefMgr);
 	}
 
 	/* (non-Javadoc)

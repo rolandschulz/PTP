@@ -33,4 +33,11 @@
             id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider">
       </providerContributor>
    </extension>
+    <extension
+         point="org.eclipse.ptp.ui.runtimeModelPresentations">
+      <runtimeModelPresentation
+            class="org.eclipse.ptp.rm.slurm.ui.SLURMRuntimeModelPresentation"
+            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider">
+      </runtimeModelPresentation>
+   </extension>
 </plugin>

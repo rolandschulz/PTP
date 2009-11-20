@@ -23,5 +23,5 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.rm.slurm.ui,
  org.eclipse.ptp.rm.slurm.ui.preferences
-Import-Package: org.eclipse.ptp.rm.core.rmsystem,
- org.eclipse.ptp.rm.ui.wizards
+Import-Package: org.eclipse.ptp.rm.core,
+ org.eclipse.ptp.rm.ui
