@@ -206,9 +206,14 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputText.setText(Messages.ParallelProcessView_4);
 		
 		if (process != null) {
-			pidLabel.setText(Messages.ParallelProcessView_5 + process.getPid());
-			statusLabel.setText(Messages.ParallelProcessView_6 + process.getState());
+			if (process.getPid() == 0) {
+			   pidLabel.setText(Messages.ParallelProcessView_5 + "N/A"); //$NON-NLS-1$
+			} else {
+				pidLabel.setText(Messages.ParallelProcessView_5 + process.getPid());
+			}
 
+			statusLabel.setText(Messages.ParallelProcessView_6 + process.getState());
+			
 			/*
 			 * Set initial output text
 			 */
