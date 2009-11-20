@@ -80,15 +80,15 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	}
 
 	@Override
-	protected Job createContinuousMonitorJob() {
+	protected Job createContinuousMonitorJob(IProgressMonitor monitor) {
 		return null;
 	}
 
 	@Override
-	protected Job createDiscoverJob() {
+	protected Job createDiscoverJob(IProgressMonitor monitor) {
 		if (! rmConfiguration.hasDiscoverCmd())
 			return null;
-		Job job = new OpenMPIDiscoverJob(this);
+		Job job = new OpenMPIDiscoverJob(this, monitor);
 		job.setPriority(Job.INTERACTIVE);
 		job.setSystem(false);
 		job.setUser(false);
@@ -96,7 +96,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	}
 
 	@Override
-	protected Job createPeriodicMonitorJob() {
+	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
 		return null;
 	}
 

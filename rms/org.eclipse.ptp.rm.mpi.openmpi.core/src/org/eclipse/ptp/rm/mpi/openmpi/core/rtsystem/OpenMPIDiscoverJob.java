@@ -58,18 +58,22 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIHostMap.Host;
 public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	OpenMPIRuntimeSystem rts;
 
-	public OpenMPIDiscoverJob(OpenMPIRuntimeSystem rts) {
+	public OpenMPIDiscoverJob(OpenMPIRuntimeSystem rts, IProgressMonitor monitor) {
 		super(rts,
 				NLS.bind(Messages.OpenMPIDiscoverJob_name, rts.getRmConfiguration().getName()),
 				rts.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(),
 				Messages.OpenMPIDiscoverJob_interruptedErrorMessage,
 				Messages.OpenMPIDiscoverJob_processErrorMessage,
-				Messages.OpenMPIDiscoverJob_parsingErrorMessage);
+				Messages.OpenMPIDiscoverJob_parsingErrorMessage,
+				monitor);
 		this.rts = rts;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob#parse(java.io.BufferedReader)
+	 */
 	@Override
-	protected void parse(BufferedReader output) throws CoreException {
+	protected IStatus parse(BufferedReader output) {
 		/*
 		 * Local copy of attributes from the RuntimeSystem
 		 */
@@ -114,10 +118,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			String version = info.get("ompi:version:full"); //$NON-NLS-1$
 			if (version != null) {
 				if (!rmConfiguration.setDetectedVersion(version)) {
-					throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
+					return new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version));
 				}
 			} else {
-				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), Messages.OpenMPIDiscoverJob_Exception_UnableToDetermineVersion));
+				return new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), Messages.OpenMPIDiscoverJob_Exception_UnableToDetermineVersion);
 			}
 			
 			/*
@@ -180,20 +184,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				machine.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(Messages.OpenMPIDiscoverJob_Exception_HostFileParseError));
 			}
 			if (hostMap.hasParseErrors() || hasSomeError) {
-				throw new CoreException(new Status(IStatus.WARNING, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIDiscoverJob_Exception_HostFileErrors));
+				return new Status(IStatus.WARNING, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(), Messages.OpenMPIDiscoverJob_Exception_HostFileErrors);
 			}
-		} catch (CoreException e) {
-			/*
-			 * Show message of core exception and change machine status to error.
-			 */
-			if (e.getStatus().getSeverity() == IStatus.ERROR) {
-				AttributeManager attrManager = new AttributeManager();
-				attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailed, e.getMessage())));
-				rts.changeMachine(machineID, attrManager);
-				rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
-			}
-			throw e;
 		} catch (Exception e) {
 			/*
 			 * Show message of all other exceptions and change machine status to error.
@@ -203,8 +195,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
 			rts.changeMachine(machineID, attrManager);
 			rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e));
+			return new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e);
 		}
+		
+		return Status.OK_STATUS;
 	}
 
 	private OpenMPIHostMap readHostFile(IRemoteConnection connection,

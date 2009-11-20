@@ -200,9 +200,22 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 				return;
 			}
 			
-			Job discoverJob = createDiscoverJob();
+			/*
+			 * Wait for discover job to complete so we can check it's status and
+			 * throw an exception if it fails.
+			 */
+			Job discoverJob = createDiscoverJob(subMon.newChild(50));
 			if (discoverJob != null) {
 				discoverJob.schedule();
+				try {
+					discoverJob.join();
+				} catch (InterruptedException e) {
+					// Just check result
+				}
+				IStatus status = discoverJob.getResult();
+				if (!status.isOK()) {
+					throw new CoreException(status);
+				}
 			}
 	
 			if (jobQueueThread == null) {
@@ -305,13 +318,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: start events", rmConfiguration.getName()); //$NON-NLS-1$
 		/*
 		 * Create monitor jobs, if they do not already exist. They may exist but be suspended.
-		 * If the job is not applicate, then no job will be created, according to capabilities for the RM.
+		 * If the job is not applicable, then no job will be created, according to capabilities for the RM.
 		 */
 		if (periodicMonitorJob == null) {
-			periodicMonitorJob = createPeriodicMonitorJob();
+			periodicMonitorJob = createPeriodicMonitorJob(null);
 		}
 		if (continousMonitorJob == null) {
-			continousMonitorJob = createContinuousMonitorJob();
+			continousMonitorJob = createContinuousMonitorJob(null);
 		}
 		/*
 		 * Only schedule the job if they are available. If the job does not exists, then it was
@@ -356,23 +369,26 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/**
 	 * Creates a job that discovers the remote machine. The default implementation runs the discover
 	 * command if defined in the RM capability.
-	 * @return
+	 * @param monitor progress monitor used to report progress, or null to use the system provided progress monitor
+	 * @return discover job
 	 */
-	protected abstract Job createDiscoverJob() throws CoreException;
+	protected abstract Job createDiscoverJob(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Creates a job that periodically monitors the remote machine. The default implementation runs the periodic monitor
 	 * command if defined in the RM capability.
-	 * @return
+	 * @param monitor progress monitor used to report progress, or null to use the system provided progress monitor
+	 * @return periodic monitor job
 	 */
-	protected abstract Job createPeriodicMonitorJob() throws CoreException;
+	protected abstract Job createPeriodicMonitorJob(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Creates a job that keeps monitoring the remote machine. The default implementation runs the continuous monitor
 	 * command if defined in the RM capability.
-	 * @return
+	 * @param monitor progress monitor used to report progress, or null to use the system provided progress monitor
+	 * @return continuous monitor job
 	 */
-	protected abstract Job createContinuousMonitorJob() throws CoreException;
+	protected abstract Job createContinuousMonitorJob(IProgressMonitor monitor) throws CoreException;
 
 	/*
 	 * (non-Javadoc)
