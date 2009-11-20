@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.ui.serviceproviders.IndexLocationChangeListener;
-import org.eclipse.ptp.rdt.ui.subsystems.DStoreServerDefaults;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.osgi.framework.BundleContext;
@@ -65,7 +64,6 @@ public class UIPlugin extends Plugin {
 		
 		IndexLocationChangeListener.startListening();
 		turnOffIndexerAnnotations();
-		DStoreServerDefaults.loadDefaults();
 	}
 	
 	

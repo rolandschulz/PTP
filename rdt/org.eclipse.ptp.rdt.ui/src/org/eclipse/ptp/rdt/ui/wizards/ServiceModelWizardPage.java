@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,34 +17,20 @@ import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
+import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider2;
-import org.eclipse.ptp.rdt.ui.subsystems.DStoreServerDefaults;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceModelManager;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.widgets.AddServiceConfigurationWidget;
-import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.core.subsystems.IConnectorService;
+import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * 
@@ -54,23 +39,25 @@ import org.eclipse.swt.widgets.Control;
  * that it will remain the same. Please do not use this API without consulting
  * with the RDT team.
  * 
+ * @author crecoskie
  *
  */
 public class ServiceModelWizardPage extends MBSCustomPage {
 	public static final String SERVICE_MODEL_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.ui.serviceModelWizardPage"; //$NON-NLS-1$
 	public static final String DEFAULT_CONFIG = Messages.getString("ConfigureRemoteServices.0"); //$NON-NLS-1$
-	public static final String CONFIG_PROPERTY = "org.eclipse.ptp.rdt.ui.ServiceModelWizardPage.serviceConfig"; //$NON-NLS-1$
+	
+	public static final String SERVICE_MODEL_WIDGET_PROPERTY = "org.eclipse.ptp.rdt.ui.ServiceModelWizardPage.serviceModelWidget"; //$NON-NLS-1$
 
 	boolean fbVisited;
 	private String fTitle;
 	private String fDescription;
 	private ImageDescriptor fImageDescriptor;
 	private Image fImage;
-	private IServiceConfiguration fNewConfig;
-	private Control pageControl;
+	private Control fCanvas;
+	private IServiceConfiguration fConfig;
+	private ServiceProviderConfigurationWidget fModelWidget;
 	
-	private AddServiceConfigurationWidget serviceConfigWidget;
-	
+
 	public ServiceModelWizardPage(String pageID) {
 		super(pageID);
 	}
@@ -92,7 +79,6 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 		
 		return allApplicableServices;
 	}
-	
 	
 	/**
 	 * 
@@ -118,124 +104,40 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	public void createControl(final Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
-		comp.setLayout(new GridLayout(1, false));
-		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		pageControl = comp;
-
-        serviceConfigWidget = new AddServiceConfigurationWidget(comp, SWT.NONE);
-        GridData data = new GridData(GridData.FILL_BOTH);
-        serviceConfigWidget.setLayoutData(data);
-        serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				updateConfigPageProperty();
-			}
-        });
-        serviceConfigWidget.setDefaultConfiguration(getNewConfiguration());
-        serviceConfigWidget.setSelection(true);
-        
-		updateConfigPageProperty();
-	}
-	
-	private void updateConfigPageProperty() {
-		IServiceConfiguration config = serviceConfigWidget.getServiceConfiguration();
-		MBSCustomPageManager.addPageProperty(
-				SERVICE_MODEL_WIZARD_PAGE_ID, CONFIG_PROPERTY, config);
+	public void createControl(Composite parent) {
+		fCanvas = parent; // TODO
+		fModelWidget = new ServiceProviderConfigurationWidget(parent, SWT.NONE);
 		
-	}
-	
-	private String getDefaultConfigName() {
-		String candidateName = DEFAULT_CONFIG;
+		MBSCustomPageManager.addPageProperty(pageID, SERVICE_MODEL_WIDGET_PROPERTY, fModelWidget);
+		
+		String configName = DEFAULT_CONFIG;
 		IWizardPage page = getWizard().getStartingPage();
-		if(page instanceof NewRemoteProjectCreationPage) {
-			NewRemoteProjectCreationPage cdtPage = (NewRemoteProjectCreationPage) page;
-			candidateName = cdtPage.getRemoteConnection().getName();
+		if(page instanceof CDTMainWizardPage) {
+			CDTMainWizardPage cdtPage = (CDTMainWizardPage) page;
+			configName = cdtPage.getProjectName();
 		}
 		
-		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
-		Set<String> existingNames = new HashSet<String>();
-		for(IServiceConfiguration config : configs) {
-			existingNames.add(config.getName());
-		}
+		fConfig = ServiceModelManager.getInstance().newServiceConfiguration(configName);
 		
-		int i = 2;
-		String newConfigName = candidateName;
-		while(existingNames.contains(newConfigName)) {
-			newConfigName = candidateName + " (" + (i++) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
+		fModelWidget.setServiceConfiguration(fConfig);
 		
-		return newConfigName;
+		Control control = fModelWidget.getParent().getShell(); //get the shell or doesn't display help correctly
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(control,RDTHelpContextIds.SERVICE_MODEL_WIZARD);
 	}
-	
-	/**
-	 * Creates a new configuration with the RDT defaults.
-	 */
-	private IServiceConfiguration getNewConfiguration() {
-		if(fNewConfig == null) {
-			IServiceModelManager smm = ServiceModelManager.getInstance();
-			fNewConfig = smm.newServiceConfiguration(getDefaultConfigName());
-			
-			IWizardPage page = getWizard().getStartingPage();
-			if(page instanceof NewRemoteProjectCreationPage) {
-				NewRemoteProjectCreationPage cdtPage = (NewRemoteProjectCreationPage) page;
-				IRemoteServices remoteServices = cdtPage.getRemoteServices();
-				IRemoteConnection remoteConnection = cdtPage.getRemoteConnection();
-				
-				IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-				IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
-				RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider)smm.getServiceProvider(descriptor);
-				rbsp.setRemoteToolsProviderID(remoteServices.getId());
-				rbsp.setRemoteToolsConnection(remoteConnection);
-				fNewConfig.setServiceProvider(buildService, rbsp);
-			
-				IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-				if (remoteServices.getId().equals("org.eclipse.ptp.remote.RSERemoteServices")) { //$NON-NLS-1$
-					descriptor = indexingService.getProviderDescriptor(RemoteCIndexServiceProvider.ID);
-					RemoteCIndexServiceProvider provider = (RemoteCIndexServiceProvider) smm.getServiceProvider(descriptor);
-					
-					String hostName = remoteConnection.getAddress();
-					IHost host = RSEUtils.getConnection(hostName);
-					String configPath = RSEUtils.getDefaultConfigDirectory(host);
-					
-					provider.setConnection(host, getDStoreConnectorService(host));
-					provider.setIndexLocation(configPath);
-					provider.setConfigured(true);
-					fNewConfig.setServiceProvider(indexingService, provider);
-				} else if (remoteServices.getId().equals("org.eclipse.ptp.remote.RemoteTools")) { //$NON-NLS-1$
-					descriptor = indexingService.getProviderDescriptor(RemoteCIndexServiceProvider2.ID);
-					RemoteCIndexServiceProvider2 provider = (RemoteCIndexServiceProvider2) smm.getServiceProvider(descriptor);
-					provider.setConnection(remoteServices, remoteConnection);
-					provider.setDStoreCommand(DStoreServerDefaults.COMMAND);
-					provider.setDStoreEnv("CLASSPATH=" + DStoreServerDefaults.CLASSPATH); //$NON-NLS-1$
-					fNewConfig.setServiceProvider(indexingService, provider);
-				}
-			}
-		}
-		
-		return fNewConfig;
-	}
-	
-	private IConnectorService getDStoreConnectorService(IHost host) {
-		for(IConnectorService cs : host.getConnectorServices()) {
-			if(cs instanceof DStoreConnectorService)
-				return cs;
-		}
-		return null;
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
 	 */
 	public void dispose() {
 		// TODO Auto-generated method stub
+
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getControl()
 	 */
 	public Control getControl() {
-		return pageControl;
+		return fModelWidget;
 	}
 
 	/* (non-Javadoc)
@@ -324,6 +226,7 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 		if(visible) {
 			fbVisited = true;
 		}
+		fCanvas.setVisible(visible);
 	}
 
 
