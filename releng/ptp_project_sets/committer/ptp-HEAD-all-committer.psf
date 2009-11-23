@@ -66,6 +66,7 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinst,org.eclipse.ptp.etfw.tau.selinst"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinstfort,org.eclipse.ptp.etfw.tau.selinstfort"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.toolopts,org.eclipse.ptp.etfw.toolopts"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.feedback,org.eclipse.ptp.etfw.feedback"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.common,org.eclipse.ptp.pldt.common"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.help,org.eclipse.ptp.pldt.help"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.lapi,org.eclipse.ptp.pldt.lapi"/>
