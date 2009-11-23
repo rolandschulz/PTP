@@ -35,9 +35,8 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
-	private IServiceConfiguration selectedConfig;
-
-	private Set<IServiceConfiguration> currentServiceConfigurations;
+	private ServiceConfigurationSelectionWidget fServiceWidget;
+	private Set<IServiceConfiguration> fCurrentServiceConfigurations;
 
 	/**
 	 * Create a dialog listing the service configurations which can be selected
@@ -51,7 +50,7 @@ public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
 	public ServiceConfigurationSelectionDialog(Shell parentShell,
 			Set<IServiceConfiguration> currentConfigs) {
 		super(parentShell);
-		currentServiceConfigurations = currentConfigs;
+		fCurrentServiceConfigurations = currentConfigs;
 	}
 
 	/**
@@ -75,10 +74,10 @@ public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
 		serviceConfigurationPane.setLayout(layout);
 		serviceConfigurationPane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		Composite widget = new ServiceConfigurationSelectionWidget(serviceConfigurationPane, SWT.NONE, 
-				currentServiceConfigurations, null, false);
-		widget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		return widget;
+		fServiceWidget = new ServiceConfigurationSelectionWidget(serviceConfigurationPane, SWT.NONE, 
+				fCurrentServiceConfigurations, null, false);
+		fServiceWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		return fServiceWidget;
 	}
 
 	/**
@@ -87,6 +86,6 @@ public class ServiceConfigurationSelectionDialog extends TitleAreaDialog {
 	 * @return Selected service configuration
 	 */
 	public IServiceConfiguration getSelectedConfiguration() {
-		return selectedConfig;
+		return fServiceWidget.getSelectedConfiguration();
 	}
 }
