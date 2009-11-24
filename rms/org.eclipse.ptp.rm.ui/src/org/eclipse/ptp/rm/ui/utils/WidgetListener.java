@@ -26,22 +26,35 @@ import org.eclipse.swt.events.TypedEvent;
  *
  * @author Daniel Felix Ferber
  */
-public abstract class WidgetListener implements SelectionListener,
-ModifyListener {
+public abstract class WidgetListener implements SelectionListener, ModifyListener {
 	/** State of the listener (enabled/disabled). */
 	private boolean listenerEnabled = true;
 
-	/** Enable the listener to handle events. */
-	public synchronized void enable() {
-		listenerEnabled = true;
+	/**
+	 * Enable the listener to handle events.
+	 */
+	public void enable() {
+		setEnabled(true);
 	}
 
-	/** Disable listener, received events shall be ignored. */
-	public synchronized void disable() {
-		listenerEnabled = false;
+	/**
+	 * Disable listener, received events shall be ignored.
+	 */
+	public void disable() {
+		setEnabled(false);
+	}
+	
+	/**
+	 * Set listener enabled state
+	 * @param enabled
+	 */
+	public synchronized void setEnabled(boolean enabled) {
+		listenerEnabled = enabled;
 	}
 
-	/** Test if the listener is enabled. */
+	/**
+	 * Test if the listener is enabled. 
+	 */
 	public synchronized boolean isEnabled() {
 		return listenerEnabled;
 	}
