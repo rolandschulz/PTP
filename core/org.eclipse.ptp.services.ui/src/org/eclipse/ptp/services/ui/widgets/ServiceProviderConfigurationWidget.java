@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -77,7 +78,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	private Button enabledCheckbox;
 	private Combo providerCombo;
 	private Composite configurationComposite;
-	private Composite providerComposite;
+	private Group providerComposite;
 	private StackLayout stackLayout;
 	
 	private Image enabledIcon;
@@ -145,7 +146,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		labelData.horizontalSpan = 2;
 		label.setLayoutData(labelData);
 		label.setText(Messages.ServiceProviderConfigurationWidget_0);
-		
+
 		servicesTree = new Tree(this, SWT.BORDER  | SWT.SINGLE);
 		GridData servicesTreeData = new GridData(SWT.FILL, SWT.FILL, false, true);
 		servicesTreeData.widthHint = 150;
@@ -162,7 +163,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 			}
 		});
 		
-		providerComposite = new Composite(this, SWT.NONE);
+		providerComposite = new Group(this, SWT.SHADOW_ETCHED_IN);
 		providerComposite.setLayout(new GridLayout(1, false));
 		providerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
