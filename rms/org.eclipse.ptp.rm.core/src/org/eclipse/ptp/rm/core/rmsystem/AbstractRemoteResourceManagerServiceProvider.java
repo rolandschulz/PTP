@@ -87,7 +87,7 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	 * @return local address
 	 */
 	public String getLocalAddress() {
-		return getString(TAG_LOCAL_ADDRESS, ""); //$NON-NLS-1$
+		return getString(TAG_LOCAL_ADDRESS, "localhost"); //$NON-NLS-1$
 	}
 	
 	/**
