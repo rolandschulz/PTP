@@ -102,9 +102,10 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            name="%page.name"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
             class="org.eclipse.ptp.etfw.feedback.preferences.FeedbackPreferencePage"
-            id="org.eclipse.ptp.etfw.feedback.preferences.SamplePreferencePage">
+            id="org.eclipse.ptp.etfw.feedback.preferences.SamplePreferencePage"
+            name="%page.name">
       </page>
    </extension>
    <extension
