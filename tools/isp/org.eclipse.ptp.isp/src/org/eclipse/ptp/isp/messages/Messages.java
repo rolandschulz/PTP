@@ -52,6 +52,9 @@ public class Messages extends NLS {
 	public static String IspUtilities_0;
 	public static String IspUtilities_1;
 	public static String IspUtilities_14;
+	public static String IspUtilities_15;
+	public static String IspUtilities_16;
+	public static String IspUtilities_17;
 	public static String IspUtilities_2;
 	public static String IspUtilities_3;
 	public static String IspUtilities_4;

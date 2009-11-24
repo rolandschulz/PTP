@@ -825,14 +825,16 @@ public class Transitions {
 	}
 
 	public boolean hasError() {
-		if (this.assertionViolation || this.deadlock)
+		if (this.assertionViolation || this.deadlock) {
 			return true;
+		}
 		Iterator<HashMap<String, Envelope>> itr = this.errorCallsList
 				.iterator();
 		while (itr.hasNext()) {
 			HashMap<String, Envelope> currentHash = itr.next();
-			if (currentHash != null && !currentHash.isEmpty())
+			if (currentHash != null && !currentHash.isEmpty()) {
 				return true;
+			}
 		}
 		return false;
 	}

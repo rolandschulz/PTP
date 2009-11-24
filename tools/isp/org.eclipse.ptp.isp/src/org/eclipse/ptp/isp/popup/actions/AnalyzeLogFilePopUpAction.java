@@ -75,8 +75,11 @@ public class AnalyzeLogFilePopUpAction implements IObjectActionDelegate {
 					Messages.AnalyzeLogFilePopUpAction_1, pie);
 			IspUtilities.logError(Messages.AnalyzeLogFilePopUpAction_1, pie);
 		}
-		IspUtilities
-				.activateAnalyzer(sourceFilePath, logFilePath, false, false);
+
+		if (!sourceFilePath.equals("")) { //$NON-NLS-1$
+			IspUtilities.activateAnalyzer(sourceFilePath, logFilePath, false,
+					false);
+		}
 	}
 
 	/**

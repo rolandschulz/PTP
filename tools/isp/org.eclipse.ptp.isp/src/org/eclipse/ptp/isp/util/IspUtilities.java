@@ -304,8 +304,11 @@ public class IspUtilities {
 	}
 
 	/**
-	 * Returns the path
+	 * Returns the path of the source files form the specified logFilePath
 	 * 
+	 * @param logFilePath
+	 *            The path of the input log file.
+	 * @return String The source file path.
 	 */
 	public static String getSourcePathFromLog(String logFilePath) {
 		// Check if the log file is where we expect it to be
@@ -319,7 +322,25 @@ public class IspUtilities {
 					Messages.AnalyzeLogFilePopUpAction_0, pie);
 			IspUtilities.logError(Messages.AnalyzeLogFilePopUpAction_0, pie);
 		}
+
+		// If the log file is empty
+		if (!scanner.hasNextLine()) {
+			IspUtilities.showErrorDialog(Messages.IspUtilities_17,
+					Messages.IspUtilities_16);
+			return ""; //$NON-NLS-1$
+		}
+
+		// Skip the line holding the number of processes
 		scanner.nextLine();
+
+		// If ISP exited out without running any MPI Calls (ie two deadlocks w/
+		// <2 procs)
+		if (!scanner.hasNextLine()) {
+			IspUtilities.showErrorDialog(Messages.IspUtilities_15,
+					Messages.IspUtilities_16);
+			return ""; //$NON-NLS-1$
+		}
+
 		sourceFilePath = scanner.nextLine();
 		sourceFilePath = sourceFilePath.substring(sourceFilePath.indexOf("/"), //$NON-NLS-1$
 				sourceFilePath.lastIndexOf(".") + 2); //$NON-NLS-1$
@@ -468,7 +489,7 @@ public class IspUtilities {
 	 * Returns the path of the last used file relative to the workspace.
 	 * 
 	 * @param none
-	 * @return The path of the last used file relative to the workspace.
+	 * @return String The path of the last used file relative to the workspace.
 	 */
 	public static String getLastFile() {
 		IPreferenceStore pstore = ISPPlugin.getDefault().getPreferenceStore();
@@ -478,8 +499,9 @@ public class IspUtilities {
 	/**
 	 * Saves the full path of the last used file to the preference store.
 	 * 
-	 * @param none
-	 * @return The path of the last used file inthe workspace.
+	 * @param The
+	 *            path of the last used file in the workspace.
+	 * @return void
 	 */
 	public static void saveLastFile(String relativePath) {
 		IPreferenceStore pstore = ISPPlugin.getDefault().getPreferenceStore();

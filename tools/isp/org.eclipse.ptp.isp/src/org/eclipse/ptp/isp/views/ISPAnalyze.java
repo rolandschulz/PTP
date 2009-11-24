@@ -153,8 +153,6 @@ public class ISPAnalyze extends ViewPart {
 	// Things for highlighting the appropriate line in the code windows
 	private int leftIndex;
 	private int rightIndex;
-	private int leftUp;
-	private int rightUp;
 	private int oldLeftIndex;
 
 	// Listeners for the viewers
@@ -173,8 +171,10 @@ public class ISPAnalyze extends ViewPart {
 
 	// Misc
 	private Shell errShell;
+	private int leftLines;
+	private int rightLines;
 
-	// Listens for doubleclicks and jump to that line of code
+	// Listens for double-clicks and jumps to that line of code
 	private class DoubleClickListener implements IDoubleClickListener {
 
 		public void doubleClick(DoubleClickEvent event) {
@@ -184,8 +184,7 @@ public class ISPAnalyze extends ViewPart {
 
 			// Open the source file in the Editor Window
 			String base = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation()
-					+ ""; //$NON-NLS-1$
+					.getLocation().toPortableString();
 			String sourceFilePath = element.fullFileName.substring(base
 					.length());
 			openEditor(element.line, sourceFilePath);
@@ -194,6 +193,8 @@ public class ISPAnalyze extends ViewPart {
 
 	/**
 	 * Constructor.
+	 * 
+	 * @param none
 	 */
 	public ISPAnalyze() {
 		this.lockedRank = -1;
@@ -322,7 +323,7 @@ public class ISPAnalyze extends ViewPart {
 			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_1
 					+ leftSourceFilePath, f);
 			IspUtilities.logError(Messages.ISPAnalyze_2, f);
-			leftViewer.add(new ListElement("", Messages.ISPAnalyze_3, -1, //$NON-NLS-1$
+			this.leftViewer.add(new ListElement("", Messages.ISPAnalyze_3, -1, //$NON-NLS-1$
 					false));
 		}
 		try {
@@ -412,6 +413,20 @@ public class ISPAnalyze extends ViewPart {
 	}
 
 	/**
+	 * This method is used when another location changes the number of processes
+	 * preference. Calling this method will update the drop down so that it has
+	 * the correct number of processes displayed.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	public void updateDropDown() {
+		Integer nprocs = ISPPlugin.getDefault().getPreferenceStore().getInt(
+				PreferenceConstants.ISP_PREF_NUMPROCS);
+		this.setRankComboList.setText(nprocs.toString());
+	}
+
+	/**
 	 * Starts the viewer by: Generating the log file, parsing it, and
 	 * initializing everything.
 	 * 
@@ -439,6 +454,13 @@ public class ISPAnalyze extends ViewPart {
 				parseLogFile(globalLogFilePath);
 				globalSourceFilePath = IspUtilities
 						.getSourcePathFromLog(globalLogFilePath);
+
+				// if the log file contained no mpi calls
+				if (globalSourceFilePath.equals("")) { //$NON-NLS-1$
+					endEarlyButton.setEnabled(false);
+					return;
+				}
+
 				parseSourceFile(globalSourceFilePath, globalSourceFilePath);
 				initTransitions(globalLogFilePath);
 				endEarlyButton.setEnabled(false);
@@ -465,8 +487,9 @@ public class ISPAnalyze extends ViewPart {
 	 */
 	public void dispose() {
 		for (Shell s : this.activeShells) {
-			if (s != null)
+			if (s != null) {
 				s.dispose();
+			}
 		}
 		super.dispose();
 	}
@@ -528,14 +551,16 @@ public class ISPAnalyze extends ViewPart {
 		leftList.deselectAll();
 		rightList.deselectAll();
 
+		updateLineCount();
+
 		// Update left view
-		for (int i = 0; i <= this.leftUp; i++) {
+		for (int i = 0; i < this.leftLines; i++) {
 			// -1, 0-based
 			leftList.select((this.leftIndex - i) - 1);
 		}
 
 		// Update right view
-		for (int i = 0; i <= this.rightUp; i++) {
+		for (int i = 0; i < this.rightLines; i++) {
 			// -1, 0-based
 			rightList.select((this.rightIndex - i) - 1);
 		}
@@ -545,23 +570,83 @@ public class ISPAnalyze extends ViewPart {
 		}
 	}
 
+	/**
+	 * This method is used to highlight ALL lines involved in a call
+	 */
+	private void updateLineCount() {
+		List leftList = this.leftViewer.getList();
+		List rightList = this.rightViewer.getList();
+
+		String curr = ""; //$NON-NLS-1$
+		this.leftLines = 1;
+		if (this.leftIndex <= 0) {
+			this.leftLines = 0;
+			return;
+		}
+		while (leftLines < leftIndex + 1) {// to prevent accidentally going over
+			// Get current string
+			curr = ""; //$NON-NLS-1$
+			for (int i = leftLines; i > 0; i--) {
+				curr += leftList.getItem(leftIndex - i);
+				curr = removeComments(curr);
+			}
+
+			if (this.parenthesesMatched(curr))
+				break;
+			leftLines++;
+		}
+		// Be sure to include the MPI Call
+		curr = curr.substring(0, curr.indexOf("(") - 1); //$NON-NLS-1$
+		if (curr.trim().length() == 0) {
+			this.leftLines++;
+		}
+
+		if (rightIndex == -1) {
+			return;
+		}
+		this.rightLines = 1;
+
+		// to prevent accidentally going over
+		while (rightLines < rightIndex + 1) {
+			// Get current string
+			curr = ""; //$NON-NLS-1$
+			for (int i = rightLines; i > 0; i--) {
+				curr += rightList.getItem(rightIndex - i);
+				curr = removeComments(curr);
+			}
+
+			if (this.parenthesesMatched(curr)) {
+				break;
+			}
+			rightLines++;
+		}
+		curr = curr.substring(0, curr.indexOf("(") - 1); //$NON-NLS-1$
+		if (curr.trim().length() == 0) {
+			this.rightLines++;
+		}
+	}
+
 	/*
 	 * Updates the relative position of the scrollbar for the list viewers.
 	 */
 	private void updateScrollBars() {
 		try {
-			if (this.leftViewer.getList() != null)
+			if (this.leftViewer.getList() != null) {
 				this.leftViewer.reveal(this.leftViewer.getElementAt(0));
+			}
 			if (this.leftViewer.getList() != null
-					&& this.leftViewer.getList().getSelection()[0] != null)
+					&& this.leftViewer.getList().getSelection()[0] != null) {
 				this.leftViewer.reveal(this.leftViewer
 						.getElementAt(this.leftIndex - 1));
-			if (this.rightViewer.getList() != null)
+			}
+			if (this.rightViewer.getList() != null) {
 				this.rightViewer.reveal(this.rightViewer.getElementAt(0));
+			}
 			if (this.rightViewer.getList() != null
-					&& this.rightViewer.getList().getSelection()[0] != null)
-				rightViewer.reveal(this.rightViewer
+					&& this.rightViewer.getList().getSelection()[0] != null) {
+				this.rightViewer.reveal(this.rightViewer
 						.getElementAt(this.rightIndex - 1));
+			}
 		} catch (Exception e) {
 		}
 	}
@@ -608,7 +693,6 @@ public class ISPAnalyze extends ViewPart {
 			this.errorMessageLabel.setText(Messages.ISPAnalyze_13
 					+ this.transitions.getTotalInterleavings());
 		} else if (this.transitions.hasError()) {
-			int temp = this.transitions.getErrorCallsList().size();
 			this.errorMessageLabel.setForeground(RED);
 			this.errorMessageLabel.setText(Messages.ISPAnalyze_120);
 		} else {
@@ -655,7 +739,6 @@ public class ISPAnalyze extends ViewPart {
 		tree.setFont(setFontSize(tree.getFont(), 8));
 
 		// Declare everything we'll be working with
-		String currFile = ""; //$NON-NLS-1$
 		TreeItem interleavingItem = null;
 		TreeItem rankItem = null;
 		int prevInterleaving = -1;
@@ -665,8 +748,7 @@ public class ISPAnalyze extends ViewPart {
 		int lineNum = -1;
 		int end = this.logContents.size();
 
-		// Parse the logfile and populate the Call Browser window with the
-		// contents.
+		// Parse the logfile and populate Call Browser with contents.
 		for (int i = 0; i < end; i++) {
 			String logEntry = this.logContents.get(i);
 			Scanner s = new Scanner(logEntry);
@@ -691,10 +773,11 @@ public class ISPAnalyze extends ViewPart {
 			}
 
 			// Leaks don't have any more ints and we don't want to display them
-			if (!s.hasNextInt())
+			if (!s.hasNextInt()) {
 				continue;
+			}
 
-			// Find if the call completed
+			// Find out if the call completed
 			boolean completes = true;
 			s.nextInt();
 			s.nextInt();
@@ -708,14 +791,9 @@ public class ISPAnalyze extends ViewPart {
 
 			// Grab the name of the source file
 			int index = logEntry.lastIndexOf(" "); //$NON-NLS-1$
-
-			// 1 0 0 1 1 Barrier 0_0:1:2:3: { 1 } { [ 1 1 ] [ 2 1 ] [ 3 1 ] }
-			// Match: -1 -1 File: 80
 			String name = logEntry.substring(0, index);
-
-			// /home/alan/eclipse/runtime-isp/MPI_AnySrcCanDeadlock/src/MPI_AnySrcCanDeadlock.c
 			index = name.lastIndexOf("/"); //$NON-NLS-1$
-			name = name.substring(index + 1, name.length());// MPI_AnySrcCanDeadlock.c
+			name = name.substring(index + 1, name.length());
 
 			// Grab the line number at the end of the log-entry
 			int lastSpaceIndex = logEntry.lastIndexOf(" "); //$NON-NLS-1$
@@ -725,11 +803,10 @@ public class ISPAnalyze extends ViewPart {
 			// Create leaves for the rank branchesassembleSourceLine
 			TreeItem callItem = new TreeItem(rankItem, SWT.NULL);
 			String call = logContents.get(i);
-			for (int c = 0; c < 5; c++)
+			for (int c = 0; c < 5; c++) {
 				call = call.substring(call.indexOf(" ") + 1); //$NON-NLS-1$
+			}
 			call = call.substring(0, call.indexOf(" ")); //$NON-NLS-1$
-
-			int[] notNeeded = new int[1];
 			callItem.setText(call
 					+ " \t" + name + Messages.ISPAnalyze_21 + lineNum); //$NON-NLS-1$
 
@@ -737,12 +814,9 @@ public class ISPAnalyze extends ViewPart {
 			int currentInter = this.transitions.currentInterleaving + 1;
 			if (lineNum == this.leftIndex && inter == currentInter) {
 				callItem.setForeground(new Color(null, 0, 0, 255));
-				if (true) {// If we want the revealing to be an option just
-					// change the condition here
-					revealTreeItem(callItem);
-				}
+				// Comment this out if you don't want items expanded
+				revealTreeItem(callItem);
 			}
-
 			// Mark the lines with errors
 			if (!completes) {
 				callItem.setForeground(new Color(null, 255, 0, 0));
@@ -762,15 +836,11 @@ public class ISPAnalyze extends ViewPart {
 		}
 	}
 
-	/**
+	/*
 	 * To make an item visible we must expand each of its parents. Sadly the
 	 * root must be expanded first and work its way down to the goal. So we
 	 * recursively find parents and then expand once all of the current item's
 	 * parents has been expanded.
-	 * 
-	 * @param callItem
-	 *            The item we want to reveal.
-	 * @return void
 	 */
 	private void revealTreeItem(TreeItem callItem) {
 		if (callItem.getParentItem() == null) {
@@ -904,17 +974,17 @@ public class ISPAnalyze extends ViewPart {
 		// Parse the resource leak list and populate tree.
 		int listSize = this.errorCount;
 		for (int i = 0; i < listSize; i++) {
-			Envelope env = (Envelope) errorCalls[i];
+			Envelope env = (Envelope) this.errorCalls[i];
 
 			// If this error is not part of this interleaving skip it
-			if (env.getInterleaving() != transitions.getCurrentInterleaving())
+			if (env.getInterleaving() != this.transitions
+					.getCurrentInterleaving()) {
 				continue;
+			}
 
 			String sourceFilePath = env.getFilename();
-
 			String base = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation()
-					+ ""; //$NON-NLS-1$
+					.getLocation().toPortableString();
 			String name = sourceFilePath.substring(base.length());
 
 			fileItem = new TreeItem(tree, SWT.NULL);
@@ -947,7 +1017,7 @@ public class ISPAnalyze extends ViewPart {
 		// Open up the Call Browser window with the specified size
 		shell.setSize(500, 400);
 		shell.open();
-		activeShells.add(shell);
+		this.activeShells.add(shell);
 
 		// Set up the event loop
 		while (!shell.isDisposed()) {
@@ -958,96 +1028,6 @@ public class ISPAnalyze extends ViewPart {
 	}
 
 	/*
-	 * This method deals with a line of code that is spread over more than one
-	 * line in a file. It returns the correct String.
-	 */
-	private String assembleSourceLine(String call, int lineNum,
-			int[] _numLinesBack) {
-		try {
-			call = removeComments(call);
-
-			// If we received line-wrapped call info, prepend the line above it
-			int numLinesBack = 2;// -1 gives the current, -2 gives the previous
-			while (!parenthesesMatched(call)) {
-				call = removeComments(this.leftViewer.getList().getItem(
-						lineNum - numLinesBack).trim())
-						+ " " + call.trim(); //$NON-NLS-1$
-				numLinesBack++;
-			}
-			/* Find the '(' at the beginning of the MPI Call */
-			int loc = call.lastIndexOf(")"); //$NON-NLS-1$
-
-			// Usually means that the wrong file is being observed
-			if (loc == -1) {
-				return Messages.ISPAnalyze_33;
-			}
-
-			int parenthsLeft = 1;
-			while (parenthsLeft > 0) {
-				loc--;
-				if (call.charAt(loc) == ')') {
-					parenthsLeft++;
-				} else if (call.charAt(loc) == '(') {
-					parenthsLeft--;
-				}
-			}
-			int firstBraceIndex = loc;
-			_numLinesBack[0] = numLinesBack - 2;
-
-			String temp = call.substring(0, firstBraceIndex);
-			if (temp.contains("MPI_")) { //$NON-NLS-1$
-				int start = temp.lastIndexOf("MPI_"); //$NON-NLS-1$
-				return call.substring(start);
-			} else {
-				// Reaches here for asserts and maybe some other calls
-				return call.trim();
-			}
-		} catch (Exception e) {
-			IspUtilities.showExceptionDialog(Messages.ISPAnalyze_34, e);
-			String msg = Messages.ISPAnalyze_34;
-			IspUtilities.logError(msg, e);
-			return Messages.ISPAnalyze_35;
-		}
-	}
-
-	/*
-	 * Returns whether or not the specified String has a matching number of left
-	 * and right. parenthesis.
-	 */
-	private boolean parenthesesMatched(String call) {
-		int numRightParens = 0;
-		int numLeftParens = 0;
-
-		call = removeComments(call);
-		for (int i = 0; i < call.length(); i++) {
-			if (call.charAt(i) == '(') {
-				numLeftParens++;
-			}
-			if (call.charAt(i) == ')') {
-				numRightParens++;
-			}
-		}
-		return (numRightParens == numLeftParens);
-	}
-
-	/*
-	 * Removes comments from the specified call String.
-	 */
-	private String removeComments(String call) {
-		// remove any c-style comments
-		while (call.contains("/*")) { //$NON-NLS-1$
-			call = call.substring(0, call.indexOf("/*")) //$NON-NLS-1$
-					+ call.substring(call.indexOf("*/") + 2); //$NON-NLS-1$
-		}
-
-		// remove any c++-style comments
-		while (call.contains("//")) { //$NON-NLS-1$
-			call = call.substring(0, call.indexOf("//")); //$NON-NLS-1$
-		}
-		return call;
-	}
-
-	/*
 	 * Sets the enabled property of all buttons to the appropriate state.
 	 */
 	private void setButtonEnabledState() {
@@ -1055,9 +1035,9 @@ public class ISPAnalyze extends ViewPart {
 				.hasValidPreviousTransition(this.lockedRank));
 		this.previousTransitionButton.setEnabled(this.transitions
 				.hasValidPreviousTransition(this.lockedRank));
-		this.nextTransitionButton.setEnabled(transitions
+		this.nextTransitionButton.setEnabled(this.transitions
 				.hasValidNextTransition(this.lockedRank));
-		this.lastTransitionButton.setEnabled(transitions
+		this.lastTransitionButton.setEnabled(this.transitions
 				.hasValidNextTransition(this.lockedRank));
 		this.firstInterleavingButton.setEnabled(this.transitions
 				.hasPreviousInterleaving());
@@ -1067,7 +1047,7 @@ public class ISPAnalyze extends ViewPart {
 				.hasNextInterleaving());
 		this.lastInterleavingButton.setEnabled(this.transitions
 				.hasNextInterleaving());
-		this.deadlockInterleavingButton.setEnabled(transitions
+		this.deadlockInterleavingButton.setEnabled(this.transitions
 				.getDeadlockInterleavings() != null);
 
 	}
@@ -1123,28 +1103,18 @@ public class ISPAnalyze extends ViewPart {
 			} else if (this.transitions.hasDeadlock()) {
 				this.rightCodeWindowLabel.setText(Messages.ISPAnalyze_36);
 			} else {
-				rightCodeWindowLabel.setText(Messages.ISPAnalyze_37);
+				this.rightCodeWindowLabel.setText(Messages.ISPAnalyze_37);
 			}
 		}
 	}
 
 	/*
 	 * Returns a String representing all information relative to a particular
-	 * successfully MPI call.
+	 * successful MPI call.
 	 */
 	private String getCallText(Envelope env, boolean isLeft) {
 		String filename = env.getFilename();
 		filename = filename.substring(filename.lastIndexOf('/') + 1);
-
-		String call = ""; //$NON-NLS-1$
-		if (isLeft
-				&& (this.leftViewer.getList().getItemCount() > this.leftIndex - 1)) {
-			call = this.leftViewer.getList().getItem(this.leftIndex - 1);
-			// -1 because the list is 0-based while line number is 1 based
-		} else if (this.rightViewer.getList().getItemCount() > this.rightIndex - 1) {
-			call = this.rightViewer.getList().getItem(this.rightIndex - 1);
-			// -1 because the list is 0-based while line number is 1 based
-		}
 
 		// determine which ranks are involved; by default only call's rank
 		String ranks = Messages.ISPAnalyze_38 + env.getRank() + "\n"; //$NON-NLS-1$
@@ -1188,20 +1158,13 @@ public class ISPAnalyze extends ViewPart {
 						+ ranksCommunicatedTo + Messages.ISPAnalyze_43;
 			}
 		}
-		int[] intMessenger = new int[1];
 		String result = ""; //$NON-NLS-1$
 		if (isLeft) {
 			result = ranks + Messages.ISPAnalyze_44 + filename
-					+ Messages.ISPAnalyze_45 + this.leftIndex + "\n" //$NON-NLS-1$
-					+ assembleSourceLine(call, this.leftIndex, intMessenger);
-			this.leftUp = intMessenger[0]; // this.leftUp is used by the
-			// highlighting method to highlight all lines for this call
+					+ Messages.ISPAnalyze_45 + this.leftIndex;
 		} else {
 			result = ranks + Messages.ISPAnalyze_46 + filename
-					+ Messages.ISPAnalyze_47 + this.rightIndex + "\n" //$NON-NLS-1$
-					+ assembleSourceLine(call, this.rightIndex, intMessenger);
-			this.rightUp = intMessenger[0]; // this.leftUp is used by the
-			// highlighting method to highlight all lines for this call
+					+ Messages.ISPAnalyze_47 + this.rightIndex;
 		}
 		return result;
 	}
@@ -1237,10 +1200,15 @@ public class ISPAnalyze extends ViewPart {
 	}
 
 	/*
-	 * Resets everything to default values (used for when you analyze a new
-	 * file)
+	 * Resets everything to default values. Used when a new file is analyzed.
 	 */
 	private void reset() {
+		// By making the current files "" we force the code viewers to update
+		this.currLeftFileName = ""; //$NON-NLS-1$
+		this.currRightFileName = ""; //$NON-NLS-1$
+		transitions.currentInterleaving = 0;
+		transitions.currentTransition = 0;
+
 		// Update labels and combo lists
 		setMessageLabelText();
 		setLockRankItems();
@@ -1252,11 +1220,6 @@ public class ISPAnalyze extends ViewPart {
 		this.lockedRank = -1;
 		this.errorIndex = 1;
 
-		// TEMP
-		// int curr = transitions.getCurrentInterleaving();
-		// ArrayList<Integer> list = transitions.getDeadlockInterleavings();
-		// list.contains(curr);
-
 		// Runtime group buttons
 		this.deadlockInterleavingButton.setEnabled(transitions
 				.getDeadlockInterleavings() != null);
@@ -1267,7 +1230,7 @@ public class ISPAnalyze extends ViewPart {
 		this.launchIspUIButton.setEnabled(true);
 
 		// Browse resource leaks button
-		this.browseLeaksButton.setEnabled(transitions.hasResourceLeak());
+		this.browseLeaksButton.setEnabled(this.transitions.hasResourceLeak());
 		if (this.browseLeaksButton.isEnabled()) {
 			this.browseLeaksButton.setImage(ISPPlugin.getImage(ISPPlugin
 					.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
@@ -1278,12 +1241,12 @@ public class ISPAnalyze extends ViewPart {
 			this.browseLeaksButton.setText(Messages.ISPAnalyze_54);
 		}
 
-		// Error button - for deadlocks OR assertion violations
+		// Error button for deadlocks OR assertion violations
 		updateErrorButtonState();
 
 		// Clear the code window info labels
-		this.leftCodeWindowLabel.setText("\n\n\n"); //$NON-NLS-1$
-		this.rightCodeWindowLabel.setText("\n\n\n"); //$NON-NLS-1$
+		this.leftCodeWindowLabel.setText("\n"); //$NON-NLS-1$
+		this.rightCodeWindowLabel.setText("\n"); //$NON-NLS-1$
 
 		// GoToFirstTransition(); Called by UpdateTransitionVars
 		updateTransitionVars(false);
@@ -1291,15 +1254,15 @@ public class ISPAnalyze extends ViewPart {
 		// This is UGLY section is needed since the scroll bars are unresponsive
 		// until the view is fully created. For this reason we need to back up
 		// to Transition 0 and update the labels.
-		transitionIndex = 0;
-		transitionsGroup.setText(Messages.ISPAnalyze_55 + transitionIndex + "/" //$NON-NLS-1$
-				+ transitionCount);
-		transitions.currentTransition = -1;
-		leftIndex = 0;
-		rightIndex = 0;
-		oldLeftIndex = 0;
+		this.transitionIndex = 0;
+		this.transitionsGroup.setText(Messages.ISPAnalyze_55
+				+ this.transitionIndex + "/" //$NON-NLS-1$
+				+ this.transitionCount);
+		this.transitions.currentTransition = -1;
+		this.leftIndex = 0;
+		this.rightIndex = 0;
+		this.oldLeftIndex = 0;
 		setButtonEnabledState();
-		// displayEnvelopes(null);
 		updateSelectedLine(true);
 		setMessageLabelText();
 		// END UGLY SECTION
@@ -1548,7 +1511,7 @@ public class ISPAnalyze extends ViewPart {
 		this.firstInterleavingButton.setLayoutData(ifirstFormData);
 
 		// Previous interleaving button
-		this.previousInterleavingButton = new Button(interleavingsGroup,
+		this.previousInterleavingButton = new Button(this.interleavingsGroup,
 				SWT.PUSH);
 		this.previousInterleavingButton.setImage(prevItemImage);
 		this.previousInterleavingButton.setToolTipText(Messages.ISPAnalyze_70);
@@ -1604,20 +1567,21 @@ public class ISPAnalyze extends ViewPart {
 				.getImageDescriptor("icons/progress_stop.gif")); //$NON-NLS-1$
 
 		// Group and FormLayout data for step order radio buttons
-		stepOrderGroup = new Group(parent, SWT.SHADOW_IN);
-		stepOrderGroup.setText(Messages.ISPAnalyze_74);
-		stepOrderGroup.setToolTipText(Messages.ISPAnalyze_75);
+		this.stepOrderGroup = new Group(parent, SWT.SHADOW_IN);
+		this.stepOrderGroup.setText(Messages.ISPAnalyze_74);
+		this.stepOrderGroup.setToolTipText(Messages.ISPAnalyze_75);
 		FormData stepOrderFormData = new FormData();
-		stepOrderFormData.left = new FormAttachment(interleavingsGroup, 20);
+		stepOrderFormData.left = new FormAttachment(this.interleavingsGroup, 20);
 		stepOrderFormData.bottom = new FormAttachment(100, -5);
-		stepOrderGroup.setLayoutData(stepOrderFormData);
-		stepOrderGroup.setLayout(new GridLayout(3, false));
+		this.stepOrderGroup.setLayoutData(stepOrderFormData);
+		this.stepOrderGroup.setLayout(new GridLayout(3, false));
 
 		// Step order radio buttons
-		this.internalIssueOrderButton = new Button(stepOrderGroup, SWT.RADIO);
+		this.internalIssueOrderButton = new Button(this.stepOrderGroup,
+				SWT.RADIO);
 		this.internalIssueOrderButton.setText(Messages.ISPAnalyze_76);
 		this.internalIssueOrderButton.setToolTipText(Messages.ISPAnalyze_77);
-		this.programOrderButton = new Button(stepOrderGroup, SWT.RADIO);
+		this.programOrderButton = new Button(this.stepOrderGroup, SWT.RADIO);
 		this.programOrderButton.setText(Messages.ISPAnalyze_78);
 		this.programOrderButton.setToolTipText(Messages.ISPAnalyze_79);
 
@@ -1679,7 +1643,7 @@ public class ISPAnalyze extends ViewPart {
 		this.resourcLeakLabel = new Label(runtimeInfoGroup, SWT.NONE);
 		FormData resourceLeakFormData = new FormData();
 		resourceLeakFormData.left = new FormAttachment(0, 5);
-		resourceLeakFormData.bottom = new FormAttachment(100, -2);
+		resourceLeakFormData.bottom = new FormAttachment(100, -1);
 		resourceLeakFormData.width = 240;
 		this.resourcLeakLabel.setLayoutData(resourceLeakFormData);
 		Font resourceleakLabelFont = setFontSize(this.resourcLeakLabel
@@ -1746,6 +1710,9 @@ public class ISPAnalyze extends ViewPart {
 		setRankFormData.right = new FormAttachment(this.launchIspUIButton, -5);
 		setRankFormData.bottom = new FormAttachment(100, -5);
 		this.setRankComboList.setLayoutData(setRankFormData);
+		this.setRankComboList.setEnabled(true);
+		setRankItems();
+		updateDropDown();
 
 		// Font for the buttons
 		Font buttonFont = setFontSize(this.errorMessageLabel.getFont(), 8);
@@ -1766,7 +1733,7 @@ public class ISPAnalyze extends ViewPart {
 		Image matchCallImage = ISPPlugin.getImage(ISPPlugin
 				.getImageDescriptor("icons/match-call.gif")); //$NON-NLS-1$
 
-		// Create the layoutfor the analyzer windows and call info labels
+		// Create the layout for the analyzer windows and call info labels
 		Group codeWindowsGroup = new Group(parent, SWT.NONE | SWT.SHADOW_IN);
 		codeWindowsGroup.setText(Messages.ISPAnalyze_92);
 		GridLayout codeWindowsLayout = new GridLayout();
@@ -1779,22 +1746,20 @@ public class ISPAnalyze extends ViewPart {
 				true, 2, 1));
 
 		// Create code window labels and their respective layouts, etc.
-		this.leftCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP
-				| SWT.BORDER);
+		this.leftCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP);
 		this.leftCodeWindowLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
 				true, false, 1, 1));
 		Font leftCodeWindowLabelFont = setFontSize(this.leftCodeWindowLabel
 				.getFont(), 9);
 		this.leftCodeWindowLabel.setFont(leftCodeWindowLabelFont);
-		this.leftCodeWindowLabel.setText("\n\n\n"); //$NON-NLS-1$
-		this.rightCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP
-				| SWT.BORDER);
+		this.leftCodeWindowLabel.setText("\n"); //$NON-NLS-1$
+		this.rightCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP);
 		this.rightCodeWindowLabel.setLayoutData(new GridData(SWT.FILL,
 				SWT.FILL, true, false, 1, 1));
 		Font rightCodeWindowLabelFont = setFontSize(this.rightCodeWindowLabel
 				.getFont(), 9);
 		this.rightCodeWindowLabel.setFont(rightCodeWindowLabelFont);
-		this.rightCodeWindowLabel.setText("\n\n\n"); //$NON-NLS-1$
+		this.rightCodeWindowLabel.setText("\n"); //$NON-NLS-1$
 
 		// The short explanations of each of the code windows
 		this.leftCodeWindowExplenationLabel = new CLabel(codeWindowsGroup,
@@ -1824,7 +1789,7 @@ public class ISPAnalyze extends ViewPart {
 
 		// Create two listeners for these viewers
 		// HACK to prevent user from changing the selected line
-		singleListener = new SelectionAdapter() {
+		this.singleListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				org.eclipse.swt.widgets.List list = (org.eclipse.swt.widgets.List) e
@@ -1832,13 +1797,8 @@ public class ISPAnalyze extends ViewPart {
 				String entry = list.getItem(0).toString();
 
 				// Determine if collective call clicked in the Right Viewer
-				boolean notCollective = false;
-				if (!entry.contains(Messages.ISPAnalyze_95))
-					notCollective = true;
-				if (!entry.contains(Messages.ISPAnalyze_96))
-					notCollective = true;
-
-				if (notCollective) {
+				if (!entry.contains(Messages.ISPAnalyze_95)
+						|| !entry.contains(Messages.ISPAnalyze_96)) {
 					updateSelectedLine(false);
 				}
 			}
@@ -2017,8 +1977,6 @@ public class ISPAnalyze extends ViewPart {
 									.setValue(
 											PreferenceConstants.ISP_PREF_STEP_ORDER,
 											Messages.ISPAnalyze_104);
-							transitions.currentInterleaving = 0;
-							transitions.currentTransition = 0;
 							reset();
 						}
 					}
@@ -2043,8 +2001,6 @@ public class ISPAnalyze extends ViewPart {
 					ISPPlugin.getDefault().getPreferenceStore().setValue(
 							PreferenceConstants.ISP_PREF_STEP_ORDER,
 							Messages.ISPAnalyze_105);
-					transitions.currentInterleaving = 0;
-					transitions.currentTransition = 0;
 					reset();
 				}
 			}
@@ -2135,9 +2091,9 @@ public class ISPAnalyze extends ViewPart {
 	// displayEnvelope decides whether or not the final destination is displayed
 	private void updateTransitionVars(boolean displayEnvelope) {
 		goToFirstTransition(false);
-		this.transitionCount = 1;// because only incremented if NEXT is also
-		// valid
 
+		// because only incremented if NEXT is also valid
+		this.transitionCount = 1;
 		Envelope env = this.transitions.getCurrentTransition();
 
 		int test = 1;
@@ -2230,8 +2186,7 @@ public class ISPAnalyze extends ViewPart {
 		Envelope env = this.transitions.previousTransition(lockedRank);
 		this.oldLeftIndex = env.getLinenumber();
 
-		// Keep going back until you reach the first itr of the call or the
-		// beginning
+		// Go back until you reach the first call itr or beginning
 		if (env.isCollective() && this.lockedRank == -1) {
 			while (true) {
 				env = this.transitions.previousTransition(this.lockedRank);
@@ -2278,7 +2233,7 @@ public class ISPAnalyze extends ViewPart {
 			updateCodeViewers();
 			displayEnvelopes(env);
 			updateSelectedLine(true);
-			transitionIndex++;
+			this.transitionIndex++;
 			setMessageLabelText();
 		}
 		return returnValue;
@@ -2348,13 +2303,42 @@ public class ISPAnalyze extends ViewPart {
 	}
 
 	/*
-	 * This method is used when another location changes the number of processes
-	 * calling this method will update the drop down so that it has the correct
-	 * number of processses displayed.
+	 * Returns whether or not the specified String has a matching number of left
+	 * and right. parenthesis.
 	 */
-	public void updateDropDown() {
-		Integer nprocs = ISPPlugin.getDefault().getPreferenceStore().getInt(
-				PreferenceConstants.ISP_PREF_NUMPROCS);
-		this.setRankComboList.setText(nprocs.toString());
+	private boolean parenthesesMatched(String call) {
+		int numRightParens = 0;
+		int numLeftParens = 0;
+
+		call = removeComments(call);
+		for (int i = 0; i < call.length(); i++) {
+			if (call.charAt(i) == '(') {
+				numLeftParens++;
+			}
+			if (call.charAt(i) == ')') {
+				numRightParens++;
+			}
+		}
+		return (numRightParens == numLeftParens);
+	}
+
+	/*
+	 * Removes comments from the specified call String.
+	 */
+	private String removeComments(String call) {
+		// remove any c-style comments
+		while (call.contains("/*")) { //$NON-NLS-1$
+			if (!call.contains("*/")) {//$NON-NLS-1$
+				break;
+			}
+			call = call.substring(0, call.indexOf("/*")) //$NON-NLS-1$
+					+ call.substring(call.indexOf("*/") + 2); //$NON-NLS-1$
+		}
+
+		// remove any c++-style comments
+		while (call.contains("//")) { //$NON-NLS-1$
+			call = call.substring(0, call.indexOf("//")); //$NON-NLS-1$
+		}
+		return call;
 	}
 }
