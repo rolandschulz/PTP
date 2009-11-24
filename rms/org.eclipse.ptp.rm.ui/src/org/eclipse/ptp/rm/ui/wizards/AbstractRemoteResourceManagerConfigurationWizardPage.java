@@ -31,7 +31,6 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -52,15 +51,13 @@ import org.eclipse.swt.widgets.Label;
 public abstract class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		AbstractConfigurationWizardPage {
 	
-	protected class DataSource extends WizardPageDataSource {
-		private IRemoteResourceManagerConfiguration fConfig = null;
-		
+	protected class RMDataSource extends WizardPageDataSource {
 		private String fRemoteServicesId = null;
 		private String fConnectionName = null;
 		private boolean fPortForward = true;
 		private String fLocalAddr = null;
 
-		protected DataSource(AbstractConfigurationWizardPage page) {
+		protected RMDataSource(AbstractConfigurationWizardPage page) {
 			super(page);
 		}
 
@@ -80,27 +77,32 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			return fRemoteServicesId;
 		}
 
-		public void setCommandFields(String remServId, String connName, String addr, boolean portFwd) {
-			fRemoteServicesId = remServId;
+		public void setConnectionName(String connName) {
 			fConnectionName = connName;
+		}
+		
+		public void setLocalAddr(String addr) {
 			fLocalAddr = addr;
+		}
+		
+		public void setPortForward(boolean portFwd) {
 			fPortForward = portFwd;
 		}
-
-		@Override
-		public void setConfig(IResourceManagerConfiguration configuration) {
-			super.setConfig(configuration);
-			// Store a local reference to the configuration
-			fConfig = (IRemoteResourceManagerConfiguration) configuration;
+		
+		public void setRemoteServicesId(String remServId) {
+			fRemoteServicesId = remServId;
 		}
-
+		
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			if (remoteCombo != null) {
-				fRemoteServicesId = remoteServices.getId();
+			if (remoteCombo != null && fRemoteServices != null) {
+				int index = remoteCombo.getSelectionIndex();
+				if (index >= 0 && index < fRemoteServices.length) {
+					fRemoteServicesId = fRemoteServices[index].getId();
+				}
 			}
 			if (connectionCombo != null) {
-				fConnectionName = connection.getName();
+				fConnectionName = extractText(connectionCombo);
 			}
 			if (localAddrCombo != null) {
 				fLocalAddr = extractText(localAddrCombo);
@@ -112,37 +114,40 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		@Override
 		protected void copyToFields() {
+			IRemoteServices services = null;
+			IRemoteConnection connection = null;
 			if (localAddrCombo != null) {
 				applyText(localAddrCombo, fLocalAddr);
 			}
 			if (fRemoteServicesId != null) {
-				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(fRemoteServicesId);
+				services = getRemoteServices(fRemoteServicesId);
 			}
-			if (remoteServices != null && fConnectionName != null) {
-				connection = remoteServices.getConnectionManager().getConnection(fConnectionName);
+			if (services != null && fConnectionName != null) {
+				connection = getRemoteConnection(services, fConnectionName);
 			}
 			handleRemoteServiceSelected(connection);
+			updateControls();
 		}
 
 		@Override
 		protected void copyToStorage() {
 			if (remoteCombo != null) {
-				fConfig.setRemoteServicesId(fRemoteServicesId);
+				getConfig().setRemoteServicesId(fRemoteServicesId);
 			}
 			if (connectionCombo != null) {
-				fConfig.setConnectionName(fConnectionName);
+				getConfig().setConnectionName(fConnectionName);
 			}
 			if (localAddrCombo != null) {
-				fConfig.setLocalAddress(fLocalAddr);
+				((IRemoteResourceManagerConfiguration)getConfig()).setLocalAddress(fLocalAddr);
 			}
 			if (portForwardingButton != null) {
-				int options = fConfig.getOptions();
+				int options = ((IRemoteResourceManagerConfiguration)getConfig()).getOptions();
 				if (fPortForward) {
 					options |= IRemoteProxyOptions.PORT_FORWARDING;
 				} else {
 					options &= ~IRemoteProxyOptions.PORT_FORWARDING;
 				}
-				fConfig.setOptions(options);
+				((IRemoteResourceManagerConfiguration)getConfig()).setOptions(options);
 			}
 		}
 
@@ -153,26 +158,28 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		@Override
 		protected void loadFromStorage() {
+			String id = getConfig().getRemoteServicesId();
 			if (remoteCombo != null) {
-				fRemoteServicesId = fConfig.getRemoteServicesId();
-				if (fRemoteServicesId != null) {
-					remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(fRemoteServicesId);
-				}
+				fRemoteServicesId = initializeRemoteServicesCombo(id);
 			}
 			if (connectionCombo != null) {
-				fConnectionName = fConfig.getConnectionName();
-				if (remoteServices != null && fConnectionName != null) {
-					connection = remoteServices.getConnectionManager().getConnection(fConnectionName);
-				}
+				fConnectionName = getConfig().getConnectionName();
 			}
 			if (localAddrCombo != null) {
-				fLocalAddr = fConfig.getLocalAddress();
+				fLocalAddr = ((IRemoteResourceManagerConfiguration)getConfig()).getLocalAddress();
 				initializeLocalHostCombo();
 			}
 			if (portForwardingButton != null) {
-				fPortForward = (fConfig.getOptions() & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
+				fPortForward = (((IRemoteResourceManagerConfiguration)getConfig()).getOptions() & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 			}
-			initializeRemoteServicesCombo();
+			/* 
+			 * if id is null then this is a new resource manager
+			 * save the default values to storage in case a copyToStorage()
+			 * is not triggered elsewhere.
+			 */
+			if (id == null) {
+				copyToStorage();
+			}
 		}
 
 		@Override
@@ -192,9 +199,10 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			Object source = evt.getSource();
 			if (source == remoteCombo) {
 				handleRemoteServiceSelected(null);
+				getDataSource().storeAndValidate();
 				updateControls();
 			} else if (source == connectionCombo) {
-				handleConnectionSelected();
+				handleConnectionSelected(getDataSource().getRemoteServicesId());
 				getDataSource().storeAndValidate();
 				updateControls();
 			} else if (source == localAddrCombo) {
@@ -210,13 +218,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			Object source = e.getSource();
 			if (source == newConnectionButton) {
 				handleNewRemoteConnectionSelected();
-				resetErrorMessages();
-				getDataSource().storeAndValidate();
-				updateControls();
 			} else if (source == noneButton || source == portForwardingButton)  {
 				resetErrorMessages();
 				getDataSource().storeAndValidate();
-				updateControls();
+			} else if (source == localAddrCombo) {
+				resetErrorMessages();
+				getDataSource().storeAndValidate();
 			} else {
 				assert false;
 			}
@@ -224,11 +231,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 	
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	protected IRemoteServices remoteServices = null;
-	private IRemoteConnectionManager connectionManager = null;
 	private IRemoteUIConnectionManager uiConnectionManager = null;
-	protected IRemoteConnection connection = null;
-	protected boolean portFwdSupported = true;
 
 	protected Button noneButton = null;
 	protected Button portForwardingButton = null;
@@ -237,6 +240,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	protected Combo  remoteCombo;
 	protected Combo  connectionCombo;
 	protected Combo  localAddrCombo;
+	
+	protected IRemoteServices[] fRemoteServices;
 
 	public AbstractRemoteResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard,
 			String title) {
@@ -256,6 +261,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		setControl(composite);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage#getDataSource()
+	 */
+	@Override
+	public RMDataSource getDataSource() {
+		return (RMDataSource)super.getDataSource();
+	}
+	
 	/**
 	 * Initialize the contents of the local address selection combo. Host names are obtained by
 	 * performing a reverse lookup on the IP addresses of each network interface. If DNS is configured
@@ -263,6 +276,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * the IP address. We also add the configuration address to the combo in case it was specified manually.
 	 */
 	public void initializeLocalHostCombo() {
+		final boolean enabled = getWidgetListener().isEnabled();
+		getWidgetListener().disable();
 		Set<String> addrs = new TreeSet<String>();
 		try {
 			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -285,11 +300,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		localAddrCombo.removeAll();
 		int index = 0;
 		int selection = -1;
-		DataSource data = (DataSource)getDataSource();
 		for (String addr : addrs) {
 			localAddrCombo.add(addr);
-			if ((data.getLocalAddr().equals("") && addr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
-					|| addr.equals(data.getLocalAddr())) {
+			if (addr.equals(getDataSource().getLocalAddr())) {
 				selection = index;
 			}
 			index++;
@@ -299,28 +312,40 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 * it the current selection
 		 */
 		if (selection < 0) {
-			if (!data.getLocalAddr().equals("")){ //$NON-NLS-1$
-				localAddrCombo.add(data.getLocalAddr());
+			if (!getDataSource().getLocalAddr().equals("")){ //$NON-NLS-1$
+				localAddrCombo.add(getDataSource().getLocalAddr());
 			}
 			selection = localAddrCombo.getItemCount()-1;
 		}
 		localAddrCombo.select(selection);
+		getWidgetListener().setEnabled(enabled);
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage#updateControls()
+	 */
 	@Override
 	public void updateControls() {
-		boolean portFwd = ((DataSource)getDataSource()).getPortForward();
-		
+		final boolean enabled = getWidgetListener().isEnabled();
+		getWidgetListener().disable();
+		final boolean portFwd = getDataSource().getPortForward();
+		final IRemoteServices services = getRemoteServices(getDataSource().getRemoteServicesId());
+		final IRemoteConnection connection = getRemoteConnection(services, getDataSource().getConnectionName());
+		boolean supportsPortForwarding = false;
+		if (connection != null) {
+			supportsPortForwarding = connection.supportsTCPPortForwarding();
+		}
 		if (localAddrCombo != null) {
 			localAddrCombo.setEnabled(!portFwd);
 		}
 		if (portForwardingButton != null) {
-			portForwardingButton.setEnabled(portFwdSupported);
-			portForwardingButton.setSelection(portFwdSupported ? portFwd : false);
+			portForwardingButton.setEnabled(supportsPortForwarding);
+			portForwardingButton.setSelection(supportsPortForwarding ? portFwd : false);
 		}
 		if (noneButton != null) {
-			noneButton.setSelection(portFwdSupported ? !portFwd : true);
+			noneButton.setSelection(supportsPortForwarding ? !portFwd : true);
 		}
+		getWidgetListener().setEnabled(enabled);
 	}
 
 	/**
@@ -409,6 +434,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 1;
 		localAddrCombo.setLayoutData(gd);
 		localAddrCombo.addModifyListener(getWidgetListener());
+		localAddrCombo.addSelectionListener(getWidgetListener());
 
 		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6, "mxGroup", listener); //$NON-NLS-1$
 		portForwardingButton.addSelectionListener(getWidgetListener());
@@ -431,41 +457,13 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		return hostname;
 	}
-	
-	/**
-	 * Convenience method for creating a button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @param type
-	 * @return the button widget
-	 */
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-	
-	/**
-	 * Convenience method for creating a check button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @return the check button widget
-	 */
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage#createDataSource()
 	 */
 	@Override
 	protected WizardPageDataSource createDataSource() {
-		return new DataSource(this);
+		return new RMDataSource(this);
 	}
 
 	/**
@@ -516,6 +514,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		return button;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage#doCreateContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
@@ -549,23 +550,59 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 	
 	/**
+	 * Get a remote connection given a remote services provider and a connection name
+	 * 
+	 * @param services remote services
+	 * @param name connection name
+	 * @return remote connection or null if the name is not valid
+	 */
+	protected IRemoteConnection getRemoteConnection(IRemoteServices services, String name) {
+		IRemoteConnectionManager manager = getRemoteConnectionManager(services);
+		if (manager != null) {
+			return manager.getConnection(name);
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the connection manager for the given services
+	 * 
+	 * @return connection manager or null if one can't be found
+	 */
+	protected IRemoteConnectionManager getRemoteConnectionManager(IRemoteServices services) {
+		if (services != null) {
+			return services.getConnectionManager();
+		}
+		return null;
+	}
+	
+	/**
+	 * Get remote services give a remote services id.
+	 * 
+	 * @param id id of remote services
+	 * @return remote services or null if the id is not valid
+	 */
+	protected IRemoteServices getRemoteServices(String id) {
+		if (id != null && !id.equals(EMPTY_STRING)) {
+			return PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
+		}
+		return null;
+	}
+	
+	/**
 	 * Handle the section of a new connection. Update connection option buttons
 	 * appropriately.
 	 */
-	protected void handleConnectionSelected() {
+	protected void handleConnectionSelected(String servicesId) {
+		final boolean enabled = getWidgetListener().isEnabled();
+		getWidgetListener().disable();
 		int currentSelection = connectionCombo.getSelectionIndex();
-		if (currentSelection >= 0 && connectionManager != null) {
+		IRemoteServices services = getRemoteServices(servicesId);
+		if (currentSelection >= 0 && services != null) {
 			String connectionName = connectionCombo.getItem(currentSelection);
-			connection = connectionManager.getConnection(connectionName);
+			getDataSource().setConnectionName(connectionName);
 		}
-		
-		/*
-		 * Disable port forwarding button if it's not supported. If port forwarding was selected,
-		 * switch to 'none' instead.
-		 */
-		if (connection != null) {
-			portFwdSupported = connection.supportsTCPPortForwarding();
-		}
+		getWidgetListener().setEnabled(enabled);
 	}
 	
 	/**
@@ -580,6 +617,10 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (uiConnectionManager != null) {
 			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
 		}
+
+		resetErrorMessages();
+		getDataSource().storeAndValidate();
+		updateControls();
 	}
 
 	/**
@@ -592,11 +633,13 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param conn connection to select as current. If conn is null, select the first item in the list.
 	 */
 	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
-		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+		final boolean enabled = getWidgetListener().isEnabled();
+		getWidgetListener().disable();
 		int selectionIndex = remoteCombo.getSelectionIndex();
-		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
-			remoteServices = allRemoteServices[selectionIndex];
-			connectionManager = remoteServices.getConnectionManager();
+		if (fRemoteServices != null && fRemoteServices.length > 0 && selectionIndex >=0) {
+			IRemoteServices remoteServices = fRemoteServices[selectionIndex];
+			getDataSource().setRemoteServicesId(remoteServices.getId());
+			IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
 			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 			if (remUIServices != null) {
 				uiConnectionManager = remUIServices.getUIConnectionManager();
@@ -615,56 +658,57 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 					selected = i;
 				}
 			}
-			if (connections.length > 0) {
-				connectionCombo.select(selected);
-				/*
-				 * Linux doesn't call selection handler so need to call it explicitly here 
-				 */
-				handleConnectionSelected(); 
-			}
 			
 			/*
 			 * Enable 'new' button if new connections are supported
 			 */
 			newConnectionButton.setEnabled(uiConnectionManager != null);
+			
+			if (connections.length > 0) {
+				connectionCombo.select(selected);
+				/*
+				 * Events are disabled so call selection handler here 
+				 */
+				handleConnectionSelected(remoteServices.getId()); 
+			}
 		}
+		
+		getWidgetListener().setEnabled(enabled);
 	}
 	
 	/**
-	 * Initialize the contents of the remote services combo.
-	 * 
-	 * The assumption is that this will trigger a call to the selection handling
-	 * routine when the default index is selected.
+	 * Initialize the contents of the remote services combo. Keeps an array
+	 * of remote services that matches the combo elements. Returns the
+	 * id of the selected element.
 	 */
-	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] allServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+	protected String initializeRemoteServicesCombo(String id) {
+		final boolean enabled = getWidgetListener().isEnabled();
+		getWidgetListener().disable();
+		fRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		IRemoteServices defServices;
-		if (remoteServices != null) {
-			defServices = remoteServices;
+		if (id != null) {
+			defServices = getRemoteServices(id);
 		} else {
 			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		}
 		int defIndex = 0; 
-		Arrays.sort(allServices, new Comparator<IRemoteServices>() {
+		Arrays.sort(fRemoteServices, new Comparator<IRemoteServices>() {
 			public int compare(IRemoteServices c1, IRemoteServices c2) {
 				return c1.getName().compareToIgnoreCase(c2.getName());
 			}
 		});		
 		remoteCombo.removeAll();
-		for (int i = 0; i < allServices.length; i++) {
-			remoteCombo.add(allServices[i].getName());
-			if (allServices[i].equals(defServices)) {
+		for (int i = 0; i < fRemoteServices.length; i++) {
+			remoteCombo.add(fRemoteServices[i].getName());
+			if (fRemoteServices[i].equals(defServices)) {
 				defIndex = i;
 			}
 		}
-		if (allServices.length > 0) {
+		if (fRemoteServices.length > 0) {
 			remoteCombo.select(defIndex);
-			/*
-			 * Linux doesn't call selection handler so need to call it explicitly here
-			 */ 
-			handleRemoteServiceSelected(connection); 
-			handleConnectionSelected();
 		}
+		getWidgetListener().setEnabled(enabled);
+		return defServices.getId();
 	}
 	
 	/**
