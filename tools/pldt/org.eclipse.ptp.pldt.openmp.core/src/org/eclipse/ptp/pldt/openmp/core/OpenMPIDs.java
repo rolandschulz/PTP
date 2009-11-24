@@ -16,7 +16,7 @@ package org.eclipse.ptp.pldt.openmp.core;
  */
 public class OpenMPIDs {
  
-	public static final String OpenMP_INCLUDES = "OpenMP Includes";
-	public static final String OpenMP_BUILD_CMD = "gcc -fopenmp";
+	public static final String OpenMP_INCLUDES = Messages.OpenMPIDs_OPENMP_INCLUDES;
+	public static final String OpenMP_BUILD_CMD = "gcc -fopenmp"; //$NON-NLS-1$
 
 }

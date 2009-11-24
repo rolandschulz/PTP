@@ -36,6 +36,7 @@ import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPErrorManager;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTNode;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
+import org.eclipse.ptp.pldt.openmp.core.Messages;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPScanReturn;
@@ -49,7 +50,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  *
  */
 public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
-	private static final String OPENMP_DIRECTIVE = "OpenMP directive";
+	private static final String OPENMP_DIRECTIVE = Messages.RunAnalyseOpenMPcommandHandler_OPENMP_DIRECTIVE;
 	private static final boolean traceOn=false;
 	/**
 	 * Constructor for the "Run Analysis" action
@@ -89,7 +90,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			file = (IFile) res;
 		}
 		else{ 
-			System.out.println("RunAnalyseOpenMP.doArtifactAnalysis, file cast won't work...");
+			System.out.println("RunAnalyseOpenMP.doArtifactAnalysis, file cast won't work..."); //$NON-NLS-1$
 		}
 		// Find the OpenMP #pragmas
 		processOpenMPPragmas(msr, atu, file);
@@ -168,12 +169,12 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		// DPP - put in stuff for problems view
 		// Just subclass scanreturn and create markers for problems view here
 		List<OpenMPError> problems = osr.getProblems();
-		if(traceOn)System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems.");
+		if(traceOn)System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems."); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			for (Iterator<OpenMPError> i = problems.iterator(); i.hasNext();)
 				processProblem((OpenMPError) i.next(), resource);
 		} catch (CoreException e) {
-			System.out.println("RunAnalysisOpenMP.processResults exception: "
+			System.out.println("RunAnalysisOpenMP.processResults exception: " //$NON-NLS-1$
 					+ e);
 			e.printStackTrace();
 		}
@@ -218,7 +219,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		} catch (CoreException e) {
 			System.out.println(e);
 			System.out.println(e.toString());
-			System.out.println("Problem deleting markers on OMP Problems: "
+			System.out.println("Problem deleting markers on OMP Problems: " //$NON-NLS-1$
 					+ resource.getProjectRelativePath());
 		}
 	}

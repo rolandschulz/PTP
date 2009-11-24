@@ -19,6 +19,7 @@ import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
+import org.eclipse.ptp.pldt.openmp.core.Messages;
 
 
 /**
@@ -39,8 +40,8 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
     public OpenMPCASTVisitor(List<String> includes, String fileName, ScanReturn msr)
     {
         super(includes, fileName, msr);
-        ARTIFACT_CALL = "OpenMP Call";
-		ARTIFACT_CONSTANT="OpenMP Constant";
+        ARTIFACT_CALL = Messages.OpenMPCASTVisitor_OPENMP_CALL;
+		ARTIFACT_CONSTANT=Messages.OpenMPCASTVisitor_OPENMP_CONSTANT;
     }
 
 
@@ -50,7 +51,7 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
      * 
      * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTExpression)
      */
-    private static final String PREFIX="omp_";
+    private static final String PREFIX="omp_"; //$NON-NLS-1$
     public int visit(IASTExpression expression)
     {
         if (expression instanceof IASTFunctionCallExpression) {
