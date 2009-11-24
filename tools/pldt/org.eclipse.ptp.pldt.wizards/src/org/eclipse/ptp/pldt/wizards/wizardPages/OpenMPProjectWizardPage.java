@@ -182,7 +182,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param openMPincludePath
 	 */
 	private void setDefaultOtherNames(String openMPincludePath) {
-		defaultOpenMPLibName="openmp";
+		defaultOpenMPLibName="";//"openmp";
 		setCurrentOpenMPLibName(defaultOpenMPLibName);
 		
 		// if >1 path in openmp include path, use just the first
@@ -196,7 +196,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		path=path.removeLastSegments(1);
 		path=path.addTrailingSeparator();
 
-		defaultOpenMPLibPath=path.toString()+"lib";
+		defaultOpenMPLibPath=""; // path.toString()+"lib";   // default is blank: -fopenmp option does it all
 		//System.out.println("defaultOpenMPLibPath="+defaultOpenMPLibPath);
 		setCurrentOpenMPLibPath(defaultOpenMPLibPath);
 		
