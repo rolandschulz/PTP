@@ -52,7 +52,7 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.getString("MpiCASTVisitor.mpiCall"); //$NON-NLS-1$
 		ARTIFACT_CONSTANT = Messages.getString("MpiCASTVisitor.mpiConstant"); //$NON-NLS-1$
-		ARTIFACT_NAME="MPI";
+		ARTIFACT_NAME="MPI"; //$NON-NLS-1$
 
 		traceOn = CommonPlugin.getTraceOn();
 		if (traceOn)

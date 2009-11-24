@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionSummaryImpl;
+import org.eclipse.ptp.pldt.mpi.core.Messages;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.osgi.framework.Bundle;
 
@@ -31,7 +32,7 @@ import org.osgi.framework.Bundle;
  *
  */
 public class MpiCHelpBook extends CHelpBookImpl {
-	private static final String TITLE = "MPI C Help Book";
+	private static final String TITLE = Messages.getString("MpiCHelpBook_MPI_C_HELP_BOOK_TITLE"); //$NON-NLS-1$
     
 	/**
 	 * builds the list of function summaries by parsing an XML file
@@ -40,7 +41,7 @@ public class MpiCHelpBook extends CHelpBookImpl {
 		super(MpiPlugin.getPluginId());
 		// populate func map
 		Bundle bundle = Platform.getBundle(MpiPlugin.getPluginId());
-		Path path = new Path("mpiref.xml");
+		Path path = new Path("mpiref.xml"); //$NON-NLS-1$
 		////
 		//URL fileURL = Platform.find(bundle, path); // old
 		URL fileURL = FileLocator.find(bundle, path, null);
@@ -51,7 +52,7 @@ public class MpiCHelpBook extends CHelpBookImpl {
 			e.printStackTrace();
 		}
 
-		List<FunctionSummaryImpl> mpiFuncList = MPIDocXMLParser.parseDOM(xmlIn, "cname");
+		List<FunctionSummaryImpl> mpiFuncList = MPIDocXMLParser.parseDOM(xmlIn, "cname"); //$NON-NLS-1$
 		for (Iterator<FunctionSummaryImpl> it = mpiFuncList.iterator(); it.hasNext();) {
 			FunctionSummaryImpl functionSummary = it.next();
 			funcName2FuncInfo.put(functionSummary.getName(), functionSummary);

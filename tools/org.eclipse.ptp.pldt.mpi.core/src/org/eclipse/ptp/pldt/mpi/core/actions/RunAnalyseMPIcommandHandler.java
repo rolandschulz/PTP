@@ -74,7 +74,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 
 		} catch (CoreException e) {
 			e.printStackTrace();
-			CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project "+tu.getCProject()+" error="+e.getMessage());
+			CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project "+tu.getCProject()+" error="+e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return msr;
 	}

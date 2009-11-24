@@ -115,7 +115,7 @@ public class MpiPlugin extends AbstractUIPlugin
      * @return
      */
     public ImageDescriptor getIconImageDescriptor(){
-    	ImageDescriptor id = getImageDescriptor("icons/mpi.gif");
+    	ImageDescriptor id = getImageDescriptor("icons/mpi.gif"); //$NON-NLS-1$
     	return id;
     }
 
