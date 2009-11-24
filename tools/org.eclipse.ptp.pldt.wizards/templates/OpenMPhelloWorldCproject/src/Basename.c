@@ -7,34 +7,30 @@
  Description : Hello OpenMP World in C
  ============================================================================
  */
+#include <omp.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <math.h>
-#include "omp.h"
+/**
+ * Hello OpenMP World prints the number of threads and the current thread id
+ */
+int main (int argc, char *argv[]) {
 
+  int numThreads, tid;
 
-int main(int argc, char* argv[]){
-	int    i,arraySize;
-	double *x, *y;     /* the arrays                 */
-	printf("$(openmp.hello.message)\n");
+  /* This creates a team of threads; each thread has own copy of variables  */
+#pragma omp parallel private(numThreads, tid)
+ {
+   tid = omp_get_thread_num();
+   printf("Hello World from thread number %d\n", tid);
 
-// sample openMP API
-	if (omp_in_parallel()){
-		printf("true");
-	}
-	  /* Allocate memory for the arrays. */
-  x = (double *) malloc( (size_t) (  arraySize * sizeof(double) ) );
-  y = (double *) malloc( (size_t) (  arraySize * sizeof(double) ) );
-
-  /* Here's the OpenMP pragma that parallelizes the for-loop. */
-#pragma omp parallel for
-  for ( i = 0; i < arraySize; i++ )
-    {
-      y[i] = sin( exp( cos( - exp( sin(x[i]) ) ) ) );
-    }
-
-
-	return 0;
+   /* The following is executed by the master thread only (tid=0) */
+   if (tid == 0)
+     {
+       numThreads = omp_get_num_threads();
+       printf("Number of threads is %d\n", numThreads);
+     }
+ }
+ return 0;
 }
+
 
