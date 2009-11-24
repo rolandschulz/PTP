@@ -67,6 +67,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	private static /*final*/ boolean traceOn=false;
 	
 	private static boolean dontAskToModifyIncludePathAgain=false;
+	protected boolean allowPrefixOnlyMatch=false;
 
 	/**
 	 * List of include paths that we'll probably want to consider in the work that this visitor does.
@@ -86,18 +87,32 @@ public class PldtAstVisitor extends CASTVisitor {
 	 *            the work that this visitor does
 	 * @param fileName
 	 *            the name of the file that this visitor is visiting(?)
+	 * @param prefixOnlyMatch
+	 *            if true, then artifact is recognized if it starts with the plugin-specific prefix
+	 *            (e.g. "MPI_"  etc.) instead of forcing a lookup of the location of the header file
+	 *            in which the API is found.  This proves to be difficult for users to get right, so prefix-only
+	 *            recognition of artifacts is allowed here.
 	 * @param scanReturn
 	 *            the ScanReturn object to which the artifacts that we find will
 	 *            be appended.
+
 	 */
-	public PldtAstVisitor(List<String> includes, String fileName, ScanReturn scanReturn) {
+	public PldtAstVisitor(List<String> includes, String fileName, boolean prefixOnlyMatch, ScanReturn scanReturn ) {
 		this.includes_ = includes;
 		this.fileName = fileName;
 		this.scanReturn = scanReturn;
 		dontAskToModifyIncludePathAgain=false;
+		this.allowPrefixOnlyMatch=prefixOnlyMatch;
 		if(!traceOn) traceOn=CommonPlugin.getTraceOn();
 		if(traceOn)System.out.println("PldtAstVisitor, traceOn="+traceOn);
 	}
+	/**
+	 * Constructor without prefixOnlyMatch arg, assumes false
+	 */
+	public PldtAstVisitor(List<String> includes, String fileName, ScanReturn scanReturn) {
+		this(includes, fileName, false, scanReturn);
+	}
+
 
 	/**
 	 * Skip statements that are included.
@@ -136,7 +151,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	public void processFuncName(IASTName funcName, IASTExpression astExpr) {
 		//IASTTranslationUnit tu = funcName.getTranslationUnit();
 
-		if (isArtifact(funcName)) {
+		if (this.allowPrefixOnlyMatch || isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				if(traceOn) System.out.println("found artifact: " + funcName.toString());
@@ -163,7 +178,7 @@ public class PldtAstVisitor extends CASTVisitor {
 		IASTName funcName = ((IASTIdExpression) astExpr).getName();
 		//IASTTranslationUnit tu = funcName.getTranslationUnit();
 
-		if (isArtifact(funcName)) {
+		if (this.allowPrefixOnlyMatch || isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				//System.out.println("found MPI artifact: " + funcName.toString());
@@ -349,7 +364,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	public void processIdExprAsLiteral(IASTIdExpression expression) {
 		IASTName name = expression.getName();
 
-		if (isArtifact(name)) {
+		if (this.allowPrefixOnlyMatch || isArtifact(name)) {
 			SourceInfo sourceInfo = getSourceInfo(expression, Artifact.CONSTANT);
 			if (sourceInfo != null) {
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1, // column:

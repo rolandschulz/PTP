@@ -47,5 +47,10 @@ public interface MpiIDs
     
     /** id for MPI Artifact view */
     public static final String MPI_VIEW_ID = "org.eclipse.ptp.pldt.mpi.core.views.MPITableView";
+    /** 
+     * If we recognize MPI APIs by prefix (MPI_) alone, we don't need the include file location and the hassle 
+     * that it causes for users to get it right.
+     */
+	public static final String MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE = "mpiRecognizeAPIsByPrefixAlone";
 
 }

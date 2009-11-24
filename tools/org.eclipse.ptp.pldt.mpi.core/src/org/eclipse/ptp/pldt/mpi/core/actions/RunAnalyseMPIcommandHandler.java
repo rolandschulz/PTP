@@ -56,6 +56,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
+		boolean allowPrefixOnlyMatch=MpiPlugin.getDefault().getPreferenceStore().getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		try {
 			lang = tu.getLanguage(); 
             
@@ -65,10 +66,10 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 			//System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
 			String languageID=lang.getId();
 			if (languageID.equals(GCCLanguage.ID)) {// C
-				atu.accept(new MpiCASTVisitor(includes, fileName, msr));
+				atu.accept(new MpiCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			}
 			else if (languageID.equals(GPPLanguage.ID)) { // C++
-			  atu.accept(new MpiCPPASTVisitor(includes, fileName, msr));
+			  atu.accept(new MpiCPPASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			}
 
 		} catch (CoreException e) {
@@ -87,6 +88,11 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 	protected void activateArtifactView() {
 		ViewActivater.activateView(MpiIDs.MPI_VIEW_ID);
 	}
+    @Override
+	public boolean areIncludePathsNeeded() {
+    	boolean allowPrefixOnlyMatch= MpiPlugin.getDefault().getPreferenceStore().getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+    	return !allowPrefixOnlyMatch;
+    }
 
 	
 	 

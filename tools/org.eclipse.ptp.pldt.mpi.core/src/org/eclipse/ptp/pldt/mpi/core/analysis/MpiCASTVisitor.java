@@ -48,8 +48,8 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
-	public MpiCASTVisitor(List mpiIncludes, String fileName, ScanReturn msr) {
-		super(mpiIncludes, fileName, msr);
+	public MpiCASTVisitor(List mpiIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
+		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.getString("MpiCASTVisitor.mpiCall"); //$NON-NLS-1$
 		ARTIFACT_CONSTANT = Messages.getString("MpiCASTVisitor.mpiConstant"); //$NON-NLS-1$
 		ARTIFACT_NAME="MPI";
