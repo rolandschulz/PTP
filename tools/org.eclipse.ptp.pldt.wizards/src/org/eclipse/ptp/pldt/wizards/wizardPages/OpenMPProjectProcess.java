@@ -91,8 +91,8 @@ public class OpenMPProjectProcess extends ProcessRunner {
 		propID=OpenMPProjectWizardPage.OpenMP_COMPILE_COMMAND_PROP_ID;
 		String OpenMPCompileCommand=getNewPropValue(pageID,propID,"gcc");
 		
-		propID=OpenMPProjectWizardPage.OpenMP_LINK_COMMAND_PROP_ID;
-		String OpenMPLinkCommand=getNewPropValue(pageID,propID,"gcccc");
+		propID=OpenMPProjectWizardPage.OpenMP_LINK_COMMAND_PROP_ID;    
+		String OpenMPLinkCommand=getNewPropValue(pageID,propID,"gcc");
 		
 		IManagedBuildInfo info = null;
 		try {
@@ -115,7 +115,8 @@ public class OpenMPProjectProcess extends ProcessRunner {
 			IConfiguration cf = configs[i];
 			if(traceOn)System.out.println("Config " + i + ": " + cf.getName());
 			addIncludePath(cf, newIncludePath);
-			addLinkerOpt(cf,newLib,newLibSearchPath);
+			// 11/24/09: do not set linker lib, -fopenmp command does it all
+			//addLinkerOpt(cf,newLib,newLibSearchPath);
 			setCompileCommand(cf,OpenMPCompileCommand);
 			setLinkCommand(cf,OpenMPLinkCommand);		
 		}
