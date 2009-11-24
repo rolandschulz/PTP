@@ -21,13 +21,17 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Launches a dialog that contains the ServiceProviderConfigurationWidget
- * with OK and Cancel buttons.
+ * with OK and Cancel buttons. Also has a text field to allow the name
+ * of the configuration to be changed.
  */
 public class ServiceProviderConfigurationDialog extends Dialog {
 
@@ -35,6 +39,7 @@ public class ServiceProviderConfigurationDialog extends Dialog {
 	private IServiceConfiguration fConfig;
 	private Control fDialogControl;
 	private Point fDialogSize;
+	private Text fNameText;
 	
 	public ServiceProviderConfigurationDialog(IShellProvider parentShell, IServiceConfiguration config) {
 		super(parentShell);
@@ -62,6 +67,19 @@ public class ServiceProviderConfigurationDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		final Composite dialogArea = (Composite) super.createDialogArea(parent);
+		
+		final Composite textArea = new Composite(dialogArea, SWT.NONE);
+		GridLayout textLayout = new GridLayout(2, false);
+		textLayout.marginWidth = 0;
+		textArea.setLayout(textLayout);
+		GridData textAreaData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		textArea.setLayoutData(textAreaData);
+		final Label nameLabel = new Label(textArea, SWT.NONE);
+		nameLabel.setText(Messages.ServiceProviderConfigurationDialog_0);
+		fNameText = new Text(textArea, SWT.BORDER);
+		fNameText.setText(fConfig.getName());
+		GridData textData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		fNameText.setLayoutData(textData);
 		
 		fServiceModelWidget = new ServiceProviderConfigurationWidget(dialogArea, SWT.NONE);
 		fServiceModelWidget.setServiceConfiguration(fConfig);
@@ -92,6 +110,10 @@ public class ServiceProviderConfigurationDialog extends Dialog {
 	@Override
 	protected void okPressed() {
 		fServiceModelWidget.applyChangesToConfiguration();
+		String name = fNameText.getText();
+		if (!name.equals("")) { //$NON-NLS-1$
+			fConfig.setName(name);
+		}
 		super.okPressed();
 	}
 
