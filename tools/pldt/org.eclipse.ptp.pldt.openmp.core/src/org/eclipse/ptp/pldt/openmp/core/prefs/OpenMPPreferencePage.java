@@ -14,6 +14,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.openmp.core.Messages;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -25,8 +26,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class OpenMPPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-    private static final String INCLUDES_PREFERENCE_LABEL  = "OpenMP include paths:";
-    private static final String INCLUDES_PREFERENCE_BROWSE = "Please choose a directory for OpenMP includes:";
+    private static final String INCLUDES_PREFERENCE_LABEL  = Messages.OpenMPPreferencePage_OPENMP_INCLUDE_PATHS;
+    private static final String INCLUDES_PREFERENCE_BROWSE = Messages.OpenMPPreferencePage_OPENMP_INCLUDES_LABEL;
 
     public OpenMPPreferencePage()
     {
