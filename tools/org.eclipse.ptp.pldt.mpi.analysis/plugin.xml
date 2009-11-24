@@ -130,17 +130,17 @@
             presentationLayer="3"
             label="MPI Barrier Matching Set Annotation Marker"
             
-            textPreferenceKey="mpiIndication"
+            textPreferenceKey="mpiIndicationMatch"
             textPreferenceValue="true"
-            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceKey="artifactHighlightingMatch"
             highlightPreferenceValue="false"
-            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceKey="artifactIndicationColorMatch"
             colorPreferenceValue="0,128,192"
-            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRulerMatch"
             verticalRulerPreferenceValue="true"
 			showInNextPrevDropdownToolbarActionKey="showPortingInNextPrevDropdownToolbarAction"
             showInNextPrevDropdownToolbarAction="false"
-            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRulerMatch"
             overviewRulerPreferenceValue="true"
             
             includeOnPreferencePage="true"
@@ -155,7 +155,7 @@
    <extension point="org.eclipse.core.resources.markers"
 		id="mpiErrorMarker"
         name="MPI Barrier Error Marker">
-      <super type="org.eclipse.core.resources.textmarker"/>
+      <super type="org.eclipse.core.resources.problemmarker"/>
       <attribute name="fileName"/>
       <attribute name="theLineNo"/>
       <attribute name="theNewLineNo"/>
@@ -169,30 +169,31 @@
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-            markerType="org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierErrorMarker"
-            name="org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierErrorMarkerAnnotation">
+            markerSeverity="2"
+            markerType="org.eclipse.ptp.pldt.mpi.analysis.mpiErrorMarker"
+            name="org.eclipse.ptp.pldt.mpi.analysis.mpiErrorMarkerAnnotation">
       </type>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationType="org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierErrorMarkerAnnotation"
+            annotationType="org.eclipse.ptp.pldt.mpi.analysis.mpiErrorMarkerAnnotation"
             icon="icons/barrier.gif" 
             
             presentationLayer="3"
             label="MPI Barrier Error Annotation Marker"
             
-            textPreferenceKey="mpiIndication"
+            textPreferenceKey="mpiIndicationError"
             textPreferenceValue="true"
-            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceKey="artifactHighlightingError"
             highlightPreferenceValue="false"
-            colorPreferenceKey="artifactIndicationColor"
-            colorPreferenceValue="0,128,192"
-            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            colorPreferenceKey="artifactIndicationColorError"
+            colorPreferenceValue="128,0,0"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRulerError"
             verticalRulerPreferenceValue="true"
 			showInNextPrevDropdownToolbarActionKey="showPortingInNextPrevDropdownToolbarAction"
             showInNextPrevDropdownToolbarAction="false"
-            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRulerError"
             overviewRulerPreferenceValue="true"
             
             includeOnPreferencePage="true"
