@@ -50,6 +50,7 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
     private static final String MPI_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiBuildCommand"); //$NON-NLS-1$
     private static final String MPI_CPP_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiCppBuildCommand"); //$NON-NLS-1$
     private static final String PROMPT_FOR_OTHERS_LABEL=Messages.getString("MPIPreferencePage.promptToIncludeOtherLocations");
+    private static final String MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.getString("MPIPreferencePage.recognizeAPISByPrefixAlone");
 
     public MPIPreferencePage()
     {
@@ -90,6 +91,9 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
 
     protected void createFieldEditors()
     {
+        BooleanFieldEditor bPrefix = new BooleanFieldEditor(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE, MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
+        addField(bPrefix);
+        
         PathEditor pathEditor = new PathEditor(MpiIDs.MPI_INCLUDES, MPI_INCLUDES_PREFERENCE_LABEL,
                 MPI_INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
         addField(pathEditor);
@@ -103,5 +107,6 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
         BooleanFieldEditor bed = new BooleanFieldEditor(MpiIDs.MPI_PROMPT_FOR_OTHER_INCLUDES, PROMPT_FOR_OTHERS_LABEL, getFieldEditorParent());
         addField(bed);
         
+
     }
 }
