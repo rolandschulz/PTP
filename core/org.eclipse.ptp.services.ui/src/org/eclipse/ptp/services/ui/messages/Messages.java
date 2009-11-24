@@ -65,15 +65,19 @@ public class Messages extends NLS {
 
 	public static String ServiceConfigurationPreferencePage_0;
 	public static String ServiceConfigurationPreferencePage_1;
+
+	public static String ServiceConfigurationPreferencePage_10;
 	public static String ServiceConfigurationPreferencePage_2;
 	public static String ServiceConfigurationPreferencePage_3;
 	public static String ServiceConfigurationPreferencePage_4;
 	public static String ServiceConfigurationPreferencePage_5;
 	public static String ServiceConfigurationPreferencePage_6;
+	public static String ServiceConfigurationPreferencePage_7;
+	public static String ServiceConfigurationPreferencePage_8;
+	public static String ServiceConfigurationPreferencePage_9;
 
 	public static String ServiceConfigurationPropertyPage_0;
 	public static String ServiceConfigurationPropertyPage_1;
-
 	public static String ServiceConfigurationPropertyPage_2;
 	
 	public static String ServiceConfigurationSelectionDialog_0;
@@ -128,6 +132,7 @@ public class Messages extends NLS {
 
 	public static String ServiceModelWidget_8;
 	
+	public static String ServiceProviderConfigurationDialog_0;
 	public static String ServiceProviderConfigurationDialog_title;
 
 	public static String ServiceSelectionDialog_0;
