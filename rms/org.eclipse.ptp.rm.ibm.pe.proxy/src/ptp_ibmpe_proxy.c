@@ -1182,6 +1182,18 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
         }
     }
+    if (debug_sdm_mode) {
+	    char routing_file_path[_POSIX_PATH_MAX + 1];
+
+	      /*
+           * Ensure that any existing routing file is deleted before SDMs are
+           * started. This eliminates a timing exposure where a SDM may mistakenly
+           * find a stale routing_file.
+           */
+        sprintf(routing_path, "%s/routing_file", cwd);
+        unlink(routing_file_path);
+    }
+
     if (jobid == NULL) {
         post_error(trans_id, PTP_PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
     }
