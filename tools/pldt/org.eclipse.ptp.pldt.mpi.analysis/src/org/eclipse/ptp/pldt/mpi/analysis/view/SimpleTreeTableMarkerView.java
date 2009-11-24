@@ -407,7 +407,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			} catch (CoreException e) {
 				System.out
 						.println("STTMV, exception getting model elements (markers for Table view)");
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			if (traceOn)
 				System.out.println("STTMV.get---Elements, found " + objs.length
@@ -422,7 +422,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				parentID = ((Integer) marker.getAttribute(IDs.parentIDAttr))
 						.intValue();
 			} catch (CoreException e) {
-				System.out.println("Barrier SimpleTreeTableMarkerView.getParentID,  "+e.getMessage());
+				if(traceOn)System.out.println("Barrier SimpleTreeTableMarkerView.getParentID,  "+e.getMessage());
 				//e.printStackTrace();
 			}
 			return parentID;
@@ -544,10 +544,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 							viewer.refresh();
 
 						} catch (Exception e) {
-							System.out
-									.println("STTMV: Exception refreshing viewer: "
-											+ e);
-							e.printStackTrace();
+							if(traceOn) System.out.println("STTMV: Exception refreshing viewer: "+ e);
+							//e.printStackTrace();
 						}
 
 					}
@@ -1340,7 +1338,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(infoAction);
-		//manager.add(removeMarkerAction); // BRT barrierMarker - put remove marker action in here
+		manager.add(removeMarkerAction); // BRT barrierMarker - put remove marker action in here
 	}
 
 	/**
@@ -1351,7 +1349,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		makeShowInfoAction();
 		makeFilterAction();
 		makeDoubleClickAction();
-		//makeRemoveMarkerAction(); // BRT barrierMarker removeMarkerAction
+		makeRemoveMarkerAction(); // BRT barrierMarker removeMarkerAction
 	}
 
 	/**
@@ -1624,8 +1622,24 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 							throws CoreException {
 						try {
 							int depth = IResource.DEPTH_INFINITE;
-							wsResource.deleteMarkers(IDs.barrierMarkerID,false, depth);
-							wsResource.deleteMarkers(IDs.errorMarkerID, false, depth);
+							if (traceOn) {
+								IMarker[] bMarkers = wsResource.findMarkers(IDs.barrierMarkerID, true, depth);
+								IMarker[] eMarkers = wsResource.findMarkers(IDs.errorMarkerID, true, depth);
+								IMarker[] mMarkers = wsResource.findMarkers(IDs.matchingSetMarkerID, true, depth);
+								IMarker[] pMarkers = wsResource.findMarkers(IMarker.PROBLEM, true, depth);
+
+								int bLen = bMarkers.length;
+								int eLen = eMarkers.length;
+								int mLen = mMarkers.length;
+								int pLen = pMarkers.length;
+
+								System.out.println("RemoveMarkers: found "+ bLen + " barrier markers, " + eLen
+										+ " error markers and " + mLen+ " matching set markers found.");
+								System.out.println(pLen + " problem markers.");
+							}
+							wsResource.deleteMarkers(IDs.barrierMarkerID,true, depth);
+							wsResource.deleteMarkers(IDs.errorMarkerID, true, depth);
+							wsResource.deleteMarkers(IDs.matchingSetMarkerID, true, depth);
 							if (traceOn)System.out.println("markers removed.");
 
 						} catch (CoreException e) {

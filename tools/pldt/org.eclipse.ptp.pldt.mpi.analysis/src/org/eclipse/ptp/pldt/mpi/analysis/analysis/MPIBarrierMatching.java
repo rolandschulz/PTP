@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
+import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierExpression.BarrierExpressionOP;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
@@ -227,8 +228,10 @@ public class MPIBarrierMatching {
 		}
 		
 		try{
-			// BRT barrierMarker change to problem marker here?
-			IMarker m = currentFunc_.getResource().createMarker(IMarker.PROBLEM);
+			// Don't want it to be a problem marker: then it's harder to delete (don't
+			// want to delete the other problem markers)
+			//IMarker m = currentFunc_.getResource().createMarker(IMarker.PROBLEM);
+			IMarker m = currentFunc_.getResource().createMarker(IDs.errorMarkerID);
 			//IMarker m = currentFunc_.getResource().createMarker(IDs.errorMarkerID);
 			m.setAttribute(IMarker.LINE_NUMBER, line);
 			m.setAttribute(IMarker.MESSAGE, "Barrier Synchronization Error");
