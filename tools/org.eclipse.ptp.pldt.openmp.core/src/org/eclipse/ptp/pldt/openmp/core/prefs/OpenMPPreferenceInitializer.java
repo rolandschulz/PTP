@@ -26,7 +26,7 @@ public class OpenMPPreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = OpenMPPlugin.getDefault()
 				.getPreferenceStore();
-    	store.setDefault(OpenMPIDs.OpenMP_BUILD_CMD, "gcc");
+    	store.setDefault(OpenMPIDs.OpenMP_BUILD_CMD, "gcc -fopenmp");
 	}
 
 }
