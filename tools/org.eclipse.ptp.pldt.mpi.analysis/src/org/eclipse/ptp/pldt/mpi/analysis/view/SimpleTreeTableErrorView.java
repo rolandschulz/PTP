@@ -80,6 +80,11 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 /**
+ * 
+ * 
+ * UNUSED ????
+ * 
+ * 
 * TODO: This is basically a copy of class from common plugin
 * (org.eclipse.ptp.pldt.common); need to work toward replacing this with that one -
 * however some changes have been made to this one
