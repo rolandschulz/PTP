@@ -168,7 +168,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	private AbstractUIPlugin thePlugin_;
 
-	private String iconName_ = "icons/sample.gif";
+	private String iconName_ = "icons/feedback.png";
 
 	private String viewName_;
 
