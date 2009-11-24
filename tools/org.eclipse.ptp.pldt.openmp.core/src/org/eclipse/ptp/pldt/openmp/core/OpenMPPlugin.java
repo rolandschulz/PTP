@@ -29,16 +29,16 @@ public class OpenMPPlugin extends AbstractUIPlugin {
 
 	//The shared instance.
 	private static OpenMPPlugin plugin;
-    public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.openmp.core";
+    public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.openmp.core"; //$NON-NLS-1$
 	
     // Constants
     // preference page name for OpenMP
-    public static final String OPEN_MP_INCLUDES    = "OpenMP Includes";
+    public static final String OPEN_MP_INCLUDES    = Messages.OpenMPPlugin_OPENMP_INCLUDES;
     
-    public static final String MARKER_ID       = "org.eclipse.ptp.pldt.openmp.core.openMPMarker";
+    public static final String MARKER_ID       = "org.eclipse.ptp.pldt.openmp.core.openMPMarker"; //$NON-NLS-1$
    
     // artifact view id
-    public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView";
+    public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"; //$NON-NLS-1$
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.openmp.core.messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
@@ -81,7 +81,7 @@ public class OpenMPPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.openmp.core", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.openmp.core", path); //$NON-NLS-1$
 	}
     /**
      * Returns the preference setting for OpenMP include paths
