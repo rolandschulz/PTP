@@ -137,13 +137,18 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		
 		// access the preference store from the MPI plugin
 		preferenceStore = MpiPlugin.getDefault().getPreferenceStore();
+		boolean allowPrefixOnlyMatch = preferenceStore.getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		String mip=preferenceStore.getString(prefIDincludes);
 		if(traceOn)System.out.println("Got mpi include pref from other plugin: "+mip);
 
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
 		defaultMpiIncludePath = mip;
-		if(defaultMpiIncludePath.length()==0) {
+		// We only need to force MPI prefs to be set now if a prefix-only match isn't allowed.
+		// Note that if the user doesn't set include path, we can't make a guess at what the lib path etc is.
+		// However, this workaround (encourage setting of mpi include path) is used since mpi settings page
+		// in wizard dialog is blank if this value is not set.  
+		if( /*!allowPrefixOnlyMatch &&*/  defaultMpiIncludePath.length()==0) {
 			// warn if no MPI preferences have been set and allow user to set them right there
 			String newMip=showNoPrefs("MPI",prefIDincludes);
 			defaultMpiIncludePath=newMip;
@@ -202,20 +207,21 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		if(-1!=sepLoc) {
 			tempPath=mpiIncludePath.substring(0, sepLoc);
 		}
-		IPath path = Path.fromOSString(tempPath);
-		path=path.removeLastSegments(1);
-		path=path.addTrailingSeparator();
-
-		defaultMpiLibPath=path.toString()+"lib";
-		//System.out.println("defaultMpiLibPath="+defaultMpiLibPath);
-		setCurrentMpiLibPath(defaultMpiLibPath);
-		
-		//standardize format for mpi include path, too
-		path = Path.fromOSString(mpiIncludePath);
-		String temp=path.toString();
-		temp=stripTrailingSeparator(temp);
-		defaultMpiIncludePath=temp;
-		setCurrentMpiIncludePath(defaultMpiIncludePath);	
+		// if no mpi include path, then don't bother to calculate
+		// a libpath based on it.
+		if (mpiIncludePath.length() > 0) { 
+			IPath path = Path.fromOSString(tempPath);
+			path = path.removeLastSegments(1);
+			path = path.addTrailingSeparator();
+			defaultMpiLibPath = path.toString() + "lib";
+			setCurrentMpiLibPath(defaultMpiLibPath);
+			// standardize format for mpi include path, too
+			path = Path.fromOSString(mpiIncludePath);
+			String temp = path.toString();
+			temp = stripTrailingSeparator(temp);
+			defaultMpiIncludePath = temp;
+			setCurrentMpiIncludePath(defaultMpiIncludePath);
+		}
 			
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
 	}
@@ -239,7 +245,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param path
 	 */
 	private void setCurrentMpiLibName(String name) {
-		currentMpiIncludePath = name;
+		//currentMpiIncludePath = name;//???
 		pageData.put(PAGE_ID+DOT+LIB_PROP_ID, name);
 	}
 	
@@ -499,7 +505,6 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param defaultEnabled do we use default mpi include path?
 	 */
 	private void createContents(Composite composite, boolean defaultEnabled) {
-
 		int columns = 4;
 		Composite group = new Composite(composite, SWT.NONE);
 		GridLayout layout = new GridLayout();
