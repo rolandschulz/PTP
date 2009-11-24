@@ -1,6 +1,7 @@
 package org.eclipse.ptp.pldt.mpi.core.views;
 
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
+import org.eclipse.ptp.pldt.mpi.core.Messages;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 
@@ -14,7 +15,7 @@ import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 public class MPITableView extends SimpleTableMarkerView {
 	public MPITableView() {
 
-		super(MpiPlugin.getDefault(), "Artifact", "Artifacts",
-				"Construct", MpiIDs.MARKER_ID);
+		super(MpiPlugin.getDefault(), Messages.getString("MPITableView_ARTIFACT"), Messages.getString("MPITableView_ARTIFACTS"), //$NON-NLS-1$ //$NON-NLS-2$
+				Messages.getString("MPITableView_CONSTRUCT"), MpiIDs.MARKER_ID); //$NON-NLS-1$
 	}
 }

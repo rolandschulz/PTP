@@ -38,9 +38,9 @@ public class MPIDocXMLParser {
 	{
 		File file = new File(args[0]);
 		try {
-			List<FunctionSummaryImpl> functions = parseDOM(new FileInputStream(file), "cname");
-			System.out.println("num of functions gathered: "+functions.size());
-            System.out.println("first function summary:");
+			List<FunctionSummaryImpl> functions = parseDOM(new FileInputStream(file), "cname");//$NON-NLS-1$
+			System.out.println("num of functions gathered: "+functions.size());//$NON-NLS-1$
+            System.out.println("first function summary:");//$NON-NLS-1$
             System.out.println((FunctionSummaryImpl)(functions.iterator().next()));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -70,7 +70,7 @@ public class MPIDocXMLParser {
 		}
 
 		if (document != null) {
-			NodeList functionList = document.getElementsByTagName("function");
+			NodeList functionList = document.getElementsByTagName("function");//$NON-NLS-1$
 			for (int i = 0; i < functionList.getLength(); i++) {
 				Node func = functionList.item(i);
 				NodeList child = func.getChildNodes();
@@ -82,10 +82,10 @@ public class MPIDocXMLParser {
 					if (sub.getNodeName().equals(cOrCppName)) {
  						cname = sub.getTextContent(); // java 5 
 //                        cname = sub.getFirstChild().getNodeValue();
-					} else if (sub.getNodeName().equals("description")) {
+					} else if (sub.getNodeName().equals("description")) {//$NON-NLS-1$
 						desc = sub.getTextContent(); // java 5
 //                     desc = sub.getFirstChild().getNodeValue();
-					} else if (sub.getNodeName().equals("prototype")) {
+					} else if (sub.getNodeName().equals("prototype")) {//$NON-NLS-1$
 						NodeList protoSub = sub.getChildNodes();
                         // java 5
 						prototypeSummary = new FunctionPrototypeSummaryImpl(
@@ -99,7 +99,7 @@ public class MPIDocXMLParser {
 					}
 				}
 				FunctionSummaryImpl functionSummary = new FunctionSummaryImpl(cname,
-						"", desc, prototypeSummary, null);
+						"", desc, prototypeSummary, null); //$NON-NLS-1$
 				mpiFuncList.add(functionSummary);
 			}
 		}

@@ -49,8 +49,8 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
     private static final String MPI_INCLUDES_PREFERENCE_BROWSE = Messages.getString("MPIPreferencePage.pleaseChooseAdirectory"); //$NON-NLS-1$
     private static final String MPI_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiBuildCommand"); //$NON-NLS-1$
     private static final String MPI_CPP_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiCppBuildCommand"); //$NON-NLS-1$
-    private static final String PROMPT_FOR_OTHERS_LABEL=Messages.getString("MPIPreferencePage.promptToIncludeOtherLocations");
-    private static final String MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.getString("MPIPreferencePage.recognizeAPISByPrefixAlone");
+    private static final String PROMPT_FOR_OTHERS_LABEL=Messages.getString("MPIPreferencePage.promptToIncludeOtherLocations"); //$NON-NLS-1$
+    private static final String MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.getString("MPIPreferencePage.recognizeAPISByPrefixAlone"); //$NON-NLS-1$
 
     public MPIPreferencePage()
     {

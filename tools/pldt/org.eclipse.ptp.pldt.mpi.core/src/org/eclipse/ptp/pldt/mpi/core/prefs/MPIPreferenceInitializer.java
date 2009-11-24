@@ -26,8 +26,8 @@ public class MPIPreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = MpiPlugin.getDefault()
 				.getPreferenceStore();
-    	store.setDefault(MpiIDs.MPI_BUILD_CMD, "mpicc");
-    	store.setDefault(MpiIDs.MPI_CPP_BUILD_CMD, "mpic++");
+    	store.setDefault(MpiIDs.MPI_BUILD_CMD, "mpicc");//$NON-NLS-1$
+    	store.setDefault(MpiIDs.MPI_CPP_BUILD_CMD, "mpic++");//$NON-NLS-1$
     	store.setDefault(MpiIDs.MPI_PROMPT_FOR_OTHER_INCLUDES, true);
     	store.setDefault(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE, true);
 	}
