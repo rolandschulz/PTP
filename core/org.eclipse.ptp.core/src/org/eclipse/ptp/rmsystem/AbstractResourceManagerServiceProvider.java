@@ -201,7 +201,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getRemoteServicesId()
 	 */
 	public String getRemoteServicesId() {
-		return getString(TAG_REMOTE_SERVICES_ID, ""); //$NON-NLS-1$
+		return getString(TAG_REMOTE_SERVICES_ID, null);
 	}
 
 	/* (non-Javadoc)
@@ -238,7 +238,7 @@ public abstract class AbstractResourceManagerServiceProvider
 	}
 	
 	public boolean isConfigured() {
-		return !getConnectionName().equals("") && !getRemoteServicesId().equals(""); //$NON-NLS-1$//$NON-NLS-2$
+		return !getConnectionName().equals("") && getRemoteServicesId() != null; //$NON-NLS-1$//$NON-NLS-2$
 	}
 	
 	/* (non-Javadoc)
