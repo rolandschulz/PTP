@@ -49,8 +49,8 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 
 	private boolean usingNamespaceMPI;
 
-	public MpiCPPASTVisitor(List mpiIncludes, String fileName, ScanReturn msr) {
-		super(mpiIncludes, fileName, msr);
+	public MpiCPPASTVisitor(List mpiIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
+		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
 		usingNamespaceMPI = false;
 		ARTIFACT_CALL = Messages.getString("MpiCPPASTVisitor.mpiCall"); //$NON-NLS-1$
 		ARTIFACT_CONSTANT = Messages.getString("MpiCPPASTVisitor.mpiConstant"); //$NON-NLS-1$
