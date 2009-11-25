@@ -27,6 +27,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IFunction;
 import org.eclipse.cdt.core.model.IMethod;
+import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.internal.ui.CPluginImages;
@@ -37,6 +38,7 @@ import org.eclipse.cdt.internal.ui.callhierarchy.CHNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHReferenceInfo;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.util.CoreUtility;
+import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.viewsupport.AdaptingSelectionProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
@@ -83,6 +85,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
@@ -95,6 +98,7 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * The view part for the include browser.
@@ -601,12 +605,29 @@ public class RemoteCHViewPart extends ViewPart {
 		if (node != null && !node.isMultiDef()) {
     		ICElement elem= node.getRepresentedDeclaration();
     		if (elem != null) {
-    			IWorkbenchPage page= getSite().getPage();
     			try {
-					EditorOpener.open(page, elem);
-				} catch (CModelException e) {
-					CUIPlugin.log(e);
-				}
+    				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), elem);
+    				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
+    					ISourceReference sr = (ISourceReference) elem;
+    					int offset = sr.getSourceRange().getIdStartPos();
+    					int length = sr.getSourceRange().getIdLength();
+    					
+    					if(offset >= 0 && length >= 0) {
+    						((ITextEditor)editor).selectAndReveal(offset, length);
+    					}
+    				} 
+    			} catch (PartInitException e) {
+    				CUIPlugin.log(e);
+    			} catch (CModelException e) {
+    				CUIPlugin.log(e);
+    			}
+    			
+//    			IWorkbenchPage page= getSite().getPage();
+//    			try {
+//					EditorOpener.open(page, elem);
+//				} catch (CModelException e) {
+//					CUIPlugin.log(e);
+//				}
     		}
     	}
 	}
@@ -770,7 +791,8 @@ public class RemoteCHViewPart extends ViewPart {
 
         			CHReferenceInfo ref= fNavigationNode.getReference(fNavigationDetail);
         			Region region= new Region(ref.getOffset(), ref.getLength());
-        			EditorOpener.open(page, file, region, timestamp);
+        			//EditorOpener.open(page, file, region, timestamp);
+        			EditorOpener.openExternalFile(page, file.getLocationURI(), region, timestamp, file);
         		}
         		else {
         			try {
