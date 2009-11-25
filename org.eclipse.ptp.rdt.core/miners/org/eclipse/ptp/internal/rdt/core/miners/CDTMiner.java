@@ -1080,7 +1080,7 @@ public class CDTMiner extends Miner {
 				IProgressMonitor monitor = new NullProgressMonitor();
 				THGraph graph = new THGraph();
 				graph.setLocationConverter(getLocationConverter(hostName));
-				final RemoteCProjectFactory projectFactory = new RemoteCProjectFactory();
+				final RemoteCProjectFactory projectFactory = new RemoteCProjectFactory(input.getCProject());
 				graph.defineInputNode(index, input, projectFactory);
 				graph.addSuperClasses(index, monitor, projectFactory);
 				graph.addSubClasses(index, monitor, projectFactory);

@@ -21,6 +21,18 @@ import org.eclipse.ptp.internal.rdt.core.miners.ScopeManager;
  */
 public class RemoteCProjectFactory implements ICProjectFactory {
 
+	
+	private ICProject defaultProject = null;
+	
+	public RemoteCProjectFactory() {
+	}
+
+
+	public RemoteCProjectFactory(ICProject defaultProject) {
+		this.defaultProject = defaultProject;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory#getProjectForFile(java.lang.String)
 	 */
@@ -33,7 +45,11 @@ public class RemoteCProjectFactory implements ICProjectFactory {
 			return new CProject(projName);
 		}
 		
-		return null;
+		return defaultProject;
 	}
 
+	
+	public void setDefaultProject(ICProject defaultProject) {
+		this.defaultProject = defaultProject;
+	}
 }
