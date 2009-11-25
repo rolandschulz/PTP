@@ -2,7 +2,7 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Reference" link_to="toc.xml#reference">
-   <topic href="html/reference/remote_c_cpp_perspective.html" label="Remote C/C++ Development Perspective">
+   <topic href="html/reference/remote_c_cpp_perspective.html" label="Remote C/C++ Perspective">
    </topic>
  <topic href="html/reference/remote_c_views.html" label="Remote C/C++ Views and Editors">
     <topic href="html/reference/project_explorer_view.htm" label="Project Explorer View">
