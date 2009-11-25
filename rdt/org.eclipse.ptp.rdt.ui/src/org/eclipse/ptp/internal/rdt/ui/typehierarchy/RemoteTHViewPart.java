@@ -28,6 +28,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IDeclaration;
 import org.eclipse.cdt.core.model.IMember;
 import org.eclipse.cdt.core.model.IMethodDeclaration;
+import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.ui.CPluginImages;
@@ -36,11 +37,11 @@ import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.typehierarchy.ITHModelPresenter;
 import org.eclipse.cdt.internal.ui.typehierarchy.Messages;
 import org.eclipse.cdt.internal.ui.typehierarchy.THNode;
+import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.viewsupport.AdaptingSelectionProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
-import org.eclipse.cdt.internal.ui.viewsupport.EditorOpener;
 import org.eclipse.cdt.internal.ui.viewsupport.SelectionProviderMediator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -96,9 +97,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PartInitException;
@@ -109,6 +110,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * The view part for the include browser.
@@ -837,12 +839,29 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 
 	private void openElement(ICElement elem) {
 		if (elem != null) {
-			IWorkbenchPage page= getSite().getPage();
 			try {
-				EditorOpener.open(page, elem);
+				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), elem);
+				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
+					ISourceReference sr = (ISourceReference) elem;
+					int offset = sr.getSourceRange().getIdStartPos();
+					int length = sr.getSourceRange().getIdLength();
+					
+					if(offset >= 0 && length >= 0) {
+						((ITextEditor)editor).selectAndReveal(offset, length);
+					}
+				} 
+			} catch (PartInitException e) {
+				CUIPlugin.log(e);
 			} catch (CModelException e) {
 				CUIPlugin.log(e);
 			}
+			
+//			IWorkbenchPage page= getSite().getPage();
+//			try {
+//				EditorOpener.open(page, elem);
+//			} catch (CModelException e) {
+//				CUIPlugin.log(e);
+//			}
 		}
 	}
 
