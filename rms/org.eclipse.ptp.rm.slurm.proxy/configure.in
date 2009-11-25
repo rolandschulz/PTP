@@ -3,7 +3,7 @@ dnl
 
 AC_PREREQ([2.50])
 
-AC_INIT([org.eclipse.ptp.slurm], [2.1])
+AC_INIT([org.eclipse.ptp.slurm], [3.0.0])
 AC_CONFIG_SRCDIR([src/ptp_slurm_proxy.c])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
@@ -14,7 +14,7 @@ dnl
 dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
-UTILS="../../core/org.eclipse.ptp.utils"
+UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
 	if test ! -d $UTILS; then
@@ -22,7 +22,7 @@ if test ! -d $UTILS; then
 	fi
 fi
 
-PROXY="../../core/org.eclipse.ptp.proxy"
+PROXY="../org.eclipse.ptp.proxy"
 if test ! -d $PROXY; then
 	PROXY="`echo ${PROXY}_${PACKAGE_VERSION}.*`"
 	if test ! -d $PROXY; then
