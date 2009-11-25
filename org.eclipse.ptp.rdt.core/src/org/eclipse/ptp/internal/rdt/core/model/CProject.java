@@ -72,8 +72,7 @@ public class CProject extends Parent implements ICProject {
 	}
 
 	public IIncludeReference[] getIncludeReferences() throws CModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new IIncludeReference[0];
 	}
 
 	public ILibraryReference[] getLibraryReferences() throws CModelException {
