@@ -1182,7 +1182,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
         }
     }
-    if (debug_sdm_mode) {
+    if ((debug_sdm_mode) && (cwd != NULL)) {
 	    char routing_file_path[_POSIX_PATH_MAX + 1];
 
 	      /*
@@ -1190,7 +1190,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
            * started. This eliminates a timing exposure where a SDM may mistakenly
            * find a stale routing_file.
            */
-        sprintf(routing_path, "%s/routing_file", cwd);
+        sprintf(routing_file_path, "%s/routing_file", cwd);
         unlink(routing_file_path);
     }
 
