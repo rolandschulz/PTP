@@ -82,8 +82,8 @@
 		<move file="${zipsdir}/${ptpMasterFile}" todir="${buildDirectory}"/>
 		<move file="${zipsdir}/${photranMasterFile}" todir="${buildDirectory}"/>
 		
+		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/>
 		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
-		<!--unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/-->
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
@@ -94,21 +94,6 @@
 
 		<zip destfile="${zipsdir}/${ptpMasterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
-		
-		<!--
-		<unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/photran_site"/>
-		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/photran_site/eclipse"/>
-		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/photran_site/eclipse"/>
-		<copy file="photran_buildsite.xml" tofile="${buildDirectory}/photran_site/eclipse/site.xml"/>
-		<replace file="${buildDirectory}/photran_site/eclipse/site.xml">
-			<replacefilter token="@timeStamp@" value="${timestamp}"/>
-		</replace>
-		<copy file="pack.properties" todir="${buildDirectory}/photran_site/eclipse"/>
-
-		<zip destfile="${zipsdir}/${photranMasterFile}"
-			basedir="${buildDirectory}/photran_site/eclipse"/>
-		-->
-
 	</target>
 
 	<target name="sign" depends="init" unless="hasErrors">
@@ -121,17 +106,6 @@
 			<available file="${buildDirectory}/signed/${ptpMasterFile}"/>
 		</waitfor>
 		<move file="${buildDirectory}/signed/${ptpMasterFile}" todir="${zipsdir}"/>
-		<!--
-		<exec executable="sign">
-			<arg value="${buildDirectory}/${buildType}.${buildId}/${photranMasterFile}"/>
-			<arg value="nomail"/>
-			<arg value="${buildDirectory}/signed"/>
-		</exec>
-		<waitfor maxwait="30" maxwaitunit="minute">
-			<available file="${buildDirectory}/signed/${photranMasterFile}"/>
-		</waitfor>
-		<move file="${buildDirectory}/signed/${photranMasterFile}" todir="${zipsdir}"/>
-		-->
 	</target>
 	
 	<target name="test" depends="init" unless="hasErrors"/>
