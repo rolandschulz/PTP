@@ -94,6 +94,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -424,11 +425,18 @@ public class ResourceManagerView extends ViewPart {
 			public void doubleClick(DoubleClickEvent event) {
 				ITreeSelection selection = (ITreeSelection)event.getSelection();
 				if (!selection.isEmpty()) {
-					IResourceManagerControl rm = (IResourceManagerControl)selection.getFirstElement();
-					if (rm.getState() == ResourceManagerAttributes.State.STOPPED) {
-						editResourceManagerAction.setResourceManager(rm);
-						editResourceManagerAction.run();
+					if (selection.getFirstElement() instanceof IResourceManagerControl) {
+						IResourceManagerControl rm = (IResourceManagerControl)selection.getFirstElement();
+						if (rm.getState() == ResourceManagerAttributes.State.STOPPED) {
+							editResourceManagerAction.setResourceManager(rm);
+							editResourceManagerAction.run();
+							return;
+						}
 					}
+					
+					TreeItem item = viewer.getTree().getSelection()[0];
+					item.setExpanded(!item.getExpanded());
+					viewer.refresh(selection.getFirstElement());
 				}
 			}
 		});
