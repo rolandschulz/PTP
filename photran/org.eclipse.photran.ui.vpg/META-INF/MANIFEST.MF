@@ -29,7 +29,14 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.rephraserengine.ui.vpg
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.photran.internal.ui.actions,
+ org.eclipse.photran.internal.ui.editor_vpg,
+ org.eclipse.photran.internal.ui.editor_vpg.contentassist,
+ org.eclipse.photran.internal.ui.editor_vpg.folding,
+ org.eclipse.photran.internal.ui.editor_vpg.hover,
  org.eclipse.photran.internal.ui.properties,
  org.eclipse.photran.internal.ui.refactoring,
- org.eclipse.photran.internal.ui.search
+ org.eclipse.photran.internal.ui.search,
+ org.eclipse.photran.internal.ui.views,
+ org.eclipse.photran.internal.ui.views.vpgproblems,
+ org.eclipse.photran.internal.ui.vpg
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
