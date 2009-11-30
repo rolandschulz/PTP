@@ -34,27 +34,26 @@ public final class ShowReleaseNotes implements IStartup
     public void earlyStartup()
     {
         if (shouldShowReleaseNotes())
-            openWebBrowser();
+        {
+            openWebBrowser(setPreference());
+        }
     }
 
     private boolean shouldShowReleaseNotes()
     {
-        if (FortranPreferences.RELEASE_NOTES_SHOWN.getValue() == true
-            || System.getenv("TESTING") != null)
+        if (System.getenv("TESTING") != null)
+        {
+            // The JUnit tests clear the workspace, so make sure we don't show the release notes
+            // every time we run the JUnit tests
+            return false;
+        }
+        else if (photranVersion().toString().equals(getPreference()))
         {
             // The release notes were already displayed once; don't show them again
             return false;
         }
         else
         {
-            /*
-             * Set the preference, then make sure it was actually set.  If there was a problem
-             * saving the preference, we shouldn't show the release notes, since we might have
-             * already done that and we don't want to annoy the user
-             */
-            FortranPreferences.RELEASE_NOTES_SHOWN.setValue(true);
-            if (!FortranPreferences.RELEASE_NOTES_SHOWN.getValue()) return false;
-
             /*
             GregorianCalendar today = new GregorianCalendar();
             if (today.after(new GregorianCalendar(2012, GregorianCalendar.JANUARY, 1)))
@@ -65,7 +64,20 @@ public final class ShowReleaseNotes implements IStartup
         }
     }
 
-    private void openWebBrowser()
+    private String getPreference()
+    {
+        return FortranPreferences.RELEASE_NOTES_SHOWN.getValue();
+    }
+
+    /** @return the previous version stored in the preference */
+    private String setPreference()
+    {
+        String lastVersion = getPreference();
+        FortranPreferences.RELEASE_NOTES_SHOWN.setValue(photranVersion().toString());
+        return lastVersion;
+    }
+
+    private void openWebBrowser(final String lastVersion)
     {
         Display.getDefault().asyncExec(new Runnable()
         {
@@ -80,7 +92,7 @@ public final class ShowReleaseNotes implements IStartup
                             null,
                             "Welcome",
                             null)
-                        .openURL(new URL(getURL()));
+                        .openURL(new URL(getURL(lastVersion)));
                 }
                 catch (Throwable e)
                 {
@@ -90,9 +102,9 @@ public final class ShowReleaseNotes implements IStartup
         });
     }
 
-    private String getURL()
+    private String getURL(String lastVersion)
     {
-        Version version = FortranUIPlugin.getDefault().getBundle().getVersion();
+        Version version = photranVersion();
         return "http://www.eclipse.org/photran/welcome/"
             + version.getMajor()
             + "."
@@ -102,6 +114,13 @@ public final class ShowReleaseNotes implements IStartup
             + "&os="
             + Platform.getOS()
             + "&arch="
-            + Platform.getOSArch();
+            + Platform.getOSArch()
+            + "&lastVersion="
+            + lastVersion;
+    }
+
+    private Version photranVersion()
+    {
+        return FortranUIPlugin.getDefault().getBundle().getVersion();
     }
 }
