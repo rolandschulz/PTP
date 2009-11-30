@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -38,11 +39,11 @@ public class ListAllModulesTests extends RefactoringTestCase
          * are not used.
          */
 
-        importFile(DIR, "use-module1.f90");
-        importFile(DIR, "module1.f90");
-        importFile(DIR, "module2-module3.f90");
-        importFile(DIR, "module4.f90");
-        importFile(DIR, "use-module4.f90");
+        importFile(Activator.getDefault(), DIR, "use-module1.f90");
+        importFile(Activator.getDefault(), DIR, "module1.f90");
+        importFile(Activator.getDefault(), DIR, "module2-module3.f90");
+        importFile(Activator.getDefault(), DIR, "module4.f90");
+        importFile(Activator.getDefault(), DIR, "use-module4.f90");
         PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
         //PhotranVPG.getDatabase().printOn(System.out);
     }

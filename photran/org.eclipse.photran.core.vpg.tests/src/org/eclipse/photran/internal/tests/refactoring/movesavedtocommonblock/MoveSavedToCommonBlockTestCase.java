@@ -26,6 +26,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 public class MoveSavedToCommonBlockTestCase extends RefactoringTestCase
@@ -68,7 +69,7 @@ public class MoveSavedToCommonBlockTestCase extends RefactoringTestCase
 
     private MoveSavedToCommonBlockRefactoring createRefactoring(final String filename, final LineCol lineCol) throws Exception
     {
-        final IFile thisFile = importFile(DIR, filename);
+        final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
 
         MoveSavedToCommonBlockRefactoring r = new MoveSavedToCommonBlockRefactoring();
         r.initialize(thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
@@ -77,7 +78,7 @@ public class MoveSavedToCommonBlockTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     public void test() throws Exception

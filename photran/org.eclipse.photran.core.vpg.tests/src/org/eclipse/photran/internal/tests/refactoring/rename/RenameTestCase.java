@@ -23,6 +23,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 import org.eclipse.photran.internal.tests.refactoring.rename.RenameTestSuite.Ident;
 
@@ -96,9 +97,9 @@ public abstract class RenameTestCase extends RefactoringTestCase
     {
     	PhotranVPG.getDatabase().clearDatabase();
 
-        final IFile thisFile = importFile(DIR, filename);
+        final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
         for (String f : allFiles)
-            importFile(DIR, f);
+            importFile(Activator.getDefault(), DIR, f);
 
         // Originally, we called acquireTransientAST on each IFile
         PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
@@ -116,7 +117,7 @@ public abstract class RenameTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     public static class ExpectSuccess extends RenameTestCase

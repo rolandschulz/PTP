@@ -16,11 +16,13 @@ import java.net.URISyntaxException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.ExtractProcedureRefactoring;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 public class ExtractProcTestCase extends RefactoringTestCase
@@ -71,15 +73,15 @@ public class ExtractProcTestCase extends RefactoringTestCase
 
     private ExtractProcedureRefactoring createRefactoring(final String filename) throws Exception
     {
-        final IFile thisFile = importFile(DIR, filename);
+        final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
         ExtractProcedureRefactoring r = new ExtractProcedureRefactoring();
         r.initialize(thisFile, selectionToExtract);
         return r;
     }
 
-    @Override protected String readTestFile(String srcDir, String filename) throws IOException, URISyntaxException
+    @Override protected String readTestFile(Plugin activator, String srcDir, String filename) throws IOException, URISyntaxException
     {
-        String result = super.readTestFile(srcDir, filename);
+        String result = super.readTestFile(activator, srcDir, filename);
 
         int startOffset = result.lastIndexOf('\n', result.indexOf("!<<<<<START")) + 1;
         int endOffset = result.indexOf("!<<<<<END");
@@ -93,7 +95,7 @@ public class ExtractProcTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     /**

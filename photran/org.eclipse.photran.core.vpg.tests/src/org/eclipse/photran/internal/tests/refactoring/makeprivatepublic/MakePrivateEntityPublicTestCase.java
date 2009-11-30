@@ -23,6 +23,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -76,7 +77,7 @@ public class MakePrivateEntityPublicTestCase extends RefactoringTestCase
 
     private MakePrivateEntityPublicRefactoring createRefactoring(final String filename, final LineCol lineCol, final int length) throws Exception
     {
-        final IFile file = importFile(DIR, filename);
+        final IFile file = importFile(Activator.getDefault(), DIR, filename);
         Document doc = new Document(readFileToString(DIR+"/"+filename));
         TextSelection text = new TextSelection(doc, getLineColOffset(filename, lineCol), length);
         MakePrivateEntityPublicRefactoring r = new MakePrivateEntityPublicRefactoring();
@@ -92,7 +93,7 @@ public class MakePrivateEntityPublicTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     public void test() throws Exception

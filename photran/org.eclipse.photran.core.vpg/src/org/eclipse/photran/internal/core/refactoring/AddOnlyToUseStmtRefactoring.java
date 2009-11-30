@@ -287,18 +287,26 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
     {
+        pm.beginTask("Analyzing", IProgressMonitor.UNKNOWN);
+
         if(useNode == null)
             fail("No module name in a USE statement is selected.");
 
+        pm.subTask("Parsing " + fileInEditor.getName());
         IFortranAST ast = vpg.acquirePermanentAST(fileInEditor);
         if(ast == null) return;
 
+        pm.subTask("Checking for conflicts after addition");
         checkConflictingBindings(ast, pm, status);  //find conflicts
 
+        pm.subTask("Inserting USE statement");
         createAndInsertUseStmt(ast);
 
+        pm.subTask("Creating change object");
         addChangeFromModifiedAST(fileInEditor, pm);
         vpg.releaseAST(fileInEditor);
+
+        pm.done();
     }
 
 
@@ -308,19 +316,17 @@ public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
      */
     private void checkConflictingBindings(IFortranAST ast, IProgressMonitor pm, RefactoringStatus status)
     {
+        pm.subTask("Finding references");
         allReferences = findModuleEntityRefs(ast);
         //removeOriginalModuleRefs(); //possibly not needed - working without
 
-        if(defsToAdd.size() > 0)
+        for(Definition def : defsToAdd)
         {
-            for(Definition def : defsToAdd)
-            {
-                checkForConflictingBindings(pm,
-                    new ConflictingBindingErrorHandler(status),
-                    def,
-                    allReferences,
-                    def.getCanonicalizedName());
-            }
+            checkForConflictingBindings(pm,
+                new ConflictingBindingErrorHandler(status),
+                def,
+                allReferences,
+                def.getCanonicalizedName());
         }
     }
 

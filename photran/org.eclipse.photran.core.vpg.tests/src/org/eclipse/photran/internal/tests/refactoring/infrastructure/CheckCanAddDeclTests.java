@@ -23,6 +23,7 @@ import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -42,9 +43,9 @@ public class CheckCanAddDeclTests extends RefactoringTestCase
     {
         super.setUp();
 
-        IFile main_f90 = importFile(DIR, "main.f90");
-        IFile module_f90 = importFile(DIR, "module.f90");
-        importFile(DIR, "external.f90");
+        IFile main_f90 = importFile(Activator.getDefault(), DIR, "main.f90");
+        IFile module_f90 = importFile(Activator.getDefault(), DIR, "module.f90");
+        importFile(Activator.getDefault(), DIR, "external.f90");
         PhotranVPG.getInstance().ensureVPGIsUpToDate(new NullProgressMonitor());
 
         project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());

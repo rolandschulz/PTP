@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.KeywordCaseRefactoring;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -68,7 +69,7 @@ public class KeywordCaseTestCase extends RefactoringTestCase
 
     private KeywordCaseRefactoring createRefactoring(final String filename) throws Exception
     {
-        final IFile thisFile = importFile(DIR, filename);
+        final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
 
         ArrayList<IFile> files = new ArrayList<IFile>();
         files.add(thisFile);
@@ -80,7 +81,7 @@ public class KeywordCaseTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     /**

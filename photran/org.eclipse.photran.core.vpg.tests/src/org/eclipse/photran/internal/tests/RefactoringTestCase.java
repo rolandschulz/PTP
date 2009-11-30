@@ -15,12 +15,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.util.Spawner;
@@ -34,20 +36,22 @@ public abstract class RefactoringTestCase extends BaseTestFramework
     	if (!PhotranVPG.inTestingMode()) fail("WHEN RUNNING JUNIT TESTS, THE \"TESTING\" ENVIRONMENT VARIABLE MUST BE SET");
     }
 
-    protected IFile importFile(String srcDir, String filename) throws Exception
+    protected IFile importFile(Plugin activator, String srcDir, String filename) throws Exception
     {
         //project.getProject().getFile(filename).delete(true, new NullProgressMonitor());
-        IFile result = super.importFile(filename, readTestFile(srcDir, filename));
+        IFile result = super.importFile(filename, readTestFile(activator, srcDir, filename));
         //project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
         return result;
     }
 
-    protected String readTestFile(String srcDir, String filename) throws IOException, URISyntaxException
+    protected String readTestFile(Plugin activator, String srcDir, String filename) throws IOException, URISyntaxException
     {
         ArrayList<Integer> lineMap = new ArrayList<Integer>(50);
         lineMaps.put(filename, lineMap);
         lineMap.add(0); // Offset of line 1
-        return readStream(lineMap, Activator.getDefault().getBundle().getResource(srcDir + "/" + filename).openStream());
+        URL resource = activator.getBundle().getResource(srcDir + "/" + filename);
+        assertNotNull(resource);
+        return readStream(lineMap, resource.openStream());
     }
 
     protected String readStream(ArrayList<Integer> lineMap, InputStream inputStream) throws IOException
@@ -161,7 +165,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
      * it can be time-consuming.  Tests should NOT assume that a compiler is available.)
      * <p>
      * This will compile the file(s) that are currently being refactored (i.e., the files
-     * imported into the test project using {@link #importFile(String, String)}) into a
+     * imported into the test project using {@link #importFile(Plugin, String, String)}) into a
      * single executable, and then run that executable.  This can be invoked before and
      * after a refactoring is performed to make sure runtime behavior is actually preserved
      * for the test program.  If a specific ordering of the filenames is desired, it

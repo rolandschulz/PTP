@@ -1047,7 +1047,7 @@ public abstract class AbstractFortranRefactoring extends Refactoring implements 
 
         private void checkIfReferenceBindingWillChange(IConflictingBindingCallback callback, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
         {
-            pm.subTask("Checking for binding conflicts in " + ref.getFilename());
+            pm.subTask("Checking for binding conflicts in " + PhotranVPG.lastSegmentOfFilename(ref.getFilename()));
 
             Token reference = ref.findToken();
 

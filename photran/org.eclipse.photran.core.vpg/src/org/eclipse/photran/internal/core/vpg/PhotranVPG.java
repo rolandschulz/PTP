@@ -104,7 +104,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         		{
         		    @Override public void debug(String message, String filename)
         		    {
-        		        System.out.println(message + " - " + lastSegmentOf(filename));
+        		        System.out.println(message + " - " + lastSegmentOfFilename(filename));
         		    }
         		};
             }
@@ -157,11 +157,6 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 //                else break;
 //            }
 //        }
-    }
-
-    private static String lastSegmentOf(String filename)
-    {
-        return filename.substring(filename.lastIndexOf('/') + 1);
     }
 
     @Override public void start()

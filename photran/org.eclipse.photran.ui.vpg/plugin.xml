@@ -66,20 +66,6 @@
              inputPage="org.eclipse.photran.internal.ui.refactoring.KeywordCaseInputPage"
          />
       </group>
-      <group><!-- Test Refactorings -->
-         <editorRefactoring
-             require_env="PHOTRAN_INCLUDE_TEST_REFACTORINGS"
-             class="org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring"
-         />
-         <editorRefactoring
-             require_env="PHOTRAN_INCLUDE_TEST_REFACTORINGS"
-             class="org.eclipse.photran.internal.core.refactoring.SafeDeleteRefactoring"
-         />
-         <editorRefactoring
-             require_env="PHOTRAN_INCLUDE_TEST_REFACTORINGS"
-             class="org.eclipse.photran.internal.core.refactoring.RenameRefactoring2"
-         />
-      </group>
    </extension>
 
    <!--=====================================-->

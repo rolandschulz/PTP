@@ -18,6 +18,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -54,10 +55,10 @@ public class InterfaceLinkTests extends RefactoringTestCase
          * /after/ all of the corresponding subprograms.
          */
 
-        interface1 = importFile(DIR, "interface1.f90");
-        definition1 = importFile(DIR, "definition1.f90");
-        definition2 = importFile(DIR, "definition2.f90");
-        interface2 = importFile(DIR, "interface2.f90");
+        interface1 = importFile(Activator.getDefault(), DIR, "interface1.f90");
+        definition1 = importFile(Activator.getDefault(), DIR, "definition1.f90");
+        definition2 = importFile(Activator.getDefault(), DIR, "definition2.f90");
+        interface2 = importFile(Activator.getDefault(), DIR, "interface2.f90");
         //                    File      Line  Column
         if1  = findDefinition(interface1,  2, 20); // Ordinary INTERFACE block
         if2  = findDefinition(interface1, 10, 24); // INTERFACE block for a subprogram parameter

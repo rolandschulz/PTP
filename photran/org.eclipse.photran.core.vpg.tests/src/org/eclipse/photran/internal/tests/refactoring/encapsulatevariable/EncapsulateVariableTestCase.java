@@ -23,6 +23,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -84,19 +85,19 @@ public class EncapsulateVariableTestCase extends RefactoringTestCase
     protected IFile getFile(String dir, String fName) throws Exception
     {
         //String text = super.readTestFile(DIR, fName);
-        return importFile(dir, fName);
+        return importFile(Activator.getDefault(), dir, fName);
     }
 
     protected IFile getFileAndSetSelection(String dir, String fName) throws Exception
     {
-        String text = super.readTestFile(DIR, fName);
+        String text = super.readTestFile(Activator.getDefault(), DIR, fName);
         setSelection(text, fName);
-        return importFile(dir, fName);
+        return importFile(Activator.getDefault(), dir, fName);
     }
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     protected void setSelection(String fContent, String filename)

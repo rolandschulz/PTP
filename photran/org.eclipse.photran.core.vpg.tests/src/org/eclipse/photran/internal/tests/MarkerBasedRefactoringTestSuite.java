@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
@@ -48,7 +49,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
     protected Class<R> refactoringClass;
     protected TreeMap<PhotranTokenRef, String> markers;
 
-    protected MarkerBasedRefactoringTestSuite(String descriptionPrefix, String directory, Class<R> clazz) throws Exception
+    protected MarkerBasedRefactoringTestSuite(Plugin activator, String descriptionPrefix, String directory, Class<R> clazz) throws Exception
     {
         this.refactoringClass = clazz;
 
@@ -60,21 +61,21 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
         for (File subdir : dir.listFiles())
         {
             if (subdir.getName().equalsIgnoreCase("CVS")) continue;
-            
+
             String description = descriptionPrefix + " " + subdir.getName();
             String subdirPath = directory + "/" + subdir.getName();
 
-            populateMarkers(subdirPath);
+            populateMarkers(activator, subdirPath);
 
             TestSuite subsuite = new TestSuite(description);
             for (PhotranTokenRef tr : markers.keySet())
-                subsuite.addTest(new IndividualRefactoringTestCase(description, subdirPath, tr, markers.get(tr)));
+                subsuite.addTest(new IndividualRefactoringTestCase(activator, description, subdirPath, tr, markers.get(tr)));
 
             this.addTest(subsuite);
         }
     }
 
-    private void populateMarkers(String subdir) throws Exception
+    private void populateMarkers(Plugin activator, String subdir) throws Exception
     {
         markers = new TreeMap<PhotranTokenRef, String>();
 
@@ -83,7 +84,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
             String filename = file.getName();
             if (!filename.endsWith(".result") && !filename.equalsIgnoreCase("CVS"))
             {
-                String fileContents = readTestFile(subdir, filename);
+                String fileContents = readTestFile(activator, subdir, filename);
                 for (int index = fileContents.indexOf(MARKER);
                      index >= 0;
                      index = fileContents.indexOf(MARKER, index+1))
@@ -103,15 +104,15 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
             throw new Exception("No markers of the form " + MARKER + " found in files in " + subdir);
     }
 
-    private String readTestFile(String subdir, String filename) throws Exception
+    private String readTestFile(Plugin activator, String subdir, String filename) throws Exception
     {
         return new RefactoringTestCase()
         {
-            @Override public String readTestFile(String subdir, String filename) throws IOException, URISyntaxException
+            @Override public String readTestFile(Plugin activator, String subdir, String filename) throws IOException, URISyntaxException
             {
-                return super.readTestFile(subdir, filename);
+                return super.readTestFile(activator, subdir, filename);
             }
-        }.readTestFile(subdir, filename);
+        }.readTestFile(activator, subdir, filename);
     }
 
     /**
@@ -148,6 +149,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
 
     public class IndividualRefactoringTestCase extends RefactoringTestCase
     {
+        private Plugin activator;
         private String description;
         private String subdir;
         private PhotranTokenRef marker;
@@ -155,8 +157,9 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
 
         private TreeMap<String, IFile> files = new TreeMap<String, IFile>();
 
-        public IndividualRefactoringTestCase(String description, String subdir, PhotranTokenRef marker, String markerText) throws Exception
+        public IndividualRefactoringTestCase(Plugin activator, String description, String subdir, PhotranTokenRef marker, String markerText) throws Exception
         {
+            this.activator = activator;
             this.description = description;
             this.subdir = subdir;
             this.marker = marker;
@@ -217,7 +220,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
                     for (String filename : files.keySet())
                     {
                         assertEquals(
-                            readTestFile(subdir, filename + ".result").replaceAll("\\r", ""), // expected result
+                            readTestFile(activator, subdir, filename + ".result").replaceAll("\\r", ""), // expected result
                             readWorkspaceFile(filename).replaceAll("\\r", ""));               // actual refactored file
                     }
                 }
@@ -235,7 +238,7 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
                 String filename = file.getName();
                 if (!filename.endsWith(".result") && !filename.equalsIgnoreCase("CVS"))
                 {
-                    IFile thisFile = importFile(subdir, filename);
+                    IFile thisFile = importFile(activator, subdir, filename);
                     files.put(filename, thisFile);
                 }
             }

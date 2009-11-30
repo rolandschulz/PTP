@@ -24,6 +24,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 /**
@@ -106,9 +107,9 @@ public class AddOnlyToUseTestCase extends RefactoringTestCase
     private AddOnlyToUseStmtRefactoring createRefactoring(final String[] filenames, final LineCol lineCol, final int length) throws Exception
     {
         for (int i = 1; i < filenames.length; i++)
-            importFile(DIR, filenames[i]);
+            importFile(Activator.getDefault(), DIR, filenames[i]);
 
-        final IFile file = importFile(DIR, filenames[0]);
+        final IFile file = importFile(Activator.getDefault(), DIR, filenames[0]);
         Document doc = new Document(readFileToString(DIR+"/"+filenames[0]));
         TextSelection text = new TextSelection(doc, getLineColOffset(filenames[0], lineCol), length);
         AddOnlyToUseStmtRefactoring r = new AddOnlyToUseStmtRefactoring(file, text);
@@ -118,7 +119,7 @@ public class AddOnlyToUseTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     public void test() throws Exception

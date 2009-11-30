@@ -21,6 +21,7 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 public class IntroImplicitTestCase extends RefactoringTestCase
@@ -72,7 +73,7 @@ public class IntroImplicitTestCase extends RefactoringTestCase
 
     private IntroImplicitNoneRefactoring createRefactoring(final String filename, final LineCol lineCol) throws Exception
     {
-        final IFile thisFile = importFile(DIR, filename);
+        final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
 
         //project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); // Runs in separate thread... grrr...
         ArrayList<IFile> files = new ArrayList<IFile>();
@@ -84,7 +85,7 @@ public class IntroImplicitTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 
     /**

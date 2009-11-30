@@ -17,11 +17,13 @@ import java.net.URISyntaxException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
 
 public class ReindenterTestCase extends RefactoringTestCase
@@ -46,7 +48,7 @@ public class ReindenterTestCase extends RefactoringTestCase
     {
         if (filename == null) return; // when JUnit invokes this outside a test suite
 
-        final IFile thisFile = importFile(DIR, filename);
+        final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
 
         IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(thisFile);
         assertNotNull(ast);
@@ -66,9 +68,9 @@ public class ReindenterTestCase extends RefactoringTestCase
             readWorkspaceFile(filename));       // actual refactored file
     }
 
-    @Override protected String readTestFile(String srcDir, String filename) throws IOException, URISyntaxException
+    @Override protected String readTestFile(Plugin activator, String srcDir, String filename) throws IOException, URISyntaxException
     {
-        String result = super.readTestFile(srcDir, filename);
+        String result = super.readTestFile(activator, srcDir, filename);
 
         int startOffset = result.lastIndexOf('\n', result.indexOf("!<<<<<START")) + 1;
         int endOffset = result.indexOf("!<<<<<END");
@@ -99,6 +101,6 @@ public class ReindenterTestCase extends RefactoringTestCase
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
-        return super.readTestFile(DIR, filename);
+        return super.readTestFile(Activator.getDefault(), DIR, filename);
     }
 }

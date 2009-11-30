@@ -128,6 +128,6 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
     @Override
     public String getName()
     {
-        return "Interchange Loops";
+        return "Interchange Loops (Unchecked)";
     }
 }
