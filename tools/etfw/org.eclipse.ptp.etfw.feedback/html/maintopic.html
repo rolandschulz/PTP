@@ -19,22 +19,35 @@ interest with source code lines that are referenced.
 that allows the user to easily navigate to the source code lines in the user's source code. 
 <h1>Basic Tasks</h1>
 <h2>Show Items in feedback view</h2>
+<p>As an example, check out the org.eclipse.ptp.etfw.feedback.sample project from CVS:
+<ul>
+<li>Host: dev.eclipse.org</li>
+<li>Repository path: /cvsroot/tools</li>
+<li>Under HEAD, scroll down to org.eclipse.ptp and expand it.</li>
+<li>Expand tools/etfw</li>
+<li>Check out org.eclipse.ptp.etfw.feedback.sample</li>
+
+</ul>
+<p>Launch a development eclipse workspace </p>
 <ol>
-<li>Create a basic C project
-<li>Put the  xml file in a C project under folder 'xml'
-<li>Put source files referenced in the xml transform file(s) under 'src'.  Directories will be ignored for now.
-<li>Select one or more transform xml files
+<li>Create a basic C project (or almost any type of Eclipse project will do)
+<li>Put the  xml file in the project (e.g. use data/sample.xml in the above project)
+<li>Put source files referenced in the xml  file(s) in the same directory (e.g. use data/sample.c from the above project)
+as the xml file, unless you put specific code in your plug-in to find them.
+<li>Select the xml file in the Project Explorer view
 <li>Hit the (purple) button in the toolbar (Hover says "Show Feedback View for selected XML File")
-- see red arrow at top of image below.
-<li>The Feedback view appears.
-<br>
-<img src="images/feedbackSample.png">
-<br>
+<li>The xml file is parsed by the SampleFeedbackParser class, IFeedbackItems are created, and
+markers are created for each of these, which appear in the Feedback view.
+<p>
+
+
 The items are initially all collapsed. You can expand individual parent nodes, or use the
 "Expand All" button in the view's toolbar  (see red arrow in middle of image above\) to see more information.
 <li>To see the source file line referred to by an item, double-click on the line in the Feedback view.
 <li>To see more information on an item, rightMouse and select "Show Info", or select the item and hit
 the "Show Info" (icon "i") button in the view toolbar.
 </ol>
+<p>For more information, see the <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework_Feedback_View">
+ETFw Feedback view </a> page on the PTP wiki.</p>
 </body>
 </html>

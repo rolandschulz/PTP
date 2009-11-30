@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="PTP ETFw Feedback View to show XML info">
+<toc label="PTP ETFw Feedback View">
 	<topic label="Feedback viewing - main tasks"  href="html/maintopic.html"> 
 		<topic label="Sub Topic" href="html/subtopic.html"/> 
 	</topic>

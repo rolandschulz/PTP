@@ -30,6 +30,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
@@ -52,6 +54,7 @@ public class ShowFeedbackHandler extends AbstractHandler {
 	private static final String ATTR_NAME = "name";
 	private static final String ATTR_CLASSNAME = "class";
 	private IStructuredSelection selection=null;
+	private static final boolean traceOn=false;
 	/**
 	 * The constructor.
 	 */
@@ -72,15 +75,15 @@ public class ShowFeedbackHandler extends AbstractHandler {
 			IResource obj = it.next();  
 			if (obj instanceof IFile) {
 				IFile file = (IFile) obj;
-				System.out.println("selected: "+file);
+				if(traceOn)System.out.println("selected: "+file);
 				String name = file.getName();
 				IPath path = file.getLocation();
-				System.out.println("Selected: " + name);
+				if(traceOn)System.out.println("Selected: " + name);
 				if (name.endsWith(".xml")) {
 					File jfile = path.toFile();
 					parser = findFeedbackParser(jfile );
 					List<IFeedbackItem> items=parser.getFeedbackItems(jfile);
-					parser.createMarkers(items,parser.getMarkerID()); 
+					parser.createMarkers(items,parser.getMarkerID());
 				}
 			}
 		}
@@ -131,15 +134,18 @@ public class ShowFeedbackHandler extends AbstractHandler {
 			}
 			// 1. find the extensions
 			// 2. find one that matches nodeName in its id
-			// 3. (TBD) instantiate the class of parser or whatever that knows
+			// 3. instantiate the class of parser or whatever that knows
 			//       how to read this type
 			final String pid=Activator.PLUGIN_ID;
 			final String extid=Activator.FEEDBACK_EXTENSION_ID;
+			IExtensionRegistry ier=Platform.getExtensionRegistry();
+			IExtensionPoint ixp=ier.getExtensionPoint(pid,extid);
+			IExtension[] xs =ixp.getExtensions();
 			IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pid, extid).getExtensions();
 			for (int i = 0; i < extensions.length; i++) {
 				IExtension extn=extensions[i];
 				String extLabel=extn.getLabel();
-				System.out.println("Found extension for "+extLabel+ "  id="+extn.getUniqueIdentifier());
+				if(traceOn)System.out.println("Found extension for "+extLabel+ "  id="+extn.getUniqueIdentifier());
 				IConfigurationElement[] configElements =
 					extensions[i].getConfigurationElements();
 				for (int j = 0; j < configElements.length; j++) {
@@ -147,20 +153,18 @@ public class ShowFeedbackHandler extends AbstractHandler {
 					// from this thing we should be able to make the specific
 					// parts that we need.
 					// specifically: something that can parse this file and return
-					// things that implement the FeedbackItem(TBD) interface.
-					// or whatever.
-					System.out.println(ice.getAttributeNames());
+					// things that implement the IFeedbackItem interface.
+					if(traceOn)System.out.println(ice.getAttributeNames());
 					String id=ice.getAttribute("id");
 					String nodeName=ice.getAttribute("nodeName");
-					
-					boolean temp=rootNode.equals(nodeName);
-					if(temp) {
+
+					if(rootNode.equals(nodeName)) {
 						// we found a match!
-						System.out.println("match! "+rootNode);
+						if(traceOn)System.out.println("match! "+rootNode);
 					
 						String className = ice.getAttribute(ATTR_CLASSNAME);
 						String name=ice.getAttribute(ATTR_NAME);
-						System.out.println("class="+className+"   name="+name);
+						if(traceOn)System.out.println("class="+className+"   name="+name);
 						Object obj=null;
 						try {
 							obj=ice.createExecutableExtension(ATTR_CLASSNAME);

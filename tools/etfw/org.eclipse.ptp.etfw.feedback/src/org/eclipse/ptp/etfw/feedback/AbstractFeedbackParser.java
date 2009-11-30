@@ -27,12 +27,23 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 	private MarkerManager mkrMgr;
 
 	public void createMarkers(List<IFeedbackItem> items, String markerID) {
-		System.out.println("create markers");
+		//System.out.println("create markers");
 		if (mkrMgr == null) {
 			mkrMgr = new MarkerManager();
 		}
 		mkrMgr.createMarkers(items,markerID);
 
+	}
+	/**
+	 * Find a source file in some fashion - presumed filename without absolute
+	 * path information.  How do we know where to look?
+	 * Ideas include same project as the xml file is found; same workspace; some path specified in preferences maybe?
+	 * 
+	 * @param filename
+	 * @return fully qualified filename including path, or null if not found
+	 */
+	public String findSourceFile(String filename) {
+		return null;
 	}
 
 }

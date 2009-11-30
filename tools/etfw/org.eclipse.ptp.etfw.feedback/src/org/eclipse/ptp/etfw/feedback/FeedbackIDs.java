@@ -17,9 +17,6 @@ public interface FeedbackIDs
 {
     // preference page name for XForm
     String FEEDBACK_PREF_NAME    = "Feedback";
-    
-    /** Marker ID - markers represent the info to display in the compiler xform view and hold the info we need */
-     //String MARKER_ID       = "org.eclipse.ptp.etfw.feedback.XForm";
    
     /** View ID */
     String FEEDBACK_VIEW_ID = "org.eclipse.ptp.etfw.feedback.views.feedbackView";
@@ -31,10 +28,10 @@ public interface FeedbackIDs
     String FEEDBACK_ATTR_PATHNAME="pathname";
     String FEEDBACK_ATTR_PARENT="parent";
     String FEEDBACK_ATTR_FUNCTION="functionCaller";
-    String FEEDBACK_ATTR_FUNCTION_CALLEE="functionCallee";
+    String FEEDBACK_ATTR_FUNCTION_CALLEE="functionCallee"; // unused? others?
     String FEEDBACK_ATTR_DESC="description";
-	String FEEDBACK_ATTR_LOOP_ID = "LoopId";    //attr name in xml file AND attr name in marker
-    //Note: we use IMarker.LINE_NUMBER too
+ 	String FEEDBACK_ATTR_LOOP_ID = "LoopId";    //attr name in xml file AND attr name in marker
+//    //Note: we use IMarker.LINE_NUMBER too
 
 
 
