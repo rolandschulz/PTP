@@ -24,14 +24,14 @@ import org.eclipse.swt.graphics.RGB;
  * <i>All Photran preferences must have a constant declared in this file
  * and should be accessed via that constant.  They should be implemented
  * as subclasses of <code>FortranPreference</code>.</i>
- * 
+ *
  * @author Jeff Overbey
- * 
+ *
  * TODO: Jeff: Make sure we call <code>FortranPreferences.initializeDefaults(getPluginPreferences());</code>
  */
 public final class FortranPreferences
 {
-    public static final FortranBooleanPreference RELEASE_NOTES_SHOWN = new FortranBooleanPreference("releasenotesshown", false);
+    public static final FortranStringPreference RELEASE_NOTES_SHOWN = new FortranStringPreference("releasenotesversionshown", "");
 
     public static final FortranBooleanPreference ENABLE_VPG_LOGGING = new FortranBooleanPreference("vpglogging", false);
     public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false);
@@ -46,7 +46,7 @@ public final class FortranPreferences
 
     public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", "");
     public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", "");
-    
+
     private FortranPreferences() {}
 
     /** Initializes/resets all Photran-specific preferences to their default values */
@@ -86,7 +86,7 @@ public final class FortranPreferences
             throw new Error(e);
         }
     }
-    
+
     /** Saves the values of <i>all</i> workspace-wide Photran preferences */
     public static void savePreferenceStore()
     {

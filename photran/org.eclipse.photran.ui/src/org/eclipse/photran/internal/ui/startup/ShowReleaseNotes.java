@@ -43,8 +43,7 @@ public final class ShowReleaseNotes implements IStartup
     {
         if (System.getenv("TESTING") != null)
         {
-            // The JUnit tests clear the workspace, so make sure we don't show the release notes
-            // every time we run the JUnit tests
+            // Don't show the release notes during JUnit test runs (which clear the workspace)
             return false;
         }
         else if (photranVersion().toString().equals(getPreference()))
@@ -56,20 +55,20 @@ public final class ShowReleaseNotes implements IStartup
         {
             /*
             GregorianCalendar today = new GregorianCalendar();
-            if (today.after(new GregorianCalendar(2012, GregorianCalendar.JANUARY, 1)))
-                return false;
+            return !today.after(new GregorianCalendar(2012, GregorianCalendar.JANUARY, 1));
             */
 
             return true;
         }
     }
 
+    /** @return the current value of the Release Notes Shown workspace preference */
     private String getPreference()
     {
         return FortranPreferences.RELEASE_NOTES_SHOWN.getValue();
     }
 
-    /** @return the previous version stored in the preference */
+    /** Sets the Release Notes Shown workspace preference, and returns its previous value */
     private String setPreference()
     {
         String lastVersion = getPreference();
