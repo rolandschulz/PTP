@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/4.0"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/5.0"/>
    </url>
 
    <requires>
@@ -26,6 +26,7 @@
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.cdt.core"/>
+      <import feature="org.eclipse.photran" version="5.0.0" match="compatible"/>
    </requires>
 
    <plugin
