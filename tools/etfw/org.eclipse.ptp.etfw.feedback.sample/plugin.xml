@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  
+   <extension
+         point="org.eclipse.ui.menus">
+         
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="Feedback"
+               mnemonic="%menu.mnemonic"
+               id="org.eclipse.ptp.etfw.feedback.actions.menus.sampleMenu">
+            <command
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
+                  mnemonic="%command.mnemonic"
+                  id="org.eclipse.ptp.etfw.feedback.actions.menus.sampleCommand">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleToolbar">
+            <command
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
+                  icon="icons/sample.gif"
+                  tooltip="Show ETFw Feedback view for selected XML file"
+                  id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleCommand">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+      <extension
+         id="sampleParser"
+         name="Sample PTP Feedback view report items"
+         point="org.eclipse.ptp.etfw.feedback.parser">
+      <feedtype
+            class="org.eclipse.ptp.etfw.feedback.sample.SampleFeedbackParser"
+            id="org.eclipse.ptp.etfw.feedback.sample.parser"
+            name="Sample feedback parser"
+            nodeName="SampleXMLRoot">
+      </feedtype>
+   </extension>
+     <extension
+         point="org.eclipse.ui.views">
+   <!--   <category
+            name="Sample Feedback View"
+            id="org.eclipse.ptp.etfw.feedback">
+      </category>
+      -->
+      <view
+            name="Sample Feedback items"
+            icon="icons/sample.gif"
+            category="org.eclipse.ptp.etfw.feedback"
+            class="org.eclipse.ptp.etfw.feedback.sample.SampleFeedbackView"
+            id="org.eclipse.ptp.etfw.feedback.sample.view">
+      </view>
+   </extension>
+
+</plugin>
