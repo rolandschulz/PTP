@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.etfw.feedback" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.etfw.feedback" id="feedback" name="Feedback"/>
+         <meta.schema plugin="org.eclipse.ptp.etfw.feedback" id="parser" name="Feedback Parser"/>
       </appInfo>
       <documentation>
          The Feedback view displays information to the user that is contained in an accompanying XML file.  For example, a compiler may provide an xml file with information that the compiler gleaned from the source code during compilation.  The information is presented to the user in an Eclipse view, and items are mapped to source code lines.  Clicking on the items navigates, in the Eclipse editor, to the appropriate source code line(s).
@@ -64,7 +64,7 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  this is the name of the root element in the XML file we are reading.
+                  id of this element
                </documentation>
             </annotation>
          </attribute>

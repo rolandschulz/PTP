@@ -41,8 +41,8 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 		IMarker.LINE_NUMBER, /*IMarker.CHAR_START,IMarker.CHAR_END*/
 		FeedbackIDs.FEEDBACK_ATTR_DESC,
 		FeedbackIDs.FEEDBACK_ATTR_LOOP_ID};
-	private static String[] colNames=new String[] {"Type/Name","File","Caller(Target)","Callee(Src)", "Caller Line",
-		/*"Char start","Char end"*/ "Description", "Loop ID"};
+	private static String[] colNames;//=new String[] {"Type/Name","File","Caller(Target)","Callee(Src)", "Caller Line",;
+		// /*"Char start","Char end"*/ "Description", "Loop ID"};
 	private static int[] widths = new int[] { 160, 100, 100, 100, 80, 200 , 60};
 	
 	protected IPreferenceStore preferenceStore;

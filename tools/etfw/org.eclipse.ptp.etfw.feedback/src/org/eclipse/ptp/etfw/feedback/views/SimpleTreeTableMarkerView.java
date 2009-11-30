@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -77,6 +78,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.ide.undo.CreateMarkersOperation;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -204,7 +206,10 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	protected String columnID_ = "constructType"; // id for (variable)
 
 	/**
-	 * whether or not to create parent nodes if they don't exist
+	 * whether or not to create parent nodes if they don't exist.
+	 * If true, for each unique "parent=" attribute in the XML items, a parent node of that name will be created,
+	 * and the children will be grouped under it.  org.eclipse.ptp.etfw.sample project uses this.
+	 * If false, then the IFeedbackItems should themselves indicate their parents/children.
 	 * 
 	 */
 	private boolean createParentsIfNeeded = false;
@@ -314,17 +319,16 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			boolean createParentsIfNeeded) {
 		this(thePlugin, thingname, thingnames, null, markerID, parentMarkerAttribName);
 		columnNames_ = colNames;
-		columnName_ = null;// set this so we can tell we are using array of
-							// attrs/cols
+		columnName_ = null;// set this so we can tell we are using array of  attrs/cols
 		markerAttrNames_ = attrNames;
 		widths_ = widths;
+		 
 		this.createParentsIfNeeded = createParentsIfNeeded;
 		int len1 = attrNames.length;
 		int len2 = colNames.length;
 		int len3 = widths.length;
 		if ((len1 != len2) || (len2 != len3)) {
-			System.out
-					.println("WARNING: SimpleTreeTableMarkerView expects attrNames, colNames, and widths to all be the same length.");
+			System.out.println("WARNING: SimpleTreeTableMarkerView expects attrNames, colNames, and widths to all be the same length.");
 		}
 	}
 
@@ -443,7 +447,9 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						System.out.println("input is null in getElements...");
 				}
 				markers = input.findMarkers(id, false, IResource.DEPTH_INFINITE);
-				// parentList=createParents(objs);
+				if(createParentsIfNeeded) {
+					parentList=createParents(markers);
+				}
 
 				for (int i = 0; i < markers.length; i++) {
 					IMarker marker = markers[i];
@@ -465,7 +471,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				System.out.println("STTMV.get---Elements, found " + markers.length + " markers");
 			// the "parents" are the root nodes of the view. they may have
 			// children.
-			return rootNodeList.toArray();
+			if(createParentsIfNeeded) {
+				int len=parentList.size();
+				return parentList.toArray();
+			} else {
+				return rootNodeList.toArray();
+			}
+			
 
 		}
 
@@ -486,12 +498,25 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				// if this IS a parent, put *it* in the parent list
 				String parentName = getParentAttr(marker);
 				// make one single parent, if attrs don't have parent info (yet)
+				
 				if (parentName == null) {
 					// then this is a parent!
-					list.add(marker);
+					list.add(marker);   //???
+				}
+				else {
+					ParentNode pn=getParentNode(parentName);
+					//System.out.println("parent");
+					//list.add(pn);
+					
 				}
 			}
-			return list;// parentList;
+			if(createParentsIfNeeded) {
+				int len=parentList.size();
+				return parentList;
+				}
+			else {
+				return list;// parentList;
+			}
 		}
 
 		private String getParentAttr(IMarker marker) {
@@ -689,16 +714,27 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * get the children (markers) of a parent node
 		 */
 		public Object[] getChildren(Object parentElement) {
+			String parentName=null;
+			if (parentElement instanceof IMarker) {
 
-			IMarker parentMarker = (IMarker) parentElement;
-			// String parentName=parentMarker.getAttribute(parentMarkerAttrib);
-			String parentName;
-			try {
-				parentName = (String) parentMarker.getAttribute(FeedbackIDs.FEEDBACK_ATTR_ID);
-			} catch (CoreException e1) {
-				System.out.println("unable to get id attr of marker in order to find children with that parent id.");
-				e1.printStackTrace();
-				return null;
+				IMarker parentMarker = (IMarker) parentElement;
+				// String
+				// parentName=parentMarker.getAttribute(parentMarkerAttrib);
+
+				try {
+					parentName = (String) parentMarker.getAttribute(FeedbackIDs.FEEDBACK_ATTR_ID);
+				} catch (CoreException e1) {
+					System.out
+							.println("unable to get id attr of marker in order to find children with that parent id.");
+					e1.printStackTrace();
+					return null;
+				}
+			}
+			else if(parentElement instanceof ParentNode) {
+				ParentNode parentNode = (ParentNode) parentElement;// messy
+				parentName=parentNode.getParentAttrName();
+				//System.out.println("STTMV: parentNode parentName: "+parentName);
+				
 			}
 
 			IMarker[] markers = null;
@@ -715,7 +751,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				String parentAttr = getParentAttr(marker);
 				String itemID = getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_ID);
 
-				if (parentAttr.equals(parentName)) {
+				if (parentAttr!=null && parentAttr.equals(parentName)) {
 					children.add(marker);
 				}
 			}
@@ -878,6 +914,9 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					return (String) marker.getAttribute(attrname);
 				case 4:
 					// assumes attrname is IMarker.LINE_NUMBER;
+					//Note: currently this restricts the attribute/column in this position
+					// to a value that resolves to an int value, presumably the line number location.  
+					// This will be generalized later.  Perhaps include a type for each column.
 					String line = (marker.getAttribute(IMarker.LINE_NUMBER)).toString();
 					return line;
 				case 5:
@@ -1294,9 +1333,6 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		contributeToActionBars();
 	}
 
-	/**
-	 * from mpi barrier version
-	 */
 	private void createTreeColumns() {
 
 		TreeColumn column;
@@ -1331,8 +1367,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			columns[colNo].setText(columnNames_[colNo]);
 			columns[colNo].setWidth(widths_[colNo]);
 			columns[colNo].setResizable(true);
-			columns[colNo].setMoveable(true); // can reorder columns by
-			// dragging
+			columns[colNo].setMoveable(true); // can reorder columns by dragging
 			SelectionListener columnListener = new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					Object src = event.getSource();
@@ -1429,21 +1464,6 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						}
 
 					} else {
-						/*
-						 * IArtifact artifact =
-						 * artifactManager_.getArtifact(idFromMarker);
-						 * StringBuffer infoBuffer = new StringBuffer();
-						 * infoBuffer
-						 * .append("\nFile name: ").append(artifact.getFileName
-						 * ());
-						 * infoBuffer.append("\nLine number: ").append(artifact
-						 * .getLine());
-						 * infoBuffer.append("\nName: ").append(artifact
-						 * .getShortName());
-						 * infoBuffer.append("\nDescription: ")
-						 * .append(artifact.getDescription()); info =
-						 * infoBuffer.toString();
-						 */
 						info = "STTMV: no info, no ArtifactManager";
 					}
 					MessageDialog.openInformation(null, title, info);
@@ -1533,7 +1553,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					public void run(IProgressMonitor monitor) throws CoreException {
 						try {
 							int depth = IResource.DEPTH_INFINITE;
-							wsResource.deleteMarkers(markerID_, false, depth);
+							wsResource.deleteMarkers(markerID_, false, depth); 
 							if (traceOn)
 								System.out.println("markers removed.");
 
@@ -1771,6 +1791,17 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	public String extractMarkerInfo(IMarker marker) {
 		return null;
 	}
+	/**
+	 * remove spaces from a string
+	 * @param s
+	 * @return
+	 */
+	public String removeSpaces(String s) {
+		  StringTokenizer st = new StringTokenizer(s," ",false);
+		  String t="";
+		  while (st.hasMoreElements()) t += st.nextElement();
+		  return t;
+		  }
 
 	/**
 	 * Keep icons already created, and reuse the images

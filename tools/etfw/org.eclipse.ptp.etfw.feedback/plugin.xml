@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="feedback" name="%extension-point.name" schema="schema/feedback.exsd"/>
+   <extension-point id="parser" name="%extension-point.name" schema="schema/feedback.exsd"/>
 
    <extension
          point="org.eclipse.ui.views">
@@ -68,37 +68,7 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
    </extension>
-   <!-- Disable ETFw feedback view icon for now  
-   <extension
-         point="org.eclipse.ui.menus">
-         
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               label="%menu.label"
-               mnemonic="%menu.mnemonic"
-               id="org.eclipse.ptp.etfw.feedback.actions.menus.sampleMenu">
-            <command
-                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
-                  mnemonic="%command.mnemonic"
-                  id="org.eclipse.ptp.etfw.feedback.actions.menus.sampleCommand">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleToolbar">
-            <command
-                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
-                  icon="icons/sample.gif"
-                  tooltip="%command.tooltip"
-                  id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleCommand">
-            </command>
-         </toolbar>
-      </menuContribution>
-   </extension>
-   -->
+   
    <extension
          point="org.eclipse.ui.preferencePages">
       <page

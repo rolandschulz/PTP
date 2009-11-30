@@ -51,6 +51,9 @@ public interface IFeedbackItem {
 	/** A longer description */
 	public String getDescription();
 	
+	/** string which may be used to tell which item is parent; an artificial 'parent' node MAY be created for this */
+	public String getParentID();
+	
 	
 	
 }

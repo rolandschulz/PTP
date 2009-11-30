@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -34,9 +35,9 @@ import org.w3c.dom.Node;
  * Creates markers representing IFeedbackItem objects, to be shown in the Feedback view
  */
 public class MarkerManager {
-	private static final boolean dbg=true;
+	private static final boolean traceOn=false;
 	
-	String srcTempPathname="/Users/beth/ews/runtime-compiler-xform-test/MyHPCSTproject/src";
+	 String srcTempPathname="/Users/beth/ews/runtime-compiler-xform-test/MyHPCSTproject/src";
 	
 	static String path;
 	static String filename;
@@ -46,92 +47,9 @@ public class MarkerManager {
 	
 
 	/**
-	 * Note: some Items may be parent groups and not have file, etc. info
-	 * 
-	 * Do we create markers for children that don't appear yet? think so
-	 * Or not until they are expanded? think not
-	 * 
-	 * Note: need to batch this in a single resource change event, getElements()
-	 * is being called on every marker creation.
-	 * @param itemlist
-	 */
-	public void createMarkersOld(List<IFeedbackItem> itemlist, String markerID) {
-		
-		boolean dbgTags=true;
-		// HACK we need to be able to remove markers on (all?) files in the list.
-		// What if some markers were from other things? need to use only our specific plugin's marker id.
-		IResource res1 = getResource(srcTempPathname, itemlist.get(0).getFile());
-		removeMarkers(res1,markerID);
-		
-		// for root nodes, no parent ID
-		final String parentID="";
-		int count=0;
-		Map<String, Object> attrs;
-		
-		int size=itemlist.size();
-		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
-			IFeedbackItem item = iterator.next();	
-			String filename=item.getFile();		
-			String name=item.getName()+" "+item.getID();
-			int lineNo=item.getLineNoStart();
-			String desc=item.getDescription();// more info can go here
-			String itemID=item.getID();
-			attrs=createCommonMarkers(itemID,name, parentID, filename, srcTempPathname, lineNo, /*function,*/ desc);			
-			
-			IResource resource = getResource(srcTempPathname,filename);
-			createMarker(resource, attrs,markerID);
-			if(item.hasChildren()) {
-				List<IFeedbackItem> kids=item.getChildren();
-				for (Iterator iterator2 = kids.iterator(); iterator2.hasNext();) {
-					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
-					String parentid=item.getID();
-					String namePrefix="Bottleneck: "; //HACK
-					String kname=kid.getName();
-					if(dbgTags)kname=namePrefix+kname;
-					if(dbgTags)kname+=" parent="+parentid;
-					int uid=counter++; // need something unique
-					String uidStr=Integer.toString(uid);
-					// make file/location the same as parent
-					attrs=createCommonMarkers(uidStr,kname,parentid,filename,srcTempPathname,lineNo,kid.getDescription());
-					createMarker(resource,attrs,markerID);	
-					boolean gkids=kid.hasChildren();
-					// fixme make this recursive so level of hierarchy doesn't matter
-					if(gkids) {
-						System.out.println("grandkids");
-						List<IFeedbackItem> gkidItems=kid.getChildren();
-						for(Object gkid : gkidItems) {
-							IFeedbackItem gki = (IFeedbackItem) gkid;
-							String gkNamePrefix="Solution: "; //HACK
-							attrs=createCommonMarkers(gki.getID(),gkNamePrefix+gki.getName(),uidStr,filename,srcTempPathname,lineNo,gki.getDescription());
-							createMarker(resource,attrs,markerID);
-						}
-					}
-				}
-			}
-		}
-	}
-	/**
 	 * Remove the markers from the files we're about to add new markers to
 	 * @param sfList List of source files
 	 */
-	/*
-	public void removeMarkers(List<SourceFile> sfList) {
-		// delete existing markers, if any
-		//if(dbg)System.out.println("removeMarkers()...");
-		for (Iterator<SourceFile> iterator = sfList.iterator(); iterator.hasNext();) {
-			SourceFile sf = iterator.next();
-			String pathname=sf.getPathName();
-			IResource res=getResource(pathname, sf.getFileName());
-			try {
-				res.deleteMarkers(FeedbackIDs.MARKER_ID, true, IResource.DEPTH_INFINITE);
-			} catch (CoreException e) {
-				System.out.println("Error deleting markers on "+res.getName());
-				e.printStackTrace();
-			}
-			
-		}
-	}
-	*/
 	public void removeMarkers(IResource res, String markerID) {
 			try {
 				res.deleteMarkers(markerID, true, IResource.DEPTH_INFINITE);
@@ -164,8 +82,7 @@ public class MarkerManager {
 		return null;
 	}
 	/**
-	 * temporary: because the supplied xml is inconsistent about whether or not it lists the filename fully qualified or not.
-		
+	 * temporary: because the supplied xml is inconsistent about whether or not it lists the filename fully qualified or not.		
 	 * @param filename
 	 * @return
 	 */
@@ -247,6 +164,18 @@ public class MarkerManager {
 		   IFile file=root.getFileForLocation(new Path(pathname+SLASH+filename));
 		   return file;
 	}
+	/**
+	 * get IResource from a fully qualified file name
+	 * @param filename
+	 * @return
+	 */
+	public IResource getResource(String filename) {
+		ResourcesPlugin.getWorkspace();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile file = root.getFileForLocation(new Path(filename));
+		return file;
+	}
 
 
 	private static int counter=0;
@@ -286,7 +215,7 @@ public class MarkerManager {
 	public void createMarker(IResource resource, Map<String,Object>attrs, String markerID) {
 		try {
 			MarkerUtilities.createMarker(resource, attrs, markerID);
-			if(dbg)System.out.println("  Created marker for "+resource.getName()+" "+attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME)+" lineNo:"+attrs.get(IMarker.LINE_NUMBER)+" parentID="+attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT));
+			if(traceOn)System.out.println("  MarkerManager: Created marker for "+resource.getName()+" "+attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME)+" lineNo:"+attrs.get(IMarker.LINE_NUMBER)+" parentID="+attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT));
 		} catch (CoreException e) {
 			System.out.println("Error creating Xform marker: "+e.getMessage());
 			e.printStackTrace();
@@ -307,11 +236,14 @@ public class MarkerManager {
 		boolean dbgTags=true;
 		// HACK we need to be able to remove markers on (all?) files in the list.
 		// What if some markers were from other things? need to use only our specific plugin's marker id.
-		IResource res1 = getResource(srcTempPathname, itemlist.get(0).getFile());
+		String f1=itemlist.get(0).getFile();
+		IResource res1 = getResource(f1);
+		
 		removeMarkers(res1,markerID);
 		
-		// for root nodes, no parent ID
-		final String parentID="";
+		// for root nodes, may have no parent ID
+		String parentID="";
+		IFeedbackItem temp=itemlist.get(0);
 		int count=0;
 		Map<String, Object> attrs;
 		
@@ -319,32 +251,39 @@ public class MarkerManager {
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
 			IFeedbackItem item = iterator.next();	
 			String filename=item.getFile();		
-			String name=item.getName()+" "+item.getID();
+			String name=item.getName();//+" "+item.getID();
 			int lineNo=item.getLineNoStart();
-			String desc=item.getDescription();// more info can go here
+			String desc=item.getDescription(); 
 			String itemID=item.getID();
-			attrs=createCommonMarkers(itemID,name, parentID, filename, srcTempPathname, lineNo, /*function,*/ desc);			
+			parentID=item.getParentID();
+			String pathname="";//srcTempPathname; // we assume it's fully qualified filename now
+			if(filename.contains(Path.SEPARATOR+"")) {
+				IPath path=new Path(filename);
+				pathname=path.removeLastSegments(1).toString();
+				filename=path.segment(path.segmentCount()-1);
+			}
+			attrs=createCommonMarkers(itemID,name,parentID, filename, pathname, lineNo, /*function,*/ desc);	
 			
-			IResource resource = getResource(srcTempPathname,filename);
+			IResource resource = getResource(pathname,filename);
 			createMarker(resource, attrs,markerID);
 			if(item.hasChildren()) {
 				List<IFeedbackItem> kids=item.getChildren();
 				for (Iterator iterator2 = kids.iterator(); iterator2.hasNext();) {
 					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
 					String parentid=item.getID();
-					String namePrefix="Bottleneck: "; //HACK
+					String namePrefix="";//"Bottleneck: ";  
 					String kname=kid.getName();
 					if(dbgTags)kname=namePrefix+kname;
 					if(dbgTags)kname+=" parent="+parentid;
 					int uid=counter++; // need something unique
 					String uidStr=Integer.toString(uid);
 					// make file/location the same as parent
-					attrs=createCommonMarkers(uidStr,kname,parentid,filename,srcTempPathname,lineNo,kid.getDescription());
+					attrs=createCommonMarkers(uidStr,kname,parentid,filename,pathname,lineNo,kid.getDescription());
 					createMarker(resource,attrs,markerID);	
 					boolean gkids=kid.hasChildren();
 					// fixme make this recursive so level of hierarchy doesn't matter
 					if(gkids) {
-						System.out.println("grandkids");
+						if(traceOn)System.out.println("grandkids");
 						List<IFeedbackItem> gkidItems=kid.getChildren();
 						for(Object gkid : gkidItems) {
 							IFeedbackItem gki = (IFeedbackItem) gkid;
