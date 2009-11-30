@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2009 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,13 +24,6 @@ public class IDs {
 	 * The marker id for barrier matching sets
 	 */
 	public static final String matchingSetMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierMatchingSetMarker";
-	/**
-	 * the marker attribute name for a parent node.
-	 * All markers with the same parent value are considered part of
-	 * the same Barrier matching set.
-	 */
-	public static final String parentAttribName="parent";
-	public static final String parentName = "parentName";
 	
     public static final String matchingSetViewID="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetTableView";
     public static final String errorViewID =     "org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView";
@@ -38,9 +31,13 @@ public class IDs {
     
     /* For error counter examples */
     public static final String errorMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.errorMarker";
+	/**
+	 * The marker attribute name for a parent node.
+	 * All markers with the same parent value may be considered children of the same parent.
+	 *  
+	 */
     public static final String parentIDAttr = "parentID";
     public static final String myIDAttr = "myID";
     public static final String myNameAttr = "myName";
-    public static final String myIndexAttr = "myIndex";
-// test    
+    public static final String myIndexAttr = "myIndex";   
 }
