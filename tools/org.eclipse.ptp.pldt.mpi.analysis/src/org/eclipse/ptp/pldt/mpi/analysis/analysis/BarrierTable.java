@@ -37,7 +37,7 @@ public class BarrierTable {
 	 */
 	protected Hashtable<String,List<BarrierInfo>> table_; 
 	protected int commCounter = 0;
-	private static boolean dbg_barrier=true;
+	private static boolean dbg_barrier=false;
 	
 	public BarrierTable(){
 		table_ = new Hashtable<String,List<BarrierInfo>>();
