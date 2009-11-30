@@ -779,7 +779,7 @@
 
 	<!-- runtime adapters //-->
 	<extension point="org.eclipse.core.runtime.adapters">
-		<factory 
+		<!--factory 
 			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
 			adaptableType="org.eclipse.cdt.internal.ui.editor.CEditor">
 			<adapter
@@ -795,7 +795,7 @@
 			<adapter
 				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
 			</adapter>
-		</factory>
+		</factory-->
 		<factory
 			class="org.eclipse.ptp.debug.internal.ui.PBreakpointWorkbenchAdapterFactory"
 			adaptableType="org.eclipse.ptp.debug.core.model.IPBreakpoint">
@@ -855,12 +855,4 @@
 			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.absolutePath"/>
 	</extension>
 
-	<!-- testing
-	<extension
-		point="org.eclipse.core.filebuffers.annotationModelCreation">
-		<factory
-			class="org.eclipse.ptp.debug.internal.ui.DebugMarkerAnnotationModelFactory"
-			contentTypeId="org.eclipse.ptt.core.pSource"/>
-	</extension>
-	//-->
 </plugin>
