@@ -5,7 +5,7 @@
 		<group style-id="content-group" id="orgeclipseptppldtwelcome-introLink-group">
 			<link label="Parallel Language Development Tools" id="orgeclipseptppldtwelcome-introLink" style-id="content-link"
        		   url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.pldt.help/html/toc.html" >
-       		<text>Learn more about PLDT, to help in developing MPI and OpenMP programs.</text>
+       		<text>Learn more about PLDT, to help in developing parallel programs including MPI, OpenMP, and UPC.</text>
           	</link>
        	</group>
   	</extensionContent>
