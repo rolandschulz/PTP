@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2009 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -98,14 +98,6 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  */
 public class SimpleTreeTableMarkerView extends ViewPart {
 	protected TreeViewer viewer;
-
-	/**
-	 * marker attribute indicating parent node. All markers with this parentAttr
-	 * will be the children of the same parent, and a node for that parent will
-	 * be created so that the poor things won't be orphans.
-	 */
-	// SimpleTreeTableMarkerView.parentMarkerAttrib;
-	private String parentMarkerAttrib = "parent";
 
 	private Tree tree; // keep so we can dispose of listeners in dispose()?
 
@@ -643,65 +635,6 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			}
 		}
 	} // end ViewContentProvider
-
-	class ParentNode {
-
-		private String name;
-		private int ID;
-		private IMarker marker_;
-
-		public ParentNode(String name) {
-			this.name = name;
-			ID = 0;
-			marker_ = null;
-		}
-
-		public ParentNode(int ID) {
-			name = (String) null;
-			this.ID = ID;
-			marker_ = null;
-		}
-
-		public ParentNode(IMarker marker) {
-			name = (String) null;
-			ID = 0;
-			marker_ = marker;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public int getID() {
-			return ID;
-		}
-
-		public IMarker getMarker() {
-			return marker_;
-		}
-
-		public void setMarker(IMarker marker) {
-			marker_ = marker;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		/**
-		 * for dummy testing only
-		 * 
-		 * @return
-		 */
-		public Object[] getChildren() {
-			return new String[] { "one", "two", "three" };
-		}
-
-		public String toString() {
-			return "ParentNode: " + name;
-		}
-
-	}
 
 	/**
 	 * get artifact from marker
