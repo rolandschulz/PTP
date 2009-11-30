@@ -415,6 +415,36 @@
 				<selection class="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"/>
 			</action>
 		</viewerContribution>
+  <viewerContribution
+        id="org.eclipse.ptp.debug.ui.RemoteCEditorRulerActions"
+        targetID="#RemoteCEditorRulerContext">
+     <menu
+           id="org.eclipse.ptp.debug.ui.popupmenu.submenu"
+           label="%EditorRulerAction.label"
+           path="debug">
+        <groupMarker
+              name="ptpGroup">
+        </groupMarker>
+     </menu>
+     <action
+           class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
+           id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
+           label="%PBreakpointProperties.label"
+           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
+     </action>
+     <action
+           class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+           id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+           label="%EnableDisableBreakpoint.label"
+           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
+     </action>
+     <action
+           class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+           id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+           label="%ToggleBreakpoint.label"
+           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
+     </action>
+  </viewerContribution>
 		<!-- debug view end -->
 		<!-- variable view start -->
 		<!--//
