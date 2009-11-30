@@ -314,7 +314,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		IWorkspaceRoot workspaceRoot = workspace.getRoot();
 		IProject project = workspaceRoot.getProject(scope.getName());
 		try {
-			project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+			project.deleteMarkers("org.eclipse.ptp.rdt.ui.indexerproblemmarker", true, IResource.DEPTH_INFINITE); //$NON-NLS-1$
 		} catch (CoreException e) {
 			RDTLog.logError(e);
 		}
@@ -326,7 +326,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		IWorkspaceRoot workspaceRoot = workspace.getRoot();
 		IProject project = workspaceRoot.getProject(scope.getName());
 		try {
-			IMarker marker =  project.createMarker(IMarker.PROBLEM);
+			IMarker marker =  project.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 		} catch (CoreException e) {
