@@ -127,8 +127,9 @@ barrier statements found.
 <img src="images/BarrierMatchingSetView.gif">
 
 <h2 id="barError">Barrier Errors View </h2>
-<p>When a barrier error is detected, it is highlighted in
-the editor in red. In addition, the Barrier Errors view shows a counter example which contains 
+<p>When a barrier error is detected, it is shown in the <b>Barrier Errors</b> view.
+Double-click on the <b>Error</b> line to highlight the error line in the source code.
+In addition, the Barrier Errors view shows a counter example which contains 
 two sequences of barriers which have different sizes along two
 paths starting from the highlighted error position. This counter example
 simulates an execution and illustrates the reason for the 
@@ -202,7 +203,10 @@ contains an error also, since different
 tasks may execute a different number of iterations, and thus encounter a different number of
 barriers.
 <h3>Removing Barrier Markers</h3>
-<p>To remove barrier markers, simply run barrier analysis on any file without barrier errors (even a trivial non-source file).
+<p>To remove barrier markers, Use the remove markers icon (red X) on the <b>Barrier Matches</b> or
+<b>Barrier Errors</b> view.  This removes all barrier markers.
+<br><img src="images/barrierMarkerRemove.png">
+
  <!-- since this code isn't included, don't refer to it here  
 <h3> MPB </h3>
 <p>MPB is a scientific application which computes the electromagnetic model using
