@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2009 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,9 +71,7 @@ public class MPIArtifactMarkingVisitor extends ArtifactMarkingVisitor{
 	    
 	    // Get the parent name out of the artifact, to place in the marker
 	    ArtifactWithParent awp=(ArtifactWithParent)artifact;
-	    String parentAttr=IDs.parentAttribName;
-	    //String parentName=awp.getParentName();
-	    //attrs.put(parentAttr, parentName);
+
     	attrs.put(IDs.parentIDAttr, new Integer(awp.getParentID()));
     	attrs.put(IDs.myIDAttr, new Integer(awp.getMyID()));
     	attrs.put(IDs.myNameAttr, awp.getMyName());
