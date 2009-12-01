@@ -1708,10 +1708,28 @@ startup_monitor(void *job_ident)
         char *p;
         int tasknum;
         int numlines;
-
-        stat(tasklist_path, &fileinfo);
         cfgfile = fopen(tasklist_path, "r");
         if (cfgfile != NULL) {
+              /*
+               * If file size is zero bytes, the following malloc will fail,
+               * terminating the proxy. The code needs to check if the poe
+               * process is still running. If so, then sleep and try again. If
+               * the poe process has terminated, then exit this thread. The
+               * zombie_reaper function will clean up the defunct poe process
+               */
+            stat(tasklist_path, &fileinfo);
+            if (fileinfo.st_size == 0) {
+                if (kill(job->poe_pid, 0) == 0) {
+                    fclose(cfgfile);
+                    sleep(1);
+                    continue;
+                }
+                else {
+                    TRACE_DETAIL("POE process terminated while proxy waiting for attach.cfg file\n");
+                    TRACE_DETAIL("startup_monitor thread terminating.\n");
+                    return;
+                } 
+            }
             cfginfo = (char *) malloc(fileinfo.st_size);
             malloc_check(cfginfo, __FUNCTION__, __LINE__);
             status = fread(cfginfo, fileinfo.st_size, 1, cfgfile);
@@ -1877,6 +1895,9 @@ startup_monitor(void *job_ident)
                 delete_task_list(tasknum + 1, tasks);
                 sleep(1);
             }
+        }
+        else {
+            sleep(1);
         }
     }
     if (job->current_hostlist != NULL) {
@@ -5307,7 +5328,7 @@ void send_stderr(jobinfo * job, char *buf)
             msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
             job->poe_taskid = generate_id();
             sprintf(jobid_str, "%d", job->poe_taskid);
-            proxy_add_process(msg, jobid_str, "poe", PTP_PROC_STATE_STARTING, 3);
+            proxy_add_process(msg, jobid_str, "poe", PTP_PROC_STATE_RUNNING, 3);
             proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, 0);
             proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, 0);
             proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, job->poe_pid);
@@ -5502,6 +5523,18 @@ void send_process_state_change_event(int trans_id, jobinfo * job, char *state)
 
     tasks = job->tasks;
     if (tasks == NULL) {
+          /*
+           * It's possible that the job terminated suring startup, in which case
+           * the only task present is the dummy task created to represent the
+           * poe home task. Generate a process state change event to the
+           * specified state for that task only.
+           */
+        if (job->numtasks == 0) {
+            snprintf(range, sizeof range, "%d", job->poe_taskid);`
+            msg = proxy_process_change_event(trans_id, range, 1);
+            proxy_msg_add_keyval_string(msg, PTP_PROC_STATE_ATTR, state);
+            enqueue_event(msg);
+        }
         return;
     }
     task_index = -1;
