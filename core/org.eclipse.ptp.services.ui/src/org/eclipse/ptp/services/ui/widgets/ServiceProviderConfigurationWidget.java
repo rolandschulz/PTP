@@ -23,6 +23,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceCategory;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -383,11 +385,11 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		// clear everything out
 		providerCombo.removeAll();
 		enabledCheckbox.setEnabled(false);
+		stackLayout.topControl = null;
+		configurationComposite.layout();
 		
-		// if the user selected a category node then clear out the composite too and quit
+		// if the user selected a category node then nothing else needed
 		if (service == null) {
-			stackLayout.topControl = null;
-			configurationComposite.layout();
 			return;
 		}
 		
@@ -400,34 +402,27 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		// populate the provider combo
 		Set<IServiceProviderDescriptor> providers = service.getProviders();
 		// it's possible there are no providers
-		if (providers.size() == 0) {
-			return;
+		if (providers.size() != 0) {
+			IServiceProviderDescriptor[] descriptors = providers.toArray(new IServiceProviderDescriptor[0]);
+			Arrays.sort(descriptors, PROVIDER_COMPARATOR);
+			
+			int selection = 0;
+			for (int i = 0; i < descriptors.length; i++) {
+				providerCombo.add(descriptors[i].getName());
+				if (provider != null && provider.getId().equals(descriptors[i].getId())) {
+					selection = i;
+				}
+			}
+			providerCombo.setData(descriptors);
+			providerCombo.select(selection);
+			selectProvider(descriptors[selection]);
 		}
-		IServiceProviderDescriptor[] descriptors = providers.toArray(new IServiceProviderDescriptor[0]);
-		Arrays.sort(descriptors, PROVIDER_COMPARATOR);
-		
-		int selection = 0;
-		for (int i = 0; i < descriptors.length; i++) {
-			providerCombo.add(descriptors[i].getName());
-			if(provider != null && provider.getId().equals(descriptors[i].getId()))
-				selection = i;
-		}
-		providerCombo.setData(descriptors);
-		providerCombo.select(selection);
 		
 		// set the enabled/disabled state appropriately
 		boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
 		providerCombo.setEnabled(!disabled);
 		enabledCheckbox.setSelection(!disabled);
 		enabledCheckbox.setEnabled(true);
-		
-		if (disabled) {
-			// this is easier than disabling the provider composite
-			stackLayout.topControl = null;
-			configurationComposite.layout();
-		} else {
-			selectProvider(descriptors[selection]);
-		}
 	}
 	
 	/**
@@ -472,16 +467,16 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		}
 	}
 	
-	private void selectProvider(IServiceProviderDescriptor descriptor) {
+	private void selectProvider(final IServiceProviderDescriptor descriptor) {
 		TreeItem serviceTreeItem = servicesTree.getSelection()[0];
 		IServiceProvider newProvider = providerMap.get(descriptor.getId());
-		if(newProvider == null) {
+		if (newProvider == null) {
 			newProvider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
 			providerMap.put(newProvider.getId(), newProvider);
 			
 			IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
 			IServiceProvider existingProvider = getExistingProvider(newProvider.getId(), service);
-			if(existingProvider != null) {
+			if (existingProvider != null) {
 				for(String key : existingProvider.getProperties().keySet()) {
 					newProvider.putString(key, existingProvider.getString(key, null));
 				}
@@ -497,10 +492,33 @@ public class ServiceProviderConfigurationWidget extends Composite {
 		comp.setLayout(layout);
 		
 		ServiceModelUIManager uim = ServiceModelUIManager.getInstance();
-		IServiceProviderContributor contributor = uim.getServiceProviderContributor(descriptor);
+		final IServiceProviderContributor contributor = uim.getServiceProviderContributor(descriptor);
 		
-		if(contributor != null) {
+		if (contributor != null) {
 			contributor.configureServiceProvider(newProvider, comp);
+		}
+		
+		/*
+		 * If no service provider configuration UI is provided, see if there is a wizard
+		 * and use that.
+		 */
+		if (comp.getChildren().length == 0) {
+			final IWizard wizard = contributor.getWizard(newProvider, null);
+			if (wizard != null) {
+				Button button = new Button(comp, SWT.PUSH);
+				button.setText(Messages.ServiceProviderConfigurationWidget_4);
+				button.addSelectionListener(new SelectionAdapter() {
+	
+					/* (non-Javadoc)
+					 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+					 */
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						WizardDialog dialog = new WizardDialog(getShell(), wizard);
+						dialog.open();
+					}
+				});
+			}
 		}
 		
 		stackLayout.topControl = comp;
