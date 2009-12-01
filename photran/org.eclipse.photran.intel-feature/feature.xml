@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/tools/ptp/photran/updates/5.0"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
    </url>
 
    <requires>
