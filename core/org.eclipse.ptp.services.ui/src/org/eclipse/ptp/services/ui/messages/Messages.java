@@ -29,6 +29,8 @@ public class Messages extends NLS {
 	public static String ServiceProviderConfigurationWidget_2;
 	public static String ServiceProviderConfigurationWidget_3;
 
+	public static String ServiceProviderConfigurationWidget_4;
+
 	public static String RemoveServiceConfigurationAction_0;
 	public static String RemoveServiceConfigurationAction_1;
 
