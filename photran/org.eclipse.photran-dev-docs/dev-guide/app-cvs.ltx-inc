@@ -78,7 +78,9 @@ The sources should all compile (albeit with lots of warnings).
 	\item In Package Explorer view, select the \texttt{org.eclipse.photran.core.vpg.tests} project.
 	\item Right-click on that project and select Run As $>$ Run Configurations\ldots. A dialog will appear.
 	\item In that dialog, create a new \textbf{JUnit Plug-in Test} launch configuration. Call it ``Photran-Tests''.
-	\item For the configuration that you have just created, switch to the ``Environment'' tab and create a new variable called ``TESTING'' with a value of 1.
+	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
+	      Change the ``VM arguments'' field to \texttt{-ea -Xms40m -Xmx512m}
+	\item Then switch to the ``Environment'' tab and create a new environment variable called ``TESTING'' with a value of 1.
 	\item Select ``Run'' to run the tests. To run the tests again, just launch the ``Photran-Tests'' configuration from the Eclipse Run menu.
 
 	\vspace{.5em}

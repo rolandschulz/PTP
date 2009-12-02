@@ -1,0 +1,44 @@
+% Running Photran's Automated Test Suite
+
+The basic procedure for running Photran's automated test suite is described in the previous
+appendix as part of the procedure for checking out Photran's source code from CVS.  In particular,
+\begin{itemize}
+\item the test suite is run as a JUnit 3 plug-in test,
+\item assertions are enabled, and
+\item a TESTING environment variable is set, which (among other things) places the VPG in a testing
+      mode.
+\end{itemize}
+
+This appendix explains some of the additional options that are available when running the test suite.
+
+\section{Enabling Fortran Compilation and Run Comparison}
+
+Some of Photran's refactoring unit tests can attempt to compile and run the Fortran test programs
+before and after the refactoring in order to ensure that the refactoring actually preserves behavior
+(and produces code that compiles).
+
+To enable this behavior,
+\begin{itemize}
+\item Open the run configuration for the test suite, and switch to the Environment tab.
+\item Add environment variables similar to the following: \\
+  \begin{tabular}{ll}
+  \texttt{COMPILER} & \texttt{/usr/local/bin/gfortran} \\
+  \texttt{EXECUTABLE} & \texttt{/Users/joverbey/a.out} \\
+  \end{tabular} \\
+\end{itemize}
+The COMPILER environment variable should give the path to gfortran.  When gfortran is run, the
+compiled Fortran program will be written to the file specified by the EXECUTABLE environment
+variable.
+
+When both of these environment variables are set, you will be able to see the output from the
+compiler and the Fortran program in the Console view.  If compilation fails, or if the Fortran
+program exits with a nonzero status code, or if the Fortran program does not produce the same output
+before and after refactoring, the JUnit test will fail.
+
+See RefactoringTestCase#compileAndRunFortranProgram for more details.
+
+\section{Enabling Additional Parser/Source Reproduction Tests}
+
+UIUC personnel may check out additional projects from a private Subversion repository at UIUC to
+enable additional parser and source reproduction tests.  This is described in more detail in the
+appendix \textit{Additional Information for UIUC Personnel.}
