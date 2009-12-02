@@ -20,5 +20,15 @@ import org.eclipse.core.runtime.IAdaptable;
  * copy and then saving the working copy.
  */
 public interface IServiceProviderWorkingCopy extends IServiceProvider, IAdaptable {
+	/**
+	 * Check if any properties have been modified.
+	 * 
+	 * @return true if the properties need to be saved
+	 */
+	public boolean isDirty();
+	
+	/**
+	 * Saves the modified properties.
+	 */
 	public void save();
 }

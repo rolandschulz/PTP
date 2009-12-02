@@ -18,9 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ui.IMemento;
 
 public interface IResourceManagerConfiguration {
+	/**
+	 * Create a resource manager from this configuration.
+	 * 
+	 * @return resource manager that uses this configuration
+	 */
+	public IResourceManagerControl createResourceManager();
+	
 	/**
 	 * Get the auto start flag for this resource manager. If the auto start
 	 * flag is set to true, an attempt will be made to start the resource
