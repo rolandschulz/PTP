@@ -30,6 +30,7 @@ import org.eclipse.ptp.services.core.IServiceCategory;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
@@ -238,23 +239,26 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	}
 
 	public void applyChangesToConfiguration() {
-		if(configuration == null)
+		if (configuration == null) {
 			return;
+		}
 		
-		for(TreeItem categoryTreeItem : servicesTree.getItems()) {
-			for(TreeItem serviceTreeItem : categoryTreeItem.getItems()) {
+		for (TreeItem categoryTreeItem : servicesTree.getItems()) {
+			for (TreeItem serviceTreeItem : categoryTreeItem.getItems()) {
 				IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
 				boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
 				
-				if(disabled) {
+				if (disabled) {
 					configuration.disable(service);
-				}
-				else {
-					// TODO check if the state of the new service provider is actually different from the current one
-					// no need to fire bogus change events
+				} else {
 					IServiceProvider serviceProvider = (IServiceProvider) serviceTreeItem.getData(PROVIDER_KEY);
-					if(serviceProvider != null)
-						configuration.setServiceProvider(service, serviceProvider);
+					if (serviceProvider != null) {
+						IServiceProvider current = configuration.getServiceProvider(service);
+						if (current == null || !current.equals(serviceProvider.getId())) {
+							configuration.setServiceProvider(service, serviceProvider);
+						}
+						((IServiceProviderWorkingCopy)serviceProvider).save();
+					}
 				}
 			}
 		}
@@ -322,26 +326,28 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	
 	private void createTreeContent(Set<String> filterNatureIds) {
 		servicesTree.removeAll();
-		if(configuration == null)
+		if (configuration == null) {
 			return;
+		}
 		
-		if(filterNatureIds == null)
+		if (filterNatureIds == null) {
 			filterNatureIds = Collections.emptySet();
+		}
 		
 		SortedSet<IService> defaultCategoryServices = new TreeSet<IService>(SERVICE_COMPARATOR);
 		SortedMap<IServiceCategory, SortedSet<IService>> categoryServices = new TreeMap<IServiceCategory, SortedSet<IService>>(CATEGORY_COMPARATOR);
 		
-		for(IService service : ServiceModelManager.getInstance().getServices()) {
-			if(filterOut(service.getNatures(), filterNatureIds))
+		for (IService service : ServiceModelManager.getInstance().getServices()) {
+			if (filterOut(service.getNatures(), filterNatureIds)) {
 				continue;
+			}
 			
 			IServiceCategory category = service.getCategory();
-			if(category == null) {
+			if (category == null) {
 				defaultCategoryServices.add(service);
-			}
-			else {
+			} else {
 				SortedSet<IService> services = categoryServices.get(category);
-				if(services == null) {
+				if (services == null) {
 					services = new TreeSet<IService>(SERVICE_COMPARATOR);
 					categoryServices.put(category, services);
 				}
@@ -349,17 +355,17 @@ public class ServiceProviderConfigurationWidget extends Composite {
 			}
 		}
 		
-		for(Map.Entry<IServiceCategory,SortedSet<IService>> entry : categoryServices.entrySet()) {
+		for (Map.Entry<IServiceCategory,SortedSet<IService>> entry : categoryServices.entrySet()) {
 			TreeItem parent = createTreeCategory(servicesTree, entry.getKey());
-			for(IService service : entry.getValue()) {
+			for (IService service : entry.getValue()) {
 				createTreeService(parent, service);
 			}
 			parent.setExpanded(true);
 		}
 		
-		if(!defaultCategoryServices.isEmpty()) {
+		if (!defaultCategoryServices.isEmpty()) {
 			TreeItem parent = createTreeCategory(servicesTree, null);
-			for(IService service : defaultCategoryServices) {
+			for (IService service : defaultCategoryServices) {
 				createTreeService(parent, service);
 			}
 			parent.setExpanded(true);
@@ -399,6 +405,8 @@ public class ServiceProviderConfigurationWidget extends Composite {
 			provider = configuration.getServiceProvider(service);
 		}
 		
+		boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
+
 		// populate the provider combo
 		Set<IServiceProviderDescriptor> providers = service.getProviders();
 		// it's possible there are no providers
@@ -415,11 +423,12 @@ public class ServiceProviderConfigurationWidget extends Composite {
 			}
 			providerCombo.setData(descriptors);
 			providerCombo.select(selection);
-			selectProvider(descriptors[selection]);
+			if (!disabled) {
+				selectProvider(descriptors[selection]);
+			}
 		}
 		
 		// set the enabled/disabled state appropriately
-		boolean disabled = Boolean.TRUE.equals(serviceTreeItem.getData(DISABLED_KEY));
 		providerCombo.setEnabled(!disabled);
 		enabledCheckbox.setSelection(!disabled);
 		enabledCheckbox.setEnabled(true);
@@ -431,12 +440,13 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	 */
 	private IServiceProvider getExistingProvider(String providerId, IService service) {
 		IServiceProvider setProvider = configuration.getServiceProvider(service);
-		if(setProvider != null && providerId.equals(setProvider.getId()))
+		if (setProvider != null && providerId.equals(setProvider.getId())) {
 			return setProvider;
+		}
 		
-		if(configuration instanceof ServiceConfiguration) {
-			for(IServiceProvider formerProvider : ((ServiceConfiguration)configuration).getFormerServiceProviders(service)) {
-				if(providerId.equals(formerProvider.getId())) {
+		if (configuration instanceof ServiceConfiguration) {
+			for (IServiceProvider formerProvider : ((ServiceConfiguration)configuration).getFormerServiceProviders(service)) {
+				if (providerId.equals(formerProvider.getId())) {
 					return formerProvider;
 				}
 			}
@@ -469,21 +479,16 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	
 	private void selectProvider(final IServiceProviderDescriptor descriptor) {
 		TreeItem serviceTreeItem = servicesTree.getSelection()[0];
-		IServiceProvider newProvider = providerMap.get(descriptor.getId());
-		if (newProvider == null) {
-			newProvider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
-			providerMap.put(newProvider.getId(), newProvider);
-			
+		IServiceProvider newProvider = (IServiceProvider)servicesTree.getData(PROVIDER_KEY);
+		if (newProvider == null || !newProvider.getId().equals(descriptor.getId())) {
 			IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
-			IServiceProvider existingProvider = getExistingProvider(newProvider.getId(), service);
-			if (existingProvider != null) {
-				for(String key : existingProvider.getProperties().keySet()) {
-					newProvider.putString(key, existingProvider.getString(key, null));
-				}
+			IServiceProvider existingProvider = getExistingProvider(descriptor.getId(), service);
+			if (existingProvider == null) {
+				existingProvider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
 			}
+			newProvider = existingProvider.copy();
+			serviceTreeItem.setData(PROVIDER_KEY, newProvider);
 		}
-		
-		serviceTreeItem.setData(PROVIDER_KEY, newProvider);
 		
 		Composite comp = new Composite(configurationComposite, SWT.NONE);
 		GridLayout layout = new GridLayout(1,false);
