@@ -14,7 +14,8 @@ The remaining sections go into the details of each of those steps based on a
 simple (but not useful) refactoring example: obfuscating Fortran by removing the
 comments and adding redundant comments to the header. The source code is
 available from
-\url{http://subversion.cs.uiuc.edu/pub/svn/FruitFly/edu.uiuc.nchen.obfuscator/trunk/}
+\url{http://photran.cs.illinois.edu/samples/obfuscator-photran5.zip}
+(UIUC personnel can find it in the Subversion repository described in the appendix).
 
 \section{Modifying the plugin.xml}
 
