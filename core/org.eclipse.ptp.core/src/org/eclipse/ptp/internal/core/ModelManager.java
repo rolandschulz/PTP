@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.IServiceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
@@ -49,7 +50,13 @@ import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.internal.core.events.ChangedResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelEvent;
+import org.eclipse.ptp.services.core.IServiceModelEventListener;
 import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public class ModelManager implements IModelManager {
@@ -81,12 +88,70 @@ public class ModelManager implements IModelManager {
 		
 	}
 	
-	private final ListenerList resourceManagerListeners = new ListenerList();
-	protected final IServiceModelManager fManager = ServiceModelManager.getInstance();
+	private IServiceModelEventListener fServiceEventListener = new IServiceModelEventListener() {
+		
+		public void handleEvent(IServiceModelEvent event) {
+			switch (event.getType()) {
+			case IServiceModelEvent.SERVICE_CONFIGURATION_ADDED: {
+				IServiceProvider provider = ((IServiceConfiguration)event.getSource()).getServiceProvider(fLaunchService);
+				if (provider != null && provider instanceof IResourceManagerConfiguration) {
+					addResourceManager(((IResourceManagerConfiguration)provider).createResourceManager());
+				}
+				break;
+			}
+				
+			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
+				IServiceProvider provider = ((IServiceConfiguration)event.getSource()).getServiceProvider(fLaunchService);
+				if (provider != null && provider instanceof IResourceManagerConfiguration) {
+					IResourceManagerControl rm = (IResourceManagerControl)getResourceManagerFromUniqueName(((IResourceManagerConfiguration)provider).getUniqueName());
+					if (rm != null) {
+						removeResourceManager((IResourceManagerControl)rm);
+					}
+				}
+				break;
+			}
 
+			case IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED: {
+				IServiceConfiguration config = (IServiceConfiguration)event.getSource();
+				IServiceProvider oldProvider = event.getOldProvider();
+				if (oldProvider != null && oldProvider instanceof IResourceManagerConfiguration) {
+					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
+					if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
+						IResourceManagerControl rm = (IResourceManagerControl)getResourceManagerFromUniqueName(((IResourceManagerConfiguration)oldProvider).getUniqueName());
+						if (rm != null) {
+							rm.setConfiguration((IResourceManagerConfiguration)newProvider);
+						}
+					}
+				}
+				break;
+			}
+			
+			case IServiceModelEvent.SERVICE_PROVIDER_CHANGED: {
+				IServiceProvider provider = (IServiceProvider)event.getSource();
+				if (provider != null && provider instanceof IResourceManagerConfiguration) {
+					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration)provider).getUniqueName());
+					if (rm != null) {
+						updateResourceManager(rm);
+					}
+				}
+				break;
+			}
+			}
+		}
+	};
+	
+	private final ListenerList resourceManagerListeners = new ListenerList();
+	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
+	protected IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
+	
 	protected IPUniverseControl universe = new PUniverse();
 	
 	public ModelManager() {
+		fServiceManager.addEventListener(fServiceEventListener, 
+			IServiceModelEvent.SERVICE_CONFIGURATION_ADDED |
+			IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED |
+			IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED |
+			IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
 	}
 	
 	/* (non-Javadoc)
@@ -169,7 +234,7 @@ public class ModelManager implements IModelManager {
 		 * Need to force service model to load so that the resource managers are
 		 * created.
 		 */
-		ServiceModelManager.getInstance().getActiveConfiguration();
+		fServiceManager.getActiveConfiguration();
 		
 		for (IResourceManager rm : getUniverse().getResourceManagers()) {
 			IResourceManagerControl rmControl = (IResourceManagerControl)rm;
