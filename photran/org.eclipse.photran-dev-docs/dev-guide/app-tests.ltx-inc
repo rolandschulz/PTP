@@ -11,7 +11,7 @@ appendix as part of the procedure for checking out Photran's source code from CV
 
 This appendix explains some of the additional options that are available when running the test suite.
 
-\section{Enabling Fortran Compilation and Run Comparison}
+\section{Enabling Fortran Compilation \& Run Comparison}
 
 Some of Photran's refactoring unit tests can attempt to compile and run the Fortran test programs
 before and after the refactoring in order to ensure that the refactoring actually preserves behavior
@@ -35,9 +35,10 @@ compiler and the Fortran program in the Console view.  If compilation fails, or 
 program exits with a nonzero status code, or if the Fortran program does not produce the same output
 before and after refactoring, the JUnit test will fail.
 
-See RefactoringTestCase#compileAndRunFortranProgram for more details.
+See the JavaDoc for the method
+\texttt{RefactoringTestCase\#compileAndRunFortranProgram} for more details.
 
-\section{Enabling Additional Parser/Source Reproduction Tests}
+\section{Enabling Closed-Source Parser Tests}
 
 UIUC personnel may check out additional projects from a private Subversion repository at UIUC to
 enable additional parser and source reproduction tests.  This is described in more detail in the

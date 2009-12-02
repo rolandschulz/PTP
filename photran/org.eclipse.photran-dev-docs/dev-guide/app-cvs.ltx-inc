@@ -84,8 +84,10 @@ The sources should all compile (albeit with lots of warnings).
 	\item Select ``Run'' to run the tests. To run the tests again, just launch the ``Photran-Tests'' configuration from the Eclipse Run menu.
 
 	\vspace{.5em}
-	\noindent\textit{\textbf{Note.} Some JUnit tests for the parser and
-	refactoring engine require closed-source code that is not available in CVS.
-	A warning will appear in the JUnit runner if this code is not available.}
+	\noindent\textit{\textbf{Note.} If you will be developing refactorings or modifying the parser,
+	please read the appendix ``Running Photran's Automated Test Suite'' in the \textit{Photran
+	Developer's Guide.}  Also note that some parser tests will attempt to look for closed-source
+	code that you did not check out as part of this procedure;
+	a warning will appear in the JUnit runner if this code is not available.}
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}
