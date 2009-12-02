@@ -39,16 +39,13 @@
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.cdt.debug.ui"/>
-      <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import feature="org.eclipse.cdt" version="6.0.0" match="compatible"/>
-      <import feature="org.eclipse.rephraserengine" version="1.0.0" match="compatible"/>
       <import plugin="org.eclipse.cdt.debug.core"/>
       <import plugin="com.ibm.icu"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ui.intro"/>
       <import plugin="org.eclipse.ui.intro.universal"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.rephraserengine.core.vpg"/>
       <import plugin="org.eclipse.rephraserengine.core"/>
@@ -57,6 +54,9 @@
       <import plugin="org.eclipse.rephraserengine.ui.refactoring"/>
       <import plugin="org.eclipse.rephraserengine.ui"/>
       <import plugin="org.eclipse.rephraserengine.ui.vpg"/>
+      <import feature="org.eclipse.cdt" version="6.0.0" match="compatible"/>
+      <import feature="org.eclipse.rephraserengine" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core" version="6.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
