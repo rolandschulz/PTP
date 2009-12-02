@@ -144,21 +144,33 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 	 * @see org.eclipse.ptp.services.core.IServiceConfiguration#setServiceProvider(org.eclipse.ptp.services.core.IService, org.eclipse.ptp.services.core.IServiceProvider)
 	 */
 	public void setServiceProvider(IService service, IServiceProvider provider) {
-		if(provider != null && provider.equals(service.getNullProvider()))
+		if (provider != null && provider.equals(service.getNullProvider())) {
 			provider = null;
+		}
 		
 		IServiceProvider oldProvider;
-		if(provider == null)
+		if (provider == null) {
 			oldProvider = fServiceToProviderMap.remove(service);
-		else
+		} else {
 			oldProvider = fServiceToProviderMap.put(service, provider);
-		
-		if(oldProvider != null) {
-			addFormerServiceProvider(service, oldProvider);
-			fFormerServiceProviders.get(service).remove(provider);
 		}
-	
-		fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED, oldProvider));
+		
+		if ((provider == null && oldProvider == null) || (oldProvider != null && oldProvider.equals(provider))) {
+			
+		}
+		
+		if (oldProvider != null) {
+			addFormerServiceProvider(service, oldProvider);
+			if (provider != null) {
+				fFormerServiceProviders.get(service).remove(provider);
+			}
+			
+			if (!oldProvider.equals(provider)) {
+				fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED, oldProvider));
+			}
+		} else if (oldProvider != provider) {
+			fManager.notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED, oldProvider));
+		}
 	}
 	
 	
