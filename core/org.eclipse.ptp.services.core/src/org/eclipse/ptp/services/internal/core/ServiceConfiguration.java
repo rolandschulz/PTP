@@ -155,10 +155,6 @@ public class ServiceConfiguration extends PlatformObject implements IServiceConf
 			oldProvider = fServiceToProviderMap.put(service, provider);
 		}
 		
-		if ((provider == null && oldProvider == null) || (oldProvider != null && oldProvider.equals(provider))) {
-			
-		}
-		
 		if (oldProvider != null) {
 			addFormerServiceProvider(service, oldProvider);
 			if (provider != null) {
