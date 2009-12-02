@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -194,7 +195,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText("Tool Configuration");
+		aGroup.setText("Tool Location Configuration");
 
 		if(toolGroups!=null)
 		for(int i=0;i<toolGroups.length;i++)

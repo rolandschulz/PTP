@@ -112,7 +112,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText("Performance Tool Configuration");
+		aGroup.setText("External Tool Configuration");
 
 		Composite xmlcom = new Composite(aGroup, SWT.NONE);
 		xmlcom.setLayout(createGridLayout(2, false, 0, 0));

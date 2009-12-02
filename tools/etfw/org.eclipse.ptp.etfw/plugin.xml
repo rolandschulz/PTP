@@ -32,13 +32,13 @@
       <page
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
             class="org.eclipse.ptp.etfw.preferences.ExternalToolPreferencePage"
-            id="org.eclipse.ptp.etfw.performanceToolsMainpage"
-            name="Performance Tools"/>
+            id="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
+            name="External Tools"/>
       <page
-            category="org.eclipse.ptp.etfw.performanceToolsMainpage"
+            category="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
             class="org.eclipse.ptp.etfw.preferences.ToolLocationPreferencePage"
-            id="org.eclipse.ptp.etfw.preferences.PerfPreferencePage"
-            name="Tool Configuration"/> 
+            id="org.eclipse.ptp.etfw.preferences.ExternalToolLocationPreferencePage"
+            name="Tool Location Configuration"/> 
    </extension>
  <extension
        point="org.eclipse.ui.perspectiveExtensions">
