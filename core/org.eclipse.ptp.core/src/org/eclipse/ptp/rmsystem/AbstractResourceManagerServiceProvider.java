@@ -92,7 +92,7 @@ public abstract class AbstractResourceManagerServiceProvider
 				IServiceProvider provider = ((IServiceConfiguration)event.getSource()).getServiceProvider(fLaunchService);
 				if (provider instanceof IResourceManagerConfiguration &&
 						((IResourceManagerConfiguration)provider).getUniqueName().equals(getUniqueName())) {
-					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());;
+					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());
 					if (rm != null) {
 						fModelManager.removeResourceManager((IResourceManagerControl)rm);
 					}
@@ -134,7 +134,7 @@ public abstract class AbstractResourceManagerServiceProvider
 				IServiceProvider provider = (IServiceProvider)event.getSource();
 				if (provider instanceof IResourceManagerConfiguration &&
 						((IResourceManagerConfiguration)provider).getUniqueName().equals(getUniqueName())) {
-					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());;
+					IResourceManager rm = fModelManager.getResourceManagerFromUniqueName(getUniqueName());
 					if (rm != null) {
 						fModelManager.updateResourceManager(rm);
 					}
