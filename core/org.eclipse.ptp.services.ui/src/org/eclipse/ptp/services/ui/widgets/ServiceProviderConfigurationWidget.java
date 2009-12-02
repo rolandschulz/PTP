@@ -14,7 +14,6 @@ package org.eclipse.ptp.services.ui.widgets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -87,8 +86,6 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	private Image enabledIcon;
 	private Image disabledIcon;
 	private Image configIcon;
-	
-	private Map<String,IServiceProvider> providerMap = new HashMap<String,IServiceProvider>();
 	
 	private final ListenerList fSelectionListeners = new ListenerList();
 	
@@ -251,13 +248,15 @@ public class ServiceProviderConfigurationWidget extends Composite {
 				if (disabled) {
 					configuration.disable(service);
 				} else {
-					IServiceProvider serviceProvider = (IServiceProvider) serviceTreeItem.getData(PROVIDER_KEY);
+					IServiceProviderWorkingCopy serviceProvider = (IServiceProviderWorkingCopy) serviceTreeItem.getData(PROVIDER_KEY);
 					if (serviceProvider != null) {
 						IServiceProvider current = configuration.getServiceProvider(service);
-						if (current == null || !current.equals(serviceProvider.getId())) {
+						if (current == null || !current.getId().equals(serviceProvider.getId())) {
 							configuration.setServiceProvider(service, serviceProvider);
 						}
-						((IServiceProviderWorkingCopy)serviceProvider).save();
+						if (serviceProvider.isDirty()) {
+							serviceProvider.save();
+						}
 					}
 				}
 			}
