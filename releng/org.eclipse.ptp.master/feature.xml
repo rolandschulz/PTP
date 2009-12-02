@@ -117,4 +117,20 @@
          id="org.eclipse.ptp.rdt.xlc"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.photran"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.photran.intel"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.photran.xlf"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.rephraserengine"
+         version="0.0.0"/>
+
 </feature>
