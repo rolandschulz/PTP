@@ -72,7 +72,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            category="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
             class="org.eclipse.ptp.etfw.feedback.preferences.FeedbackPreferencePage"
             id="org.eclipse.ptp.etfw.feedback.preferences.SamplePreferencePage"
             name="%page.name">
