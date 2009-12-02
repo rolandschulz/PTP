@@ -33,7 +33,7 @@
 		<property name="buildId" value="${buildType}${timestamp}"/>
 		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
 		<property name="ptpMasterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
-		<property name="photranMasterFile" value="photran-master-${photranBranchVersion}-${buildId}.zip"/>
+		<!--property name="photranMasterFile" value="photran-master-${photranBranchVersion}-${buildId}.zip"/-->
 		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
 		<property name="mailto" value="g.watson@computer.org"/>
 		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
@@ -80,7 +80,7 @@
 			<contains string="${compileLog}" substring=" ERROR"/>
 		</condition>
 		<move file="${zipsdir}/${ptpMasterFile}" todir="${buildDirectory}"/>
-		<move file="${zipsdir}/${photranMasterFile}" todir="${buildDirectory}"/>
+		<!--move file="${zipsdir}/${photranMasterFile}" todir="${buildDirectory}"/-->
 		
 		<!--unzip src="${buildDirectory}/${photranMasterFile}" dest="${buildDirectory}/site"/-->
 		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
