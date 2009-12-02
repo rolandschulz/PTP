@@ -9,10 +9,10 @@
 		<property name="type" value="feature"/>
 		<property name="id" value="org.eclipse.ptp.master"/>
 	</ant>
-	<ant antfile="${genericTargets}" target="${target}">
+	<!--ant antfile="${genericTargets}" target="${target}">
 		<property name="type" value="feature"/>
 		<property name="id" value="org.eclipse.photran.master"/>
-	</ant>
+	</ant-->
 </target>
 
 <!-- ===================================================================== -->
@@ -28,11 +28,11 @@
 	</ant>
 </target>
 	
-<target name="assemble.org.eclipse.photran.master.group.group.group">
+<!--target name="assemble.org.eclipse.photran.master.group.group.group">
 	<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 		<property name="archiveName" value="photran-master-${photranBranchVersion}-${buildId}.zip"/>
 	</ant>
-</target>
+</target-->
 	
 <!-- ===================================================================== -->
 <!-- Check out map files from correct repository -->
