@@ -98,31 +98,7 @@
             class="org.eclipse.ptp.isp.preferences.PreferenceInitializer">
       </initializer>
    </extension>
-   
-
-   <!-- Bindings extension point (key bindings) -->
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="org.eclipse.ptp.isp.commands.numprocsCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+5">
-      </key>
-      <key
-            commandId="org.eclipse.ptp.isp.commands.analyzeCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+6">
-      </key>
-      <key
-            commandId="org.eclipse.ptp.isp.commands.consoleCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+7">
-      </key>
-   </extension>
-
+    
     
    <!-- Commands extension point and contributions (for toolbar buttons) -->
    <extension
