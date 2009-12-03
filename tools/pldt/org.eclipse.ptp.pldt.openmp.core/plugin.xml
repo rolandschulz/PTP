@@ -3,14 +3,10 @@
 <plugin>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="%viewcat.name"
-            id="org.eclipse.ptp.pldt.openmp">
-      </category>
       <view
             name="%view.name"
             icon="icons/openMP.gif"
-            category="org.eclipse.ptp.pldt.openmp"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"
             id="org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView">
       </view>

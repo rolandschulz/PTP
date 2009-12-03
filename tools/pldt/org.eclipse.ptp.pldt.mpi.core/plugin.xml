@@ -4,14 +4,10 @@
 
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="PTP MPI Views"
-            id="org.eclipse.ptp.pldt.mpi">
-      </category>
       <view
             name="MPI Artifact View"
             icon="icons/mpi.gif"
-            category="org.eclipse.ptp.pldt.mpi"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.mpi.core.views.MPITableView"
             id="org.eclipse.ptp.pldt.mpi.core.views.MPITableView">
       </view>

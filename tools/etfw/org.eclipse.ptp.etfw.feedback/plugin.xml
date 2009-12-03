@@ -5,14 +5,9 @@
 
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="%category.name"
-            id="org.eclipse.ptp.etfw.feedback">
-      </category>
       <view
             name="%view.name"
-            icon="icons/sample.gif"
-            category="org.eclipse.ptp.etfw.feedback"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.etfw.feedback.views.FeedbackTreeTableMarkerView"
             id="org.eclipse.ptp.etfw.feedback.views.feedbackView">
       </view>
