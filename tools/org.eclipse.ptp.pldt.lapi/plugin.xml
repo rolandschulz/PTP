@@ -57,14 +57,10 @@
    </extension>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="%viewcat.name"
-            id="org.eclipse.ptp.pldt.lapi">
-      </category>
       <view
             name="%view.name"
             icon="icons/lapi.gif"
-            category="org.eclipse.ptp.pldt.lapi"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.lapi.views.LapiArtifactView"
             id="org.eclipse.ptp.pldt.lapi.views.LapiArtifactView">
       </view>

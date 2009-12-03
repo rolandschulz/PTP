@@ -6,12 +6,8 @@
    <extension-point id="wizardExtensions" name="Service Configuration Wizard Extensions" schema="schema/wizardExtensions.exsd"/>
    <extension
 		point="org.eclipse.ui.views">
-      <category
-		name="%ServicesViewCategory.name"
-		id="org.eclipse.ptp.services.ui.views">
-	 </category>
   	 <view
-        category="org.eclipse.ptp.services.ui.views"
+        category="org.eclipse.ptp.ui.views"
         class="org.eclipse.ptp.services.ui.views.ServiceConfigurationView"
         id="org.eclipse.ptp.services.ui.views.serviceConfigurationView"
         name="%ServiceConfigurationView.name">

@@ -3,48 +3,30 @@
 <plugin>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="PTP MPI Views"
-            id="org.eclipse.ptp.pldt.mpi">
-      </category>
       <view
-            name="MPI Barriers"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView"
             icon="icons/barrier.gif"
-            category="org.eclipse.ptp.pldt.mpi"
+            id="org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView"
+            name="%errorsView.name">
+      </view>
+      <view
+            name="%barriersView.name"
+            icon="icons/barrier.gif"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierView"
             id="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierTableView">
       </view>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.views">
-      <category
-            name="PTP MPI Views"
-            id="org.eclipse.ptp.pldt.mpi">
-      </category>
       <view
-            name="Barrier Matches"
-            icon="icons/barrier.gif"
-            category="org.eclipse.ptp.pldt.mpi"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetView"
-            id="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetTableView">
+            icon="icons/barrier.gif"
+            id="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetTableView"
+            name="%matchesView.name">
       </view>
    </extension>
 
-   <extension
-         point="org.eclipse.ui.views">
-      <category
-            name="PTP MPI Views"
-            id="org.eclipse.ptp.pldt.mpi">
-      </category>
-      <view
-            name="Barrier Errors"
-            icon="icons/barrier.gif"
-            category="org.eclipse.ptp.pldt.mpi"
-            class="org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView"
-            id="org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView">
-      </view>
-   </extension>
+
 
    <!--  MPI Barrier markers -->
    <extension point="org.eclipse.core.resources.markers"

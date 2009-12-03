@@ -4,14 +4,10 @@
 
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="PTP OpenMP Views"
-            id="org.eclipse.ptp.pldt.openmp.ui.pv">
-      </category>
       <view
             name="OpenMP Problems"
             icon="icons/openMPproblem.gif"
-            category="org.eclipse.ptp.pldt.openmp" 
+            category="org.eclipse.ptp.ui.views" 
             class="org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView"
             id="org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView">
       </view>

@@ -57,14 +57,10 @@
    </extension>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="%viewcat.name"
-            id="org.eclipse.ptp.pldt.upc">
-      </category>
       <view
             name="%view.name"
             icon="icons/upc.gif"
-            category="org.eclipse.ptp.pldt.upc"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.upc.views.UPCArtifactView"
             id="org.eclipse.ptp.pldt.upc.views.upcArtifactView">
       </view>
