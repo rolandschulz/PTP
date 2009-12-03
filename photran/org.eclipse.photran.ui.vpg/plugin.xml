@@ -614,9 +614,9 @@
       </editor-->
    </extension>
 
-   <!--==================-->
-   <!-- Declaration View -->
-   <!--==================-->
+   <!--================================================================-->
+   <!-- Views: Declaration View and Analysis/Refactoring Problems View -->
+   <!--================================================================-->
    <!--
  		Added for the Declaration view Project
  		@author John Goode, Abe Hassan, Sean Kim
@@ -638,13 +638,13 @@
       </view>
 
       <!--TODO: Need to find a better icon for this view-->
-      <view
+      <!--view
             category="org.eclipse.photran.ui.views"
             class="org.eclipse.photran.internal.ui.views.vpgproblems.VGPProblemView"
             icon="icons/full/eview16/source.gif"
             id="org.eclipse.photran.ui.VGPProblemView"
             name="Fortran Analysis/Refactoring Problems">
-      </view>
+      </view-->
    </extension>
        <!--
    <extension
