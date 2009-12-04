@@ -20,6 +20,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.core.model.IHost;
@@ -42,7 +43,7 @@ import org.eclipse.swt.widgets.Label;
 
 public class RemoteCIndexServiceProviderContributer implements IServiceProviderContributor {
 
-	private RemoteCIndexServiceProvider provider;
+	private RemoteCIndexServiceProvider fProvider;
 	
 	private Map<Integer, IHost> hostComboIndexToHostMap = new HashMap<Integer, IHost>();
 	
@@ -51,10 +52,15 @@ public class RemoteCIndexServiceProviderContributer implements IServiceProviderC
 	
 	
 	public void configureServiceProvider(IServiceProvider sp, final Composite container) {
-		if(!(sp instanceof RemoteCIndexServiceProvider))
-			throw new IllegalArgumentException(); // should never happen
+		if (sp instanceof IServiceProviderWorkingCopy) {
+			sp = ((IServiceProviderWorkingCopy)sp).getOriginal();
+		}
 		
-		this.provider = (RemoteCIndexServiceProvider) sp;
+		if (!(sp instanceof RemoteCIndexServiceProvider)) {
+			throw new IllegalArgumentException(); // should never happen
+		}
+		
+		fProvider = (RemoteCIndexServiceProvider) sp;
 
 		container.setLayout(new GridLayout(1, false));
 		
@@ -73,7 +79,7 @@ public class RemoteCIndexServiceProviderContributer implements IServiceProviderC
         hostCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false)); // set layout to grab horizontal space
         
         //attempt to restore settings from saved state
-        IHost hostSelected = provider.getHost();
+        IHost hostSelected = fProvider.getHost();
         
         // populate the combo with a list of hosts
         IHost[] hosts = SystemStartHere.getConnections();
@@ -123,8 +129,8 @@ public class RemoteCIndexServiceProviderContributer implements IServiceProviderC
         	
         });
         
-        configPath = provider.getIndexLocation();
-        if(provider.isConfigured() && configPath == null) // happens if the project was created before the index location feature was added
+        configPath = fProvider.getIndexLocation();
+        if(fProvider.isConfigured() && configPath == null) // happens if the project was created before the index location feature was added
         	configPath = ""; //$NON-NLS-1$
       
         final IndexFileLocationWidget scopeWidget = new IndexFileLocationWidget(container, SWT.NONE, selectedHost, configPath);
@@ -158,9 +164,9 @@ public class RemoteCIndexServiceProviderContributer implements IServiceProviderC
 
 	private void updateProvider() {
 		// set the host for the service provider
-		provider.setConnection(selectedHost, getDStoreConnectorService(selectedHost));
-		provider.setIndexLocation(configPath);
-		provider.setConfigured(true);
+		fProvider.setConnection(selectedHost, getDStoreConnectorService(selectedHost));
+		fProvider.setIndexLocation(configPath);
+		fProvider.setConfigured(true);
 	}
 	
 	private IConnectorService getDStoreConnectorService(IHost host) {
