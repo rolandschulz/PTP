@@ -24,6 +24,12 @@
    <feature url="features/org.eclipse.ptp.rm.ibm.pe_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.ibm.pe" version="3.0.0.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.rm.slurm_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.slurm" version="3.0.0.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.pbs_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.pbs" version="3.0.0.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.remote.remotetools_3.0.0.@timeStamp@.jar" id="org.eclipse.ptp.remote.remotetools" version="3.0.0.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
