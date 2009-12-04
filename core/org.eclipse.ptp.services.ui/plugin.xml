@@ -7,10 +7,11 @@
    <extension
 		point="org.eclipse.ui.views">
   	 <view
-        category="org.eclipse.ptp.ui.views"
-        class="org.eclipse.ptp.services.ui.views.ServiceConfigurationView"
-        id="org.eclipse.ptp.services.ui.views.serviceConfigurationView"
-        name="%ServiceConfigurationView.name">
+          category="org.eclipse.ptp.ui.views"
+          class="org.eclipse.ptp.services.ui.views.ServiceConfigurationView"
+          icon="icons/etool16/service.gif"
+          id="org.eclipse.ptp.services.ui.views.serviceConfigurationView"
+          name="%ServiceConfigurationView.name">
      </view>
    </extension>
    <extension
