@@ -36,28 +36,28 @@ public abstract class AbstractResourceManagerServiceProvider
 	implements IResourceManagerConfiguration, IServiceProviderWorkingCopy
 {
 	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
+
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 	private static final String TAG_STATE = "state"; //$NON-NLS-1$
-	
 	private final IModelManager fModelManager = PTPCorePlugin.getDefault().getModelManager();
+	
 	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
-	
 	/*
 	 * If we're a working copy, keep a copy of the original
 	 */
 	private boolean fIsDirty = false;
+	
 	private IServiceProvider fServiceProvider = null;
-
 	/*
 	 * Keep a copy of our service configuration so we don't have to search for it
 	 */
 	private IServiceConfiguration fServiceConfiguration = null;
-	
+
 	private IModelManagerChildListener fModelListener = new IModelManagerChildListener() {
 		
 		public void handleEvent(IChangedResourceManagerEvent e) {
@@ -126,13 +126,20 @@ public abstract class AbstractResourceManagerServiceProvider
 	public String getDescription() {
 		return getString(TAG_DESCRIPTION, ""); //$NON-NLS-1$
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.ServiceProvider#getName()
 	 */
 	@Override
 	public String getName() {
 		return getString(TAG_NAME, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#getOriginal()
+	 */
+	public IServiceProvider getOriginal() {
+		return fServiceProvider;
 	}
 	
 	/* (non-Javadoc)
