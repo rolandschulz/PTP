@@ -250,12 +250,12 @@ public class ServiceProviderConfigurationWidget extends Composite {
 				} else {
 					IServiceProviderWorkingCopy serviceProvider = (IServiceProviderWorkingCopy) serviceTreeItem.getData(PROVIDER_KEY);
 					if (serviceProvider != null) {
-						IServiceProvider current = configuration.getServiceProvider(service);
-						if (current == null || !current.getId().equals(serviceProvider.getId())) {
-							configuration.setServiceProvider(service, serviceProvider);
-						}
 						if (serviceProvider.isDirty()) {
 							serviceProvider.save();
+						}
+						IServiceProvider current = configuration.getServiceProvider(service);
+						if (current == null || !current.getId().equals(serviceProvider.getId())) {
+							configuration.setServiceProvider(service, serviceProvider.getOriginal());
 						}
 					}
 				}
