@@ -6,10 +6,11 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="%view.name"
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.etfw.feedback.views.FeedbackTreeTableMarkerView"
-            id="org.eclipse.ptp.etfw.feedback.views.feedbackView">
+            icon="icons/view16/feedback_view.gif"
+            id="org.eclipse.ptp.etfw.feedback.views.feedbackView"
+            name="%view.name">
       </view>
    </extension>
    <extension

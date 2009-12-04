@@ -16,3 +16,4 @@ Export-Package: org.eclipse.ptp.etfw.feedback,
  org.eclipse.ptp.etfw.feedback.obj,
  org.eclipse.ptp.etfw.feedback.preferences,
  org.eclipse.ptp.etfw.feedback.views
+Bundle-Vendor: %Bundle-Provider
