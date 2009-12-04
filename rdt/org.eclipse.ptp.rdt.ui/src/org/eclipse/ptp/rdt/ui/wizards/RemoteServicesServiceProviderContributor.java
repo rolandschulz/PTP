@@ -24,6 +24,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,11 +46,16 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 
 	
 	public void configureServiceProvider(IServiceProvider provider, final Composite container) {
-		if(provider instanceof RemoteBuildServiceProvider)
+		if (provider instanceof IServiceProviderWorkingCopy) {
+			provider = ((IServiceProviderWorkingCopy)provider).getOriginal();
+		}
+
+		if (provider instanceof RemoteBuildServiceProvider) {
 			fProvider = (RemoteBuildServiceProvider) provider;
-		else
+		} else {
 			throw new IllegalArgumentException(); // should never happen
-		
+		}
+
 		GridLayout layout = new GridLayout();
         layout.numColumns = 1;
         container.setLayout(layout);
