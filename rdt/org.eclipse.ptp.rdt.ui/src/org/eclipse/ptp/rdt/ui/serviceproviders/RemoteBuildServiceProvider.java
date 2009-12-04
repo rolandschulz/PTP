@@ -100,7 +100,11 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		fRemoteConnection = connection;
-		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, connection.getName());
+		String name = ""; //$NON-NLS-1$
+		if (connection != null) {
+			name = connection.getName();
+		}
+		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, name);
 	}
 
 	/**
