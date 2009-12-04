@@ -224,7 +224,9 @@ public class RemoteSearchResult extends AbstractTextSearchResult implements IEdi
 			if (location.getFullPath() != null) {
 				return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(location.getFullPath()));
 			} else {
-				return ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(location.getURI())[0];
+				IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(location.getURI());
+				if(files != null && files.length > 0) 
+					return files[0];
 			}
 		}
 		return null;
