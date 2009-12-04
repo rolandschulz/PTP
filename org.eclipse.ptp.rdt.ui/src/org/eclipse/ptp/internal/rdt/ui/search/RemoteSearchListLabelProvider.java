@@ -20,11 +20,11 @@
 
 package org.eclipse.ptp.internal.rdt.ui.search;
 
+import java.net.URI;
+
 import org.eclipse.cdt.core.index.IIndexFileLocation;
-import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.util.Messages;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 
 public class RemoteSearchListLabelProvider extends RemoteSearchLabelProvider {
@@ -40,7 +40,8 @@ public class RemoteSearchListLabelProvider extends RemoteSearchLabelProvider {
 		if (element instanceof RemoteSearchElement) {
 			RemoteSearchElement searchElement = (RemoteSearchElement)element;
 			final int count= getMatchCount(element);
-			final String filename = " - " + IndexLocationFactory.getPath(searchElement.getLocation()); //$NON-NLS-1$
+			URI uri = searchElement.getLocation().getURI();
+			final String filename = uri == null ? "" : " - " + uri.getPath(); //$NON-NLS-1$ //$NON-NLS-2$
 			if (count == 1) {
 				return text + filename;
 			}
@@ -49,10 +50,8 @@ public class RemoteSearchListLabelProvider extends RemoteSearchLabelProvider {
 		} 
 		
 		if (element instanceof IIndexFileLocation) {
-			IPath path= IndexLocationFactory.getPath((IIndexFileLocation)element); 
-			if(path!=null) {
-				return path.toString();
-			}
+			URI uri = ((IIndexFileLocation)element).getURI();
+			return uri == null ? "" : " - " + uri.getPath(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		return text;
