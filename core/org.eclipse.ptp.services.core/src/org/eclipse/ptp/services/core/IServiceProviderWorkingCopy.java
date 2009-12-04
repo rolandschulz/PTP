@@ -21,6 +21,13 @@ import org.eclipse.core.runtime.IAdaptable;
  */
 public interface IServiceProviderWorkingCopy extends IServiceProvider, IAdaptable {
 	/**
+	 * Get the service provider used to create this working copy.
+	 * 
+	 * @return original service provider
+	 */
+	public IServiceProvider getOriginal();
+	
+	/**
 	 * Check if any properties have been modified.
 	 * 
 	 * @return true if the properties need to be saved
