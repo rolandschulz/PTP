@@ -11,6 +11,8 @@
 package org.eclipse.ptp.internal.rdt.ui.scannerinfo;
 
 
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.ui.newui.AbstractCPropertyTab;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -26,11 +28,8 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -42,8 +41,6 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Dialog box that allows the user to browse the remote system for
  * include directories.
- * 
- * @author Mike Kucera
  */
 public class RemoteIncludeDialog extends Dialog {
 	
@@ -53,6 +50,7 @@ public class RemoteIncludeDialog extends Dialog {
 	private Button b_ok;
 	private Button b_cancel;
 	private Button b_browse;
+	private Button b_vars;
 	
 	// check boxes
 	private Button b_add2confs;
@@ -69,6 +67,7 @@ public class RemoteIncludeDialog extends Dialog {
 	private String directory = null;
 	private boolean isAllLanguages = false;
 	private boolean isAllConfigurations = false;
+	private ICConfigurationDescription config;
 	
 	
 	private final boolean isEdit;
@@ -82,11 +81,11 @@ public class RemoteIncludeDialog extends Dialog {
 	private IRemoteServices fRemoteServices = null;
 	private IRemoteConnection fRemoteConnection = null;
 	
-	public RemoteIncludeDialog(Shell parent, String title, boolean isEdit) {
-		
+	public RemoteIncludeDialog(Shell parent, String title, boolean isEdit, ICConfigurationDescription config) {
 		super(parent);
 		setText(title);
 		this.isEdit = isEdit;
+		this.config = config;
 	}
 	
 	
@@ -115,67 +114,56 @@ public class RemoteIncludeDialog extends Dialog {
 	}
 	
 
-	protected Control createDialogArea(Composite c) {
-		RowLayout rl = new RowLayout(SWT.VERTICAL); // don't need a grid layout
-		rl.marginWidth = rl.marginHeight = 5;
-		rl.fill = true;
-		c.setLayout(rl);
+	protected void createDialogArea(Composite parent) {
+		parent.setLayout(new GridLayout(2, false));
+		GridData gd;
 		
-		Label l1 = new Label(c, SWT.NONE);
+		Label l1 = new Label(parent, SWT.NONE);
 		l1.setText(Messages.RemoteIncludeDialog_directory);
+		l1.setLayoutData(gd = new GridData());
+		gd.horizontalSpan = 2;
 
-		// composite to hold text area and browse button
-		Composite c1 = new Composite(c, SWT.NONE);
-		c1.setLayout(new RowLayout(SWT.HORIZONTAL));
+		text = new Text(parent, SWT.SINGLE | SWT.BORDER);
+		text.setLayoutData(gd = new GridData(GridData.FILL_HORIZONTAL));
+		gd.widthHint = 300;
+		text.setText(pathText == null ? "" : pathText); //$NON-NLS-1$
 
-		text = new Text(c1, SWT.SINGLE | SWT.BORDER);
-		text.setLayoutData(new RowData(300, SWT.DEFAULT));
-		if(pathText != null)
-			text.setText(pathText);
-
-		b_browse = new Button(c1, SWT.PUSH);
+		b_browse = new Button(parent, SWT.PUSH);
 		b_browse.setText(Messages.RemoteIncludeDialog_browse);
 		b_browse.addSelectionListener(listener);
-
-		// composite to hold checkboxes
-		Composite c2 = new Composite(c, SWT.NONE);
-		c2.setLayout(new RowLayout(SWT.VERTICAL));
-		b_add2confs = new Button(c2, SWT.CHECK);
+		b_browse.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		new Label(parent, SWT.NONE);
+		
+		b_vars = new Button(parent, SWT.PUSH);
+		b_vars.setText(Messages.RemoteIncludeDialog_vars);
+		b_vars.addSelectionListener(listener);
+		b_vars.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		b_add2confs = new Button(parent, SWT.CHECK);
 		b_add2confs.setText(Messages.RemoteIncludeDialog_configurations);
-		b_add2langs = new Button(c2, SWT.CHECK);
+		b_add2confs.setVisible(!isEdit);
+		b_add2confs.setLayoutData(gd = new GridData());
+		gd.horizontalSpan = 2;
+		
+		b_add2langs = new Button(parent, SWT.CHECK);
 		b_add2langs.setText(Messages.RemoteIncludeDialog_languages);
+		b_add2langs.setVisible(!isEdit);
+		b_add2langs.setLayoutData(gd = new GridData());
+		gd.horizontalSpan = 2;
 		
-		if(isEdit) {
-			b_add2confs.setVisible(false);
-			b_add2langs.setVisible(false);
-		}
-		
-		// composite to hold OK and Cancel buttons
-		Composite c3 = new Composite(c, SWT.NONE);
-		c3.setLayout(new GridLayout(3, false));
-		
-		GridData gd = new GridData();
-		gd.widthHint = 200;
-		Label ph = new Label(c3, 0); // place holder
-		ph.setLayoutData(gd);
-		ph.setText(""); //$NON-NLS-1$
-		
-		b_ok = new Button(c3, SWT.PUSH);
+		b_ok = new Button(parent, SWT.PUSH);
 		b_ok.setText(Messages.RemoteIncludeDialog_ok); 
 		b_ok.addSelectionListener(listener);
-		gd = new GridData();
+		b_ok.setLayoutData(gd = new GridData());
 		gd.widthHint = 80;
-		b_ok.setLayoutData(gd);
+		gd.horizontalAlignment = SWT.END;
 		
-		b_cancel = new Button(c3, SWT.PUSH);
+		b_cancel = new Button(parent, SWT.PUSH);
 		b_cancel.setText(Messages.RemoteIncludeDialog_cancel); 
 		b_cancel.addSelectionListener(listener);
-		b_cancel.setLayoutData(new RowData(300, SWT.DEFAULT));
-		gd = new GridData();
+		b_cancel.setLayoutData(gd = new GridData());
 		gd.widthHint = 80;
-		b_cancel.setLayoutData(gd);
-		
-		return c;
 	}
 	
 	
@@ -201,7 +189,8 @@ public class RemoteIncludeDialog extends Dialog {
 			} 
 			else if(pressed.equals(b_browse)) {
 				if (fHost != null) {
-					SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, Messages.RemoteIncludeDialog_select); 
+					SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, Messages.RemoteIncludeDialog_select, fHost);
+					folderDialog.setShowNewConnectionPrompt(false);
 					folderDialog.open();
 					Object remoteObject = folderDialog.getSelectedObject();
 					if(remoteObject instanceof IRemoteFile) {
@@ -224,6 +213,11 @@ public class RemoteIncludeDialog extends Dialog {
 						}
 					}
 				}
+			}
+			else if(pressed.equals(b_vars)) {
+				String s = AbstractCPropertyTab.getVariableDialog(shell, config);
+				if(s != null) 
+					text.insert(s);
 			}
 		}
 	};
