@@ -541,7 +541,7 @@ public class RemoteCHViewPart extends ViewPart {
         mm.add(fReferencedByAction);
         mm.add(fMakesReferenceToAction);
         mm.add(new Separator());
-        mm.add(fShowFilesInLabelsAction);
+//        mm.add(fShowFilesInLabelsAction);
         mm.add(new Separator());
 //        mm.add(fFilterMacrosAction);
         mm.add(fFilterVariablesAction);
