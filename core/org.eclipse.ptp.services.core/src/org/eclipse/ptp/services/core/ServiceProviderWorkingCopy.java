@@ -22,7 +22,11 @@ public class ServiceProviderWorkingCopy extends ServiceProvider implements
 	private boolean fIsDirty = false;
 
 	public ServiceProviderWorkingCopy(IServiceProvider provider) {
-		fProvider = provider;
+		if (provider instanceof IServiceProviderWorkingCopy) {
+			fProvider = ((IServiceProviderWorkingCopy)provider).getOriginal();
+		} else {
+			fProvider = provider;
+		}
 		setProperties(provider.getProperties());
 		setDescriptor(provider.getDescriptor());
 	}
