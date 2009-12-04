@@ -10,10 +10,10 @@
           includes="**/*"
         />
         <fileset dir="../src-cdtdb-4.0.3"
-          includes="**/*"
+          includes="**/*.java"
         />
         <fileset dir="../src-cdtdb-mock-objects"
-          includes="**/*"
+          includes="**/*.java"
         />
       </jar>
 
@@ -25,7 +25,7 @@
           includes="org/eclipse/rephraserengine/internal/db/org/eclipse/cdt/**/*"
         />
         <fileset dir="../src-cdtdb-4.0.3"
-          includes="org/eclipse/rephraserengine/internal/db/org/eclipse/cdt/**/*"
+          includes="org/eclipse/rephraserengine/internal/db/org/eclipse/cdt/**/*.java"
         />
       </jar>
 
