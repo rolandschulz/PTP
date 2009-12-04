@@ -58,7 +58,8 @@ public class CallHierarchyUtil {
 					protected IStatus run(IProgressMonitor monitor) {
 						try {
 							StatusLineHandler.clearStatusLine(editor.getSite());
-							final ICElement[] elems= service.findDefinitions(Scope.WORKSPACE_ROOT_SCOPE, project, inputCElement, selectionStart, selectionLength, monitor);
+							Scope scope = new Scope(project.getProject().getName());
+							final ICElement[] elems= service.findDefinitions(scope, project, inputCElement, selectionStart, selectionLength, monitor);
 							if (elems.length > 0) {
 								display.asyncExec(new Runnable() {
 									public void run() {
@@ -87,7 +88,8 @@ public class CallHierarchyUtil {
 	
 	    	Job job= new Job(CHMessages.CallHierarchyUI_label) {
 	    		protected IStatus run(IProgressMonitor monitor) {
-	    			final ICElement[] elems= service.findDefinitions(Scope.WORKSPACE_ROOT_SCOPE, input, monitor);
+	    			Scope scope = new Scope(input.getCProject().getProject().getName());
+	    			final ICElement[] elems= service.findDefinitions(scope, input, monitor);
 					if (elems != null && elems.length > 0) {
 						display.asyncExec(new Runnable() {
 							public void run() {
