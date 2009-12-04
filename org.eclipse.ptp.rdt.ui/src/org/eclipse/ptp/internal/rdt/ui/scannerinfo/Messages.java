@@ -12,6 +12,7 @@ public class Messages extends NLS {
 	public static String RemoteIncludeDialog_ok;
 	public static String RemoteIncludeDialog_select;
 	public static String RemoteIncludeTab_title;
+	public static String RemoteIncludeDialog_vars;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

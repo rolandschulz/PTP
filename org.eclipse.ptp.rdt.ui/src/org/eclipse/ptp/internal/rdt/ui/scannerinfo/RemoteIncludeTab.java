@@ -27,17 +27,13 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
 /**
  * Reuse the standard CDT IncludeTab but override the functionality
  * of the Add and Edit buttons to pop up our custom remote dialog.
- * 
- * TODO The RSE dialog should default to the IHost of the project.
- * 
- * @author Mike Kucera
  */
 public class RemoteIncludeTab extends IncludeTab {
 	
 	@Override
 	public ICLanguageSettingEntry doAdd() {
-		
-		RemoteIncludeDialog dlg = new RemoteIncludeDialog(usercomp.getShell(), Messages.RemoteIncludeTab_title, false);
+		RemoteIncludeDialog dlg = new RemoteIncludeDialog(usercomp.getShell(), Messages.RemoteIncludeTab_title, false, getResDesc().getConfiguration());
+
 		setRemoteConnection(dlg);
 		if(dlg.open() && dlg.getDirectory().trim().length() > 0 ) {
 			toAllCfgs = dlg.isAllConfigurations();
@@ -51,8 +47,8 @@ public class RemoteIncludeTab extends IncludeTab {
 	
 	@Override
 	public ICLanguageSettingEntry doEdit(ICLanguageSettingEntry ent) {
-		
-		RemoteIncludeDialog dlg = new RemoteIncludeDialog(usercomp.getShell(), Messages.RemoteIncludeTab_title, true);
+		RemoteIncludeDialog dlg = new RemoteIncludeDialog(usercomp.getShell(), Messages.RemoteIncludeTab_title, true, getResDesc().getConfiguration());
+
 		dlg.setPathText(ent.getValue());
 		setRemoteConnection(dlg);
 		
