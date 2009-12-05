@@ -27,28 +27,35 @@
 <li><a href="#rm">Removing a Resource Manager</a></li>
 </ul>
 <h2 id="defn">Resource Managers</h2>
-<p>PTP uses the term <i>resource manager</i> to refer to any subsystem that controls the resources required for launching a parallel job. If the target parallel system employs a job scheduler for controlling access to compute resources, then the job scheduler would be considered the resource manager for the system. For a cluster with Open MPI installed, the Open MPI runtime system would be considered the resource manager.</p>
+<p>PTP uses the term <i>resource manager</i> to refer to any subsystem that controls the resources required for 
+launching a parallel job. If the target parallel system employs a job scheduler for controlling access to compute resources, 
+then the job scheduler would be considered the resource manager for the system. For a cluster with Open MPI installed, the 
+Open MPI runtime system would be considered the resource manager.</p>
 
-<p>In order for PTP to launch, monitor, and control applications on a target system, it must know what type of resource manager is being employed. PTP allows you to configure and manage resource managers that correspond to target systems. Each resource manager controls one target system, although a particular target system may have more than one type of resource manager.</p>
+<p>In order for PTP to launch, monitor, and control applications on a target system, it must know what type of resource manager 
+is being employed. PTP allows you to configure and manage resource managers that correspond to target systems. Each resource manager 
+controls one target system, although a particular target system may have more than one type of resource manager.</p>
 
-<p>Resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running Eclipse. A remote resource manager controls resources on a physically remote system. The process of configuring a local or remote resource manager is the same.</p>
+<p>Resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running 
+Eclipse. A remote resource manager controls resources on a physically remote system. The process of configuring a local or remote 
+resource manager is the same.</p>
 
 <h2 id="creat">Step 1: Creating a resource manager</h2>
 <p></p>
 <ol>
 <li><p>Open the <b>PTP Runtime Perspective</b> using 
-<b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>PTP Runtime</b> from the 
+<b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>Parallel Runtime</b> from the 
 list of perspectives.</p><p><br></p>
-<p><script> thumb("images/02RuntimePerspEmpty.png")</script></p><p><br></p>
+<p><img src="images/02RuntimePerspEmpty.png"></p><p><br></p>
 </li>
 <li><p>Right-click in <b>Resource Managers</b> view and select 
 <b>Add Resource Manager...</b></p><p><br></p>
-<p><script> full("images/02addResMgr.png") </script></p><p><br></p>
+<p><img src="images/02addResMgr.png"></p><p><br></p>
 </li>
 <li><p>Choose the resource manager that corresponds to the target system. In this example we 
 will use the <b>Open MPI</b> resource manager, which is used to control the Open MPI Open Runtime 
 Environment.</p><p><br></p>
-<p><script> thumb("images/02chooseResMgrType-OpenMPI.png",200) </script></p><p><br></p></li>
+<p><img src="images/02chooseResMgrType.png"></p><p><br></p></li>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
 
@@ -65,7 +72,7 @@ The <b>Open MPI connection configuration</b> dialog is used to configure how Ecl
 	<li>
 		<p>To configure the simple case of a local resource manager, select <b>Local</b> as the <b>Remote service provider</b>.
 		</p>
-		<p><script> thumb("images/02-RM-OpenMPI-Connection-Local.png",240)</script></p>
+		<p><img src="images/02-RM-OpenMPI-Connection-Local.png"></p>
 		<p><br></p>
 	</li>
 	
@@ -111,7 +118,7 @@ for more information. We will only consider Remote Tools here, but the steps for
 		<p>In the <b>Open MPI connection configuration</b> dialog,  select <b>Remote Tools</b> as the <b>Remote service provider</b>.
 		</p>
 		<p><br></p>
-		<p><script> thumb("images/02-RM-OpenMPI-Connection-Remote0.png") </script></p><p><br></p>
+		<p><img src="images/02-RM-OpenMPI-Connection-Remote0.png"></p><p><br></p>
 	</li>
 	
 	<li>
@@ -131,7 +138,7 @@ for more information. We will only consider Remote Tools here, but the steps for
 		<li>
 			<p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> field (can be anything).</p>
 			<p><br></p>
-			<p><script> thumb("images/02newRemoteHost.png") </script></p>
+			<p><img src="images/02newRemoteHost.png"></p>
 			<p><br></p>
 		</li>
 		<li><p>Select the <b>Remote Host</b> radio button.</p><p><br></p></li>
@@ -162,11 +169,12 @@ for more information. We will only consider Remote Tools here, but the steps for
 <h2 id="spec">Step 3: Resource manager-specific configuration</h2>
 <p>The next page will show configuration information specific to a particular resource manager. 
 In this case, the <b>Open MPI tool configuration</b> dialog is shown. 
-You will not normally need to change this information. Just select the <b>Open MPI version</b> installed on the target machine, and default values will automatically loaded into the fields.</p>
-<p><script> thumb("images/02-RM-OpenMPI-Configuration.png") </script></p>
+You will not normally need to change this information. Just leave the <b>Open MPI version</b> set to <b>Auto Detect</b>, 
+and default values will automatically loaded into the fields.</p>
+<p><img src="images/02-RM-OpenMPI-Configuration.png"></p>
 <ol>
 <li><p>If you wish to specify the commands for the Open MPI environment, or add extra arguments, 
-uncheck the <b>Use default settings</b> checkbox.</p>
+select a specific Open MPI version and uncheck the <b>Use default settings</b> checkbox.</p>
 <p><br></p></li>
 <ol>
 <li><p><b>Launch command</b>: A command line executed to launch the parallel application with Open MPI.</p><p><br></p></li>
@@ -182,13 +190,17 @@ Several place holders (macros) are allowed, the most relevant are:</p>
 <li><b>execPath</b> and <b>execName</b>: Path and name of the executable of the parallel application to be launched by mpirun.
 <li><b>progArgs</b>: arguments to be passed to the parallel application.</li>
 </ul>
+<li><p>If you have installed Open MPI in a non-standard location, or it is not in your path, uncheck the <b>Use default location</b> checkbox, then
+enter the path to the installation <code>bin</code> directory. So, for example if your installation is in <code>/usr/local/openmpi-1.3.4</code>, you
+would enter <code>/usr/local/openmpi-1.3.4/bin</code> for the location.</p></li>
+<p>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
 
-<h2 id="finish">Step 4: Finishing resource manager configuration</h2>
-<p>The final dialog is <b>Choose Resource Manager Name and Description</b> which provides an opportunity
+<h2 id="name">Step 4: Naming the resource manager configuration</h2>
+<p>The next dialog is <b>Choose Resource Manager Name and Description</b> which provides an opportunity
 to change how the resource manager is displayed.</p>
-<p><script> thumb("images/02ChooseResMgrNameAndDesc.png") </script></p>
+<p><img src="images/02ChooseResMgrNameAndDesc.png"></p>
 <ol>
 <li><p>If you wish to change the name or description, uncheck the <b>Use default name and 
 description</b> checkbox.</p><p><br></p></li>
@@ -198,27 +210,42 @@ description</b> checkbox.</p><p><br></p></li>
   <p>Enter a new description in the <b>Description</b> field. Anything can be entered.</p><p><br></p>
 </li>
 </ol>
-<li><p>Select <b>Finish</b></p></li>
+<li><p>If you want the resource manager to start automatially when you start a new Eclipse session, check the <b>Automatically start resource
+manager when Eclipse starts</b> checkbox.</p><p><br></li>
+<li><p>Select <b>Next &gt;</b></p></li>
+</ol>
+
+<h2 id="finish">Step 5: Finishing resource manager configuration</h2>
+<p>The final dialog is the <b>Select Service Configuration</b> page. This page allows you to add the resource manager to an existing service configuration,
+or create a new service configuration for the resource manager. Service configurations can be shared with users in order to simplify the configuration
+of PTP.
+<p><img src="images/02rmServiceConfig.png"></p>
+<ol>
+<li><p>If there are no existing configurations, you will need to create a new one. You can either choose a new name or 
+leave the default.</p><p><br></p></li>
+<li><p>If there are existing configurations, you can add the resource manager to an existing configuration. Just select the 
+configuration you wish to add it to.</p><p><br></p></li>
+<li><p>Select <b>Finish</b></p><p><br></p></li>
 </ol>
 <p>The new Resource Manager should appear in the list of Resource
 Managers.</p>
-<p><script> thumb("images/02-RM-OpenMPI-View-List.png") </script></p>
+<p><img src="images/02-RM-OpenMPI-View-List.png"></p>
 
-<h2 id="start">Step 5: Starting the resource manager</h2>
+<h2 id="start">Step 6: Starting the resource manager</h2>
 <p></p>
 <ol>
 <li><p>To start the resource manager, right mouse click on the resource manager in the <b>Resource 
 Managers view</b>, then select <b>Start Resource Manager</b> from the context menu.</p><p><br></p>
-<p><script> thumb("images/02-RM-OpenMPI-View-Start.png") </script></p><p><br></p>
+<p><img src="images/02-RM-OpenMPI-View-Start.png"></p><p><br></p>
 </li>
 <li><p>The resource manager icon should change color to green to indicate has been successfully 
 started.</p><p><br></p>
-  <p><script> full("images/02-RM-OpenMPI-View-Running.png") </script></p><p><br></p>
+  <p><img src="images/02-RM-OpenMPI-View-Running.png"></p><p><br></p>
 </li>
 <li>
   <p>In the <b>Machines view</b> you should see an icon representing your target system and icons 
   showing status of the node(s).</p><p><br></p>
-  <p><script> thumb("images/02-RM-OpenMPI-View-Machines.png") </script></p><p><br></p>
+  <p><img src="images/02-RM-OpenMPI-View-Machines.png"></p><p><br></p>
 </li>
 <li><p>If the resource manager fails to start (the icon is red), right click on the resource 
 manager and select <b>Stop Resource Manager</b>. Check the log files for the reason that the 
@@ -231,7 +258,7 @@ resource manager failed to start, correct the error and restart again.</p></li>
 <li><p>If the resource manager is running, stop it first. Right-click on the resource manager and 
 select <b>Stop Resource Manager</b></p><p><br></p></li>
 <li><p>Right-click on the resource manager and select <b>Edit Resource Manager</b><p><br></p></p>
-<p><script> thumb("images/02-RM-OpenMPI-View-Edit.png") </script></p><p><br></p>
+<p><img src="images/02-RM-OpenMPI-View-Edit.png"></p><p><br></p>
 </li>
 <li><p>Modify the required configuration settings and click <b>Finish</b>.</p><p><br></p></li>
 <li><p>Restart the resource manager.</p></li>
@@ -243,7 +270,7 @@ select <b>Stop Resource Manager</b></p><p><br></p></li>
 <li><p>If the resource manager is running, stop it first. Right-click on the resource manager and 
 select <b>Stop Resource Manager</b></p><p><br></p></li>
 <li><p>Right-click on the resource manager and select <b>Remove Resource Manager</b></p><p><br></p>
-<p><script> thumb("images/02-RM-OpenMPI-View-Remove.png") </script></p><p><br></p>
+<p><img src="images/02-RM-OpenMPI-View-Remove.png"></p><p><br></p>
 </li>
 <li>
   <p>You will be prompted to confirm removal. Click <b>OK</b></p>
