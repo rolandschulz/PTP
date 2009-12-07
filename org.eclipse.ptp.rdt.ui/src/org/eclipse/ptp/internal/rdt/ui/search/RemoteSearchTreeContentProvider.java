@@ -20,6 +20,7 @@
 
 package org.eclipse.ptp.internal.rdt.ui.search;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,9 +37,13 @@ import org.eclipse.cdt.core.model.ISourceRoot;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.IPDOMSearchContentProvider;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -57,6 +62,7 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 		Set children = tree.get(parentElement);
 		if (children == null)
 			return new Object[0];
+		
 		return children.toArray();
 	}
 
@@ -146,7 +152,9 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 		} 
 		if (!handled) {
 			// insert a folder and then the file under that
-			IPath path = IndexLocationFactory.getAbsolutePath(location);
+			//IPath path = IndexLocationFactory.getAbsolutePath(location);
+			IPath path = getAbsolutePath(location);
+			
 			if (path != null) {
 				IPath directory = path.removeLastSegments(1);
 				insertChild(location, element);
@@ -159,6 +167,29 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 			}
 		}
 	}
+	
+	
+	/**
+	 * Copied from IndexLocationFactory.getAbsolutePath()
+	 */
+	static IPath getAbsolutePath(IIndexFileLocation location) {
+		IPath path = URIUtil.toPath(location.getURI());
+		// Workaround for platform bug http://bugs.eclipse.org/bugs/show_bug.cgi?id=261457
+		if (path == null) {
+			try {
+				IFileStore store = EFS.getStore(location.getURI());
+				if (store == null)
+					return null;
+				File file = store.toLocalFile(EFS.NONE, null);
+				if (file == null) 
+					return new Path(location.getURI().getPath()); // better than returning null
+				path = new Path(file.getAbsolutePath());
+			} catch (CoreException e) {
+			}
+		}
+		return path;
+	}
+	
 	
 	private void insertCElement(ICElement element) {
 		if (element instanceof ICProject)
