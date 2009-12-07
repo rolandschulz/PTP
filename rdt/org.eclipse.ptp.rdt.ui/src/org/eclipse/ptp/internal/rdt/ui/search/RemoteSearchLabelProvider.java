@@ -23,7 +23,6 @@ import java.net.URI;
 
 import org.eclipse.cdt.core.dom.ast.ASTSignatureUtil;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
-import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.search.IPDOMSearchContentProvider;
 import org.eclipse.cdt.internal.ui.search.ProblemSearchElement;
@@ -117,7 +116,8 @@ public class RemoteSearchLabelProvider extends LabelProvider {
 		}
 		
 		if (element instanceof IIndexFileLocation) {
-			IPath path= IndexLocationFactory.getPath((IIndexFileLocation)element); 
+			//IPath path= IndexLocationFactory.getPath((IIndexFileLocation)element);
+			IPath path = RemoteSearchTreeContentProvider.getAbsolutePath((IIndexFileLocation)element);
 			if(path!=null) {
 				// these are categorized into directories already
 				return path.lastSegment();
