@@ -1,5 +1,5 @@
 ! Master feature
-feature@org.eclipse.photran.master=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.master
+!feature@org.eclipse.photran.master=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.photran.master
 
 ! Photran features
 feature@org.eclipse.rephraserengine=@photranTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/photran/org.eclipse.rephraserengine-feature

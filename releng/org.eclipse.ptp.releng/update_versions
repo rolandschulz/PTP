@@ -2,23 +2,25 @@
 #
 # script to update PTP versions
 #
-# Usage: update_versions version
+# Usage: update_versions ptp_version photran_version
 #
-# version - new version string (e.g. "3.0.1")
+# ptp_version - new version string for PTP (e.g. "3.0.1")
+# photran_version - new version string for Photran (e.g. "5.0.1")
 #
 # Note: a "qualifier" suffix will automatically be added to the version where appropriate
 #
 
 TMP_DIR=/tmp
 
-if [ $# -lt 1 ]; then
-	echo "usage: update_versions version"
+if [ $# -lt 2 ]; then
+	echo "usage: update_versions ptp_version photran_version"
 	exit 1
 fi
 
-version=$1
+ptp_version=$1
+photran_version=$2
 
-FEATURES="\
+PTP_FEATURES="\
 	org.eclipse.ptp-feature \
 	org.eclipse.ptp.core-feature \
 	org.eclipse.ptp.external-feature \
@@ -43,7 +45,13 @@ FEATURES="\
 	org.eclipse.ptp.services-feature \
 	org.eclipse.ptp.utils-feature"
 	
-PLUGINS="\
+PHOTRAN_FEATURES="\
+	org.eclipse.photran-feature \
+	org.eclipse.photran.intel-feature \
+	org.eclipse.photran.xlf-feature \
+	org.eclipse.rephraserengine-feature"
+
+PTP_PLUGINS="\
 	org.eclipse.ptp.aix.ppc \
 	org.eclipse.ptp.linux.ppc \
 	org.eclipse.ptp.linux.x86 \
@@ -52,9 +60,13 @@ PLUGINS="\
 	org.eclipse.ptp.macosx.x86 \
 	org.eclipse.ptp"
 	
-C_PROJECTS="\
+PTP_C_PROJECTS="\
 	org.eclipse.ptp.debug.sdm \
 	org.eclipse.ptp.proxy \
+	org.eclipse.ptp.rm.ibm.pe.proxy \
+	org.eclipse.ptp.rm.ibm.ll.proxy \
+	org.eclipse.ptp.rm.pbs.proxy \
+	org.eclipse.ptp.rm.slurm.proxy \
 	org.eclipse.ptp.utils"
 	
 update_feature() {
@@ -73,28 +85,31 @@ update_configure() {
 	(cd $1; autoconf)
 }
 
-for feature in $FEATURES; do
+for feature in $PTP_FEATURES; do
 	echo "Updating $feature..."
-	update_feature $feature $version
+	update_feature $feature $ptp_version
 done
 
-for plugin in $PLUGINS; do
+for plugin in $PTP_PLUGINS; do
 	echo "Updating $plugin..."
-	update_manifest $plugin $version
+	update_manifest $plugin $ptp_version
 done
 
-for project in $C_PROJECTS; do
+for project in $PTP_C_PROJECTS; do
 	echo "Updating $project..."
-	update_manifest $project $version
-	update_configure $project $version
+	update_manifest $project $ptp_version
+	update_configure $project $ptp_version
+done
+
+for feature in $PHOTRAN_FEATURES; do
+	echo "Updating $feature..."
+	update_feature $feature $photran_version
 done
 
 echo "Updating org.eclipse.ptp.releng..."
-sed -e "s/<property name=\"branchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"branchVersion\" value=\"$version\"\/>/" < org.eclipse.ptp.releng/build.xml > $TMP_DIR/org.eclipse.ptp.releng_build.xml
+sed -e "s/<property name=\"ptpBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"ptpBranchVersion\" value=\"$ptp_version\"\/>/" \
+	-e "s/<property name=\"photranBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"photranBranchVersion\" value=\"$photran_version\"\/>/" \
+	< org.eclipse.ptp.releng/build.xml > $TMP_DIR/org.eclipse.ptp.releng_build.xml
 mv $TMP_DIR/org.eclipse.ptp.releng_build.xml org.eclipse.ptp.releng/build.xml
-
-echo "Updating org.eclipse.ptp.rdt.core.remotejars..."
-sed -e "s/<property name=\"ptpVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"ptpVersion\" value=\"$version\"\/>/" < org.eclipse.ptp.rdt.core.remotejars/build.xml > $TMP_DIR/org.eclipse.ptp.rdt.core.remotejars_build.xml
-mv $TMP_DIR/org.eclipse.ptp.rdt.core.remotejars_build.xml org.eclipse.ptp.rdt.core.remotejars/build.xml
 
 exit 0
