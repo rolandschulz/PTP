@@ -1,0 +1,60 @@
+% Adding New Syntax
+
+The process of adding new syntax to Photran is as follows.\footnote{Note that Photran
+originally handled Fortran 95, and it was later extended to work with Fortran 2003
+and then Fortran 2008; the requisite changes to the lexer, parser, and syntax
+highlighting code are fairly clearly marked.}
+
+\begin{enumerate}
+
+\item Modify the lexers and parser:
+
+  \begin{enumerate}
+  \item Modify the grammar (fortran2008.bnf) to recognize new syntactic constructs, and
+        modify the phase 1 lexers (FreeFormLexerPhase1.flex and FixedFormLexerPhase1.flex)
+        to recognize new keywords
+  \item Add new terminal symbols to Terminal.java
+  \item Run the build-lexer and build-parser scripts to regenerate the lexers and parser
+  \item Modify the phase 2 lexer (FreeFormLexerPhase2.java) to correctly resolve
+        any new keywords as identifiers
+  \end{enumerate}
+
+\item Modify the syntax highlighting for the Fortran editor:
+  \begin{enumerate}
+  \item Modify the list of keywords in FortranKeywordRuleBasedScanner
+  \item Modify the keyword/identifier resolution rules in SalesScanKeywordRule
+  \end{enumerate}
+
+\item Modify the model builder (Outline view), if necessary:
+  \begin{enumerate}
+  \item Add new model elements to FortranElement.java, if necessary, and place their
+        Outline view icons in the org.eclipse.photran.cdtinterface/icons/model folder
+  \item Modify FortranModelBuildingVisitor.java to visit the new constructs and add
+        them to the model
+  \end{enumerate}
+
+\item Modify the name binding analysis, if necessary:
+  \begin{enumerate}
+  \item \textit{IMPORTANT:}
+        If you change any classes that implement IPhotranSerializable, or if you
+        change the ScopingNode class, then be sure to change the VPG database filename
+        in PhotranVPGDB.  This will ensure that end users' code is completely
+        reindexed using the new versions of the serialized classes.
+%        Within your runtime workspace, you can simply clear and refresh the VPG
+%        database (from the Refactor $>$ Debugging menu), but end users should never be
+%        asked to do this.
+  \item If any new syntactic constructs are subclasses of ScopingNode, there are
+        several methods in the ScopingNode class that will need to be modified to
+        handle the new node type.  Currently, these are easy to identify because they
+        all contain large numbers of
+        ``instanceof'' tests (which is ugly; we will eventually do this the ``right''
+        way and dispatch dynamically to the subclasses after the parser generator
+        allows custom subclasses)
+  \item If the new syntax contains identifiers, modify the ReferenceCollector to bind
+        any identifiers in new syntactic constructs to their declarations
+  \item Similarly, if necessary, modify the DefinitionCollector to add any new
+        declarations to the VPG database
+  \item Modify the other collector classes in the same package if necessary
+  \end{enumerate}
+
+\end{enumerate}
