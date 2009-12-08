@@ -36,7 +36,7 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
                                         "Enable folding rather than ruler in fixed-form Fortran editors",
                                         getFieldEditorParent()));
         
-        addField(new Separator(getFieldEditorParent()));
+        //addField(new Separator(getFieldEditorParent()));
         
         addField(new ColorFieldEditor(FortranPreferences.COLOR_COMMENTS.getName(),
                                       "Comments",
@@ -53,35 +53,38 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         addField(new ColorFieldEditor(FortranPreferences.COLOR_STRINGS.getName(),
                                       "Strings",
                                       getFieldEditorParent()));
+        addField(new ColorFieldEditor(FortranPreferences.COLOR_CPP.getName(),
+                                      "C Preprocessor Directives",
+                                      getFieldEditorParent()));
     }
     
-    private static class Separator extends FieldEditor
-    {
-        private Label label;
-        
-        public Separator(Composite parent)
-        {
-            this.createControl(parent);
-        }
-        
-        protected void adjustForNumColumns(int numColumns)
-        {
-            ((GridData)label.getLayoutData()).horizontalSpan = 2;
-        }
-
-        protected void doFillIntoGrid(Composite parent, int numColumns)
-        {
-            label = new Label(parent, SWT.SEPARATOR);
-            label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns, 1));
-        }
-
-        public int getNumberOfControls()
-        {
-            return 1;
-        }
-        
-        protected void doLoad() {}
-        protected void doLoadDefault() {}
-        protected void doStore() {}
-    }
+//    private static class Separator extends FieldEditor
+//    {
+//        private Label label;
+//        
+//        public Separator(Composite parent)
+//        {
+//            this.createControl(parent);
+//        }
+//        
+//        protected void adjustForNumColumns(int numColumns)
+//        {
+//            ((GridData)label.getLayoutData()).horizontalSpan = 2;
+//        }
+//
+//        protected void doFillIntoGrid(Composite parent, int numColumns)
+//        {
+//            label = new Label(parent, SWT.SEPARATOR);
+//            label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns, 1));
+//        }
+//
+//        public int getNumberOfControls()
+//        {
+//            return 1;
+//        }
+//        
+//        protected void doLoad() {}
+//        protected void doLoadDefault() {}
+//        protected void doStore() {}
+//    }
 }

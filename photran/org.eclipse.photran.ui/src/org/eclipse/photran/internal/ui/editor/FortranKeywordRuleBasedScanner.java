@@ -118,14 +118,40 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
      */
     private static final class FortranWordDetector implements IWordDetector
     {
+        private boolean startedWithDigit = false;
+        private boolean startedWithPeriod = false;
+        private boolean reachedSecondPeriod = false;
+        
         public boolean isWordStart(char c)
         {
-            return Character.isJavaIdentifierStart(c) || c == '.';
+            if (c == '.')
+            {
+                startedWithPeriod = true;
+                reachedSecondPeriod = false;
+                startedWithDigit = false;
+                return true;
+            }
+            else if (Character.isDigit(c))
+            {
+                startedWithPeriod = false;
+                reachedSecondPeriod = false;
+                startedWithDigit = true;
+                return true;
+            }
+            else return Character.isJavaIdentifierStart(c);
         }
 
         public boolean isWordPart(char c)
         {
-            return Character.isJavaIdentifierPart(c) || c == '.';
+            if (startedWithPeriod && reachedSecondPeriod)
+                return false;
+            else if (c == '.' && (startedWithPeriod || startedWithDigit))
+            {
+                reachedSecondPeriod = true;
+                return true;
+            }
+            else
+                return Character.isJavaIdentifierPart(c);
         }
     }
 
@@ -149,6 +175,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
             if (property.equals(FortranPreferences.COLOR_COMMENTS.getName()))
                 updateToken(colorComments, newVal);
+            else if (property.equals(FortranPreferences.COLOR_CPP.getName()))
+                updateToken(colorCpp, newVal);
             else if (property.equals(FortranPreferences.COLOR_STRINGS.getName()))
                 updateToken(colorStrings, newVal);
             else if (property.equals(FortranPreferences.COLOR_IDENTIFIERS.getName()))
@@ -337,6 +365,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     // Fields - colors
     ///////////////////////////////////////////////////////////////////////////
 
+    private Token colorCpp = createTokenFromRGBPreference(FortranPreferences.COLOR_CPP);
+
     private Token colorStrings = createTokenFromRGBPreference(FortranPreferences.COLOR_STRINGS);
 
     private Token colorComments = createTokenFromRGBPreference(FortranPreferences.COLOR_COMMENTS);
@@ -349,7 +379,14 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     private static Token createTokenFromRGBPreference(FortranRGBPreference p)
     {
-        int style = (p == FortranPreferences.COLOR_KEYWORDS ? SWT.BOLD : (p == FortranPreferences.COLOR_INTRINSICS ? SWT.ITALIC : SWT.NONE));
+        int style;
+        if (p == FortranPreferences.COLOR_KEYWORDS || p == FortranPreferences.COLOR_CPP)
+            style = SWT.BOLD;
+        else if (p == FortranPreferences.COLOR_INTRINSICS)
+            style = SWT.ITALIC;
+        else
+            style = SWT.NONE;
+
         return new Token(new TextAttribute(new Color(null, p.getValue()), null, style));
     }
 
@@ -361,8 +398,10 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     {
         FortranCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(new PreferenceChangeListener(sourceViewer));
 
-        IRule[] rules = new IRule[isFixedForm ? 5+(128-33+1) : 5];
+        IRule[] rules = new IRule[isFixedForm ? 6+(128-33+1) : 6];
         int i = 0;
+
+        rules[i++] = new EndOfLineRule("#", colorCpp);
 
         rules[i++] = new MultiLineRule("\"", "\"", colorStrings);
         rules[i++] = new MultiLineRule("'", "'", colorStrings);
