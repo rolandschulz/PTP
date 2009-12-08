@@ -11,9 +11,9 @@
 	<target name="init">
 		<touch file="${user.home}/.cvspass" />
 		<tstamp/>
-		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/R-3.5-200906111540/eclipse-SDK-3.5-linux-gtk-ppc.tar.gz"/>
-		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/6.0.2/I.I200910282010/cdt-master-6.0.2-I200910282010.zip"/>
-		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/galileo/mylyn-3.2.0.v20090617-0100-e3.4.zip"/>
+		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/S-3.6M3-200910301201/eclipse-SDK-3.6M3-linux-gtk-ppc.tar.gz"/>
+		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/6.1.0/I.I200911270816/cdt-master-6.1.0-I200911270816.zip"/>
+		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/helios/mylyn-3.3.1.I20091113-1800-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.1.1-200909160905/RSE-SDK-3.1.1.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
 		<property name="eclipseRelease" value="helios"/>
