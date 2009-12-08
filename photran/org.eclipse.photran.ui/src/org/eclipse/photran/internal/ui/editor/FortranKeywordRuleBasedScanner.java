@@ -118,40 +118,14 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
      */
     private static final class FortranWordDetector implements IWordDetector
     {
-        private boolean startedWithDigit = false;
-        private boolean startedWithPeriod = false;
-        private boolean reachedSecondPeriod = false;
-        
         public boolean isWordStart(char c)
         {
-            if (c == '.')
-            {
-                startedWithPeriod = true;
-                reachedSecondPeriod = false;
-                startedWithDigit = false;
-                return true;
-            }
-            else if (Character.isDigit(c))
-            {
-                startedWithPeriod = false;
-                reachedSecondPeriod = false;
-                startedWithDigit = true;
-                return true;
-            }
-            else return Character.isJavaIdentifierStart(c);
+            return Character.isJavaIdentifierStart(c);
         }
 
         public boolean isWordPart(char c)
         {
-            if (startedWithPeriod && reachedSecondPeriod)
-                return false;
-            else if (c == '.' && (startedWithPeriod || startedWithDigit))
-            {
-                reachedSecondPeriod = true;
-                return true;
-            }
-            else
-                return Character.isJavaIdentifierPart(c);
+            return Character.isJavaIdentifierPart(c);
         }
     }
 
@@ -226,7 +200,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         "IMAGES", "SYNCMEMORY", "MEMORY", "LOCK", "UNLOCK"
         };
 
-    private static String[] fgTextualOperators = { ".AND.", ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
+    //private static String[] fgTextualOperators = { ".AND.", ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
+    private static String[] fgTextualOperators = { "AND", "EQ", "EQV", "FALSE", "GE", "GT", "LE", "LT", "NE", "NEQV", "NOT", "OR", "TRUE" };
 
     private static String[] fgIntrinsics =
     {
