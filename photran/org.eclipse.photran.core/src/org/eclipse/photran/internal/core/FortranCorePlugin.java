@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.content.IContentType;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -20,9 +22,32 @@ import org.osgi.framework.BundleContext;
  */
 public class FortranCorePlugin extends Plugin
 {
-    public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
-    public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
+    private static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
+    private static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
     
+    public static final IContentType fixedFormContentType()
+    {
+        return Platform.getContentTypeManager().getContentType(FIXED_FORM_CONTENT_TYPE);
+    }
+
+    public static final IContentType freeFormContentType()
+    {
+        return Platform.getContentTypeManager().getContentType(FREE_FORM_CONTENT_TYPE);
+    }
+    
+    public static final boolean isFixedFormContentType(String contentTypeID)
+    {
+        if (contentTypeID == null) return false;
+        
+        IContentType ct = Platform.getContentTypeManager().getContentType(contentTypeID);
+        return ct == null ? false : ct.isKindOf(fixedFormContentType());
+    }
+    
+    public static final String[] getAllFortranContentTypes()
+    {
+        return new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE };
+    }
+
     // The shared instance.
     private static FortranCorePlugin plugin;
 

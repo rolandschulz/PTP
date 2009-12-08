@@ -12,7 +12,7 @@ package org.eclipse.photran.internal.core.lexer;
 
 /**
  * Terminal symbols used by the Fortran lexer and parser.
- * 
+ *
  * @author Jeff Overbey
  */
 public final class Terminal
@@ -227,7 +227,7 @@ public final class Terminal
     public static final Terminal T_HCON = new Terminal("Hollerith constant");
     public static final Terminal T_EXIT = new Terminal("exit");
     public static final Terminal T_UNEXPECTED_CHARACTER = new Terminal("extraneous character");
-    
+
     // New for Fortran 2003
     public static final Terminal T_EXTENDS = new Terminal("extends");
     public static final Terminal T_ABSTRACT = new Terminal("abstract");
@@ -247,6 +247,26 @@ public final class Terminal
     public static final Terminal T_PROTECTED = new Terminal("protected");
     public static final Terminal T_VALUE = new Terminal("value");
     public static final Terminal T_VOLATILE = new Terminal("volatile");
+
+    // New for Fortran 2008
+    public static final Terminal T_SUBMODULE = new Terminal("submodule");
+    public static final Terminal T_ENDSUBMODULE = new Terminal("endsubmodule");
+    public static final Terminal T_ENDPROCEDURE = new Terminal("endprocedure");
+    public static final Terminal T_IMPURE = new Terminal("impure");
+    public static final Terminal T_CODIMENSION = new Terminal("codimension");
+    public static final Terminal T_CONTIGUOUS = new Terminal("contiguous");
+    public static final Terminal T_CRITICAL = new Terminal("critical");
+    public static final Terminal T_ENDCRITICAL = new Terminal("endcritical");
+    public static final Terminal T_ALL = new Terminal("all");
+    public static final Terminal T_ALLSTOP = new Terminal("allstop");
+    public static final Terminal T_SYNC = new Terminal("sync");
+    public static final Terminal T_SYNCALL = new Terminal("syncall");
+    public static final Terminal T_SYNCIMAGES = new Terminal("syncimages");
+    public static final Terminal T_IMAGES = new Terminal("images");
+    public static final Terminal T_SYNCMEMORY = new Terminal("syncmemory");
+    public static final Terminal T_MEMORY = new Terminal("memory");
+    public static final Terminal T_LOCK = new Terminal("lock");
+    public static final Terminal T_UNLOCK = new Terminal("unlock");
 
     private String description;
 

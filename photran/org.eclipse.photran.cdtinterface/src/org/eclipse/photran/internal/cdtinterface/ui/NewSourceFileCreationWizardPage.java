@@ -25,8 +25,6 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
 public class NewSourceFileCreationWizardPage extends org.eclipse.cdt.internal.ui.wizards.filewizard.NewSourceFileCreationWizardPage {
 	protected Template[] getApplicableTemplates() {
 		return StubUtility.getFileTemplatesForContentTypes(
-				new String[] {
-				    FortranCorePlugin.FREE_FORM_CONTENT_TYPE,
-				    FortranCorePlugin.FIXED_FORM_CONTENT_TYPE }, null);
+		    FortranCorePlugin.getAllFortranContentTypes(), null);
 	}
 }

@@ -27,9 +27,9 @@ import org.eclipse.jface.text.rules.WordRule;
  * <p>
  * The logic is somewhat based on FreeFormLexerPhase2, although this version is much less
  * precise and is based on a character-by-character scan rather than a token stream.
- * 
+ *
  * @see org.eclipse.jface.text.rules.WordRule
- * 
+ *
  * @author Jeff Overbey (based on WordRule)
  */
 public class SalesScanKeywordRule extends WordRule implements IRule
@@ -48,10 +48,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
     /** Buffer used for pattern detection. */
     private StringBuffer fBuffer = new StringBuffer();
-    
+
     /** Buffer used to store the entire line of text. */
     private StringBuffer fLineBuffer = new StringBuffer();
-    
+
     /** The (1-based) column on which the scanned word starts. */
     private int fWordCol = 0;
 
@@ -60,7 +60,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
      * with the detected word. If no token has been associated, the scanner will be rolled back and
      * an undefined token will be returned in order to allow any subsequent rules to analyze the
      * characters.
-     * 
+     *
      * @param detector the word detector to be used by this rule, may not be <code>null</code>
      * @see #addWord(String, IToken)
      */
@@ -73,7 +73,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
      * Creates a rule which, with the help of a word detector, will return the token associated with
      * the detected word. If no token has been associated, the specified default token will be
      * returned.
-     * 
+     *
      * @param detector the word detector to be used by this rule, may not be <code>null</code>
      * @param defaultToken the default token to be returned on success if nothing else is specified,
      *            may not be <code>null</code>
@@ -82,7 +82,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     public SalesScanKeywordRule(IWordDetector detector, IToken defaultToken)
     {
         super(detector);
-        
+
         Assert.isNotNull(detector);
         Assert.isNotNull(defaultToken);
 
@@ -93,7 +93,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     /**
      * Adds a keyword and the token to be returned if it is used as a keyword
      * rather than an identifier.
-     * 
+     *
      * @param word the word this rule will search for, may not be <code>null</code>
      * @param token the token to be returned if the word has been found, may not be
      *            <code>null</code>
@@ -108,7 +108,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
     /**
      * Adds an identifier and the token to be returned if it is not used as a keyword.
-     * 
+     *
      * @param word the word this rule will search for, may not be <code>null</code>
      * @param token the token to be returned if the word has been found, may not be
      *            <code>null</code>
@@ -168,20 +168,20 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         readPrefix(scanner);
         readWord(scanner);
         readSuffix(scanner);
-        
+
         fixLineBuffer();
     }
 
     private void readPrefix(ICharacterScanner scanner)
     {
         fWordCol = scanner.getColumn();
-        
+
         for (int i = 0; i < fWordCol; i++)
             scanner.unread();
-        
+
         for (int i = 0; i < fWordCol; i++)
             fLineBuffer.append((char)scanner.read());
-        
+
     }
 
     private void readWord(ICharacterScanner scanner)
@@ -203,7 +203,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     {
         int startCol = scanner.getColumn();
         int count = 1;
-        
+
         int c = scanner.read();
         if (c == ICharacterScanner.EOF || scanner.getColumn() < startCol) return;
         do
@@ -213,7 +213,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             c = scanner.read();
         }
         while (c != ICharacterScanner.EOF && scanner.getColumn() > startCol);
-        
+
         for (int i = 0; i < count; i++)
             scanner.unread();
     }
@@ -228,17 +228,17 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     private void removeStringLiterals()
     {
         boolean inString = false;
-        
+
         for (int i = 0, length = fLineBuffer.length(); i < length; i++)
         {
             char thisChar = fLineBuffer.charAt(i);
             char nextChar = i+1 < length ? fLineBuffer.charAt(i+1) : '\0';
-            
+
             if ((thisChar == '\"' || thisChar == '\'') && !inString)
                 inString = true;
             else if ((thisChar == '\"' || thisChar == '\'') && inString)
                 inString = (nextChar == '\"');
-            
+
             if (inString || thisChar == '\"' || thisChar == '\'')
                 fLineBuffer.setCharAt(i, ' ');
         }
@@ -261,10 +261,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         {
             for (int i = 0; i <= precedingSemicolon; i++)
                 fLineBuffer.setCharAt(i, ' ');
-            
+
             precedingSemicolon = fLineBuffer.indexOf(";", precedingSemicolon+1);
         }
-        
+
         int followingSemicolon = fLineBuffer.indexOf(";", fWordCol);
         if (followingSemicolon > 0)
             for (int i = followingSemicolon, length = fLineBuffer.length(); i < length; i++)
@@ -275,7 +275,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     {
         SalesScanner salesScanner = new SalesScanner(fLineBuffer.toString(), fBuffer.toString());
         boolean result = salesScanner.retainAsKeyword(fWordCol);
-        
+
 //        System.out.println();
 //        System.out.println("\"" + fLineBuffer + "\"");
 //        System.out.println("\"" + fBuffer + "\"");
@@ -285,7 +285,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 //        System.out.println("Open context comma?   " + salesScanner.openContextComma);
 //        System.out.println("Open context equals?  " + salesScanner.openContextEquals);
 //        System.out.println("Letter follows paren? " + salesScanner.letterFollowsParenthetical);
-        
+
         return result ? tokenIfKeyword : (tokenIfIdentifier == null ? fDefaultToken : tokenIfIdentifier);
     }
 
@@ -309,11 +309,11 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
         private boolean lineContainsColonColon;
         private boolean[] inParens;
-        
+
         private boolean openContextComma;
         private boolean openContextEquals;
         private boolean letterFollowsParenthetical;
-        
+
         private int firstTokenPos = -1;
         private int tokenFollowingParentheticalPos = -1;
 
@@ -324,7 +324,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             this.length = line.length();
             this.pos = 0;
             this.inParens = new boolean[line.length()];
-            
+
             this.firstTokenPos = findFirstToken();
             scan();
         }
@@ -332,11 +332,11 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private int findFirstToken()
         {
             int start = 0;
-            
+
             int cc = line.indexOf("::");
             lineContainsColonColon = cc > 0;
-            if (lineContainsColonColon) start = cc + 2; 
-            
+            if (lineContainsColonColon) start = cc + 2;
+
             int pos = skipWhitespace(start);
             if (pos >= 0 && Character.isDigit(line.charAt(pos)))
             {
@@ -353,7 +353,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             for (pos = start; pos < length; pos++)
                 if (!Character.isWhitespace(line.charAt(pos)))
                     return pos;
-            
+
             return -1;
         }
 
@@ -362,7 +362,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             for (pos = start; pos < length; pos++)
                 if (!Character.isDigit(line.charAt(pos)))
                     return pos;
-            
+
             return -1;
         }
 
@@ -371,13 +371,13 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             openContextComma = false;
             openContextEquals = false;
             letterFollowsParenthetical = false;
-            
+
             int currentParenDepth = 0;          // Track nested parentheses
             boolean justClosedParen = false;    // Does this token immediately follow T_RPAREN?
             boolean firstParenthetical = true;  // Is this the first non-nested T_RPAREN?
             boolean inArrayLiteral = false;     // Are we inside an (/ array literal /)
             boolean followingThen = false;      // Have we seen a THEN token
-            
+
             for (pos = 0; pos < length; pos++)
             {
                 if (currentParenDepth == 0)
@@ -388,7 +388,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                         inArrayLiteral = false;
                     else if (match("then"))
                         followingThen = true;
-                    
+
                     if (!inArrayLiteral)
                     {
                         // The pos test ensures that we don't match the = in "integer, kind=3 :: if"
@@ -396,12 +396,12 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                             openContextComma = true;
                         else if (match("=") && pos >= firstTokenPos && !followingThen)
                             openContextEquals = true;
-        
+
                         if (justClosedParen && firstParenthetical)
                         {
                             firstParenthetical = false;
                             tokenFollowingParentheticalPos = pos;
-                            
+
                             letterFollowsParenthetical = letterIsNext();
                         }
                     }
@@ -416,7 +416,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                     currentParenDepth--;
                     justClosedParen = true;
                 }
-                
+
                 inParens[pos] = currentParenDepth > 0;
             }
         }
@@ -429,17 +429,17 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private boolean match(String pattern, int matchAtPosition)
         {
             if (matchAtPosition < 0) return false;
-            
+
             int patternLength = pattern.length();
-            
+
             if (matchAtPosition + patternLength > length) return false;
-            
+
             for (int i = 0; i < patternLength; i++)
                 if (Character.toLowerCase(line.charAt(matchAtPosition+i)) != Character.toLowerCase(pattern.charAt(i)))
                     return false;
             return true;
         }
-        
+
         private boolean letterIsNext()
         {
             for (int i = pos; i < length; i++)
@@ -453,7 +453,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             }
             return false;
         }
-        
+
         public boolean retainAsKeyword(int column)
         {
 //            System.out.println();
@@ -465,7 +465,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 //            System.out.println("Retain preceding token as keyword? " + internalRetainAsKeyword(precedingKeywordOffset, precedingKeyword));
 //            System.out.println("Line starting at first token: " + line.substring(firstTokenPos));
 //            System.out.println("Retain as keyword? " + internalRetainAsKeyword(column, keyword));
-            
+
             return internalRetainAsKeyword(column, keyword);
         }
 
@@ -489,7 +489,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else if (keyword.equalsIgnoreCase("bind"))
                 return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos));
             else if (keyword.equalsIgnoreCase("procedure"))
-                return match("procedure", firstTokenPos) || match("module", firstTokenPos);
+                return match("procedure", firstTokenPos) || match("module", firstTokenPos) /* F08 */  || match("end", firstTokenPos);
             else if (keyword.equalsIgnoreCase("pointer"))
                 return openContextComma;
             else if (keyword.equalsIgnoreCase("operator")
@@ -510,8 +510,13 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
         private boolean applyPrecedingKeywordRules(String keyword, String precedingKeyword)
         {
+            // BEGIN FORTRAN 2008
+            if (keyword.equalsIgnoreCase("module"))
+                return isPrefixSpec(precedingKeyword) && !precedingKeyword.equalsIgnoreCase("module")
+                    || precedingKeyword.equalsIgnoreCase("end");
+            // END FORTRAN 2008
             // N.B. These rules depend on the token preceding this one
-            if (isType(keyword) && !keyword.equalsIgnoreCase("type"))
+            else if (isType(keyword) && !keyword.equalsIgnoreCase("type"))
                 return isPrefixSpec(precedingKeyword)|| precedingKeyword.equalsIgnoreCase("implicit");
             else if (isPrefixSpec(keyword))
                 return isType(precedingKeyword);
@@ -544,6 +549,14 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else if (keyword.equalsIgnoreCase("default"))
                 return precedingKeyword.equalsIgnoreCase("case") || precedingKeyword.equalsIgnoreCase("class");
             // END FORTRAN 2003
+            // BEGIN FORTRAN 2008
+            else if (keyword.equalsIgnoreCase("stop"))
+                return precedingKeyword.equalsIgnoreCase("all");
+            else if (keyword.equalsIgnoreCase("all")
+                  || keyword.equalsIgnoreCase("images")
+                  || keyword.equalsIgnoreCase("memory"))
+                return precedingKeyword.equalsIgnoreCase("sync");
+            // END FORTRAN 2008
             else
                 return precedingKeyword.equalsIgnoreCase("end");
         }
@@ -559,7 +572,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else
                 return false;
         }
-        
+
         private boolean retainFirstTokenAsKeyword()
         {
             if (!openContextComma && !openContextEquals)
@@ -597,7 +610,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         {
             return kw.equalsIgnoreCase("recursive")
                 || kw.equalsIgnoreCase("pure")
-                || kw.equalsIgnoreCase("elemental");
+                || kw.equalsIgnoreCase("elemental")
+                || kw.equalsIgnoreCase("impure")  // F08
+                || kw.equalsIgnoreCase("module"); // F08
         }
 
         private int findPrecedingKeyword(int wordCol)
@@ -616,7 +631,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         {
             if (offset >= 0 && line.charAt(offset) == ')')
                 offset = backOverParens(offset);
-            
+
             while (offset >= 0 && Character.isJavaIdentifierPart(line.charAt(offset)))
                 offset--;
             return offset;
@@ -625,22 +640,22 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private int backOverParens(int offset)
         {
             int depth = 0;
-            
+
             while (offset >= 0)
             {
                 if (line.charAt(offset) == ')')
                     depth++;
                 else if (line.charAt(offset) == '(')
                     depth--;
-                
+
                 offset--;
-                
+
                 if (depth == 0) break;
             }
-            
+
             return offset;
         }
-        
+
         private String precedingKeywordAsString(int column, int precedingKeywordOffset)
         {
             String precedingKeyword = line.substring(precedingKeywordOffset, column);

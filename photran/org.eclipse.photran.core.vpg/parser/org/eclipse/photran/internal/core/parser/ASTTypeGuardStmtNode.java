@@ -26,27 +26,16 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 
 public class ASTTypeGuardStmtNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isClass; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token isType; // in ASTTypeGuardStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isClass; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIs; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeGuardStmtNode
-    org.eclipse.photran.internal.core.lexer.Token isDefault; // in ASTTypeGuardStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTDefault; // in ASTTypeGuardStmtNode
     ASTTypeSpecNode typeSpecNoPrefix; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeGuardStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isDefault; // in ASTTypeGuardStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTDefault; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token selectConstructName; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTTypeGuardStmtNode
-
-    public boolean isClass()
-    {
-        return this.isClass != null;
-    }
-
-    public void setIsClass(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isClass = newValue;
-    }
-
 
     public boolean isType()
     {
@@ -59,14 +48,14 @@ public class ASTTypeGuardStmtNode extends ASTNode
     }
 
 
-    public boolean isDefault()
+    public boolean isClass()
     {
-        return this.isDefault != null;
+        return this.isClass != null;
     }
 
-    public void setIsDefault(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsClass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isDefault = newValue;
+        this.isClass = newValue;
     }
 
 
@@ -78,6 +67,17 @@ public class ASTTypeGuardStmtNode extends ASTNode
     public void setTypeSpecNoPrefix(ASTTypeSpecNode newValue)
     {
         this.typeSpecNoPrefix = newValue;
+    }
+
+
+    public boolean isDefault()
+    {
+        return this.isDefault != null;
+    }
+
+    public void setIsDefault(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDefault = newValue;
     }
 
 
@@ -107,14 +107,14 @@ public class ASTTypeGuardStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isClass;
-        case 1:  return this.isType;
+        case 0:  return this.isType;
+        case 1:  return this.isClass;
         case 2:  return this.hiddenTIs;
         case 3:  return this.hiddenTLparen;
-        case 4:  return this.isDefault;
-        case 5:  return this.hiddenTDefault;
-        case 6:  return this.typeSpecNoPrefix;
-        case 7:  return this.hiddenTRparen;
+        case 4:  return this.typeSpecNoPrefix;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.isDefault;
+        case 7:  return this.hiddenTDefault;
         case 8:  return this.selectConstructName;
         case 9:  return this.hiddenTEos;
         default: return null;
@@ -125,14 +125,14 @@ public class ASTTypeGuardStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isClass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isClass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.hiddenTIs = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.isDefault = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTDefault = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.typeSpecNoPrefix = (ASTTypeSpecNode)value; return;
-        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.typeSpecNoPrefix = (ASTTypeSpecNode)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.isDefault = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 7:  this.hiddenTDefault = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 8:  this.selectConstructName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

@@ -16,7 +16,7 @@
  * (See FreeFormLexerPhase2.java and f95t.bnf)
  *
  * @author Jeffrey Overbey
- * 
+ *
  * @see FreeFormLexerPhase2
  * @see Parser
  *
@@ -25,7 +25,7 @@
  * (It was also omitted in the lines for T_SLASH so that
  * INTERFACE OPERATOR (/) would tokenize correctly.)
  */
- 
+
 package org.eclipse.photran.internal.core.lexer;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 
 %%
- 
+
 %public
 %class FreeFormLexerPhase1
 %throws LexerException
@@ -52,12 +52,12 @@ import org.eclipse.core.resources.IFile;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
     protected IToken lastToken = null;
     protected StringBuffer whiteAfterSB = new StringBuffer();
-    
+
     protected void storeNonTreeToken()
     {
         if (accumulateWhitetext) whiteBeforeSB.append(yytext());
     }
-    
+
     protected IToken token(Terminal terminal) throws IOException
     {
         if (terminal == Terminal.END_OF_INPUT)
@@ -72,7 +72,7 @@ import org.eclipse.core.resources.IFile;
                 }
             }
         }
-        
+
         if (terminal == Terminal.T_SCON)
         {
             lastTokenLine = sbLine;
@@ -89,7 +89,7 @@ import org.eclipse.core.resources.IFile;
             lastTokenStreamOffset = yychar;
             lastTokenLength = yylength();
         }
-        
+
         if (accumulateWhitetext)
         {
             lastToken = tokenFactory.createToken(terminal,
@@ -106,7 +106,7 @@ import org.eclipse.core.resources.IFile;
         }
         return lastToken;
     }
-    
+
     protected void storeWhiteTextAtEndOfFile()
     {
         lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
@@ -117,10 +117,10 @@ import org.eclipse.core.resources.IFile;
     //      FreeFormLexerPhase2 l = new FreeFormLexerPhase2(System.in);
     //      Parser.parse(l);
     //}
-    
+
     private String filename = "<stdin>";
     protected TokenFactory tokenFactory;
-    
+
     public FreeFormLexerPhase1(java.io.InputStream in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
         this(new LineAppendingInputStream(in));
@@ -134,7 +134,7 @@ import org.eclipse.core.resources.IFile;
     {
         return filename;
     }
-    
+
     public TokenFactory getTokenFactory()
     {
         return tokenFactory;
@@ -149,43 +149,43 @@ import org.eclipse.core.resources.IFile;
     {
         return lastTokenCol;
     }
-    
+
     public IFile getLastTokenFile()
     {
         return lastTokenFile;
     }
-    
+
     public int getLastTokenFileOffset()
     {
         return lastTokenFileOffset;
     }
-    
+
     public int getLastTokenStreamOffset()
     {
         return lastTokenStreamOffset;
     }
-    
+
     public int getLastTokenLength()
     {
         return lastTokenLength;
     }
-        
+
     private void startInclude() throws FileNotFoundException
     {
 //      //GRRRRR, yypushStream is in the JFlex docs but is not actually implemented in v1.4.1!
-//        
+//
 //      if (!(this.zzReader instanceof PreprocessingReader))
 //          throw new Error("The reader passed to a Fortran lexer must be a PreprocessingReader");
 //
 //      ((PreprocessingReader)zzReader).pushReader(extractFilenameFromFortranInclude(yytext()));
 //    }
-//      
+//
 //    private String extractFilenameFromFortranInclude(String fortranInclude)
 //    {
 //        String removeInclude = fortranInclude.substring(7);
 //        return removeInclude.trim().replaceAll("\"", "");
     }
-        
+
     private String getCurrentFilename()
     {
 //        if (!(this.zzReader instanceof PreprocessingReader))
@@ -198,7 +198,7 @@ import org.eclipse.core.resources.IFile;
     private StringBuffer stringBuffer = null;
 
     private boolean wantEos = false;
-        
+
     private int sbOffset = -1;
     private int sbLine = -1;
     private int sbCol = -1;
@@ -268,6 +268,25 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 /* Lexical rules */
 
 <YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
+// New for Fortran 2008 //////////////////////////////////
+"SUBMODULE"                                     { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SUBMODULE); }
+"ENDSUBMODULE"                                  { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ENDSUBMODULE); }
+"ENDPROCEDURE"                                  { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ENDPROCEDURE); }
+"IMPURE"                                        { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IMPURE); }
+"CODIMENSION"                                   { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_CODIMENSION); }
+"CONTIGUOUS"                                    { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_CONTIGUOUS); }
+"CRITICAL"                                      { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_CRITICAL); }
+"ENDCRITICAL"                                   { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ENDCRITICAL); }
+"ALL"                                           { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ALL); }
+"ALLSTOP"                                       { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ALLSTOP); }
+"SYNC"                                          { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SYNC); }
+"SYNCALL"                                       { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SYNCALL); }
+"SYNCIMAGES"                                    { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SYNCIMAGES); }
+"IMAGES"                                        { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IMAGES); }
+"SYNCMEMORY"                                    { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SYNCMEMORY); }
+"MEMORY"                                        { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_MEMORY); }
+"LOCK"                                          { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_LOCK); }
+"UNLOCK"                                        { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_UNLOCK); }
 // New for Fortran 2003 //////////////////////////////////
 "IMPORT"                                        { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IMPORT); }
 "NON_INTRINSIC"                                 { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NON_INTRINSIC); }
@@ -386,7 +405,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 ">="                                            { wantEos = true;                     return token(Terminal.T_GREATERTHANEQ); }
 ".GT."                                          { wantEos = true;                     return token(Terminal.T_GT); }
 "IF"                                            { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IF); }
-"IMPLICIT"                                      { wantEos = true; yybegin(IMPLICIT); return token(Terminal.T_IMPLICIT); }
+"IMPLICIT"                                      { wantEos = true; yybegin(IMPLICIT);  return token(Terminal.T_IMPLICIT); }
 "IN"                                            { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IN); }
 "INOUT"                                         { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_INOUT); }
 "INQUIRE"                                       { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_INQUIRE); }

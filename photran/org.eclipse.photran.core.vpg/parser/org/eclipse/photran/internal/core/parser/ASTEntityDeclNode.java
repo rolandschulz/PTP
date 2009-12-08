@@ -33,9 +33,12 @@ public class ASTEntityDeclNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTEntityDeclNode
     ASTArraySpecNode arraySpec; // in ASTEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTEntityDeclNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenRparen2; // in ASTEntityDeclNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLbracket; // in ASTEntityDeclNode
+    ASTCoarraySpecNode coarraySpec; // in ASTEntityDeclNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRbracket; // in ASTEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTEntityDeclNode
     ASTCharLengthNode charLength; // in ASTEntityDeclNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenRparen2; // in ASTEntityDeclNode
     ASTInitializationNode initialization; // in ASTEntityDeclNode
 
     public ASTObjectNameNode getObjectName()
@@ -71,6 +74,17 @@ public class ASTEntityDeclNode extends ASTNode
     }
 
 
+    public ASTCoarraySpecNode getCoarraySpec()
+    {
+        return this.coarraySpec;
+    }
+
+    public void setCoarraySpec(ASTCoarraySpecNode newValue)
+    {
+        this.coarraySpec = newValue;
+    }
+
+
     public ASTCharLengthNode getCharLength()
     {
         return this.charLength;
@@ -101,7 +115,7 @@ public class ASTEntityDeclNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 11;
+        return 14;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -115,10 +129,13 @@ public class ASTEntityDeclNode extends ASTNode
         case 4:  return this.hiddenTLparen;
         case 5:  return this.arraySpec;
         case 6:  return this.hiddenTRparen;
-        case 7:  return this.hiddenRparen2;
-        case 8:  return this.hiddenTAsterisk;
-        case 9:  return this.charLength;
-        case 10: return this.initialization;
+        case 7:  return this.hiddenTLbracket;
+        case 8:  return this.coarraySpec;
+        case 9:  return this.hiddenTRbracket;
+        case 10: return this.hiddenTAsterisk;
+        case 11: return this.charLength;
+        case 12: return this.hiddenRparen2;
+        case 13: return this.initialization;
         default: return null;
         }
     }
@@ -134,10 +151,13 @@ public class ASTEntityDeclNode extends ASTNode
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 5:  this.arraySpec = (ASTArraySpecNode)value; return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.charLength = (ASTCharLengthNode)value; return;
-        case 10: this.initialization = (ASTInitializationNode)value; return;
+        case 7:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.coarraySpec = (ASTCoarraySpecNode)value; return;
+        case 9:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 11: this.charLength = (ASTCharLengthNode)value; return;
+        case 12: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 13: this.initialization = (ASTInitializationNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-    
+
 <!-- ==============-->
 <!-- Error Parsers -->
 <!-- ==============-->
@@ -111,22 +111,25 @@
 <!-- ======================================-->
 <!-- Fortran Content Types/File Extensions -->
 <!-- ======================================-->
-  <extension point="org.eclipse.core.runtime.contentTypes">
-  
+  <extension point="org.eclipse.core.contenttype.contentTypes">
+
       <!-- A "base" content type, so that we can refer to both free and fixed form at once -->
 	  <content-type id="fortranSource" name="Fortran Source File"
-		  base-type="org.eclipse.core.runtime.text"
-		  priority="high"/>
-  
+		  base-type="org.eclipse.core.runtime.text"/>
+
       <!-- Individual content types for free and fixed format -->
 	  <content-type id="freeFormFortranSource" name="Fortran Source File - Free Format"
-		  base-type="org.eclipse.photran.core.fortranSource"
-		  file-extensions="f77,f90,f95,f03"
-		  priority="high"/>
+		  base-type="org.eclipse.photran.core.fortranSource"/>
 	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
-		  base-type="org.eclipse.photran.core.fortranSource"
-		  file-extensions="f,for,ftn,fix,fpp,F,FOR,FTN,FIX,FPP"
-		  priority="high"/>
+		  base-type="org.eclipse.photran.core.fortranSource"/>
+		  
+      <!-- Associated filename extensions -->
+	  <file-association 
+          content-type="org.eclipse.photran.core.freeFormFortranSource"
+          file-extensions="f90,f95,f03,f08,F90,F95,F03,F08"/>
+	  <file-association 
+          content-type="org.eclipse.photran.core.fixedFormFortranSource"
+          file-extensions="f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP"/>
   </extension>
 
 <!-- =================================================================================== -->

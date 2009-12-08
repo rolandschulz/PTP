@@ -26,9 +26,9 @@ import org.eclipse.photran.internal.core.lexer.IToken;
  * Every model element beneath a Fortran Translation Unit is a subclass of
  * <code>FortranElement</code>. The <code>FortranElement</code> hierarchy is a Fortran-specific
  * extension of <code>ICElement</code>.
- * 
+ *
  * @author Jeff Overbey
- * 
+ *
  * @see ICElement
  * @see Parent
  */
@@ -61,7 +61,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
      * subroutines, etc.). For the ones that do, this is the <code>Token</code> for that name. It
      * is expected to contain position information within the source file.
-     * 
+     *
      * @return the identifier <code>Token</code> for this element.
      */
     public IToken getIdentifier()
@@ -73,7 +73,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
      * subroutines, etc.). For the ones that do, this sets the <code>Token</code> for that name.
      * It is expected to contain position information within the source file.
-     * 
+     *
      * @param identifier The identifier <code>Token</code> for this element.
      */
     public void setIdentifier(IToken identifier)
@@ -85,7 +85,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
             int offset = identifier.getFileOffset();
             int length = identifier.getLength();
             int line = identifier.getLine();
-            
+
             setIdPos(offset, length);
             setPos(offset, length);
             setLines(line, line);
@@ -97,7 +97,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 	/**
      * Creates a new <code>FortranElement</code> under the given parent, which has the given name
      * (passed as a <code>Token</code>) from the source text.
-     * 
+     *
      * @param parent
      * @param identifier
      * @param parseTreeNode
@@ -111,7 +111,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
     /**
      * Creates a new <code>FortranElement</code> under the given parent, which has the given name
      * (textual representation).
-     * 
+     *
      * @param parent
      * @param name
      */
@@ -127,13 +127,13 @@ public abstract class FortranElement extends SourceManipulation // Parent
 		else
 			return super.getAdapter(required);
 	}
-	
+
 	protected abstract ImageDescriptor getBaseImageDescriptor();
 
 	/**
      * Returns an <code>ImageDescriptor</code> for an icon in the icons folder of the core plugin.
      * Based on code in <code>CPluginImages</code>.
-     * 
+     *
      * @param filename
      * @return <code>ImageDescriptor</code>
      */
@@ -141,10 +141,10 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
 	    return CDTInterfacePlugin.getImageDescriptor("icons/model/" + filename);
 	}
-	
+
     /**
      * Returns an <code>ImageDescriptor</code> for elements that don't have a dedicated icon.
-     * 
+     *
      * @return <code>ImageDescriptor</code>
      */
     public static ImageDescriptor unknownImageDescriptor()
@@ -229,6 +229,27 @@ public abstract class FortranElement extends SourceManipulation // Parent
         public static ImageDescriptor imageDescriptor()
         {
             return getImageDescriptorForIcon("module.gif");
+        }
+    }
+
+    /**
+     * An element representing a Fortran 2008 submodule (SUBMODULE (X) Y ... END SUBMODULE).
+     */
+    public static class Submodule extends FortranElement
+    {
+        public Submodule(Parent parent, IToken nameToken)
+        {
+            super(parent, nameToken);
+        }
+
+        public ImageDescriptor getBaseImageDescriptor()
+        {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
+        {
+            return getImageDescriptorForIcon("submodule.gif");
         }
     }
 
@@ -325,7 +346,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
         {
             super(parent, nameToken);
         }
-        
+
         public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();

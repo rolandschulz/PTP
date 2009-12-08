@@ -30,6 +30,7 @@ public class ASTAllocationNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hasAllocatedShape; // in ASTAllocationNode
     IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTAllocationNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAllocationNode
+    ASTImageSelectorNode imageSelector; // in ASTAllocationNode
 
     public IASTListNode<ASTAllocateObjectNode> getAllocateObject()
     {
@@ -64,6 +65,17 @@ public class ASTAllocationNode extends ASTNode
     }
 
 
+    public ASTImageSelectorNode getImageSelector()
+    {
+        return this.imageSelector;
+    }
+
+    public void setImageSelector(ASTImageSelectorNode newValue)
+    {
+        this.imageSelector = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllocationNode(this);
@@ -72,7 +84,7 @@ public class ASTAllocationNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 5;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -83,6 +95,7 @@ public class ASTAllocationNode extends ASTNode
         case 1:  return this.hasAllocatedShape;
         case 2:  return this.sectionSubscriptList;
         case 3:  return this.hiddenTRparen;
+        case 4:  return this.imageSelector;
         default: return null;
         }
     }
@@ -95,6 +108,7 @@ public class ASTAllocationNode extends ASTNode
         case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.imageSelector = (ASTImageSelectorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

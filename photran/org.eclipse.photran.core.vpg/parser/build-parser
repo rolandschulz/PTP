@@ -20,11 +20,13 @@ java -Xmx512M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-wo
 	-prec "<BodyPlusInternals> < <Label>, T_ICON" \
 	-prec "<TypeBoundProcedurePart> < T_ICON" \
 	-shift T_IDENT "<CommonBlock>" \
+	-shift T_LBRACKET "<DataRef>" \
+	-shift T_LBRACKET "<SFDataRef>" \
 	-imports "import org.eclipse.photran.internal.core.lexer.*; \
                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode; \
                   import org.eclipse.photran.internal.core.SyntaxException; \
                   import java.io.IOException;" \
-	-description "An LALR(1) parser for Fortran 2003" \
+	-description "An LALR(1) parser for Fortran 2008" \
 	-throws "IOException, LexerException, SyntaxException" \
 	-onError "throw new SyntaxException(lookahead);" \
 	-lexerClass IAccumulatingLexer \
@@ -35,7 +37,7 @@ java -Xmx512M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-wo
 	-genLexerInterface false \
 	-genTokenClass false \
 	-enablePreproc IPreprocessorReplacement \
-	$SRCDIR/fortran2003.bnf
+	$SRCDIR/fortran2008.bnf
 
 echo Applying patches...
 for file in *.java; do

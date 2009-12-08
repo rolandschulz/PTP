@@ -295,7 +295,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         if (contentType == null) return;
 
         boolean expectedSourceForm = this.isFixedForm();
-        boolean actualSourceForm = contentType.equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE);
+        boolean actualSourceForm = FortranCorePlugin.isFixedFormContentType(contentType);
         if (actualSourceForm != expectedSourceForm)
             contentTypeMismatch = true;
     }

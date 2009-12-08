@@ -31,6 +31,7 @@ public class ASTScalarVariableNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTScalarVariableNode
     IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTScalarVariableNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTScalarVariableNode
+    ASTImageSelectorNode imageSelector; // in ASTScalarVariableNode
 
     public org.eclipse.photran.internal.core.lexer.Token getVariableName()
     {
@@ -65,6 +66,17 @@ public class ASTScalarVariableNode extends ASTNode
     }
 
 
+    public ASTImageSelectorNode getImageSelector()
+    {
+        return this.imageSelector;
+    }
+
+    public void setImageSelector(ASTImageSelectorNode newValue)
+    {
+        this.imageSelector = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTScalarVariableNode(this);
@@ -73,7 +85,7 @@ public class ASTScalarVariableNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 5;
+        return 6;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -85,6 +97,7 @@ public class ASTScalarVariableNode extends ASTNode
         case 2:  return this.hiddenTLparen;
         case 3:  return this.sectionSubscriptList;
         case 4:  return this.hiddenTRparen;
+        case 5:  return this.imageSelector;
         default: return null;
         }
     }
@@ -98,6 +111,7 @@ public class ASTScalarVariableNode extends ASTNode
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.imageSelector = (ASTImageSelectorNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

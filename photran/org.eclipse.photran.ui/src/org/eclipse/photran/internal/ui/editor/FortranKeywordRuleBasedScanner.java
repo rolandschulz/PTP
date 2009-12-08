@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * Scans for for Fortran keywords (for syntax highlighting)
- * 
+ *
  * @author Jeff Overbey
  */
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
@@ -68,8 +68,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     }
 
 //    /**
-//     * Rule which detects identifiers between columns 7 and 72 
-//     * 
+//     * Rule which detects identifiers between columns 7 and 72
+//     *
 //     * @see org.eclipse.jface.text.rules.WordRule
 //     */
 //    private static final class FixedFormIdentifierWordRule extends WordRule
@@ -132,21 +132,21 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     ///////////////////////////////////////////////////////////////////////////
     // Inner Class - updates the display when the editor's colors are changed
     ///////////////////////////////////////////////////////////////////////////
-    
+
     private final class PreferenceChangeListener implements IPropertyChangeListener
     {
         private ISourceViewer sourceViewer;
-        
+
         PreferenceChangeListener(ISourceViewer sourceViewer)
         {
             this.sourceViewer = sourceViewer;
         }
-        
+
         public void propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent event)
         {
             String property = event.getProperty();
             String newVal = event.getNewValue() instanceof String ? (String)event.getNewValue() : null;
-            
+
             if (property.equals(FortranPreferences.COLOR_COMMENTS.getName()))
                 updateToken(colorComments, newVal);
             else if (property.equals(FortranPreferences.COLOR_STRINGS.getName()))
@@ -158,7 +158,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
             else if (property.equals(FortranPreferences.COLOR_KEYWORDS.getName()))
                 updateToken(colorKeywords, newVal);
         }
-        
+
         private void updateToken(Token token, String newColor)
         {
             Object data = token.getData();
@@ -169,19 +169,19 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                                                 oldAttr.getBackground(),
                                                 oldAttr.getStyle()));
             }
-            
+
             // Force redraw of entire editor text
             sourceViewer.invalidateTextPresentation();
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // Constants - Words to highlight
     ///////////////////////////////////////////////////////////////////////////
-    
+
     private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE", "ALLOCATABLE", "ALLOCATE", "ASSIGN", "ASSIGNMENT", "ASSOCIATE", "ASYNCHRONOUS", "BACKSPACE",
         "BIND", "BLANK", "BLOCK", "BLOCKDATA", "CALL", "CASE", "CLOSE", "CLASS", "COMMON", "CONTAINS", "CONTINUE", "CYCLE", "DATA", "DEALLOCATE", "DEFAULT", "DELIM", "DIMENSION",
-        "DIRECT", "DO", "DOUBLE", "DOUBLEPRECISION", "ELSE", "ELSEIF", "ELSEWHERE", "END", "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", "EQUIVALENCE", "ERR", "EXIST", "EXIT",
+        "DIRECT", "DO", "DOUBLE", "DOUBLEPRECISION", "ELSE", "ELSEIF", "ELSEWHERE", "END", "ENDBLOCK", "ENDBLOCKDATA", "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", "EQUIVALENCE", "ERR", "EXIST", "EXIT",
         "EXTENDS", "EXTENSIBLE", "EXTERNAL", "FILE", "FMT", "FLUSH", "FORALL", "FORM", "FORMAT", "FORMATTED", "FUNCTION", "GO", "IF", "IMPLICIT", "IN", "INOUT",
         "INCLUDE", "INQUIRE", "INTENT", "INTERFACE", "INTRINSIC", "IOLENGTH", "IOSTAT", "INSTRINSIC", "KIND", "LEN", "MODULE", "NAME", "NAMED", "NAMELIST", "NEXTREC",
         "NML", "NONE", "NON_OVERRIDABLE", "NOPASS", "NULLIFY", "NUMBER", "ONLY", "OPEN", "OPENED", "OPERATOR", "OPTIONAL", "OUT", "PAD", "PARAMETER", "PASS", "PAUSE",
@@ -191,7 +191,12 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         // Fortran 2003 keywords to highlight
         "EXTENDS", "ABSTRACT", "BIND", "GENERIC", "PASS", "NOPASS", "NON_OVERRIDABLE", "DEFERRED", "FINAL",
         "ENUM", "ENUMERATOR", "CLASS", "VALUE", "ASSOCIATE", "IS",
-        "WAIT", "NON_INTRINSIC", "IMPORT" };
+        "WAIT", "NON_INTRINSIC", "IMPORT",
+        // Fortran 2008 keywords to highlight
+        "SUBMODULE", "ENDSUBMODULE", "ENDPROCEDURE", "IMPURE", "CODIMENSION", "CONTIGUOUS",
+        "CRITICAL", "ENDCRITICAL", "ALL", "ALLSTOP", "SYNC", "SYNCALL", "SYNCIMAGES",
+        "IMAGES", "SYNCMEMORY", "MEMORY", "LOCK", "UNLOCK"
+        };
 
     private static String[] fgTextualOperators = { ".AND.", ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
 
@@ -305,7 +310,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
          "maxloc",
          "minloc",
          "null",
-    
+
          // Subroutines
          "mvbits",
          "date_and_time",
@@ -331,7 +336,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     ///////////////////////////////////////////////////////////////////////////
     // Fields - colors
     ///////////////////////////////////////////////////////////////////////////
-    
+
     private Token colorStrings = createTokenFromRGBPreference(FortranPreferences.COLOR_STRINGS);
 
     private Token colorComments = createTokenFromRGBPreference(FortranPreferences.COLOR_COMMENTS);
@@ -351,7 +356,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     ///////////////////////////////////////////////////////////////////////////
     // Constructor
     ///////////////////////////////////////////////////////////////////////////
-    
+
     public FortranKeywordRuleBasedScanner(boolean isFixedForm, ISourceViewer sourceViewer)
     {
         FortranCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(new PreferenceChangeListener(sourceViewer));
@@ -363,7 +368,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         rules[i++] = new MultiLineRule("'", "'", colorStrings);
 
         rules[i++] = new EndOfLineRule("!", colorComments);
-        
+
         if (isFixedForm)
         {
             for (char ch = 33; ch < 128; ch++)
@@ -379,7 +384,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
             //salesRule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);
             //wordRule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);
         }
-        
+
         Eclipse33WordRule wordRule = new Eclipse33WordRule(new FortranWordDetector(), Token.UNDEFINED, true);
         SalesScanKeywordRule salesRule = new SalesScanKeywordRule(new FortranWordDetector(), colorIdentifiers);
 
@@ -388,7 +393,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         rules[i++] = salesRule; // Apply Sales last, since it will mark "everything else" as an identifier
 
         setRules(rules);
-        
+
         // Punctuation, numbers, etc.
         setDefaultReturnToken(new Token(new TextAttribute(new Color(Display.getCurrent(), new RGB(0, 0, 0)))));
     }
@@ -409,7 +414,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         for (int i = 0; i < fgKeywords.length; i++)
             salesRule.addWord(fgKeywords[i], colorKeywords);
     }
-    
+
     /*******************************************************************************
      * Copyright (c) 2000, 2006 IBM Corporation and others.
      * All rights reserved. This program and the accompanying materials
@@ -542,7 +547,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
                     String buffer= fBuffer.toString();
                     IToken token= (IToken)fWords.get(buffer);
-                    
+
                     if(fIgnoreCase) {
                         Iterator iter= fWords.keySet().iterator();
                         while (iter.hasNext()) {
@@ -554,7 +559,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                         }
                     } else
                         token= (IToken)fWords.get(buffer);
-                    
+
                     if (token != null)
                         return token;
 

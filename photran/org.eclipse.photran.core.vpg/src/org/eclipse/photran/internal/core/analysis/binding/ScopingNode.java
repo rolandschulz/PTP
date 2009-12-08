@@ -26,18 +26,22 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
+import org.eclipse.photran.internal.core.parser.ASTBlockConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataNameNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTBlockStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndBlockDataStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEndBlockStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndInterfaceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndNameNode;
 import org.eclipse.photran.internal.core.parser.ASTEndProgramStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEndSubmoduleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -54,6 +58,8 @@ import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramNameNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSubmoduleNode;
+import org.eclipse.photran.internal.core.parser.ASTSubmoduleStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
@@ -125,7 +131,8 @@ public abstract class ScopingNode extends ASTNode
 	 * <p>
 	 * In general, this is true for
 	 * derived type names, program names, module names, block data names,
-	 * interface names, subroutine names, and function names in the beginning and ending
+	 * interface names, subroutine names, function names, submodule names, and block
+	 * construct names in the beginning and ending
 	 * statements for their respective scoping nodes.
 	 */
     private static boolean shouldBeBoundToOuterScope(IASTNode node)
@@ -169,13 +176,17 @@ public abstract class ScopingNode extends ASTNode
         	|| node instanceof ASTBlockDataStmtNode
         	|| node instanceof ASTDerivedTypeStmtNode
         	|| node instanceof ASTInterfaceStmtNode
+        	|| node instanceof ASTSubmoduleStmtNode
+        	|| node instanceof ASTBlockStmtNode
         	|| node instanceof ASTEndProgramStmtNode
         	|| node instanceof ASTEndFunctionStmtNode
         	|| node instanceof ASTEndSubroutineStmtNode
         	|| node instanceof ASTEndModuleStmtNode
         	|| node instanceof ASTEndBlockDataStmtNode
         	|| node instanceof ASTEndTypeStmtNode
-        	|| node instanceof ASTEndInterfaceStmtNode;
+        	|| node instanceof ASTEndInterfaceStmtNode
+        	|| node instanceof ASTEndSubmoduleStmtNode
+        	|| node instanceof ASTEndBlockStmtNode;
     }
 
 	private static boolean inAnonymousInterface(IASTNode n)
@@ -195,7 +206,9 @@ public abstract class ScopingNode extends ASTNode
     		|| node instanceof ASTModuleNode
     		|| node instanceof ASTBlockDataSubprogramNode
     		|| node instanceof ASTDerivedTypeDefNode
-    		|| (node instanceof ASTInterfaceBlockNode && !isAnonymousInterface((ASTInterfaceBlockNode)node));
+    		|| (node instanceof ASTInterfaceBlockNode && !isAnonymousInterface((ASTInterfaceBlockNode)node))
+    		|| node instanceof ASTSubmoduleNode
+    		|| node instanceof ASTBlockConstructNode;
     }
 
 	private static boolean isAnonymousInterface(ASTInterfaceBlockNode node)
@@ -314,6 +327,14 @@ public abstract class ScopingNode extends ASTNode
 			else
 				return s.getInterfaceToken().getTokenRef();
 		}
+        else if (this instanceof ASTSubmoduleNode)
+        {
+            return ((ASTSubmoduleNode)this).getSubmoduleStmt().getSubmoduleName().getModuleName().getTokenRef();
+        }
+        else if (this instanceof ASTBlockConstructNode)
+        {
+            return ((ASTBlockConstructNode)this).findFirstToken().getTokenRef();
+        }
     	else
     	{
     		throw new UnsupportedOperationException();
@@ -341,6 +362,10 @@ public abstract class ScopingNode extends ASTNode
             return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt();
         else if (this instanceof ASTInterfaceBlockNode)
             return ((ASTInterfaceBlockNode)this).getInterfaceStmt();
+        else if (this instanceof ASTSubmoduleNode)
+            return ((ASTSubmoduleNode)this).getSubmoduleStmt();
+        else if (this instanceof ASTBlockConstructNode)
+            return ((ASTBlockConstructNode)this).getBlockStmt();
         else
             throw new UnsupportedOperationException();
     }
@@ -366,6 +391,10 @@ public abstract class ScopingNode extends ASTNode
             return ((ASTDerivedTypeDefNode)this).getDerivedTypeBody();
         else if (this instanceof ASTInterfaceBlockNode)
             return ((ASTInterfaceBlockNode)this).getInterfaceBlockBody();
+        else if (this instanceof ASTSubmoduleNode)
+            return ((ASTSubmoduleNode)this).getModuleBody();
+        else if (this instanceof ASTBlockConstructNode)
+            return ((ASTBlockConstructNode)this).getBody();
         else
             throw new UnsupportedOperationException();
     }
@@ -391,6 +420,10 @@ public abstract class ScopingNode extends ASTNode
                 ((ASTDerivedTypeDefNode)this).setDerivedTypeBody(new ASTListNode<IDerivedTypeBodyConstruct>());
             else if (this instanceof ASTInterfaceBlockNode)
                 ((ASTInterfaceBlockNode)this).setInterfaceBlockBody(new ASTListNode<IInterfaceSpecification>());
+            else if (this instanceof ASTSubmoduleNode)
+                ((ASTSubmoduleNode)this).setModuleBody(new ASTListNode<IModuleBodyConstruct>());
+            else if (this instanceof ASTBlockConstructNode)
+                ((ASTBlockConstructNode)this).setBody(new ASTListNode<IBodyConstruct>());
             else
                 throw new UnsupportedOperationException();
         }

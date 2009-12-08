@@ -32,6 +32,7 @@ public class ASTCOperandNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token stringConst; // in ASTCOperandNode
     IASTListNode<ASTSectionSubscriptNode> primarySectionSubscriptList; // in ASTCOperandNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCOperandNode
+    ASTImageSelectorNode imageSelector; // in ASTCOperandNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTPercent; // in ASTCOperandNode
     IASTListNode<ASTDataRefNode> derivedTypeComponentRef; // in ASTCOperandNode
     org.eclipse.photran.internal.core.lexer.Token hiddenLparen2; // in ASTCOperandNode
@@ -82,6 +83,17 @@ public class ASTCOperandNode extends ASTNode
     }
 
 
+    public ASTImageSelectorNode getImageSelector()
+    {
+        return this.imageSelector;
+    }
+
+    public void setImageSelector(ASTImageSelectorNode newValue)
+    {
+        this.imageSelector = newValue;
+    }
+
+
     public IASTListNode<ASTDataRefNode> getDerivedTypeComponentRef()
     {
         return this.derivedTypeComponentRef;
@@ -112,7 +124,7 @@ public class ASTCOperandNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 11;
+        return 12;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -125,11 +137,12 @@ public class ASTCOperandNode extends ASTNode
         case 3:  return this.stringConst;
         case 4:  return this.primarySectionSubscriptList;
         case 5:  return this.hiddenTRparen;
-        case 6:  return this.hiddenTPercent;
-        case 7:  return this.derivedTypeComponentRef;
-        case 8:  return this.hiddenLparen2;
-        case 9:  return this.componentSectionSubscriptList;
-        case 10: return this.hiddenRparen2;
+        case 6:  return this.imageSelector;
+        case 7:  return this.hiddenTPercent;
+        case 8:  return this.derivedTypeComponentRef;
+        case 9:  return this.hiddenLparen2;
+        case 10: return this.componentSectionSubscriptList;
+        case 11: return this.hiddenRparen2;
         default: return null;
         }
     }
@@ -144,11 +157,12 @@ public class ASTCOperandNode extends ASTNode
         case 3:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; return;
-        case 8:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 10: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.imageSelector = (ASTImageSelectorNode)value; return;
+        case 7:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 8:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; return;
+        case 9:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 10: this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
+        case 11: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

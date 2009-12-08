@@ -31,6 +31,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTVariableNode
     IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTVariableNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTVariableNode
+    ASTImageSelectorNode imageSelector; // in ASTVariableNode
     ASTSubstringRangeNode substringRange; // in ASTVariableNode
 
     public IASTListNode<ASTDataRefNode> getDataRef()
@@ -66,6 +67,17 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     }
 
 
+    public ASTImageSelectorNode getImageSelector()
+    {
+        return this.imageSelector;
+    }
+
+    public void setImageSelector(ASTImageSelectorNode newValue)
+    {
+        this.imageSelector = newValue;
+    }
+
+
     public ASTSubstringRangeNode getSubstringRange()
     {
         return this.substringRange;
@@ -87,7 +99,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
 
     @Override protected int getNumASTFields()
     {
-        return 6;
+        return 7;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -99,7 +111,8 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
         case 2:  return this.hiddenTLparen;
         case 3:  return this.sectionSubscriptList;
         case 4:  return this.hiddenTRparen;
-        case 5:  return this.substringRange;
+        case 5:  return this.imageSelector;
+        case 6:  return this.substringRange;
         default: return null;
         }
     }
@@ -113,7 +126,8 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.substringRange = (ASTSubstringRangeNode)value; return;
+        case 5:  this.imageSelector = (ASTImageSelectorNode)value; return;
+        case 6:  this.substringRange = (ASTSubstringRangeNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

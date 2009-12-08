@@ -30,6 +30,9 @@ public class ASTTargetObjectNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTargetObjectNode
     ASTArraySpecNode arraySpec; // in ASTTargetObjectNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTargetObjectNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLbracket; // in ASTTargetObjectNode
+    ASTCoarraySpecNode coarraySpec; // in ASTTargetObjectNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRbracket; // in ASTTargetObjectNode
 
     public org.eclipse.photran.internal.core.lexer.Token getTargetName()
     {
@@ -53,6 +56,17 @@ public class ASTTargetObjectNode extends ASTNode
     }
 
 
+    public ASTCoarraySpecNode getCoarraySpec()
+    {
+        return this.coarraySpec;
+    }
+
+    public void setCoarraySpec(ASTCoarraySpecNode newValue)
+    {
+        this.coarraySpec = newValue;
+    }
+
+
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTTargetObjectNode(this);
@@ -61,7 +75,7 @@ public class ASTTargetObjectNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 7;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -72,6 +86,9 @@ public class ASTTargetObjectNode extends ASTNode
         case 1:  return this.hiddenTLparen;
         case 2:  return this.arraySpec;
         case 3:  return this.hiddenTRparen;
+        case 4:  return this.hiddenTLbracket;
+        case 5:  return this.coarraySpec;
+        case 6:  return this.hiddenTRbracket;
         default: return null;
         }
     }
@@ -84,6 +101,9 @@ public class ASTTargetObjectNode extends ASTNode
         case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.arraySpec = (ASTArraySpecNode)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.coarraySpec = (ASTCoarraySpecNode)value; return;
+        case 6:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

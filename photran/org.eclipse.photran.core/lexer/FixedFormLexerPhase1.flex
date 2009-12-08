@@ -17,7 +17,7 @@
  * (See FixedFormLexerPrepass and FixedFormLexerPhase2.java and f95t.bnf)
  *
  * @author Jeffrey Overbey and Dirk Rossow
- * 
+ *
  * @see FixedFormLexerPrepass
  * @see FixedFormLexerPhase2
  * @see Parser
@@ -30,7 +30,7 @@
  * Changes:
  * 29.06.2005 Jeff Overbey: Added Fortran INCLUDE and CPP directives
  */
- 
+
 package org.eclipse.photran.internal.core.lexer;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
 %%
- 
+
 %class FixedFormLexerPhase1
 %throws LexerException
 %char
@@ -47,7 +47,7 @@ import org.eclipse.core.resources.IFile;
 %column
 %ignorecase
 //%8bit
-%unicode 
+%unicode
 %implements ILexer
 %type IToken
 
@@ -55,20 +55,20 @@ import org.eclipse.core.resources.IFile;
     private IToken prevToken = null;
 
     private FixedFormLexerPrepass prepass;
-        
+
     private TokenFactory tokenFactory;
-    
+
     public FixedFormLexerPhase1(InputStream in, FixedFormLexerPrepass _prepass, TokenFactory tokenFactory) {
         this(new LineAppendingInputStream(in));
         this.prepass=_prepass;
         this.tokenFactory = tokenFactory;
     }
-    
+
     //unset start of line state
     private void unsetSOL() {
-        if (yystate()==YYINITIAL) yybegin(YYSTANDARD); 
+        if (yystate()==YYINITIAL) yybegin(YYSTANDARD);
     }
-    
+
     public int getLine() {
         return prepass.getLine(yychar);
     }
@@ -76,48 +76,48 @@ import org.eclipse.core.resources.IFile;
     public int getCol() {
         return prepass.getColumn(yychar);
     }
-    
+
     protected IFile lastTokenFile = null;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
-    
+
     private IToken token(Terminal terminal)
     {
         //For some there are 2 terminals of type Terminal.END_OF_INPUT that get here in a row
         // so, technically, the function below sets the whitespaceAfter on the first one it sees,
-        // which is not really the expected behavior, but that token's whitespace is not used for 
+        // which is not really the expected behavior, but that token's whitespace is not used for
         // anything anyway, so this should be OK
         if(prevToken != null && terminal == Terminal.END_OF_INPUT)
         {
-            //We need to manually set this, because the input string to the lexer does not 
+            //We need to manually set this, because the input string to the lexer does not
             // have any whitespace, or at the very list has it trimmed, so we are loosing all
-            // of the trailing whitespace on any refactoring. That is why we assign it as 
+            // of the trailing whitespace on any refactoring. That is why we assign it as
             // whitespaceAfter to the last END_OF_STATEMENT token before END_OF_INPUT
             String whiteAfter = prepass.getTrailingWhitespace();
             prevToken.setWhiteAfter(whiteAfter);
         }
-        
+
         lastTokenLine = prepass.getLine(yychar)+1;
         lastTokenCol = prepass.getColumn(yychar)+1;
         lastTokenFileOffset = prepass.getOffset(yychar);
         lastTokenStreamOffset = prepass.getOffset(yychar);
         lastTokenLength = prepass.getOffset(yychar+yylength()-1)-prepass.getOffset(yychar)+1;
-        
+
         //For some reason the author of above code needed to add 1 to the line/col values
         // for my code, I actually need the original value of token positions, so
         // I added those variables for that
         int tokLine = lastTokenLine-1;
         int tokCol = lastTokenCol-1;
         int tokOff = lastTokenFileOffset;
-        
+
         String tokenText = "";
         //If it is the end of statement, use text from original string to get the line separator.
-        // For some reason the text returned by yytext() in this case is always '/n', while the 
+        // For some reason the text returned by yytext() in this case is always '/n', while the
         // actual separator is '/r/n'
         if(terminal == Terminal.T_EOS)
         {
             tokenText = prepass.getFileEOL();
         }
-        //If it is the end of input, use the Lexer's text. 
+        //If it is the end of input, use the Lexer's text.
         else if(terminal == Terminal.END_OF_INPUT)
         {
             tokenText = yytext();
@@ -136,18 +136,18 @@ import org.eclipse.core.resources.IFile;
         // tokens text)
         else
             tokenText = prepass.getTokenText(lastTokenFileOffset, lastTokenLength);
-            
+
         prevToken = tokenFactory.createToken(terminal,
                                         prepass.getWhitespaceBefore(tokLine, tokCol, tokOff),
                                         tokenText,
                                         "");
-                                        
+
         if(!tokenText.equals(yytext()) && terminal != Terminal.T_EOS)
         {
             prevToken.setPreprocessorDirective(new FixedFormReplacement(tokenText));
             prevToken.setText(yytext());
         }
-        
+
         return prevToken;
     }
 
@@ -176,21 +176,21 @@ import org.eclipse.core.resources.IFile;
     private int hollerithLength = 0;
 
     private boolean wantEos = false;
-        
+
     private String filename = "<stdin>";
-    
+
     public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
     {
         this(in, _prepass, tokenFactory);
         this.lastTokenFile = file;
         this.filename = filename;
     }
-        
+
     public String getFilename()
     {
         return filename;
     }
-    
+
     public TokenFactory getTokenFactory()
     {
         return tokenFactory;
@@ -205,22 +205,22 @@ import org.eclipse.core.resources.IFile;
     {
         return lastTokenCol;
     }
-    
+
     public IFile getLastTokenFile()
     {
         return lastTokenFile;
     }
-    
+
     public int getLastTokenFileOffset()
     {
         return lastTokenFileOffset;
     }
-    
+
     public int getLastTokenStreamOffset()
     {
         return lastTokenStreamOffset;
     }
-    
+
     public int getLastTokenLength()
     {
         return lastTokenLength;
@@ -298,7 +298,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 %state HOLLERITH
 %state YYSTANDARD
 %state OPERATORorFORMAT
-%state IDENT 
+%state IDENT
 
 %%
 
@@ -309,11 +309,11 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 <YYSTANDARD,IMPLICIT,OPERATORorFORMAT> {
 {Hcon}                                          { stringBuffer = new StringBuffer();
                                                   String text = yytext();
-                                                  stringBuffer.append(text);                                                              
+                                                  stringBuffer.append(text);
                                                   hollerithLength=Integer.parseInt(text.substring(0,text.length()-1));
                                                   if (hollerithLength==0)
-                                                      throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0"); 
-                                                  yybegin(HOLLERITH); 
+                                                      throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0");
+                                                  yybegin(HOLLERITH);
                                                 }
 {Rcon1}                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
 {Rcon2}/{NumDotLkahead}                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
@@ -330,6 +330,25 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 
 <YYSTANDARD,YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
+// New for Fortran 2008 //////////////////////////////////
+"SUBMODULE"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SUBMODULE); }
+"ENDSUBMODULE"                                  { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ENDSUBMODULE); }
+"ENDPROCEDURE"                                  { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ENDPROCEDURE); }
+"IMPURE"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_IMPURE); }
+"CODIMENSION"                                   { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CODIMENSION); }
+"CONTIGUOUS"                                    { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CONTIGUOUS); }
+"CRITICAL"                                      { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CRITICAL); }
+"ENDCRITICAL"                                   { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ENDCRITICAL); }
+"ALL"                                           { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ALL); }
+"ALLSTOP"                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ALLSTOP); }
+"SYNC"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SYNC); }
+"SYNCALL"                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SYNCALL); }
+"SYNCIMAGES"                                    { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SYNCIMAGES); }
+"IMAGES"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_IMAGES); }
+"SYNCMEMORY"                                    { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SYNCMEMORY); }
+"MEMORY"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_MEMORY); }
+"LOCK"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_LOCK); }
+"UNLOCK"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_UNLOCK); }
 // New for Fortran 2003 //////////////////////////////////
 "IMPORT"                                        { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_IMPORT); }
 "NON_INTRINSIC"                                 { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_NON_INTRINSIC); }
@@ -432,7 +451,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "GO"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_GO); }
 "GOTO"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_GOTO); }
 "IF"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_IF); }
-"IMPLICIT"                                      { wantEos = true; yybegin(IMPLICIT); return token(Terminal.T_IMPLICIT); }
+"IMPLICIT"                                      { wantEos = true; yybegin(IMPLICIT);   return token(Terminal.T_IMPLICIT); }
 "IN"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_IN); }
 "INOUT"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INOUT); }
 "INQUIRE"                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INQUIRE); }
@@ -548,13 +567,13 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                   yybegin(QUOTED); }
 \"                                              { stringBuffer = new StringBuffer();
                                                   stringBuffer.append('\"');
-                                                  yybegin(DBLQUOTED); 
+                                                  yybegin(DBLQUOTED);
                                                 }
 {CppDirective}                                  { storeNonTreeToken(); }
 {FortranInclude}                                { storeNonTreeToken(); }
 {LineTerminator}|";"                            { yybegin(YYINITIAL); boolean b = wantEos; wantEos = false; if (b) return token(Terminal.T_EOS); else storeNonTreeToken(); }
 <<EOF>>                                         { wantEos = false; yybegin(YYSTANDARD); return token(Terminal.END_OF_INPUT); }
-.                                               {       yypushback(1); 
+.                                               {       yypushback(1);
                                                         int state=yystate();
                                                         yybegin(IDENT);
                                                         IToken token = yylex();

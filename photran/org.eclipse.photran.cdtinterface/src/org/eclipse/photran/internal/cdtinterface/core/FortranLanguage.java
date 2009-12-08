@@ -69,7 +69,7 @@ public class FortranLanguage extends AbstractLanguage
 	    if (modelBuilder == null) modelBuilder = new SimpleFortranModelBuilder();
 	    
 	    modelBuilder.setTranslationUnit(tu);
-	    modelBuilder.setIsFixedForm(tu.getContentTypeId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE));
+	    modelBuilder.setIsFixedForm(FortranCorePlugin.isFixedFormContentType(tu.getContentTypeId()));
 	    return modelBuilder;
 	}
 
@@ -138,7 +138,7 @@ public class FortranLanguage extends AbstractLanguage
 	// JO - This is not required as of CDT 4.0, but it is used by the Fortran dependency calculator, so I'm leaving it in...
     public Collection getRegisteredContentTypeIds()
     {
-        return Arrays.asList(new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE });
+        return Arrays.asList(FortranCorePlugin.getAllFortranContentTypes());
     }
 
 	public int getLinkageID()
