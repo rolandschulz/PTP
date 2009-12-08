@@ -39,12 +39,16 @@ public abstract class SourceForm
     
     public abstract IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
     
+    public abstract String getDescription(String filename);
+    
     public static final SourceForm UNPREPROCESSED_FREE_FORM = new SourceForm()
     {
         @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
         {
             return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext)));
         }
+        
+        @Override public String getDescription(String filename) { return "Free Form"; }
     };
     
     public static final SourceForm FIXED_FORM = new SourceForm()
@@ -53,6 +57,8 @@ public abstract class SourceForm
         {
             return new LexerPhase3(new FixedFormLexerPhase2(in, file, filename, ASTTokenFactory.getInstance()));
         }
+        
+        @Override public String getDescription(String filename) { return "Fixed Form"; }
     };
     
     // TODO: JEFF: Automatically detect lexer type from filename extension
@@ -78,6 +84,15 @@ public abstract class SourceForm
                                 filename,
                                 callback,
                                 accumulateWhitetext)));
+            }
+            
+            @Override public String getDescription(String filename)
+            {
+                SourceForm sf = findPreferredSourceForm(filename);
+                if (sf != null)
+                    return sf.getDescription(filename);
+                else
+                    return "Free Form";
             }
         };
     }

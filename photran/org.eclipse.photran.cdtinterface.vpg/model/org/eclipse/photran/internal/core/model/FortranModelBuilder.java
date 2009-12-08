@@ -71,17 +71,19 @@ public class FortranModelBuilder implements IFortranModelBuilder
         try
         {
             IFile file = translationUnit.getFile();
+            SourceForm sourceForm = determineSourceForm(file);
+            String filename = determineFilename(file);
             lexer = LexerFactory.createLexer(
                 new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
                 file,
-                determineFilename(file),
-                determineSourceForm(file),
+                filename,
+                sourceForm,
                 true /*false*/);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
             IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
 
-            createSourceFormNode();
+            createSourceFormNode(sourceForm.getDescription(filename));
 
             if (isParseTreeModelEnabled())
             {
@@ -169,10 +171,10 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
     // --NODE CREATION METHODS-------------------------------------------
 
-    private FortranElement createSourceFormNode() throws CModelException
+    private FortranElement createSourceFormNode(String desc) throws CModelException
     {
-        String sourceForm = isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>";
-        FortranElement element = new FortranElement.UnknownNode(translationUnit, sourceForm);
+        desc = "<" + desc + " Source>";
+        FortranElement element = new FortranElement.UnknownNode(translationUnit, desc);
         translationUnit.addChild(element);
         this.newElements.put(element, element.getElementInfo());
         return element;
