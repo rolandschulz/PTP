@@ -31,7 +31,6 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.parser.ParserMessages;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -41,9 +40,11 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
@@ -108,8 +109,10 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	}
 	
 	private void generateErrorMessages() {				
-    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.inclusionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
-    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
+//    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.inclusionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
+//    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
+    	fErrorMessages.add("Unresolved inclusion:"); //$NON-NLS-1$
+    	fErrorMessages.add("Macro definition not found:"); //$NON-NLS-1$
 	}	
 	
 	// index management
@@ -325,12 +328,41 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot workspaceRoot = workspace.getRoot();
 		IProject project = workspaceRoot.getProject(scope.getName());
-		try {
-			IMarker marker =  project.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-		} catch (CoreException e) {
-			RDTLog.logError(e);
+
+		//parse for file name and line number
+		int fileStart = message.indexOf("in file: "); //$NON-NLS-1$
+		int fileEnd = message.indexOf(":", fileStart + 9); //$NON-NLS-1$
+		String fileName = message.substring(fileStart + 9, fileEnd);
+		
+		int lineStart = fileEnd;
+		int lineEnd = message.indexOf(".  Please", lineStart); //$NON-NLS-1$
+		String lineNumber = message.substring(lineStart + 1, lineEnd);
+		
+		String projectLocation = project.getLocationURI().getPath();
+		fileStart = fileName.indexOf(projectLocation);
+		fileName = fileName.substring(fileStart + projectLocation.length() + 1);
+		
+		IPath path = new Path(fileName);
+		IFile file = project.getFile(path);
+		
+		if (file != null) {
+			try {
+				IMarker marker = file.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
+				marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(lineNumber));
+				marker.setAttribute(IMarker.MESSAGE, message);
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+				return;
+			} catch (CoreException e) {
+				RDTLog.logError(e);
+			}
+		} else {
+			try {
+				IMarker marker =  project.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
+				marker.setAttribute(IMarker.MESSAGE, message);
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			} catch (CoreException e) {
+				RDTLog.logError(e);
+			}
 		}
 	}
 
