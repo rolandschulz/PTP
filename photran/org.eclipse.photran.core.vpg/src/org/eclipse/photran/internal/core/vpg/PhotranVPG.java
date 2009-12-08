@@ -52,8 +52,8 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
     // Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
 	// (since our parser declares classes with the same name)
-    public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
-    public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
+    private static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
+    private static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
 
 	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
 	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
@@ -744,7 +744,10 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         if (inTestingMode()) // Fortran content types not set in testing workspace
             return filename.endsWith(".f");
         else
-            return FIXED_FORM_CONTENT_TYPE.equals(getContentType(filename));
+        {
+            IContentType ct = getContentTypeOf(filename);
+            return ct != null && ct.isKindOf(fixedFormContentType());
+        }
     }
 
     protected static boolean hasFreeFormContentType(String filename)
@@ -752,15 +755,25 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         if (inTestingMode()) // Fortran content types not set in testing workspace
             return filename.endsWith(".f90");
         else
-            return FREE_FORM_CONTENT_TYPE.equals(getContentType(filename));
+        {
+            IContentType ct = getContentTypeOf(filename);
+            return ct != null && ct.isKindOf(freeFormContentType());
+        }
     }
 
-    protected static final String getContentType(String filename)
+    protected static final IContentType getContentTypeOf(String filename)
     {
-        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
-        return contentType == null ? null : contentType.getId();
+        return Platform.getContentTypeManager().findContentTypeFor(filename);
+    }
 
-        // In CDT, return CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
+    protected static final IContentType fixedFormContentType()
+    {
+        return Platform.getContentTypeManager().getContentType(FIXED_FORM_CONTENT_TYPE);
+    }
+
+    protected static final IContentType freeFormContentType()
+    {
+        return Platform.getContentTypeManager().getContentType(FREE_FORM_CONTENT_TYPE);
     }
 
     public boolean doesProjectHaveRefactoringEnabled(IFile file)

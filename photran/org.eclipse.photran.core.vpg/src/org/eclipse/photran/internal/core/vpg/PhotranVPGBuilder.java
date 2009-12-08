@@ -201,12 +201,10 @@ public class PhotranVPGBuilder extends PhotranVPG
     private SourceForm determineSourceForm(final String filename)
     {
         IFile file = getIFileForFilename(filename);
-        IContentType contentType2 = Platform.getContentTypeManager().findContentTypeFor(filename);
-        String contentType = contentType2 == null ? null : contentType2.getId();
-        // In CDT, String contentType = CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
+        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
 
         SourceForm sourceForm;
-        if (contentType != null && contentType.equals(FIXED_FORM_CONTENT_TYPE))
+        if (contentType != null && contentType.isKindOf(fixedFormContentType()))
             sourceForm = SourceForm.FIXED_FORM;
         else if (file == null || file.getProject() == null)
             sourceForm = SourceForm.UNPREPROCESSED_FREE_FORM;
