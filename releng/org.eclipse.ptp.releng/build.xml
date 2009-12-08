@@ -16,9 +16,9 @@
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/galileo/mylyn-3.2.0.v20090617-0100-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.1.1-200909160905/RSE-SDK-3.1.1.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
-		<property name="eclipseRelease" value="galileo"/>
-		<property name="ptpBranchVersion" value="3.0.0"/>
-		<property name="photranBranchVersion" value="5.0.0"/>
+		<property name="eclipseRelease" value="helios"/>
+		<property name="ptpBranchVersion" value="4.0.0"/>
+		<property name="photranBranchVersion" value="6.0.0"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
