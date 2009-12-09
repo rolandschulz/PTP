@@ -28,6 +28,7 @@ PTP_FEATURES="\
 	org.eclipse.ptp.etfw-feature \
 	org.eclipse.ptp.etfw.tau-feature \
 	org.eclipse.ptp.etfw.tau.fortran-feature \
+	org.eclipse.ptp.isp-feature \
 	org.eclipse.ptp.pldt-feature \
 	org.eclipse.ptp.pldt.lapi-feature \
 	org.eclipse.ptp.pldt.upc-feature \
@@ -41,6 +42,8 @@ PTP_FEATURES="\
 	org.eclipse.ptp.rm.ibm.pe-feature \
 	org.eclipse.ptp.rm.mpich2-feature \
 	org.eclipse.ptp.rm.openmpi-feature \
+	org.eclipse.ptp.rm.slurm-feature \
+	org.eclipse.ptp.rm.pbs-feature \
 	org.eclipse.ptp.sdm-feature \
 	org.eclipse.ptp.services-feature \
 	org.eclipse.ptp.utils-feature"
@@ -80,7 +83,7 @@ update_manifest() {
 }
 
 update_configure() {
-	sed -e "s/AC_INIT(\([^,]*\), *[0-9]\.[0-9]\.[0-9])/AC_INIT(\1, $2)/" < $1/configure.in > $TMP_DIR/${1}_configure.in
+	sed -e "s/AC_INIT(\[*\([^],]*\)\]*, *\[*[0-9]\.[0-9]\.[0-9]\]*)/AC_INIT([\1], [$2])/" < $1/configure.in > $TMP_DIR/${1}_configure.in
 	mv $TMP_DIR/${1}_configure.in $1/configure.in
 	(cd $1; autoconf)
 }
@@ -111,5 +114,10 @@ sed -e "s/<property name=\"ptpBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<
 	-e "s/<property name=\"photranBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"photranBranchVersion\" value=\"$photran_version\"\/>/" \
 	< org.eclipse.ptp.releng/build.xml > $TMP_DIR/org.eclipse.ptp.releng_build.xml
 mv $TMP_DIR/org.eclipse.ptp.releng_build.xml org.eclipse.ptp.releng/build.xml
+
+echo "Updating org.eclipse.ptp.rdt.core.remotejars.."
+sed -e "s/<property name=\"serverVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"serverVersion\" value=\"$ptp_version\"\/>/" \
+	< org.eclipse.ptp.rdt.core.remotejars/build.xml > $TMP_DIR/org.eclipse.ptp.rdt.core.remotejars_build.xml
+mv $TMP_DIR/org.eclipse.ptp.rdt.core.remotejars_build.xml org.eclipse.ptp.rdt.core.remotejars/build.xml
 
 exit 0
