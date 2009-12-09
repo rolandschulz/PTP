@@ -3,7 +3,7 @@ dnl
 
 AC_PREREQ([2.50])
 
-AC_INIT([org.eclipse.ptp.slurm], [3.0.0])
+AC_INIT([org.eclipse.ptp.slurm], [4.0.0])
 AC_CONFIG_SRCDIR([src/ptp_slurm_proxy.c])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
