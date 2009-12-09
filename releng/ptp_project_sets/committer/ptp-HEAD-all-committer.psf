@@ -92,6 +92,7 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs,org.eclipse.ptp.rdt.core.stubs"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests,org.eclipse.ptp.rdt.core.tests"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user,org.eclipse.ptp.rdt.doc.user"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.make.ui,org.eclipse.ptp.rdt.make.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui,org.eclipse.ptp.rdt.managedbuilder.xlc.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.releng,org.eclipse.ptp.rdt.releng"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui,org.eclipse.ptp.rdt.ui"/>
