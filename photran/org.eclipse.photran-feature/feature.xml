@@ -21,6 +21,10 @@
       <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
    </url>
 
+   <includes
+         id="org.eclipse.rephraserengine"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.cdt.core"/>
@@ -43,6 +47,7 @@
       <import plugin="com.ibm.icu"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core" version="6.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.intro"/>
       <import plugin="org.eclipse.ui.intro.universal"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
@@ -55,8 +60,6 @@
       <import plugin="org.eclipse.rephraserengine.ui"/>
       <import plugin="org.eclipse.rephraserengine.ui.vpg"/>
       <import feature="org.eclipse.cdt" version="6.0.0" match="compatible"/>
-      <import feature="org.eclipse.rephraserengine" version="1.0.0" match="compatible"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core" version="6.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
