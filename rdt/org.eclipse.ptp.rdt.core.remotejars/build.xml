@@ -262,7 +262,7 @@
 		<mkdir dir="${downloads}"/>
 		<get src="${platformBaseUrl}/${platformVersion}/${icuBaseZip}" dest="${downloads}/${icuBaseZip}"/>
 		<unzip src="${downloads}/${icuBaseZip}" dest="${downloads}"/>
-		<copy file="${downloads}/eclipse/plugins/${icuBaseJar}" todir="${platformTempDir}/eclipse/plugins"/>
+		<copy file="${downloads}/plugins/${icuBaseJar}" todir="${platformTempDir}/eclipse/plugins"/>
 	</target>
 	
 	<target name="unpack.platform">
