@@ -92,6 +92,10 @@
          id="org.eclipse.ptp.pldt.lapi"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.isp"
+         version="0.0.0"/>
+
    <plugin
          id="org.eclipse.ptp"
          download-size="0"

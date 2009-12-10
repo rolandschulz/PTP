@@ -15,7 +15,7 @@
    <feature url="features/org.eclipse.ptp.etfw.tau_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau" version="4.0.0.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.isp_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.isp" version="4.0.0.@timeStamp@">
+    <feature url="features/org.eclipse.ptp.etfw.tau.fortran_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau.fortran" version="4.0.0.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
    <feature url="features/org.eclipse.ptp.rdt_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt" version="4.0.0.@timeStamp@">
