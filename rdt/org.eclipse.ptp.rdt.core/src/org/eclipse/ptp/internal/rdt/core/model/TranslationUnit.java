@@ -35,24 +35,23 @@ import org.eclipse.cdt.core.model.IUsing;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.model.LanguageManager;
 import org.eclipse.cdt.core.parser.CodeReader;
-import org.eclipse.cdt.core.parser.DefaultLogService;
+import org.eclipse.cdt.core.parser.FileContent;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.core.parser.IScannerInfo;
-import org.eclipse.cdt.internal.core.dom.AbstractCodeReaderFactory;
-import org.eclipse.cdt.internal.core.dom.NullCodeReaderFactory;
-import org.eclipse.cdt.internal.core.index.IndexBasedCodeReaderFactory;
+import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
+import org.eclipse.cdt.core.parser.ParserUtil;
+import org.eclipse.cdt.internal.core.index.IndexBasedFileContentProvider;
 import org.eclipse.cdt.internal.core.model.IBufferFactory;
-import org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver;
+import org.eclipse.cdt.internal.core.parser.scanner.InternalFileContentProvider;
 import org.eclipse.cdt.internal.core.pdom.indexer.ProjectIndexerIncludeResolutionHeuristics;
+import org.eclipse.cdt.internal.core.pdom.indexer.ProjectIndexerInputAdapter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dstore.core.model.DataStore;
-import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInputAdapter;
 import org.eclipse.ptp.internal.rdt.core.RemoteUtil;
 import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteLanguageMapper;
-import org.eclipse.ptp.internal.rdt.core.miners.StandaloneSavedCodeReaderFactory;
 import org.eclipse.ptp.rdt.core.IConfigurableLanguage;
 
 public class TranslationUnit extends Parent implements ITranslationUnit {
@@ -154,27 +153,30 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
 	 * Version: 1.102
 	 */
-	private AbstractCodeReaderFactory getCodeReaderFactory(int style, IIndex index, int linkageID) {
-		ASTFilePathResolver pathResolver = new RemoteIndexerInputAdapter();
-		ProjectIndexerIncludeResolutionHeuristics heuristics = null;
-		
-		AbstractCodeReaderFactory codeReaderFactory;
+	private IncludeFileContentProvider getIncludeFileContentProvider(int style, IIndex index, int linkageID) {
+		final ICProject cprj= getCProject();
+		final ProjectIndexerInputAdapter pathResolver = new ProjectIndexerInputAdapter(cprj);
+		IncludeFileContentProvider fileContentsProvider;
 		if ((style & AST_SKIP_NONINDEXED_HEADERS) != 0) {
-			codeReaderFactory= NullCodeReaderFactory.getInstance();
+			fileContentsProvider= IncludeFileContentProvider.getEmptyFilesProvider();
 		} else {
-			codeReaderFactory= StandaloneSavedCodeReaderFactory.getInstance();
+			fileContentsProvider= IncludeFileContentProvider.getSavedFilesProvider();
 		}
 		
 		if (index != null && (style & AST_SKIP_INDEXED_HEADERS) != 0) {
-			IndexBasedCodeReaderFactory ibcf= new IndexBasedCodeReaderFactory(index, 
-					heuristics, pathResolver, linkageID, codeReaderFactory);
+			IndexBasedFileContentProvider ibcf= new IndexBasedFileContentProvider(index, pathResolver, linkageID, fileContentsProvider);
 			if ((style & AST_CONFIGURE_USING_SOURCE_CONTEXT) != 0) {
 				ibcf.setSupportFillGapFromContextToHeader(true);
 			}
-			codeReaderFactory= ibcf;
+			fileContentsProvider= ibcf;
 		}
-
-		return codeReaderFactory;
+		
+		if (fileContentsProvider instanceof InternalFileContentProvider) {
+			final ProjectIndexerIncludeResolutionHeuristics heuristics = new ProjectIndexerIncludeResolutionHeuristics(cprj.getProject(), pathResolver);
+			((InternalFileContentProvider) fileContentsProvider).setIncludeResolutionHeuristics(heuristics);
+		}
+		
+		return fileContentsProvider;
 	}
 	
 
@@ -186,11 +188,11 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			return null;
 		}
 		
-		CodeReader reader = getCodeReader();
-		if (reader != null) {
+		FileContent fileContent= FileContent.create(this);
+		if (fileContent != null) {
 			ILanguage language= getLanguage();
 			if (language != null) {
-				AbstractCodeReaderFactory crf= getCodeReaderFactory(style, index, language.getLinkageID());
+				IncludeFileContentProvider crf= getIncludeFileContentProvider(style, index, language.getLinkageID());
 				int options= 0;
 				if ((style & AST_SKIP_FUNCTION_BODIES) != 0) {
 					options |= ILanguage.OPTION_SKIP_FUNCTION_BODIES;
@@ -204,8 +206,8 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 				if (isSourceUnit()) {
 					options |= ILanguage.OPTION_IS_SOURCE_UNIT;
 				}
-				IParserLogService log = new DefaultLogService();
-				return ((AbstractLanguage)language).getASTTranslationUnit(reader, scanInfo, crf, index, options, log);
+				final IParserLogService log = ParserUtil.getParserLogService();
+				return ((AbstractLanguage)language).getASTTranslationUnit(fileContent, scanInfo, crf, index, options, log);
 			}
 		}
 		return null;
@@ -247,14 +249,12 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			return null;
 		}
 		
-		CodeReader reader;
-		reader = getCodeReader();
+		FileContent fileContent= FileContent.create(this);
 		
 		ILanguage language= getLanguage();
 		if (language != null) {
-			AbstractCodeReaderFactory crf= getCodeReaderFactory(style, index, language.getLinkageID());
-			IParserLogService log = new DefaultLogService();
-			return language.getCompletionNode(reader, scanInfo, crf, index, log, offset);
+			IncludeFileContentProvider crf= getIncludeFileContentProvider(style, index, language.getLinkageID());
+			return language.getCompletionNode(fileContent, scanInfo, crf, index, ParserUtil.getParserLogService(), offset);
 		}
 		return null;
 	}
