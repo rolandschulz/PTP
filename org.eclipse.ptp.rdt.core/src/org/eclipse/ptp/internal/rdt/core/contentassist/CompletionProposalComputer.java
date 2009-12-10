@@ -66,7 +66,6 @@ import org.eclipse.cdt.core.parser.util.CharArrayUtils;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitFunction;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitMethod;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitTypedef;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates.CPPImplicitFunctionTemplate;
 
 /**
  * Searches the DOM (both the AST and the index) for completion proposals.
@@ -195,7 +194,7 @@ public class CompletionProposalComputer {
 			String prefix,
 			IASTCompletionContext astContext, List<Proposal> proposals) {
 		if ((binding instanceof CPPImplicitFunction
-				|| binding instanceof CPPImplicitFunctionTemplate || binding instanceof CPPImplicitTypedef)
+				|| binding instanceof CPPImplicitTypedef)
 				&& !(binding instanceof CPPImplicitMethod)) {
 			return;
 		}
