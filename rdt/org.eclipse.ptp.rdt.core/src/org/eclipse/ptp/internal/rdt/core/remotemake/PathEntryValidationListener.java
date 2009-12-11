@@ -19,6 +19,7 @@ import org.eclipse.cdt.internal.core.model.PathEntryManager;
 import org.eclipse.cdt.internal.core.model.PathEntryUtil;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.messages.Messages;
+import org.eclipse.ptp.rdt.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 
 
@@ -94,7 +96,8 @@ public class PathEntryValidationListener {
 			MarkerDeletionJob job = new MarkerDeletionJob();
 			
 			for(IMarkerDelta delta : markerDeltas) {
-				if(RemoteNature.hasRemoteNature(delta.getResource().getProject())) {
+				IProject proj = delta.getResource().getProject(); 
+				if(RemoteNature.hasRemoteNature(proj) || RemoteMakeNature.hasNature(proj)) {
 					job.addMarker(delta.getMarker());
 				}
 			}
