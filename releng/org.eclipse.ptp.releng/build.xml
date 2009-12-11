@@ -40,8 +40,8 @@
 		<property name="baseos" value="${osgi.os}"/>
 		<property name="basews" value="${osgi.ws}"/>
 		<property name="basearch" value="${osgi.arch}"/>
-		<property name="ptpTagBranch" value="-r ptp_3_0"/>
-		<property name="photranTagBranch" value="-r photran_5_0"/>
+		<property name="ptpTagBranch" value=""/>
+		<property name="photranTagBranch" value=""/>
 		<property name="tagname" value="v${timestamp}"/>
 		<property name="testReports" value="${zipsdir}/testReports"/>
 		<property name="junit-report-output" value="${testReports}"/>
