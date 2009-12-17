@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.cdtinterface.launch;
 
-import org.eclipse.cdt.launch.internal.ui.LocalRunLaunchConfigurationTabGroup;
 import org.eclipse.cdt.launch.ui.CArgumentsTab;
 import org.eclipse.cdt.launch.ui.CDebuggerTab;
 import org.eclipse.cdt.launch.ui.CMainTab;
+import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
@@ -21,8 +21,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.eclipse.swt.widgets.Composite;
 
-@SuppressWarnings("restriction")
-public class FortranLocalRunLaunchConfigurationTabGroup extends LocalRunLaunchConfigurationTabGroup
+public class FortranLocalRunLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup
 {
     /*@Override*/ public void createTabs(ILaunchConfigurationDialog dialog, String mode)  {
         ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
