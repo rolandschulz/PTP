@@ -50,16 +50,16 @@
     <extension
         point="org.eclipse.cdt.ui.completionProposalComputer"
         id="remoteParserProposalCategory"
-        name="Remote Proposals">
+        name="%RemoteProposals.name">
         <proposalCategory
             icon="$nl$/icons/elcl16/codeassist_co.gif"/>
     </extension>
    <extension
-         id="LocalCompletionProposalAdapter"
+         id="RemoteCompletionProposalAdapter"
          point="org.eclipse.cdt.ui.completionProposalComputer">
       <completionProposalComputer
             activate="true"
-            categoryId="remoteParserProposalCategory"
+            categoryId="org.eclipse.ptp.rdt.ui.remoteParserProposalCategory"
             class="org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteCompletionProposalAdapter">
          <partition type="__dftl_partition_content_type" />
          <partition type="__c_preprocessor" />
