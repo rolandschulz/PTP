@@ -63,14 +63,6 @@ public interface ICIndexSubsystem {
 	public void checkAllProjects(IProgressMonitor monitor);
 
 	// index management
-	/**
-	 * Incrementally indexes the given scope
-	 * 
-	 * @param scopeName
-	 * @param monitor
-	 * @return IStatus indicating success or failure
-	 */
-	public IStatus startIndexOfScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor);
 
 	/**
 	 * Re-indexes the given scope.
