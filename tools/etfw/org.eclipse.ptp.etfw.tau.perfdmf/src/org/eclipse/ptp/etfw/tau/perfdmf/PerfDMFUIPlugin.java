@@ -20,6 +20,8 @@ package org.eclipse.ptp.etfw.tau.perfdmf;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -29,114 +31,144 @@ import org.osgi.framework.BundleContext;
  */
 public class PerfDMFUIPlugin extends AbstractUIPlugin {
 
-    // The plug-in ID
-    public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.tau.perfdmf";
+	// The plug-in ID
+	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.tau.perfdmf";
 
-    // The shared instance
-    private static PerfDMFUIPlugin plugin;
+	// The shared instance
+	private static PerfDMFUIPlugin plugin;
 
-    // A handle to the view
-    static PerfDMFView theView;
+	// A handle to the view
+	static PerfDMFView theView;
 
-    /**
-     * The constructor
-     */
-    public PerfDMFUIPlugin() {
-        plugin = this;
-    }
+	static final String VIEW_ID= "org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView";
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-     */
-    public void start(BundleContext context) throws Exception {
-        super.start(context);
-    }
+	/**
+	 * The constructor
+	 */
+	public PerfDMFUIPlugin() {
+		plugin = this;
+	}
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-     */
-    public void stop(BundleContext context) throws Exception {
-        plugin = null;
-        super.stop(context);
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+	}
 
-    /**
-     * Returns the shared instance
-     *
-     * @return the shared instance
-     */
-    public static PerfDMFUIPlugin getDefault() {
-        return plugin;
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
 
-    /**
-     * Returns an image descriptor for the image file at the given
-     * plug-in relative path
-     *
-     * @param path the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
+	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static PerfDMFUIPlugin getDefault() {
+		return plugin;
+	}
 
-    public static void registerPerfDMFView(PerfDMFView view) {
-        theView = view;
-    }
+	/**
+	 * Returns an image descriptor for the image file at the given
+	 * plug-in relative path
+	 *
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 
-    /**
-     * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
-     * @param projectName The project that produced the data
-     * @param projectType The TAU options used in the production of the data
-     * @param location The location of the profile data
-     * @return True on success, false on failure to upload
-     */
-    public static boolean displayPerformanceData(String projectName, String projectType, String trialName) {//, String location, String dbname
-        try {
-            PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow()
-            .getActivePage()
-            .showView("org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView");
+	public static void registerPerfDMFView(PerfDMFView view) {
+		theView = view;
+	}
 
-            // when that class is initialized, it will call registerPerfDMFView so we can get a handle on it
-            return theView.showProfile(projectName, projectType, trialName); // location,dbname
-            
-            //return true;
+	/**
+	 * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
+	 * @param projectName The project that produced the data
+	 * @param projectType The TAU options used in the production of the data
+	 * @param location The location of the profile data
+	 * @return True on success, false on failure to upload
+	 */
+	public static boolean displayPerformanceData(String projectName, String projectType, String trialName) {//, String location, String dbname
+		try {
+			PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow()
+			.getActivePage()
+			.showView(VIEW_ID);
 
-        } catch (Throwable t) {
-            t.printStackTrace();
-            return false;
-        }
-        
-    }
-    
-    
-    /**
-     * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
-     * @param projectName The project that produced the data
-     * @param projectType The TAU options used in the production of the data
-     * @param location The location of the profile data
-     * @return True on success, false on failure to upload
-     */
-    public static boolean addPerformanceData(String projectName, String projectType, String trialName, String location, String dbname) {
-        try {
-            PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow()
-            .getActivePage()
-            .showView("org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView");
+			// when that class is initialized, it will call registerPerfDMFView so we can get a handle on it
+			return theView.showProfile(projectName, projectType, trialName); // location,dbname
 
-            // when that class is initialized, it will call registerPerfDMFView so we can get a handle on it
-            return theView.addProfile(projectName, projectType, trialName, location, dbname);
-            
-            //return true;
+			//return true;
 
-        } catch (Throwable t) {
-            t.printStackTrace();
-            return false;
-        }
-        
-    }
+		} catch (Throwable t) {
+			t.printStackTrace();
+			return false;
+		}
+
+	}
+
+
+	/**
+	 * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
+	 * @param projectName The project that produced the data
+	 * @param projectType The TAU options used in the production of the data
+	 * @param location The location of the profile data
+	 * @return True on success, false on failure to upload
+	 */
+	public static boolean addPerformanceData(String projectName, String projectType, String trialName, String location, String dbname) {
+		try {
+			PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow()
+			.getActivePage()
+			.showView(VIEW_ID);
+
+			// when that class is initialized, it will call registerPerfDMFView so we can get a handle on it
+			return theView.addProfile(projectName, projectType, trialName, location, dbname);
+
+			//return true;
+
+		} catch (Throwable t) {
+			t.printStackTrace();
+			return false;
+		}
+
+	}
+
+	public static PerfDMFView getPerfDMFView(){
+
+		if(theView==null){
+
+			IViewReference viewReferences[] = PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow().getActivePage().getViewReferences();
+			for (int i = 0; i < viewReferences.length; i++) {
+				if (VIEW_ID.equals(viewReferences[i].getId())) {
+					theView = (PerfDMFView) viewReferences[i].getView(false);
+					if(theView!=null)
+						return theView;
+				}
+			}
+
+			try {
+				PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow()
+				.getActivePage()
+				.showView(VIEW_ID);
+			} catch (PartInitException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return theView;
+	}
 
 }

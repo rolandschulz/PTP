@@ -47,6 +47,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.papiselect.PapiListSelectionDialog;
 import org.eclipse.ptp.etfw.tau.papiselect.papic.EventTreeDialog;
+import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.ptp.etfw.toolopts.ToolOption;
 import org.eclipse.ptp.etfw.toolopts.ToolPane;
@@ -1151,7 +1152,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	{
 		String[] dbs = null;
 		try{
-		dbs = PerfDMFView.getDatabaseNames();
+		dbs = PerfDMFUIPlugin.getPerfDMFView().getDatabaseNames();
 		}catch(java.lang.NoClassDefFoundError e){
 			System.out.println("Warning: Tau Jars Not Found");
 		}
