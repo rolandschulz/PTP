@@ -50,6 +50,7 @@ import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreResources;
+import org.eclipse.dstore.core.model.DataStoreSchema;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
@@ -80,7 +81,6 @@ import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 public class CDTMiner extends Miner {
 	
 	// index management
-	public static final String C_INDEX_START = "C_INDEX_START"; //$NON-NLS-1$
 	public static final String C_INDEX_REINDEX = "C_INDEX_REINDEX"; //$NON-NLS-1$
 	public static final String C_INDEX_DELTA = "C_INDEX_DELTA"; //$NON-NLS-1$
 	public static final String T_INDEX_STATUS_DESCRIPTOR = "Type.Index.Status"; //$NON-NLS-1$
@@ -153,6 +153,8 @@ public class CDTMiner extends Miner {
 	public static final String LOG_TAG = "CDTMiner"; //$NON-NLS-1$
 	
 	
+	private IndexerThread indexerThread = null;
+	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.dstore.core.miners.Miner#getVersion()
@@ -212,21 +214,6 @@ public class CDTMiner extends Miner {
 		{
 			DataElement scopeName = getCommandArgument(theCommand, 1);
 			handleIndexFileRemove(scopeName, status);
-		}
-
-		else if (name.equals(C_INDEX_START)) {
-			try {
-				String scopeName = getString(theCommand, 1);
-				IRemoteIndexerInfoProvider provider = (IRemoteIndexerInfoProvider) Serializer.deserialize(getString(theCommand, 2));
-				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Indexing scope " + scopeName, _dataStore); //$NON-NLS-1$
-				handleIndexStart(scopeName, provider, status);
-				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Indexing complete", _dataStore); //$NON-NLS-1$
-				
-			} catch (IOException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-			} catch (ClassNotFoundException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-			}
 		}
 		
 		else if(name.equals(C_INDEX_DELTA)) {
@@ -296,6 +283,20 @@ public class CDTMiner extends Miner {
 
 		}
 
+		else if(name.equals(DataStoreSchema.C_CANCEL)) {
+			DataElement subject = getCommandArgument(theCommand, 0);
+			DataElement cancelStatus = getCommandStatus(subject);
+			
+			// get the name of the command that is to be canceled
+			// Note for now only the indexer can be canceled, but we check the name anyway
+			String commandName = subject.getName().trim();
+			
+			if(C_INDEX_REINDEX.equals(commandName) || C_INDEX_DELTA.equals(commandName)) {
+				handleIndexCancel(cancelStatus);
+			}
+			// add more cancelable commands here
+		}
+		
 		else if(name.equals(C_MOVE_INDEX_FILE)) {
 			try {
 				String scopeName = getString(theCommand, 1);
@@ -1169,7 +1170,7 @@ public class CDTMiner extends Miner {
 			
 			index.acquireReadLock();
 			try {
-				query.runWithIndex(index, getLocationConverter(hostName), getProgressMonitor());
+				query.runWithIndex(index, getLocationConverter(hostName), new StdoutProgressMonitor());
 				List<RemoteSearchMatch> matches = query.getMatches();
 
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Found " + matches.size() + " match(es)", _dataStore); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1206,52 +1207,6 @@ public class CDTMiner extends Miner {
 		return Integer.parseInt(element.getName());
 	}
 	
-	protected void handleIndexDelta(String scopeName, List<String> addedFiles,
-			List<String> changedFiles, List<String> removedFiles, IRemoteIndexerInfoProvider provider, DataElement status) {
-		try {
-//			statusWorking(status);
-			
-			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider, _dataStore, status);
-			ScopeManager scopeManager = ScopeManager.getInstance();
-			
-			// update the scope if required
-			for(String file : addedFiles) {
-				scopeManager.addFileToScope(scopeName, file);
-			}
-			
-			for(String file : changedFiles) {
-				scopeManager.addFileToScope(scopeName, file);
-			}
-			
-			for(String file : removedFiles) {
-				scopeManager.removeFileFromScope(scopeName, file);
-			}
-			
-			try {
-				indexer.setTraceStatistics(true);
-				indexer.setShowProblems(true);
-				indexer.setShowActivity(true);
-				indexer.handleDelta(addedFiles, changedFiles, removedFiles, getProgressMonitor(indexer, status));
-			} catch (IOException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-			}
-		} catch (Exception e) {
-			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-		}
-		
-		finally {
-			statusDone(status);
-		}
-		
-	}
-	
-	private IProgressMonitor getProgressMonitor(StandaloneFastIndexer indexer, DataElement status) {
-		return new RemoteIndexProgressMonitor(indexer, status, _dataStore);
-	}
-
-	private IProgressMonitor getProgressMonitor() {
-		return new StdoutProgressMonitor();
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.dstore.core.model.ISchemaExtender#extendSchema(org.eclipse.dstore.core.model.DataElement)
@@ -1260,16 +1215,17 @@ public class CDTMiner extends Miner {
 		
 		UniversalServerUtilities.logInfo(LOG_TAG, "Extended schema from CDTMiner", _dataStore); //$NON-NLS-1$
 		
+		DataElement cancellable = _dataStore.findObjectDescriptor(DataStoreResources.model_Cancellable);
+		
 		// scope management
 		createCommandDescriptor(schemaRoot, "Register Scope", C_SCOPE_REGISTER, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Unregister Scope", C_SCOPE_UNREGISTER, false); //$NON-NLS-1$
 		
 		// index management
-		createCommandDescriptor(schemaRoot, "Start Index", C_INDEX_START, false); //$NON-NLS-1$
-		createCommandDescriptor(schemaRoot, "Reindex", C_INDEX_REINDEX, false); //$NON-NLS-1$
-		createCommandDescriptor(schemaRoot, "Index Delta", C_INDEX_DELTA, false); //$NON-NLS-1$
-		createCommandDescriptor(schemaRoot, "Remove Index File", C_REMOVE_INDEX_FILE, false); //$NON-NLS-1$
-		createCommandDescriptor(schemaRoot, "Move Index File", C_MOVE_INDEX_FILE, false); //$NON-NLS-1$
+		DataElement rcmd = createCommandDescriptor(schemaRoot, "Reindex", C_INDEX_REINDEX, false); //$NON-NLS-1$
+		_dataStore.createReference(cancellable, rcmd, DataStoreResources.model_abstracts, DataStoreResources.model_abstracted_by);
+		DataElement dcmd = createCommandDescriptor(schemaRoot, "Index Delta", C_INDEX_DELTA, false); //$NON-NLS-1$
+		_dataStore.createReference(cancellable, dcmd, DataStoreResources.model_abstracts, DataStoreResources.model_abstracted_by);
 		
 		// call hierarchy
 		createCommandDescriptor(schemaRoot, "Get Callers", C_CALL_HIERARCHY_GET_CALLERS, false); //$NON-NLS-1$
@@ -1573,25 +1529,36 @@ public class CDTMiner extends Miner {
 		}
 	}
 
-	protected void handleIndexStart(String scopeName, IRemoteIndexerInfoProvider provider, DataElement status) {
-		try {
-			StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider, _dataStore, status);
-			Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
-			List<String> sourcesList = new LinkedList<String>(sources);
+	protected void handleIndexDelta(String scopeName, List<String> addedFiles, List<String> changedFiles, List<String> removedFiles, 
+			IRemoteIndexerInfoProvider provider, DataElement status) {
 
+		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider, _dataStore, status);
+		ScopeManager scopeManager = ScopeManager.getInstance();
+		
+		// update the scope if required
+		for(String file : addedFiles)
+			scopeManager.addFileToScope(scopeName, file);
+		for(String file : changedFiles)
+			scopeManager.addFileToScope(scopeName, file);
+		for(String file : removedFiles)
+			scopeManager.removeFileFromScope(scopeName, file);
+		
+		// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
+		if(indexerThread != null) {
 			try {
-				indexer.rebuild(sourcesList, getProgressMonitor());
-			} catch (IOException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				indexerThread.join();
+			} catch (InterruptedException e) {
+				UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
+			} catch (NullPointerException e) {
+				
 			}
-		} catch (Exception e) {
-			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			
 		}
 		
-		finally {
-			statusDone(status);
-		}
+		indexerThread = IndexerThread.createIndexDeltaThread(indexer, addedFiles, changedFiles, removedFiles, status, this);
+		indexerThread.start();
 	}
+	
 	
 	protected void handleReindex(String scopeName, String newIndexLocation, IRemoteIndexerInfoProvider provider, DataElement status) {
 		RemoteIndexManager indexManager = RemoteIndexManager.getInstance();
@@ -1600,15 +1567,24 @@ public class CDTMiner extends Miner {
 		Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
 		
 		List<String> sourcesList = new LinkedList<String>(sources);
-	
-		try { 
-			indexer.setTraceStatistics(true);
-			indexer.setShowProblems(true);
-			indexer.setShowActivity(true);
-			indexer.rebuild(sourcesList, getProgressMonitor(indexer, status));
-		} catch (IOException e) {
-			UniversalServerUtilities.logError(LOG_TAG, "I/O Exception while reindexing", e, _dataStore); //$NON-NLS-1$
+		
+		// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
+		if(indexerThread != null) {
+			try {
+				indexerThread.join();
+			} catch (InterruptedException e) {
+				UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
+			} 
 		}
+		
+		indexerThread = IndexerThread.createReindexThread(indexer, sourcesList, status, this);
+		indexerThread.start();
+	}
+
+	
+	protected void handleIndexCancel(DataElement status) {
+		if(indexerThread != null)
+			indexerThread.cancel();
 		
 		statusDone(status);
 	}
