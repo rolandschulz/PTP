@@ -730,64 +730,6 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 		return (String) sendRequest(requestType, arguments, monitor, false);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#startIndexOfScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public IStatus startIndexOfScope(Scope scope, IRemoteIndexerInfoProvider provider, IProgressMonitor monitor)
-	{
-		DataStore dataStore = getDataStore();
-		   
-	    if (dataStore != null)
-	    {
-	    	
-	     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
-	    	
-	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.0"), 100); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INDEX_START);
-            if (queryCmd != null)
-            {
-                      	
-            	ArrayList<Object> args = new ArrayList<Object>();
-            	            	
-            	// need to know the scope
-            	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-            	args.add(scopeElement);
-            	
-            	String serializedProvider = null;
-            	try {
-					serializedProvider = Serializer.serialize(provider);
-				} catch (IOException e) {
-					RDTLog.logError(e);
-				}
-				
-				DataElement providerElement = dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider);
-				args.add(providerElement);
-            
-           	
-            	// execute the command
-            	//DataElement status = dataStore.command(queryCmd, dataStore.getDescriptorRoot(), true); 
-            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
-            	
-            	try
-                {
-                	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
-                }
-                catch (Exception e)
-                {                	
-                }
-            	
-            }	
-                    
-	    }
-	    
-	    return Status.OK_STATUS;
-
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#unregisterScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)

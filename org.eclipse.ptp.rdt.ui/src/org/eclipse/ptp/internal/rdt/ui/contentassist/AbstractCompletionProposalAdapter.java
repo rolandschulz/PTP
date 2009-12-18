@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 QNX Software Systems and others.
+ * Copyright (c) 2007, 2009 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,11 +40,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.CompletionType;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteProposalContextInformation;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Visibility;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -56,21 +58,21 @@ public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProp
 	protected abstract IContentAssistService getService(IProject project);
 	
 	@Override
-	public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
 		try {
 			if (context instanceof CContentAssistInvocationContext) {
 				CContentAssistInvocationContext cContext = (CContentAssistInvocationContext) context;
 				return computeCompletionProposals(cContext, null, null);
 			}
 		} catch (Exception e) {
-			CUIPlugin.log(e);
+			UIPlugin.log(e);
 		}
 
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 	
 	@Override
-	protected List computeCompletionProposals(CContentAssistInvocationContext context, IASTCompletionNode node, String prefix) throws CoreException {
+	protected List<ICompletionProposal> computeCompletionProposals(CContentAssistInvocationContext context, IASTCompletionNode node, String prefix) throws CoreException {
 		IProject project = ((CContentAssistInvocationContext) context).getProject().getProject();
 		IContentAssistService service = getService(project);
 		if (service == null) {
@@ -78,12 +80,13 @@ public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProp
 		}
 		ITranslationUnit unit = context.getTranslationUnit();
 		Scope scope = Scope.WORKSPACE_ROOT_SCOPE; // TODO: Use local scope
-		List<CCompletionProposal> proposals = adaptProposals(context, service.computeCompletionProposals(scope, context, unit)); // TODO: Provide IScope
+		List<Proposal> rawProposals = service.computeCompletionProposals(scope, context, unit);
+		List<ICompletionProposal> proposals = adaptProposals(context, rawProposals); // TODO: Provide IScope
 		return proposals;
 	}
 
-	private List<CCompletionProposal> adaptProposals(CContentAssistInvocationContext context, List<Proposal> proposals) {
-		List<CCompletionProposal> result = new LinkedList<CCompletionProposal>();
+	private List<ICompletionProposal> adaptProposals(CContentAssistInvocationContext context, List<Proposal> proposals) {
+		List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 		
 		for (Proposal proposal : proposals) {
 			String replacement = proposal.getReplacementText();
