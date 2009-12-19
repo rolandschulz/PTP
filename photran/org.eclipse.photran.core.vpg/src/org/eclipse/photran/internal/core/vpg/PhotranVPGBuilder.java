@@ -168,12 +168,6 @@ public class PhotranVPGBuilder extends PhotranVPG
         return filename.startsWith("module:") || filename.startsWith("common:") || filename.startsWith("subprogram:");
     }
 
-    @Override
-    protected boolean shouldListFileInIndexerProgressMessages(String filename)
-    {
-        return !isVirtualFile(filename);
-    }
-
     @Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)
     {
         return new PhotranTokenRef(filename, offset, length);

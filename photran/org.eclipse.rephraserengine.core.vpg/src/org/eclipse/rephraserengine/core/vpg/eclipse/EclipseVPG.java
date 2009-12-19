@@ -206,7 +206,9 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         return total;
     }
 
-    protected abstract boolean shouldListFileInIndexerProgressMessages(String filename);
+    protected boolean shouldListFileInIndexerProgressMessages(String filename) {
+        return !isVirtualFile(filename);
+    }
 
     //public ArrayList<String> sortFilesAccordingToDependencies(final ArrayList<String> files, final IProgressMonitor monitor)
 
