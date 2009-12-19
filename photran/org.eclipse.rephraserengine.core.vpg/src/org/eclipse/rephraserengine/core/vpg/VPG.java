@@ -390,7 +390,10 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
      * @param filename (non-null)
      * @return <code>true</code> iff the given filename refers to a virtual file
      */
-    public abstract boolean isVirtualFile(String filename);
+    public boolean isVirtualFile(String filename)
+    {
+        return false;
+    }
 
 	/**
 	 * Parses the given file.
