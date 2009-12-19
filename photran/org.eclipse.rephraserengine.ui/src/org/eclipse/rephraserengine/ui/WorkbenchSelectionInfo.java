@@ -112,8 +112,8 @@ public class WorkbenchSelectionInfo
         fileInEditor = fileInput.getFile();
         if (!resourceFilter.shouldProcess(fileInEditor))
         {
-            fileInEditor = null;
             errorMsg = resourceFilter.getError(fileInEditor);
+            fileInEditor = null;
         }
 
         if (selection instanceof ITextSelection)
