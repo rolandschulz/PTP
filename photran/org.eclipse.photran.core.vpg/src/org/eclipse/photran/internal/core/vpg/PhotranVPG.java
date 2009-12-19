@@ -282,21 +282,6 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		return forToken.getTokenRef();
 	}
 
-	public IFortranAST acquireTransientAST(IFile file)
-	{
-	    return file == null ? null : acquireTransientAST(getFilenameForIFile(file));
-	}
-
-	public IFortranAST acquirePermanentAST(IFile file)
-	{
-	    return file == null ? null : acquirePermanentAST(getFilenameForIFile(file));
-	}
-
-	public void releaseAST(IFile file)
-	{
-	    if (file != null) releaseAST(getFilenameForIFile(file));
-	}
-
 	public static String canonicalizeIdentifier(String identifier)
 	{
 		return identifier.trim().toLowerCase().replaceAll("[ \t\r\n]", "");
@@ -710,7 +695,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
             return "org.eclipse.photran.core.vpg.errorMarker";
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void setMarkerAttributes(IMarker marker, VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
     {
         Map attribs = new HashMap(5);

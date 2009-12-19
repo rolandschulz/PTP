@@ -442,6 +442,25 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // IFile-Based AST Acquisition & Release API
+    ///////////////////////////////////////////////////////////////////////////
+
+    public A acquireTransientAST(IFile file)
+    {
+        return file == null ? null : acquireTransientAST(getFilenameForIFile(file));
+    }
+
+    public A acquirePermanentAST(IFile file)
+    {
+        return file == null ? null : acquirePermanentAST(getFilenameForIFile(file));
+    }
+
+    public void releaseAST(IFile file)
+    {
+        if (file != null) releaseAST(getFilenameForIFile(file));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // VPG Overrides
     ///////////////////////////////////////////////////////////////////////////
 
