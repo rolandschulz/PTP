@@ -294,6 +294,15 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 		return dependents;
 	}
 
+    /** Changes the AST for the given file from a transient AST to a permanent
+     *  AST.  The AST will remain in memory until it is explicitly released
+     *  using {@link #releaseAST(String)} or {@link #releaseAllASTs()}.
+     */
+    public A makeTransientASTPermanent(String filename)
+    {
+        return makeTransientASTPermanent(filename, acquireTransientAST(filename));
+    }
+
 	/** Changes the AST for the given file from a transient AST to a permanent
 	 *  AST.  The AST will remain in memory until it is explicitly released
 	 *  using {@link #releaseAST(String)} or {@link #releaseAllASTs()}.

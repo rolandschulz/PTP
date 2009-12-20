@@ -454,6 +454,16 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     {
         return file == null ? null : acquirePermanentAST(getFilenameForIFile(file));
     }
+    
+    public A makeTransientASTPermanent(IFile file)
+    {
+        return file == null ? null : makeTransientASTPermanent(getFilenameForIFile(file));
+    }
+
+    public A makeTransientASTPermanent(IFile file, A ast)
+    {
+        return file == null ? null : makeTransientASTPermanent(getFilenameForIFile(file), ast);
+    }
 
     public void releaseAST(IFile file)
     {
