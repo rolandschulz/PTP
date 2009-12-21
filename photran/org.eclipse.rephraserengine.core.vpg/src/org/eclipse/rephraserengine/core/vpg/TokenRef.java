@@ -87,7 +87,7 @@ public class TokenRef<T> implements Serializable
         return "(Offset " + offset + ", length " + length + " in " + filename + ")";
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override public boolean equals(Object other)
     {
         if (!(other instanceof TokenRef)) return false;
