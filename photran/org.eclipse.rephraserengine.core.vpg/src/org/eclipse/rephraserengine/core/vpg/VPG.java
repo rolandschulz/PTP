@@ -336,6 +336,30 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 		permanentASTs.clear();
 	}
 
+	/**
+	 * If the given AST was acquired using {@link #acquireTransientAST(String)} or
+	 * {@link #acquirePermanentAST(String)}, returns the filename to which it
+	 * corresponds.  If it is not the root of an AST acquired from this VPG, returns
+	 * <code>null</code>.
+	 * <p>
+	 * Note that this is not an O(1) operation: Internally, the filename is found
+	 * by comparing the given argument with every AST in memory.
+	 * 
+	 * @return filename or <code>null</code>
+	 */
+	public String getFilenameCorrespondingTo(A ast)
+	{
+        for (String filename : transientASTs.keySet())
+            if (transientASTs.get(filename).get() == ast)
+                return filename;
+        
+        for (String filename : permanentASTs.keySet())
+            if (permanentASTs.get(filename) == ast)
+                return filename;
+        
+        return null;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////
 	// API: DEPENDENCIES
 	////////////////////////////////////////////////////////////////////////////
