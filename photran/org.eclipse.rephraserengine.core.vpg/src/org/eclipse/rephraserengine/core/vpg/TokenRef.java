@@ -87,10 +87,9 @@ public class TokenRef<T> implements Serializable
         return "(Offset " + offset + ", length " + length + " in " + filename + ")";
     }
 
-    @SuppressWarnings("rawtypes")
     @Override public boolean equals(Object other)
     {
-        if (!(other instanceof TokenRef)) return false;
+        if (!(other instanceof TokenRef<?>)) return false;
 
         TokenRef<?> o = (TokenRef<?>)other;
         return filename.equals(o.filename)
