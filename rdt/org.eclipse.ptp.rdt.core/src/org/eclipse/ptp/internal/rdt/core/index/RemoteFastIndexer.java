@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.core.index;
 import org.eclipse.cdt.core.dom.IPDOMIndexerTask;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.pdom.indexer.AbstractPDOMIndexer;
+import org.eclipse.cdt.internal.core.pdom.indexer.PDOMRebuildTask;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.services.core.IService;
@@ -35,15 +36,25 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 		IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 		
-		boolean update = true;
-		
-		if (changed.length == 0 && removed.length == 0)
-			update = false;
-		
-		if(serviceProvider instanceof IIndexServiceProvider)
+		if(serviceProvider instanceof IIndexServiceProvider) {
+			boolean update = !isReindex();
 			return new RemoteIndexerTask(this, (IIndexServiceProvider) serviceProvider, added, changed, removed, update);
+		}
 		
 		return null;
+	}
+
+	
+	private boolean isReindex() {
+		// Uses reflection to determine if createTask() is being called from PDOMRebuildTask.
+		String pdomRebuildTask = PDOMRebuildTask.class.getName();
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		for(StackTraceElement frame : stackTrace) {
+			if(frame.getClassName().equals(pdomRebuildTask)) {
+				return true;
+			}
+		}	
+		return false;
 	}
 
 	
