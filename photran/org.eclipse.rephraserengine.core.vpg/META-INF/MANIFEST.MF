@@ -9,6 +9,7 @@ Export-Package: org.eclipse.rephraserengine.core.preservation,
  org.eclipse.rephraserengine.core.vpg.db.caching,
  org.eclipse.rephraserengine.core.vpg.db.cdt,
  org.eclipse.rephraserengine.core.vpg.eclipse,
+ org.eclipse.rephraserengine.core.vpg.refactoring,
  org.eclipse.rephraserengine.internal.core.preservation;x-friends:="org.eclipse.rephraserengine.core.vpg.tests,org.eclipse.rephraserengine.ui.vpg",
  org.eclipse.rephraserengine.internal.core.vpg.db.cdt;x-friends:="org.eclipse.rephraserengine.core.vpg.tests",
  org.eclipse.rephraserengine.internal.db.org.eclipse.cdt.core;x-friends:="org.eclipse.rephraserengine.core.vpg.tests",
@@ -21,6 +22,7 @@ Import-Package: org.eclipse.core.runtime
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.rephraserengine.core,
  org.eclipse.core.runtime,
+ org.eclipse.jface.text,
  org.eclipse.ltk.core.refactoring,
- org.eclipse.jface.text
+ org.eclipse.rephraserengine.core.refactoring
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

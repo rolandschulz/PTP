@@ -21,7 +21,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
@@ -156,11 +156,11 @@ public class CheckCanAddDeclTests extends RefactoringTestCase
 
     /**
      * This is intended to be subclassed in order to gain access to the protected methods of
-     * {@link AbstractFortranRefactoring} to test those methods.
+     * {@link SingleFileFortranRefactoring} to test those methods.
      *
      * @author Jeff Overbey
      */
-    private class FauxFortranRefactoring extends AbstractFortranRefactoring
+    private class FauxFortranRefactoring extends SingleFileFortranRefactoring
     {
         public FauxFortranRefactoring()
         {
@@ -182,17 +182,6 @@ public class CheckCanAddDeclTests extends RefactoringTestCase
         @Override
         protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
         {
-        }
-
-        @Override
-        protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
-        {
-        }
-
-        @Override
-        protected RefactoringStatus getAbstractSyntaxTree(RefactoringStatus status)
-        {
-            return null;
         }
 
         @Override

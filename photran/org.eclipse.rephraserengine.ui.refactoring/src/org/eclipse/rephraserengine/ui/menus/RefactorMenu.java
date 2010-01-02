@@ -126,7 +126,7 @@ public final class RefactorMenu extends CompoundContributionItem
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private void addResourceRefactoring(IConfigurationElement elt,
         LinkedList<IContributionItem> result) throws CoreException
     {
@@ -134,17 +134,24 @@ public final class RefactorMenu extends CompoundContributionItem
         {
             if (elt.getAttribute("class") != null && environmentOK(elt))
             {
-                IResourceRefactoring refactoring = (IResourceRefactoring)elt.createExecutableExtension("class");
-                String label = elt.getAttribute("label");
-                CustomUserInputPage customInputPage =
-                    elt.getAttribute("inputPage") == null
-                    ? null
-                    : (CustomUserInputPage)elt.createExecutableExtension("inputPage");
-                result.add(new ResourceRefactoringContributionItem(
-                    refactoring,
-                    label,
-                    customInputPage,
-                    selection.getAllFilesInSelectedResources()));
+                try
+                {
+                    IResourceRefactoring refactoring = (IResourceRefactoring)elt.createExecutableExtension("class");
+                    String label = elt.getAttribute("label");
+                    CustomUserInputPage customInputPage =
+                        elt.getAttribute("inputPage") == null
+                        ? null
+                        : (CustomUserInputPage)elt.createExecutableExtension("inputPage");
+                    result.add(new ResourceRefactoringContributionItem(
+                        refactoring,
+                        label,
+                        customInputPage,
+                        selection.getAllFilesInSelectedResources()));
+                }
+                catch (Throwable t)
+                {
+                    t.printStackTrace();
+                }
             }
             else if (elt.getAttribute("command") != null)
             {
@@ -153,7 +160,7 @@ public final class RefactorMenu extends CompoundContributionItem
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private void addEditorRefactoring(IConfigurationElement elt,
         LinkedList<IContributionItem> result) throws CoreException
     {
@@ -161,18 +168,25 @@ public final class RefactorMenu extends CompoundContributionItem
         {
             if (elt.getAttribute("class") != null && environmentOK(elt))
             {
-                IEditorRefactoring refactoring = (IEditorRefactoring)elt.createExecutableExtension("class");
-                String label = elt.getAttribute("label");
-                CustomUserInputPage customInputPage =
-                    elt.getAttribute("inputPage") == null
-                    ? null
-                    : (CustomUserInputPage)elt.createExecutableExtension("inputPage");
-                result.add(new EditorRefactoringContributionItem(
-                    refactoring,
-                    label,
-                    customInputPage,
-                    selection.getFileInEditor(),
-                    selection.getSelectionInEditor()));
+                try
+                {
+                    IEditorRefactoring refactoring = (IEditorRefactoring)elt.createExecutableExtension("class");
+                    String label = elt.getAttribute("label");
+                    CustomUserInputPage customInputPage =
+                        elt.getAttribute("inputPage") == null
+                        ? null
+                        : (CustomUserInputPage)elt.createExecutableExtension("inputPage");
+                    result.add(new EditorRefactoringContributionItem(
+                        refactoring,
+                        label,
+                        customInputPage,
+                        selection.getFileInEditor(),
+                        selection.getSelectionInEditor()));
+                }
+                catch (Throwable t)
+                {
+                    t.printStackTrace();
+                }
             }
             else if (elt.getAttribute("command") != null)
             {
@@ -194,6 +208,7 @@ public final class RefactorMenu extends CompoundContributionItem
         result.add(commandContribution(elt.getAttribute("id")));
     }
 
+    @SuppressWarnings("deprecation")
     private CommandContributionItem commandContribution(String commandID)
     {
 //        CommandContributionItemParameter param = new CommandContributionItemParameter(
@@ -217,7 +232,7 @@ public final class RefactorMenu extends CompoundContributionItem
             CommandContributionItem.STYLE_PUSH);            // Style
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private static class ResourceRefactoringContributionItem extends ContributionItem
     {
         private IResourceRefactoring refactoring;
@@ -243,6 +258,7 @@ public final class RefactorMenu extends CompoundContributionItem
             menuItem.setText(label);
             menuItem.addSelectionListener(new SelectionAdapter()
             {
+                @SuppressWarnings("unchecked")
                 public void widgetSelected(SelectionEvent e)
                 {
                     refactoring.initialize(selectedFiles);
@@ -252,7 +268,7 @@ public final class RefactorMenu extends CompoundContributionItem
         }
     };
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private static class EditorRefactoringContributionItem extends ContributionItem
     {
         private IEditorRefactoring refactoring;
@@ -281,6 +297,7 @@ public final class RefactorMenu extends CompoundContributionItem
             menuItem.setText(label);
             menuItem.addSelectionListener(new SelectionAdapter()
             {
+                @SuppressWarnings("unchecked")
                 public void widgetSelected(SelectionEvent e)
                 {
                     refactoring.initialize(fileInEditor, textSelection);

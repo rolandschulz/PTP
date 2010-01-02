@@ -123,6 +123,7 @@ public final class Model
     private String name;
     private EclipseVPG<?,?,?,?,?> vpg;
     private List<String> files;
+    private Set<String> filesWithNoEdges;
     private Set<Entry> edges;
 
     public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<?,?,?,?,?> vpg, String... filenames)
@@ -138,6 +139,8 @@ public final class Model
         pm.subTask("Preparing to compute " + name);
         this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames), new NullProgressMonitor());
 
+        this.filesWithNoEdges = new TreeSet<String>();
+        
         pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
         pm.beginTask("Computing " + name + ":", files.size());
         this.edges = new TreeSet<Entry>();
@@ -152,6 +155,8 @@ public final class Model
 
     private void addEdges(String filename, IProgressMonitor pm)
     {
+        int count = 0;
+        
         for (VPGEdge<?,?,?> edge : vpg.db.getAllEdgesFor(filename))
         {
             TokenRef<?> source = edge.getSource();
@@ -164,7 +169,12 @@ public final class Model
                     sink.getFilename(),
                     new Interval(sink.getOffset(), sink.getEndOffset()),
                     edge.getType()));
+            
+            count++;
         }
+        
+        if (count == 0)
+            filesWithNoEdges.add(filename);
     }
 
     public List<String> getFiles()
@@ -246,13 +256,18 @@ public final class Model
                 }
                 else
                 {
-                    diff.add(
-                        new EdgeDeleted(
-                            entry.sourceFilename,
-                            entry.origSource,
-                            entry.sinkFilename,
-                            entry.sink,
-                            entry.edgeType));
+                    if (that.filesWithNoEdges.contains(entry.sourceFilename))
+                        diff.recordFileWithNoEdges(entry.sourceFilename);
+                    else if (that.filesWithNoEdges.contains(entry.sinkFilename))
+                        diff.recordFileWithNoEdges(entry.sinkFilename);
+                    else
+                        diff.add(
+                            new EdgeDeleted(
+                                entry.sourceFilename,
+                                entry.origSource,
+                                entry.sinkFilename,
+                                entry.sink,
+                                entry.edgeType));
                 }
             }
             pm.worked(1);

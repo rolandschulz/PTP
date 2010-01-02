@@ -238,6 +238,18 @@ public final class PreservationAnalysis
 
         diff.processUsing(new ModelDiffProcessor()
         {
+            @Override
+            public void processAllEdgesDeleted(Set<String> filesWithAllEdgesDeleted)
+            {
+                String msg = "The following files will not compile if the transformation "
+                    + "is completed:";
+                status.addError(msg);
+
+                for (String filename : filesWithAllEdgesDeleted)
+                    status.addError("    " + filename,
+                        new FileStatusContext(EclipseVPG.getIFileForFilename(filename), null));
+            }
+            
             private String getCode(IFile file, HashMap<IFile, String> modifiedSourceCode)
             {
                 if (file == null)

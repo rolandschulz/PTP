@@ -20,13 +20,15 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
+import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.actions.FortranEditorActionDelegate;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.photran.internal.ui.vpg.PhotranResourceFilter;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
+import org.eclipse.rephraserengine.core.vpg.refactoring.VPGRefactoring;
 import org.eclipse.rephraserengine.internal.ui.UIUtil;
 import org.eclipse.rephraserengine.ui.WorkbenchSelectionInfo;
 import org.eclipse.swt.widgets.Shell;
@@ -60,15 +62,17 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
     {
         WorkbenchSelectionInfo selection = new WorkbenchSelectionInfo(new PhotranResourceFilter());
 
-        if (IResourceRefactoring.class.isAssignableFrom(refactoringClass)
-            && UIUtil.askUserToSaveModifiedFiles(selection.getAllFilesInSelectedResources()))
-        {
-            runForSelectedFiles(selection);
-        }
-        else if (IEditorRefactoring.class.isAssignableFrom(refactoringClass)
+        if (IEditorRefactoring.class.isAssignableFrom(refactoringClass)
+            && (!IResourceRefactoring.class.isAssignableFrom(refactoringClass)
+                || selection.isTextSelectedInEditor())
             && UIUtil.askUserToSaveModifiedFiles(selection.getFileInEditor()))
         {
             super.run(action);
+        }
+        else if (IResourceRefactoring.class.isAssignableFrom(refactoringClass)
+            && UIUtil.askUserToSaveModifiedFiles(selection.getAllFilesInSelectedResources()))
+        {
+            runForSelectedFiles(selection);
         }
         else
         {
@@ -81,7 +85,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
     }
 
     /**
-     * Creates an <code>AbstractFortranRefactoring</code> and a <code>RefactoringWizard</code>
+     * Creates an <code>VPGRefactoring<IFortranAST, Token, PhotranVPG></code> and a <code>RefactoringWizard</code>
      * for refactorings that require/accept operations on multiple files(i.e. IntroduceImplicitNone)
      * @param selection
      *
@@ -90,7 +94,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
      */
     private void runForSelectedFiles(WorkbenchSelectionInfo selection)
     {
-        AbstractFortranRefactoring refact = getRefactoring(selection.getAllFilesInSelectedResources());
+        VPGRefactoring<IFortranAST, Token, PhotranVPG> refact = getRefactoring(selection.getAllFilesInSelectedResources());
         RefactoringWizard wizard = getRefactoringWizard(wizardClass, refact);
         try
         {
@@ -145,7 +149,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
             {
                 ArrayList<IFile> files = new ArrayList<IFile>();
                 files.add(getFortranEditor().getIFile());
-                AbstractFortranRefactoring refactoring = getRefactoring(files);
+                VPGRefactoring<IFortranAST, Token, PhotranVPG> refactoring = getRefactoring(files);
                 RefactoringWizard wizard = getRefactoringWizard(wizardClass, refactoring);
 
                 new RefactoringWizardOpenOperation(wizard).run(getFortranEditor().getShell(), refactoring.getName());
@@ -169,7 +173,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
      * @param fortranRefactoringClass
      * @return FortranRefactoring
      */
-    protected abstract AbstractFortranRefactoring getRefactoring(List<IFile> files);
+    protected abstract VPGRefactoring<IFortranAST, Token, PhotranVPG> getRefactoring(List<IFile> files);
 
     /**
      * Invoke the constructor of the given <code>RefactoringWizard</code> with the given
@@ -177,7 +181,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
      * @param fortranRefactoringClass
      * @return FortranRefactoring
      */
-    private RefactoringWizard getRefactoringWizard(Class<?> wizardClass, AbstractFortranRefactoring refactoring)
+    private RefactoringWizard getRefactoringWizard(Class<?> wizardClass, VPGRefactoring<IFortranAST, Token, PhotranVPG> refactoring)
     {
         try
         {

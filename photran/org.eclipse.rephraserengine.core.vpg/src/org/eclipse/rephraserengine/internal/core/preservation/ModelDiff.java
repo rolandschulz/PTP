@@ -12,6 +12,7 @@ package org.eclipse.rephraserengine.internal.core.preservation;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
@@ -33,6 +34,7 @@ public final class ModelDiff
     {
         public abstract void processEdgeAdded(EdgeAdded addition);
         public abstract void processEdgeDeleted(EdgeDeleted deletion);
+        public abstract void processAllEdgesDeleted(Set<String> filenames);
         public abstract void processEdgeSinkChanged(EdgeSinkChanged change);
     }
 
@@ -193,8 +195,14 @@ public final class ModelDiff
         }
     }
 
+    private Set<String> filesWithAllEdgesDeleted = new TreeSet<String>();
     private Set<DiffEntry> differences = new HashSet<DiffEntry>();
 
+    void recordFileWithNoEdges(String filename)
+    {
+        filesWithAllEdgesDeleted.add(filename);
+    }
+    
     void add(DiffEntry entry)
     {
         differences.add(entry);
@@ -207,6 +215,9 @@ public final class ModelDiff
 
     public void processUsing(ModelDiffProcessor processor)
     {
+        if (!filesWithAllEdgesDeleted.isEmpty())
+            processor.processAllEdgesDeleted(filesWithAllEdgesDeleted);
+        
         for (DiffEntry entry : differences)
             entry.accept(processor);
     }

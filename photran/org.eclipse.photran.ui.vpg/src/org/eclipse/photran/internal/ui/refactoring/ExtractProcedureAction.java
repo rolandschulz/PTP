@@ -14,8 +14,11 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
+import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.refactoring.ExtractProcedureRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.vpg.refactoring.VPGRefactoring;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,7 +46,7 @@ public class ExtractProcedureAction
     }
 
     @Override
-    protected AbstractFortranRefactoring getRefactoring(List<IFile> files)
+    protected VPGRefactoring<IFortranAST, Token, PhotranVPG> getRefactoring(List<IFile> files)
     {
         ExtractProcedureRefactoring r = new ExtractProcedureRefactoring();
         r.initialize(

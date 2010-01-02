@@ -11,7 +11,10 @@
 package org.eclipse.photran.internal.ui.refactoring;
 
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFortranRefactoring;
+import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.vpg.refactoring.VPGRefactoring;
 
 /**
  * This is the base class for most (all?) of the wizard dialogs for Fortran refactorings.
@@ -22,7 +25,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.AbstractFort
  */
 public abstract class AbstractFortranRefactoringWizard extends RefactoringWizard
 {
-    public AbstractFortranRefactoringWizard(AbstractFortranRefactoring r)
+    public AbstractFortranRefactoringWizard(VPGRefactoring<IFortranAST, Token, PhotranVPG> r)
     {
         // CHECK_INITIAL_CONDITIONS_ON_OPEN causes the initial conditions to be checked
         // twice, which leads to duplicate and missing error messages
