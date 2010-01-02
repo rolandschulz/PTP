@@ -54,16 +54,16 @@ public class IntervalTestCase extends TestCase
         assertEquals(0, empty2.cardinality());
     }
 
-    public void testComparison()
-    {
-        assertFalse(width3at1.isLessThan(width1at0));
-        assertTrue(width1at0.isLessThan(width3at1));
-
-        assertFalse(width3at1.isLessThan(negWidth20));
-
-        assertTrue(empty1.isLessThan(empty2));
-        assertFalse(empty2.isLessThan(empty1));
-    }
+//    public void testComparison()
+//    {
+//        assertFalse(width3at1.isLessThan(width1at0));
+//        assertTrue(width1at0.isLessThan(width3at1));
+//
+//        assertFalse(width3at1.isLessThan(negWidth20));
+//
+//        assertTrue(empty1.isLessThan(empty2));
+//        assertFalse(empty2.isLessThan(empty1));
+//    }
 
     public void testSubset()
     {
@@ -83,12 +83,12 @@ public class IntervalTestCase extends TestCase
         assertTrue(empty2.isSubsetOf(empty1));
     }
 
-    public void testOffset()
-    {
-        assertEquals(new Interval( 3,  4), width1at0.plus(3));
-        assertEquals(new Interval( 4,  7), width3at1.plus(3));
-        assertEquals(new Interval(-1, 19), negWidth20.plus(3));
-        assertEquals(new Interval( 6,  6), empty1.plus(3));
-        assertEquals(new Interval( 8,  8), empty2.plus(3));
-    }
+//    public void testOffset()
+//    {
+//        assertEquals(new Interval( 3,  4), width1at0.plus(3));
+//        assertEquals(new Interval( 4,  7), width3at1.plus(3));
+//        assertEquals(new Interval(-1, 19), negWidth20.plus(3));
+//        assertEquals(new Interval( 6,  6), empty1.plus(3));
+//        assertEquals(new Interval( 8,  8), empty2.plus(3));
+//    }
 }

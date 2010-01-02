@@ -25,7 +25,8 @@ public final class Interval implements Comparable<Interval>
     public Interval(int lb, int ub)
     {
         if (ub < lb) throw new IllegalArgumentException(
-            "An interval [j,k) must have j <= k; [" + lb + "," + ub + ") is not a valid interval");
+            "An interval [j,k) must have j <= k.  " +
+            "[" + lb + "," + ub + ") is not a valid interval");
 
         this.lb = lb;
         this.ub = ub;
@@ -51,35 +52,20 @@ public final class Interval implements Comparable<Interval>
             return other.lb <= this.lb && this.ub <= other.ub;
     }
 
-// THESE DEFINITIONS ARE **WRONG**!
-//    public Interval union(Interval that)
-//    {
-//        return new Interval(
-//            Math.min(this.lb, that.lb),
-//            Math.max(this.ub, that.ub));
-//    }
-//
-//    public Interval intersection(Interval that)
-//    {
-//        return new Interval(
-//            Math.max(this.lb, that.lb),
-//            Math.min(this.ub, that.ub));
-//    }
-
     public int cardinality()
     {
         return ub - lb;
     }
 
-    public boolean isLessThan(Interval that)
-    {
-        return this.ub <= that.lb && !this.equals(that);
-    }
-
-    public boolean isGreaterThan(Interval that)
-    {
-        return this.lb >= that.ub && !this.equals(that);
-    }
+//    public boolean isLessThan(Interval that)
+//    {
+//        return this.ub <= that.lb && !this.equals(that);
+//    }
+//
+//    public boolean isGreaterThan(Interval that)
+//    {
+//        return this.lb >= that.ub && !this.equals(that);
+//    }
 
     public boolean overlaps(Interval that)
     {
@@ -91,15 +77,15 @@ public final class Interval implements Comparable<Interval>
         return this.ub <= that.lb || this.lb >= that.ub;
     }
 
-    public Interval plus(int offset)
-    {
-        return new Interval(lb + offset, ub + offset);
-    }
-
-    public Interval minus(int offset)
-    {
-        return plus(-offset);
-    }
+//    public Interval plus(int offset)
+//    {
+//        return new Interval(lb + offset, ub + offset);
+//    }
+//
+//    public Interval minus(int offset)
+//    {
+//        return plus(-offset);
+//    }
 
     @Override
     public boolean equals(Object o)

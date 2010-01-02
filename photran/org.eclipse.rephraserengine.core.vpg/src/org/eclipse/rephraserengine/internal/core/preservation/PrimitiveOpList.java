@@ -38,30 +38,30 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
             add(op);
     }
 
-    public boolean isEmpty()
-    {
-        return list.isEmpty();
-    }
-
-    public int size()
-    {
-        return list.size();
-    }
-
-    public PrimitiveOp get(int i)
-    {
-        return list.get(i);
-    }
+//    public boolean isEmpty()
+//    {
+//        return list.isEmpty();
+//    }
+//
+//    public int size()
+//    {
+//        return list.size();
+//    }
+//
+//    public PrimitiveOp get(int i)
+//    {
+//        return list.get(i);
+//    }
 
     public Iterator<PrimitiveOp> iterator()
     {
         return list.iterator();
     }
 
-    public PrimitiveOp remove(int i)
-    {
-        return list.remove(i);
-    }
+//    public PrimitiveOp remove(int i)
+//    {
+//        return list.remove(i);
+//    }
 
     public void add(PrimitiveOp op)
     {
@@ -108,6 +108,64 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
                     + existingOp);
 
         list.add(opToAdd);
+    }
+    
+    public int offset(String filename, int n)
+    {
+        int result = n;
+        for (PrimitiveOp op : list)
+            result += op.adjust(filename, n);
+        return result;
+    }
+    
+    public Interval inorm(String filename, Interval interval)
+    {
+        int lb = offset(filename, interval.lb);
+        for (PrimitiveOp op : list)
+        {
+            if (op.filename.equals(filename) && op.daff(this).contains(lb))
+            {
+                lb = op.daff(this).lb;
+                break;
+            }
+        }
+        
+        int ub = offset(filename, interval.ub);
+        for (PrimitiveOp op : list)
+        {
+            if (op.filename.equals(filename) && op.daff(this).contains(ub))
+            {
+                ub = op.daff(this).ub;
+                break;
+            }
+        }
+        
+        return new Interval(lb, ub);
+    }
+    
+    public Interval dnorm(String filename, Interval interval)
+    {
+        int lb = interval.lb;
+        for (PrimitiveOp op : list)
+        {
+            if (op.filename.equals(filename) && op.daff(this).contains(lb))
+            {
+                lb = op.daff(this).lb;
+                break;
+            }
+        }
+        
+        int ub = interval.ub;
+        for (PrimitiveOp op : list)
+        {
+            if (op.filename.equals(filename) && op.daff(this).contains(ub))
+            {
+                ub = op.daff(this).ub;
+                break;
+            }
+        }
+        
+        return new Interval(lb, ub);
     }
     
     @Override public String toString()

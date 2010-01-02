@@ -54,26 +54,29 @@ public final class Model
             this.edgeType = edgeType;
         }
 
-        public boolean shouldPreserveAccordingTo(Set<PreservationRule> preserveEdgeTypes, String affectedFilename, Interval affected)
+        public boolean shouldPreserveAccordingTo(Set<PreservationRule> preserveEdgeTypes, PrimitiveOpList primitiveOps, boolean initial)
         {
             for (PreservationRule rule : preserveEdgeTypes)
-                if (shouldPreserveAccordingTo(rule, affectedFilename, affected))
+                if (shouldPreserveAccordingTo(rule, primitiveOps, initial))
                     return true;
 
             return false;
         }
 
-        public boolean shouldPreserveAccordingTo(PreservationRule rule, String affectedFilename, Interval affected)
+        public boolean shouldPreserveAccordingTo(PreservationRule rule, PrimitiveOpList primitiveOps, boolean initial)
         {
-            boolean incoming = sinkFilename.equals(affectedFilename) && sink.isSubsetOf(affected);
-            boolean outgoing = sourceFilename.equals(affectedFilename) && source.isSubsetOf(affected);
-            return rule.shouldPreserve(incoming, outgoing, this.edgeType);
-        }
-
-        public void offset(PrimitiveOp op)
-        {
-            this.source = op.inorm(this.sourceFilename, this.source);
-            this.sink = op.inorm(this.sinkFilename, this.sink);
+            boolean result = false;
+            for (PrimitiveOp op : primitiveOps)
+            {
+                Interval affected = initial ? op.iaff() : op.daff(primitiveOps);
+                boolean incoming = sinkFilename.equals(op.filename) && sink.isSubsetOf(affected);
+                boolean outgoing = sourceFilename.equals(op.filename) && source.isSubsetOf(affected);
+                if (rule.definitelyShouldNotPreserve(incoming, outgoing, this.edgeType))
+                    return false;
+                else
+                    result = result || rule.shouldPreserve(incoming, outgoing, this.edgeType);
+            }
+            return result;
         }
 
         @Override public boolean equals(Object o)
@@ -178,20 +181,11 @@ public final class Model
 
         for (Entry entry : edges)
         {
-            for (PrimitiveOp op : primitiveOps)
+            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, primitiveOps, true))
             {
-                if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, op.iaff()))
-                {
-                    entry.source = op.inorm(entry.sourceFilename, entry.source); // leave origSource unchanged
-                    entry.sink = op.inorm(entry.sinkFilename, entry.sink);
-
-                    for (PrimitiveOp otherOp : primitiveOps)
-                        if (!otherOp.equals(op))
-                            entry.offset(otherOp);
-
-                    revisedList.add(entry);
-                    break;
-                }
+                entry.source = primitiveOps.inorm(entry.sourceFilename, entry.source);
+                entry.sink = primitiveOps.inorm(entry.sinkFilename, entry.sink);
+                revisedList.add(entry);
             }
             pm.worked(1);
         }
@@ -210,16 +204,11 @@ public final class Model
 
         for (Entry entry : edges)
         {
-            for (PrimitiveOp op : primitiveOps)
+            if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, primitiveOps, false))
             {
-                Interval daff = offset(op.daff(), op, primitiveOps);
-                if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, op.filename, daff))
-                {
-                    entry.source = op.dnorm(entry.sourceFilename, entry.source, daff);
-                    entry.sink = op.dnorm(entry.sinkFilename, entry.sink, daff);
-                    revisedList.add(entry);
-                    break;
-                }
+                entry.source = primitiveOps.dnorm(entry.sourceFilename, entry.source);
+                entry.sink = primitiveOps.dnorm(entry.sinkFilename, entry.sink);
+                revisedList.add(entry);
             }
             pm.worked(1);
         }
@@ -227,20 +216,6 @@ public final class Model
         edges = revisedList;
 
         pm.done();
-    }
-
-    private Interval offset(Interval daff, PrimitiveOp op, PrimitiveOpList primitiveOps)
-    {
-        int dx = 0, dy = 0;
-        for (PrimitiveOp otherOp : primitiveOps)
-        {
-            if (!otherOp.equals(op))
-            {
-                dx += otherOp.offset(daff.lb) - daff.lb;
-                dy += otherOp.offset(daff.ub) - daff.ub;
-            }
-        }
-        return new Interval(daff.lb + dx, daff.ub + dy);
     }
 
     public ModelDiff compareAgainst(Model that, IProgressMonitor pm)

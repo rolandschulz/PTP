@@ -53,6 +53,12 @@ public final class PreservationRule
         this.preserveOutgoing = preserveOutgoing;
     }
 
+    public boolean definitelyShouldNotPreserve(boolean isIncoming, boolean isOutgoing, int edgeType)
+    {
+        // entirely contained in affected region
+        return edgeType == edgeTypeToPreserve && isIncoming && isOutgoing;
+    }
+
     public boolean shouldPreserve(boolean isIncoming, boolean isOutgoing, int edgeType)
     {
         if (edgeType != edgeTypeToPreserve)
@@ -65,5 +71,20 @@ public final class PreservationRule
             return preserveOutgoing;
         else                               // outside affected region
             return true;
+    }
+    
+    @Override public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Preserve ");
+        if (preserveIncoming && preserveOutgoing)
+            sb.append("all");
+        else if (preserveIncoming)
+            sb.append("incoming");
+        else if (preserveOutgoing)
+            sb.append("outgoing");
+        sb.append(" edges of type ");
+        sb.append(edgeTypeToPreserve);
+        return sb.toString();
     }
 }

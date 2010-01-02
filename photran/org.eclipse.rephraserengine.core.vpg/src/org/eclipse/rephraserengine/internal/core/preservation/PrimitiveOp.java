@@ -68,18 +68,12 @@ public abstract class PrimitiveOp
     {
         this.filename = filename;
     }
-
-    public abstract int offset(int n);
-
-    public abstract Interval inorm(String filename, Interval i);
-
+    
     public abstract Interval iaff();
-
-    public abstract Interval dnorm(String filename, Interval i);
-
-    public abstract Interval dnorm(String filename, Interval i, Interval k);
-
-    public abstract Interval daff();
+    
+    public abstract Interval daff(PrimitiveOpList s);
+    
+    public abstract int adjust(String filename, int n);
 
     @Override public abstract String toString();
 
@@ -105,55 +99,25 @@ public abstract class PrimitiveOp
             this.j = j;
             this.k = k;
         }
-
-        @Override
-        public int offset(int n)
-        {
-            if (n < j.lb)
-                return n;
-            else if (n >= j.ub)
-                return n - j.cardinality() + k.cardinality();
-            else
-                return UNDEFINED;
-        }
-
-        @Override
-        public Interval inorm(String filename, Interval i)
-        {
-            if (!filename.equals(this.filename)) return i;
-
-            return new Interval(
-                offset(i.lb) != UNDEFINED ? offset(i.lb) : k.lb,
-                offset(i.ub) != UNDEFINED ? offset(i.ub) : k.ub);
-        }
-
-        @Override
-        public Interval iaff()
+        
+        @Override public Interval iaff()
         {
             return j;
         }
-
-        @Override
-        public Interval dnorm(String filename, Interval i)
+        
+        @Override public Interval daff(PrimitiveOpList s)
         {
-            return dnorm(filename, i, k);
+            int lb = s.offset(filename, k.lb);
+            int ub = lb + k.cardinality();
+            return new Interval(lb, ub);
         }
-
-        @Override
-        public Interval dnorm(String filename, Interval i, Interval k)
+        
+        @Override public int adjust(String filename, int n)
         {
-            if (!filename.equals(this.filename)) return i;
-
-            if (i.isSubsetOf(k))
-                return k;
+            if (this.filename.equals(filename) && n >= j.ub)
+                return k.cardinality() - j.cardinality();
             else
-                return i;
-        }
-
-        @Override
-        public Interval daff()
-        {
-            return k;
+                return 0;
         }
 
         @Override public String toString()
