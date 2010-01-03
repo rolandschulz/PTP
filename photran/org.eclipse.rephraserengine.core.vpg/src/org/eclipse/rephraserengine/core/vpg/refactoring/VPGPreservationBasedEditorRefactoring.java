@@ -24,6 +24,13 @@ public abstract class VPGPreservationBasedEditorRefactoring<A, T, V extends Ecli
         {
             pm.beginTask("Checking final preconditions", 40);
 
+            // If the user used the Back button in the refactoring wizard dialog,
+            // the AST pointed to by astOfFileInEditor may have been released, so we
+            // should re-acquire the current AST to make sure (1) we're not using
+            // a modified AST, and (2) we're using an AST that the VPG is currently
+            // aware of (i.e., not a stale AST no longer in its cache).
+            this.astOfFileInEditor = vpg.acquireTransientAST(fileInEditor);
+
             doValidateUserInput(status, new SubProgressMonitor(pm, 5));
             if (!status.hasFatalError())
             {
