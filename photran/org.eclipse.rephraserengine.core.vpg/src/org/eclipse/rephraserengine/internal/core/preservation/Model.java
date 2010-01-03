@@ -37,11 +37,11 @@ public final class Model
 {
     private static final class Entry implements Comparable<Entry>
     {
+        private int edgeType;
         private String sourceFilename;
         private Interval source, origSource;
         private String sinkFilename;
         private Interval sink;
-        private int edgeType;
 
         public Entry(String sourceFilename, Interval source, String sinkFilename, Interval sink, int edgeType)
         {
@@ -84,11 +84,11 @@ public final class Model
             if (o == null || !o.getClass().equals(this.getClass())) return false;
 
             Entry that = (Entry)o;
-            return this.sourceFilename.equals(that.sourceFilename)
+            return this.edgeType == that.edgeType
+                && this.sourceFilename.equals(that.sourceFilename)
                 && this.source.equals(that.source)
                 && this.sinkFilename.equals(that.sinkFilename)
-                && this.sink.equals(that.sink)
-                && this.edgeType == that.edgeType;
+                && this.sink.equals(that.sink);
         }
 
         @Override public int hashCode()
@@ -99,22 +99,22 @@ public final class Model
         public int compareTo(Entry that)
         {
             // Lexicographic comparison
-            int result = this.sourceFilename.compareTo(that.sourceFilename);
+            int result = that.edgeType - this.edgeType;
             if (result == 0)
             {
-                result = this.sinkFilename.compareTo(that.sinkFilename);
+                result = this.sourceFilename.compareTo(that.sourceFilename);
                 if (result == 0)
                 {
-                    result = this.source.compareTo(that.source);
+                    result = this.sinkFilename.compareTo(that.sinkFilename);
                     if (result == 0)
                     {
-                        result = this.sink.compareTo(that.sink);
+                        result = this.source.compareTo(that.source);
                         if (result == 0)
                         {
-                            return that.edgeType - this.edgeType;
+                            result = this.sink.compareTo(that.sink);
                         }
                     }
-                }
+            }
             }
             return result;
         }
