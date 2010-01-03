@@ -491,8 +491,18 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
             return filename.substring(Math.max(lastSlash + 1, lastBackslash + 1));
     }
 
-    /** @return source code for the given AST (which may have been modified), or <code>null</code>
-     *  if this capability is not supported */
+    /**
+     * Returns the source code for the given AST (which may have been modified).
+     * <p>
+     * In preservation-based refactorings, if a transformation will cause an error
+     * in the modified source code, this is used in the refactoring wizard to display
+     * the modified source code and highlight the erroroneous region when the error
+     * list is displayed.  If preservation-based refactorings are not being implemented,
+     * usually it is not necessary to override this method.
+     * 
+     * @return source code for the given AST (which may have been modified), or <code>null</code>
+     *         if this capability is not supported.
+     */
     public String getSourceCodeFromAST(A ast)
     {
         return null;
