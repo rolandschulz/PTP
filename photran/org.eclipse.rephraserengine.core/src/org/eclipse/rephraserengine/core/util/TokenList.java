@@ -115,6 +115,11 @@ public abstract class TokenList<T> implements Iterable<T>
         return -1;
     }
     
+    public T findStreamOffset(int offset)
+    {
+        return findStreamOffsetLength(offset, Integer.MIN_VALUE);
+    }
+    
     public T findStreamOffsetLength(int offset, int length)
     {
         int low = 0, high = size - 1;
@@ -125,8 +130,12 @@ public abstract class TokenList<T> implements Iterable<T>
                 low = mid + 1;
             else if (offset < value)
                 high = mid - 1;
-            else // (value == offset)
-                return getLength(array[mid]) == length ? array[mid] : null;
+            else /* (value == offset) */ {
+                if (length == Integer.MIN_VALUE)
+                    return array[mid]; // Don't consider length
+                else
+                    return getLength(array[mid]) == length ? array[mid] : null;
+            }
         }
         return null;
     }
