@@ -312,71 +312,92 @@ public final class Model
         return toString(null, null, null);
     }
 
-    public String toString(String filename, CharSequence fileContents, ArrayList<Integer> lineMap)
+    public String toString(String filename, String fileContents, ArrayList<Integer> lineMap)
     {
         StringBuilder sb = new StringBuilder();
 
         sb.append(edges.size());
         sb.append(" edges\n\n");
 
+        Set<Integer> edgeTypes = new TreeSet<Integer>();
         for (Entry entry : edges)
+            edgeTypes.add(entry.edgeType);
+
+        for (int edgeType : edgeTypes)
         {
-            if (!entry.sourceFilename.equals(filename))
+            for (Entry entry : edges)
             {
-                sb.append(entry.sourceFilename);
-                sb.append(':');
-            }
-            sb.append('[');
-            sb.append(String.format("%5d", entry.source.lb));
-            sb.append(", ");
-            sb.append(String.format("%5d", entry.source.ub));
-            sb.append(")  ===(");
-            sb.append(entry.edgeType);
-            sb.append(")==>  ");
-            if (!entry.sinkFilename.equals(filename))
-            {
-                sb.append(entry.sinkFilename);
-                sb.append(':');
-            }
-            sb.append('[');
-            sb.append(String.format("%5d", entry.sink.lb));
-            sb.append(", ");
-            sb.append(String.format("%5d", entry.sink.ub));
-            sb.append(")");
-
-            if (fileContents != null)
-            {
-                sb.append("           [");
-                if (!entry.sourceFilename.equals(filename))
-                    sb.append('?');
-                else if (entry.source.lb >= 0 && entry.source.ub >= entry.source.lb)
-                    sb.append(fileContents.subSequence(entry.source.lb, entry.source.ub));
-                sb.append("]");
-                if (lineMap != null)
+                if (entry.edgeType == edgeType)
                 {
-                    sb.append(" (Line ");
-                    sb.append(getLine(entry.source.lb, lineMap));
+                    if (!entry.sourceFilename.equals(filename))
+                    {
+                        sb.append(entry.sourceFilename);
+                        sb.append(':');
+                    }
+                    sb.append('[');
+                    sb.append(String.format("%5d", entry.source.lb));
+                    sb.append(", ");
+                    sb.append(String.format("%5d", entry.source.ub));
+                    sb.append(")  ===(");
+                    sb.append(entry.edgeType);
+                    sb.append(")==>  ");
+                    if (!entry.sinkFilename.equals(filename))
+                    {
+                        sb.append(entry.sinkFilename);
+                        sb.append(':');
+                    }
+                    sb.append('[');
+                    sb.append(String.format("%5d", entry.sink.lb));
+                    sb.append(", ");
+                    sb.append(String.format("%5d", entry.sink.ub));
                     sb.append(")");
-                }
-                sb.append("  ===(");
-                sb.append(vpg.describeEdgeType(entry.edgeType));
-                sb.append(")==>  [");
-                if (!entry.sinkFilename.equals(filename))
-                    sb.append('?');
-                else if (entry.sink.lb >= 0 && entry.sink.ub >= entry.sink.lb)
-                    sb.append(fileContents.subSequence(entry.sink.lb, entry.sink.ub));
-                sb.append("]");
-                if (lineMap != null)
-                {
-                    sb.append(" (Line ");
-                    sb.append(getLine(entry.sink.lb, lineMap));
-                    sb.append(")");
+        
+                    if (fileContents != null)
+                    {
+                        sb.append("           [");
+                        if (!entry.sourceFilename.equals(filename))
+                            sb.append('?');
+                        else if (entry.source.lb >= 0 && entry.source.ub >= entry.source.lb)
+                            sb.append(extractText(fileContents, entry.source));
+                        sb.append("]");
+                        if (lineMap != null)
+                        {
+                            sb.append(" (Line ");
+                            sb.append(getLine(entry.source.lb, lineMap));
+                            sb.append(")");
+                        }
+                        sb.append("  ===(");
+                        sb.append(vpg.describeEdgeType(entry.edgeType));
+                        sb.append(")==>  [");
+                        if (!entry.sinkFilename.equals(filename))
+                            sb.append('?');
+                        else if (entry.sink.lb >= 0 && entry.sink.ub >= entry.sink.lb)
+                            sb.append(extractText(fileContents, entry.sink));
+                        sb.append("]");
+                        if (lineMap != null)
+                        {
+                            sb.append(" (Line ");
+                            sb.append(getLine(entry.sink.lb, lineMap));
+                            sb.append(")");
+                        }
+                    }
+    
+                    sb.append('\n');
                 }
             }
-
-            sb.append('\n');
         }
         return sb.toString();
+    }
+
+    private String extractText(String fileContents, Interval interval)
+    {
+        String result = fileContents.substring(interval.lb, interval.ub);
+        result = result.replace("\t", "\\t");
+        result = result.replace("\r", "\\r");
+        result = result.replace("\n", "\\n");
+        if (result.length() > 17)
+            result = result.substring(0, 18) + "...";
+        return result;
     }
 
     private int getLine(int offset, ArrayList<Integer> lineMap)
