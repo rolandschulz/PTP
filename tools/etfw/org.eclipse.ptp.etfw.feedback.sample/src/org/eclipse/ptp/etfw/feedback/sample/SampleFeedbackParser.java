@@ -34,6 +34,7 @@ import org.eclipse.ptp.etfw.feedback.AbstractFeedbackParser;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -160,11 +161,15 @@ public class SampleFeedbackParser extends AbstractFeedbackParser {
 					String line = attributes.getNamedItem("lineNo").getNodeValue();
 					int lineNo = Integer.parseInt(line);
 					String id = attributes.getNamedItem("id").getNodeValue();
-					String parentID=attributes.getNamedItem("parent").getNodeValue();
+					Node parentNode=attributes.getNamedItem("parent");
+					String parentID="noParent";
+					if(parentNode!=null) {
+					  parentID=attributes.getNamedItem("parent").getNodeValue();
+					}
 					SampleFeedbackItem item = new SampleFeedbackItem(name, parentID, id, fname, lineNo, function);
 					items.add(item);
 				} catch (Exception e) {
-					System.out.println("Exception creating item " + i);
+					System.out.println("SampleFeedbackParser: Exception creating item " + i);
 				}
 	
 	      }//end for
