@@ -24,7 +24,7 @@
                id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleToolbar">
             <command
                   commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
-                  icon="icons/sample.gif"
+                  icon="icons/feedback_view.gif"
                   tooltip="Show ETFw Feedback view for selected XML file"
                   id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleCommand">
             </command>
@@ -51,11 +51,23 @@
       -->
       <view
             name="Sample Feedback items"
-            icon="icons/sample.gif"
+            icon="icons/feedback_view.gif"
             category="org.eclipse.ptp.etfw.feedback"
             class="org.eclipse.ptp.etfw.feedback.sample.SampleFeedbackView"
             id="org.eclipse.ptp.etfw.feedback.sample.view">
       </view>
+   </extension>
+      <extension
+         id="sampleAction"
+         name="Sample Added Action"
+         point="org.eclipse.ptp.etfw.feedback.action">
+      <action
+            class="org.eclipse.ptp.etfw.feedback.sample.actions.SampleFeedbackAction"
+            icon="icons/feedback_action.gif"
+            id="sampleFeedbackAction1"
+            name="Sample Feedback Action"
+            viewID="org.eclipse.ptp.etfw.feedback.sample.view">
+      </action>
    </extension>
 
 </plugin>
