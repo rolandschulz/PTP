@@ -23,6 +23,7 @@ public class Activator extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback";
 	
 	public static final String FEEDBACK_EXTENSION_ID="parser";
+	public static final String FEEDBACK_ACTION_EXTENSION_ID="action";
 
 	/** The shared instance */
 	private static Activator plugin;
