@@ -60,6 +60,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
 import org.eclipse.ptp.etfw.feedback.Activator;
 import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.swt.SWT;
@@ -78,7 +79,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.ide.undo.CreateMarkersOperation;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -108,6 +108,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	private Tree tree; // keep so we can dispose of listeners in dispose()?
 
 	protected Action infoAction;
+	protected Action extensionAction; // possible addition by an plug-in extension
+	protected AbstractFeedbackAction feedbackAction;
 
 	protected Action filterAction;
 
@@ -173,6 +175,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	private String iconName_ = "icons/feedback.png";
 
 	private String viewName_;
+	private String viewID_;
 
 	private String markerID_;
 
@@ -366,9 +369,10 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						iconName_ = iconName;
 					}
 					this.viewName_ = name;
+					this.viewID_=cElement.getAttribute("id");
 					if (markerID_ == null) {
 						// use plugin id for marker id, if not specified
-						markerID_ = cElement.getAttribute("id");
+						markerID_ = this.viewID_;
 					}
 				}
 			}
@@ -1426,6 +1430,9 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(infoAction);
+		if(extensionAction!=null) {
+			manager.add(extensionAction);
+		}
 		manager.add(removeMarkerAction);
 		manager.add(expandAllAction);
 		manager.add(collapseAllAction);
@@ -1437,6 +1444,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 */
 	private void makeActions() {
 		makeShowInfoAction();
+		makeExtensionAction();
 		makeFilterAction();
 		makeDoubleClickAction();
 		makeRemoveMarkerAction();
@@ -1611,6 +1619,33 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 */
 	protected void maintainExpandCollapseStatus() {
 
+	}
+	
+	/**
+	 * Make "show info" action to display artifact information
+	 */
+	protected void makeExtensionAction() {
+		FeedbackActionCreator creator=new FeedbackActionCreator();
+		String ps=thePlugin_.toString();//??
+		// do we also want ability to have a view id such that the action ONLY gets attached to that view?
+		feedbackAction= creator.findFeedbackAction(this.viewID_);
+		if (feedbackAction != null) {
+			extensionAction = new Action() {
+				public void run() {
+					
+					if (selectedMarker_ != null) {
+						feedbackAction.run(selectedMarker_);
+					}// end if selectedMarker!=null
+					else {
+						MessageDialog.openInformation(null, "Select an item in the view.", "No Feedback item selected.");
+					}
+				}
+			};
+			extensionAction.setText(feedbackAction.getText());
+			extensionAction.setToolTipText(feedbackAction.getToolTip());
+			extensionAction.setImageDescriptor(feedbackAction.getIconImageDescriptor());
+			//TODO destroy image description on shutdown/dispose?
+		}
 	}
 
 	/**

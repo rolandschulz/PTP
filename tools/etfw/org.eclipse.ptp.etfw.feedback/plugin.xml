@@ -2,17 +2,8 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="parser" name="%extension-point.name" schema="schema/feedback.exsd"/>
+   <extension-point id="action" name="Feedback Action" schema="schema/action.exsd"/>
 
-   <extension
-         point="org.eclipse.ui.views">
-      <view
-            category="org.eclipse.ptp.ui.views"
-            class="org.eclipse.ptp.etfw.feedback.views.FeedbackTreeTableMarkerView"
-            icon="icons/view16/feedback_view.gif"
-            id="org.eclipse.ptp.etfw.feedback.views.feedbackView"
-            name="%view.name">
-      </view>
-   </extension>
    <extension
          point="org.eclipse.help.contexts">
       <contexts
