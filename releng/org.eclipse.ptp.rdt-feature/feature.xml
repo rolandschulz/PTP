@@ -24,10 +24,9 @@
    </url>
 
    <requires>
-      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.core" version="5.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.core" version="5.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.dstore.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.make.core" version="5.0.1" match="greaterOrEqual"/>
@@ -38,6 +37,7 @@
       <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.services.dstore" version="3.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.ui" version="5.0.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.workbench.texteditor" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.search" version="3.4.0" match="greaterOrEqual"/>
@@ -58,12 +58,7 @@
       <import plugin="org.eclipse.ui.console" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.files.ui"/>
-      <import plugin="org.eclipse.ptp.rdt.core" version="1.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.core.lrparser" version="5.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.core.lrparser.xlc" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.ptp.remote.rse" version="2.1.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.make.ui"/>
    </requires>
 
    <plugin
@@ -92,13 +87,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.ptp.rdt.xlc"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.rdt.make.ui"
