@@ -620,7 +620,15 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-dev-docs"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>	
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-feature"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>	
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran-samples"/>
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>	
 		<antcall target="tagone">
@@ -632,6 +640,10 @@
 			<param name="tagbranch" value="${photranTagBranch}"/>
         </antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.cmdline"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>	
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core"/>
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>
@@ -641,6 +653,14 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.vpg"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.vpg.tests"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.core.vpg.tests.failing"/>
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
@@ -672,6 +692,14 @@
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.master"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.releng"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>	
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.ui"/>
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>		
@@ -680,7 +708,19 @@
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>	
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.vpg-feature"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.photran.xlf-feature"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine-feature"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine-support"/>
 			<param name="tagbranch" value="${photranTagBranch}"/>
 		</antcall>
         <antcall target="tagone">
@@ -693,6 +733,18 @@
         </antcall>
         <antcall target="tagone">
             <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.vpg"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.core.vpg.tests"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.doc.isv"/>
+			<param name="tagbranch" value="${photranTagBranch}"/>
+        </antcall>
+        <antcall target="tagone">
+            <param name="tagmodule" value="org.eclipse.ptp/photran/org.eclipse.rephraserengine.examples.text"/>
 			<param name="tagbranch" value="${photranTagBranch}"/>
         </antcall>
         <antcall target="tagone">
