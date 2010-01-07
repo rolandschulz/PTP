@@ -17,11 +17,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.rephraserengine.core.refactoring
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.photran.core,
- org.eclipse.photran.internal.core.vpg,
  org.eclipse.photran.internal.core,
  org.eclipse.photran.internal.core.analysis.binding,
  org.eclipse.photran.internal.core.analysis.dependence,
  org.eclipse.photran.internal.core.analysis.loops,
+ org.eclipse.photran.internal.core.analysis.preservation,
  org.eclipse.photran.internal.core.analysis.types,
  org.eclipse.photran.internal.core.lexer,
  org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include,
@@ -29,6 +29,8 @@ Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.internal.core.properties,
  org.eclipse.photran.internal.core.refactoring,
  org.eclipse.photran.internal.core.refactoring.infrastructure,
- org.eclipse.photran.internal.core.util
+ org.eclipse.photran.internal.core.refactoring.interfaces,
+ org.eclipse.photran.internal.core.util,
+ org.eclipse.photran.internal.core.vpg
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

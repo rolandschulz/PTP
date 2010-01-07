@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.tests.refactoring.rename;
 import java.util.HashMap;
 import java.util.Set;
 
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.eclipse.photran.internal.core.util.LineCol;
@@ -26,7 +27,7 @@ public abstract class RenameTestSuite extends TestSuite
     //
     ///////////////////////////////////////////////////////////////////////////
     
-    protected static class Ident
+    public static class Ident
     {
         private String name;
         private HashMap<String, LineCol[]> references;
@@ -89,10 +90,11 @@ public abstract class RenameTestSuite extends TestSuite
         
         for (String filename : ident.getFiles())
             for (LineCol position : ident.getReferences(filename))
-                subSubSuite.addTest(new RenameTestCase.ExpectSuccess(filename, ident, position, newName));
+                subSubSuite.addTest(createSuccessTestCase(ident, newName, filename, position));
         
         currentSubSuite.addTest(subSubSuite);
     }
+
 
     protected void addPreconditionTests(Ident ident, String newName)
     {
@@ -101,9 +103,19 @@ public abstract class RenameTestSuite extends TestSuite
         
         for (String filename : ident.getFiles())
             for (LineCol position : ident.getReferences(filename))
-                subSubSuite.addTest(new RenameTestCase.ExpectFailure(filename, ident, position, newName));
+                subSubSuite.addTest(createFailureTestCase(ident, newName, filename, position));
         
         currentSubSuite.addTest(subSubSuite);
+    }
+
+    protected TestCase createSuccessTestCase(Ident ident, String newName, String filename, LineCol position)
+    {
+        return new RenameTestCase.ExpectSuccess(filename, ident, position, newName);
+    }
+    
+    protected TestCase createFailureTestCase(Ident ident, String newName, String filename, LineCol position)
+    {
+        return new RenameTestCase.ExpectFailure(filename, ident, position, newName);
     }
     
     private String describe(Ident ident, String newName)

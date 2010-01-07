@@ -21,6 +21,7 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
+import org.eclipse.photran.internal.core.refactoring.interfaces.IRenameRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
@@ -57,7 +58,7 @@ public abstract class RenameTestCase extends RefactoringTestCase
     {
         String description = "Attempt to rename identifier at " + lineCol;
 
-        RenameRefactoring refactoring = createRefactoring(filename, lineCol, allFiles);
+        IRenameRefactoring refactoring = createRefactoring(filename, lineCol, allFiles);
 
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         assertTrue(description + " failed initial precondition check: " + status.toString(), !status.hasError());
@@ -82,7 +83,7 @@ public abstract class RenameTestCase extends RefactoringTestCase
      */
     protected RefactoringStatus attemptRename(String filename, LineCol lineCol, String newName, Set<String> allFiles) throws Exception
     {
-        RenameRefactoring refactoring = createRefactoring(filename, lineCol, allFiles);
+        IRenameRefactoring refactoring = createRefactoring(filename, lineCol, allFiles);
 
         RefactoringStatus status = refactoring.checkInitialConditions(pm);
         if (status.hasError()) return status;
@@ -93,7 +94,7 @@ public abstract class RenameTestCase extends RefactoringTestCase
         return status;
     }
 
-    private RenameRefactoring createRefactoring(final String filename, final LineCol lineCol, final Set<String> allFiles) throws Exception
+    private IRenameRefactoring createRefactoring(final String filename, final LineCol lineCol, final Set<String> allFiles) throws Exception
     {
     	PhotranVPG.getDatabase().clearDatabase();
 
@@ -110,10 +111,12 @@ public abstract class RenameTestCase extends RefactoringTestCase
 //            System.out.println(f);
 //        PhotranVPG.getInstance().db.printOn(System.out);
 
-        RenameRefactoring r = new RenameRefactoring();
+        IRenameRefactoring r = createRefactoring();
         r.initialize(thisFile, new TextSelection(getLineColOffset(filename, lineCol), 0));
         return r;
     }
+
+    protected abstract IRenameRefactoring createRefactoring();
 
     protected String readTestFile(String filename) throws IOException, URISyntaxException
     {
@@ -148,6 +151,11 @@ public abstract class RenameTestCase extends RefactoringTestCase
                               readWorkspaceFile(filename)); // refactored file
             }
         }
+
+        @Override protected IRenameRefactoring createRefactoring()
+        {
+            return new RenameRefactoring();
+        }
     }
 
     public static class ExpectFailure extends RenameTestCase
@@ -174,6 +182,11 @@ public abstract class RenameTestCase extends RefactoringTestCase
                            + " (" + position + " - " + variable.getReferences(filename).length + " occurrences) "
                            + "should have failed precondition checking.",
                        status.hasError());
+        }
+
+        @Override protected IRenameRefactoring createRefactoring()
+        {
+            return new RenameRefactoring();
         }
     }
 }
