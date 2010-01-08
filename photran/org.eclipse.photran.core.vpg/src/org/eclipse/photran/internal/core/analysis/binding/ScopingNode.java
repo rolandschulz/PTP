@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
@@ -248,34 +247,35 @@ public abstract class ScopingNode extends ASTNode
 
     public PhotranTokenRef getRepresentativeToken()
     {
-        if (cachedRepresentataiveToken == null)
-            cachedRepresentataiveToken = internalGetRepresentativeToken();
+        return getRepresentativeToken(false);
+    }
+
+    public PhotranTokenRef getRepresentativeToken(boolean force)
+    {
+        if (force || cachedRepresentataiveToken == null)
+        {
+            Token result = internalGetRepresentativeToken();
+            if (result == null)
+            {
+                Token firstToken = findFirstToken();
+                if (firstToken == null) throw new Error("Empty file");
+                cachedRepresentataiveToken = new PhotranTokenRef(firstToken.getIFile(), -1, 0);
+            }
+            else
+                cachedRepresentataiveToken = result.getTokenRef();
+        }
 
         return cachedRepresentataiveToken;
     }
 
-    private PhotranTokenRef internalGetRepresentativeToken()
+    private Token internalGetRepresentativeToken()
     {
     	// TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
     	// AND DYNAMICALLY DISPATCHED TO!
 
     	if (this instanceof ASTExecutableProgramNode)
     	{
-    		try
-    		{
-	    		this.accept(new ASTVisitor()
-	    		{
-					@Override public void visitToken(Token token)
-					{
-						throw new Notification(token.getIFile());
-					}
-	    		});
-    		}
-    		catch (Notification n)
-    		{
-    			return new PhotranTokenRef((IFile)n.getResult(), -1, 0);
-    		}
-    		throw new Error("Empty file");
+    		return null;
     	}
     	else if (this instanceof ASTMainProgramNode)
     	{
@@ -283,57 +283,57 @@ public abstract class ScopingNode extends ASTNode
     		if (m != null)
     		{
     			if (m.getProgramName() != null)
-    				return m.getProgramName().getProgramName().getTokenRef();
+    				return m.getProgramName().getProgramName();
     			else
-    				return m.getProgramToken().getTokenRef();
+    				return m.getProgramToken();
     		}
     		else
     		{
 	    		ASTEndProgramStmtNode s = ((ASTMainProgramNode)this).getEndProgramStmt();
-	    		return s.getEndToken().getTokenRef();
+	    		return s.getEndToken();
     		}
     	}
     	else if (this instanceof ASTFunctionSubprogramNode)
     	{
-    		return ((ASTFunctionSubprogramNode)this).getFunctionStmt().getFunctionName().getFunctionName().getTokenRef();
+    		return ((ASTFunctionSubprogramNode)this).getFunctionStmt().getFunctionName().getFunctionName();
     	}
     	else if (this instanceof ASTSubroutineSubprogramNode)
     	{
-    		return ((ASTSubroutineSubprogramNode)this).getSubroutineStmt().getSubroutineName().getSubroutineName().getTokenRef();
+    		return ((ASTSubroutineSubprogramNode)this).getSubroutineStmt().getSubroutineName().getSubroutineName();
     	}
     	else if (this instanceof ASTModuleNode)
     	{
-    		return ((ASTModuleNode)this).getModuleStmt().getModuleName().getModuleName().getTokenRef();
+    		return ((ASTModuleNode)this).getModuleStmt().getModuleName().getModuleName();
     	}
     	else if (this instanceof ASTBlockDataSubprogramNode)
     	{
     		ASTBlockDataStmtNode s = ((ASTBlockDataSubprogramNode)this).getBlockDataStmt();
     		if (s.getBlockDataName() != null)
-    			return s.getBlockDataName().getBlockDataName().getTokenRef();
+    			return s.getBlockDataName().getBlockDataName();
     		else
-    			return s.getBlockDataToken().getTokenRef();
+    			return s.getBlockDataToken();
     	}
     	else if (this instanceof ASTDerivedTypeDefNode)
     	{
-    		return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt().getTypeName().getTokenRef();
+    		return ((ASTDerivedTypeDefNode)this).getDerivedTypeStmt().getTypeName();
     	}
     	else if (this instanceof ASTInterfaceBlockNode)
 		{
     		ASTInterfaceStmtNode s = ((ASTInterfaceBlockNode)this).getInterfaceStmt();
 			if (s.getGenericName() != null)
-				return s.getGenericName().getGenericName().getTokenRef();
+				return s.getGenericName().getGenericName();
 			else if (s.getGenericSpec() != null && s.getGenericSpec().getEqualsToken() != null)
-				return s.getGenericSpec().getEqualsToken().getTokenRef();
+				return s.getGenericSpec().getEqualsToken();
 			else
-				return s.getInterfaceToken().getTokenRef();
+				return s.getInterfaceToken();
 		}
         else if (this instanceof ASTSubmoduleNode)
         {
-            return ((ASTSubmoduleNode)this).getSubmoduleStmt().getSubmoduleName().getModuleName().getTokenRef();
+            return ((ASTSubmoduleNode)this).getSubmoduleStmt().getSubmoduleName().getModuleName();
         }
         else if (this instanceof ASTBlockConstructNode)
         {
-            return ((ASTBlockConstructNode)this).findFirstToken().getTokenRef();
+            return ((ASTBlockConstructNode)this).findFirstToken();
         }
     	else
     	{
@@ -341,6 +341,19 @@ public abstract class ScopingNode extends ASTNode
     	}
     }
 
+    public void clearAllCachedRepresentativeTokens()
+    {
+        this.accept(new ASTVisitor()
+        {
+            @Override public void visitASTNode(IASTNode node)
+            {
+                if (isScopingNode(node))
+                    ((ScopingNode)node).cachedRepresentataiveToken = null;
+                super.visitASTNode(node);
+            }
+        });
+    }
+    
     public ASTNode getHeaderStmt()
     {
         // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
@@ -439,6 +452,11 @@ public abstract class ScopingNode extends ASTNode
     public boolean isMainProgram()
     {
         return this instanceof ASTMainProgramNode;
+    }
+
+    public boolean isModule()
+    {
+        return this instanceof ASTModuleNode;
     }
 
     public boolean isInternal()
@@ -860,13 +878,25 @@ public abstract class ScopingNode extends ASTNode
 
     public String getName()
     {
-        Token nameToken = getNameToken();
+        return getName(PhotranVPG.getDatabase().isInHypotheticalMode());
+    }
+
+    public String getName(boolean force)
+    {
+        Token nameToken = getNameToken(force);
         return nameToken == null ? null : nameToken.getText();
     }
 
     public Token getNameToken()
     {
-        Token repToken = getRepresentativeToken().findTokenOrReturnNull();
+        return getNameToken(PhotranVPG.getDatabase().isInHypotheticalMode());
+    }
+
+    public Token getNameToken(boolean force)
+    {
+        Token repToken = force
+            ? internalGetRepresentativeToken() // does not use cached TokenRef
+            : getRepresentativeToken().findTokenOrReturnNull(); // might use cached TokenRef
         if (repToken == null || repToken.getTerminal() != Terminal.T_IDENT)
             return null;
         else

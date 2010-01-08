@@ -13,6 +13,7 @@ package org.eclipse.rephraserengine.core.vpg.eclipse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -487,5 +488,16 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, IFile file)
     {
         commitChangesFromInMemoryASTs(pm, ticks, getFilenameForIFile(file));
+    }
+
+    /** Forces the database to be updated based on the current in-memory ASTs for the given files */
+    public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, Set<IFile> files)
+    {
+        String[] filenames = new String[files.size()];
+        int i = 0;
+        for (IFile file : files)
+            filenames[i++] = getFilenameForIFile(file);
+        
+        commitChangesFromInMemoryASTs(pm, ticks, filenames);
     }
 }

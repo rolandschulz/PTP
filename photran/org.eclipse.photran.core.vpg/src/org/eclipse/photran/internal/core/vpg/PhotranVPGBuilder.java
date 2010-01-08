@@ -93,10 +93,15 @@ public class PhotranVPGBuilder extends PhotranVPG
             db.delete(privateEdge);
     }
 
-	public void markScope(PhotranTokenRef identifier, ScopingNode scope)
-	{
-	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, identifier, scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
-	}
+    public void markScope(PhotranTokenRef identifier, ScopingNode scope)
+    {
+        db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, identifier, scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
+    }
+
+    public void markIllegalShadowing(PhotranTokenRef shadowingIdent, PhotranTokenRef shadowedIdent)
+    {
+        db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, shadowingIdent, shadowedIdent, ILLEGAL_SHADOWING_EDGE_TYPE));
+    }
 
 	public void markBinding(PhotranTokenRef reference, PhotranTokenRef definition)
 	{
@@ -295,7 +300,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         IFortranAST ast = acquireTransientAST(filename);
         if (ast == null)
             throw new IllegalArgumentException(filename + " returned null AST");
-
+        
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         ast.getRoot().printOn(new PrintStream(out), null);
         ast = parse(filename, new ByteArrayInputStream(out.toByteArray()));

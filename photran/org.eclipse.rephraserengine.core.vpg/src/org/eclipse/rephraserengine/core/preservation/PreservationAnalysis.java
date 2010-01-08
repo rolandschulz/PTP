@@ -276,12 +276,19 @@ public final class PreservationAnalysis
                     + vpg.describeEdgeType(addition.edgeType).toLowerCase()
                     + " (" + addition + ")"
                     ;
+                status.addError(msg);
 
-                status.addError(msg,
+                status.addError("    from here (click to view)",
                     new PostTransformationContext(
-                        addition.getFileContainingRegion(),
-                        getCode(addition.getFileContainingRegion(), modifiedSourceCode),
-                        addition.toRegion()));
+                        addition.getFileContainingSourceRegion(),
+                        getCode(addition.getFileContainingSourceRegion(), modifiedSourceCode),
+                        addition.getSourceRegion()));
+
+                status.addError("    to here (click to view)",
+                    new PostTransformationContext(
+                        addition.getFileContainingSinkRegion(),
+                        getCode(addition.getFileContainingSinkRegion(), modifiedSourceCode),
+                        addition.getSinkRegion()));
             }
 
             @Override
@@ -292,11 +299,17 @@ public final class PreservationAnalysis
                     + " to be eliminated"
                     + " (" + deletion + ")"
                     ;
+                status.addError(msg);
 
-                status.addError(msg,
+                status.addError("    from here (click to view)",
                     new FileStatusContext(
-                        deletion.getFileContainingRegion(),
-                        deletion.toRegion()));
+                        deletion.getFileContainingSourceRegion(),
+                        deletion.getSourceRegion()));
+
+                status.addError("    to here (click to view)",
+                    new FileStatusContext(
+                        deletion.getFileContainingSinkRegion(),
+                        deletion.getSinkRegion()));
             }
 
             @Override
@@ -307,12 +320,27 @@ public final class PreservationAnalysis
                     + " to change"
                     + " (" + change + ")"
                     ;
+                status.addError(msg);
 
-                status.addError(msg,
+                status.addError("    The "
+                    + vpg.describeEdgeType(change.edgeType).toLowerCase()
+                    + " from here (click to view)",
                     new PostTransformationContext(
-                        change.getFileContainingRegion(),
-                        getCode(change.getFileContainingRegion(), modifiedSourceCode),
-                        change.toRegion()));
+                        change.getFileContainingSourceRegion(),
+                        getCode(change.getFileContainingSourceRegion(), modifiedSourceCode),
+                        change.getSourceRegion()));
+
+                status.addError("    to here (click to view)",
+                    new PostTransformationContext(
+                        change.getFileContainingSinkRegion(),
+                        getCode(change.getFileContainingSinkRegion(), modifiedSourceCode),
+                        change.getSinkRegion()));
+
+                status.addError("    will instead point here (click to view)",
+                    new PostTransformationContext(
+                        change.getFileContainingNewSinkRegion(),
+                        getCode(change.getFileContainingNewSinkRegion(), modifiedSourceCode),
+                        change.getNewSinkRegion()));
             }
 
         });

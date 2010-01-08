@@ -71,11 +71,26 @@ public abstract class BindingCollector extends ASTVisitor
     	
     	try
     	{
-    	    Visibility visibility = token.getEnclosingScope().isDefaultVisibilityPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC;
+    	    ScopingNode enclosingScope = token.getEnclosingScope();
+    	    
+            Visibility visibility = enclosingScope.isDefaultVisibilityPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC;
             Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, /*visibility,*/ type);
     		vpg.setDefinitionFor(token.getTokenRef(), definition);
-    		vpg.markScope(token.getTokenRef(), token.getEnclosingScope());
-    		vpg.markDefinitionVisibilityInScope(token.getTokenRef(), token.getEnclosingScope(), visibility);
+    		vpg.markScope(token.getTokenRef(), enclosingScope);
+    		vpg.markDefinitionVisibilityInScope(token.getTokenRef(), enclosingScope, visibility);
+    		
+    		if (enclosingScope.isMainProgram() || enclosingScope.isSubprogram() || enclosingScope.isModule())
+    		{
+    		    // Force resolution in case this is a post-transform analysis and the scope has been renamed
+        		String scopeName = enclosingScope.getName();
+                if (scopeName != null &&
+        		    PhotranVPG.canonicalizeIdentifier(token.getText()).equals(
+        		        PhotranVPG.canonicalizeIdentifier(scopeName)))
+        		{
+        		    vpg.markIllegalShadowing(token.getTokenRef(), enclosingScope.getNameToken().getTokenRef());
+        		}
+    		}
+    		
     		return definition;
     	}
     	catch (Exception e)

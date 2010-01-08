@@ -62,14 +62,24 @@ public final class ModelDiff
 
         protected abstract void accept(ModelDiffProcessor processor);
 
-        public IFile getFileContainingRegion()
+        public IFile getFileContainingSourceRegion()
         {
             return EclipseVPG.getIFileForFilename(sourceFilename);
         }
 
-        public IRegion toRegion()
+        public IRegion getSourceRegion()
         {
             return new Region(source.lb, source.cardinality());
+        }
+
+        public IFile getFileContainingSinkRegion()
+        {
+            return EclipseVPG.getIFileForFilename(sinkFilename);
+        }
+
+        public IRegion getSinkRegion()
+        {
+            return new Region(sink.lb, sink.cardinality());
         }
 
         @Override public boolean equals(Object other)
@@ -158,6 +168,16 @@ public final class ModelDiff
         @Override protected void accept(ModelDiffProcessor processor)
         {
             processor.processEdgeSinkChanged(this);
+        }
+
+        public IFile getFileContainingNewSinkRegion()
+        {
+            return EclipseVPG.getIFileForFilename(newSinkFilename);
+        }
+
+        public IRegion getNewSinkRegion()
+        {
+            return new Region(newSink.lb, newSink.cardinality());
         }
 
         @Override public String toString()
