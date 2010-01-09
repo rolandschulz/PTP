@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -33,6 +34,8 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.Workbench;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Class providing information about the active page/editor/shell, current selection, etc. in the
@@ -226,6 +229,26 @@ public class WorkbenchSelectionInfo
         return selectionInEditor;
     }
 
+    /** @return the contents of the active editor in the workbench (if the active editor is a
+     *          text editor and its contents can be retrieved), or <code>null</code> otherwise.
+     *          Note that, if the editor's contents have not been saved, the <i>unsaved</i>
+     *          version (i.e., the current text in the editor) will be returned.
+     */
+    public String getEditorContents()
+    {
+        if (activeEditor == null || !(activeEditor instanceof ITextEditor)) return null;
+
+        ITextEditor textEditor = (ITextEditor)activeEditor;
+        
+        IDocumentProvider dp = textEditor.getDocumentProvider();
+        if (dp == null) return null;
+        
+        IDocument doc = dp.getDocument(textEditor.getEditorInput());
+        if (doc == null) return null;
+        
+        return doc.get();
+    }
+    
     /**
      * Returns a list of all acceptable files in the current workbench selection.
      * <p>
