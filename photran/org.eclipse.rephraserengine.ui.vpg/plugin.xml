@@ -14,7 +14,7 @@
       <actionSet
             label="Refactoring Debugging Actions"
             description="Refactoring Debugging Actions"
-            visible="true"
+            visible="false"
             id="org.eclipse.rephraserengine.ui.DebugActionSet">
          <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
               http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
