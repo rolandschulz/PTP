@@ -79,17 +79,7 @@ public abstract class BindingCollector extends ASTVisitor
     		vpg.markScope(token.getTokenRef(), enclosingScope);
     		vpg.markDefinitionVisibilityInScope(token.getTokenRef(), enclosingScope, visibility);
     		
-    		if (enclosingScope.isMainProgram() || enclosingScope.isSubprogram() || enclosingScope.isModule())
-    		{
-    		    // Force resolution in case this is a post-transform analysis and the scope has been renamed
-        		String scopeName = enclosingScope.getName();
-                if (scopeName != null &&
-        		    PhotranVPG.canonicalizeIdentifier(token.getText()).equals(
-        		        PhotranVPG.canonicalizeIdentifier(scopeName)))
-        		{
-        		    vpg.markIllegalShadowing(token.getTokenRef(), enclosingScope.getNameToken().getTokenRef());
-        		}
-    		}
+    		checkForIllegalShadowing(token.getText(), token.getTokenRef(), enclosingScope);
     		
     		return definition;
     	}
@@ -97,6 +87,21 @@ public abstract class BindingCollector extends ASTVisitor
     	{
     		throw new Error(e);
     	}
+    }
+
+    protected void checkForIllegalShadowing(String name, PhotranTokenRef tokenRef, ScopingNode enclosingScope)
+    {
+        if (enclosingScope.isMainProgram() || enclosingScope.isSubprogram() || enclosingScope.isModule())
+        {
+            // Force resolution in case this is a post-transform analysis and the scope has been renamed
+        	String scopeName = enclosingScope.getName();
+            if (scopeName != null &&
+        	    PhotranVPG.canonicalizeIdentifier(name).equals(
+        	        PhotranVPG.canonicalizeIdentifier(scopeName)))
+        	{
+        	    vpg.markIllegalShadowing(tokenRef, enclosingScope.getNameToken().getTokenRef());
+        	}
+        }
     }
     
 //    Definition addDefinitionAndDuplicateInLocalScope(Token name, Classification classification, Type type)
@@ -123,6 +128,8 @@ public abstract class BindingCollector extends ASTVisitor
     		
     		if (importIntoScope.isDefaultVisibilityPrivate())
     		    vpg.markDefinitionVisibilityInScope(definitionToImport.getTokenRef(), importIntoScope, Visibility.PRIVATE);
+    		
+    		checkForIllegalShadowing(definitionToImport.getCanonicalizedName(), definitionToImport.getTokenRef(), importIntoScope);
     	}
     	catch (Exception e)
     	{
