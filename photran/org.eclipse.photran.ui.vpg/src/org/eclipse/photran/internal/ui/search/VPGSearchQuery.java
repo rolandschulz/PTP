@@ -112,7 +112,7 @@ public class VPGSearchQuery implements ISearchQuery {
                 buff.append(".");
                 break;
             default:
-                if (!(""+c).matches("[0-9a-zA-Z.]")) {
+                if (!Character.toString(c).matches("[0-9a-zA-Z._]")) {
                     throw new PatternSyntaxException("Illegal character in pattern string", patternStr, i+1);
                 }
                 buff.append("" + c);
