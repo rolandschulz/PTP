@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,22 +25,12 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTTypeParamValueNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTTypeParamValueNode
     org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTTypeParamValueNode
+    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTTypeParamValueNode
     IExpr expr; // in ASTTypeParamValueNode
-
-    public boolean isColon()
-    {
-        return this.isColon != null;
-    }
-
-    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isColon = newValue;
-    }
-
 
     public boolean isAsterisk()
     {
@@ -49,6 +40,17 @@ public class ASTTypeParamValueNode extends ASTNode
     public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAsterisk = newValue;
+    }
+
+
+    public boolean isColon()
+    {
+        return this.isColon != null;
+    }
+
+    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isColon = newValue;
     }
 
 
@@ -78,8 +80,8 @@ public class ASTTypeParamValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isColon;
-        case 1:  return this.isAsterisk;
+        case 0:  return this.isAsterisk;
+        case 1:  return this.isColon;
         case 2:  return this.expr;
         default: return null;
         }
@@ -89,8 +91,8 @@ public class ASTTypeParamValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.expr = (IExpr)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }

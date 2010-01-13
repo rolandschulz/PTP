@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,13 +25,16 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTAllocationNode extends ASTNode
 {
     IASTListNode<ASTAllocateObjectNode> allocateObject; // in ASTAllocationNode
     org.eclipse.photran.internal.core.lexer.Token hasAllocatedShape; // in ASTAllocationNode
     IASTListNode<ASTSectionSubscriptNode> sectionSubscriptList; // in ASTAllocationNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTAllocationNode
-    ASTImageSelectorNode imageSelector; // in ASTAllocationNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLbracket; // in ASTAllocationNode
+    ASTAllocateCoarraySpecNode allocateCoarraySpec; // in ASTAllocationNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTRbracket; // in ASTAllocationNode
 
     public IASTListNode<ASTAllocateObjectNode> getAllocateObject()
     {
@@ -65,14 +69,14 @@ public class ASTAllocationNode extends ASTNode
     }
 
 
-    public ASTImageSelectorNode getImageSelector()
+    public ASTAllocateCoarraySpecNode getAllocateCoarraySpec()
     {
-        return this.imageSelector;
+        return this.allocateCoarraySpec;
     }
 
-    public void setImageSelector(ASTImageSelectorNode newValue)
+    public void setAllocateCoarraySpec(ASTAllocateCoarraySpecNode newValue)
     {
-        this.imageSelector = newValue;
+        this.allocateCoarraySpec = newValue;
     }
 
 
@@ -84,7 +88,7 @@ public class ASTAllocationNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 5;
+        return 7;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -95,7 +99,9 @@ public class ASTAllocationNode extends ASTNode
         case 1:  return this.hasAllocatedShape;
         case 2:  return this.sectionSubscriptList;
         case 3:  return this.hiddenTRparen;
-        case 4:  return this.imageSelector;
+        case 4:  return this.hiddenTLbracket;
+        case 5:  return this.allocateCoarraySpec;
+        case 6:  return this.hiddenTRbracket;
         default: return null;
         }
     }
@@ -108,7 +114,9 @@ public class ASTAllocationNode extends ASTNode
         case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
         case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.imageSelector = (ASTImageSelectorNode)value; return;
+        case 4:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.allocateCoarraySpec = (ASTAllocateCoarraySpecNode)value; return;
+        case 6:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

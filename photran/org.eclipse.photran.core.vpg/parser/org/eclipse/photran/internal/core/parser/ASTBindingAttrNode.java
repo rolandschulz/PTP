@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,25 +25,26 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTBindingAttrNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isNonOverridable; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTBindingAttrNode
     ASTAccessSpecNode accessSpec; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token isDeferred; // in ASTBindingAttrNode
-    org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTBindingAttrNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token isNonOverridable; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token argName; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTBindingAttrNode
 
-    public boolean isNonOverridable()
+    public boolean isPass()
     {
-        return this.isNonOverridable != null;
+        return this.isPass != null;
     }
 
-    public void setIsNonOverridable(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsPass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isNonOverridable = newValue;
+        this.isPass = newValue;
     }
 
 
@@ -68,17 +70,6 @@ public class ASTBindingAttrNode extends ASTNode
     }
 
 
-    public boolean isPass()
-    {
-        return this.isPass != null;
-    }
-
-    public void setIsPass(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPass = newValue;
-    }
-
-
     public boolean isNoPass()
     {
         return this.isNoPass != null;
@@ -87,6 +78,17 @@ public class ASTBindingAttrNode extends ASTNode
     public void setIsNoPass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNoPass = newValue;
+    }
+
+
+    public boolean isNonOverridable()
+    {
+        return this.isNonOverridable != null;
+    }
+
+    public void setIsNonOverridable(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isNonOverridable = newValue;
     }
 
 
@@ -116,12 +118,12 @@ public class ASTBindingAttrNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isNonOverridable;
+        case 0:  return this.isPass;
         case 1:  return this.accessSpec;
         case 2:  return this.isDeferred;
-        case 3:  return this.isPass;
+        case 3:  return this.isNoPass;
         case 4:  return this.hiddenTLparen;
-        case 5:  return this.isNoPass;
+        case 5:  return this.isNonOverridable;
         case 6:  return this.argName;
         case 7:  return this.hiddenTRparen;
         default: return null;
@@ -132,12 +134,12 @@ public class ASTBindingAttrNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isNonOverridable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 1:  this.accessSpec = (ASTAccessSpecNode)value; return;
         case 2:  this.isDeferred = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.isNonOverridable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 6:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");

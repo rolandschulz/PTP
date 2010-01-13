@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,15 +25,16 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTProcComponentAttrSpecNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTProcComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isPointer; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token argName; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTProcComponentAttrSpecNode
     ASTAccessSpecNode accessSpec; // in ASTProcComponentAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isPointer; // in ASTProcComponentAttrSpecNode
 
     public boolean isNoPass()
     {
@@ -42,6 +44,17 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
     public void setIsNoPass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNoPass = newValue;
+    }
+
+
+    public boolean isPointer()
+    {
+        return this.isPointer != null;
+    }
+
+    public void setIsPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isPointer = newValue;
     }
 
 
@@ -78,17 +91,6 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
     }
 
 
-    public boolean isPointer()
-    {
-        return this.isPointer != null;
-    }
-
-    public void setIsPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPointer = newValue;
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTProcComponentAttrSpecNode(this);
@@ -105,12 +107,12 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
         switch (index)
         {
         case 0:  return this.isNoPass;
-        case 1:  return this.isPass;
-        case 2:  return this.hiddenTLparen;
-        case 3:  return this.argName;
-        case 4:  return this.hiddenTRparen;
-        case 5:  return this.accessSpec;
-        case 6:  return this.isPointer;
+        case 1:  return this.isPointer;
+        case 2:  return this.isPass;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.argName;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.accessSpec;
         default: return null;
         }
     }
@@ -120,12 +122,12 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
         switch (index)
         {
         case 0:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.accessSpec = (ASTAccessSpecNode)value; return;
-        case 6:  this.isPointer = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isPointer = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 4:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 6:  this.accessSpec = (ASTAccessSpecNode)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

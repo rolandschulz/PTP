@@ -1598,9 +1598,9 @@ ASTAttrSpecNode:<AttrSpec> ::=
   | <AllocateObject> (inline):<AllocatedShape>
 
 <AllocatedShape> ::= hasAllocatedShape(bool):T_LPAREN <SectionSubscriptList> -:T_RPAREN
-# F08 <ImageSelector>
-                   | hasAllocatedShape(bool):T_LPAREN <SectionSubscriptList> -:T_RPAREN <ImageSelector>
-                   |                                                                    <ImageSelector>
+# F08 <AllocateCoarraySpec>
+                   | hasAllocatedShape(bool):T_LPAREN <SectionSubscriptList> -:T_RPAREN -:T_LBRACKET <AllocateCoarraySpec> -:T_RBRACKET
+                   |                                                                    -:T_LBRACKET <AllocateCoarraySpec> -:T_RBRACKET
 
 # Need to use <SectionSubscriptList> here to solve an LALR(1) conflict with the
 # <FieldSelector> in R625.  (Can't tell which we have until the character
@@ -1614,6 +1614,13 @@ ASTAttrSpecNode:<AttrSpec> ::=
 (list):<AllocateObject> ::=
   | <VariableName>
   | <AllocateObject> <FieldSelector>
+
+# F08 R636
+<AllocateCoarraySpec> ::=
+  | <SectionSubscriptList> -:T_COMMA lb:<Expr> -:T_COLON isAsterisk(bool):T_ASTERISK
+  | <SectionSubscriptList> -:T_COMMA                     isAsterisk(bool):T_ASTERISK
+  |                                  lb:<Expr> -:T_COLON isAsterisk(bool):T_ASTERISK
+  |                                                      isAsterisk(bool):T_ASTERISK
 
 # R626
 # Omitted to solve LALR(1) conflict.  see R624

@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,26 +25,16 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTDataStmtValueNode extends ASTNode
 {
-    ASTNamedConstantUseNode namedConstKind; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hasConstIntKind; // in ASTDataStmtValueNode
+    ASTNamedConstantUseNode namedConstKind; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDataStmtValueNode
     ASTConstantNode constant; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDataStmtValueNode
-
-    public ASTNamedConstantUseNode getNamedConstKind()
-    {
-        return this.namedConstKind;
-    }
-
-    public void setNamedConstKind(ASTNamedConstantUseNode newValue)
-    {
-        this.namedConstKind = newValue;
-    }
-
 
     public boolean hasConstIntKind()
     {
@@ -53,6 +44,17 @@ public class ASTDataStmtValueNode extends ASTNode
     public void setHasConstIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasConstIntKind = newValue;
+    }
+
+
+    public ASTNamedConstantUseNode getNamedConstKind()
+    {
+        return this.namedConstKind;
+    }
+
+    public void setNamedConstKind(ASTNamedConstantUseNode newValue)
+    {
+        this.namedConstKind = newValue;
     }
 
 
@@ -93,8 +95,8 @@ public class ASTDataStmtValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.namedConstKind;
-        case 1:  return this.hasConstIntKind;
+        case 0:  return this.hasConstIntKind;
+        case 1:  return this.namedConstKind;
         case 2:  return this.hiddenTAsterisk;
         case 3:  return this.isNull;
         case 4:  return this.hiddenTLparen;
@@ -108,8 +110,8 @@ public class ASTDataStmtValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
-        case 1:  this.hasConstIntKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hasConstIntKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
         case 2:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;

@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,11 +25,12 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTFormatIdentifierNode extends ASTNode
 {
     ASTCExprNode formatExpr; // in ASTFormatIdentifierNode
-    org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTFormatIdentifierNode
     ASTLblRefNode formatLbl; // in ASTFormatIdentifierNode
+    org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTFormatIdentifierNode
 
     public ASTCExprNode getFormatExpr()
     {
@@ -41,17 +43,6 @@ public class ASTFormatIdentifierNode extends ASTNode
     }
 
 
-    public boolean formatIsAsterisk()
-    {
-        return this.formatIsAsterisk != null;
-    }
-
-    public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.formatIsAsterisk = newValue;
-    }
-
-
     public ASTLblRefNode getFormatLbl()
     {
         return this.formatLbl;
@@ -60,6 +51,17 @@ public class ASTFormatIdentifierNode extends ASTNode
     public void setFormatLbl(ASTLblRefNode newValue)
     {
         this.formatLbl = newValue;
+    }
+
+
+    public boolean formatIsAsterisk()
+    {
+        return this.formatIsAsterisk != null;
+    }
+
+    public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.formatIsAsterisk = newValue;
     }
 
 
@@ -79,8 +81,8 @@ public class ASTFormatIdentifierNode extends ASTNode
         switch (index)
         {
         case 0:  return this.formatExpr;
-        case 1:  return this.formatIsAsterisk;
-        case 2:  return this.formatLbl;
+        case 1:  return this.formatLbl;
+        case 2:  return this.formatIsAsterisk;
         default: return null;
         }
     }
@@ -90,8 +92,8 @@ public class ASTFormatIdentifierNode extends ASTNode
         switch (index)
         {
         case 0:  this.formatExpr = (ASTCExprNode)value; return;
-        case 1:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.formatLbl = (ASTLblRefNode)value; return;
+        case 1:  this.formatLbl = (ASTLblRefNode)value; return;
+        case 2:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

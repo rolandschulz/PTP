@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
@@ -24,21 +25,11 @@ import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
+@SuppressWarnings({ "unchecked", "unused" })
 public class ASTAccessSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isPublic; // in ASTAccessSpecNode
     org.eclipse.photran.internal.core.lexer.Token isPrivate; // in ASTAccessSpecNode
-
-    public boolean isPublic()
-    {
-        return this.isPublic != null;
-    }
-
-    public void setIsPublic(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPublic = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isPublic; // in ASTAccessSpecNode
 
     public boolean isPrivate()
     {
@@ -48,6 +39,17 @@ public class ASTAccessSpecNode extends ASTNode
     public void setIsPrivate(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isPrivate = newValue;
+    }
+
+
+    public boolean isPublic()
+    {
+        return this.isPublic != null;
+    }
+
+    public void setIsPublic(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isPublic = newValue;
     }
 
 
@@ -66,8 +68,8 @@ public class ASTAccessSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isPublic;
-        case 1:  return this.isPrivate;
+        case 0:  return this.isPrivate;
+        case 1:  return this.isPublic;
         default: return null;
         }
     }
@@ -76,8 +78,8 @@ public class ASTAccessSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isPublic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isPublic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

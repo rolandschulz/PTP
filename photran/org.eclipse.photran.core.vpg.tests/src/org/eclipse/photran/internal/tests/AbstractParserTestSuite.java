@@ -154,8 +154,10 @@ public abstract class AbstractParserTestSuite extends TestSuite
         {
             return (name.endsWith(".f90")
                 || name.endsWith(".f03")
+                || name.endsWith(".f08")
                 || name.endsWith(".F90")
                 || name.endsWith(".F03")
+                || name.endsWith(".F08")
                 || name.endsWith(".FRE")) && !name.startsWith("XXX");
         }
     };
