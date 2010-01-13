@@ -138,19 +138,15 @@ public class PhotranVPGSerializer
                 case CLASS_STRING:      return (T)readString(in);
                 case CLASS_INT:         return (T)Integer.valueOf(readInt(in));
                 case CLASS_BOOLEAN:     return (T)Boolean.valueOf(readBoolean(in));
-                default:
 
-                    //String className = deserialize(in); System.out.println(className);
-                    switch (code)
-                    {
-                        case CLASS_TOKENREF:     return (T)PhotranTokenRef.readFrom(in);
-                        case CLASS_DEFINITION:   return (T)Definition.readFrom(in);
-                        case CLASS_TYPE:         return (T)Type.readFrom(in);
-                        case CLASS_ARRAYSPEC:    return (T)ArraySpec.readFrom(in);
-                        case CLASS_DIMENSION:    return (T)Dimension.readFrom(in);
-                        case CLASS_IMPLICITSPEC: return (T)ImplicitSpec.readFrom(in);
-                        default:                 throw new Error("Unknown class code in deserialization: " + Integer.toString(code));
-                    }
+                case CLASS_TOKENREF:     return (T)PhotranTokenRef.readFrom(in);
+                case CLASS_DEFINITION:   return (T)Definition.readFrom(in);
+                case CLASS_TYPE:         return (T)Type.readFrom(in);
+                case CLASS_ARRAYSPEC:    return (T)ArraySpec.readFrom(in);
+                case CLASS_DIMENSION:    return (T)Dimension.readFrom(in);
+                case CLASS_IMPLICITSPEC: return (T)ImplicitSpec.readFrom(in);
+
+                default:                 throw new Error("Unknown class code in deserialization: " + Integer.toString(code));
             }
         }
         catch (IOException e)
