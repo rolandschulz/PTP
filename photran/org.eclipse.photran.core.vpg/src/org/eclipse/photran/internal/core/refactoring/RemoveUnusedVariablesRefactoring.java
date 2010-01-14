@@ -5,7 +5,6 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-
 package org.eclipse.photran.internal.core.refactoring;
 
 import java.util.List;
@@ -36,7 +35,6 @@ import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
  **/
-
 public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefactoring{
 
     @Override

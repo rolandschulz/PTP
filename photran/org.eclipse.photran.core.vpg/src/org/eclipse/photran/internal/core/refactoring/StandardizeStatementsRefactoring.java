@@ -5,7 +5,6 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-
 package org.eclipse.photran.internal.core.refactoring;
 
 import java.util.LinkedList;
@@ -38,7 +37,6 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
  **/
-
 public class StandardizeStatementsRefactoring extends MultipleFileFortranRefactoring{
 
     @Override
