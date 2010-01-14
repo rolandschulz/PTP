@@ -1,0 +1,15 @@
+program standardize_statements !<<<<<1,1,true
+    implicit none
+    real :: x !first declare some reals
+    real :: y !first declare some reals
+    real :: z !first declare some reals
+    integer :: t !then add integer declaration
+    integer :: q !then add integer declaration
+    integer :: p !then add integer declaration
+    integer :: r !then add integer declaration
+    real :: a !and declare some more reals
+    real :: b !and declare some more reals
+    real :: c !and declare some more reals
+    !done
+
+end program standardize_statements

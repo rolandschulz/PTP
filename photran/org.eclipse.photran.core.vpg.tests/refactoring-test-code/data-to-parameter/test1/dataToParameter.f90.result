@@ -1,0 +1,17 @@
+program dataToParameter !<<<<<1,1,true
+	implicit none
+	real :: x, y, z
+	integer :: a, b, c !A comment
+	!Another comment on a new line
+	data x/1./ !Those values are assigned
+	parameter ( z = 3. ) !Those values are assigned
+	parameter ( y = 2. ) !Those values are assigned
+		!About to assign more values
+	data b/15/ !More values are assigned
+	parameter ( c = 20 ) !More values are assigned
+	parameter ( a = 10 ) !More values are assigned
+	!About to change some assigned values
+	x = 5.4
+	b = 6
+
+end program dataToParameter

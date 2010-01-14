@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.TreeMap;
 
 import junit.framework.TestSuite;
@@ -27,10 +28,14 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.vpg.refactoring.VPGResourceRefactoring;
 
 /**
  * A test suite constructed by importing files from a directory in the source tree, searching its
@@ -42,7 +47,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  *
  * @author Jeff Overbey
  */
-public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortranRefactoring> extends TestSuite
+public abstract class MarkerBasedRefactoringTestSuite<R extends VPGResourceRefactoring<IFortranAST, Token, PhotranVPG>> extends TestSuite
 {
     protected static final String MARKER = "!<<<<<";
 
@@ -133,7 +138,12 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends SingleFileFortra
      */
     protected void initializeRefactoring(R refactoring, IFile file, TextSelection selection, String[] markerText)
     {
-        refactoring.initialize(file, selection);
+        if (refactoring instanceof SingleFileFortranRefactoring)
+            ((SingleFileFortranRefactoring)refactoring).initialize(file, selection);
+        else if (refactoring instanceof MultipleFileFortranRefactoring)
+            ((MultipleFileFortranRefactoring)refactoring).initialize(Collections.singletonList(file));
+        else
+            throw new IllegalStateException();
     }
 
     /**
