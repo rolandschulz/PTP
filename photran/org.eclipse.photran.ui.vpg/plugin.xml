@@ -30,6 +30,15 @@
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
          />
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring"
+         />
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.RemoveUnusedVariablesRefactoring"
+         />
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring"
+         />
       </group>
       <group><!-- Refactorings for USE statements -->
          <editorRefactoring
