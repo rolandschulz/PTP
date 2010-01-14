@@ -111,10 +111,10 @@ public class StandardizeStatementsRefactoring extends MultipleFileFortranRefacto
         String source_2 = source.substring(position_type,source.length());
         if (!points(source_2)) 
         {
-            twoPoints = " ::";
+            twoPoints = " :: ";
         }
         // New statement, with the two points (::).
-        source = source_1+twoPoints+source_2;
+        source = source_1+twoPoints+source_2.trim();
         return source;
     }
     
