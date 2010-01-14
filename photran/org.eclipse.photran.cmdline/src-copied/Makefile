@@ -15,9 +15,11 @@ copy:
 	mkdir org/eclipse/photran/internal/cdtinterface
 	mkdir org/eclipse/photran/internal/cdtinterface/natures
 	mkdir org/eclipse/photran/internal/core
+	mkdir org/eclipse/photran/internal/core/util
 	mkdir org/eclipse/photran/internal/core/refactoring
 	cp -R $(ROOT)/org.eclipse.photran.cdtinterface/src/org/eclipse/photran/internal/cdtinterface/natures/* org/eclipse/photran/internal/cdtinterface/natures
 	cp -R $(ROOT)/org.eclipse.photran.core/lexer/org/eclipse/photran/internal/core/lexer org/eclipse/photran/internal/core/
+	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/util org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/vpg org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/analysis org/eclipse/photran/internal/core/
 	cp -R $(ROOT)/org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/refactoring/infrastructure org/eclipse/photran/internal/core/refactoring/

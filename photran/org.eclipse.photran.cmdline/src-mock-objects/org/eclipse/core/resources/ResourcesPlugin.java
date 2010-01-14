@@ -21,7 +21,7 @@ public class ResourcesPlugin
 
         public void addResourceChangeListener(IResourceChangeListener listener, int eventMask)
         {
-            System.err.println("WARNING: IWorkspace#addResourceChangeListener not implemented");
+            Util.displayWarning("WARNING: IWorkspace#addResourceChangeListener not implemented");
         }
     };
 

@@ -1,9 +1,8 @@
 import java.io.PrintStream;
 
+import org.eclipse.core.resources.Util;
 import org.eclipse.photran.cmdline.CmdLineBase;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
@@ -12,12 +11,16 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 public class ListDefs extends CmdLineBase
 {
     public static void main(String[] args)
     {
         String filename = parseCommandLine("listdefs", args);
+
+        Util.DISPLAY_WARNINGS = false;
         PhotranVPG.getInstance().start();
         IFortranAST ast = parse(filename);
 

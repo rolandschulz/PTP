@@ -19,6 +19,8 @@ public interface IFile extends IResource
 {
     InputStream getContents() throws CoreException;
 
+    InputStream getContents(boolean force) throws CoreException;
+
     String getName();
 
     long getLocalTimeStamp();
@@ -28,4 +30,8 @@ public interface IFile extends IResource
     IResource getParent();
 
     IPath getLocation();
+
+    String getFileExtension();
+
+    boolean isReadOnly();
 }

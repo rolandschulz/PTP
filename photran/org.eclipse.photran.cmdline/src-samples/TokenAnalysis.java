@@ -4,18 +4,20 @@ import java.lang.reflect.Method;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.cmdline.CmdLineBase;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 public class TokenAnalysis extends CmdLineBase
 {
     public static void main(String[] args) throws CoreException
     {
+        Util.DISPLAY_WARNINGS = false;
         PhotranVPG.getInstance().start();
         
         System.out.println("Filename\tSz\tIntNd\tTok-\tTok+\tWht\tTxt-\tTxt+");

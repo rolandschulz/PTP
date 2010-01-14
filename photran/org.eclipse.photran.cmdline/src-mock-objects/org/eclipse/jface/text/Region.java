@@ -10,10 +10,23 @@
  *******************************************************************************/
 package org.eclipse.jface.text;
 
-public class Region
+public class Region implements IRegion
 {
+    private int offset, length;
+    
     public Region(int offset, int length)
     {
-        // TODO Auto-generated constructor stub
+        this.offset = offset;
+        this.length = length;
+    }
+
+    public int getOffset()
+    {
+        return offset;
+    }
+
+    public int getLength()
+    {
+        return length;
     }
 }

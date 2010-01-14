@@ -13,4 +13,6 @@ package org.eclipse.core.runtime;
 public interface IConfigurationElement
 {
     Object createExecutableExtension(String string) throws CoreException;
+    String getAttribute(String name);
+    String getName();
 }

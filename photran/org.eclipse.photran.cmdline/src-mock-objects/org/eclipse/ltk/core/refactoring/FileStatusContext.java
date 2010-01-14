@@ -11,11 +11,11 @@
 package org.eclipse.ltk.core.refactoring;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.IRegion;
 
 public class FileStatusContext extends RefactoringStatusContext
 {
-    public FileStatusContext(IFile file, Region region)
+    public FileStatusContext(IFile file, IRegion region)
     {
         // TODO Auto-generated constructor stub
     }

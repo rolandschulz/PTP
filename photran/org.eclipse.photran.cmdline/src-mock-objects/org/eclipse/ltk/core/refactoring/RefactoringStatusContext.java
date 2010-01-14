@@ -12,5 +12,8 @@ package org.eclipse.ltk.core.refactoring;
 
 public class RefactoringStatusContext
 {
-
+    public Object getCorrespondingElement()
+    {
+        return null;
+    }
 }

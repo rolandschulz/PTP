@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.core.vpg;
+package org.eclipse.photran.internal.core;
 
 import org.eclipse.core.resources.Util;
 import org.eclipse.core.resources.WorkspaceRoot;

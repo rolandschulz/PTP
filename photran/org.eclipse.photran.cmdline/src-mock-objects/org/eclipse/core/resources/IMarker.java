@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 
+@SuppressWarnings("rawtypes")
 public interface IMarker
 {
     public static final String TEXT = null;
@@ -24,6 +25,6 @@ public interface IMarker
     public static final String SEVERITY = null;
     public static final String SEVERITY_ERROR = null;
     void setAttribute(String charStart, int startOffset);
-	@SuppressWarnings("unchecked") void setAttributes(Map attribs);
+	void setAttributes(Map attribs);
 	public void delete() throws CoreException;
 }

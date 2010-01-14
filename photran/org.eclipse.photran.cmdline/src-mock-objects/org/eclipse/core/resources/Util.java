@@ -24,6 +24,13 @@ import org.eclipse.core.runtime.Status;
 
 public class Util
 {
+    public static boolean DISPLAY_WARNINGS = true;
+    
+    public static void displayWarning(String msg)
+    {
+        if (DISPLAY_WARNINGS) System.err.println(msg);
+    }
+    
     public static void traverse(final File file, IResourceVisitor resourceVisitor) throws CoreException
     {
         if (file.isDirectory())
@@ -89,6 +96,11 @@ public class Util
                 return null;
             }
 
+            public InputStream getContents(boolean force) throws CoreException
+            {
+                return getContents();
+            }
+
             public InputStream getContents() throws CoreException
             {
                 try
@@ -137,6 +149,20 @@ public class Util
             public boolean isAccessible()
             {
                 return file.exists() && file.canRead();
+            }
+
+            public boolean isReadOnly()
+            {
+                return !file.canWrite();
+            }
+            
+            public String getFileExtension()
+            {
+                int index = file.getName().lastIndexOf('.');
+                if (index < 0)
+                    return null;
+                else
+                    return file.getName().substring(index + 1);
             }
 
             @Override public int hashCode()

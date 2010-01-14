@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.core.runtime;
 
+import org.eclipse.core.resources.Util;
+import org.eclipse.photran.internal.core.analysis.preservation.ASTNodeAdapterFactory;
+
 public class Platform
 {
     public static ContentTypeManager getContentTypeManager()
@@ -23,8 +26,19 @@ public class Platform
         {
             public IConfigurationElement[] getConfigurationElementsFor(String extensionPointId)
             {
-                System.err.println("WARNING: IExtensionRegistry#getConfigurationElementsFor not implemented");
+                Util.displayWarning("WARNING: IExtensionRegistry#getConfigurationElementsFor not implemented");
                 return new IConfigurationElement[0];
+            }
+        };
+    }
+
+    public static IAdapterManager getAdapterManager()
+    {
+        return new IAdapterManager()
+        {
+            public Object getAdapter(Object node, Class<?> clazz)
+            {
+                return new ASTNodeAdapterFactory().getAdapter(node, clazz);
             }
         };
     }

@@ -3,7 +3,7 @@ package org.eclipse.photran.cmdline;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 public class CmdLineBase
 {

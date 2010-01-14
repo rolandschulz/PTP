@@ -27,6 +27,11 @@ public class ContentTypeManager
         {
             return FIXED_FORM_CONTENT_TYPE;
         }
+        
+        public boolean isKindOf(IContentType result)
+        {
+            return result != null && result.getId().equals(FIXED_FORM_CONTENT_TYPE);
+        }
     };
 
     private static IContentType FREE = new IContentType()
@@ -35,6 +40,11 @@ public class ContentTypeManager
         {
             return FREE_FORM_CONTENT_TYPE;
         }
+        
+        public boolean isKindOf(IContentType result)
+        {
+            return result != null && result.getId().equals(FREE_FORM_CONTENT_TYPE);
+        }
     };
 
     private static IContentType UNKNOWN = new IContentType()
@@ -42,6 +52,11 @@ public class ContentTypeManager
         public String getId()
         {
             return "(unknown content type)";
+        }
+        
+        public boolean isKindOf(IContentType result)
+        {
+            return result != null && result.getId().equals("(unknown content type)");
         }
     };
 
@@ -56,5 +71,20 @@ public class ContentTypeManager
                 return FREE;
 
         return UNKNOWN;
+    }
+
+    public IContentType[] findContentTypesFor(String filename)
+    {
+        return new IContentType[] { findContentTypeFor(filename) };
+    }
+
+    public IContentType getContentType(String id)
+    {
+        if (id.equals(FIXED_FORM_CONTENT_TYPE))
+            return FIXED;
+        else if (id.equals(FREE_FORM_CONTENT_TYPE))
+            return FREE;
+        else
+            return null;
     }
 }
