@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/helios"/>
    </url>
 
    <requires>
@@ -30,7 +30,7 @@
       <import plugin="org.eclipse.photran.core"/>
       <import plugin="org.eclipse.photran.managedbuilder.core"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import feature="org.eclipse.photran" version="5.0.0" match="compatible"/>
+      <import feature="org.eclipse.photran" version="6.0.0" match="compatible"/>
    </requires>
 
    <plugin
