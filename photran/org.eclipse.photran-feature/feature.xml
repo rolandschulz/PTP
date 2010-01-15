@@ -18,12 +18,8 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/helios"/>
    </url>
-
-   <includes
-         id="org.eclipse.rephraserengine"
-         version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
@@ -60,6 +56,7 @@
       <import plugin="org.eclipse.rephraserengine.ui"/>
       <import plugin="org.eclipse.rephraserengine.ui.vpg"/>
       <import feature="org.eclipse.cdt" version="6.0.0" match="compatible"/>
+      <import feature="org.eclipse.rephraserengine" version="2.0.0.qualifier" match="perfect"/>
    </requires>
 
    <plugin
