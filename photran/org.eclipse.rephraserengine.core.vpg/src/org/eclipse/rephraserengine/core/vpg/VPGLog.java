@@ -10,16 +10,30 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.vpg;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class VPGLog<T, R extends TokenRef<T>>
+/**
+ * VPG error/warning log.
+ * 
+ * @author Jeff Overbey
+ * @author Kurt Hendle
+ */
+public abstract class VPGLog<T, R extends TokenRef<T>>
 {
-	public class Entry
+    public class Entry
 	{
 		private boolean isWarning;
 		private String message;
@@ -304,5 +318,108 @@ public class VPGLog<T, R extends TokenRef<T>>
     {
         for (ILogListener listener : listeners)
             listener.onLogChange();
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // Persistence Support
+    ////////////////////////////////////////////////////////////////////////////////
+
+    private static final String EOL = System.getProperty("line.separator");
+
+    private static final String EOL_ESCAPE = "&EOL;";
+    
+    protected abstract File getLogFile();
+
+    /**
+     * Writes the log to a file.
+     * 
+     * @throws IOException 
+     */
+    public void writeToFile() throws IOException
+    {
+        Writer output = new BufferedWriter(new FileWriter(getLogFile()));
+        
+        try
+        {
+            R tokenRef = null;
+            String message = "";
+            for(Entry entry : log)
+            {
+                output.write(Boolean.toString(entry.isWarning())+
+                    EOL);
+                
+                tokenRef = entry.getTokenRef();
+                output.write(tokenRef.getFilename() + "," +
+                    Integer.toString(tokenRef.getOffset()) + "," +
+                    Integer.toString(tokenRef.getLength()) +
+                    EOL);
+                
+                message = entry.getMessage();
+                message.replaceAll(EOL, EOL_ESCAPE);
+                output.write(message + EOL);
+            }
+        }
+        finally
+        {
+            output.close();
+        }
+    }
+    
+    /**
+     * Reads the log which from a file back into memory.
+     * <p>
+     * Log entries have the format:
+     * <pre>
+     *      isWarning
+     *      TokenRef filename, offset, length
+     *      message
+     * </pre>
+     */
+    public void readLogFromFile()
+    {
+        try
+        {
+            FileInputStream fstream = new FileInputStream(getLogFile());
+            BufferedReader bRead = new BufferedReader(new InputStreamReader(fstream));
+            
+            String line;
+            boolean isWarning = false;
+            R tokenRef = null;
+            String[] tokenRefString = null;
+            String message = "";
+            
+            clear();
+            
+            while ((line = bRead.readLine()) != null)
+            {
+                isWarning = Boolean.parseBoolean(line);
+                
+                //read tokenRef values
+                line = bRead.readLine();
+                tokenRefString = line.split("\\,");
+                tokenRef = vpg.createTokenRef(
+                    tokenRefString[0],
+                    Integer.parseInt(tokenRefString[1]),
+                    Integer.parseInt(tokenRefString[2]));
+                
+                //read message
+                line = bRead.readLine();
+                message = line;
+                message.replaceAll("&EOL;", EOL);
+                
+                log.add(new Entry(isWarning, message, tokenRef));
+            }
+            
+            bRead.close();
+            fstream.close();
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+        finally
+        {
+            notifyListeners();
+        }
     }
 }

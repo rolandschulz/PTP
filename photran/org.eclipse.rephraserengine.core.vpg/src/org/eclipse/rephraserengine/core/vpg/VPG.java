@@ -89,7 +89,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 		this.db = database;
 		this.db.setVPG(this);
 	    this.log = log;
-		this.db.setVPG(this);
+	    this.log.setVPG(this);
 	}
 
 	////////////////////////////////////////////////////////////////////////////

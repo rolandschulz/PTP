@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.vpg;
 
+import java.io.File;
+
+import org.eclipse.photran.internal.core.Activator;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
 
@@ -22,5 +25,10 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
  */
 public class PhotranVPGLog extends EclipseVPGLog<Token, PhotranTokenRef>
 {
-
+    @Override protected File getLogFile()
+    {
+        return new File(
+            Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() +
+            "photran60vpg-log.txt");
+    }
 }

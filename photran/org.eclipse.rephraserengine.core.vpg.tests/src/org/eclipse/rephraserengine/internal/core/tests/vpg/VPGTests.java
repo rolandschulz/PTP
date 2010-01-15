@@ -52,11 +52,19 @@ public class VPGTests extends TestCase
         }
     }
 
+    private static class MyVPGLog extends VPGLog<Integer, TokenRef<Integer>>
+    {
+        @Override protected File getLogFile()
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private static class MyVPG extends VPG<Boolean, Integer, TokenRef<Integer>, MyVPGDB, VPGLog<Integer, TokenRef<Integer>>>
     {
         public MyVPG(File file)
         {
-            super(new VPGLog<Integer, TokenRef<Integer>>(), new MyVPGDB(file));
+            super(new MyVPGLog(), new MyVPGDB(file));
         }
 
         @Override

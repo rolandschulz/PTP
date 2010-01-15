@@ -69,6 +69,8 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
      */
     public void start()
     {
+        log.readLogFromFile();
+        
         // Now listen for changes to workspace resources
         ResourcesPlugin.getWorkspace().addResourceChangeListener(new VPGResourceChangeListener(), IResourceChangeEvent.POST_CHANGE);
 
