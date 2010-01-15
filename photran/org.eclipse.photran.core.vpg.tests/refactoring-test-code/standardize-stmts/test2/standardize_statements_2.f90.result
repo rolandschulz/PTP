@@ -1,0 +1,14 @@
+program standardize_statements !<<<<<1,1,true
+    implicit none
+    real, dimension(1:10) :: vector
+    real, dimension(1:10) :: vector2
+    integer :: a(4)
+    integer :: b(20)
+    integer :: c(6)
+    integer :: d
+    a = (/1,2,3,4/)
+    vector(1:10) = 4.0
+    
+    dimension :: d(10)
+
+end program standardize_statements
