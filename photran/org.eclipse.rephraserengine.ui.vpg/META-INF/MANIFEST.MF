@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rephraser Engine VPG User Interface Plug-in
 Bundle-SymbolicName: org.eclipse.rephraserengine.ui.vpg;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org - Photran
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.rephraserengine.core.vpg,

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rephraser Engine Core Refactoring Plug-in
 Bundle-SymbolicName: org.eclipse.rephraserengine.core.refactoring
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org - Photran
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.rephraserengine.core.refactorings
