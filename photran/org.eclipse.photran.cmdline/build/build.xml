@@ -1,14 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="jar">
-<target name="jar">
+<project default="all">
 
-      <jar destfile="../distrib/photran-cmdline.jar">
+<property name="ecj" location="${basedir}/ecj-3.5.1.jar" />
+
+<target name="all" depends="copy, compile"/>
+
+<target name="copy">
+    <delete quiet="true">
+        <fileset dir="../src-copied/">
+            <exclude name=".cvsignore"/>
+            <exclude name="Makefile"/>
+        </fileset>
+    </delete>
+    <delete dir="../src-copied/org" quiet="true" />
+    <delete dir="../src-copied/eclipse" quiet="true" />
+
+	<mkdir dir="../src-copied/org" />
+	<mkdir dir="../src-copied/org/eclipse" />
+	<mkdir dir="../src-copied/org/eclipse/photran" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/cdtinterface" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/cdtinterface/natures" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core/lexer" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core/util" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core/vpg" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core/analysis" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core/refactoring" />
+	<mkdir dir="../src-copied/org/eclipse/photran/internal/core/refactoring/infrastructure" />
+
+	<copy todir="../src-copied/org/eclipse/photran/internal/cdtinterface/natures/">
+		<fileset dir="../../org.eclipse.photran.cdtinterface/src/org/eclipse/photran/internal/cdtinterface/natures">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org/eclipse/photran/internal/core/lexer/">
+		<fileset dir="../../org.eclipse.photran.core/lexer/org/eclipse/photran/internal/core/lexer">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org/eclipse/photran/internal/core/util/">
+		<fileset dir="../../org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/util">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org/eclipse/photran/internal/core/vpg">
+		<fileset dir="../../org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/vpg">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org/eclipse/photran/internal/core/analysis">
+		<fileset dir="../../org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/analysis">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org/eclipse/photran/internal/core/refactoring/infrastructure">
+		<fileset dir="../../org.eclipse.photran.core.vpg/src/org/eclipse/photran/internal/core/refactoring/infrastructure">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org">
+		<fileset dir="../../org.eclipse.photran.core.vpg/parser/org">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/"
+		  file="../../org.eclipse.photran.core.vpg/parser/fortran2008.bnf">
+	</copy>
+	<copy todir="../src-copied/org">
+		<fileset dir="../../org.eclipse.rephraserengine-support/src-cdtdb-4.0.3/org">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org">
+		<fileset dir="../../org.eclipse.rephraserengine-support/src-cdtdb-mock-objects/org">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org">
+		<fileset dir="../../org.eclipse.rephraserengine.core/src/org">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org">
+		<fileset dir="../../org.eclipse.rephraserengine.core.vpg/src/org">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+	<copy todir="../src-copied/org">
+		<fileset dir="../../org.eclipse.rephraserengine.core.refactoring/src/org">
+			<exclude name="CVS" />
+		</fileset>
+	</copy>
+</target>
+	
+<target name="compile" depends="copy">
+    <mkdir dir="temp"/>
+    <delete>
+        <fileset dir="temp/">
+            <include name="**"/>
+        </fileset>
+    </delete>
+	
+	<!-- These sources do not compile with Sun javac -->
+    <!--javac
+        debug="true"
+        destdir="temp/"
+        listfiles="false"
+        nowarn="true"
+        source="1.5"
+        target="1.5"
+        failonerror="true"
+        classpath="temp/">
+        <src path="${basedir}/../src-samples/"/>
+        <src path="${basedir}/../src-util/"/>
+        <src path="${basedir}/../src-mock-objects/"/>
+        <src path="${basedir}/../src-copied/"/>
+        <include name="**/*.java" />
+    </javac-->
+
+	<echo message="Compiling..." />
+	<java
+        jar="${ecj}"
+        failonerror="true"
+        fork="true">
+        <arg line="-classpath temp/" />
+        <arg line="-d temp/" />
+        <arg line="-1.5" />
+        <arg line="-warn:none" />
+        <arg line="-g" />
+        <!--arg line="-verbose" /-->
+        <arg line="-time" />
+        <arg line="../src-samples ../src-util ../src-mock-objects ../src-copied" />
+        <jvmarg line="-Xmx1024M" />
+    </java>
+
+	<jar destfile="../distrib/photran-cmdline.jar">
         <fileset dir=".."
           includes="about.html"
         />
 
-      	<fileset dir="../bin"
+      	<fileset dir="temp/"
           includes="org/**/*"
+        />
+        <fileset dir="../src-samples"
+          includes="**/*"
         />
         <fileset dir="../src-util"
           includes="**/*"
@@ -19,7 +155,8 @@
         <fileset dir="../src-copied"
           includes="**/*"
         />
-      </jar>
-
+    </jar>
+	
+    <delete dir="temp" quiet="true" />
 </target>
 </project>
