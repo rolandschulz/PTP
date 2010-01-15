@@ -5,6 +5,9 @@
    <!-- Refactorings -->
    <!--==============-->
 
+   <!-- NOTE: When adding refactorings, please update
+        http://wiki.eclipse.org/PTP/photran/refactorings -->
+
    <extension
          point="org.eclipse.rephraserengine.ui.refactoring.refactorings">
       <resourceFilter class="org.eclipse.photran.internal.ui.vpg.PhotranResourceFilter" />
@@ -18,17 +21,9 @@
          <editorRefactoring command="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand" />
          <editorRefactoring command="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand" />
       </group>
-      <group>
+      <group><!-- Refactorings that change local variable declarations -->
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring"
-         />
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"
-         />
-      </group>
-      <group>
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
          />
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring"
@@ -38,6 +33,14 @@
          />
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring"
+         />
+      </group>
+      <group><!-- Refactorings that change declarations in modules -->
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"
+         />
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
          />
       </group>
       <group><!-- Refactorings for USE statements -->
