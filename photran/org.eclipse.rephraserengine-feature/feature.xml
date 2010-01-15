@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
+      <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/helios"/>
    </url>
 
    <requires>
