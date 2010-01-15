@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="WINDOWS-1252"?>
+<jardesc>
+    <jar path="C:/remote_deploy_rdt/upcparser.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/org.eclipse.ptp.rdt.core.remotejars/upcparser.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/org.eclipse.cdt.core.parser.upc/about.mappings"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/.project"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/about.html"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/about.properties"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/plugin.properties"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/build.properties"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/eclipse32.gif"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.parser.upc/src"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/about.ini"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/plugin.xml"/>
+        <file path="/org.eclipse.cdt.core.parser.upc/.classpath"/>
+    </selectedElements>
+    <fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
+</jardesc>
