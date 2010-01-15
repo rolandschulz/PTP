@@ -4,65 +4,67 @@
 our entire release and deployment procedure: setting the Photran version
 number, building the feature, uploading it to the download site, etc.}
 
+\section{Preparing for a Release Build}
+
 \begin{enumerate}
 
-\item Note that, as a policy, Photran's update site URL changes when the
-version of the Platform or CDT that it requires changes.
+\item Proofread the documentation on the wiki.
+
+\item Update the plug-in version numbers in all projects.
+
+\item Update the feature.xml and feature.properties files for
+    \begin{itemize}
+    \item org.eclipse.photran-feature
+    \item org.eclipse.photran.intel-feature
+    \item org.eclipse.photran.xlf-feature
+    \item org.eclipse.rephraserengine-feature
+    \end{itemize}
+    and change
+    \begin{enumerate}
+    \item the feature version
+    \item the versions of other features/plug-ins it depends on
+          (e.g., Photran depends on the Rephraser Engine and CDT, and
+          Intel Compiler Support depends on Photran).
+    \item the copyright year
+    \item the update site URL
+    \end{enumerate}
 
 \item If the VPG database structure (or any of the serialized classes) have
-changed, update the VPG database filename in the PhotranVPGDB class
-constructor.  For example, in Photran 4.0 beta 5, the filename was
-``photran40b5vpg''
+changed, update
+    \begin{itemize}
+    \item the VPG database filename in the PhotranVPGDB class constructor and
+    \item the VPG log filename in the PhotranVPGLog class constructor.
+    \end{itemize}
+For example, in Photran 4.0 beta 5, the database filename was ``photran40b5vpg''.
 
-\item There are three features: org.eclipse.photran-feature,
-org.eclipse.photran.intel-feature, and org.eclipse.photran.xlf-feature.
-(Ignore the vpg-feature; it is included in the photran-feature.)  For each of
-these three features:
-  \begin{enumerate}
-  \item The feature.xml should open in the Feature Manifest Editor.  In the
-        Overview tab, first update the version number.
-  \item Then click Synchronize, and ``force feature version into plug-in and
-        fragment manifests.''
-  \item Change the update site URL.
-  \item In the Information tab, change the copyright year.
-  \item For the intel-feature and xlf-feature, in the Dependencies tab, change
-        the ``version to match'' to the new photran-feature version number
-  \end{enumerate}
+\item Make sure the org.eclipse.ptp.releng scripts have the correct versions.
 
-\item In an update site project (create one if necessary), open the site.xml
-file (it should open in the Site Manifest Editor).  Add the three features, and
-Build each of them.  Note that, as long as the
-required versions of the Platform and CDT are the same, \textit{there can be multiple
-version of Photran features in the update site.}  For example, this allowed
-users running 4.0 beta 4 to automatically upgrade to 4.0 beta 5 simply by
-clicking the ``Update'' button in Help > Software Updates > Installed Software.
+\item Greg Watson will initiate a PTP build at build.eclipse.org.
 
-\item \textit{Delete} the artifacts.xml and content.xml files.  In Eclipse
-3.4, these only seem to confuse/break the update manager.
+\end{enumerate}
 
-\item Switch to the ``site.xml'' tab in the Site Manifest Editor, and update
-  \begin{enumerate}
-  \item the ``site mirrorsURL'' to reflect the new update site URL, and
-  \item the ``description url'' to reflect the new update site URL, and
-  \end{enumerate}
+\section{After the Release Has Been Built}
 
-\item Assuming your committer username is joverbey and the update site project
-is called eclipse9.9cdt9.9,
-\begin{verbatim}
-cd /wherever/the/update/site/project/is
-rsync -av -e ssh joverbey@dev.eclipse.org:/home/data/users/joverbey/downloads/technology/photran/updates/
-\end{verbatim}
-\textit{Don't forget the trailing slash!}
+\begin{enumerate}
 
-\item Update the timeline in the next appendix
+\item Update the timeline in this guide's Release History appendix
 (org.eclipse.photran-dev-docs/dev-guide/app-history.ltx-inc)
 
-\item Tag the org.eclipse.photran module in CVS with something like
-v20090225\_4\_0\_5\_Beta5 where the date and version have been substituted
-appropriately
+\item Create a maintenance branch for the org.eclipse.photran module in CVS.
+      For example, a photran\_5\_0 branch was created after the Photran 5.0.0 release
+      and was subsequently used to build Photran 5.0.1, etc.
 
-\item Wait 24 hours for the update site to replicate to the mirrors
+\item Add a Bugzilla version for the release and a target for the next expected release
 
-\item E-mail photran, photran-announce, and photran-dev
+\item Update the Web site:
+    \begin{enumerate}
+    \item Update the home page to mention the release
+    \item Change the update site URL and archived update site link on the Downloads page
+    \item Update the Report a Bug URL in the nav bar to default to the new release version
+    \end{enumerate}
+
+\item Announce the release, e-mailing the photran, photran-dev, and ptp-announce mailing lists
+
+\item Copy the Documentation pages on the wiki and update the version numbers for the next expected release
 
 \end{enumerate}

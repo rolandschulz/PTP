@@ -1,0 +1,93 @@
+% Getting the Photran Sources from CVS
+
+\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.5} (Galileo)
+and a \textbf{Java 5} or later JVM. We recommend the
+\href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.}
+
+\newcounter{running_counter}
+\textbf{Part~I.  Check out the CDT 6.0 sources from CVS}
+
+\begin{enumerate}
+	\item  In Eclipse, switch to the CVS Repository Exploring perspective.
+	\item  Right-click the CVS Repositories view; choose New, Repository Location
+	\item  In the dialog box, enter the following information, then click Finish. \\
+	\begin{tabular}{ll}
+	        Host name:       & dev.eclipse.org \\
+	        Repository path: & /cvsroot/tools \\
+	        Username:        & anonymous \\
+	        Password:        & (no password) \\
+	        Connection type: & pserver \\
+	\end{tabular}
+	\item  In the CVS Repositories view
+	       \begin{itemize}
+	       \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
+	       \item  Then expand ``HEAD''
+	       \end{itemize}
+	\item  Right-click on ``org.eclipse.cdt''
+	\item  Select ``Configure Branches and Versions\ldots''
+	\item  Under ``Browse files for tags'', expand ``all'', then expand
+	       ``org.eclipse.cdt'', then click on the .project file
+	\item  Under ``New tags found in the selected files'', click on the Deselect
+	       All button, then check cdt\_6\_0 in the list above it
+  \item	 Click Add Checked Tags
+	\item	 Click OK
+	\item  Now, in the CVS Repositories view
+				 \begin{itemize}
+				 \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
+		     \item  Then expand ``Branches''
+				 \item  Then expand ``cdt\_6\_0''
+		     \item  Then expand ``org.eclipse.cdt cdt\_6\_0''
+		     \item  Then expand ``all''
+			  \end{itemize}
+	\item  Click on the first entry under ``all''
+	       (it should be org.eclipse.cdt), then shift-click on the last entry
+	       under ``all'' (it should be org.eclipse.cdt.ui.tests).
+	       All of the intervening plug-ins should now be selected.
+	       Right-click on any of the selected plug-ins, and select
+	       Check Out from the pop-up menu.
+	       (Check out will take several minutes.)
+	\item  You now have the CDT source code.  Make sure it compiles successfully
+	       (lots of warnings, but no errors).
+	\setcounter{running_counter}{\value{enumi}}
+\end{enumerate}
+
+\vspace{1em}
+\textbf{Part~II.  Check out the Photran sources from CVS}
+\begin{enumerate}
+	\setcounter{enumi}{\value{running_counter}}
+	\item Under ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,''
+	    expand HEAD, then expand
+	    org.eclipse.ptp, then expand
+	    photran
+	\item  Click on the first entry under ``photran''
+	       (it should be org.eclipse.photran-dev-docs), then shift-click on the last entry
+	       under ``photran'' (it should be org.eclipse.rephraserengine.ui.vpg).
+	       All of the intervening plug-ins should now be selected.
+	       Right-click on any of the selected plug-ins, and select
+	       Check Out from the pop-up menu.
+	       (Check out will take several minutes.)
+	\setcounter{running_counter}{\value{enumi}}
+\end{enumerate}
+The sources should all compile (albeit with lots of warnings).
+
+\vspace{1em}
+\noindent\textbf{Part~III.  Running the test cases}
+
+\begin{enumerate}
+	\setcounter{enumi}{\value{running_counter}}
+	\item In Package Explorer view, select the \texttt{org.eclipse.photran.core.vpg.tests} project.
+	\item Right-click on that project and select Run As $>$ Run Configurations\ldots. A dialog will appear.
+	\item In that dialog, create a new \textbf{JUnit Plug-in Test} launch configuration. Call it ``Photran-Tests''.
+	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
+	      Change the ``VM arguments'' field to \texttt{-ea -Xms40m -Xmx512m}
+	\item Then switch to the ``Environment'' tab and create a new environment variable called ``TESTING'' with a value of 1.
+	\item Select ``Run'' to run the tests. To run the tests again, just launch the ``Photran-Tests'' configuration from the Eclipse Run menu.
+
+	\vspace{.5em}
+	\noindent\textit{\textbf{Note.} If you will be developing refactorings or modifying the parser,
+	please read the appendix ``Running Photran's Automated Test Suite'' in the \textit{Photran
+	Developer's Guide.}  Also note that some parser tests will attempt to look for closed-source
+	code that you did not check out as part of this procedure;
+	a warning will appear in the JUnit runner if this code is not available.}
+	\setcounter{running_counter}{\value{enumi}}
+\end{enumerate}

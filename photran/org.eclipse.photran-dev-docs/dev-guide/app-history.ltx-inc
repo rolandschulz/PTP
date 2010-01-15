@@ -18,7 +18,8 @@ Photran & Date & Platform & CDT & Notes \\
 4.0b5 & Feb 2009 & 3.4     & 5.0.1 & \textit{Move saved vars to common} \\
       & Mar 2009 & 3.4     & 5.0.1 & First automated integration build under PTP \\
       & Sep 2009 & 3.5     & 6.0.0 & \\
-5.0.0 & Dec 2009 & 3.5     & 6.0.1 & First official release at eclipse.org
+5.0.0 & Dec 2009 & 3.5     & 6.0.1 & First official release at eclipse.org \\
+6.0.0 & Jun 2010 & 3.6     & 7.0.0 & Part of the Helios release train (TENTATIVE) \\
 %Vers & Mon Year & Platfrm & CDT   & \\
 \end{tabular}
 }
