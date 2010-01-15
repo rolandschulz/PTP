@@ -165,6 +165,7 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
         {
             addChangeFromModifiedAST(file, pm);
             status.addInfo("After clicking 'Continue', do the same refactoring again to make sure that all unused variables are removed from file " + file.getName()+"!");
+            status.addWarning("This refactoring does not remove un-used variables when their dimentions are specified on another line. I.e. real a /n/n dimention a(10) will not be removed.");
         }
         else
         {
