@@ -63,17 +63,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 /**
- * @author crecoskie
+ * @author crecoskie, peterwan
  *
  */
 public class RemoteEnvironmentTab extends AbstractCPropertyTab {
-
-	/**
-	 * 
-	 */
-	public RemoteEnvironmentTab() {
-		// TODO Auto-generated constructor stub
-	}
 
 	private static final String SEMI = ";"; //$NON-NLS-1$
 	private static final String LBR = " ["; //$NON-NLS-1$
@@ -85,7 +78,6 @@ public class RemoteEnvironmentTab extends AbstractCPropertyTab {
 	private Table table;
 	private TableViewer tv;
 	private ArrayList<TabData> data = new ArrayList<TabData>();
-	private Button b1, b2;
 	private Label  lb1, lb2;
 	
 	private ICConfigurationDescription cfgd = null;
@@ -216,38 +208,7 @@ public class RemoteEnvironmentTab extends AbstractCPropertyTab {
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 3;
 	    table.setLayoutData(gd);
-	    
-	    b1 = new Button(usercomp, SWT.RADIO);
-	    b1.setText(UIMessages.getString("EnvironmentTab.3")); //$NON-NLS-1$
-	    b1.setToolTipText(UIMessages.getString("EnvironmentTab.3")); //$NON-NLS-1$
-	    gd = new GridData(GridData.FILL_HORIZONTAL);
-	    gd.horizontalSpan = 3; 
-	    b1.setLayoutData(gd);
-	    b1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (cfgd != null)
-					ce.setAppendEnvironment(true, cfgd);
-				else
-					vars.setAppendContributedEnvironment(true);
-				updateData();
-			}});
 
-	    b2 = new Button(usercomp, SWT.RADIO);
-	    b2.setText(UIMessages.getString("EnvironmentTab.4")); //$NON-NLS-1$
-	    b2.setToolTipText(UIMessages.getString("EnvironmentTab.4")); //$NON-NLS-1$
-	    gd = new GridData(GridData.FILL_HORIZONTAL);
-	    gd.horizontalSpan = 3; 
-	    b2.setLayoutData(gd);
-	    b2.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (cfgd != null)
-					ce.setAppendEnvironment(false, cfgd);
-				else
-					vars.setAppendContributedEnvironment(false);
-				updateData();
-			}});
 
 	    if (!page.isForPrefs()) {
 	    	// dummy placeholder
@@ -334,14 +295,10 @@ public class RemoteEnvironmentTab extends AbstractCPropertyTab {
 	private void updateData() {
 		IEnvironmentVariable[] _vars = null;
 		if (cfgd != null) {
-			b1.setSelection(ce.appendEnvironment(cfgd));
-			b2.setSelection(!ce.appendEnvironment(cfgd));
 			 _vars = ce.getVariables(cfgd);
 		} else {
 			if (vars == null)
 				vars = fUserSupplier.getWorkspaceEnvironmentCopy();
-			b1.setSelection(vars.appendContributedEnvironment());
-			b2.setSelection(!vars.appendContributedEnvironment());
 			_vars = vars.getVariables() ;
 		}
 		
@@ -606,5 +563,6 @@ public class RemoteEnvironmentTab extends AbstractCPropertyTab {
 			  ((EnvVarDescriptor)var).getContextInfo().getContext() != null);
 
 	}
+	
 	
 }
