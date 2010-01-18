@@ -66,6 +66,7 @@ cvs co -r $TAG -d org.eclipse.ptp.rdt.core.stubs org.eclipse.ptp/rdt/org.eclipse
 cvs co -r $CDT_TAG -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
 cvs co -r $CDT_TAG -d org.eclipse.cdt.core.lrparser org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser
 cvs co -r $CDT_TAG -d org.eclipse.cdt.core.lrparser.xlc org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc
+cvs co -r $CDT_TAG -d org.eclipse.cdt.core.parser.upc org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc
 
 cd org.eclipse.ptp.rdt.core.remotejars
 
