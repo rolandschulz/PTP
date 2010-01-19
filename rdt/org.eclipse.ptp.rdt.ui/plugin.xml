@@ -732,6 +732,31 @@
              activityId="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
              pattern="org\.eclipse\.cdt\.ui/org\.eclipse\.cdt\.ui\.indexer">
        </activityPatternBinding>
+       <activity
+       		 id="com.ibm.etools.aix.ui.EnvironmentPreferencePageActivity"
+       		 name="%CDTEnvironmentPref.name">
+       </activity>
+       <categoryActivityBinding
+       		 activityId="com.ibm.etools.aix.ui.EnvironmentPreferencePageActivity"
+       		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
+       </categoryActivityBinding>
+       <activityPatternBinding
+       		 activityId="com.ibm.etools.aix.ui.EnvironmentPreferencePageActivity"
+       		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.preferences.PrefPage_Env">
+       </activityPatternBinding>
+            
+        <activity
+       		 id="com.ibm.etools.aix.ui.EnvironmentPropertiesPageActivity"
+       		 name="%CDTEnvironmentProp.name">
+       </activity>
+       <categoryActivityBinding
+       		 activityId="com.ibm.etools.aix.ui.EnvironmentPropertiesPageActivity"
+       		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
+       </categoryActivityBinding>
+       <activityPatternBinding
+       		 activityId="com.ibm.etools.aix.ui.EnvironmentPropertiesPageActivity"
+       		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment">
+       </activityPatternBinding>
        
      </extension>
      <extension
