@@ -2,15 +2,20 @@
 
 \textit{Most contributors/committers do not need to read this.  This explains
 our entire release and deployment procedure: setting the Photran version
-number, building the feature, uploading it to the download site, etc.}
+number, updating the Web site, etc.}
 
 \section{Preparing for a Release Build}
 
 \begin{enumerate}
 
-\item Proofread the documentation on the wiki.
+\item Proofread the documentation on the wiki.  Make sure version numbers are
+      correct, screenshots and step-by-step instructions are up-to-date, and
+      UI labels are up-to-date (e.g., if the name of a refactoring changed).
 
-\item Update the plug-in version numbers in all projects.
+\item Update the plug-in version numbers in all projects.  Note that the URL for
+      the release notes shown when the user first installs a new version of Photran
+      is determined by the version of the org.eclipse.photran.ui plug-in (see
+      ShowReleaseNotes.java for details).
 
 \item Update the feature.xml and feature.properties files for
     \begin{itemize}
@@ -23,8 +28,15 @@ number, building the feature, uploading it to the download site, etc.}
     \begin{enumerate}
     \item the feature version
     \item the versions of other features/plug-ins it depends on
-          (e.g., Photran depends on the Rephraser Engine and CDT, and
-          Intel Compiler Support depends on Photran).
+    \begin{itemize}
+        \item org.eclipse.photran-feature must specify the correct versions of
+            \begin{itemize}
+            \item CDT
+            \item Rephraser Engine
+            \end{itemize}
+        \item org.eclipse.photran.intel-feature must specify the current version of Photran
+        \item org.eclipse.photran.xlf-feature must specify the current version of Photran
+    \end{itemize}
     \item the copyright year
     \item the update site URL
     \end{enumerate}
@@ -37,7 +49,11 @@ changed, update
     \end{itemize}
 For example, in Photran 4.0 beta 5, the database filename was ``photran40b5vpg''.
 
+\item Make sure the org.eclipse.photran.cmdline JAR is up-to-date.
+
 \item Make sure the org.eclipse.ptp.releng scripts have the correct versions.
+    \textit{Note that Photran is built from PTP's releng scripts; Photran's own
+    releng scripts are no longer used.}
 
 \item Greg Watson will initiate a PTP build at build.eclipse.org.
 
