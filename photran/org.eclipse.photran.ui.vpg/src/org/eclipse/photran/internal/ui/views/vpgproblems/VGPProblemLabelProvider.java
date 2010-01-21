@@ -30,8 +30,6 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 @SuppressWarnings("restriction")
 public class VGPProblemLabelProvider implements ITableLabelProvider
 {
-    private static final int MAX_NUM_CHARS = 60;
-
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
      */
@@ -65,12 +63,12 @@ public class VGPProblemLabelProvider implements ITableLabelProvider
             // To see the columns in order, look in VGPProblemView.java
             switch(index)
             {
-                case 0: return String.valueOf(m.getId());                           //Marker ID
-                case 1: return getFirstMessageSentense(m);                          //Marker message
-                case 2: return m.getResource().getName().toString();                //Name of file/resource
-                case 3: return m.getResource().getProjectRelativePath().toString(); //Project-relative path
-                case 4: return getLineWithNumber(m);                                //Line number
-                case 5: return MarkerUtilities.getMarkerType(m);                    //Marker type
+                //case 0: return String.valueOf(m.getId());                           //Marker ID
+                case 0: return getFirstMessageSentense(m);                          //Marker message
+                case 1: return m.getResource().getName().toString();                //Name of file/resource
+                case 2: return m.getResource().getProjectRelativePath().toString(); //Project-relative path
+                case 3: return getLineWithNumber(m);                                //Line number
+                case 4: return MarkerUtilities.getMarkerType(m);                    //Marker type
             }
         }
         return null;
@@ -87,8 +85,8 @@ public class VGPProblemLabelProvider implements ITableLabelProvider
     private static String getFirstMessageSentense(IMarker marker)
     {
         String fullMessage = MarkerUtilities.getMessage(marker);
-        if(fullMessage.length() > MAX_NUM_CHARS)
-            return fullMessage.substring(0, MAX_NUM_CHARS-1)+"...";
+        /*if(fullMessage.length() > MAX_NUM_CHARS)
+            return fullMessage.substring(0, MAX_NUM_CHARS-1)+"...";*/
         return fullMessage;
     }
 

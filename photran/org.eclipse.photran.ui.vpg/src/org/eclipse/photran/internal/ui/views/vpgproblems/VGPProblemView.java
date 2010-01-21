@@ -19,6 +19,10 @@ package org.eclipse.photran.internal.ui.views.vpgproblems;
  * Timofey Yuvashev
  */
 
+
+import java.util.List;
+import java.util.logging.ErrorManager;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -57,18 +61,18 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
     private CopyMarkedFileAction copyAction     = null;
     private OpenMarkedFileAction openAction     = null;
     private ShowFullMessageAction showAction    = null;
-    private RemoveMarkerAction remAction        = null;
+    //private RemoveMarkerAction remAction        = null;
 
-    private VPGViewFilterAction infosMarkerFilterAction     = null;
+    //private VPGViewFilterAction infosMarkerFilterAction     = null;
     private VPGViewFilterAction warningsMarkerFilterAction  = null;
     private VPGViewFilterAction errorsMarkerFilterAction    = null;
 
-    private static final String[] COLUMN_NAMES = {"ID", "Description",
-                                                  "Resource", "Path",
-                                                  "Location"};
-    private static final int[] COLUMN_WIDTHS   = {4, 40,
-                                                  10, 13,
-                                                  6};
+    private static final String[] COLUMN_NAMES = {"Description",
+                                                  "Resource", "Path" /*,
+                                                  "Location"*/};
+    private static final int[] COLUMN_WIDTHS   = {44,
+                                                  10, 20/*,
+                                                  6*/};
 
     //TODO: Depending on how we will handle updates to markers, we might need a
     // way to update this array. Currently, it is populated as Workbench's start-time
@@ -122,7 +126,16 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
                 Table t = tableViewer.getTable();
                 t.removeAll();
                 t.update();
-                tableViewer.setInput(PhotranVPG.getInstance().recomputeErrorLogMarkers());
+                List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+                tableViewer.setInput(markers);
+                countMarkers(markers);
+                if(warningsMarkerFilterAction != null && errorsMarkerFilterAction != null)
+                {
+                    String warnStr = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_WARNING]) + " Warnings";
+                    String errStr  = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_ERROR]) + " Errors";
+                    warningsMarkerFilterAction.setText(warnStr);
+                    errorsMarkerFilterAction.setText(errStr);
+                }
             }
         });
     }
@@ -137,29 +150,30 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         tableViewer.getTable().setLayoutData(tableData);
     }
 
-    private void countMarkers()
+    private void resetMarkerCount()
     {
-        try
+        for(int i = 0; i < MARKER_COUNT.length; ++i)
         {
-            //TODO: Possibly we want to filter which markers we are getting, since we
-            // are only interested in VGP-problem markers
-
-            //Get all the markers in the workspace
-            IMarker[] markers = ResourcesPlugin.getWorkspace().getRoot().findMarkers(null, true, IResource.DEPTH_INFINITE);
-
-            //HACK
-            for(int i = 0; i < markers.length; i++)
-            {
-                int sev = MarkerUtilities.getSeverity(markers[i]);
-
-                if(sev == IMarker.SEVERITY_ERROR    ||
-                   sev == IMarker.SEVERITY_WARNING  ||
-                   sev == IMarker.SEVERITY_INFO)
-                    MARKER_COUNT[sev]++;
-            }
+            MARKER_COUNT[i] = 0;
         }
-        catch(CoreException e)
-        {}
+    }
+    
+    private void countMarkers(List<IMarker> markers)
+    {
+        //Get all the markers in the workspace
+        //IMarker[] markers = ResourcesPlugin.getWorkspace().getRoot().findMarkers(null, true, IResource.DEPTH_INFINITE);
+        resetMarkerCount();;
+        
+        //HACK
+        for(IMarker marker : markers)
+        {
+            int sev = MarkerUtilities.getSeverity(marker);
+
+            if(sev == IMarker.SEVERITY_ERROR    ||
+               sev == IMarker.SEVERITY_WARNING  ||
+               sev == IMarker.SEVERITY_INFO)
+                MARKER_COUNT[sev]++;
+        }
     }
 
     private void createActions()
@@ -167,21 +181,22 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         copyAction = new CopyMarkedFileAction(this, "Copy");
         openAction = new OpenMarkedFileAction(getSite());
         showAction = new ShowFullMessageAction(getSite());
-        remAction  = new RemoveMarkerAction(getSite());
+        //remAction  = new RemoveMarkerAction(getSite());
 
-        int sevInfo = IMarker.SEVERITY_INFO;
+        //int sevInfo = IMarker.SEVERITY_INFO;
         int sevWarn = IMarker.SEVERITY_WARNING;
         int sevErr  = IMarker.SEVERITY_ERROR;
 
-        countMarkers();
+        List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+        countMarkers(markers);
 
-        String infoStr = String.valueOf(MARKER_COUNT[sevInfo]) + " Infos";
+        //String infoStr = String.valueOf(MARKER_COUNT[sevInfo]) + " Infos";
         String warnStr = String.valueOf(MARKER_COUNT[sevWarn]) + " Warnings";
         String errStr  = String.valueOf(MARKER_COUNT[sevErr]) + " Errors";
 
-        infosMarkerFilterAction     = new VPGViewFilterAction(tableViewer,
+        /*infosMarkerFilterAction     = new VPGViewFilterAction(tableViewer,
                                                               infoStr,
-                                                              sevInfo);
+                                                              sevInfo);*/
 
         warningsMarkerFilterAction  = new VPGViewFilterAction(tableViewer,
                                                               warnStr,
@@ -198,10 +213,10 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
 
         toolBarManager.add(errorsMarkerFilterAction);
         toolBarManager.add(warningsMarkerFilterAction);
-        toolBarManager.add(infosMarkerFilterAction);
+        //toolBarManager.add(infosMarkerFilterAction);
         toolBarManager.add(openAction);
         toolBarManager.add(copyAction);
-        toolBarManager.add(remAction);
+        //toolBarManager.add(remAction);
         toolBarManager.add(new Separator());
         toolBarManager.add(showAction);
     }
@@ -215,7 +230,7 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
                 boolean isEnabled = !e.getSelection().isEmpty();
                 openAction.setEnabled(isEnabled);
                 copyAction.setEnabled(isEnabled);
-                remAction.setEnabled(isEnabled);
+                //remAction.setEnabled(isEnabled);
                 showAction.setEnabled(isEnabled);
             }
         });
@@ -227,7 +242,7 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
 
         openAction.setEnabled(false);
         copyAction.setEnabled(false);
-        remAction.setEnabled(false);
+        //remAction.setEnabled(false);
         showAction.setEnabled(false);
 
         addActionsToToolbar();

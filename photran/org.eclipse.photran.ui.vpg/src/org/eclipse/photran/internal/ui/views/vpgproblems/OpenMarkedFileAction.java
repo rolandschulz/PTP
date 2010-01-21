@@ -25,9 +25,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.photran.internal.ui.vpg.Activator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
@@ -50,41 +53,14 @@ public class OpenMarkedFileAction extends SelectionDispatchAction
     @SuppressWarnings("deprecation")
     public ImageDescriptor getImageDescriptor()
     {
-        /*File sourceFile = new File(OPEN_IMAGE_PATH);
-        URL url = null;
-        try
-        {
-            url = sourceFile.toURL();
-        }
-        catch (MalformedURLException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        ImageDescriptor imgDescr = ImageDescriptor.createFromURL(url);
-        return imgDescr;*/
+        Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_FORWARD_HOVER);
+        return ImageDescriptor.createFromImage(img);
 
-
-        URL installURL = Activator.getDefault().getDescriptor().getInstallURL();
+      /*  URL installURL = Activator.getDefault().getDescriptor().getInstallURL();
         URL url = null;
         try
         {
             url = new URL(installURL, "icons/full/eview16/config-preprocessor.gif");
-        }
-        catch (MalformedURLException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return ImageDescriptor.createFromURL(url);
-
-        /*
-        URL url = null;
-        try
-        {
-            String path = Activator.getDefault().getBundle().getLocation();
-            URL contextUrl = new URL(path);
-            url = new URL(contextUrl, OPEN_IMAGE_PATH);
         }
         catch (MalformedURLException e)
         {

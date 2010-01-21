@@ -37,8 +37,8 @@ public class VGPProblemContextMenu extends MenuManager
         CopyMarkedFileAction copyAct = new CopyMarkedFileAction((VGPProblemView)site.getPart(), "Copy");
         add(copyAct);
         
-        RemoveMarkerAction remAct = new RemoveMarkerAction(site);
-        add(remAct);
+       /* RemoveMarkerAction remAct = new RemoveMarkerAction(site);
+        add(remAct);*/
         
         add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         
@@ -50,7 +50,7 @@ public class VGPProblemContextMenu extends MenuManager
         
         registerAction(showAct, provider, sel);
         registerAction(openAct, provider, sel);
-        registerAction(remAct,  provider, sel);
+        //registerAction(remAct,  provider, sel);
         
         site.getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), copyAct);
         
