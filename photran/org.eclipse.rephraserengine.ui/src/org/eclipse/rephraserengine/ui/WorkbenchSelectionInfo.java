@@ -201,6 +201,19 @@ public class WorkbenchSelectionInfo
         return fileInEditor != null;
     }
 
+    /** @return the active editor in the workbench, or <code>null</code> if no editor is active */
+    public IEditorPart getActiveEditor()
+    {
+        return activeEditor;
+    }
+
+    /** @return the active editor in the workbench, if it is a text editor, or <code>null</code>
+     *  if no editor is active or it is not a text editor */
+    public ITextEditor getActiveTextEditor()
+    {
+        return activeEditor instanceof ITextEditor ? (ITextEditor)activeEditor : null;
+    }
+
     /** @return the file open in the active editor in the workbench, or <code>null</code> if there
      *          is no editor open, it is editing a document not based on an {@link IFile}, or the
      *          file being edited was not accepted by the resource filter passed to the
