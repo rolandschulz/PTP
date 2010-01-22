@@ -16,6 +16,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.remote.ui.messages.messages"; //$NON-NLS-1$
 	
+	public static String LocalUIConnectionManager_0;
+
+	public static String LocalUIConnectionManager_1;
+
 	public static String PTPRemoteUIPlugin_0;
 
 	public static String PTPRemoteUIPlugin_1;
