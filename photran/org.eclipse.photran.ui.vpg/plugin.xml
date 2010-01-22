@@ -430,7 +430,7 @@
       <menu
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
             label="Re&amp;ferences"
-            path="group.search"><!-- See IContextMenuConstants -->
+            path="group.find"><!-- See ITextEditorActionConstants - was originally group.search according to IContextMenuConstants -->
          <separator
                name="FindAllReferencesGroup">
          </separator>
@@ -466,7 +466,7 @@
       <menu
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
             label="Re&amp;ferences"
-            path="group.search"><!-- See IContextMenuConstants -->
+            path="group.find"><!-- Same as above -->
          <separator
                name="FindAllReferencesGroup">
          </separator>

@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IDocument;
@@ -69,11 +70,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 
 /**
@@ -208,11 +211,14 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     //@Override
     public void editorContextMenuAboutToShow(IMenuManager menu)
     {
+        super.editorContextMenuAboutToShow(menu);
+        
         try
         {
             MenuManager refactorSubmenu = new MenuManager("Refactor");
             refactorSubmenu.add(new RefactorMenu());
-            menu.add(refactorSubmenu);
+            menu.appendToGroup(ITextEditorActionConstants.GROUP_EDIT, refactorSubmenu); // cf. CEditor#createActions()
+            //menu.add(refactorSubmenu);
         }
         catch (Throwable x)
         {
