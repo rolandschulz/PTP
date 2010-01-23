@@ -173,10 +173,14 @@ public class IntelCompilerErrorParser  implements IErrorParser {
 			    try {
 				int num= Integer.parseInt(lineNumber);
 				int i= fileName.lastIndexOf(File.separatorChar);
+				String fileName2 = fileName ;
 				if (i != -1) {
-				    fileName= fileName.substring(i + 1);
+				    fileName2= fileName.substring(i + 1);
 				}
-				IFile file= eoParser.findFileName(fileName);
+				IFile file= eoParser.findFileName(fileName2);
+				if (file == null){
+					file = eoParser.findFileName(fileName);
+				}
 				if (file != null || eoParser.isConflictingName(fileName)) {
 				    String middle= desc.substring(0, secondColon);
 				    int severity = -1;
