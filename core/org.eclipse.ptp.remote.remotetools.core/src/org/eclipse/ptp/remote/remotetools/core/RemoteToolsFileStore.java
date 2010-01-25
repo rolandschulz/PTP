@@ -42,6 +42,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 public class RemoteToolsFileStore extends FileStore {
 	private static Map<String, RemoteToolsFileStore> instanceMap = new HashMap<String, RemoteToolsFileStore>();
 
+	
 	/**
 	 * Public factory method for obtaining RemoteToolsFileStore instances.
 	 * 
@@ -67,15 +68,40 @@ public class RemoteToolsFileStore extends FileStore {
 			return store;
 		}
 	}
-
+	
 	private final String fConnectionName;
 	private final IPath fRemotePath;
-
+	
 	private IRemoteItem fRemoteItem = null;
 
 	public RemoteToolsFileStore(String connName, String path) {
 		fConnectionName = connName;
 		fRemotePath = new Path(path);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.provider.FileStore#childInfos(int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public IFileInfo[] childInfos(int options, IProgressMonitor monitor)
+			throws CoreException {
+		IRemoteItem[] items;
+		try {
+			items = getExecutionManager(monitor).getRemoteFileTools()
+					.listItems(fRemotePath.toString());
+		} catch (Exception e) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL, e
+							.getMessage(), null));
+		}
+		IFileInfo[] result = new FileInfo[items.length];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = convertRemoteItemToFileInfo(items[i], 
+					getNameFromPath(new Path(items[i].getPath())));
+		}
+
+		return result;
 	}
 
 	/*
@@ -107,7 +133,7 @@ public class RemoteToolsFileStore extends FileStore {
 
 		for (int i = 0; i < items.length; i++) {
 			IPath path = new Path(items[i].getPath());
-			names[i] = path.lastSegment();
+			names[i] = path.lastSegment(); // should this be getNameFromPath(path)?
 		}
 
 		return names;
@@ -164,22 +190,9 @@ public class RemoteToolsFileStore extends FileStore {
 
 		IRemoteItem item = getRemoteItem(monitor);
 
-		FileInfo info = new FileInfo(getName());
-
-		if (!item.exists()) {
-			info.setExists(false);
-			return info;
-		}
-
-		info.setExists(true);
-		info.setLastModified(item.getModificationTime());
-		info.setDirectory(item.isDirectory());
-		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !item.isWritable());
-		info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, item.isExecutable());
-		info.setLength(item.getSize());
-		return info;
+	    return convertRemoteItemToFileInfo(item, getName());
 	}
-
+		
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -201,10 +214,7 @@ public class RemoteToolsFileStore extends FileStore {
 	 */
 	@Override
 	public String getName() {
-		if (fRemotePath.isRoot()) {
-			return fRemotePath.toString();
-		}
-		return fRemotePath.lastSegment();
+		return getNameFromPath(fRemotePath);
 	}
 
 	/*
@@ -414,6 +424,34 @@ public class RemoteToolsFileStore extends FileStore {
 				.toString());
 	}
 
+	private void cacheRemoteItem(IRemoteItem item) {
+		fRemoteItem = item;
+	}
+
+	/**
+	 * Copy attributes from an IRemoteItem object into an IFileInfo object.
+	 * 
+	 * @param item the IRemoteItem to convert
+	 * @param name the name of the file object
+	 * @return an IFileInfo object containing the IRemoteItem attributes
+	 */
+	private IFileInfo convertRemoteItemToFileInfo(IRemoteItem item, String name) {
+		FileInfo info = new FileInfo(name);
+		
+		if (!item.exists()) {
+			info.setExists(false);
+			return info;
+		}
+
+		info.setExists(true);
+		info.setLastModified(item.getModificationTime());
+		info.setDirectory(item.isDirectory());
+		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !item.isWritable());
+		info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, item.isExecutable());
+		info.setLength(item.getSize());
+		return info;
+	}
+
 	/**
 	 * Get the remote tools execution manager associated with the connection.
 	 * Will attempt to initialize and open the connection if necessary.
@@ -486,6 +524,19 @@ public class RemoteToolsFileStore extends FileStore {
 	}
 
 	/**
+	 * Utility routing to get the file name from an absolute path.
+	 * 
+	 * @param path path to extract file name from
+	 * @return last segment of path, or the full path if it is root
+	 */
+	private String getNameFromPath(IPath path) {
+		if (path.isRoot()) {
+			return path.toString();
+		}
+		return path.lastSegment();
+	}
+
+	/**
 	 * Gets the remote item associated with this file store. Will open the
 	 * connection if necessary.
 	 * 
@@ -529,9 +580,5 @@ public class RemoteToolsFileStore extends FileStore {
 		}
 
 		return fRemoteItem;
-	}
-
-	private void cacheRemoteItem(IRemoteItem item) {
-		fRemoteItem = item;
 	}
 }
