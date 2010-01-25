@@ -103,11 +103,12 @@ public class DeferredFileStore implements IDeferredWorkbenchAdapter {
 			IElementCollector collector, IProgressMonitor monitor) {
 		DeferredFileStore[] children = null;
 		try {
-			IFileStore[] stores = fileStore.childStores(EFS.NONE, monitor);
-			children = new DeferredFileStore[stores.length];
-			for (int i = 0; i < stores.length; i++) {
-				IFileInfo info = stores[i].fetchInfo(EFS.NONE, monitor);
-				children[i] = new DeferredFileStore(stores[i], info);
+			IFileInfo[] info = fileStore.childInfos(EFS.NONE, monitor);
+			IFileStore[] wrapped = new IFileStore[info.length];
+			children = new DeferredFileStore[info.length];
+			for (int i = 0; i < wrapped.length; i++) {
+				wrapped[i] = fileStore.getChild(info[i].getName());
+				children[i] = new DeferredFileStore(wrapped[i], info[i]);
 			}
 		} catch (CoreException e) {
 		}
