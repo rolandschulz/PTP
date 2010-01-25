@@ -157,7 +157,7 @@ public class PVariableManager {
 				return ""; //$NON-NLS-1$
 
 			IPProcess p = job.getProcessByIndex(task);
-			if (p == null || p.getState() == ProcessAttributes.State.SUSPENDED)
+			if (p == null || p.getState() != ProcessAttributes.State.SUSPENDED)
 				return ""; //$NON-NLS-1$
 			
 			StringBuffer display = new StringBuffer();
