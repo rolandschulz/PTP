@@ -214,7 +214,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 		if (ast == null)
 			return null;
 		else
-			return ast.findTokenByFileOffsetLength(getIFileForFilename(tokenRef.getFilename()), tokenRef.getOffset(), tokenRef.getLength());
+			return ast.findTokenByStreamOffsetLength(tokenRef.getOffset(), tokenRef.getLength());
 	}
 
     @Override

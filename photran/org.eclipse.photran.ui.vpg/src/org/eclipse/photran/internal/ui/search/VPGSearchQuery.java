@@ -182,6 +182,7 @@ public class VPGSearchQuery implements ISearchQuery {
 
             Token searchToken = new Token(Terminal.T_IDENT, patternStr);
             searchToken.setFile((IFile)resource);
+            searchToken.setContainerFile((IFile)resource);
 
             if (ast.getRoot().getEmptyProgram() == null) { // manuallyResolve errs on empty file
                 for (ScopingNode sNode : ast.getRoot().getAllContainedScopes()) {

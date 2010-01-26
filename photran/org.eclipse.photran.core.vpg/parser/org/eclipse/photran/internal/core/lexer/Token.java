@@ -73,6 +73,9 @@ public class Token implements IToken, IASTNode
     protected IFile ifile = null;
     protected java.io.File javaFile = null;
     
+    protected IFile containerIFile = null;
+    protected java.io.File containerJavaFile = null;
+    
     protected int line = -1, col = -1, fileOffset = -1, streamOffset = -1, length = -1;
     
     protected PhotranTokenRef tokenRef = null;
@@ -103,6 +106,8 @@ public class Token implements IToken, IASTNode
         this.preprocessorDirective = copyFrom.preprocessorDirective;
         this.ifile                 = copyFrom.ifile;
         this.javaFile              = copyFrom.javaFile;
+        this.containerIFile        = copyFrom.containerIFile;
+        this.containerJavaFile     = copyFrom.containerJavaFile;
         this.line                  = copyFrom.line;
         this.col                   = copyFrom.col;
         this.fileOffset            = copyFrom.fileOffset;
@@ -205,6 +210,16 @@ public class Token implements IToken, IASTNode
         return javaFile;
     }
 
+    public IFile getContainerIFile()
+    {
+        return containerIFile;
+    }
+
+    public java.io.File getContainerJavaFile()
+    {
+        return containerJavaFile;
+    }
+
     public void setFile(IFile file)
     {
         this.ifile = file;
@@ -217,6 +232,20 @@ public class Token implements IToken, IASTNode
     {
         this.ifile = null;
         this.javaFile = file;
+    }
+
+    public void setContainerFile(IFile file)
+    {
+        this.containerIFile = file;
+        
+        IPath location = file == null ? null : file.getLocation();
+        this.containerJavaFile = location == null ? null : location.toFile();
+    }
+
+    public void setContainerFile(java.io.File file)
+    {
+        this.containerIFile = null;
+        this.containerJavaFile = file;
     }
 
     public int getFileOffset()
@@ -393,7 +422,7 @@ public class Token implements IToken, IASTNode
 
     public PhotranTokenRef getTokenRef()
     {
-    	if (tokenRef == null) tokenRef = new PhotranTokenRef(ifile, fileOffset, length);
+    	if (tokenRef == null) tokenRef = new PhotranTokenRef(containerIFile, streamOffset, length);
     	
     	return tokenRef;
     }

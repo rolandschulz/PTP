@@ -38,8 +38,12 @@ public class FortranAST implements IFortranAST
         this.tokenList = tokenList;
         
         for (Token token : new IterableWrapper<Token>(tokenList))
+        {
         	if (token.getIFile() == null)
         		token.setFile(file);
+        	
+        	token.setContainerFile(file);
+        }
     }
 
     public void accept(IASTVisitor visitor)

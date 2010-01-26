@@ -12,14 +12,16 @@ package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
 import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
+import org.eclipse.photran.internal.core.lexer.IPreprocessorReplacement;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenList;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * The Reindenter is used to correct indentation when a node is inserted or
@@ -129,39 +131,65 @@ public class Reindenter
     private Reindenter(Token firstTokenInRegion, Token lastTokenInRegion, IFortranAST ast, Strategy strategy)
     {
         // Recompute TokenList so that line number-based searches will be correct
-        this.lineNumOfLastTokenInAST = recomputeLineColInfo(ast.getRoot());
+        this.lineNumOfLastTokenInAST = recomputeLineColInfo(ast);
         this.ast = new FortranAST(ast.getFile(), ast.getRoot(), new TokenList(ast.getRoot()));
         
         if (firstTokenInRegion != null && lastTokenInRegion != null)
             ast.accept(strategy.createVisitor(this, firstTokenInRegion, lastTokenInRegion));
     }
 
-    private int recomputeLineColInfo(ASTExecutableProgramNode astRoot)
+    private int recomputeLineColInfo(IFortranAST ast)
     {
-        LineColComputer lcc = new LineColComputer();
-        astRoot.accept(lcc);
+        LineColComputer lcc = new LineColComputer(PhotranVPG.getInstance().getIFileCorrespondingTo(ast));
+        ast.getRoot().accept(lcc);
         return lcc.line; // line number of last token
     }
 
     private final class LineColComputer extends ASTVisitorWithLoops
     {
-        private int streamOffset = 0, line = 1, col = 1;
+        private IFile file;
+        private int fileOffset = 0, line = 1, col = 1;
+        private IPreprocessorReplacement lastPreprocRepl = null;
+
+        public LineColComputer(IFile file)
+        {
+            this.file = file;
+        }
 
         @Override public void visitToken(Token token)
         {
-            consider(token.getWhiteBefore());
-            token.setStreamOffset(streamOffset);
-            token.setLine(line);
-            token.setCol(col);
-            consider(token.getText());
-            consider(token.getWhiteAfter());
+            IPreprocessorReplacement thisPreprocRepl = token.getPreprocessorDirective();
+
+            // This method's structure is similar to Token#printOn
+            if (thisPreprocRepl != lastPreprocRepl)
+            {
+                if (thisPreprocRepl != null)
+                {
+                    consider(token.getWhiteBefore());
+                    token.setFileOffset(fileOffset);
+                    token.setLine(line);
+                    token.setCol(col);
+                    consider(thisPreprocRepl.toString());
+                }
+                lastPreprocRepl = thisPreprocRepl;
+            }
+
+            if (thisPreprocRepl == null)
+            {
+                consider(token.getWhiteBefore());
+                token.setFileOffset(fileOffset);
+                token.setLine(line);
+                token.setCol(col);
+                consider(token.getText());
+                consider(token.getWhiteAfter());
+            }
         }
 
         private void consider(String s)
         {
             for (int i = 0, len = s.length(); i < len; i++)
             {
-                streamOffset++;
+                fileOffset++;
                 
                 if (s.charAt(i) == '\n')
                 {

@@ -211,6 +211,26 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
                 new FortranElement.UnknownNode(getCurrentParent(),
                     "getText(): \"" + token.getText().replaceAll("\\n", "\\\\n") + "\""));
             
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getPreprocessorDirective(): " + token.getPreprocessorDirective()));
+            
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getJavaFile(): " + token.getJavaFile()));
+            
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getFileOffset(): " + token.getFileOffset()));
+            
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getContainerJavaFile(): " + token.getContainerJavaFile()));
+            
+            modelBuilder.addF90Element(
+                new FortranElement.UnknownNode(getCurrentParent(),
+                    "getStreamOffset(): " + token.getStreamOffset()));
+            
             doneAddingChildrenFor(token);
         }
         catch (CModelException e)

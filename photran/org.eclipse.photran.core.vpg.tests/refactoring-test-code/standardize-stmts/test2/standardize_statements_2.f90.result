@@ -6,9 +6,9 @@ program standardize_statements !<<<<<1,1,true
     integer :: b(20)
     integer :: c(6)
     integer :: d
+    dimension :: d(10)
+
     a = (/1,2,3,4/)
     vector(1:10) = 4.0
-    
-    dimension :: d(10)
 
 end program standardize_statements
