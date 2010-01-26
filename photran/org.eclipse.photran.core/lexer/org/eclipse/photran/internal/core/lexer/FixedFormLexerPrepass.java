@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
+
 /**
  * Preprocesses the input stream, discarding all whitespaces and comment lines and concatenating
  * continuation lines.  Additionally, it holds a mapping to the character-positions in the file (for
@@ -143,7 +145,7 @@ class FixedFormLexerPrepass {
 				    actLinePos=0;
 			} 
 			else if(actLinePos==actLine.length() || 
-			        actLinePos==PreLexerLine.COLWIDTH) 
+			        actLinePos==FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue()) 
 			{ //test if continuation-line follows, else send \n
 				prevLine=actLine;
 				actLine=getNextLine();
@@ -290,7 +292,7 @@ class FixedFormLexerPrepass {
 	                startWhitespace = charPos;
 	            whiteAgg = whiteAgg.concat(String.valueOf(c));
 	        }
-	        else if(c=='!' || charPos >= PreLexerLine.COLWIDTH) //It a comment, grab the rest of the line
+	        else if(c=='!' || charPos >= FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue()) //It a comment, grab the rest of the line
 	        {
 	            if(startWhitespace == -1)
                     startWhitespace = charPos;
@@ -315,7 +317,7 @@ class FixedFormLexerPrepass {
             prevWhiteSpace = "";
             
             //If we moved into the comments, return -1 since we gobbled those up
-            if(charPos >= PreLexerLine.COLWIDTH)
+            if(charPos >= FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue())
                 charPos = -1;
 	    }
 	    if(charPos >= length) //If we "gobbled up" the entire line, return -1 to
@@ -345,7 +347,7 @@ class FixedFormLexerPrepass {
     			    isWhitespace(c) || 
                     c=='!' || 
                     line.type == PreLexerLine.COMMENT || 
-                    charPos >= PreLexerLine.COLWIDTH || 
+                    charPos >= FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue() || 
                     line.type == PreLexerLine.CONTINUATION
                  ))
             {
@@ -500,8 +502,6 @@ class DynamicIntArray {
 }
 
 class PreLexerLine {
-	static public final int COLWIDTH=72;
-
 	static final int COMMENT=0;
 	static final int CONTINUATION=1;
 	static final int STMT=2;
@@ -545,7 +545,7 @@ class PreLexerLine {
 		else if (trimmedText.startsWith("#")) type=CPPDIRECTIVE;
 		
 //check if line is empty up to COLWIDTH
-		else if (lineText.length()>COLWIDTH && lineText.substring(0,COLWIDTH).trim().length()==0) type=COMMENT;
+		else if (lineText.length()>FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue() && lineText.substring(0,FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue()).trim().length()==0) type=COMMENT;
 		
 //check for tab in column 0-5
 		else if (lineText.indexOf('\t')>=0 && lineText.indexOf('\t')<=5) type=STMT;

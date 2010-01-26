@@ -54,7 +54,8 @@ public class FixedFormFortranEditor extends AbstractFortranEditor
 
     protected int[] getColumnsToDrawVerticalLinesOn()
     {
-        return new int[] { 5, 6, 72 };
+        int endColumnWidth = FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue();
+        return new int[] { 5, 6, endColumnWidth };
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

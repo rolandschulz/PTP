@@ -47,20 +47,21 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * Rule which detects any string occurring past column 72 as a comment
+     * Rule which detects any string occurring past workspace-defined column 
+     * (72 by default) as a comment
      */
-    private final class FixedFormColumn72CommentRule implements IRule
+    private final class FixedFormColumnCommentRule implements IRule
     {
         public IToken evaluate(ICharacterScanner scanner)
         {
             IToken result = Token.UNDEFINED;
             scanner.read();
-            if (scanner.getColumn() > 72)
+            if (scanner.getColumn() > FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue())
             {
                 result = colorComments;
                 do
                     scanner.read();
-                while (scanner.getColumn() > 72);
+                while (scanner.getColumn() > FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue());
             }
             scanner.unread();
             return result;
@@ -392,7 +393,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                 rules[i++] = c1;
             }
 
-            IRule c3 = new FixedFormColumn72CommentRule();
+            IRule c3 = new FixedFormColumnCommentRule();
             rules[i++] = c3;
 
             //salesRule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);

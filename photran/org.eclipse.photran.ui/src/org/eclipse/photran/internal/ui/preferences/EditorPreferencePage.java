@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.ui.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -26,6 +27,7 @@ import org.eclipse.swt.widgets.Label;
  */
 public class EditorPreferencePage extends AbstractFortranPreferencePage
 {
+    private final int MAX_FIXED_FILE_FORMAT_OFFSET = 999;
     protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FREE_FORM_FOLDING.getName(),
@@ -35,6 +37,13 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FIXED_FORM_FOLDING.getName(),
                                         "Enable folding rather than ruler in fixed-form Fortran editors",
                                         getFieldEditorParent()));
+        
+        IntegerFieldEditor intEditor = new IntegerFieldEditor(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getName(),
+                                                              "Fixed-form line length",
+                                                               getFieldEditorParent());
+        intEditor.setValidRange(72, MAX_FIXED_FILE_FORMAT_OFFSET);
+        intEditor.setTextLimit(3);
+        addField(intEditor);
         
         //addField(new Separator(getFieldEditorParent()));
         

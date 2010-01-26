@@ -48,6 +48,8 @@ public final class FortranPreferences
     public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", "");
     public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", "");
 
+    public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, FortranIntegerPreference.NO_LIMIT, 72);
+    
     private FortranPreferences() {}
 
     /** Initializes/resets all Photran-specific preferences to their default values */
