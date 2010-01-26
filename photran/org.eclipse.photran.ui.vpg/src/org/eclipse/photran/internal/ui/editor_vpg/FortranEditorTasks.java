@@ -138,7 +138,7 @@ public class FortranEditorTasks
                                 : SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject()));
                             IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
                                                                                 null,
-                                                                                null,
+                                                                                editor.getIFile().getName(),
                                                                                 sourceForm,
                                                                                 true /*false*/);
                             astRootNode = parser.parse(lexer);
@@ -156,7 +156,7 @@ public class FortranEditorTasks
                     }
                     catch (Throwable e)
                     {
-                        ;
+                        e.printStackTrace();
                     }
 
                     dispatchASTTasksJob = null;
