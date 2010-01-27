@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -35,13 +36,6 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		super(conn, command);
 		remoteEnv.putAll(System.getenv());
 		localProcessBuilder = ProcessFactory.getFactory();
-		String cwd = System.getProperty("user.dir"); //$NON-NLS-1$
-		if (cwd != null) {
-			IPath path = new Path(cwd);
-			if (path.isAbsolute()) {
-				directory(EFS.getLocalFileSystem().getStore(path));
-			}
-		}
 	}
 
 	public LocalProcessBuilder(IRemoteConnection conn, String... command) {
@@ -69,6 +63,7 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		Process localProc;
 		if (directory() != null) {
 			try {
+				System.out.println("Directory = " + directory().toLocalFile(EFS.NONE, new NullProgressMonitor()));
 				localProc = localProcessBuilder.exec(commandArray, environmentArray, 
 						directory().toLocalFile(EFS.NONE, new NullProgressMonitor()));
 			} catch (CoreException e) {
@@ -78,5 +73,24 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 			localProc = localProcessBuilder.exec(commandArray, environmentArray);
 		}
 		return new LocalProcess(localProc, redirectErrorStream());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
+	 */
+	@Override
+	public IFileStore directory() {
+		IFileStore dir = super.directory();
+		if (dir == null) {
+			String cwd = System.getProperty("user.dir"); //$NON-NLS-1$
+			if (cwd != null) {
+				IPath path = new Path(cwd);
+				if (path.isAbsolute()) {
+					dir = EFS.getLocalFileSystem().getStore(path);
+					directory(dir);
+				}
+			}
+		}
+		return dir;
 	}
 }
