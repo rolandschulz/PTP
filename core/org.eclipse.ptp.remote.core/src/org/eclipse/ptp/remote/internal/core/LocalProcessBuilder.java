@@ -20,7 +20,9 @@ import java.util.Map.Entry;
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -33,6 +35,13 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		super(conn, command);
 		remoteEnv.putAll(System.getenv());
 		localProcessBuilder = ProcessFactory.getFactory();
+		String cwd = System.getProperty("user.dir"); //$NON-NLS-1$
+		if (cwd != null) {
+			IPath path = new Path(cwd);
+			if (path.isAbsolute()) {
+				directory(EFS.getLocalFileSystem().getStore(path));
+			}
+		}
 	}
 
 	public LocalProcessBuilder(IRemoteConnection conn, String... command) {
