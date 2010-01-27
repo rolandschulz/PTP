@@ -71,7 +71,7 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 
 						setMessage(
 								Messages.getString("XLCompilerPropertyPage_DisconnectedErrorMsg", projectHostName), IMessageProvider.WARNING); //$NON-NLS-1$
-						return false;
+
 					}
 					// always return true, as we don't want to fail cases when
 					// compiler path is not existed
