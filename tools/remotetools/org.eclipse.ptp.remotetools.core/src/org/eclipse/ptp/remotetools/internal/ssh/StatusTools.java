@@ -30,6 +30,8 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 /**
  * Concrete class responsible for returning status data from the remote host
  * 
+ * NOTE: This implementation assumes that the remote host is Linux based
+ * 
  * @author Richard Maciel
  *
  */
