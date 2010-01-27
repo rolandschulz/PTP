@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,6 +62,24 @@ public class RSEUtils {
 		
 		String hostName = uri.getHost();
 		return getConnection(hostName);
+	}
+	
+	//this is different from getConnection, this function will return a host even it is disconnected.
+	public static IHost getAnyConnection(URI uri){
+		if(!"rse".equals(uri.getScheme())) //$NON-NLS-1$
+			return null;
+		
+		String hostName = uri.getHost();
+		
+		ISystemRegistry sr = RSECorePlugin.getTheSystemRegistry();
+		IHost[] connections = sr.getHosts();
+
+		for(IHost con : connections) {
+			if (hostName.equalsIgnoreCase(con.getHostName())) {
+				return con;
+			}
+		}
+		return null;
 	}
 	
 	
