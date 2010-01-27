@@ -63,7 +63,6 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		Process localProc;
 		if (directory() != null) {
 			try {
-				System.out.println("Directory = " + directory().toLocalFile(EFS.NONE, new NullProgressMonitor()));
 				localProc = localProcessBuilder.exec(commandArray, environmentArray, 
 						directory().toLocalFile(EFS.NONE, new NullProgressMonitor()));
 			} catch (CoreException e) {
