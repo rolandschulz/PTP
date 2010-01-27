@@ -13,13 +13,13 @@ package org.eclipse.ptp.remotetools.internal.ssh;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
-import org.eclipse.ptp.remotetools.core.IRemoteDownloadExecution;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
+import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteStatusTools;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
@@ -334,12 +334,13 @@ public class StatusTools implements IRemoteStatusTools {
 	 */
 	private Set<Integer> readGroupList(String username) throws RemoteConnectionException, RemoteOperationException {
 		Set<Integer> groupList = new HashSet<Integer>();
-		IRemoteDownloadExecution downloadExecution = null;
+
+		BufferedReader etcGroupFile = null;
 		
 		try {
-			IRemoteCopyTools ct = manager.getRemoteCopyTools();
-			downloadExecution = ct.executeDownload("/etc/group"); //$NON-NLS-1$
-			BufferedReader etcGroupFile = new BufferedReader(new InputStreamReader(downloadExecution.getInputStreamFromProcessRemoteFile() ));
+			IRemoteFileTools ft = manager.getRemoteFileTools();
+			InputStream is = ft.getInputStream("/etc/group",null); //$NON-NLS-1$
+			etcGroupFile = new BufferedReader(new InputStreamReader(is ));
 			
 			String line = etcGroupFile.readLine();
 
@@ -361,10 +362,10 @@ public class StatusTools implements IRemoteStatusTools {
 
 				line = etcGroupFile.readLine();
 			}
-			
-			etcGroupFile.close();
 		} catch (IOException ioe) {
 			throw new RemoteOperationException(ioe);
+		} catch (CancelException ce) {
+			throw new RemoteOperationException(ce);
 		} catch (NumberFormatException nfe) {
 			//Maybe the format of this /etc/group file put the fields in a
 			//different order.
@@ -372,12 +373,14 @@ public class StatusTools implements IRemoteStatusTools {
 		} catch (ArrayIndexOutOfBoundsException aioobe) {
 			//This case is going to happen if the format is not the expected one.
 			throw new RemoteOperationException(aioobe);
-		} finally {
-			if (downloadExecution != null) {
-				downloadExecution.close();
-			}
 		}
-
+		finally {
+			try {
+			    if (etcGroupFile != null) { 
+			    	etcGroupFile.close(); 
+			    }
+			} catch (IOException ioe) {throw new RemoteOperationException(ioe);}
+		} 
 		return groupList;
 	}
 	

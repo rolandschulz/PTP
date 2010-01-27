@@ -12,9 +12,6 @@
 package org.eclipse.ptp.remotetools.core;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
@@ -30,14 +27,7 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
  * @see org.eclipse.ptp.remote.core.IRemoteFileManager
  */
 public interface IRemoteCopyTools {
-	public IRemoteUploadExecution executeUpload(String remoteFile, InputStream source) throws RemoteConnectionException;
-
-	public IRemoteDownloadExecution executeDownload(String remoteFile, OutputStream sink) throws RemoteConnectionException;
-
-	public IRemoteUploadExecution executeUpload(String remoteFile) throws RemoteConnectionException;
-
-	public IRemoteDownloadExecution executeDownload(String remoteFile) throws RemoteConnectionException;
-
+	
 	public void downloadFileToDir(String remotePath, File localDir) throws RemoteConnectionException, CancelException, RemoteOperationException;
 
 	public void downloadFileToDir(String remotePath, String localPah) throws RemoteConnectionException, CancelException, RemoteOperationException;
