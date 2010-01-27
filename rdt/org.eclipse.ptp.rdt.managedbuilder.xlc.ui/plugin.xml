@@ -211,5 +211,50 @@
 			</scannerInfoConsoleParser>
 		</scannerInfoProvider>
    </extension>
+	<!-- activity to disable the local XL Compiler path properties page extension defined in org.eclipse.cdt.managedbuilder.xlc.ui-->
+    <extension point="org.eclipse.ui.activities">
+    <!-- this category is redefined from the one in org.eclipse.ptp.rdt.ui, they have no different-->
+     <category
+             id="org.eclipse.ptp.rdt.ui.rdtCategory"
+             name="%rdt.category.name.0">
+       </category>
+     <activity
+       		 id="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.XLCompilerPropertiesPageActivity"
+       		 name="%CDTXLCompilerProp.name">
+       </activity>
+       <categoryActivityBinding
+       		 activityId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.XLCompilerPropertiesPageActivity"
+       		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
+       </categoryActivityBinding>
+       <activityPatternBinding
+       		 activityId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.XLCompilerPropertiesPageActivity"
+       		 pattern="org.eclipse.cdt.managedbuilder.xlc.ui/org.eclipse.cdt.managedbuilder.xlc.ui.properties.samplePropertyPage">
+       </activityPatternBinding>
+       <!-- redefine the XL Compiler path property page extension which will cover both local and remote directory browsing.-->
+        </extension>
+         <extension
+         point="org.eclipse.ui.propertyPages">
+         <page
+            category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
+            class="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.properties.RemoteXLCompilerPropertyPage"
+            id="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.properties.RemoteXLCompilerPropertyPage"
+            name="%XLCompilerPropertyPage.name">
+         <filter
+               name="projectNature"
+               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
+         </filter>            
+         <enabledWhen>
+            <or>
+		     <instanceof value="org.eclipse.core.resources.IProject"/>
+		     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+		     
+		     <instanceof value="org.eclipse.core.resources.IFolder"/>
+		     <instanceof value="org.eclipse.cdt.core.model.ICContainer"/>
 
+         	 <instanceof value="org.eclipse.cdt.core.model.ITranslationUnit"/>
+	         <instanceof value="org.eclipse.core.resources.IFile"/>
+		    </or>          
+         </enabledWhen>
+      </page>
+       </extension>
 </plugin>
