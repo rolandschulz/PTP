@@ -11,7 +11,6 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
 
-import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 import org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration;
@@ -37,9 +36,8 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
  */
 public class RemoteFileEnumeration implements IRemoteFileEnumeration {
 
-	IRemoteItem[] items = null;
-	int currentItem = 0;
-	FileTools fileTools = null;
+	private IRemoteItem[] items = null;
+	private int currentItem = 0;
 	
 	/**
 	 * Enumerates all files on a given root directory.
@@ -50,23 +48,38 @@ public class RemoteFileEnumeration implements IRemoteFileEnumeration {
 	 * @throws RemoteConnectionException The root directory does not exist or is not a directory.
 	 * @throws CancelException
 	 */
-	RemoteFileEnumeration(FileTools fileTools, String directoryPath) throws RemoteOperationException, RemoteConnectionException, CancelException {
-		// dont need, listItems(root) will test
+	public RemoteFileEnumeration(FileTools fileTools, String directoryPath) throws RemoteOperationException, RemoteConnectionException, CancelException {
+		// don't need, listItems(root) will test
 		// fileTools.test();
 
-		this.fileTools = fileTools;
 		this.items = fileTools.listItems(directoryPath);
 		this.currentItem = 0;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.util.Enumeration#hasMoreElements()
+	 */
 	public boolean hasMoreElements() {
 		return currentItem < items.length;
 	}
 
-	public Object nextElement() {
-		return nextElementAsItem();
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration#hasMoreExceptions()
+	 */
+	public boolean hasMoreExceptions() {
+		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.util.Enumeration#nextElement()
+	 */
+	public IRemoteItem nextElement() {
+		return nextElementAsItem();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration#nextElementAsItem()
+	 */
 	public IRemoteItem nextElementAsItem() {
 		if (currentItem >= items.length) {
 			throw new NoSuchElementException();
@@ -74,12 +87,11 @@ public class RemoteFileEnumeration implements IRemoteFileEnumeration {
 		return items[currentItem++];
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration#nextException()
+	 */
 	public Exception nextException() {
-		return null; // always nulls
-	}
-
-	public boolean hasMoreExceptions() {
-		return false;
+		return null; // always null
 	}
 }
 
