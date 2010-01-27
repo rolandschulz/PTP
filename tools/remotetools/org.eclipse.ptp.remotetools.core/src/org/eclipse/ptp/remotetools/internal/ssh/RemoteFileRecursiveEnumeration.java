@@ -25,11 +25,11 @@ import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 public class RemoteFileRecursiveEnumeration implements IRemoteFileEnumeration {
 
-	Stack<String> directories;
-	RemoteFileEnumeration currentItems;
-	FileTools fileTools;
-	LinkedList<Exception> currentExceptions = new LinkedList<Exception>();
-	IRemoteItem nextRemoteItem;
+	private Stack<String> directories;
+	private RemoteFileEnumeration currentItems;
+	private FileTools fileTools;
+	private LinkedList<Exception> currentExceptions = new LinkedList<Exception>();
+	private IRemoteItem nextRemoteItem;
 	
 	public RemoteFileRecursiveEnumeration(FileTools fileTools, String root) throws RemoteOperationException, RemoteConnectionException, CancelException {
 		this.fileTools = fileTools;
@@ -40,6 +40,49 @@ public class RemoteFileRecursiveEnumeration implements IRemoteFileEnumeration {
 		prefetchNextRemoteItem();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.util.Enumeration#hasMoreElements()
+	 */
+	public boolean hasMoreElements() {
+		return nextRemoteItem != null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration#hasMoreExceptions()
+	 */
+	public boolean hasMoreExceptions() {
+		return currentExceptions.size() > 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Enumeration#nextElement()
+	 */
+	public IRemoteItem nextElement() {
+		return nextElementAsItem();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration#nextElementAsItem()
+	 */
+	public IRemoteItem nextElementAsItem() {
+		if (nextRemoteItem == null) {
+			throw new NoSuchElementException();
+		}
+		IRemoteItem returnItem = nextRemoteItem;
+		prefetchNextRemoteItem();
+		return returnItem;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration#nextException()
+	 */
+	public Exception nextException() {
+		if (currentExceptions.size() == 0) {
+			return null;
+		}
+		return (Exception) currentExceptions.removeFirst();
+	}
+
 	private void prefetchNextRemoteItem() {
 		if (directories == null) {
 			// Enumeration stopped due to error.
@@ -75,34 +118,6 @@ public class RemoteFileRecursiveEnumeration implements IRemoteFileEnumeration {
 			directories.add(item.getPath());
 		}
 		nextRemoteItem = item;
-	}
-
-	public boolean hasMoreElements() {
-		return nextRemoteItem != null;
-	}
-
-	public Exception nextException() {
-		if (currentExceptions.size() == 0) {
-			return null;
-		}
-		return (Exception) currentExceptions.removeFirst();
-	}
-	
-	public boolean hasMoreExceptions() {
-		return currentExceptions.size() > 0;
-	}
-
-	public IRemoteItem nextElementAsItem() {
-		if (nextRemoteItem == null) {
-			throw new NoSuchElementException();
-		}
-		IRemoteItem returnItem = nextRemoteItem;
-		prefetchNextRemoteItem();
-		return returnItem;
-	}
-
-	public Object nextElement() {
-		return nextElementAsItem();
 	}
 	
 	
