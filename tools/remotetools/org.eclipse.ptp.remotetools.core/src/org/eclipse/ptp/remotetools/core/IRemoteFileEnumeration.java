@@ -13,13 +13,8 @@ package org.eclipse.ptp.remotetools.core;
 
 import java.util.Enumeration;
 
-import org.eclipse.ptp.remotetools.exception.CancelException;
-import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
-import org.eclipse.ptp.remotetools.exception.RemoteException;
-import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
-
-public interface IRemoteFileEnumeration extends Enumeration {
+public interface IRemoteFileEnumeration extends Enumeration<IRemoteItem> {
 	public IRemoteItem nextElementAsItem();
 	public Exception nextException();
 	public boolean hasMoreExceptions();
