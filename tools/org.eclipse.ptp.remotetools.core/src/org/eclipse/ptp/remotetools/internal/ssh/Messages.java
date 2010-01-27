@@ -46,6 +46,7 @@ public class Messages extends NLS {
 	public static String ControlChannel_Open_FailedCreateIOStream;
 	public static String ControlChannel_Open_FailedSendInitCommands;
 	public static String ControlChannel_Open_WaitControlTerminalPathInterrupted;
+	public static String CopyTools_0;
 	public static String CopyTools_doDownloadFileToFile_CannotWriteFile;
 	public static String CopyTools_doDownloadFileToFile_CommandFailes;
 	public static String CopyTools_doDownloadFileToFile_ExecutionFailed;
@@ -56,6 +57,8 @@ public class Messages extends NLS {
 	public static String ExecutionManager_CreateTunnel_AllLocalPortsBusy;
 	public static String ExecutionObserver_ExecutionObserver_RemoteCommandObserver;
 	public static String ExecutionTools_ExecuteBashCommand_FailedRunBashCommand;
+	public static String FileTools_0;
+	public static String FileTools_1;
 	public static String KillableExecution_Debug_1;
 	public static String KillableExecution_FinishStatus_AlarmClock;
 	public static String KillableExecution_FinishStatus_BackgroundProcessReadTTY;
