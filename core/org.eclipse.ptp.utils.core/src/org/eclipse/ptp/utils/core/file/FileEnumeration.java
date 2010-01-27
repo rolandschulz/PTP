@@ -18,44 +18,9 @@ import java.util.Enumeration;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.utils.core.messages.Messages;
 
-public class FileEnumeration implements Enumeration {
-
-	File[] files;
-	int currentFile;
-	
-	public FileEnumeration(File root) throws IOException {
-		if (! root.exists()) {
-			throw new FileNotFoundException();
-		} else if (root.isFile()) {
-			files = new File[1];
-			files[0] = root;
-		} else if (root.isDirectory()) {
-			files = root.listFiles();
-			if (files == null) {
-				throw new IOException(NLS.bind("Cannot list directory {0}", root.getAbsolutePath()));
-			}
-		} else {
-			Assert.isTrue(false);
-		}
-		currentFile = 0;
-	}
-	
-	FileEnumeration(String root) throws IOException {
-		this(new File(root));
-	}
-	
-	public boolean hasMoreElements() {
-		return currentFile < files.length;
-	}
-
-	public Object nextElement() {
-		if (currentFile < files.length) {
-			return files[currentFile++];
-		} else {
-			return null;
-		}
-	}
+public class FileEnumeration implements Enumeration<File> {
 
 	public static void main(String[] args) {
 		FileEnumeration enumeration = null;
@@ -67,6 +32,48 @@ public class FileEnumeration implements Enumeration {
 		} 
 		while (enumeration.hasMoreElements()) {
 			// System.out.println(enumeration.nextElement().toString());
+		}
+	}
+	
+	private File[] files;
+	private int currentFile;
+	
+	public FileEnumeration(File root) throws IOException {
+		if (! root.exists()) {
+			throw new FileNotFoundException();
+		} else if (root.isFile()) {
+			files = new File[1];
+			files[0] = root;
+		} else if (root.isDirectory()) {
+			files = root.listFiles();
+			if (files == null) {
+				throw new IOException(NLS.bind(Messages.FileEnumeration_0, root.getAbsolutePath()));
+			}
+		} else {
+			Assert.isTrue(false);
+		}
+		currentFile = 0;
+	}
+	
+	public FileEnumeration(String root) throws IOException {
+		this(new File(root));
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Enumeration#hasMoreElements()
+	 */
+	public boolean hasMoreElements() {
+		return currentFile < files.length;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Enumeration#nextElement()
+	 */
+	public File nextElement() {
+		if (currentFile < files.length) {
+			return files[currentFile++];
+		} else {
+			return null;
 		}
 	}
 }
