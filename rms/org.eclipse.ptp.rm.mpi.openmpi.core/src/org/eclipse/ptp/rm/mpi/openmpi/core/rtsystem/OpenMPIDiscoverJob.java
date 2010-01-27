@@ -301,10 +301,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 				String hostname = getRemoteHostname(connection, remoteServices);
 				hostMap.addDefaultHost(hostname);
 				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "Hostfile is empty. Added default host {0} for Open MPI 1.2.", hostname); //$NON-NLS-1$
-			} 
-			
-			DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Empty hostfile is not allowed."); //$NON-NLS-1$
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileEmpty, hostfile)));
+			} else {
+				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Empty hostfile is not allowed."); //$NON-NLS-1$
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileEmpty, hostfile)));
+			}
 		}
 		return hostMap;
 	}
