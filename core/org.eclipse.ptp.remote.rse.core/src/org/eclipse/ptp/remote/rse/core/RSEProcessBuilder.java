@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
@@ -29,15 +31,35 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final static 	String EXIT_CMD = "exit"; //$NON-NLS-1$
 	private final static 	String CMD_DELIMITER = ";"; //$NON-NLS-1$
 	
-	private RSEConnection fConnection;
+	private final RSEConnection fConnection;
+	private final RSEFileManager fFileMgr;
+	
 	private Map<String, String> fRemoteEnv = new HashMap<String, String>();
 
-	public RSEProcessBuilder(IRemoteConnection conn, List<String> command) {
+	public RSEProcessBuilder(IRemoteConnection conn, IRemoteFileManager fileMgr, List<String> command) {
 		super(conn, command);
 		fConnection = (RSEConnection)conn;
+		fFileMgr = (RSEFileManager)fileMgr;
 		fRemoteEnv = conn.getEnv();
 	}
 
+	public RSEProcessBuilder(IRemoteConnection conn, IRemoteFileManager fileMgr, String... command) {
+		this(conn, fileMgr, Arrays.asList(command));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
+	 */
+	@Override
+	public IFileStore directory() {
+		IFileStore dir = super.directory();
+		if (dir == null) {
+			dir = fFileMgr.getResource(connection().getWorkingDirectory());
+			directory(dir);
+		}
+		return dir;
+	}
+	
 	/**
 	 * Convert environment map back to environment strings.
 	 * 
@@ -50,10 +72,6 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			env[pos++] = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 		}
 		return env;
-	}
-
-	public RSEProcessBuilder(IRemoteConnection conn, String... command) {
-		this(conn, Arrays.asList(command));
 	}
 	
 	/* (non-Javadoc)
