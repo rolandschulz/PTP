@@ -1363,6 +1363,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         return PTP_PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
+    job->poe_taskid = 0;
     job->app_working_dir = cwd;
     job->submit_jobid = jobid;
     job->label_io = label_io;
@@ -5302,6 +5303,8 @@ void send_stdout(jobinfo * job, char *buf)
 void send_stderr(jobinfo * job, char *buf)
 {
     int match;
+    proxy_msg *msg;
+    char jobid_str[30];
 
     /*
      * If the message written to stderr has the format 'ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'
@@ -5316,8 +5319,6 @@ void send_stderr(jobinfo * job, char *buf)
      */
     match = regexec(&errormsg_regex, buf, 0, NULL, 0);
     if ((match == 0) && (job->numtasks <= 0)) {
-        proxy_msg *msg;
-        char jobid_str[30];
         int proxy_taskid;
 
         /*
@@ -5344,17 +5345,28 @@ void send_stderr(jobinfo * job, char *buf)
          * error message id format [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] is always sent to
          * the front end.
          */
+        if (job->poe_taskid == 0) {
+            sprintf(jobid_str, "%d", job->proxy_jobid);
+            msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
+            job->poe_taskid = generate_id();
+            sprintf(jobid_str, "%d", job->poe_taskid);
+            proxy_add_process(msg, jobid_str, "poe", PTP_PROC_STATE_RUNNING, 3);
+            proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, 0);
+            proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, 0);
+            proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, job->poe_pid);
+            enqueue_event(msg);
+        }
         if (job->stderr_redirect) {
             int is_aix_msgid;
 
             fprintf(job->stderr_file, "%s", buf);
             match = regexec(&msgid_regex, buf, 0, NULL, 0);
             if (match == 0) {
-                send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PTP_PROC_STDERR_ATTR, buf);
+                send_process_state_output_event(start_events_transid, job->poe_taskid, PTP_PROC_STDERR_ATTR, buf);
             }
         }
         else {
-            send_process_state_output_event(start_events_transid, job->tasks[0].proxy_taskid, PTP_PROC_STDERR_ATTR, buf);
+            send_process_state_output_event(start_events_transid, job->poe_taskid, PTP_PROC_STDERR_ATTR, buf);
         }
     }
 }
@@ -5524,13 +5536,13 @@ void send_process_state_change_event(int trans_id, jobinfo * job, char *state)
     tasks = job->tasks;
     if (tasks == NULL) {
           /*
-           * It's possible that the job terminated suring startup, in which case
+           * It's possible that the job terminated during startup, in which case
            * the only task present is the dummy task created to represent the
            * poe home task. Generate a process state change event to the
            * specified state for that task only.
            */
         if (job->numtasks == 0) {
-            snprintf(range, sizeof range, "%d", job->poe_taskid);`
+            snprintf(range, sizeof range, "%d", job->poe_taskid);
             msg = proxy_process_change_event(trans_id, range, 1);
             proxy_msg_add_keyval_string(msg, PTP_PROC_STATE_ATTR, state);
             enqueue_event(msg);
