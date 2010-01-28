@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -26,23 +27,37 @@ import org.eclipse.ptp.remotetools.core.RemoteProcess;
 
 public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final RemoteToolsConnection fConnection;
+	private final RemoteToolsFileManager fFileMgr;
 	private final Map<String, String> fRemoteEnv;
 	private Map<String, String> fNewRemoteEnv = null;
 
-	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, List<String> command) {
+	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, RemoteToolsFileManager fileMgr, List<String> command) {
 		super(conn, command);
 		fConnection = conn;
+		fFileMgr = fileMgr;
 		fRemoteEnv = conn.getEnv();
 	}
 	
-	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, String... command) {
-		this(conn, Arrays.asList(command));
+	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, RemoteToolsFileManager fileMgr, String... command) {
+		this(conn, fileMgr, Arrays.asList(command));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
+	 */
+	@Override
+	public IFileStore directory() {
+		IFileStore dir = super.directory();
+		if (dir == null) {
+			dir = fFileMgr.getResource(connection().getWorkingDirectory());
+			directory(dir);
+		}
+		return dir;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
 	 */
-	@Override
 	public Map<String, String> environment() {
 		if (fNewRemoteEnv == null) {
 			fNewRemoteEnv = new HashMap<String, String>();
@@ -50,7 +65,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		}
 		return fNewRemoteEnv;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
@@ -76,7 +91,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 			IRemoteExecutionManager exeMgr = fConnection.createExecutionManager();
 			IRemoteExecutionTools exeTools = exeMgr.getExecutionTools();
 			IRemoteScript script = exeTools.createScript();
-			if(directory() != null) {
+			if (directory() != null) {
 				String setWorkingDirStr = "cd " + directory().toURI().getPath(); //$NON-NLS-1$
 				script.setScript(new String []{setWorkingDirStr, remoteCmd});
 			} else {
