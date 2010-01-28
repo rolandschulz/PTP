@@ -191,7 +191,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 									session.connectToDebugger(monitor, app, path, cwd, args.toArray(new String[args.size()]));
 								} catch (CoreException e) {
 									PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
-									throw new InvocationTargetException(e);
+									throw new InvocationTargetException(e, e.getLocalizedMessage());
 								} finally {
 									monitor.done();
 								}
@@ -202,7 +202,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						} catch (InterruptedException e) {
 							terminateJob(job);
 						} catch (InvocationTargetException e) {
-							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getCause());
+							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
 							PTPLaunchPlugin.log(e.getCause());
 							terminateJob(job);
 						}
@@ -215,10 +215,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
+						PTPLaunchPlugin.log(e);
+						terminateJob(job);
 					}
 				});
-				PTPLaunchPlugin.log(e);
-				terminateJob(job);
 			}
 		} else {
 			new RuntimeProcess(launch, job, null);
