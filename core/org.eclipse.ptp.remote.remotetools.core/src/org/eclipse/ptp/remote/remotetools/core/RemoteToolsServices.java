@@ -112,14 +112,14 @@ public class RemoteToolsServices implements IRemoteServices {
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
-		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
+		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, (RemoteToolsFileManager)getFileManager(conn), command);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
-		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, command);
+		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, (RemoteToolsFileManager)getFileManager(conn), command);
 	}
 	
 	/* (non-Javadoc)

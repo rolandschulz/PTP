@@ -154,6 +154,16 @@ public interface IRemoteConnection {
 	public String getUsername();
 	
 	/**
+	 * Get the working directory. Relative paths will be resolved using this path.
+	 * 
+	 * The remote connection does not need to be open to use this method, however a default 
+	 * directory path, rather than the actual working directory, may be returned in this case.
+	 * 
+	 * @return String representing the current working directory
+	 */
+	public String getWorkingDirectory();
+	
+	/**
 	 * Test if the connection is open.
 	 * 
 	 * @return true if connection is open.
@@ -190,14 +200,22 @@ public interface IRemoteConnection {
 	 * @param name
 	 */
 	public void setName(String name);
-	
+
 	/**
 	 * Set the username for this connection
 	 * 
 	 * @param username
 	 */
 	public void setUsername(String username);
-
+	
+	/**
+	 * Set the working directory. Relative paths will be resolved using this path. The path
+	 * must be valid and absolute for any changes to be made.
+	 * 
+	 * param path String representing the current working directory
+	 */
+	public void setWorkingDirectory(String path);
+	
 	/**
 	 * Test if this connection supports forwarding of TCP connections
 	 * 

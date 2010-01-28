@@ -244,7 +244,7 @@ public class RemoteDirectoryWidget extends Composite {
 	
 	private void restoreDefault(String path) {
 		if (path == null && fRemoteConnection != null) {
-			path = fRemoteServices.getFileManager(fRemoteConnection).getWorkingDirectory().toString();
+			path = fRemoteConnection.getWorkingDirectory().toString();
 		}
 		if (path == null) {
 			path = ""; //$NON-NLS-1$

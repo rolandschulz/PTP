@@ -28,27 +28,6 @@ public interface IRemoteFileManager {
 	 * @return the file store representing the remote path
 	 */
 	public IFileStore getResource(String path);
-
-	/**
-	 * Get the working directory. Relative paths will be resolved using this path.
-	 * 
-	 * The remote connection does not need to be open to use this method, however a default 
-	 * directory path, rather than the actual working directory, may be returned in this case.
-	 * 
-	 * @return String representing the current working directory
-	 */
-	public String getWorkingDirectory();
-	
-	/**
-	 * Set the working directory. Relative paths will be resolved using this path. The path
-	 * must be valid and absolute for any changes to be made.
-	 * 
-	 * The remote connection does not need to be open to use this method, however a default 
-	 * directory path, rather than the actual working directory, may be returned in this case.
-	 * 
-	 * param path String representing the current working directory
-	 */
-	public void setWorkingDirectory(String path);
 	
 	/**
 	 * Convert URI to a remote path. This path is suitable for

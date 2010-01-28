@@ -249,7 +249,7 @@ public class RemoteResourceBrowser extends Dialog {
 			 * treeViewer input is set or the treeViewer fails. No idea why this
 			 * is.
 			 */
-			String cwd = fileMgr.getWorkingDirectory();
+			String cwd = conn.getWorkingDirectory();
 			IPath initial = findInitialPath(cwd, initialPath);
 			remotePathText.setText(initial.toString());
 

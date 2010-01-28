@@ -33,8 +33,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileSystem;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
-public class RemoteToolsFileSystem extends FileSystem 
-{
+public class RemoteToolsFileSystem extends FileSystem {
 	private static RemoteToolsFileSystem instance = new RemoteToolsFileSystem();
 
 	/**
