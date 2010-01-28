@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
@@ -53,7 +52,6 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.IPDebugger;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
@@ -198,7 +196,7 @@ public class SDMDebugger implements IPDebugger {
 		try {
 			getPDIDebugger().initialize(configuration, dbgArgs, monitor);
 		} catch (PDIException e) {
-			throw newCoreException(e);
+			throw newCoreException(e.getLocalizedMessage());
 		}
 
 		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
@@ -364,9 +362,8 @@ public class SDMDebugger implements IPDebugger {
 	 * @param exception
 	 * @return CoreException
 	 */
-	private CoreException newCoreException(Throwable exception) {
-		MultiStatus status = new MultiStatus(SDMDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, Messages.SDMDebugger_10, exception);
-		status.add(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, exception == null ? new String() : exception.getLocalizedMessage(), exception));
+	private CoreException newCoreException(String message) {
+		Status status = new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), message, null);
 		return new CoreException(status);
 	}
 
@@ -397,7 +394,7 @@ public class SDMDebugger implements IPDebugger {
 			try {
 				fRoutingFileStore.delete(0, monitor);
 			} catch (CoreException e) {
-				throw newCoreException(e);
+				throw newCoreException(e.getLocalizedMessage());
 			}
 			fRoutingFileStore.fetchInfo();
 		}
@@ -420,7 +417,7 @@ public class SDMDebugger implements IPDebugger {
 		try {
 			os = fRoutingFileStore.openOutputStream(0, monitor);
 		} catch (CoreException e) {
-			throw newCoreException(e);
+			throw newCoreException(e.getLocalizedMessage());
 		}
 		PrintWriter pw = new PrintWriter(os);
 		IPProcess processes[] = launch.getPJob().getProcesses();
@@ -431,15 +428,19 @@ public class SDMDebugger implements IPDebugger {
 		for (IPProcess process : processes) {
 			String index = process.getProcessIndex();
 			IPNode node = process.getNode();
-			String nodeName = node.getName();
-			int portNumber = base + random.nextInt(range);
-			pw.format("%s %s %d\n", index, nodeName, portNumber); //$NON-NLS-1$
+			if (node != null) {
+				String nodeName = node.getName();
+				int portNumber = base + random.nextInt(range);
+				pw.format("%s %s %d\n", index, nodeName, portNumber); //$NON-NLS-1$
+			} else {
+				throw newCoreException(Messages.SDMDebugger_15);
+			}
 		}
 		pw.close();
 		try {
 			os.close();
 		} catch (IOException e) {
-			throw newCoreException(e);
+			throw newCoreException(e.getLocalizedMessage());
 		}
 	}
 	
@@ -459,9 +460,8 @@ public class SDMDebugger implements IPDebugger {
 		try {
 			return new Session(fManagerFactory, fRequestFactory, fEventFactory, fModelFactory,
 					launch.getLaunchConfiguration(), timeout, getPDIDebugger(), job.getID(), job_size);
-		}
-		catch (PDIException e) {
-			throw newCoreException(e);
+		} catch (PDIException e) {
+			throw newCoreException(e.getLocalizedMessage());
 		}
 	}
 }

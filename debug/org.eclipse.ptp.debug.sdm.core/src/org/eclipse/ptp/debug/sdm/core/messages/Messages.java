@@ -22,18 +22,17 @@ public class Messages extends NLS {
 	public static String SDMDebugger_3;
 	public static String SDMDebugger_4;
 	public static String SDMDebugger_5;
-	public static String SDMDebugger_6;
 	public static String SDMDebugger_7;
 	public static String SDMDebugger_8;
 	public static String SDMDebugger_9;
-	public static String SDMDebugger_10;
 	public static String SDMDebugger_11;
 	public static String SDMDebugger_12;
 	public static String SDMDebugger_13;
 	public static String SDMDebugger_14;
 
+	public static String SDMDebugger_15;
+
 	public static String SDMRunner_0;
-	public static String SDMRunner_1;
 	public static String SDMRunner_2;
 	public static String SDMRunner_3;
 	public static String SDMRunner_4;
