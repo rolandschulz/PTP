@@ -310,7 +310,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		setServiceId(services.getId());
 		setConnectionName(connection.getName());
 		if (reset) {
-			IPath workingDir = new Path(services.getFileManager(connection).getWorkingDirectory());
+			IPath workingDir = new Path(connection.getWorkingDirectory());
 			setIndexLocation(workingDir.append(".eclipsesettings").toString()); //$NON-NLS-1$
 			setDStoreLocation(workingDir.toString());
 		}
