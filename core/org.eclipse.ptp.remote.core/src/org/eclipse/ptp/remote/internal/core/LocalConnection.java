@@ -13,8 +13,10 @@ package org.eclipse.ptp.remote.internal.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
@@ -27,6 +29,7 @@ public class LocalConnection implements IRemoteConnection {
 	private String fAddress = Messages.LocalConnection_1;
 	private String fUsername = System.getProperty("user.name"); //$NON-NLS-1$
 	private boolean fConnected = true;
+	private IPath fWorkingDir = null;
 	
 	private final IRemoteConnection fConnection = this;
 	private final ListenerList fListeners = new ListenerList();
@@ -130,6 +133,24 @@ public class LocalConnection implements IRemoteConnection {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public String getWorkingDirectory() {
+		if (fWorkingDir == null) {
+			String cwd = System.getProperty("user.home"); //$NON-NLS-1$
+			if (cwd == null) {
+				cwd = System.getProperty("user.dir"); //$NON-NLS-1$;
+			}
+			if (cwd == null) {
+				fWorkingDir = Path.ROOT;
+			} else {
+				fWorkingDir = new Path(cwd);
+			}
+		}
+		return fWorkingDir.toString();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#isOpen()
 	 */
 	public boolean isOpen() {
@@ -176,12 +197,22 @@ public class LocalConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java.lang.String)
+	 */
+	public void setWorkingDirectory(String pathStr) {
+		IPath path = new Path(pathStr);
+		if (path.isAbsolute()) {
+			fWorkingDir = path;
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#supportsTCPPortForwarding()
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return false;
 	}
-
+	
 	/**
 	 * Notify all listeners when this connection's status changes.
 	 * 

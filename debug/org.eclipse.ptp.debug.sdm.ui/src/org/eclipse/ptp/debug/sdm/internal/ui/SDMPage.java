@@ -316,9 +316,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					IRemoteResourceManagerConfiguration remConfig = (IRemoteResourceManagerConfiguration) rmConfig;
 					String proxyPath = remConfig.getProxyServerPath();
 					if (proxyPath == null || proxyPath.equals(EMPTY_STRING)) {
-						IRemoteFileManager fileMgr = getRemoteFileManager(rm);
-						if (fileMgr != null) {
-							path = new Path(fileMgr.getWorkingDirectory())
+						IRemoteConnection conn = getRemoteConnection(rm);
+						if (conn != null) {
+							path = new Path(conn.getWorkingDirectory())
 								.append("sdm").toString(); //$NON-NLS-1$/
 						}
 					} else {
@@ -488,20 +488,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				}
 			}
 			return conn;
-		}
-		return null;
-	}
-	
-	/**
-	 * Get the file manager associated with the remote connection
-	 * 
-	 * @return
-	 */
-	private IRemoteFileManager getRemoteFileManager(IResourceManagerControl rm) {
-		IRemoteServices rsrv = getRemoteServices(rm);
-		IRemoteConnection conn = getRemoteConnection(rm);
-		if (rsrv != null) {
-			return rsrv.getFileManager(conn);
 		}
 		return null;
 	}

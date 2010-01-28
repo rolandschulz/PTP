@@ -107,7 +107,7 @@ public class RSEServices implements IRemoteServices {
 			return null;
 		}
 		
-		return new RSEProcessBuilder(conn, command);
+		return new RSEProcessBuilder(conn, getFileManager(conn), command);
 	}
 	
 	/* (non-Javadoc)
@@ -118,7 +118,7 @@ public class RSEServices implements IRemoteServices {
 			return null;
 		}
 		
-		return new RSEProcessBuilder(conn, command);
+		return new RSEProcessBuilder(conn, getFileManager(conn), command);
 	}
 	
 	/* (non-Javadoc)
