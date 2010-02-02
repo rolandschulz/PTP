@@ -55,7 +55,7 @@
       <import plugin="org.eclipse.rephraserengine.ui.refactoring"/>
       <import plugin="org.eclipse.rephraserengine.ui"/>
       <import plugin="org.eclipse.rephraserengine.ui.vpg"/>
-      <import feature="org.eclipse.cdt" version="6.1" match="equivalent"/>
+      <import feature="org.eclipse.cdt" version="7.0" match="equivalent"/>
       <import feature="org.eclipse.rephraserengine" version="2.0" match="equivalent"/>
    </requires>
 
