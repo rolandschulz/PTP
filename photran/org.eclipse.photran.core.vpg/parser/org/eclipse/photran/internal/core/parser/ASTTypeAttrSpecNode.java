@@ -28,25 +28,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public class ASTTypeAttrSpecNode extends ASTNode
 {
-    ASTAccessSpecNode accessSpec; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isAbstract; // in ASTTypeAttrSpecNode
+    ASTAccessSpecNode accessSpec; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isExtends; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isBind; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token parentTypeName; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token language; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeAttrSpecNode
-
-    public ASTAccessSpecNode getAccessSpec()
-    {
-        return this.accessSpec;
-    }
-
-    public void setAccessSpec(ASTAccessSpecNode newValue)
-    {
-        this.accessSpec = newValue;
-    }
-
 
     public boolean isAbstract()
     {
@@ -56,6 +45,17 @@ public class ASTTypeAttrSpecNode extends ASTNode
     public void setIsAbstract(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAbstract = newValue;
+    }
+
+
+    public ASTAccessSpecNode getAccessSpec()
+    {
+        return this.accessSpec;
+    }
+
+    public void setAccessSpec(ASTAccessSpecNode newValue)
+    {
+        this.accessSpec = newValue;
     }
 
 
@@ -118,8 +118,8 @@ public class ASTTypeAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.accessSpec;
-        case 1:  return this.isAbstract;
+        case 0:  return this.isAbstract;
+        case 1:  return this.accessSpec;
         case 2:  return this.isExtends;
         case 3:  return this.isBind;
         case 4:  return this.hiddenTLparen;
@@ -134,8 +134,8 @@ public class ASTTypeAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.accessSpec = (ASTAccessSpecNode)value; return;
-        case 1:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.accessSpec = (ASTAccessSpecNode)value; return;
         case 2:  this.isExtends = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;

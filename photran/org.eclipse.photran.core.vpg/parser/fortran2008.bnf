@@ -982,6 +982,9 @@ ASTAttrSpecNode:<AttrSpec> ::=
   | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_LBRACKET <CoarraySpec> -:T_RBRACKET                           <Initialization>
   | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_LBRACKET <CoarraySpec> -:T_RBRACKET -:T_ASTERISK <CharLength>
   | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_LBRACKET <CoarraySpec> -:T_RBRACKET -:T_ASTERISK <CharLength> <Initialization>
+# Extension supported by gfortran and IBM XL Fortran (see Bug 294055)
+# This actually accepts a superset (allowing multiple "a /.true./" declarations) but is close enough
+  | <ObjectName> -:T_SLASH <LogicalConstant> -:T_SLASH
 
 # JO -- Added error production
 <InvalidEntityDecl> ::=
@@ -1030,6 +1033,7 @@ ASTAttrSpecNode:<AttrSpec> ::=
   | -:T_LPAREN                                                     -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
   | -:T_LPAREN   -:T_LENEQ  (inline):<CharLenParamValue> -:T_RPAREN
   | -:T_LPAREN              (inline):<CharLenParamValue> -:T_RPAREN
+  | tLparen2(omit):T_LPAREN   tKindEq2(omit):T_KINDEQ kindExpr2:<Expr>              tComma2(omit):T_COMMA -:T_LENEQ  (inline):<CharLenParamValue> -:T_RPAREN  # FIXME should not need different names
 <CharLenParamValue> ::=
   | lengthExpr:<Expr>
   | isAssumedLength(bool):T_ASTERISK
@@ -2533,6 +2537,8 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | -:T_IOMSGEQ        iomsgExpr:<ScalarVariable> # F03
   | -:T_ROUNDEQ        roundExpr:<CExpr>          # F03
   | -:T_SIGNEQ          signExpr:<CExpr>          # F03
+
+  | -:T_CONVERTEQ    convertExpr:<CExpr>          # Intel extension
 
 # R906 chain rule deleted
 

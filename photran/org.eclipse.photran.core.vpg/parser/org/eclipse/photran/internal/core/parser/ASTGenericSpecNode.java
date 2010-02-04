@@ -29,8 +29,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTGenericSpecNode extends ASTNode implements IAccessId
 {
     org.eclipse.photran.internal.core.lexer.Token isDefinedOperator; // in ASTGenericSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isDerivedTypeIO; // in ASTGenericSpecNode
     org.eclipse.photran.internal.core.lexer.Token isAssignmentOperator; // in ASTGenericSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isDerivedTypeIO; // in ASTGenericSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTGenericSpecNode
     IDefinedOperator definedOperator; // in ASTGenericSpecNode
     org.eclipse.photran.internal.core.lexer.Token formattingSpec; // in ASTGenericSpecNode
@@ -48,17 +48,6 @@ public class ASTGenericSpecNode extends ASTNode implements IAccessId
     }
 
 
-    public boolean isDerivedTypeIO()
-    {
-        return this.isDerivedTypeIO != null;
-    }
-
-    public void setIsDerivedTypeIO(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isDerivedTypeIO = newValue;
-    }
-
-
     public boolean isAssignmentOperator()
     {
         return this.isAssignmentOperator != null;
@@ -67,6 +56,17 @@ public class ASTGenericSpecNode extends ASTNode implements IAccessId
     public void setIsAssignmentOperator(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAssignmentOperator = newValue;
+    }
+
+
+    public boolean isDerivedTypeIO()
+    {
+        return this.isDerivedTypeIO != null;
+    }
+
+    public void setIsDerivedTypeIO(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDerivedTypeIO = newValue;
     }
 
 
@@ -120,8 +120,8 @@ public class ASTGenericSpecNode extends ASTNode implements IAccessId
         switch (index)
         {
         case 0:  return this.isDefinedOperator;
-        case 1:  return this.isDerivedTypeIO;
-        case 2:  return this.isAssignmentOperator;
+        case 1:  return this.isAssignmentOperator;
+        case 2:  return this.isDerivedTypeIO;
         case 3:  return this.hiddenTLparen;
         case 4:  return this.definedOperator;
         case 5:  return this.formattingSpec;
@@ -136,8 +136,8 @@ public class ASTGenericSpecNode extends ASTNode implements IAccessId
         switch (index)
         {
         case 0:  this.isDefinedOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isDerivedTypeIO = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.isAssignmentOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isAssignmentOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 2:  this.isDerivedTypeIO = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         case 4:  this.definedOperator = (IDefinedOperator)value; return;
         case 5:  this.formattingSpec = (org.eclipse.photran.internal.core.lexer.Token)value; return;

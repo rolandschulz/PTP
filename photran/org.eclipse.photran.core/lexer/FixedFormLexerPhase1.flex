@@ -270,7 +270,8 @@ Rcon1 = {Dig}{EExp} | {Sig}{EExp} | {Sig1}
 Rcon2 = {Sig2}
 Xcon = {Dig} (X|x)
 Xdop = \. [A-Za-z]+ \.
-Ident = [A-Za-z][A-Za-z0-9_]*
+Ident = [A-Za-z$][A-Za-z0-9$_]*
+      | "@" [A-Za-z$][A-Za-z0-9$_]* ":T_IDENT"  /* for AST pattern matching */
 xImpl = "(" {Range} ("," {Range})* ")"
 xImplLkahead = (","|";"|{LineTerminator}|"!")
 
@@ -330,6 +331,8 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 
 <YYSTANDARD,YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
+// Intel Extension
+"CONVERT"[ \t]*"="                              { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_CONVERTEQ); }
 // New for Fortran 2008 //////////////////////////////////
 "SUBMODULE"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SUBMODULE); }
 "ENDSUBMODULE"                                  { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ENDSUBMODULE); }

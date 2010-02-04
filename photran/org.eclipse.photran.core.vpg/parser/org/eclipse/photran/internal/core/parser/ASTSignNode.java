@@ -28,19 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public class ASTSignNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hasMinusSign; // in ASTSignNode
     org.eclipse.photran.internal.core.lexer.Token hasPlusSign; // in ASTSignNode
-
-    public boolean hasMinusSign()
-    {
-        return this.hasMinusSign != null;
-    }
-
-    public void setHasMinusSign(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasMinusSign = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token hasMinusSign; // in ASTSignNode
 
     public boolean hasPlusSign()
     {
@@ -50,6 +39,17 @@ public class ASTSignNode extends ASTNode
     public void setHasPlusSign(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasPlusSign = newValue;
+    }
+
+
+    public boolean hasMinusSign()
+    {
+        return this.hasMinusSign != null;
+    }
+
+    public void setHasMinusSign(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasMinusSign = newValue;
     }
 
 
@@ -68,8 +68,8 @@ public class ASTSignNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.hasMinusSign;
-        case 1:  return this.hasPlusSign;
+        case 0:  return this.hasPlusSign;
+        case 1:  return this.hasMinusSign;
         default: return null;
         }
     }
@@ -78,8 +78,8 @@ public class ASTSignNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasMinusSign = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hasPlusSign = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hasPlusSign = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.hasMinusSign = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

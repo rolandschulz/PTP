@@ -521,6 +521,8 @@ public class FreeFormLexerPhase2 implements ILexer
         applySameRulesTo(Terminal.T_ASYNCHRONOUSEQ);
         // END FORTRAN 2003 ///////////////////////////////////////////////////////////////////////
 
+        applySameRulesTo(Terminal.T_CONVERTEQ); // Intel Extension
+
         // R912
         addRules(Terminal.T_FMTEQ,
                 new StmtMustStartWithOneOf(Terminal.T_READ, Terminal.T_WRITE),

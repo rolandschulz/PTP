@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.parser.Parser.ASTMatcher;
 import org.eclipse.photran.internal.core.parser.Parser.ASTNodeUtil;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
@@ -324,6 +325,16 @@ public class Token implements IToken, IASTNode
         visitor.visitToken(this);
     }
 
+    public <T extends IASTNode> T findFirst(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findFirst(this, targetClass);
+    }
+
+    public <T extends IASTNode> T findLast(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findLast(this, targetClass);
+    }
+
     public Token findFirstToken()
     {
         return this;
@@ -352,6 +363,26 @@ public class Token implements IToken, IASTNode
     public void replaceChild(IASTNode node, IASTNode withNode)
     {
         throw new UnsupportedOperationException();
+    }
+
+    public boolean matches(IASTNode pattern)
+    {
+        return ASTNodeUtil.match(this, pattern).succeeded();
+    }
+
+    public <T extends IASTNode> ASTMatcher.Match<T> match(T pattern)
+    {
+        return ASTNodeUtil.match(this, pattern);
+    }
+
+    public <T extends IASTNode> List<ASTMatcher.Match<T>> matchAll(T pattern)
+    {
+        return ASTNodeUtil.matchAll(this, pattern);
+    }
+
+    public <T extends IASTNode> void replaceAll(T pattern, T replacement)
+    {
+        ASTNodeUtil.replaceAll(this, pattern, replacement);
     }
     
     public void removeFromTree()

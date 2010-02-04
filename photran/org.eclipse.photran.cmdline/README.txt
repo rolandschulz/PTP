@@ -98,8 +98,8 @@ Building:
 
 2. Place the downloaded ecj-3.5.1.jar in the build/ directory (or create a symlink)
 
-3. Run Apache Ant in the distrib/ directory
-   cd distrib && ant
+3. Run Apache Ant in the build/ directory
+   cd build && ant
 
 4. If you run Ant from inside Eclipse (Run As > Ant Build), be sure to refresh
    (right click > Refresh) the org.eclipse.photran.cmdline project after running Ant.

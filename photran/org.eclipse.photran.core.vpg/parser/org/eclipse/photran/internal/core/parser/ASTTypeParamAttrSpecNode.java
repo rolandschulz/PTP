@@ -28,19 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public class ASTTypeParamAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isLen; // in ASTTypeParamAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isKind; // in ASTTypeParamAttrSpecNode
-
-    public boolean isLen()
-    {
-        return this.isLen != null;
-    }
-
-    public void setIsLen(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isLen = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isLen; // in ASTTypeParamAttrSpecNode
 
     public boolean isKind()
     {
@@ -50,6 +39,17 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     public void setIsKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isKind = newValue;
+    }
+
+
+    public boolean isLen()
+    {
+        return this.isLen != null;
+    }
+
+    public void setIsLen(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isLen = newValue;
     }
 
 
@@ -68,8 +68,8 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isLen;
-        case 1:  return this.isKind;
+        case 0:  return this.isKind;
+        case 1:  return this.isLen;
         default: return null;
         }
     }
@@ -78,8 +78,8 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isLen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 1:  this.isLen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

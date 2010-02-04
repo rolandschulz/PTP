@@ -268,6 +268,9 @@ public final class Terminal
     public static final Terminal T_LOCK = new Terminal("lock");
     public static final Terminal T_UNLOCK = new Terminal("unlock");
 
+    // Intel extension
+    public static final Terminal T_CONVERTEQ = new Terminal("convert=");
+    
     private String description;
 
     public Terminal(String description)

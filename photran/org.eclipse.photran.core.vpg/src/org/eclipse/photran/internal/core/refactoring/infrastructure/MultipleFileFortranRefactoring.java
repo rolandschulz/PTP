@@ -595,7 +595,7 @@ public abstract class MultipleFileFortranRefactoring
 
     protected static boolean isValidIdentifier(String name)
     {
-        return Pattern.matches("[A-Za-z][A-Za-z0-9_]*", name);
+        return Pattern.matches("[A-Za-z$][A-Za-z0-9$_]*", name);
     }
 
     protected static boolean isBoundIdentifier(Token t)

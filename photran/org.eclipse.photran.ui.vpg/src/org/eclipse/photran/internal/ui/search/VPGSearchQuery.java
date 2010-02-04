@@ -111,6 +111,9 @@ public class VPGSearchQuery implements ISearchQuery {
             case '?':
                 buff.append(".");
                 break;
+            case '$':
+                buff.append("\\$");
+                break;
             default:
                 if (!Character.toString(c).matches("[0-9a-zA-Z._]")) {
                     throw new PatternSyntaxException("Illegal character in pattern string", patternStr, i+1);

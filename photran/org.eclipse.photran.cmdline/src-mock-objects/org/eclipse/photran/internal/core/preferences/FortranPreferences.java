@@ -15,13 +15,19 @@ public final class FortranPreferences
     public static final class BooleanPreference
     {
         private boolean value;
-
         public BooleanPreference(boolean value) { this.value = value; }
-
         public boolean getValue() { return value; }
+    }
+
+    public static final class FortranIntegerPreference
+    {
+        private int value;
+        public FortranIntegerPreference(int value) { this.value = value; }
+        public int getValue() { return value; }
     }
 
     private FortranPreferences() {}
 
     public static final BooleanPreference ENABLE_VPG_LOGGING = new BooleanPreference(false);
+    public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference(72);
 }
