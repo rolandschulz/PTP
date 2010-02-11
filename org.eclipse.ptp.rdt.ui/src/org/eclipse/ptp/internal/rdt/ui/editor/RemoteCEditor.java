@@ -21,6 +21,7 @@ import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.text.ICPartitions;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.help.IContextProvider;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
@@ -97,11 +98,23 @@ public class RemoteCEditor extends CEditor {
 	 * This method overrides the CEditor createPartControl method in order to set the help for the Remote
 	 * C/C++ editor.
 	 */
-	public void createPartControl(Composite parent)
-	{
+	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
 	}
+	
+	
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Object getAdapter(Class required) {
+		if(IContextProvider.class.equals(required))	 {
+			return new RemoteCEditorHelpContextProvider(this);
+		}
+		return super.getAdapter(required);
+	}
+
+	
 	
 	/**
 	 * Override so that the remote version of the
