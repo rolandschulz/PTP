@@ -21,7 +21,6 @@ import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchResult;
-import org.eclipse.search.ui.text.Match;
 
 /**
  * Fortran Search Engine Implementation.
@@ -95,12 +94,7 @@ public class ReferenceSearch implements ISearchQuery
     private void filterAndAddSearchResult(PhotranTokenRef ref)
     {
         if (!searchScope.filterOut(ref, getFile()))
-        {
-            Match match = new Match(ref.getFile(),
-                                    ref.getOffset(),
-                                    ref.getLength());
-            ((ReferenceSearchResult)getSearchResult()).addMatch(match);
-        }
+            VPGSearchQuery.addSearchResultFromTokenRef(ref, (ReferenceSearchResult)getSearchResult());
     }
 
     public static void searchForReference(Definition p_def,

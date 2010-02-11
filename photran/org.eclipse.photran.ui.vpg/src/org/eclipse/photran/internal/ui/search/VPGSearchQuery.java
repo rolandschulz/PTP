@@ -19,12 +19,14 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
@@ -45,6 +47,7 @@ import org.eclipse.ui.internal.Workbench;
  * @author Doug Schaefer
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  * @author Kurt Hendle
+ * @author Jeff Overbey
  */
 @SuppressWarnings("restriction")
 public class VPGSearchQuery implements ISearchQuery {
@@ -139,6 +142,13 @@ public class VPGSearchQuery implements ISearchQuery {
         return result;
     }
 
+    protected static boolean shouldNotProcess(IResource resource)
+    {
+        return resource == null
+            || resource instanceof IProject && !PhotranVPG.getInstance().shouldProcessProject((IProject)resource)
+            || resource instanceof IFile && !PhotranVPG.getInstance().shouldProcessFile((IFile)resource);
+    }
+
     /**
      * An IResourceVisitor to just count the number of nodes that we'll visit when searching through
      * the given resources.
@@ -151,8 +161,15 @@ public class VPGSearchQuery implements ISearchQuery {
             this.counter = counter;
         }
         public boolean visit(IResource resource) {
-            counter[0]++;
-            return !(resource instanceof IFile);
+            if (shouldNotProcess(resource))
+            {
+                return false;
+            }
+            else
+            {
+                counter[0]++;
+                return !(resource instanceof IFile);
+            }
         }
     }
 
@@ -164,19 +181,23 @@ public class VPGSearchQuery implements ISearchQuery {
      */
     private class VPGSearchResourceVisitor implements IResourceVisitor {
         private IProgressMonitor monitor;
+        private TreeSet<PhotranTokenRef> matchesToAddLater;
+        
         public VPGSearchResourceVisitor(IProgressMonitor monitor) {
             this.monitor = monitor;
+            this.matchesToAddLater = new TreeSet<PhotranTokenRef>();
         }
+        
         public boolean visit(IResource resource) {
-            if (resource == null) {
-                return false;
-            }
+            if (shouldNotProcess(resource)) return false;
 
             monitor.worked(1);
 
             if (! (resource instanceof IFile)) {
                 return true;
             }
+            
+            monitor.subTask("Searching " + resource.getName());
 
             IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST((IFile)resource);
             if (ast == null) {
@@ -199,6 +220,7 @@ public class VPGSearchQuery implements ISearchQuery {
             }
             return false;
         }
+
         /**
          * Filters search results based on whether this identifier is a reference or
          * a declaration
@@ -206,10 +228,11 @@ public class VPGSearchQuery implements ISearchQuery {
          */
         private void foundDefinition(PhotranTokenRef ref)
         {
-            for (Definition def : ref.findToken().resolveBinding()) {
+            Token token = ref.findToken();
+            for (Definition def : token.resolveBinding()) {
                 if (shouldAccept(def)) {
                     if ((searchFlags & FIND_DECLARATIONS) != 0) {
-                        foundMatch(def.getTokenRef());
+                        foundMatch(token);
                     }
                     if ((searchFlags & FIND_REFERENCES) != 0) {
                         for(PhotranTokenRef rref : def.findAllReferences(true)) {
@@ -260,25 +283,57 @@ public class VPGSearchQuery implements ISearchQuery {
             return false;
         }
 
-        private void foundMatch(PhotranTokenRef ref)
-        {
-            VPGSearchMatch match = new VPGSearchMatch(ref.getFile(),
-                ref.getOffset(),
-                ref.getLength());
-            ((ReferenceSearchResult)getSearchResult()).addMatch(match);
+        private void foundMatch(Token token) {
+            addSearchResultFromTokenRef(token.getTokenRef());
+        }
+
+        private void foundMatch(PhotranTokenRef ref) {
+            matchesToAddLater.add(ref);
+        }
+
+        public void addPostponedSearchResults(IProgressMonitor pm) {
+            pm.beginTask("Adding references", matchesToAddLater.size());
+            
+            String lastFilename = null;
+            for (PhotranTokenRef tokenRef : matchesToAddLater) {
+                if (!tokenRef.getFilename().equals(lastFilename)) {
+                    lastFilename = tokenRef.getFilename();
+                    pm.subTask("Adding references in " + lastFilename.substring(lastFilename.lastIndexOf('/')+1));
+                }
+                pm.worked(1);
+                
+                addSearchResultFromTokenRef(tokenRef);
+            }
+            
+            pm.done();
+        }
+        
+        private void addSearchResultFromTokenRef(PhotranTokenRef tokenRef) {
+            VPGSearchQuery.addSearchResultFromTokenRef(tokenRef, (ReferenceSearchResult)getSearchResult());
         }
     }
+
+    public static void addSearchResultFromTokenRef(PhotranTokenRef tokenRef, ReferenceSearchResult searchResult) {
+        Token token = tokenRef.findTokenOrReturnNull();
+        if (token != null) {
+            VPGSearchMatch match = new VPGSearchMatch(token.getIFile(),
+                token.getFileOffset(),
+                token.getLength());
+            searchResult.addMatch(match);
+        }
+    }
+
     /**
      * Runs this search query, adding the results to the search result
      */
     public final IStatus run(IProgressMonitor monitor) {
         final int[] counter = new int[1];
         try {
-            PhotranVPG.getInstance().ensureVPGIsUpToDate(monitor);
+            PhotranVPG.getInstance().ensureVPGIsUpToDate(new SubProgressMonitor(monitor, 0));
 
             result.removeAll();
 
-            monitor.subTask("Counting resources in " + scopeDesc);
+            //monitor.subTask("Counting resources in " + scopeDesc);
 
             counter[0] = 0;
             VPGCountResourceVisitor countVisitor = new VPGCountResourceVisitor(counter);
@@ -286,12 +341,13 @@ public class VPGSearchQuery implements ISearchQuery {
                 resource.accept(countVisitor);
             }
 
-            monitor.beginTask("Searching for " + origPatternStr + " in " + scopeDesc, counter[0]);
+            monitor.beginTask("Searching for " + origPatternStr + " in " + scopeDesc, counter[0]*2);
 
             VPGSearchResourceVisitor visitor = new VPGSearchResourceVisitor(monitor);
             for (IResource resource : scope) {
                 resource.accept(visitor);
             }
+            visitor.addPostponedSearchResults(new SubProgressMonitor(monitor, counter[0]));
 
             if (!PhotranVPG.inTestingMode()
                 && Workbench.getInstance().getWorkbenchWindowCount() > 0

@@ -499,9 +499,10 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         try
         {
-            IMarker marker = tokenRef.getFile().createMarker(IMarker.TEXT);
-            marker.setAttribute(IMarker.CHAR_START, tokenRef.getOffset());
-            marker.setAttribute(IMarker.CHAR_END, tokenRef.getEndOffset());
+            Token token = tokenRef.findToken();
+            IMarker marker = token.getIFile().createMarker(IMarker.TEXT);
+            marker.setAttribute(IMarker.CHAR_START, token.getFileOffset());
+            marker.setAttribute(IMarker.CHAR_END, token.getFileOffset()+token.getLength());
             return marker;
         }
         catch (CoreException e)

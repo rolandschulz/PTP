@@ -62,7 +62,7 @@ import org.eclipse.ui.PlatformUI;
 //@SuppressWarnings("restriction")
 public class VPGSearchPage extends DialogPage implements ISearchPage {
     
-    public static final String EXTENSION_ID = Activator.PLUGIN_ID + ".vpgSearchPage";
+    public static final String EXTENSION_ID = "org.eclipse.photran.ui.vpgSearchPage";
     
     // Dialog store id constants
     private final static String PAGE_NAME = "VPGSearchPage";
