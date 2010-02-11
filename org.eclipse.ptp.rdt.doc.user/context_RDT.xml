@@ -24,6 +24,7 @@
       <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy"/>
    </context>
    <context id="remote_C_CPP_editor_context">
+      <description>Click below for help</description>
       <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor"/>
    </context>
    <context id="remote_C_CPP_search_context">
