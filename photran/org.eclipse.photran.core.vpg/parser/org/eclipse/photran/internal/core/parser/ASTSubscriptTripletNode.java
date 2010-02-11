@@ -42,6 +42,7 @@ public class ASTSubscriptTripletNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTSubscriptTripletNode extends ASTNode
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTSubscriptTripletNode extends ASTNode
     public void setStep(IExpr newValue)
     {
         this.step = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -87,7 +90,7 @@ public class ASTSubscriptTripletNode extends ASTNode
         case 2:  return this.ub;
         case 3:  return this.hiddenTColon2;
         case 4:  return this.step;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -95,11 +98,11 @@ public class ASTSubscriptTripletNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (IExpr)value; return;
-        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.ub = (IExpr)value; return;
-        case 3:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.step = (IExpr)value; return;
+        case 0:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.step = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

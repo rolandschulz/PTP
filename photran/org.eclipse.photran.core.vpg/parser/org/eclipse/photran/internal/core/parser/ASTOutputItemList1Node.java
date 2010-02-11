@@ -42,6 +42,7 @@ public class ASTOutputItemList1Node extends ASTNode
     public void setOutputItemList1(ASTOutputItemList1Node newValue)
     {
         this.outputItemList1 = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTOutputItemList1Node extends ASTNode
     public void setExpr1(IExpr newValue)
     {
         this.expr1 = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTOutputItemList1Node extends ASTNode
     public void setExpr2(IExpr newValue)
     {
         this.expr2 = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTOutputItemList1Node extends ASTNode
     public void setOutputImpliedDo(ASTOutputImpliedDoNode newValue)
     {
         this.outputImpliedDo = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -98,7 +102,7 @@ public class ASTOutputItemList1Node extends ASTNode
         case 2:  return this.hiddenTComma;
         case 3:  return this.expr2;
         case 4:  return this.outputImpliedDo;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -106,11 +110,11 @@ public class ASTOutputItemList1Node extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.outputItemList1 = (ASTOutputItemList1Node)value; return;
-        case 1:  this.expr1 = (IExpr)value; return;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.expr2 = (IExpr)value; return;
-        case 4:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value; return;
+        case 0:  this.outputItemList1 = (ASTOutputItemList1Node)value; if (value != null) value.setParent(this); return;
+        case 1:  this.expr1 = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.expr2 = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 4:  this.outputImpliedDo = (ASTOutputImpliedDoNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

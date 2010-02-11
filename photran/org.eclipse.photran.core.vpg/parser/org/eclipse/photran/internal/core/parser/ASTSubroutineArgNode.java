@@ -43,6 +43,7 @@ public class ASTSubroutineArgNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTSubroutineArgNode extends ASTNode
     public void setHollerith(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hollerith = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -65,6 +67,7 @@ public class ASTSubroutineArgNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,6 +79,7 @@ public class ASTSubroutineArgNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -100,7 +104,7 @@ public class ASTSubroutineArgNode extends ASTNode
         case 3:  return this.expr;
         case 4:  return this.hiddenTAsterisk;
         case 5:  return this.label;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -108,12 +112,12 @@ public class ASTSubroutineArgNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.expr = (IExpr)value; return;
-        case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

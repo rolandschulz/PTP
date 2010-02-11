@@ -51,6 +51,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setName(ASTNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +63,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setFunctionArgList(IASTListNode<ASTFunctionArgListNode> newValue)
     {
         this.functionArgList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -73,6 +75,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setPrimarySectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.primarySectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,6 +87,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setSubstringRange(ASTSubstringRangeNode newValue)
     {
         this.substringRange = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -95,6 +99,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setImageSelector(ASTImageSelectorNode newValue)
     {
         this.imageSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -106,6 +111,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setDerivedTypeComponentRef(IASTListNode<ASTDataRefNode> newValue)
     {
         this.derivedTypeComponentRef = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -117,6 +123,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setComponentSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.componentSectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -128,6 +135,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     public void setSubstringRange2(ASTSubstringRangeNode newValue)
     {
         this.substringRange2 = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -162,7 +170,7 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
         case 11: return this.componentSectionSubscriptList;
         case 12: return this.hiddenRparen2;
         case 13: return this.substringRange2;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -170,20 +178,20 @@ public class ASTVarOrFnRefNode extends ASTNode implements IExpr, ISelector
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value; return;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.functionArgList = (IASTListNode<ASTFunctionArgListNode>)value; return;
-        case 3:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.substringRange = (ASTSubstringRangeNode)value; return;
-        case 7:  this.imageSelector = (ASTImageSelectorNode)value; return;
-        case 8:  this.hiddenHiddenPercent2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; return;
-        case 10: this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 11: this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 12: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 13: this.substringRange2 = (ASTSubstringRangeNode)value; return;
+        case 0:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.functionArgList = (IASTListNode<ASTFunctionArgListNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.primarySectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.substringRange = (ASTSubstringRangeNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.imageSelector = (ASTImageSelectorNode)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenHiddenPercent2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.derivedTypeComponentRef = (IASTListNode<ASTDataRefNode>)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 11: this.componentSectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 12: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 13: this.substringRange2 = (ASTSubstringRangeNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

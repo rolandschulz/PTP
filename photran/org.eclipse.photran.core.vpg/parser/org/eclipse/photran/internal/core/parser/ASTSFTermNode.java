@@ -41,6 +41,7 @@ public class ASTSFTermNode extends ASTNode
     public void setLhsExpr(ASTSFTermNode newValue)
     {
         this.lhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTSFTermNode extends ASTNode
     public void setSFFactor(ASTSFFactorNode newValue)
     {
         this.SFFactor = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTSFTermNode extends ASTNode
     public void setMultOp(ASTOperatorNode newValue)
     {
         this.multOp = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTSFTermNode extends ASTNode
     public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +100,7 @@ public class ASTSFTermNode extends ASTNode
         case 1:  return this.SFFactor;
         case 2:  return this.multOp;
         case 3:  return this.rhsExpr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,10 +108,10 @@ public class ASTSFTermNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTSFTermNode)value; return;
-        case 1:  this.SFFactor = (ASTSFFactorNode)value; return;
-        case 2:  this.multOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (IExpr)value; return;
+        case 0:  this.lhsExpr = (ASTSFTermNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.SFFactor = (ASTSFFactorNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.multOp = (ASTOperatorNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.rhsExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

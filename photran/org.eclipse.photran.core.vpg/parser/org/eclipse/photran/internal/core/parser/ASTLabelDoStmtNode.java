@@ -45,6 +45,7 @@ public class ASTLabelDoStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -56,6 +57,7 @@ public class ASTLabelDoStmtNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -67,6 +69,7 @@ public class ASTLabelDoStmtNode extends ASTNode
     public void setLblRef(ASTLblRefNode newValue)
     {
         this.lblRef = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -78,6 +81,7 @@ public class ASTLabelDoStmtNode extends ASTNode
     public void setLoopControl(ASTLoopControlNode newValue)
     {
         this.loopControl = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -104,7 +108,7 @@ public class ASTLabelDoStmtNode extends ASTNode
         case 5:  return this.hiddenTComma;
         case 6:  return this.loopControl;
         case 7:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -112,14 +116,14 @@ public class ASTLabelDoStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTDo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.lblRef = (ASTLblRefNode)value; return;
-        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.loopControl = (ASTLoopControlNode)value; return;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTDo = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.lblRef = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.loopControl = (ASTLoopControlNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

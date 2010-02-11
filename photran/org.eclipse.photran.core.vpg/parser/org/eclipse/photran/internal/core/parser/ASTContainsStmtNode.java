@@ -40,6 +40,7 @@ public class ASTContainsStmtNode extends ASTNode implements IModuleSubprogramPar
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,7 +63,7 @@ public class ASTContainsStmtNode extends ASTNode implements IModuleSubprogramPar
         case 0:  return this.label;
         case 1:  return this.hiddenTContains;
         case 2:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -70,9 +71,9 @@ public class ASTContainsStmtNode extends ASTNode implements IModuleSubprogramPar
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTContains = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTContains = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

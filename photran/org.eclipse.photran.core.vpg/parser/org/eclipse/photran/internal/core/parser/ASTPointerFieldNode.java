@@ -46,6 +46,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setFieldSelector(ASTFieldSelectorNode newValue)
     {
         this.fieldSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,6 +58,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setName(ASTNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -68,6 +70,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setSFExprList(IASTListNode<ASTSFExprListNode> newValue)
     {
         this.SFExprList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -79,6 +82,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setSFDummyArgNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
     {
         this.SFDummyArgNameList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -90,6 +94,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setImageSelector(ASTImageSelectorNode newValue)
     {
         this.imageSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -101,6 +106,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setHasDerivedTypeComponentRef(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasDerivedTypeComponentRef = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -112,6 +118,7 @@ public class ASTPointerFieldNode extends ASTNode
     public void setComponentName(ASTNameNode newValue)
     {
         this.componentName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -139,7 +146,7 @@ public class ASTPointerFieldNode extends ASTNode
         case 6:  return this.imageSelector;
         case 7:  return this.hasDerivedTypeComponentRef;
         case 8:  return this.componentName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -147,15 +154,15 @@ public class ASTPointerFieldNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
-        case 1:  this.name = (ASTNameNode)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.SFExprList = (IASTListNode<ASTSFExprListNode>)value; return;
-        case 4:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.imageSelector = (ASTImageSelectorNode)value; return;
-        case 7:  this.hasDerivedTypeComponentRef = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.componentName = (ASTNameNode)value; return;
+        case 0:  this.fieldSelector = (ASTFieldSelectorNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.SFExprList = (IASTListNode<ASTSFExprListNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.imageSelector = (ASTImageSelectorNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hasDerivedTypeComponentRef = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.componentName = (ASTNameNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

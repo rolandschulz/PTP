@@ -45,6 +45,7 @@ public class ASTSFExprListNode extends ASTNode
     public void setSFDummyArgNameList(IASTListNode<ASTSFDummyArgNameListNode> newValue)
     {
         this.SFDummyArgNameList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -56,6 +57,7 @@ public class ASTSFExprListNode extends ASTNode
     public void setSectionSubscript(ASTSectionSubscriptNode newValue)
     {
         this.sectionSubscript = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -67,6 +69,7 @@ public class ASTSFExprListNode extends ASTNode
     public void setLb(ASTSFExprNode newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -78,6 +81,7 @@ public class ASTSFExprListNode extends ASTNode
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -89,6 +93,7 @@ public class ASTSFExprListNode extends ASTNode
     public void setStep(IExpr newValue)
     {
         this.step = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -115,7 +120,7 @@ public class ASTSFExprListNode extends ASTNode
         case 5:  return this.ub;
         case 6:  return this.hiddenTColon2;
         case 7:  return this.step;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -123,14 +128,14 @@ public class ASTSFExprListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; return;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.sectionSubscript = (ASTSectionSubscriptNode)value; return;
-        case 3:  this.lb = (ASTSFExprNode)value; return;
-        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.ub = (IExpr)value; return;
-        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.step = (IExpr)value; return;
+        case 0:  this.SFDummyArgNameList = (IASTListNode<ASTSFDummyArgNameListNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.sectionSubscript = (ASTSectionSubscriptNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.lb = (ASTSFExprNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.step = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -40,6 +40,7 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
     public void setInterfaceStmt(ASTInterfaceStmtNode newValue)
     {
         this.interfaceStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
     public void setInterfaceBlockBody(IASTListNode<IInterfaceSpecification> newValue)
     {
         this.interfaceBlockBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
     public void setEndInterfaceStmt(ASTEndInterfaceStmtNode newValue)
     {
         this.endInterfaceStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
         case 0:  return this.interfaceStmt;
         case 1:  return this.interfaceBlockBody;
         case 2:  return this.endInterfaceStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
     {
         switch (index)
         {
-        case 0:  this.interfaceStmt = (ASTInterfaceStmtNode)value; return;
-        case 1:  this.interfaceBlockBody = (IASTListNode<IInterfaceSpecification>)value; return;
-        case 2:  this.endInterfaceStmt = (ASTEndInterfaceStmtNode)value; return;
+        case 0:  this.interfaceStmt = (ASTInterfaceStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.interfaceBlockBody = (IASTListNode<IInterfaceSpecification>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endInterfaceStmt = (ASTEndInterfaceStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

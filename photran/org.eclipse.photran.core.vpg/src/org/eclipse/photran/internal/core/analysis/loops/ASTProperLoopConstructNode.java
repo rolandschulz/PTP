@@ -39,9 +39,9 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
  */
 public class ASTProperLoopConstructNode extends ASTNode implements IExecutableConstruct
 {
-    ASTLabelDoStmtNode loopHeader;
-    IASTListNode<IExecutionPartConstruct> body;
-    ASTEndDoStmtNode endDoStmt;
+    private ASTLabelDoStmtNode loopHeader;
+    private IASTListNode<IExecutionPartConstruct> body;
+    private ASTEndDoStmtNode endDoStmt;
     
     public ASTProperLoopConstructNode()
     {
@@ -53,6 +53,12 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
     {
         return this.loopHeader;
     }
+    
+    void setLoopHeader(ASTLabelDoStmtNode header)
+    {
+        this.loopHeader = header;
+        if (header != null) header.setParent(this);
+    }
 
     public IASTListNode<IExecutionPartConstruct> getBody()
     {
@@ -62,6 +68,12 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
     public ASTEndDoStmtNode getEndDoStmt()
     {
         return this.endDoStmt;
+    }
+    
+    void setEndDoStmt(ASTEndDoStmtNode endDoStmt)
+    {
+        this.endDoStmt = endDoStmt;
+        if (endDoStmt != null) endDoStmt.setParent(this);
     }
 
     public void accept(IASTVisitor visitor)
@@ -84,7 +96,7 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         case 0:  return this.loopHeader;
         case 1:  return this.body;
         case 2:  return this.endDoStmt;
-        default: return null;
+        default: throw new IllegalArgumentException();
         }
     }
 
@@ -93,9 +105,9 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
     {
         switch (index)
         {
-        case 0:  this.loopHeader = (ASTLabelDoStmtNode)value; break;
-        case 1:  this.body = (IASTListNode<IExecutionPartConstruct>)value; break;
-        case 2:  this.endDoStmt = (ASTEndDoStmtNode)value; break;
+        case 0:  this.loopHeader = (ASTLabelDoStmtNode)value; if (loopHeader != null) loopHeader.setParent(this); break;
+        case 1:  this.body = (IASTListNode<IExecutionPartConstruct>)value; if (body != null) body.setParent(this); break;
+        case 2:  this.endDoStmt = (ASTEndDoStmtNode)value; if (endDoStmt != null) endDoStmt.setParent(this); break;
         default: throw new IllegalArgumentException();
         }
     }

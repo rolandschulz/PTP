@@ -50,7 +50,7 @@ public class ASTGoToKwNode extends ASTNode
         case 0:  return this.hiddenTGoto;
         case 1:  return this.hiddenTGo;
         case 2:  return this.hiddenTTo;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -58,9 +58,9 @@ public class ASTGoToKwNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

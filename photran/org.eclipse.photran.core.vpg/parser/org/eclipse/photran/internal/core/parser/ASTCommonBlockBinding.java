@@ -40,6 +40,7 @@ public class ASTCommonBlockBinding extends ASTNode implements IBindEntity
     public void setCommonBlockName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.commonBlockName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,7 +63,7 @@ public class ASTCommonBlockBinding extends ASTNode implements IBindEntity
         case 0:  return this.hiddenTSlash;
         case 1:  return this.commonBlockName;
         case 2:  return this.hiddenTSlash2;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -70,9 +71,9 @@ public class ASTCommonBlockBinding extends ASTNode implements IBindEntity
     {
         switch (index)
         {
-        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

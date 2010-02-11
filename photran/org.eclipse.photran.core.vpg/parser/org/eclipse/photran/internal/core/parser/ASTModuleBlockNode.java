@@ -39,6 +39,7 @@ public class ASTModuleBlockNode extends ASTNode
     public void setModuleBody(IASTListNode<IModuleBodyConstruct> newValue)
     {
         this.moduleBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTModuleBlockNode extends ASTNode
     public void setEndModuleStmt(ASTEndModuleStmtNode newValue)
     {
         this.endModuleStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTModuleBlockNode extends ASTNode
         {
         case 0:  return this.moduleBody;
         case 1:  return this.endModuleStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTModuleBlockNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value; return;
-        case 1:  this.endModuleStmt = (ASTEndModuleStmtNode)value; return;
+        case 0:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.endModuleStmt = (ASTEndModuleStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -40,6 +40,7 @@ public class ASTElseConstructNode extends ASTNode
     public void setElseStmt(ASTElseStmtNode newValue)
     {
         this.elseStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTElseConstructNode extends ASTNode
     public void setConditionalBody(IASTListNode<IExecutionPartConstruct> newValue)
     {
         this.conditionalBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTElseConstructNode extends ASTNode
     public void setEndIfStmt(ASTEndIfStmtNode newValue)
     {
         this.endIfStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +86,7 @@ public class ASTElseConstructNode extends ASTNode
         case 0:  return this.elseStmt;
         case 1:  return this.conditionalBody;
         case 2:  return this.endIfStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,9 +94,9 @@ public class ASTElseConstructNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.elseStmt = (ASTElseStmtNode)value; return;
-        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value; return;
-        case 2:  this.endIfStmt = (ASTEndIfStmtNode)value; return;
+        case 0:  this.elseStmt = (ASTElseStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.conditionalBody = (IASTListNode<IExecutionPartConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endIfStmt = (ASTEndIfStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

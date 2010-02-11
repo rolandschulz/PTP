@@ -40,6 +40,7 @@ public class ASTBozLiteralConstNode extends ASTNode
     public void setBinaryConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.binaryConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTBozLiteralConstNode extends ASTNode
     public void setOctalConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.octalConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTBozLiteralConstNode extends ASTNode
     public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hexConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +86,7 @@ public class ASTBozLiteralConstNode extends ASTNode
         case 0:  return this.binaryConst;
         case 1:  return this.octalConst;
         case 2:  return this.hexConst;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,9 +94,9 @@ public class ASTBozLiteralConstNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.binaryConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.octalConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

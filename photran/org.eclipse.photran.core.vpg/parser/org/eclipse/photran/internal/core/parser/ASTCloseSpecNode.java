@@ -47,6 +47,7 @@ public class ASTCloseSpecNode extends ASTNode
     public void setStatusExpr(ASTCExprNode newValue)
     {
         this.statusExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -58,6 +59,7 @@ public class ASTCloseSpecNode extends ASTNode
     public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
         this.unitIdentifier = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -69,6 +71,7 @@ public class ASTCloseSpecNode extends ASTNode
     public void setErrLbl(ASTLblRefNode newValue)
     {
         this.errLbl = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -80,6 +83,7 @@ public class ASTCloseSpecNode extends ASTNode
     public void setIoStatVar(ASTScalarVariableNode newValue)
     {
         this.ioStatVar = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -91,6 +95,7 @@ public class ASTCloseSpecNode extends ASTNode
     public void setIoMsgVar(ASTScalarVariableNode newValue)
     {
         this.ioMsgVar = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -119,7 +124,7 @@ public class ASTCloseSpecNode extends ASTNode
         case 7:  return this.ioStatVar;
         case 8:  return this.hiddenTIomsgeq;
         case 9:  return this.ioMsgVar;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -127,16 +132,16 @@ public class ASTCloseSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTStatuseq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.statusExpr = (ASTCExprNode)value; return;
-        case 3:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
-        case 5:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.errLbl = (ASTLblRefNode)value; return;
-        case 7:  this.ioStatVar = (ASTScalarVariableNode)value; return;
-        case 8:  this.hiddenTIomsgeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.ioMsgVar = (ASTScalarVariableNode)value; return;
+        case 0:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTStatuseq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.statusExpr = (ASTCExprNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.unitIdentifier = (ASTUnitIdentifierNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.errLbl = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.ioStatVar = (ASTScalarVariableNode)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTIomsgeq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.ioMsgVar = (ASTScalarVariableNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

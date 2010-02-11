@@ -44,6 +44,7 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -55,6 +56,7 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     public void setTypeSpec(ASTTypeSpecNode newValue)
     {
         this.typeSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,6 +68,7 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     public void setAttrSpecSeq(IASTListNode<ASTAttrSpecSeqNode> newValue)
     {
         this.attrSpecSeq = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,6 +80,7 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     public void setEntityDeclList(IASTListNode<ASTEntityDeclNode> newValue)
     {
         this.entityDeclList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -103,7 +107,7 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
         case 4:  return this.hiddenTColon2;
         case 5:  return this.entityDeclList;
         case 6:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -111,13 +115,13 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.typeSpec = (ASTTypeSpecNode)value; return;
-        case 2:  this.attrSpecSeq = (IASTListNode<ASTAttrSpecSeqNode>)value; return;
-        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.entityDeclList = (IASTListNode<ASTEntityDeclNode>)value; return;
-        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.typeSpec = (ASTTypeSpecNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.attrSpecSeq = (IASTListNode<ASTAttrSpecSeqNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.entityDeclList = (IASTListNode<ASTEntityDeclNode>)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

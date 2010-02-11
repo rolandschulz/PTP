@@ -42,6 +42,7 @@ public class ASTCrayPointerStmtObjectNode extends ASTNode
     public void setPointerName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.pointerName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTCrayPointerStmtObjectNode extends ASTNode
     public void setTargetObject(ASTTargetObjectNode newValue)
     {
         this.targetObject = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,7 +78,7 @@ public class ASTCrayPointerStmtObjectNode extends ASTNode
         case 2:  return this.hiddenTComma;
         case 3:  return this.targetObject;
         case 4:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -84,11 +86,11 @@ public class ASTCrayPointerStmtObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.pointerName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.targetObject = (ASTTargetObjectNode)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.pointerName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.targetObject = (ASTTargetObjectNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

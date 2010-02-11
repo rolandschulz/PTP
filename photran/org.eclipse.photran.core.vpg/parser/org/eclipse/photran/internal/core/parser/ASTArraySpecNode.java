@@ -41,6 +41,7 @@ public class ASTArraySpecNode extends ASTNode
     public void setAssumedShapeSpecList(IASTListNode<ASTAssumedShapeSpecListNode> newValue)
     {
         this.assumedShapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTArraySpecNode extends ASTNode
     public void setAssumedSizeSpec(ASTAssumedSizeSpecNode newValue)
     {
         this.assumedSizeSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTArraySpecNode extends ASTNode
     public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
     {
         this.explicitShapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTArraySpecNode extends ASTNode
     public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
     {
         this.deferredShapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +100,7 @@ public class ASTArraySpecNode extends ASTNode
         case 1:  return this.assumedSizeSpec;
         case 2:  return this.explicitShapeSpecList;
         case 3:  return this.deferredShapeSpecList;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,10 +108,10 @@ public class ASTArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value; return;
-        case 1:  this.assumedSizeSpec = (ASTAssumedSizeSpecNode)value; return;
-        case 2:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
-        case 3:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
+        case 0:  this.assumedShapeSpecList = (IASTListNode<ASTAssumedShapeSpecListNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.assumedSizeSpec = (ASTAssumedSizeSpecNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

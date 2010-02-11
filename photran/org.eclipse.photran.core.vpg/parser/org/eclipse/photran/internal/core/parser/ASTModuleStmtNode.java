@@ -41,6 +41,7 @@ public class ASTModuleStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTModuleStmtNode extends ASTNode
     public void setModuleName(ASTModuleNameNode newValue)
     {
         this.moduleName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTModuleStmtNode extends ASTNode
         case 1:  return this.hiddenTModule;
         case 2:  return this.moduleName;
         case 3:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTModuleStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.moduleName = (ASTModuleNameNode)value; return;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.moduleName = (ASTModuleNameNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

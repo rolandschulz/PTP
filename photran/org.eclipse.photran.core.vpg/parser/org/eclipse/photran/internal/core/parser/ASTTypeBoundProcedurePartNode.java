@@ -40,6 +40,7 @@ public class ASTTypeBoundProcedurePartNode extends ASTNode
     public void setContainsStmt(ASTContainsStmtNode newValue)
     {
         this.containsStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTTypeBoundProcedurePartNode extends ASTNode
     public void setBindingPrivateStmt(ASTBindingPrivateStmtNode newValue)
     {
         this.bindingPrivateStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTTypeBoundProcedurePartNode extends ASTNode
     public void setProcBindingStmts(IASTListNode<IProcBindingStmt> newValue)
     {
         this.procBindingStmts = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +86,7 @@ public class ASTTypeBoundProcedurePartNode extends ASTNode
         case 0:  return this.containsStmt;
         case 1:  return this.bindingPrivateStmt;
         case 2:  return this.procBindingStmts;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,9 +94,9 @@ public class ASTTypeBoundProcedurePartNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.containsStmt = (ASTContainsStmtNode)value; return;
-        case 1:  this.bindingPrivateStmt = (ASTBindingPrivateStmtNode)value; return;
-        case 2:  this.procBindingStmts = (IASTListNode<IProcBindingStmt>)value; return;
+        case 0:  this.containsStmt = (ASTContainsStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.bindingPrivateStmt = (ASTBindingPrivateStmtNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.procBindingStmts = (IASTListNode<IProcBindingStmt>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

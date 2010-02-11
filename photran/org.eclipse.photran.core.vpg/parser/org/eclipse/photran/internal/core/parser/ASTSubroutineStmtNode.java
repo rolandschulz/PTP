@@ -49,6 +49,7 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -60,6 +61,7 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void setPrefixSpecList(IASTListNode<ASTPrefixSpecNode> newValue)
     {
         this.prefixSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -71,6 +73,7 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void setSubroutineName(ASTSubroutineNameNode newValue)
     {
         this.subroutineName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -82,6 +85,7 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void setSubroutinePars(IASTListNode<ASTSubroutineParNode> newValue)
     {
         this.subroutinePars = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -112,7 +116,7 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 9:  return this.hiddenTIdent;
         case 10: return this.hiddenTRparen2;
         case 11: return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -120,18 +124,18 @@ public class ASTSubroutineStmtNode extends ASTNodeWithErrorRecoverySymbols
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value; return;
-        case 2:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.subroutineName = (ASTSubroutineNameNode)value; return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value; return;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTBind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.hiddenTIdent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 11: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTSubroutine = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.subroutineName = (ASTSubroutineNameNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTBind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTIdent = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 11: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -48,6 +48,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,6 +60,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     public void setAccessSpec(ASTAccessSpecNode newValue)
     {
         this.accessSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,6 +72,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     public void setGenericName(ASTGenericNameNode newValue)
     {
         this.genericName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -81,6 +84,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     public void setGenericSpec(ASTGenericSpecNode newValue)
     {
         this.genericSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -92,6 +96,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     public void setBindingNameList(IASTListNode<org.eclipse.photran.internal.core.lexer.Token> newValue)
     {
         this.bindingNameList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -122,7 +127,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
         case 8:  return this.hiddenTEqgreaterthan;
         case 9:  return this.bindingNameList;
         case 10: return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -130,17 +135,17 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTGeneric = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.accessSpec = (ASTAccessSpecNode)value; return;
-        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.genericName = (ASTGenericNameNode)value; return;
-        case 7:  this.genericSpec = (ASTGenericSpecNode)value; return;
-        case 8:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.bindingNameList = (IASTListNode<org.eclipse.photran.internal.core.lexer.Token>)value; return;
-        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTGeneric = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.genericName = (ASTGenericNameNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.genericSpec = (ASTGenericSpecNode)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.bindingNameList = (IASTListNode<org.eclipse.photran.internal.core.lexer.Token>)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

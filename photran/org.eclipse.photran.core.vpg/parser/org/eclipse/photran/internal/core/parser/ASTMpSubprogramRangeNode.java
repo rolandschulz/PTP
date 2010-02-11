@@ -41,6 +41,7 @@ public class ASTMpSubprogramRangeNode extends ASTNode
     public void setBody(IASTListNode<IBodyConstruct> newValue)
     {
         this.body = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTMpSubprogramRangeNode extends ASTNode
     public void setContainsStmt(ASTContainsStmtNode newValue)
     {
         this.containsStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTMpSubprogramRangeNode extends ASTNode
     public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
     {
         this.internalSubprograms = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTMpSubprogramRangeNode extends ASTNode
     public void setEndMpSubprogramStmt(ASTEndMpSubprogramStmtNode newValue)
     {
         this.endMpSubprogramStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +100,7 @@ public class ASTMpSubprogramRangeNode extends ASTNode
         case 1:  return this.containsStmt;
         case 2:  return this.internalSubprograms;
         case 3:  return this.endMpSubprogramStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,10 +108,10 @@ public class ASTMpSubprogramRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.body = (IASTListNode<IBodyConstruct>)value; return;
-        case 1:  this.containsStmt = (ASTContainsStmtNode)value; return;
-        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
-        case 3:  this.endMpSubprogramStmt = (ASTEndMpSubprogramStmtNode)value; return;
+        case 0:  this.body = (IASTListNode<IBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.containsStmt = (ASTContainsStmtNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.endMpSubprogramStmt = (ASTEndMpSubprogramStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

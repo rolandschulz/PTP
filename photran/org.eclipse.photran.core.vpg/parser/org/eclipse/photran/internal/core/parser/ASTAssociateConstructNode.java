@@ -40,6 +40,7 @@ public class ASTAssociateConstructNode extends ASTNode implements IExecutableCon
     public void setAssociateStmt(ASTAssociateStmtNode newValue)
     {
         this.associateStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTAssociateConstructNode extends ASTNode implements IExecutableCon
     public void setAssociateBody(IASTListNode<IExecutionPartConstruct> newValue)
     {
         this.associateBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTAssociateConstructNode extends ASTNode implements IExecutableCon
     public void setEndAssociateStmt(ASTEndAssociateStmtNode newValue)
     {
         this.endAssociateStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTAssociateConstructNode extends ASTNode implements IExecutableCon
         case 0:  return this.associateStmt;
         case 1:  return this.associateBody;
         case 2:  return this.endAssociateStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTAssociateConstructNode extends ASTNode implements IExecutableCon
     {
         switch (index)
         {
-        case 0:  this.associateStmt = (ASTAssociateStmtNode)value; return;
-        case 1:  this.associateBody = (IASTListNode<IExecutionPartConstruct>)value; return;
-        case 2:  this.endAssociateStmt = (ASTEndAssociateStmtNode)value; return;
+        case 0:  this.associateStmt = (ASTAssociateStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.associateBody = (IASTListNode<IExecutionPartConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endAssociateStmt = (ASTEndAssociateStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

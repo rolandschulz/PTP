@@ -39,6 +39,7 @@ public class ASTStructureComponentNode extends ASTNode implements IDataIDoObject
     public void setVariableName(ASTVariableNameNode newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTStructureComponentNode extends ASTNode implements IDataIDoObject
     public void setFieldSelector(ASTFieldSelectorNode newValue)
     {
         this.fieldSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -71,7 +73,7 @@ public class ASTStructureComponentNode extends ASTNode implements IDataIDoObject
         {
         case 0:  return this.variableName;
         case 1:  return this.fieldSelector;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -79,8 +81,8 @@ public class ASTStructureComponentNode extends ASTNode implements IDataIDoObject
     {
         switch (index)
         {
-        case 0:  this.variableName = (ASTVariableNameNode)value; return;
-        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value; return;
+        case 0:  this.variableName = (ASTVariableNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.fieldSelector = (ASTFieldSelectorNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

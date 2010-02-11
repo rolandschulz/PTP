@@ -39,6 +39,7 @@ public class ASTImageSetNode extends ASTNode
     public void setIsExpr(IExpr newValue)
     {
         this.isExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTImageSetNode extends ASTNode
     public void setIsStar(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isStar = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTImageSetNode extends ASTNode
         {
         case 0:  return this.isExpr;
         case 1:  return this.isStar;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTImageSetNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isExpr = (IExpr)value; return;
-        case 1:  this.isStar = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isStar = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

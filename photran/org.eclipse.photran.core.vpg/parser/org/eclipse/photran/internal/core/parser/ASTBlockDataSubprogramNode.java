@@ -40,6 +40,7 @@ public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramU
     public void setBlockDataStmt(ASTBlockDataStmtNode newValue)
     {
         this.blockDataStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramU
     public void setBlockDataBody(IASTListNode<IBlockDataBodyConstruct> newValue)
     {
         this.blockDataBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramU
     public void setEndBlockDataStmt(ASTEndBlockDataStmtNode newValue)
     {
         this.endBlockDataStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramU
         case 0:  return this.blockDataStmt;
         case 1:  return this.blockDataBody;
         case 2:  return this.endBlockDataStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTBlockDataSubprogramNode extends ScopingNode implements IProgramU
     {
         switch (index)
         {
-        case 0:  this.blockDataStmt = (ASTBlockDataStmtNode)value; return;
-        case 1:  this.blockDataBody = (IASTListNode<IBlockDataBodyConstruct>)value; return;
-        case 2:  this.endBlockDataStmt = (ASTEndBlockDataStmtNode)value; return;
+        case 0:  this.blockDataStmt = (ASTBlockDataStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.blockDataBody = (IASTListNode<IBlockDataBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endBlockDataStmt = (ASTEndBlockDataStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

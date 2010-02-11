@@ -43,6 +43,7 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
     public void setConnectSpecList(IASTListNode<ASTConnectSpecListNode> newValue)
     {
         this.connectSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -79,7 +81,7 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
         case 3:  return this.connectSpecList;
         case 4:  return this.hiddenTRparen;
         case 5:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -87,12 +89,12 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTOpen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.connectSpecList = (IASTListNode<ASTConnectSpecListNode>)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTOpen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.connectSpecList = (IASTListNode<ASTConnectSpecListNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

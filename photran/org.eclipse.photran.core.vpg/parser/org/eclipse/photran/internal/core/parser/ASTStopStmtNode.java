@@ -43,6 +43,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.stringConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -65,6 +67,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,6 +79,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     public void setParamVar(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.paramVar = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -101,7 +105,7 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
         case 3:  return this.intConst;
         case 4:  return this.paramVar;
         case 5:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -109,12 +113,12 @@ public class ASTStopStmtNode extends ASTNode implements IActionStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTStop = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.paramVar = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTStop = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.paramVar = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

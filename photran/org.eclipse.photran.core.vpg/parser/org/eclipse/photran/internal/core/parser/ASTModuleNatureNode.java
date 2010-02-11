@@ -28,19 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public class ASTModuleNatureNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isNonIntrinsic; // in ASTModuleNatureNode
     org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTModuleNatureNode
-
-    public boolean isNonIntrinsic()
-    {
-        return this.isNonIntrinsic != null;
-    }
-
-    public void setIsNonIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isNonIntrinsic = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isNonIntrinsic; // in ASTModuleNatureNode
 
     public boolean isIntrinsic()
     {
@@ -50,6 +39,19 @@ public class ASTModuleNatureNode extends ASTNode
     public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isIntrinsic = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isNonIntrinsic()
+    {
+        return this.isNonIntrinsic != null;
+    }
+
+    public void setIsNonIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isNonIntrinsic = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -68,9 +70,9 @@ public class ASTModuleNatureNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isNonIntrinsic;
-        case 1:  return this.isIntrinsic;
-        default: return null;
+        case 0:  return this.isIntrinsic;
+        case 1:  return this.isNonIntrinsic;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTModuleNatureNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isNonIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isNonIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

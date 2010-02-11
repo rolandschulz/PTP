@@ -39,6 +39,7 @@ public class ASTFunctionInterfaceRangeNode extends ASTNode
     public void setSubprogramInterfaceBody(IASTListNode<ISpecificationPartConstruct> newValue)
     {
         this.subprogramInterfaceBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTFunctionInterfaceRangeNode extends ASTNode
     public void setEndFunctionStmt(ASTEndFunctionStmtNode newValue)
     {
         this.endFunctionStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTFunctionInterfaceRangeNode extends ASTNode
         {
         case 0:  return this.subprogramInterfaceBody;
         case 1:  return this.endFunctionStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTFunctionInterfaceRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; return;
-        case 1:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; return;
+        case 0:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

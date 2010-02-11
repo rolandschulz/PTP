@@ -39,6 +39,7 @@ public class ASTFunctionPrefixNode extends ASTNode
     public void setPrefixSpecList(IASTListNode<ASTPrefixSpecNode> newValue)
     {
         this.prefixSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,7 +60,7 @@ public class ASTFunctionPrefixNode extends ASTNode
         {
         case 0:  return this.prefixSpecList;
         case 1:  return this.hiddenTFunction;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -67,8 +68,8 @@ public class ASTFunctionPrefixNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value; return;
-        case 1:  this.hiddenTFunction = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.prefixSpecList = (IASTListNode<ASTPrefixSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTFunction = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

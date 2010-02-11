@@ -39,6 +39,7 @@ public class ASTCoarraySpecNode extends ASTNode
     public void setDeferredCoshapeSpecList(IASTListNode<ASTDeferredCoshapeSpecListNode> newValue)
     {
         this.deferredCoshapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTCoarraySpecNode extends ASTNode
     public void setExplicitCoshapeSpec(ASTExplicitCoshapeSpecNode newValue)
     {
         this.explicitCoshapeSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTCoarraySpecNode extends ASTNode
         {
         case 0:  return this.deferredCoshapeSpecList;
         case 1:  return this.explicitCoshapeSpec;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTCoarraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.deferredCoshapeSpecList = (IASTListNode<ASTDeferredCoshapeSpecListNode>)value; return;
-        case 1:  this.explicitCoshapeSpec = (ASTExplicitCoshapeSpecNode)value; return;
+        case 0:  this.deferredCoshapeSpecList = (IASTListNode<ASTDeferredCoshapeSpecListNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.explicitCoshapeSpec = (ASTExplicitCoshapeSpecNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

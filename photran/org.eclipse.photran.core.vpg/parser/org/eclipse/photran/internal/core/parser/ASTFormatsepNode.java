@@ -39,6 +39,7 @@ public class ASTFormatsepNode extends ASTNode
     public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.slashFormatSep = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTFormatsepNode extends ASTNode
     public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.colonFormatSep = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTFormatsepNode extends ASTNode
         {
         case 0:  return this.slashFormatSep;
         case 1:  return this.colonFormatSep;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

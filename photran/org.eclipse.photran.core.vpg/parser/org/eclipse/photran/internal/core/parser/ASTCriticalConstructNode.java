@@ -40,6 +40,7 @@ public class ASTCriticalConstructNode extends ASTNode implements IExecutableCons
     public void setCriticalStmt(ASTCriticalStmtNode newValue)
     {
         this.criticalStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTCriticalConstructNode extends ASTNode implements IExecutableCons
     public void setBody(IASTListNode<IBodyConstruct> newValue)
     {
         this.body = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTCriticalConstructNode extends ASTNode implements IExecutableCons
     public void setEndCriticalStmt(ASTEndCriticalStmtNode newValue)
     {
         this.endCriticalStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTCriticalConstructNode extends ASTNode implements IExecutableCons
         case 0:  return this.criticalStmt;
         case 1:  return this.body;
         case 2:  return this.endCriticalStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTCriticalConstructNode extends ASTNode implements IExecutableCons
     {
         switch (index)
         {
-        case 0:  this.criticalStmt = (ASTCriticalStmtNode)value; return;
-        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; return;
-        case 2:  this.endCriticalStmt = (ASTEndCriticalStmtNode)value; return;
+        case 0:  this.criticalStmt = (ASTCriticalStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endCriticalStmt = (ASTEndCriticalStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

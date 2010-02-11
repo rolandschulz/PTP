@@ -40,6 +40,7 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
     public void setForallConstructStmt(ASTForallConstructStmtNode newValue)
     {
         this.forallConstructStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
     public void setForallBody(IASTListNode<IForallBodyConstruct> newValue)
     {
         this.forallBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
     public void setEndForallStmt(ASTEndForallStmtNode newValue)
     {
         this.endForallStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -88,7 +91,7 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
         case 0:  return this.forallConstructStmt;
         case 1:  return this.forallBody;
         case 2:  return this.endForallStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -96,9 +99,9 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
     {
         switch (index)
         {
-        case 0:  this.forallConstructStmt = (ASTForallConstructStmtNode)value; return;
-        case 1:  this.forallBody = (IASTListNode<IForallBodyConstruct>)value; return;
-        case 2:  this.endForallStmt = (ASTEndForallStmtNode)value; return;
+        case 0:  this.forallConstructStmt = (ASTForallConstructStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.forallBody = (IASTListNode<IForallBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endForallStmt = (ASTEndForallStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

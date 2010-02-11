@@ -40,6 +40,7 @@ public class ASTCloseSpecListNode extends ASTNode
     public void setCloseSpec(ASTCloseSpecNode newValue)
     {
         this.closeSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTCloseSpecListNode extends ASTNode
     public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
         this.unitIdentifier = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -72,7 +74,7 @@ public class ASTCloseSpecListNode extends ASTNode
         case 0:  return this.hiddenTComma;
         case 1:  return this.closeSpec;
         case 2:  return this.unitIdentifier;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -80,9 +82,9 @@ public class ASTCloseSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.closeSpec = (ASTCloseSpecNode)value; return;
-        case 2:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.closeSpec = (ASTCloseSpecNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.unitIdentifier = (ASTUnitIdentifierNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

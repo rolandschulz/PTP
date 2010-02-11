@@ -42,6 +42,7 @@ public class ASTDerivedTypeQualifiersNode extends ASTNode
     public void setArgList(IASTListNode<ASTSubroutineArgNode> newValue)
     {
         this.argList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTDerivedTypeQualifiersNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,7 +78,7 @@ public class ASTDerivedTypeQualifiersNode extends ASTNode
         case 2:  return this.hiddenTRparen;
         case 3:  return this.hiddenTPercent;
         case 4:  return this.name;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -84,11 +86,11 @@ public class ASTDerivedTypeQualifiersNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.argList = (IASTListNode<ASTSubroutineArgNode>)value; return;
-        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.argList = (IASTListNode<ASTSubroutineArgNode>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTPercent = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

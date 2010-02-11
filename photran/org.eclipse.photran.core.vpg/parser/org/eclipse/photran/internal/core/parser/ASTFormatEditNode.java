@@ -41,6 +41,7 @@ public class ASTFormatEditNode extends ASTNode
     public void setHexConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hexConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTFormatEditNode extends ASTNode
     public void setPConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.pConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTFormatEditNode extends ASTNode
     public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTFormatEditNode extends ASTNode
     public void setEditElement(ASTEditElementNode newValue)
     {
         this.editElement = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +100,7 @@ public class ASTFormatEditNode extends ASTNode
         case 1:  return this.pConst;
         case 2:  return this.intConst;
         case 3:  return this.editElement;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,10 +108,10 @@ public class ASTFormatEditNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.editElement = (ASTEditElementNode)value; return;
+        case 0:  this.hexConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.pConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.editElement = (ASTEditElementNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -41,6 +41,7 @@ public class ASTSavedEntityNode extends ASTNode
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTSavedEntityNode extends ASTNode
     public void setCommonBlockName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.commonBlockName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTSavedEntityNode extends ASTNode
         case 1:  return this.hiddenTSlash;
         case 2:  return this.commonBlockName;
         case 3:  return this.hiddenTSlash2;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTSavedEntityNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.commonBlockName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -42,6 +42,7 @@ public class ASTComplexConstNode extends ASTNode implements IUnsignedArithmeticC
     public void setRealPart(IExpr newValue)
     {
         this.realPart = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTComplexConstNode extends ASTNode implements IUnsignedArithmeticC
     public void setComplexPart(IExpr newValue)
     {
         this.complexPart = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,7 +79,7 @@ public class ASTComplexConstNode extends ASTNode implements IUnsignedArithmeticC
         case 2:  return this.hiddenTComma;
         case 3:  return this.complexPart;
         case 4:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -85,11 +87,11 @@ public class ASTComplexConstNode extends ASTNode implements IUnsignedArithmeticC
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.realPart = (IExpr)value; return;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.complexPart = (IExpr)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.realPart = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.complexPart = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

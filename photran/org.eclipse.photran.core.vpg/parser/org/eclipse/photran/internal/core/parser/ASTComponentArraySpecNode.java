@@ -39,6 +39,7 @@ public class ASTComponentArraySpecNode extends ASTNode
     public void setDeferredShapeSpecList(IASTListNode<ASTDeferredShapeSpecListNode> newValue)
     {
         this.deferredShapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTComponentArraySpecNode extends ASTNode
     public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
     {
         this.explicitShapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTComponentArraySpecNode extends ASTNode
         {
         case 0:  return this.deferredShapeSpecList;
         case 1:  return this.explicitShapeSpecList;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTComponentArraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; return;
-        case 1:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
+        case 0:  this.deferredShapeSpecList = (IASTListNode<ASTDeferredShapeSpecListNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

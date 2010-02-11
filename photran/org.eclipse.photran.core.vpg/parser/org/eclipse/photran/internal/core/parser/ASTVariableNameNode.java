@@ -38,6 +38,7 @@ public class ASTVariableNameNode extends ASTNode implements IBindEntity
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -58,7 +59,7 @@ public class ASTVariableNameNode extends ASTNode implements IBindEntity
         switch (index)
         {
         case 0:  return this.variableName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -66,7 +67,7 @@ public class ASTVariableNameNode extends ASTNode implements IBindEntity
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -46,6 +46,7 @@ public class ASTRenameNode extends ASTNode
     public void setIsOperator(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isOperator = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,6 +58,7 @@ public class ASTRenameNode extends ASTNode
     public void setNewName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.newName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -68,6 +70,7 @@ public class ASTRenameNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -95,7 +98,7 @@ public class ASTRenameNode extends ASTNode
         case 6:  return this.hiddenTLparen2;
         case 7:  return this.name;
         case 8:  return this.hiddenTRparen2;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -103,15 +106,15 @@ public class ASTRenameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTOperator = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isOperator = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.newName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTOperator = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

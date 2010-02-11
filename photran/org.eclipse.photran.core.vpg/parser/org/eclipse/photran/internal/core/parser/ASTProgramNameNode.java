@@ -38,6 +38,7 @@ public class ASTProgramNameNode extends ASTNode
     public void setProgramName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.programName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTProgramNameNode extends ASTNode
         switch (index)
         {
         case 0:  return this.programName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTProgramNameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.programName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.programName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

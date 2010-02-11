@@ -44,6 +44,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     public void setDataRef(IASTListNode<ASTDataRefNode> newValue)
     {
         this.dataRef = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -55,6 +56,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.stringConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,6 +68,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.sectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,6 +80,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     public void setImageSelector(ASTImageSelectorNode newValue)
     {
         this.imageSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -88,6 +92,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     public void setSubstringRange(ASTSubstringRangeNode newValue)
     {
         this.substringRange = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -115,7 +120,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
         case 4:  return this.hiddenTRparen;
         case 5:  return this.imageSelector;
         case 6:  return this.substringRange;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -123,13 +128,13 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     {
         switch (index)
         {
-        case 0:  this.dataRef = (IASTListNode<ASTDataRefNode>)value; return;
-        case 1:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.imageSelector = (ASTImageSelectorNode)value; return;
-        case 6:  this.substringRange = (ASTSubstringRangeNode)value; return;
+        case 0:  this.dataRef = (IASTListNode<ASTDataRefNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.imageSelector = (ASTImageSelectorNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.substringRange = (ASTSubstringRangeNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -42,6 +42,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     public void setProgramStmt(ASTProgramStmtNode newValue)
     {
         this.programStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     public void setBody(IASTListNode<IBodyConstruct> newValue)
     {
         this.body = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     public void setContainsStmt(ASTContainsStmtNode newValue)
     {
         this.containsStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
     {
         this.internalSubprograms = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -86,6 +90,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     public void setEndProgramStmt(ASTEndProgramStmtNode newValue)
     {
         this.endProgramStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -110,7 +115,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
         case 2:  return this.containsStmt;
         case 3:  return this.internalSubprograms;
         case 4:  return this.endProgramStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -118,11 +123,11 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     {
         switch (index)
         {
-        case 0:  this.programStmt = (ASTProgramStmtNode)value; return;
-        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; return;
-        case 2:  this.containsStmt = (ASTContainsStmtNode)value; return;
-        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
-        case 4:  this.endProgramStmt = (ASTEndProgramStmtNode)value; return;
+        case 0:  this.programStmt = (ASTProgramStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.containsStmt = (ASTContainsStmtNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.endProgramStmt = (ASTEndProgramStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

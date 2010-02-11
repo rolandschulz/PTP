@@ -44,6 +44,7 @@ public class ASTEditElementNode extends ASTNode
     public void setIdentifier(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.identifier = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -55,6 +56,7 @@ public class ASTEditElementNode extends ASTNode
     public void setHollerith(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hollerith = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,6 +68,7 @@ public class ASTEditElementNode extends ASTNode
     public void setFmtSpec(IASTListNode<ASTFmtSpecNode> newValue)
     {
         this.fmtSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,6 +80,7 @@ public class ASTEditElementNode extends ASTNode
     public void setFloatConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.floatConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -88,6 +92,7 @@ public class ASTEditElementNode extends ASTNode
     public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.stringConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -113,7 +118,7 @@ public class ASTEditElementNode extends ASTNode
         case 4:  return this.hiddenTRparen;
         case 5:  return this.floatConst;
         case 6:  return this.stringConst;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -121,13 +126,13 @@ public class ASTEditElementNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.identifier = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hollerith = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.fmtSpec = (IASTListNode<ASTFmtSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.floatConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

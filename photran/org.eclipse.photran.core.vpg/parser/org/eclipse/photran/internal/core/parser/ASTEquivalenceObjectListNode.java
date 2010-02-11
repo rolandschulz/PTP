@@ -39,6 +39,7 @@ public class ASTEquivalenceObjectListNode extends ASTNode
     public void setVariable(ASTVariableNode newValue)
     {
         this.variable = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,7 +60,7 @@ public class ASTEquivalenceObjectListNode extends ASTNode
         {
         case 0:  return this.hiddenTComma;
         case 1:  return this.variable;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -67,8 +68,8 @@ public class ASTEquivalenceObjectListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.variable = (ASTVariableNode)value; return;
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.variable = (ASTVariableNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

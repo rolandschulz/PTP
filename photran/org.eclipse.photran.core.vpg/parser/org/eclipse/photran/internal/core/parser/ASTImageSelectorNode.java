@@ -40,6 +40,7 @@ public class ASTImageSelectorNode extends ASTNode
     public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.sectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -61,7 +62,7 @@ public class ASTImageSelectorNode extends ASTNode
         case 0:  return this.hiddenTLbracket;
         case 1:  return this.sectionSubscriptList;
         case 2:  return this.hiddenTRbracket;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -69,9 +70,9 @@ public class ASTImageSelectorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 2:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

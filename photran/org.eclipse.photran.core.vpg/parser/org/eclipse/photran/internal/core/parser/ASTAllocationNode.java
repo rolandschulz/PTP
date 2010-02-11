@@ -44,6 +44,7 @@ public class ASTAllocationNode extends ASTNode
     public void setAllocateObject(IASTListNode<ASTAllocateObjectNode> newValue)
     {
         this.allocateObject = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -55,6 +56,7 @@ public class ASTAllocationNode extends ASTNode
     public void setHasAllocatedShape(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasAllocatedShape = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,6 +68,7 @@ public class ASTAllocationNode extends ASTNode
     public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.sectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,6 +80,7 @@ public class ASTAllocationNode extends ASTNode
     public void setAllocateCoarraySpec(ASTAllocateCoarraySpecNode newValue)
     {
         this.allocateCoarraySpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -102,7 +106,7 @@ public class ASTAllocationNode extends ASTNode
         case 4:  return this.hiddenTLbracket;
         case 5:  return this.allocateCoarraySpec;
         case 6:  return this.hiddenTRbracket;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -110,13 +114,13 @@ public class ASTAllocationNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.allocateObject = (IASTListNode<ASTAllocateObjectNode>)value; return;
-        case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.allocateCoarraySpec = (ASTAllocateCoarraySpecNode)value; return;
-        case 6:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.allocateObject = (IASTListNode<ASTAllocateObjectNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hasAllocatedShape = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.allocateCoarraySpec = (ASTAllocateCoarraySpecNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

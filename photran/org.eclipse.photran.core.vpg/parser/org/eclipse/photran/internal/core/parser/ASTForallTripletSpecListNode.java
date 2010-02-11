@@ -44,6 +44,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
     public void setName(ASTNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -55,6 +56,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
     public void setLb(ASTSubscriptNode newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,6 +68,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
     public void setUb(ASTSubscriptNode newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,6 +80,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
     public void setStepExpr(IExpr newValue)
     {
         this.stepExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -102,7 +106,7 @@ public class ASTForallTripletSpecListNode extends ASTNode
         case 4:  return this.ub;
         case 5:  return this.hiddenTColon2;
         case 6:  return this.stepExpr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -110,13 +114,13 @@ public class ASTForallTripletSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value; return;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.lb = (ASTSubscriptNode)value; return;
-        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.ub = (ASTSubscriptNode)value; return;
-        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.stepExpr = (IExpr)value; return;
+        case 0:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.lb = (ASTSubscriptNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.ub = (ASTSubscriptNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.stepExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

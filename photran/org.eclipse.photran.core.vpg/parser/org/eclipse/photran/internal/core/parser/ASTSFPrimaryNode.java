@@ -45,6 +45,7 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setSFDataRef(IASTListNode<ASTSFDataRefNode> newValue)
     {
         this.SFDataRef = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -56,6 +57,7 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setFunctionReference(ASTFunctionReferenceNode newValue)
     {
         this.functionReference = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -67,6 +69,7 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -78,6 +81,7 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -89,6 +93,7 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setSFVarName(ASTSFVarNameNode newValue)
     {
         this.SFVarName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -100,6 +105,7 @@ public class ASTSFPrimaryNode extends ASTNode
     public void setArrayConstructor(ASTArrayConstructorNode newValue)
     {
         this.arrayConstructor = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -126,7 +132,7 @@ public class ASTSFPrimaryNode extends ASTNode
         case 5:  return this.intConst;
         case 6:  return this.SFVarName;
         case 7:  return this.arrayConstructor;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -134,14 +140,14 @@ public class ASTSFPrimaryNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.SFDataRef = (IASTListNode<ASTSFDataRefNode>)value; return;
-        case 1:  this.functionReference = (ASTFunctionReferenceNode)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.expr = (IExpr)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.SFVarName = (ASTSFVarNameNode)value; return;
-        case 7:  this.arrayConstructor = (ASTArrayConstructorNode)value; return;
+        case 0:  this.SFDataRef = (IASTListNode<ASTSFDataRefNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.functionReference = (ASTFunctionReferenceNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.SFVarName = (ASTSFVarNameNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.arrayConstructor = (ASTArrayConstructorNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -40,6 +40,7 @@ public class ASTBinaryExprNode extends ASTNode implements IExpr, ISelector
     public void setLhsExpr(IExpr newValue)
     {
         this.lhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTBinaryExprNode extends ASTNode implements IExpr, ISelector
     public void setOperator(ASTOperatorNode newValue)
     {
         this.operator = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTBinaryExprNode extends ASTNode implements IExpr, ISelector
     public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -85,7 +88,7 @@ public class ASTBinaryExprNode extends ASTNode implements IExpr, ISelector
         case 0:  return this.lhsExpr;
         case 1:  return this.operator;
         case 2:  return this.rhsExpr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -93,9 +96,9 @@ public class ASTBinaryExprNode extends ASTNode implements IExpr, ISelector
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (IExpr)value; return;
-        case 1:  this.operator = (ASTOperatorNode)value; return;
-        case 2:  this.rhsExpr = (IExpr)value; return;
+        case 0:  this.lhsExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 1:  this.operator = (ASTOperatorNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.rhsExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

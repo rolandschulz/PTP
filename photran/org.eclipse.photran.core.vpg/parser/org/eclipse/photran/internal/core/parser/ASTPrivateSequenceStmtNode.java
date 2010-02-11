@@ -42,6 +42,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     public void setSequenceToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.sequenceToken = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     public void setIsSequence(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isSequence = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     public void setPrivateToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.privateToken = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -86,6 +90,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     public void setIsPrivate(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isPrivate = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -110,7 +115,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
         case 2:  return this.isSequence;
         case 3:  return this.privateToken;
         case 4:  return this.isPrivate;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -118,11 +123,11 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.sequenceToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.isSequence = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.sequenceToken = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isSequence = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -39,6 +39,7 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     public void setIsKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     public void setIsLen(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isLen = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
         {
         case 0:  return this.isKind;
         case 1:  return this.isLen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isLen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isLen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

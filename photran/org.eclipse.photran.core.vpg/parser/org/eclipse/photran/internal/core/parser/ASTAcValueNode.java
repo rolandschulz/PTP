@@ -39,6 +39,7 @@ public class ASTAcValueNode extends ASTNode
     public void setAcImpliedDo(ASTAcImpliedDoNode newValue)
     {
         this.acImpliedDo = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTAcValueNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTAcValueNode extends ASTNode
         {
         case 0:  return this.acImpliedDo;
         case 1:  return this.expr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTAcValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.acImpliedDo = (ASTAcImpliedDoNode)value; return;
-        case 1:  this.expr = (IExpr)value; return;
+        case 0:  this.acImpliedDo = (ASTAcImpliedDoNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

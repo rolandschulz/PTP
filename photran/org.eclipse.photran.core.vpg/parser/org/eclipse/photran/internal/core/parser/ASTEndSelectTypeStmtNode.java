@@ -42,6 +42,7 @@ public class ASTEndSelectTypeStmtNode extends ASTNode
     public void setSelectConstructName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.selectConstructName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -65,7 +66,7 @@ public class ASTEndSelectTypeStmtNode extends ASTNode
         case 2:  return this.hiddenTSelect;
         case 3:  return this.selectConstructName;
         case 4:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -73,11 +74,11 @@ public class ASTEndSelectTypeStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTEndbeforeselect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEndselect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.selectConstructName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTEndbeforeselect = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEndselect = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.selectConstructName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

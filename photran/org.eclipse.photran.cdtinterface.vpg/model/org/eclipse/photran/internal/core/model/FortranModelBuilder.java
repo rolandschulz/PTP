@@ -109,7 +109,10 @@ public class FortranModelBuilder implements IFortranModelBuilder
         }
         catch (Exception e)
         {
-            FortranElement elt = createParseFailureNode(translationUnit, e.getMessage());
+            String message = e.getMessage();
+            if (!e.getClass().equals(Exception.class))
+                message = e.getClass().getSimpleName() + ": " + message; // Not a legit parser error
+            FortranElement elt = createParseFailureNode(translationUnit, message);
             if (lexer != null)
             {
                 int offset = lexer.getLastTokenFileOffset();

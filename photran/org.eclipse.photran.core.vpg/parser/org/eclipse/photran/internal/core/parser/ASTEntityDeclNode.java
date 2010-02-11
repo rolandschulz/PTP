@@ -54,6 +54,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setObjectName(ASTObjectNameNode newValue)
     {
         this.objectName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -65,6 +66,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setInitialCharLength(ASTCharLengthNode newValue)
     {
         this.initialCharLength = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,6 +78,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setLogicalConstant(ASTLogicalConstNode newValue)
     {
         this.logicalConstant = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -87,6 +90,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setArraySpec(ASTArraySpecNode newValue)
     {
         this.arraySpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -98,6 +102,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setCoarraySpec(ASTCoarraySpecNode newValue)
     {
         this.coarraySpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -109,6 +114,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setCharLength(ASTCharLengthNode newValue)
     {
         this.charLength = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -120,6 +126,7 @@ public class ASTEntityDeclNode extends ASTNode
     public void setInitialization(ASTInitializationNode newValue)
     {
         this.initialization = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -155,7 +162,7 @@ public class ASTEntityDeclNode extends ASTNode
         case 14: return this.charLength;
         case 15: return this.hiddenRparen2;
         case 16: return this.initialization;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -163,23 +170,23 @@ public class ASTEntityDeclNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.objectName = (ASTObjectNameNode)value; return;
-        case 1:  this.hiddenAsterisk2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.initialCharLength = (ASTCharLengthNode)value; return;
-        case 3:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.logicalConstant = (ASTLogicalConstNode)value; return;
-        case 6:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.arraySpec = (ASTArraySpecNode)value; return;
-        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 11: this.coarraySpec = (ASTCoarraySpecNode)value; return;
-        case 12: this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 13: this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 14: this.charLength = (ASTCharLengthNode)value; return;
-        case 15: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 16: this.initialization = (ASTInitializationNode)value; return;
+        case 0:  this.objectName = (ASTObjectNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenAsterisk2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.initialCharLength = (ASTCharLengthNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.logicalConstant = (ASTLogicalConstNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.arraySpec = (ASTArraySpecNode)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 11: this.coarraySpec = (ASTCoarraySpecNode)value; if (value != null) value.setParent(this); return;
+        case 12: this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 13: this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 14: this.charLength = (ASTCharLengthNode)value; if (value != null) value.setParent(this); return;
+        case 15: this.hiddenRparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 16: this.initialization = (ASTInitializationNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

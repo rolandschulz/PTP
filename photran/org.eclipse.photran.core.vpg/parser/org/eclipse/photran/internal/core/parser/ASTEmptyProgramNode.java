@@ -46,7 +46,7 @@ public class ASTEmptyProgramNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -54,7 +54,7 @@ public class ASTEmptyProgramNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

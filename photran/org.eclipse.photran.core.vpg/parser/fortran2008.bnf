@@ -50,11 +50,31 @@
 # Last CVS version with optionals: 4.0.0 Beta 1 or Pre-LANL
 
 #######################################################################################################################
+# AST Customizations
+#######################################################################################################################
+
+# Inheritance rules
+* ASTExecutableProgramNode(extends=ScopingNode)
+* ASTMainProgramNode(extends=ScopingNode)
+* ASTFunctionSubprogramNode(extends=ScopingNode)
+* ASTSubroutineSubprogramNode(extends=ScopingNode)
+* ASTSeparateModuleSubprogramNode(extends=ScopingNode)
+* ASTModuleNode(extends=ScopingNode)
+* ASTSubmoduleNode(extends=ScopingNode)
+* ASTBlockDataSubprogramNode(extends=ScopingNode)
+* ASTDerivedTypeDefNode(extends=ScopingNode)
+* ASTBlockConstructNode(extends=ScopingNode)
+* ASTInterfaceBlockNode(extends=ScopingNode)
+
+# Custom code
+* IActionStmt =>    Token getLabel();
+
+#######################################################################################################################
 # Section 2 Rules
 #######################################################################################################################
 
 # R201
-(customsuperclass=ScopingNode):<ExecutableProgram> ::=
+<ExecutableProgram> ::=
     <ProgramUnitList>
   | <EmptyProgram>
 
@@ -79,7 +99,7 @@
 # R203 chain rule eliminated
 
 # R1101 doesn't ensure ordering as the standard requires
-(customsuperclass=ScopingNode):<MainProgram> ::=
+<MainProgram> ::=
   |               (inline):<MainRange>
   | <ProgramStmt> (inline):<MainRange>
 
@@ -103,7 +123,7 @@
 #######################################################################################################################
 
 # R1216
-(customsuperclass=ScopingNode):<FunctionSubprogram> ::=
+<FunctionSubprogram> ::=
   <FunctionStmt> (inline):<FunctionRange>
 
 <FunctionRange> ::=
@@ -112,7 +132,7 @@
   | (inline):<BodyPlusInternals> <EndFunctionStmt>
 
 # R1221
-(customsuperclass=ScopingNode):<SubroutineSubprogram> ::=
+<SubroutineSubprogram> ::=
   <SubroutineStmt> (inline):<SubroutineRange>
 
 <SubroutineRange> ::=
@@ -121,7 +141,7 @@
   | (inline):<BodyPlusInternals> <EndSubroutineStmt>
 
 # F08 R1237
-(customsuperclass=ScopingNode):<SeparateModuleSubprogram> ::=
+<SeparateModuleSubprogram> ::=
   <MpSubprogramStmt> (inline):<MpSubprogramRange>
 
 <MpSubprogramRange> ::=
@@ -146,7 +166,7 @@
 #######################################################################################################################
 
 # R1104
-(customsuperclass=ScopingNode):<Module> ::=
+<Module> ::=
   <ModuleStmt> (inline):<ModuleBlock>
 
 <ModuleBlock> ::=
@@ -168,7 +188,7 @@
   | <ModuleSubprogramPartConstruct>
 
 # F08 R1116
-(customsuperclass=ScopingNode):<Submodule> ::=
+<Submodule> ::=
   <SubmoduleStmt> (inline):<SubmoduleBlock>
 
 <SubmoduleBlock> ::=
@@ -193,7 +213,7 @@
   | (inline):<LblDef> -:T_END -:T_SUBMODULE (inline):<EndName> -:T_EOS
 
 # R1112
-(customsuperclass=ScopingNode):<BlockDataSubprogram> ::=
+<BlockDataSubprogram> ::=
   | <BlockDataStmt> <BlockDataBody> <EndBlockDataStmt>
   | <BlockDataStmt>                 <EndBlockDataStmt>
 
@@ -543,10 +563,10 @@ ASTLogicalConstNode:<LogicalConstant> ::=
   | isFalse(bool):T_FALSE -:T_UNDERSCORE (inline):<KindParam>
 
 # R422 This does not enforce the required sequence
-#(customsuperclass=ScopingNode):<DerivedTypeDef> ::=
+#<DerivedTypeDef> ::=
 #  <DerivedTypeStmt> <DerivedTypeBody> <EndTypeStmt>
 # R422 -- F03 R429 # TODO: Note ... in spec -- need to fix!
-(customsuperclass=ScopingNode):<DerivedTypeDef> ::=
+<DerivedTypeDef> ::=
 #                   (1)--------------- (2)-------------- (3)---------------------
 | <DerivedTypeStmt>                                                               <EndTypeStmt>
 | <DerivedTypeStmt>                                      <TypeBoundProcedurePart> <EndTypeStmt>
@@ -1873,41 +1893,41 @@ IExpr(superclass):<Expr> ::=
 
 # R735 - JO - Macro substituted; added error production
 ASTAssignmentStmtNode:<AssignmentStmt> ::=
-  | <LblDef> lhsVariable:<Name>                                                                                                                                                                                                       -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN                                                                                                                                               -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                                                                                                                                                                       -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN                                                                                                                                               -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                         -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name> (error) T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> (error) T_EOS
 # F08 <ImageSelector>
-  | <LblDef> lhsVariable:<Name>                                                        <ImageSelector>                                                                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector>                                                                                                                                               -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector>                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector>                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        <ImageSelector>                                                                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector>                                                                                                                                               -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector>                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector>                                                                                                                            <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name>                                                        <ImageSelector>  -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name>                                                        <ImageSelector>  -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name>                                                        <ImageSelector>  -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        <ImageSelector>  -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        <ImageSelector>  -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        <ImageSelector>  -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef>                                                                                                -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN                    -:T_EQUALS rhs:<Expr> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> lparen2(omit):T_LPAREN componentSectionSubscriptList:<SectionSubscriptList> rparen2(omit):T_RPAREN <SubstringRange> -:T_EQUALS rhs:<Expr> -:T_EOS
 
 <SFExpr> ::=
   | <SFTerm>
@@ -1943,15 +1963,15 @@ ASTAssignmentStmtNode:<AssignmentStmt> ::=
 
 # R736 -- subsumes F03 R735
 ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
-  | <LblDef> lhsVariable:<Name>                                                                                                      isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
-  | <LblDef> lhsVariable:<Name>                                                        -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                                                                      isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
 # F08 <ImageSelector>
-  | <LblDef> lhsVariable:<Name>                                                        <ImageSelector>                                               isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
-  | <LblDef> lhsVariable:<Name>                                                        <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
-  | <LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        <ImageSelector>                                               isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name>                                                        <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsExprList:<SFExprList>         -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
+  | (inline):<LblDef> lhsVariable:<Name> -:T_LPAREN lhsNameList:<SFDummyArgNameList> -:T_RPAREN <ImageSelector> -:T_PERCENT derivedTypeComponentRef:<DataRef> isPointerAssignment(bool):T_EQGREATERTHAN <Target> -:T_EOS
 
 # R737
 # JO - Added NULL() target
@@ -2163,7 +2183,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 #  | (inline):<LblDef> T_IF (error) T_EOS
 
 # F08 R807
-(customsuperclass=ScopingNode):<BlockConstruct> ::=
+<BlockConstruct> ::=
     <BlockStmt>        <EndBlockStmt>
   | <BlockStmt> <Body> <EndBlockStmt>
 
@@ -2920,7 +2940,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 #######################################################################################################################
 
 # R1201
-(customsuperclass=ScopingNode):<InterfaceBlock> ::=
+<InterfaceBlock> ::=
   <InterfaceStmt> (inline):<InterfaceRange>
 
 <InterfaceRange> ::=

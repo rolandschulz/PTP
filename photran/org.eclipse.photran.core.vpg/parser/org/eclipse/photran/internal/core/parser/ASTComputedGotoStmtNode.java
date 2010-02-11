@@ -47,6 +47,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -58,6 +59,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     public void setLblRefList(IASTListNode<ASTLblRefListNode> newValue)
     {
         this.lblRefList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -69,6 +71,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -98,7 +101,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
         case 7:  return this.hiddenTComma;
         case 8:  return this.expr;
         case 9:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -106,16 +109,16 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.lblRefList = (IASTListNode<ASTLblRefListNode>)value; return;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.expr = (IExpr)value; return;
-        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTGo = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTTo = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTGoto = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.lblRefList = (IASTListNode<ASTLblRefListNode>)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

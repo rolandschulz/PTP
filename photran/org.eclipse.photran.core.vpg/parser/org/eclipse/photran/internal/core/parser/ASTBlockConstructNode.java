@@ -40,6 +40,7 @@ public class ASTBlockConstructNode extends ScopingNode implements IExecutableCon
     public void setBlockStmt(ASTBlockStmtNode newValue)
     {
         this.blockStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTBlockConstructNode extends ScopingNode implements IExecutableCon
     public void setBody(IASTListNode<IBodyConstruct> newValue)
     {
         this.body = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTBlockConstructNode extends ScopingNode implements IExecutableCon
     public void setEndBlockStmt(ASTEndBlockStmtNode newValue)
     {
         this.endBlockStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTBlockConstructNode extends ScopingNode implements IExecutableCon
         case 0:  return this.blockStmt;
         case 1:  return this.body;
         case 2:  return this.endBlockStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTBlockConstructNode extends ScopingNode implements IExecutableCon
     {
         switch (index)
         {
-        case 0:  this.blockStmt = (ASTBlockStmtNode)value; return;
-        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; return;
-        case 2:  this.endBlockStmt = (ASTEndBlockStmtNode)value; return;
+        case 0:  this.blockStmt = (ASTBlockStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endBlockStmt = (ASTEndBlockStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

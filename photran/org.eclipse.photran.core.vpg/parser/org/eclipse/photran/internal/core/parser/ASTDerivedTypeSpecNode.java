@@ -41,6 +41,7 @@ public class ASTDerivedTypeSpecNode extends ASTNode
     public void setTypeName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.typeName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTDerivedTypeSpecNode extends ASTNode
     public void setTypeParamSpecList(IASTListNode<ASTTypeParamSpecNode> newValue)
     {
         this.typeParamSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTDerivedTypeSpecNode extends ASTNode
         case 1:  return this.hiddenHiddenLParen2;
         case 2:  return this.typeParamSpecList;
         case 3:  return this.hiddenHiddenRParen2;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTDerivedTypeSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenHiddenLParen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.typeParamSpecList = (IASTListNode<ASTTypeParamSpecNode>)value; return;
-        case 3:  this.hiddenHiddenRParen2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenHiddenLParen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.typeParamSpecList = (IASTListNode<ASTTypeParamSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenHiddenRParen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -40,6 +40,7 @@ public class ASTEnumDefNode extends ASTNode implements IDeclarationConstruct
     public void setEnumDefStmt(ASTEnumDefStmtNode newValue)
     {
         this.enumDefStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTEnumDefNode extends ASTNode implements IDeclarationConstruct
     public void setEnumeratorDefStmts(IASTListNode<ASTEnumeratorDefStmtNode> newValue)
     {
         this.enumeratorDefStmts = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTEnumDefNode extends ASTNode implements IDeclarationConstruct
     public void setEndEnumStmt(ASTEndEnumStmtNode newValue)
     {
         this.endEnumStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTEnumDefNode extends ASTNode implements IDeclarationConstruct
         case 0:  return this.enumDefStmt;
         case 1:  return this.enumeratorDefStmts;
         case 2:  return this.endEnumStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTEnumDefNode extends ASTNode implements IDeclarationConstruct
     {
         switch (index)
         {
-        case 0:  this.enumDefStmt = (ASTEnumDefStmtNode)value; return;
-        case 1:  this.enumeratorDefStmts = (IASTListNode<ASTEnumeratorDefStmtNode>)value; return;
-        case 2:  this.endEnumStmt = (ASTEndEnumStmtNode)value; return;
+        case 0:  this.enumDefStmt = (ASTEnumDefStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.enumeratorDefStmts = (IASTListNode<ASTEnumeratorDefStmtNode>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endEnumStmt = (ASTEndEnumStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

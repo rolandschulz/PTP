@@ -41,6 +41,7 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
     public void setTIdent(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.tIdent = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
     public void setTScon(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.tScon = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
     public void setTEos(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.tEos = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -97,7 +101,7 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
         case 1:  return this.tIdent;
         case 2:  return this.tScon;
         case 3:  return this.tEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -105,10 +109,10 @@ public class ASTUnprocessedIncludeStmtNode extends ASTNode implements ISpecifica
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.tIdent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.tScon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.tEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.tIdent = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.tScon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.tEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -39,6 +39,7 @@ public class ASTElseWherePartNode extends ASTNode
     public void setWhereBodyConstructBlock(IASTListNode<IWhereBodyConstruct> newValue)
     {
         this.whereBodyConstructBlock = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTElseWherePartNode extends ASTNode
     public void setEndWhereStmt(ASTEndWhereStmtNode newValue)
     {
         this.endWhereStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTElseWherePartNode extends ASTNode
         {
         case 0:  return this.whereBodyConstructBlock;
         case 1:  return this.endWhereStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTElseWherePartNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
-        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
+        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

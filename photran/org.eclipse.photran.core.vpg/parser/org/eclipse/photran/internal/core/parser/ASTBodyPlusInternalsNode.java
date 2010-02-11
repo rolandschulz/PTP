@@ -40,6 +40,7 @@ public class ASTBodyPlusInternalsNode extends ASTNode
     public void setBody(IASTListNode<IBodyConstruct> newValue)
     {
         this.body = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTBodyPlusInternalsNode extends ASTNode
     public void setContainsStmt(ASTContainsStmtNode newValue)
     {
         this.containsStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTBodyPlusInternalsNode extends ASTNode
     public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
     {
         this.internalSubprograms = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +86,7 @@ public class ASTBodyPlusInternalsNode extends ASTNode
         case 0:  return this.body;
         case 1:  return this.containsStmt;
         case 2:  return this.internalSubprograms;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,9 +94,9 @@ public class ASTBodyPlusInternalsNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.body = (IASTListNode<IBodyConstruct>)value; return;
-        case 1:  this.containsStmt = (ASTContainsStmtNode)value; return;
-        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
+        case 0:  this.body = (IASTListNode<IBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.containsStmt = (ASTContainsStmtNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

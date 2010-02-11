@@ -48,6 +48,7 @@ public class ASTLoopControlNode extends ASTNode
     public void setWhileExpr(IExpr newValue)
     {
         this.whileExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,6 +60,7 @@ public class ASTLoopControlNode extends ASTNode
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,6 +72,7 @@ public class ASTLoopControlNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -81,6 +84,7 @@ public class ASTLoopControlNode extends ASTNode
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -92,6 +96,7 @@ public class ASTLoopControlNode extends ASTNode
     public void setStep(IExpr newValue)
     {
         this.step = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -121,7 +126,7 @@ public class ASTLoopControlNode extends ASTNode
         case 8:  return this.ub;
         case 9:  return this.hiddenTComma2;
         case 10: return this.step;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -129,17 +134,17 @@ public class ASTLoopControlNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTWhile = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.whileExpr = (IExpr)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.lb = (IExpr)value; return;
-        case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.ub = (IExpr)value; return;
-        case 9:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.step = (IExpr)value; return;
+        case 0:  this.hiddenTWhile = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.whileExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.step = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

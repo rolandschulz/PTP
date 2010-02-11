@@ -41,6 +41,7 @@ public class ASTCaseSelectorNode extends ASTNode
     public void setHasDefaultSelector(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasDefaultSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTCaseSelectorNode extends ASTNode
     public void setCaseValueRangeListSelector(IASTListNode<ASTCaseValueRangeNode> newValue)
     {
         this.caseValueRangeListSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTCaseSelectorNode extends ASTNode
         case 1:  return this.hiddenTLparen;
         case 2:  return this.caseValueRangeListSelector;
         case 3:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTCaseSelectorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

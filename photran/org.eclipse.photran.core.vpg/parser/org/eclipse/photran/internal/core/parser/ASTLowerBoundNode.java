@@ -38,6 +38,7 @@ public class ASTLowerBoundNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTLowerBoundNode extends ASTNode
         switch (index)
         {
         case 0:  return this.lb;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTLowerBoundNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (IExpr)value; return;
+        case 0:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

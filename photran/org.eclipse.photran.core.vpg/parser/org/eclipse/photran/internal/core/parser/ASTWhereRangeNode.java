@@ -41,6 +41,7 @@ public class ASTWhereRangeNode extends ASTNode
     public void setWhereBodyConstructBlock(IASTListNode<IWhereBodyConstruct> newValue)
     {
         this.whereBodyConstructBlock = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTWhereRangeNode extends ASTNode
     public void setEndWhereStmt(ASTEndWhereStmtNode newValue)
     {
         this.endWhereStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTWhereRangeNode extends ASTNode
     public void setElseWhereConstruct(ASTElseWhereConstructNode newValue)
     {
         this.elseWhereConstruct = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTWhereRangeNode extends ASTNode
     public void setMaskedElseWhereConstruct(ASTMaskedElseWhereConstructNode newValue)
     {
         this.maskedElseWhereConstruct = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +100,7 @@ public class ASTWhereRangeNode extends ASTNode
         case 1:  return this.endWhereStmt;
         case 2:  return this.elseWhereConstruct;
         case 3:  return this.maskedElseWhereConstruct;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,10 +108,10 @@ public class ASTWhereRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; return;
-        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value; return;
-        case 2:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; return;
-        case 3:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; return;
+        case 0:  this.whereBodyConstructBlock = (IASTListNode<IWhereBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.endWhereStmt = (ASTEndWhereStmtNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.elseWhereConstruct = (ASTElseWhereConstructNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.maskedElseWhereConstruct = (ASTMaskedElseWhereConstructNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -42,6 +42,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     public void setFunctionStmt(ASTFunctionStmtNode newValue)
     {
         this.functionStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     public void setSubroutineStmt(ASTSubroutineStmtNode newValue)
     {
         this.subroutineStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     public void setSubprogramInterfaceBody(IASTListNode<ISpecificationPartConstruct> newValue)
     {
         this.subprogramInterfaceBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     public void setEndFunctionStmt(ASTEndFunctionStmtNode newValue)
     {
         this.endFunctionStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -86,6 +90,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     public void setEndSubroutineStmt(ASTEndSubroutineStmtNode newValue)
     {
         this.endSubroutineStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -110,7 +115,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
         case 2:  return this.subprogramInterfaceBody;
         case 3:  return this.endFunctionStmt;
         case 4:  return this.endSubroutineStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -118,11 +123,11 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     {
         switch (index)
         {
-        case 0:  this.functionStmt = (ASTFunctionStmtNode)value; return;
-        case 1:  this.subroutineStmt = (ASTSubroutineStmtNode)value; return;
-        case 2:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; return;
-        case 3:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; return;
-        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
+        case 0:  this.functionStmt = (ASTFunctionStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.subroutineStmt = (ASTSubroutineStmtNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.subprogramInterfaceBody = (IASTListNode<ISpecificationPartConstruct>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.endFunctionStmt = (ASTEndFunctionStmtNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

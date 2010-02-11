@@ -47,6 +47,7 @@ public class ASTSyncImagesStmtNode extends ASTNode implements IActionStmt
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -58,6 +59,7 @@ public class ASTSyncImagesStmtNode extends ASTNode implements IActionStmt
     public void setImageSet(ASTImageSetNode newValue)
     {
         this.imageSet = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -69,6 +71,7 @@ public class ASTSyncImagesStmtNode extends ASTNode implements IActionStmt
     public void setSyncStatList(IASTListNode<ASTSyncStatNode> newValue)
     {
         this.syncStatList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -98,7 +101,7 @@ public class ASTSyncImagesStmtNode extends ASTNode implements IActionStmt
         case 7:  return this.syncStatList;
         case 8:  return this.hiddenTRparen;
         case 9:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -106,16 +109,16 @@ public class ASTSyncImagesStmtNode extends ASTNode implements IActionStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTSyncimages = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTSync = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTImages = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.imageSet = (ASTImageSetNode)value; return;
-        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.syncStatList = (IASTListNode<ASTSyncStatNode>)value; return;
-        case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTSyncimages = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTSync = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTImages = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.imageSet = (ASTImageSetNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.syncStatList = (IASTListNode<ASTSyncStatNode>)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

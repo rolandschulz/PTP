@@ -38,6 +38,7 @@ public class ASTDoConstructNode extends ASTNode implements IExecutableConstruct
     public void setLabelDoStmt(ASTLabelDoStmtNode newValue)
     {
         this.labelDoStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -58,7 +59,7 @@ public class ASTDoConstructNode extends ASTNode implements IExecutableConstruct
         switch (index)
         {
         case 0:  return this.labelDoStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -66,7 +67,7 @@ public class ASTDoConstructNode extends ASTNode implements IExecutableConstruct
     {
         switch (index)
         {
-        case 0:  this.labelDoStmt = (ASTLabelDoStmtNode)value; return;
+        case 0:  this.labelDoStmt = (ASTLabelDoStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

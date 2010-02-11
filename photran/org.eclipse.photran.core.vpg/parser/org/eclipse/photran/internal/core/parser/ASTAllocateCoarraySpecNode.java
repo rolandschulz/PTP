@@ -42,6 +42,7 @@ public class ASTAllocateCoarraySpecNode extends ASTNode
     public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.sectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTAllocateCoarraySpecNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTAllocateCoarraySpecNode extends ASTNode
     public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAsterisk = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -87,7 +90,7 @@ public class ASTAllocateCoarraySpecNode extends ASTNode
         case 2:  return this.lb;
         case 3:  return this.hiddenTColon;
         case 4:  return this.isAsterisk;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -95,11 +98,11 @@ public class ASTAllocateCoarraySpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.lb = (IExpr)value; return;
-        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

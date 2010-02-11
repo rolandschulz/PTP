@@ -38,6 +38,7 @@ public class ASTIntrinsicProcedureNameNode extends ASTNode
     public void setIntrinsicProcedureName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intrinsicProcedureName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTIntrinsicProcedureNameNode extends ASTNode
         switch (index)
         {
         case 0:  return this.intrinsicProcedureName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTIntrinsicProcedureNameNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.intrinsicProcedureName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.intrinsicProcedureName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -43,6 +43,7 @@ public class ASTImportStmtNode extends ASTNode implements ISpecificationPartCons
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTImportStmtNode extends ASTNode implements ISpecificationPartCons
     public void setImportList(IASTListNode<org.eclipse.photran.internal.core.lexer.Token> newValue)
     {
         this.importList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -79,7 +81,7 @@ public class ASTImportStmtNode extends ASTNode implements ISpecificationPartCons
         case 3:  return this.hiddenTColon2;
         case 4:  return this.importList;
         case 5:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -87,12 +89,12 @@ public class ASTImportStmtNode extends ASTNode implements ISpecificationPartCons
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTImport = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.importList = (IASTListNode<org.eclipse.photran.internal.core.lexer.Token>)value; return;
-        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTImport = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.importList = (IASTListNode<org.eclipse.photran.internal.core.lexer.Token>)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

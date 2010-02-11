@@ -39,6 +39,7 @@ public class ASTSubroutineParNode extends ASTNode
     public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAsterisk = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTSubroutineParNode extends ASTNode
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTSubroutineParNode extends ASTNode
         {
         case 0:  return this.isAsterisk;
         case 1:  return this.variableName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

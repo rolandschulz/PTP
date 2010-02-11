@@ -357,7 +357,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         newExpr.findFirstToken().setWhiteBefore("");
         IExpr oldExpr = t.findNearestAncestor(IExpr.class);
         oldExpr.replaceWith(newExpr);
-        newExpr.setParent(oldExpr.getParent());
+        //newExpr.setParent(oldExpr.getParent());
     }
 
     protected void checkIfCanEncapsulateWithGetter(Token t) throws PreconditionFailure
@@ -494,7 +494,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
 
         newCallNode.setArgList(argList);
         oldAssignNode.replaceWith(newCallNode);
-        newCallNode.setParent(oldAssignNode.getParent());
+        //newCallNode.setParent(oldAssignNode.getParent());
     }
 
     protected IASTListNode<ASTSubroutineArgNode> convertToArguments(ASTAssignmentStmtNode oldAssignNode)
@@ -611,7 +611,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
     {
         ASTTypeDeclarationStmtNode newDeclNode = createNewDeclaration(varDefTok, oldDeclNode.getTypeSpec());
         oldDeclNode.replaceWith(newDeclNode);
-        newDeclNode.setParent(oldDeclNode.getParent());
+        //newDeclNode.setParent(oldDeclNode.getParent());
         return newDeclNode;
     }
 

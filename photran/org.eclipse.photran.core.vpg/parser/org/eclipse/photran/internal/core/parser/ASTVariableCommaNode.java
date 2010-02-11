@@ -39,6 +39,7 @@ public class ASTVariableCommaNode extends ASTNode
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,7 +60,7 @@ public class ASTVariableCommaNode extends ASTNode
         {
         case 0:  return this.variableName;
         case 1:  return this.hiddenTComma;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -67,8 +68,8 @@ public class ASTVariableCommaNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

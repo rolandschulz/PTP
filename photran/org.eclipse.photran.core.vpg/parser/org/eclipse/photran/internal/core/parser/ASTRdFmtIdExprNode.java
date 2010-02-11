@@ -40,6 +40,7 @@ public class ASTRdFmtIdExprNode extends ASTNode
     public void setFormatIdExpr(ASTUFExprNode newValue)
     {
         this.formatIdExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -61,7 +62,7 @@ public class ASTRdFmtIdExprNode extends ASTNode
         case 0:  return this.hiddenTLparen;
         case 1:  return this.formatIdExpr;
         case 2:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -69,9 +70,9 @@ public class ASTRdFmtIdExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.formatIdExpr = (ASTUFExprNode)value; return;
-        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.formatIdExpr = (ASTUFExprNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

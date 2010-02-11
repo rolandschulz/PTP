@@ -43,6 +43,7 @@ public class ASTPositionSpecNode extends ASTNode
     public void setErrLbl(ASTLblRefNode newValue)
     {
         this.errLbl = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTPositionSpecNode extends ASTNode
     public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
         this.unitIdentifier = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -65,6 +67,7 @@ public class ASTPositionSpecNode extends ASTNode
     public void setIoStatVar(ASTScalarVariableNode newValue)
     {
         this.ioStatVar = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -89,7 +92,7 @@ public class ASTPositionSpecNode extends ASTNode
         case 3:  return this.unitIdentifier;
         case 4:  return this.hiddenTIostateq;
         case 5:  return this.ioStatVar;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -97,12 +100,12 @@ public class ASTPositionSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.errLbl = (ASTLblRefNode)value; return;
-        case 2:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
-        case 4:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.ioStatVar = (ASTScalarVariableNode)value; return;
+        case 0:  this.hiddenTErreq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.errLbl = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTUniteq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.unitIdentifier = (ASTUnitIdentifierNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTIostateq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.ioStatVar = (ASTScalarVariableNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

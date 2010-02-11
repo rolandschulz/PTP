@@ -40,6 +40,7 @@ public class ASTCExprNode extends ASTNode
     public void setLhsExpr(ASTCExprNode newValue)
     {
         this.lhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTCExprNode extends ASTNode
     public void setConcatOp(ASTOperatorNode newValue)
     {
         this.concatOp = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTCExprNode extends ASTNode
     public void setRhsPrimary(ASTCPrimaryNode newValue)
     {
         this.rhsPrimary = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +86,7 @@ public class ASTCExprNode extends ASTNode
         case 0:  return this.lhsExpr;
         case 1:  return this.concatOp;
         case 2:  return this.rhsPrimary;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,9 +94,9 @@ public class ASTCExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTCExprNode)value; return;
-        case 1:  this.concatOp = (ASTOperatorNode)value; return;
-        case 2:  this.rhsPrimary = (ASTCPrimaryNode)value; return;
+        case 0:  this.lhsExpr = (ASTCExprNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.concatOp = (ASTOperatorNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.rhsPrimary = (ASTCPrimaryNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

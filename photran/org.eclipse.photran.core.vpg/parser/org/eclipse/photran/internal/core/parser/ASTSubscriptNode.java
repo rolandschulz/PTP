@@ -38,6 +38,7 @@ public class ASTSubscriptNode extends ASTNode
     public void setSubscriptExpr(IExpr newValue)
     {
         this.subscriptExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTSubscriptNode extends ASTNode
         switch (index)
         {
         case 0:  return this.subscriptExpr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.subscriptExpr = (IExpr)value; return;
+        case 0:  this.subscriptExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

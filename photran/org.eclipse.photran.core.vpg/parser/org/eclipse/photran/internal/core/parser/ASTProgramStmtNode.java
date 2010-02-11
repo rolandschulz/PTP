@@ -41,6 +41,7 @@ public class ASTProgramStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTProgramStmtNode extends ASTNode
     public void setProgramToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.programToken = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTProgramStmtNode extends ASTNode
     public void setProgramName(ASTProgramNameNode newValue)
     {
         this.programName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -85,7 +88,7 @@ public class ASTProgramStmtNode extends ASTNode
         case 1:  return this.programToken;
         case 2:  return this.programName;
         case 3:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -93,10 +96,10 @@ public class ASTProgramStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.programToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.programName = (ASTProgramNameNode)value; return;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.programToken = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.programName = (ASTProgramNameNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

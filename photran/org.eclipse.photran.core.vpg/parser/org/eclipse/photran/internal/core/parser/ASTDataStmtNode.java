@@ -41,6 +41,7 @@ public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     public void setDatalist(IASTListNode<ASTDatalistNode> newValue)
     {
         this.datalist = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +85,7 @@ public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         case 1:  return this.hiddenTData;
         case 2:  return this.datalist;
         case 3:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,10 +93,10 @@ public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTData = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.datalist = (IASTListNode<ASTDatalistNode>)value; return;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTData = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.datalist = (IASTListNode<ASTDatalistNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

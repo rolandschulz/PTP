@@ -44,6 +44,7 @@ public class ASTEntryStmtNode extends ASTNode implements IBlockDataBodyConstruct
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -55,6 +56,7 @@ public class ASTEntryStmtNode extends ASTNode implements IBlockDataBodyConstruct
     public void setEntryName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.entryName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,6 +68,7 @@ public class ASTEntryStmtNode extends ASTNode implements IBlockDataBodyConstruct
     public void setSubroutinePars(IASTListNode<ASTSubroutineParNode> newValue)
     {
         this.subroutinePars = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -97,7 +100,7 @@ public class ASTEntryStmtNode extends ASTNode implements IBlockDataBodyConstruct
         case 4:  return this.subroutinePars;
         case 5:  return this.hiddenTRparen;
         case 6:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -105,13 +108,13 @@ public class ASTEntryStmtNode extends ASTNode implements IBlockDataBodyConstruct
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEntry = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.entryName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value; return;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEntry = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.entryName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.subroutinePars = (IASTListNode<ASTSubroutineParNode>)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

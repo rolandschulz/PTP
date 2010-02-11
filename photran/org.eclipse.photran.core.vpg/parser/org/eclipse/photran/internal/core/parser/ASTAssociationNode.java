@@ -40,6 +40,7 @@ public class ASTAssociationNode extends ASTNode
     public void setAssociateName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.associateName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTAssociationNode extends ASTNode
     public void setSelector(ISelector newValue)
     {
         this.selector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -72,7 +74,7 @@ public class ASTAssociationNode extends ASTNode
         case 0:  return this.associateName;
         case 1:  return this.hiddenTEqgreaterthan;
         case 2:  return this.selector;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -80,9 +82,9 @@ public class ASTAssociationNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.associateName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.selector = (ISelector)value; return;
+        case 0:  this.associateName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.selector = (ISelector)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

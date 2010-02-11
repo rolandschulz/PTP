@@ -39,6 +39,7 @@ public class ASTSelectTypeBodyNode extends ASTNode
     public void setTypeGuardStmt(ASTTypeGuardStmtNode newValue)
     {
         this.typeGuardStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTSelectTypeBodyNode extends ASTNode
     public void setTypeGuardBlock(IASTListNode<IExecutionPartConstruct> newValue)
     {
         this.typeGuardBlock = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTSelectTypeBodyNode extends ASTNode
         {
         case 0:  return this.typeGuardStmt;
         case 1:  return this.typeGuardBlock;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTSelectTypeBodyNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.typeGuardStmt = (ASTTypeGuardStmtNode)value; return;
-        case 1:  this.typeGuardBlock = (IASTListNode<IExecutionPartConstruct>)value; return;
+        case 0:  this.typeGuardStmt = (ASTTypeGuardStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.typeGuardBlock = (IASTListNode<IExecutionPartConstruct>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

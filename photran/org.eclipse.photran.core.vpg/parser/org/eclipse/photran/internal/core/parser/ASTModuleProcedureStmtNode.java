@@ -42,6 +42,7 @@ public class ASTModuleProcedureStmtNode extends ASTNode implements IInterfaceSpe
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTModuleProcedureStmtNode extends ASTNode implements IInterfaceSpe
     public void setProcedureNameList(IASTListNode<ASTProcedureNameListNode> newValue)
     {
         this.procedureNameList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -77,7 +79,7 @@ public class ASTModuleProcedureStmtNode extends ASTNode implements IInterfaceSpe
         case 2:  return this.hiddenTProcedure;
         case 3:  return this.procedureNameList;
         case 4:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -85,11 +87,11 @@ public class ASTModuleProcedureStmtNode extends ASTNode implements IInterfaceSpe
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTProcedure = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.procedureNameList = (IASTListNode<ASTProcedureNameListNode>)value; return;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTModule = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTProcedure = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.procedureNameList = (IASTListNode<ASTProcedureNameListNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

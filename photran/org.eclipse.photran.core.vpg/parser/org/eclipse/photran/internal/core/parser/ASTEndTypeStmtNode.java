@@ -43,6 +43,7 @@ public class ASTEndTypeStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTEndTypeStmtNode extends ASTNode
     public void setTypeName(ASTTypeNameNode newValue)
     {
         this.typeName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -78,7 +80,7 @@ public class ASTEndTypeStmtNode extends ASTNode
         case 3:  return this.hiddenTType;
         case 4:  return this.typeName;
         case 5:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -86,12 +88,12 @@ public class ASTEndTypeStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEndtype = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.typeName = (ASTTypeNameNode)value; return;
-        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEndtype = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.typeName = (ASTTypeNameNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

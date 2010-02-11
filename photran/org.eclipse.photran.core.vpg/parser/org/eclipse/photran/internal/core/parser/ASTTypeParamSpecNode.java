@@ -40,6 +40,7 @@ public class ASTTypeParamSpecNode extends ASTNode
     public void setName(ASTNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTTypeParamSpecNode extends ASTNode
     public void setTypeParamValue(ASTTypeParamValueNode newValue)
     {
         this.typeParamValue = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -72,7 +74,7 @@ public class ASTTypeParamSpecNode extends ASTNode
         case 0:  return this.name;
         case 1:  return this.hiddenTEquals;
         case 2:  return this.typeParamValue;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -80,9 +82,9 @@ public class ASTTypeParamSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value; return;
-        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.typeParamValue = (ASTTypeParamValueNode)value; return;
+        case 0:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.typeParamValue = (ASTTypeParamValueNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

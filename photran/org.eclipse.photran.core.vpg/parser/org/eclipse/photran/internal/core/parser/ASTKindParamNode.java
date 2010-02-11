@@ -39,6 +39,7 @@ public class ASTKindParamNode extends ASTNode
     public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
         this.namedConstKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTKindParamNode extends ASTNode
     public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTKindParamNode extends ASTNode
         {
         case 0:  return this.namedConstKind;
         case 1:  return this.intKind;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTKindParamNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
-        case 1:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

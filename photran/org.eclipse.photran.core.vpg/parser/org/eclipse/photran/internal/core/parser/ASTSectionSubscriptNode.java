@@ -39,6 +39,7 @@ public class ASTSectionSubscriptNode extends ASTNode
     public void setSubscriptTriplet(ASTSubscriptTripletNode newValue)
     {
         this.subscriptTriplet = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTSectionSubscriptNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTSectionSubscriptNode extends ASTNode
         {
         case 0:  return this.subscriptTriplet;
         case 1:  return this.expr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTSectionSubscriptNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; return;
-        case 1:  this.expr = (IExpr)value; return;
+        case 0:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

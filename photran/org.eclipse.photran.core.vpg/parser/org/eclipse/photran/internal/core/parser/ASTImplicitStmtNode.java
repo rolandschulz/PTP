@@ -42,6 +42,7 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     public void setImplicitToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.implicitToken = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     public void setImplicitSpecList(IASTListNode<ASTImplicitSpecNode> newValue)
     {
         this.implicitSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     public void setIsImplicitNone(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isImplicitNone = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -99,7 +103,7 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
         case 2:  return this.implicitSpecList;
         case 3:  return this.isImplicitNone;
         case 4:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -107,11 +111,11 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.implicitToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.implicitSpecList = (IASTListNode<ASTImplicitSpecNode>)value; return;
-        case 3:  this.isImplicitNone = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.implicitToken = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.implicitSpecList = (IASTListNode<ASTImplicitSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.isImplicitNone = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

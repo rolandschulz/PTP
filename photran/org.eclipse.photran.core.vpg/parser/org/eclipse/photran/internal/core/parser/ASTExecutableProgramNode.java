@@ -39,6 +39,7 @@ public class ASTExecutableProgramNode extends ScopingNode
     public void setEmptyProgram(ASTEmptyProgramNode newValue)
     {
         this.emptyProgram = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTExecutableProgramNode extends ScopingNode
     public void setProgramUnitList(IASTListNode<IProgramUnit> newValue)
     {
         this.programUnitList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTExecutableProgramNode extends ScopingNode
         {
         case 0:  return this.emptyProgram;
         case 1:  return this.programUnitList;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTExecutableProgramNode extends ScopingNode
     {
         switch (index)
         {
-        case 0:  this.emptyProgram = (ASTEmptyProgramNode)value; return;
-        case 1:  this.programUnitList = (IASTListNode<IProgramUnit>)value; return;
+        case 0:  this.emptyProgram = (ASTEmptyProgramNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.programUnitList = (IASTListNode<IProgramUnit>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

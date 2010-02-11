@@ -43,6 +43,7 @@ public class ASTScalarVariableNode extends ASTNode
     public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.variableName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -54,6 +55,7 @@ public class ASTScalarVariableNode extends ASTNode
     public void setStructureComponent(IASTListNode<ASTStructureComponentNode> newValue)
     {
         this.structureComponent = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -65,6 +67,7 @@ public class ASTScalarVariableNode extends ASTNode
     public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.sectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,6 +79,7 @@ public class ASTScalarVariableNode extends ASTNode
     public void setImageSelector(ASTImageSelectorNode newValue)
     {
         this.imageSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -100,7 +104,7 @@ public class ASTScalarVariableNode extends ASTNode
         case 3:  return this.sectionSubscriptList;
         case 4:  return this.hiddenTRparen;
         case 5:  return this.imageSelector;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -108,12 +112,12 @@ public class ASTScalarVariableNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.structureComponent = (IASTListNode<ASTStructureComponentNode>)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.imageSelector = (ASTImageSelectorNode)value; return;
+        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.structureComponent = (IASTListNode<ASTStructureComponentNode>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.imageSelector = (ASTImageSelectorNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

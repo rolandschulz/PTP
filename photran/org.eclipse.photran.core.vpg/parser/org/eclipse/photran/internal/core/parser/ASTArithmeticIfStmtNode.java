@@ -48,6 +48,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,6 +60,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,6 +72,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     public void setFirst(ASTLblRefNode newValue)
     {
         this.first = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -81,6 +84,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     public void setSecond(ASTLblRefNode newValue)
     {
         this.second = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -92,6 +96,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     public void setThird(ASTLblRefNode newValue)
     {
         this.third = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -122,7 +127,7 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
         case 8:  return this.hiddenTComma2;
         case 9:  return this.third;
         case 10: return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -130,17 +135,17 @@ public class ASTArithmeticIfStmtNode extends ASTNode implements IObsoleteActionS
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.expr = (IExpr)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.first = (ASTLblRefNode)value; return;
-        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.second = (ASTLblRefNode)value; return;
-        case 8:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.third = (ASTLblRefNode)value; return;
-        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.first = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.second = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.third = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

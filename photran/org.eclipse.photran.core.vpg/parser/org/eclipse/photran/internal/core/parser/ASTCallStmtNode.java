@@ -45,6 +45,7 @@ public class ASTCallStmtNode extends ASTNode implements IActionStmt
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -56,6 +57,7 @@ public class ASTCallStmtNode extends ASTNode implements IActionStmt
     public void setSubroutineName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.subroutineName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -67,6 +69,7 @@ public class ASTCallStmtNode extends ASTNode implements IActionStmt
     public void setDerivedTypeQualifiers(IASTListNode<ASTDerivedTypeQualifiersNode> newValue)
     {
         this.derivedTypeQualifiers = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -78,6 +81,7 @@ public class ASTCallStmtNode extends ASTNode implements IActionStmt
     public void setArgList(IASTListNode<ASTSubroutineArgNode> newValue)
     {
         this.argList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -105,7 +109,7 @@ public class ASTCallStmtNode extends ASTNode implements IActionStmt
         case 5:  return this.argList;
         case 6:  return this.hiddenTRparen;
         case 7:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -113,14 +117,14 @@ public class ASTCallStmtNode extends ASTNode implements IActionStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTCall = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.subroutineName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.derivedTypeQualifiers = (IASTListNode<ASTDerivedTypeQualifiersNode>)value; return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.argList = (IASTListNode<ASTSubroutineArgNode>)value; return;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTCall = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.subroutineName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.derivedTypeQualifiers = (IASTListNode<ASTDerivedTypeQualifiersNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.argList = (IASTListNode<ASTSubroutineArgNode>)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

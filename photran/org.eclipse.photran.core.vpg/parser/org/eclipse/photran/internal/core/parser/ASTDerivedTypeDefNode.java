@@ -42,6 +42,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     public void setDerivedTypeStmt(ASTDerivedTypeStmtNode newValue)
     {
         this.derivedTypeStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     public void setTypeParamDefStmt(ASTTypeParamDefStmtNode newValue)
     {
         this.typeParamDefStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     public void setDerivedTypeBody(IASTListNode<IDerivedTypeBodyConstruct> newValue)
     {
         this.derivedTypeBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     public void setTypeBoundProcedurePart(ASTTypeBoundProcedurePartNode newValue)
     {
         this.typeBoundProcedurePart = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -86,6 +90,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     public void setEndTypeStmt(ASTEndTypeStmtNode newValue)
     {
         this.endTypeStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -110,7 +115,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
         case 2:  return this.derivedTypeBody;
         case 3:  return this.typeBoundProcedurePart;
         case 4:  return this.endTypeStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -118,11 +123,11 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     {
         switch (index)
         {
-        case 0:  this.derivedTypeStmt = (ASTDerivedTypeStmtNode)value; return;
-        case 1:  this.typeParamDefStmt = (ASTTypeParamDefStmtNode)value; return;
-        case 2:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value; return;
-        case 3:  this.typeBoundProcedurePart = (ASTTypeBoundProcedurePartNode)value; return;
-        case 4:  this.endTypeStmt = (ASTEndTypeStmtNode)value; return;
+        case 0:  this.derivedTypeStmt = (ASTDerivedTypeStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.typeParamDefStmt = (ASTTypeParamDefStmtNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.derivedTypeBody = (IASTListNode<IDerivedTypeBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.typeBoundProcedurePart = (ASTTypeBoundProcedurePartNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.endTypeStmt = (ASTEndTypeStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

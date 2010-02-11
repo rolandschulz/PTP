@@ -39,6 +39,7 @@ public class ASTCommaExpNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,7 +60,7 @@ public class ASTCommaExpNode extends ASTNode
         {
         case 0:  return this.hiddenTComma;
         case 1:  return this.expr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -67,8 +68,8 @@ public class ASTCommaExpNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.expr = (IExpr)value; return;
+        case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

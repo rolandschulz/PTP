@@ -120,7 +120,6 @@ public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
     {
         outerElement.setParent(innerLoop);
         innerElement.setParent(outerLoop);
-
         innerLoop.replaceChild(innerElement, outerElement);
         outerLoop.replaceChild(outerElement, innerElement);
     }

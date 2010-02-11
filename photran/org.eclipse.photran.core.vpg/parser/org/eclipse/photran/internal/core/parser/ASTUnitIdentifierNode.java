@@ -28,19 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public class ASTUnitIdentifierNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token hasAsterisk; // in ASTUnitIdentifierNode
     ASTUFExprNode expression; // in ASTUnitIdentifierNode
-
-    public boolean hasAsterisk()
-    {
-        return this.hasAsterisk != null;
-    }
-
-    public void setHasAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasAsterisk = newValue;
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token hasAsterisk; // in ASTUnitIdentifierNode
 
     public ASTUFExprNode getExpression()
     {
@@ -50,6 +39,19 @@ public class ASTUnitIdentifierNode extends ASTNode
     public void setExpression(ASTUFExprNode newValue)
     {
         this.expression = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean hasAsterisk()
+    {
+        return this.hasAsterisk != null;
+    }
+
+    public void setHasAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasAsterisk = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -68,9 +70,9 @@ public class ASTUnitIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.hasAsterisk;
-        case 1:  return this.expression;
-        default: return null;
+        case 0:  return this.expression;
+        case 1:  return this.hasAsterisk;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTUnitIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.expression = (ASTUFExprNode)value; return;
+        case 0:  this.expression = (ASTUFExprNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hasAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

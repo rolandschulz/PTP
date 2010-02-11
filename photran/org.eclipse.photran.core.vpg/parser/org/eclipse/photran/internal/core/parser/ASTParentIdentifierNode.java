@@ -40,6 +40,7 @@ public class ASTParentIdentifierNode extends ASTNode
     public void setAncestorModuleName(ASTModuleNameNode newValue)
     {
         this.ancestorModuleName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTParentIdentifierNode extends ASTNode
     public void setParentSubmoduleName(ASTModuleNameNode newValue)
     {
         this.parentSubmoduleName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -72,7 +74,7 @@ public class ASTParentIdentifierNode extends ASTNode
         case 0:  return this.ancestorModuleName;
         case 1:  return this.hiddenTColon;
         case 2:  return this.parentSubmoduleName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -80,9 +82,9 @@ public class ASTParentIdentifierNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.ancestorModuleName = (ASTModuleNameNode)value; return;
-        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.parentSubmoduleName = (ASTModuleNameNode)value; return;
+        case 0:  this.ancestorModuleName = (ASTModuleNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.parentSubmoduleName = (ASTModuleNameNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -45,6 +45,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     public void setIsBind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isBind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -56,6 +57,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     public void setLanguage(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.language = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -67,6 +69,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -93,7 +96,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
         case 5:  return this.hiddenTEquals;
         case 6:  return this.expr;
         case 7:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -101,14 +104,14 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.language = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTIdent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.expr = (IExpr)value; return;
-        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.language = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTIdent = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

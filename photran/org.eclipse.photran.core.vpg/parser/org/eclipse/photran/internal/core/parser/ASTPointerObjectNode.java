@@ -39,6 +39,7 @@ public class ASTPointerObjectNode extends ASTNode
     public void setName(ASTNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTPointerObjectNode extends ASTNode
     public void setPointerField(IASTListNode<ASTPointerFieldNode> newValue)
     {
         this.pointerField = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTPointerObjectNode extends ASTNode
         {
         case 0:  return this.name;
         case 1:  return this.pointerField;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTPointerObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value; return;
-        case 1:  this.pointerField = (IASTListNode<ASTPointerFieldNode>)value; return;
+        case 0:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.pointerField = (IASTListNode<ASTPointerFieldNode>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

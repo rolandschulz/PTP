@@ -40,6 +40,7 @@ public class ASTExplicitShapeSpecNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTExplicitShapeSpecNode extends ASTNode
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -72,7 +74,7 @@ public class ASTExplicitShapeSpecNode extends ASTNode
         case 0:  return this.lb;
         case 1:  return this.hiddenTColon;
         case 2:  return this.ub;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -80,9 +82,9 @@ public class ASTExplicitShapeSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lb = (IExpr)value; return;
-        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.ub = (IExpr)value; return;
+        case 0:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

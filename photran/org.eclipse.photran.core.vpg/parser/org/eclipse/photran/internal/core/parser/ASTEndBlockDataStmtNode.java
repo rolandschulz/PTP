@@ -46,6 +46,7 @@ public class ASTEndBlockDataStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,6 +58,7 @@ public class ASTEndBlockDataStmtNode extends ASTNode
     public void setEndName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.endName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +86,7 @@ public class ASTEndBlockDataStmtNode extends ASTNode
         case 6:  return this.hiddenTData;
         case 7:  return this.endName;
         case 8:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,15 +94,15 @@ public class ASTEndBlockDataStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTEndblockdata = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTEndblock = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTBlockdata = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTBlock = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTData = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTEndblockdata = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTEndblock = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTEnd = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTBlockdata = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTBlock = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTData = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

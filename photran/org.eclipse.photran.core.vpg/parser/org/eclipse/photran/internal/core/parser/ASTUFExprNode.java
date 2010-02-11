@@ -42,6 +42,7 @@ public class ASTUFExprNode extends ASTNode
     public void setLhsExpr(ASTUFExprNode newValue)
     {
         this.lhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTUFExprNode extends ASTNode
     public void setRhs2(ASTSignNode newValue)
     {
         this.rhs2 = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTUFExprNode extends ASTNode
     public void setAddOp(ASTOperatorNode newValue)
     {
         this.addOp = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTUFExprNode extends ASTNode
     public void setRhsExpr(ASTUFTermNode newValue)
     {
         this.rhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -86,6 +90,7 @@ public class ASTUFExprNode extends ASTNode
     public void setUFTerm(ASTUFTermNode newValue)
     {
         this.UFTerm = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -109,7 +114,7 @@ public class ASTUFExprNode extends ASTNode
         case 2:  return this.addOp;
         case 3:  return this.rhsExpr;
         case 4:  return this.UFTerm;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -117,11 +122,11 @@ public class ASTUFExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.lhsExpr = (ASTUFExprNode)value; return;
-        case 1:  this.rhs2 = (ASTSignNode)value; return;
-        case 2:  this.addOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (ASTUFTermNode)value; return;
-        case 4:  this.UFTerm = (ASTUFTermNode)value; return;
+        case 0:  this.lhsExpr = (ASTUFExprNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.rhs2 = (ASTSignNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.addOp = (ASTOperatorNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.rhsExpr = (ASTUFTermNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.UFTerm = (ASTUFTermNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

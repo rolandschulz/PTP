@@ -41,6 +41,7 @@ public class ASTSFFactorNode extends ASTNode
     public void setRhsPrimary(ASTSFPrimaryNode newValue)
     {
         this.rhsPrimary = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTSFFactorNode extends ASTNode
     public void setLhsPrimary(ASTSFPrimaryNode newValue)
     {
         this.lhsPrimary = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTSFFactorNode extends ASTNode
     public void setPowerOp(ASTOperatorNode newValue)
     {
         this.powerOp = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,6 +77,7 @@ public class ASTSFFactorNode extends ASTNode
     public void setRhsExpr(IExpr newValue)
     {
         this.rhsExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +100,7 @@ public class ASTSFFactorNode extends ASTNode
         case 1:  return this.lhsPrimary;
         case 2:  return this.powerOp;
         case 3:  return this.rhsExpr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,10 +108,10 @@ public class ASTSFFactorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.rhsPrimary = (ASTSFPrimaryNode)value; return;
-        case 1:  this.lhsPrimary = (ASTSFPrimaryNode)value; return;
-        case 2:  this.powerOp = (ASTOperatorNode)value; return;
-        case 3:  this.rhsExpr = (IExpr)value; return;
+        case 0:  this.rhsPrimary = (ASTSFPrimaryNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.lhsPrimary = (ASTSFPrimaryNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.powerOp = (ASTOperatorNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.rhsExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

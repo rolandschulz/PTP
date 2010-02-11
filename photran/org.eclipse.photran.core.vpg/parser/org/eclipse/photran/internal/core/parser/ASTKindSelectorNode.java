@@ -41,6 +41,7 @@ public class ASTKindSelectorNode extends ASTNode
     public void setKindExpr(IExpr newValue)
     {
         this.kindExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,7 +64,7 @@ public class ASTKindSelectorNode extends ASTNode
         case 1:  return this.hiddenTKindeq;
         case 2:  return this.kindExpr;
         case 3:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -71,10 +72,10 @@ public class ASTKindSelectorNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.kindExpr = (IExpr)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.kindExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

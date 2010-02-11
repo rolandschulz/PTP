@@ -41,6 +41,7 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
     public void setUnitIdentifier(ASTUnitIdentifierNode newValue)
     {
         this.unitIdentifier = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
     public void setFormatIdentifier(ASTFormatIdentifierNode newValue)
     {
         this.formatIdentifier = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
     public void setIoControlSpec(ASTIoControlSpecNode newValue)
     {
         this.ioControlSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -85,7 +88,7 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
         case 1:  return this.hiddenTComma;
         case 2:  return this.formatIdentifier;
         case 3:  return this.ioControlSpec;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -93,10 +96,10 @@ public class ASTRdIoCtlSpecListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value; return;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.formatIdentifier = (ASTFormatIdentifierNode)value; return;
-        case 3:  this.ioControlSpec = (ASTIoControlSpecNode)value; return;
+        case 0:  this.unitIdentifier = (ASTUnitIdentifierNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.formatIdentifier = (ASTFormatIdentifierNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.ioControlSpec = (ASTIoControlSpecNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -40,6 +40,7 @@ public class ASTSelectTypeConstructNode extends ASTNode implements IExecutableCo
     public void setSelectTypeStmt(ASTSelectTypeStmtNode newValue)
     {
         this.selectTypeStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTSelectTypeConstructNode extends ASTNode implements IExecutableCo
     public void setSelectTypeBody(IASTListNode<ASTSelectTypeBodyNode> newValue)
     {
         this.selectTypeBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTSelectTypeConstructNode extends ASTNode implements IExecutableCo
     public void setEndSelectTypeStmt(ASTEndSelectTypeStmtNode newValue)
     {
         this.endSelectTypeStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTSelectTypeConstructNode extends ASTNode implements IExecutableCo
         case 0:  return this.selectTypeStmt;
         case 1:  return this.selectTypeBody;
         case 2:  return this.endSelectTypeStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTSelectTypeConstructNode extends ASTNode implements IExecutableCo
     {
         switch (index)
         {
-        case 0:  this.selectTypeStmt = (ASTSelectTypeStmtNode)value; return;
-        case 1:  this.selectTypeBody = (IASTListNode<ASTSelectTypeBodyNode>)value; return;
-        case 2:  this.endSelectTypeStmt = (ASTEndSelectTypeStmtNode)value; return;
+        case 0:  this.selectTypeStmt = (ASTSelectTypeStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.selectTypeBody = (IASTListNode<ASTSelectTypeBodyNode>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endSelectTypeStmt = (ASTEndSelectTypeStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

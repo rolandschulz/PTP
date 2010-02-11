@@ -46,6 +46,7 @@ public class ASTIntentStmtNode extends ASTNode implements ISpecificationStmt
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,6 +58,7 @@ public class ASTIntentStmtNode extends ASTNode implements ISpecificationStmt
     public void setIntentSpec(ASTIntentSpecNode newValue)
     {
         this.intentSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -68,6 +70,7 @@ public class ASTIntentStmtNode extends ASTNode implements ISpecificationStmt
     public void setVariableList(IASTListNode<ASTIntentParListNode> newValue)
     {
         this.variableList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -96,7 +99,7 @@ public class ASTIntentStmtNode extends ASTNode implements ISpecificationStmt
         case 6:  return this.hiddenTColon2;
         case 7:  return this.variableList;
         case 8:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -104,15 +107,15 @@ public class ASTIntentStmtNode extends ASTNode implements ISpecificationStmt
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTIntent = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.intentSpec = (ASTIntentSpecNode)value; return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.variableList = (IASTListNode<ASTIntentParListNode>)value; return;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTIntent = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.intentSpec = (ASTIntentSpecNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.variableList = (IASTListNode<ASTIntentParListNode>)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

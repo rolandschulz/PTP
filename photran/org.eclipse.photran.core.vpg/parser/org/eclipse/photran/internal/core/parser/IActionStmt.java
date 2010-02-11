@@ -28,5 +28,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public interface IActionStmt extends IASTNode, IExecutableConstruct
 {
+
+
+/////////////////////////////////// User Code //////////////////////////////////
+
+    Token getLabel();
 }
 

@@ -48,6 +48,7 @@ public class ASTSelectTypeStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,6 +60,7 @@ public class ASTSelectTypeStmtNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,6 +72,7 @@ public class ASTSelectTypeStmtNode extends ASTNode
     public void setAssociateName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.associateName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -81,6 +84,7 @@ public class ASTSelectTypeStmtNode extends ASTNode
     public void setSelector(ISelector newValue)
     {
         this.selector = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -110,7 +114,7 @@ public class ASTSelectTypeStmtNode extends ASTNode
         case 8:  return this.selector;
         case 9:  return this.hiddenTRparen;
         case 10: return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -118,17 +122,17 @@ public class ASTSelectTypeStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.associateName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.selector = (ISelector)value; return;
-        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.name = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTSelect = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.associateName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTEqgreaterthan = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.selector = (ISelector)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

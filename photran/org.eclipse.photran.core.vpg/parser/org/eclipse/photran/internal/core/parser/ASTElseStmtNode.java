@@ -41,6 +41,7 @@ public class ASTElseStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTElseStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void setEndName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.endName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTElseStmtNode extends ASTNodeWithErrorRecoverySymbols
         case 1:  return this.hiddenTElse;
         case 2:  return this.endName;
         case 3:  return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTElseStmtNode extends ASTNodeWithErrorRecoverySymbols
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTElse = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -38,6 +38,7 @@ public class ASTBlockDoConstructNode extends ASTNode
     public void setLabelDoStmt(ASTLabelDoStmtNode newValue)
     {
         this.labelDoStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTBlockDoConstructNode extends ASTNode
         switch (index)
         {
         case 0:  return this.labelDoStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTBlockDoConstructNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.labelDoStmt = (ASTLabelDoStmtNode)value; return;
+        case 0:  this.labelDoStmt = (ASTLabelDoStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

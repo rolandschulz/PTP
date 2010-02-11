@@ -49,6 +49,7 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -60,6 +61,7 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setNestedImpliedDo(ASTAcImpliedDoNode newValue)
     {
         this.nestedImpliedDo = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -71,6 +73,7 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setImpliedDoVariable(ASTImpliedDoVariableNode newValue)
     {
         this.impliedDoVariable = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -82,6 +85,7 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -93,6 +97,7 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -104,6 +109,7 @@ public class ASTAcImpliedDoNode extends ASTNode
     public void setStep(IExpr newValue)
     {
         this.step = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -134,7 +140,7 @@ public class ASTAcImpliedDoNode extends ASTNode
         case 9:  return this.hiddenTComma3;
         case 10: return this.step;
         case 11: return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -142,18 +148,18 @@ public class ASTAcImpliedDoNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.expr = (IExpr)value; return;
-        case 2:  this.nestedImpliedDo = (ASTAcImpliedDoNode)value; return;
-        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.impliedDoVariable = (ASTImpliedDoVariableNode)value; return;
-        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.lb = (IExpr)value; return;
-        case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.ub = (IExpr)value; return;
-        case 9:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.step = (IExpr)value; return;
-        case 11: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 2:  this.nestedImpliedDo = (ASTAcImpliedDoNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.impliedDoVariable = (ASTImpliedDoVariableNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.step = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 11: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -40,6 +40,7 @@ public class ASTSubmoduleNode extends ScopingNode implements IProgramUnit
     public void setSubmoduleStmt(ASTSubmoduleStmtNode newValue)
     {
         this.submoduleStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTSubmoduleNode extends ScopingNode implements IProgramUnit
     public void setModuleBody(IASTListNode<IModuleBodyConstruct> newValue)
     {
         this.moduleBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTSubmoduleNode extends ScopingNode implements IProgramUnit
     public void setEndSubmoduleStmt(ASTEndSubmoduleStmtNode newValue)
     {
         this.endSubmoduleStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTSubmoduleNode extends ScopingNode implements IProgramUnit
         case 0:  return this.submoduleStmt;
         case 1:  return this.moduleBody;
         case 2:  return this.endSubmoduleStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTSubmoduleNode extends ScopingNode implements IProgramUnit
     {
         switch (index)
         {
-        case 0:  this.submoduleStmt = (ASTSubmoduleStmtNode)value; return;
-        case 1:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value; return;
-        case 2:  this.endSubmoduleStmt = (ASTEndSubmoduleStmtNode)value; return;
+        case 0:  this.submoduleStmt = (ASTSubmoduleStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.moduleBody = (IASTListNode<IModuleBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endSubmoduleStmt = (ASTEndSubmoduleStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

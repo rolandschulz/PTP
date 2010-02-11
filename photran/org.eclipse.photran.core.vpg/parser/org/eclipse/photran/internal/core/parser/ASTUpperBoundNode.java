@@ -38,6 +38,7 @@ public class ASTUpperBoundNode extends ASTNode
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTUpperBoundNode extends ASTNode
         switch (index)
         {
         case 0:  return this.ub;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTUpperBoundNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.ub = (IExpr)value; return;
+        case 0:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

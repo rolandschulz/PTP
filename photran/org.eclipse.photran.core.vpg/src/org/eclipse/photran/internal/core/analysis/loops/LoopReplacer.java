@@ -77,36 +77,54 @@ public class LoopReplacer
 
     private void replaceLoop(ASTDoConstructNode loopToReplace)
     {
-        ASTProperLoopConstructNode newLoop = buildASTProperLoopConstructNode(loopToReplace.getLabelDoStmt());
-        removeAndReparentNodesIn(newLoop);
+        // Save ancestor nodes, since parent pointers will be changed when we manipulate
+        // the AST in #buildASTProperLoopConstructNode below.
+        IASTNode oldParent = loopToReplace.getParent();
+        ScopingNode scope = loopToReplace.findNearestAncestor(ScopingNode.class);
         
-        IASTNode parent = loopToReplace.getParent();
+        // Now manipulate the AST
+        ASTProperLoopConstructNode newLoop = buildASTProperLoopConstructNode(loopToReplace, scope);
         loopToReplace.replaceWith(newLoop);
-        newLoop.setParent(parent);
+        newLoop.setParent(oldParent);
     }
 
-    private ASTProperLoopConstructNode buildASTProperLoopConstructNode(ASTLabelDoStmtNode lastLoopHeader)
+    private ASTProperLoopConstructNode buildASTProperLoopConstructNode(ASTDoConstructNode loopToReplace, ScopingNode scope)
     {
+        ASTLabelDoStmtNode lastLoopHeader = loopToReplace.getLabelDoStmt();
+        
+        // First, remove siblings of lastLoopHeader that should actually be in the loop body
         ASTProperLoopConstructBuilder nodeBuilder = new ASTProperLoopConstructBuilder(lastLoopHeader);
-        lastLoopHeader.findNearestAncestor(ScopingNode.class).accept(nodeBuilder);
+        scope.accept(nodeBuilder);
+
+        // We needed to keep the loop header in the AST so that that ASTProperLoopConstructBuilder could find it
+        // Now that it's finished, we can move the loop header into the ASTProperLoopConstructNode
+        lastLoopHeader.removeFromTree();
+        nodeBuilder.result.setLoopHeader(lastLoopHeader);
+
         return nodeBuilder.result;
     }
     
     private class ASTProperLoopConstructBuilder extends ASTVisitorWithLoops
     {
-        private ASTProperLoopConstructNode result = new ASTProperLoopConstructNode();
+        private final ASTProperLoopConstructNode result = new ASTProperLoopConstructNode();
+        private final ASTLabelDoStmtNode loopHeader;
+        private final IASTNode doConstructNode;
+        private final IASTNode listEnclosingDoConstructNode;
         private boolean loopHeaderFound = false;
         
-        // Set the loop header before we start the traversal
+        // First, save ancestor nodes, since parent pointers will be changed when we
+        // manipulate the AST in the #visit methods below
         public ASTProperLoopConstructBuilder(ASTLabelDoStmtNode loopHeader)
         {
-            this.result.loopHeader = loopHeader;
+            this.loopHeader = loopHeader;
+            this.doConstructNode = loopHeader.getParent();
+            this.listEnclosingDoConstructNode = doConstructNode.getParent();
         }
         
         // Start accumulating body statements when we find the loop header
         @Override public void visitASTLabelDoStmtNode(ASTLabelDoStmtNode node)
         {
-            if (node == this.result.loopHeader)
+            if (node == loopHeader)
                 loopHeaderFound = true;
             
             traverseChildren(node);
@@ -116,7 +134,10 @@ public class LoopReplacer
         @Override public void visitIExecutionPartConstruct(IExecutionPartConstruct node)
         {
             if (shouldBeInLoopBody(node))
-                this.result.body.add(node);
+            {
+                node.removeFromTree();
+                this.result.getBody().add(node);
+            }
         }
         
         @Override public void visitIExecutableConstruct(IExecutableConstruct node)
@@ -144,47 +165,35 @@ public class LoopReplacer
         
         private boolean isCurrentlySiblingOfLoopHeader(IExecutionPartConstruct node)
         {
-            IASTNode doConstructNode = this.result.loopHeader.getParent();
-            return node.getParent() == doConstructNode.getParent();
+            return node.getParent() == listEnclosingDoConstructNode;
         }
 
         // Don't accumulate either the ASTLabelDoStmtNode or the ASTDoConstructNode in the body; these are the header
         private boolean isLoopHeader(IExecutionPartConstruct node)
         {
-            return node == this.result.loopHeader || node == this.result.loopHeader.getParent();
+            return node == loopHeader || node == doConstructNode;
         }
 
         // Stop accumulating body statements as soon as we find an END DO stmt
         @Override public void visitASTEndDoStmtNode(ASTEndDoStmtNode node)
         {
             if (loopHeaderFound && !endDoStmtFound() && !(node.getParent() instanceof ASTProperLoopConstructNode))
-                this.result.endDoStmt = node;
+            {
+                node.removeFromTree();
+                this.result.setEndDoStmt(node);
+            }
             
             traverseChildren(node);
         }
 
         private boolean endDoStmtFound()
         {
-            return this.result.endDoStmt != null;
+            return this.result.getEndDoStmt() != null;
         }
         
         @Override public void visitASTProperLoopConstructNode(ASTProperLoopConstructNode node)
         {
             // Do not traverse child statements of nested loops
         }
-    }
-
-    private void removeAndReparentNodesIn(ASTProperLoopConstructNode newLoop)
-    {
-        removeAndReparent(newLoop, newLoop.getLoopHeader());
-        for (IExecutionPartConstruct stmt : newLoop.getBody())
-            removeAndReparent(newLoop.getBody(), stmt);
-        removeAndReparent(newLoop, newLoop.getEndDoStmt());
-    }
-
-    private void removeAndReparent(IASTNode newParent, IASTNode stmt)
-    {
-        stmt.removeFromTree();
-        stmt.setParent(newParent);
     }
 }

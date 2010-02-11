@@ -12,7 +12,10 @@ package org.eclipse.photran.internal.tests;
 
 import java.io.File;
 
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * A test case which runs the parser over a file, expecting a successful parse.
@@ -30,7 +33,41 @@ public class ParserTestCase extends AbstractParserTestCase
     @Override
     protected void handleAST(ASTExecutableProgramNode ast)
     {
-        ;
+        checkCorrectParenting(ast);
+    }
+    
+    private void checkCorrectParenting(final ASTExecutableProgramNode ast)
+    {
+        ast.accept(new GenericASTVisitor()
+        {
+            private IASTNode expectedParent = null;
+            
+            @Override public void visitASTNode(IASTNode node)
+            {
+                if (node != ast && node.getParent() == null)
+                    System.err.println("!"); // Set breakpoint here
+                
+                if (node == ast)
+                    assertNull(node.getParent());
+                else
+                    assertNotNull(node.getParent());
+                
+                assertEquals(expectedParent, node.getParent());
+                IASTNode myParent = expectedParent;
+                
+                expectedParent = node;
+                traverseChildren(node);
+                expectedParent = myParent;
+            }
+            
+            @Override public void visitToken(Token token)
+            {
+                if (token.getParent() == null)
+                    System.err.println("!"); // Set breakpoint here
+                
+                assertEquals(expectedParent, token.getParent());
+            }
+        });
     }
     
     public ParserTestCase() { super(null, false, ""); } // to keep JUnit quiet

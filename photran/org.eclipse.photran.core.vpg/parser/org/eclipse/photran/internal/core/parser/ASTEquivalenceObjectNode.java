@@ -38,6 +38,7 @@ public class ASTEquivalenceObjectNode extends ASTNode
     public void setVariable(ASTVariableNode newValue)
     {
         this.variable = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTEquivalenceObjectNode extends ASTNode
         switch (index)
         {
         case 0:  return this.variable;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTEquivalenceObjectNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variable = (ASTVariableNode)value; return;
+        case 0:  this.variable = (ASTVariableNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

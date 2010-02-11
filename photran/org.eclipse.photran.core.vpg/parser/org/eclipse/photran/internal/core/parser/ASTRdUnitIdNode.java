@@ -41,6 +41,7 @@ public class ASTRdUnitIdNode extends ASTNode
     public void setReadUnitIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.readUnitIsAsterisk = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTRdUnitIdNode extends ASTNode
     public void setReadUnitExpr(ASTUFExprNode newValue)
     {
         this.readUnitExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTRdUnitIdNode extends ASTNode
         case 1:  return this.readUnitIsAsterisk;
         case 2:  return this.readUnitExpr;
         case 3:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTRdUnitIdNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.readUnitExpr = (ASTUFExprNode)value; return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.readUnitExpr = (ASTUFExprNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

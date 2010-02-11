@@ -42,6 +42,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     public void setSubroutineStmt(ASTSubroutineStmtNode newValue)
     {
         this.subroutineStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     public void setBody(IASTListNode<IBodyConstruct> newValue)
     {
         this.body = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     public void setContainsStmt(ASTContainsStmtNode newValue)
     {
         this.containsStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
     {
         this.internalSubprograms = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -86,6 +90,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     public void setEndSubroutineStmt(ASTEndSubroutineStmtNode newValue)
     {
         this.endSubroutineStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -114,7 +119,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
         case 2:  return this.containsStmt;
         case 3:  return this.internalSubprograms;
         case 4:  return this.endSubroutineStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -122,11 +127,11 @@ public class ASTSubroutineSubprogramNode extends ScopingNode implements IInterna
     {
         switch (index)
         {
-        case 0:  this.subroutineStmt = (ASTSubroutineStmtNode)value; return;
-        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; return;
-        case 2:  this.containsStmt = (ASTContainsStmtNode)value; return;
-        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; return;
-        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; return;
+        case 0:  this.subroutineStmt = (ASTSubroutineStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.body = (IASTListNode<IBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.containsStmt = (ASTContainsStmtNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.internalSubprograms = (IASTListNode<IInternalSubprogram>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.endSubroutineStmt = (ASTEndSubroutineStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

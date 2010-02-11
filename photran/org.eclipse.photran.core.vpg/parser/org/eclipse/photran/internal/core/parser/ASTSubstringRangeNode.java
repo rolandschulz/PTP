@@ -40,6 +40,7 @@ public class ASTSubstringRangeNode extends ASTNode
     public void setSubscriptTriplet(ASTSubscriptTripletNode newValue)
     {
         this.subscriptTriplet = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -61,7 +62,7 @@ public class ASTSubstringRangeNode extends ASTNode
         case 0:  return this.hiddenTLparen;
         case 1:  return this.subscriptTriplet;
         case 2:  return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -69,9 +70,9 @@ public class ASTSubstringRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; return;
-        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.subscriptTriplet = (ASTSubscriptTripletNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

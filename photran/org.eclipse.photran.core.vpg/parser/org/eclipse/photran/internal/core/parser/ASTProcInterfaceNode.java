@@ -39,6 +39,7 @@ public class ASTProcInterfaceNode extends ASTNode
     public void setTypeSpec(ASTTypeSpecNode newValue)
     {
         this.typeSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTProcInterfaceNode extends ASTNode
     public void setInterfaceName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.interfaceName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTProcInterfaceNode extends ASTNode
         {
         case 0:  return this.typeSpec;
         case 1:  return this.interfaceName;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTProcInterfaceNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.typeSpec = (ASTTypeSpecNode)value; return;
-        case 1:  this.interfaceName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.typeSpec = (ASTTypeSpecNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.interfaceName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

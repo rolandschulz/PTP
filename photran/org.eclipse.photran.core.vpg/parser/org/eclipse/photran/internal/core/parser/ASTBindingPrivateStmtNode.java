@@ -40,6 +40,7 @@ public class ASTBindingPrivateStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTBindingPrivateStmtNode extends ASTNode
     public void setPrivateToken(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.privateToken = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTBindingPrivateStmtNode extends ASTNode
     public void setIsPrivate(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isPrivate = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -83,7 +86,7 @@ public class ASTBindingPrivateStmtNode extends ASTNode
         case 0:  return this.label;
         case 1:  return this.privateToken;
         case 2:  return this.isPrivate;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -91,9 +94,9 @@ public class ASTBindingPrivateStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.privateToken = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

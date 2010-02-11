@@ -41,6 +41,7 @@ public class ASTCommonBlockNode extends ASTNode
     public void setName(ASTCommonBlockNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTCommonBlockNode extends ASTNode
     public void setCommonBlockObjectList(IASTListNode<ASTCommonBlockObjectNode> newValue)
     {
         this.commonBlockObjectList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTCommonBlockNode extends ASTNode
         case 1:  return this.name;
         case 2:  return this.hiddenTSlash2;
         case 3:  return this.commonBlockObjectList;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTCommonBlockNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.name = (ASTCommonBlockNameNode)value; return;
-        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.commonBlockObjectList = (IASTListNode<ASTCommonBlockObjectNode>)value; return;
+        case 0:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.name = (ASTCommonBlockNameNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.commonBlockObjectList = (IASTListNode<ASTCommonBlockObjectNode>)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

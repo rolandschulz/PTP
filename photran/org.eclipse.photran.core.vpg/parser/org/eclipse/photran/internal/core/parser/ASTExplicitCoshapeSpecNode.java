@@ -42,6 +42,7 @@ public class ASTExplicitCoshapeSpecNode extends ASTNode
     public void setExplicitShapeSpecList(IASTListNode<ASTExplicitShapeSpecNode> newValue)
     {
         this.explicitShapeSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -53,6 +54,7 @@ public class ASTExplicitCoshapeSpecNode extends ASTNode
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -76,7 +78,7 @@ public class ASTExplicitCoshapeSpecNode extends ASTNode
         case 2:  return this.lb;
         case 3:  return this.hiddenTColon;
         case 4:  return this.hiddenTAsterisk;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -84,11 +86,11 @@ public class ASTExplicitCoshapeSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; return;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.lb = (IExpr)value; return;
-        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.explicitShapeSpecList = (IASTListNode<ASTExplicitShapeSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

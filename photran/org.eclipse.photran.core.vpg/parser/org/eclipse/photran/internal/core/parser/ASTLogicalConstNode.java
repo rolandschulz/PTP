@@ -28,22 +28,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings({ "unchecked", "unused" })
 public class ASTLogicalConstNode extends ASTNode implements IExpr
 {
-    org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstNode
     org.eclipse.photran.internal.core.lexer.Token isTrue; // in ASTLogicalConstNode
+    org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTLogicalConstNode
     ASTNamedConstantUseNode namedConstKind; // in ASTLogicalConstNode
     org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTLogicalConstNode
-
-    public boolean isFalse()
-    {
-        return this.isFalse != null;
-    }
-
-    public void setIsFalse(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isFalse = newValue;
-    }
-
 
     public boolean isTrue()
     {
@@ -53,6 +42,19 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     public void setIsTrue(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isTrue = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isFalse()
+    {
+        return this.isFalse != null;
+    }
+
+    public void setIsFalse(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isFalse = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -64,6 +66,7 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
         this.namedConstKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -75,6 +78,7 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -94,12 +98,12 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  return this.isFalse;
-        case 1:  return this.isTrue;
+        case 0:  return this.isTrue;
+        case 1:  return this.isFalse;
         case 2:  return this.hiddenTUnderscore;
         case 3:  return this.namedConstKind;
         case 4:  return this.intKind;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -107,11 +111,11 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
-        case 4:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.namedConstKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

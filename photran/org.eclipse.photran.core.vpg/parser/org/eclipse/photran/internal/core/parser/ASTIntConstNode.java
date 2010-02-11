@@ -41,6 +41,7 @@ public class ASTIntConstNode extends ASTNode implements IExpr, ISelector, IUnsig
     public void setIntConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTIntConstNode extends ASTNode implements IExpr, ISelector, IUnsig
     public void setNamedConstKind(ASTNamedConstantUseNode newValue)
     {
         this.namedConstKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -63,6 +65,7 @@ public class ASTIntConstNode extends ASTNode implements IExpr, ISelector, IUnsig
     public void setIntKind(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.intKind = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -88,7 +91,7 @@ public class ASTIntConstNode extends ASTNode implements IExpr, ISelector, IUnsig
         case 1:  return this.hiddenTUnderscore;
         case 2:  return this.namedConstKind;
         case 3:  return this.intKind;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -96,10 +99,10 @@ public class ASTIntConstNode extends ASTNode implements IExpr, ISelector, IUnsig
     {
         switch (index)
         {
-        case 0:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.namedConstKind = (ASTNamedConstantUseNode)value; return;
-        case 3:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.intConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.namedConstKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

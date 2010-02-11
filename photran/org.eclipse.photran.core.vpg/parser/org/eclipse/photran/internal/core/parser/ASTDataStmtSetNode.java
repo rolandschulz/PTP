@@ -41,6 +41,7 @@ public class ASTDataStmtSetNode extends ASTNode
     public void setDataStmtObjectList(IASTListNode<IDataStmtObject> newValue)
     {
         this.dataStmtObjectList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTDataStmtSetNode extends ASTNode
     public void setDataStmtValueList(IASTListNode<ASTDataStmtValueNode> newValue)
     {
         this.dataStmtValueList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTDataStmtSetNode extends ASTNode
         case 1:  return this.hiddenTSlash;
         case 2:  return this.dataStmtValueList;
         case 3:  return this.hiddenTSlash2;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTDataStmtSetNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.dataStmtObjectList = (IASTListNode<IDataStmtObject>)value; return;
-        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.dataStmtValueList = (IASTListNode<ASTDataStmtValueNode>)value; return;
-        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.dataStmtObjectList = (IASTListNode<IDataStmtObject>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.dataStmtValueList = (IASTListNode<ASTDataStmtValueNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

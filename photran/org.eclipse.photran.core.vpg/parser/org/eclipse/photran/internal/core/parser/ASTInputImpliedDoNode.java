@@ -48,6 +48,7 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
     public void setInputItemList(IASTListNode<IInputItem> newValue)
     {
         this.inputItemList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,6 +60,7 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
     public void setImpliedDoVariable(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.impliedDoVariable = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,6 +72,7 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
     public void setLb(IExpr newValue)
     {
         this.lb = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -81,6 +84,7 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
     public void setUb(IExpr newValue)
     {
         this.ub = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -92,6 +96,7 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
     public void setStep(IExpr newValue)
     {
         this.step = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -122,7 +127,7 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
         case 8:  return this.hiddenTComma3;
         case 9:  return this.step;
         case 10: return this.hiddenTRparen;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -130,17 +135,17 @@ public class ASTInputImpliedDoNode extends ASTNode implements IInputItem
     {
         switch (index)
         {
-        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.inputItemList = (IASTListNode<IInputItem>)value; return;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.impliedDoVariable = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.lb = (IExpr)value; return;
-        case 6:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.ub = (IExpr)value; return;
-        case 8:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 9:  this.step = (IExpr)value; return;
-        case 10: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.inputItemList = (IASTListNode<IInputItem>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.impliedDoVariable = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTEquals = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.lb = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.ub = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTComma3 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.step = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

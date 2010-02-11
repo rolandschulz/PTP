@@ -39,6 +39,7 @@ public class ASTSubstrConstNode extends ASTNode
     public void setStringConst(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.stringConst = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTSubstrConstNode extends ASTNode
     public void setSubstringRange(ASTSubstringRangeNode newValue)
     {
         this.substringRange = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTSubstrConstNode extends ASTNode
         {
         case 0:  return this.stringConst;
         case 1:  return this.substringRange;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTSubstrConstNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.substringRange = (ASTSubstringRangeNode)value; return;
+        case 0:  this.stringConst = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.substringRange = (ASTSubstringRangeNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

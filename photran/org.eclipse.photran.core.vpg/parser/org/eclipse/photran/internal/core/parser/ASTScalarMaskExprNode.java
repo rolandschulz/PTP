@@ -38,6 +38,7 @@ public class ASTScalarMaskExprNode extends ASTNode
     public void setMaskExpr(IExpr newValue)
     {
         this.maskExpr = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -57,7 +58,7 @@ public class ASTScalarMaskExprNode extends ASTNode
         switch (index)
         {
         case 0:  return this.maskExpr;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -65,7 +66,7 @@ public class ASTScalarMaskExprNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.maskExpr = (IExpr)value; return;
+        case 0:  this.maskExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

@@ -39,6 +39,7 @@ public class ASTSelectCaseRangeNode extends ASTNode
     public void setSelectCaseBody(IASTListNode<ICaseBodyConstruct> newValue)
     {
         this.selectCaseBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -50,6 +51,7 @@ public class ASTSelectCaseRangeNode extends ASTNode
     public void setEndSelectStmt(ASTEndSelectStmtNode newValue)
     {
         this.endSelectStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,7 +72,7 @@ public class ASTSelectCaseRangeNode extends ASTNode
         {
         case 0:  return this.selectCaseBody;
         case 1:  return this.endSelectStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -78,8 +80,8 @@ public class ASTSelectCaseRangeNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value; return;
-        case 1:  this.endSelectStmt = (ASTEndSelectStmtNode)value; return;
+        case 0:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.endSelectStmt = (ASTEndSelectStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

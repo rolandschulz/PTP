@@ -40,6 +40,7 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
     public void setSelectCaseStmt(ASTSelectCaseStmtNode newValue)
     {
         this.selectCaseStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
     public void setSelectCaseBody(IASTListNode<ICaseBodyConstruct> newValue)
     {
         this.selectCaseBody = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -62,6 +64,7 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
     public void setEndSelectStmt(ASTEndSelectStmtNode newValue)
     {
         this.endSelectStmt = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -84,7 +87,7 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
         case 0:  return this.selectCaseStmt;
         case 1:  return this.selectCaseBody;
         case 2:  return this.endSelectStmt;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -92,9 +95,9 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
     {
         switch (index)
         {
-        case 0:  this.selectCaseStmt = (ASTSelectCaseStmtNode)value; return;
-        case 1:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value; return;
-        case 2:  this.endSelectStmt = (ASTEndSelectStmtNode)value; return;
+        case 0:  this.selectCaseStmt = (ASTSelectCaseStmtNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.selectCaseBody = (IASTListNode<ICaseBodyConstruct>)value; if (value != null) value.setParent(this); return;
+        case 2:  this.endSelectStmt = (ASTEndSelectStmtNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

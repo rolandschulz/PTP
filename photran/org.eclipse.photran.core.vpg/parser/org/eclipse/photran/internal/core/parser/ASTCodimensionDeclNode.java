@@ -41,6 +41,7 @@ public class ASTCodimensionDeclNode extends ASTNode
     public void setName(ASTNameNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -52,6 +53,7 @@ public class ASTCodimensionDeclNode extends ASTNode
     public void setCoarraySpec(ASTCoarraySpecNode newValue)
     {
         this.coarraySpec = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -74,7 +76,7 @@ public class ASTCodimensionDeclNode extends ASTNode
         case 1:  return this.hiddenTLbracket;
         case 2:  return this.coarraySpec;
         case 3:  return this.hiddenTRbracket;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -82,10 +84,10 @@ public class ASTCodimensionDeclNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.name = (ASTNameNode)value; return;
-        case 1:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.coarraySpec = (ASTCoarraySpecNode)value; return;
-        case 3:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.coarraySpec = (ASTCoarraySpecNode)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

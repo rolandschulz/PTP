@@ -40,6 +40,7 @@ public class ASTFunctionArgListNode extends ASTNode
     public void setSectionSubscriptList(IASTListNode<ASTSectionSubscriptNode> newValue)
     {
         this.sectionSubscriptList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -51,6 +52,7 @@ public class ASTFunctionArgListNode extends ASTNode
     public void setFunctionArg(ASTFunctionArgNode newValue)
     {
         this.functionArg = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -72,7 +74,7 @@ public class ASTFunctionArgListNode extends ASTNode
         case 0:  return this.sectionSubscriptList;
         case 1:  return this.hiddenTComma;
         case 2:  return this.functionArg;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -80,9 +82,9 @@ public class ASTFunctionArgListNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; return;
-        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.functionArg = (ASTFunctionArgNode)value; return;
+        case 0:  this.sectionSubscriptList = (IASTListNode<ASTSectionSubscriptNode>)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.functionArg = (ASTFunctionArgNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

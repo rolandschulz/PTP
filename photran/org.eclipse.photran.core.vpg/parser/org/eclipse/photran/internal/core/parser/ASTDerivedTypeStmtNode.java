@@ -48,6 +48,7 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     public void setLabel(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.label = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -59,6 +60,7 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     public void setTypeAttrSpecList(IASTListNode<ASTTypeAttrSpecNode> newValue)
     {
         this.typeAttrSpecList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -70,6 +72,7 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     public void setTypeName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.typeName = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -81,6 +84,7 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     public void setTypeParamNameList(IASTListNode<ASTTypeParamNameNode> newValue)
     {
         this.typeParamNameList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -110,7 +114,7 @@ public class ASTDerivedTypeStmtNode extends ASTNode
         case 8:  return this.typeParamNameList;
         case 9:  return this.hiddenTRparen;
         case 10: return this.hiddenTEos;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -118,17 +122,17 @@ public class ASTDerivedTypeStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 3:  this.typeAttrSpecList = (IASTListNode<ASTTypeAttrSpecNode>)value; return;
-        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 6:  this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 8:  this.typeParamNameList = (IASTListNode<ASTTypeParamNameNode>)value; return;
-        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.typeAttrSpecList = (IASTListNode<ASTTypeAttrSpecNode>)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTColon2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.typeName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.typeParamNameList = (IASTListNode<ASTTypeParamNameNode>)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

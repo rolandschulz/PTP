@@ -42,6 +42,7 @@ public class ASTArrayConstructorNode extends ASTNode implements IExpr
     public void setAcValueList(IASTListNode<ASTAcValueNode> newValue)
     {
         this.acValueList = newValue;
+        if (newValue != null) newValue.setParent(this);
     }
 
 
@@ -66,7 +67,7 @@ public class ASTArrayConstructorNode extends ASTNode implements IExpr
         case 2:  return this.acValueList;
         case 3:  return this.hiddenTSlashrparen;
         case 4:  return this.hiddenTRbracket;
-        default: return null;
+        default: throw new IllegalArgumentException("Invalid index");
         }
     }
 
@@ -74,11 +75,11 @@ public class ASTArrayConstructorNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 1:  this.hiddenTLparenslash = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 2:  this.acValueList = (IASTListNode<ASTAcValueNode>)value; return;
-        case 3:  this.hiddenTSlashrparen = (org.eclipse.photran.internal.core.lexer.Token)value; return;
-        case 4:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; return;
+        case 0:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTLparenslash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.acValueList = (IASTListNode<ASTAcValueNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTSlashrparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
