@@ -54,7 +54,7 @@ public class FreeFormFortranEditor extends AbstractFortranEditor
 
     protected int[] getColumnsToDrawVerticalLinesOn()
     {
-        return new int[] { 132 };
+        return new int[] { };
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
