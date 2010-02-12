@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.testing.combinatorial;
 
+import java.util.Iterator;
+
 /**
  * Generates all combinations of non-negative integers within specified limits.
  * <p>
@@ -37,7 +39,7 @@ package org.eclipse.rephraserengine.testing.combinatorial;
  * 
  * @author Jeff Overbey
  */
-public class CombinationGenerator
+public class CombinationGenerator implements Iterable<int[]>
 {
     private int maxValuePlusOne, maxItems;
 
@@ -62,7 +64,8 @@ public class CombinationGenerator
     /**
      * Returns the next combination of integers (according to the parameters pass to this
      * {@link CombinationGenerator}'s constructor), given the previous combination returned by this
-     * method or by {@link #firstCombination()}.
+     * method or by {@link #firstCombination()}.  <i>Note that the <code>lastCombination</code>
+     * array is modified in-place.</i>
      * 
      * @param lastCombination an array returned by {@link #firstCombination()} or
      *            {@link #nextCombination(int[])}
@@ -123,5 +126,31 @@ public class CombinationGenerator
         for (int i = 0; i < newConfig.length; i++)
             newConfig[i] = i;
         return newConfig;
+    }
+
+    /* @see java.lang.Iterable#iterator() */
+    public Iterator<int[]> iterator()
+    {
+        return new Iterator<int[]>()
+        {
+            private int[] nextCombination = firstCombination();
+            
+            public boolean hasNext()
+            {
+                return nextCombination != null;
+            }
+
+            public int[] next()
+            {
+                int[] result = nextCombination.clone();
+                nextCombination = nextCombination(nextCombination);
+                return result;
+            }
+
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }
