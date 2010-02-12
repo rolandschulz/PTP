@@ -18,13 +18,7 @@ public abstract class SourceReproductionTestSuite extends AbstractParserTestSuit
 {
     public SourceReproductionTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {
-        super(directorySuffix, isFixedForm, mustExist);
-    }
-
-    @Override
-    protected String describeTestAction()
-    {
-        return "Reproduce source code for";
+        super("Reproduce source code for", directorySuffix, isFixedForm, mustExist);
     }
 
     @Override

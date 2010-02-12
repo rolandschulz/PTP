@@ -52,13 +52,16 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         setName(getDescription(directorySuffix, mustExist));
 
         File dir = new File(testDirectory);
-        if (!dir.exists())
+        if (mustExist && !dir.exists())
             throw new FileNotFoundException("Directory " + dir.getAbsolutePath() + " not found");
 
-        processDirectory(dir, getFilesToSkip(dir));
-
-        if (this.countTestCases() == 0)
-            throw new FileNotFoundException("No test files found in " + dir.getAbsolutePath());
+        if (dir.exists())
+        {
+            processDirectory(dir, getFilesToSkip(dir));
+    
+            if (this.countTestCases() == 0)
+                throw new FileNotFoundException("No test files found in " + dir.getAbsolutePath());
+        }
     }
 
     public GeneralTestSuiteFromFiles(String description, String directorySuffix, FilenameFilter filenameFilter)

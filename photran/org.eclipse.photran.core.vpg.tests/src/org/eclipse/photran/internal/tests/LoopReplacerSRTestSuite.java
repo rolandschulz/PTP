@@ -18,13 +18,7 @@ public abstract class LoopReplacerSRTestSuite extends AbstractParserTestSuite
 {
     public LoopReplacerSRTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {
-        super(directorySuffix, isFixedForm, mustExist);
-    }
-
-    @Override
-    protected String describeTestAction()
-    {
-        return "Replace loops and reproduce source code for";
+        super("Replace loops and reproduce source code for", directorySuffix, isFixedForm, mustExist);
     }
 
     @Override
