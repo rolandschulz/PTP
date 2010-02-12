@@ -100,4 +100,26 @@ public class StringUtil
         
         return -1;
     }
+
+    public static String stripNonASCIICharsAndCRs(String s) {
+        return stripNonASCIIChars(s, true);
+    }
+
+    public static String stripNonASCIIChars(String s) {
+        return stripNonASCIIChars(s, false);
+    }
+
+    protected static String stripNonASCIIChars(String s, boolean stripCRs) {
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0, len = s.length(); i < len; i++) {
+            char ch = s.charAt(i);
+            if (stripCRs && i == '\r')
+                continue;
+            else if (i < 256)
+                sb.append(ch);
+            else
+                sb.append('?');
+        }
+        return sb.toString();
+    }
 }
