@@ -60,4 +60,44 @@ public class StringUtil
     public static String read(File file) throws IOException {
         return read(new BufferedReader(new FileReader(file)));
     }
+
+    /**
+     * Returns the (0-based) offset of the character at the given (1-based) line and column.
+     * @param line the line number (the first line is line 1) 
+     * @param col the column number (the first column is column 1)
+     * @return the character offset (the first character is at offset 0)
+     */
+    public static int offsetOf(int line, int col, String string)
+    {
+        assert line >= 1 && col >= 1 && string != null;
+        
+        int offset = offsetOfLine(line, string);
+        if (offset < 0)
+            return -1;
+        else
+            return offset + col - 1;
+    }
+
+    /**
+     * Returns the (0-based) offset of the first character on the given (1-based) line.
+     * @param line the line number (the first line is line 1) 
+     * @return the character offset (the first character is at offset 0)
+     */
+    public static int offsetOfLine(int line, String string)
+    {
+        assert line >= 1 && string != null;
+
+        if (line == 1) return 0;
+
+        int precedingLF = -1;
+        int curLine = 1;
+        while (precedingLF >= 0 || curLine == 1)
+        {
+            precedingLF = string.indexOf('\n', precedingLF+1);
+            curLine++;
+            if (curLine == line) return precedingLF < 0 ? -1 : precedingLF+1;
+        }
+        
+        return -1;
+    }
 }
