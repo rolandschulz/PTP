@@ -34,12 +34,18 @@ public abstract class AbstractParserTestSuite extends GeneralTestSuiteFromFiles
     
     public AbstractParserTestSuite(String description, String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {
-        super(description,
+        super(description + (isFixedForm ? " fixed form" : " free form"),
               directorySuffix,
               isFixedForm ? FIXED_FORM_FILENAME_FILTER : FREE_FORM_FILENAME_FILTER,
-              mustExist);
+              mustExist,
+              isFixedForm);
     }
     
+    @Override protected void initialize(Object... initializationData)
+    {
+        this.isFixedForm = (Boolean)initializationData[0];
+    }
+
     @Override protected String getRootDirectory()
     {
         return TEST_ROOT;

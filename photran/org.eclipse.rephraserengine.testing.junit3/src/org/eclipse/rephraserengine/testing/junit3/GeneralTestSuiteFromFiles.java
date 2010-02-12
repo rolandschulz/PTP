@@ -43,7 +43,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
     protected final FilenameFilter filenameFilter;
 
     public GeneralTestSuiteFromFiles(String description, String directorySuffix, FilenameFilter filenameFilter,
-        boolean mustExist) throws FileNotFoundException, IOException
+        boolean mustExist, Object... initializationData) throws FileNotFoundException, IOException
     {
         this.description = description;
         this.testDirectory = getFullPath(directorySuffix);
@@ -51,6 +51,8 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
 
         setName(getDescription(directorySuffix, mustExist));
 
+        initialize(initializationData);
+        
         File dir = new File(testDirectory);
         if (mustExist && !dir.exists())
             throw new FileNotFoundException("Directory " + dir.getAbsolutePath() + " not found");
@@ -88,6 +90,10 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         this(description, directorySuffix, filenameExtension, true);
     }
 
+    protected void initialize(Object... initializationData)
+    {
+    }
+    
     protected String getDescription(String directorySuffix, boolean mustExist)
     {
         String dir = getFullPath(directorySuffix);
