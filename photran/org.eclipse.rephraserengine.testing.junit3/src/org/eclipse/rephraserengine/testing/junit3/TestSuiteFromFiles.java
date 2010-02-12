@@ -22,37 +22,37 @@ import junit.framework.TestSuite;
  */
 public abstract class TestSuiteFromFiles extends GeneralTestSuiteFromFiles
 {
-    public TestSuiteFromFiles(String directorySuffix, FilenameFilter filenameFilter,
+    public TestSuiteFromFiles(String description, String directorySuffix, FilenameFilter filenameFilter,
         boolean mustExist) throws FileNotFoundException, IOException
     {
-        super(directorySuffix, filenameFilter, mustExist);
+        super(description, directorySuffix, filenameFilter, mustExist);
     }
 
-    public TestSuiteFromFiles(String directorySuffix, FilenameFilter filenameFilter)
+    public TestSuiteFromFiles(String description, String directorySuffix, FilenameFilter filenameFilter)
         throws FileNotFoundException, IOException
     {
-        super(directorySuffix, filenameFilter);
+        super(description, directorySuffix, filenameFilter);
     }
 
-    public TestSuiteFromFiles(String directorySuffix, final String filenameExtension,
+    public TestSuiteFromFiles(String description, String directorySuffix, final String filenameExtension,
         boolean mustExist) throws FileNotFoundException, IOException
     {
-        super(directorySuffix, filenameExtension, mustExist);
+        super(description, directorySuffix, filenameExtension, mustExist);
     }
 
-    public TestSuiteFromFiles(String directorySuffix, final String filenameExtension)
+    public TestSuiteFromFiles(String description, String directorySuffix, final String filenameExtension)
         throws FileNotFoundException, IOException
     {
-        super(directorySuffix, filenameExtension);
+        super(description, directorySuffix, filenameExtension);
     }
 
     @Override
     protected final Test createTestFor(final File file)
     {
-        return new SimpleFileTestCase(file);
+        return new SimpleFileTestCase(file) {};
     }
 
-    public final class SimpleFileTestCase extends TestCase
+    public abstract class SimpleFileTestCase extends TestCase
     {
         protected File file;
 

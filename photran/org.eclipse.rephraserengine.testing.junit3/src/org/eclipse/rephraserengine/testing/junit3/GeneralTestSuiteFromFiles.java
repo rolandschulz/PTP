@@ -38,13 +38,14 @@ import junit.framework.TestSuite;
  */
 public abstract class GeneralTestSuiteFromFiles extends TestSuite
 {
-    protected String testDirectory;
+    protected final String description;
+    protected final String testDirectory;
+    protected final FilenameFilter filenameFilter;
 
-    protected FilenameFilter filenameFilter;
-
-    public GeneralTestSuiteFromFiles(String directorySuffix, FilenameFilter filenameFilter,
+    public GeneralTestSuiteFromFiles(String description, String directorySuffix, FilenameFilter filenameFilter,
         boolean mustExist) throws FileNotFoundException, IOException
     {
+        this.description = description;
         this.testDirectory = getFullPath(directorySuffix);
         this.filenameFilter = filenameFilter;
 
@@ -60,16 +61,16 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
             throw new FileNotFoundException("No test files found in " + dir.getAbsolutePath());
     }
 
-    public GeneralTestSuiteFromFiles(String directorySuffix, FilenameFilter filenameFilter)
+    public GeneralTestSuiteFromFiles(String description, String directorySuffix, FilenameFilter filenameFilter)
         throws FileNotFoundException, IOException
     {
-        this(directorySuffix, filenameFilter, true);
+        this(description, directorySuffix, filenameFilter, true);
     }
 
-    public GeneralTestSuiteFromFiles(String directorySuffix, final String filenameExtension,
+    public GeneralTestSuiteFromFiles(String description, String directorySuffix, final String filenameExtension,
         boolean mustExist) throws FileNotFoundException, IOException
     {
-        this(directorySuffix, new FilenameFilter()
+        this(description, directorySuffix, new FilenameFilter()
         {
             public boolean accept(File dir, String name)
             {
@@ -78,10 +79,10 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         }, mustExist);
     }
 
-    public GeneralTestSuiteFromFiles(String directorySuffix, final String filenameExtension)
+    public GeneralTestSuiteFromFiles(String description, String directorySuffix, final String filenameExtension)
         throws FileNotFoundException, IOException
     {
-        this(directorySuffix, filenameExtension, true);
+        this(description, directorySuffix, filenameExtension, true);
     }
 
     protected String getDescription(String directorySuffix, boolean mustExist)
@@ -89,7 +90,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         String dir = getFullPath(directorySuffix);
 
         StringBuffer sb = new StringBuffer(256);
-        sb.append(describeTestAction());
+        sb.append(description);
         sb.append(' ');
         sb.append(directorySuffix);
         String message = sb.toString();
@@ -105,11 +106,6 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         }
 
         return message;
-    }
-
-    protected String describeTestAction()
-    {
-        return "";
     }
 
     private String getWorkingDirectory()
@@ -197,7 +193,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         {
             if (!shouldSkip(file, filenamesToSkip))
             {
-                TestSuite subSuite = new TestSuite(describeTestAction() + " " + describe(file));
+                TestSuite subSuite = new TestSuite(description + " " + describe(file));
                 subSuite.addTest(createTestFor(file));
                 addTest(subSuite);
             }
@@ -207,14 +203,15 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
     protected boolean shouldSkip(File file, Set<String> filenamesToSkip)
     {
         for (String filename : filenamesToSkip)
-            if (file.getAbsolutePath().endsWith(filename)) return true;
+            if (file.getAbsolutePath().replace('\\', '/').endsWith(filename.replace('\\', '/')))
+                return true;
 
         return false;
     }
 
     protected String describe(File file)
     {
-        return file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf('/') + 1);
+        return file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(File.separatorChar) + 1);
     }
 
     private static FileFilter DIRECTORY_FILTER = new FileFilter()

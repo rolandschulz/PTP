@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rephraser Engine Text File Manipulation Example
-Bundle-SymbolicName: org.eclipse.rephraserengine.internal.examples.text;singleton:=true
+Bundle-SymbolicName: org.eclipse.rephraserengine.examples.text;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org - Photran
 Require-Bundle: org.eclipse.ui,
