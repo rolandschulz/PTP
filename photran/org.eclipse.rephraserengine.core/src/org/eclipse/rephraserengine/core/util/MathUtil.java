@@ -8,25 +8,25 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.rephraserengine.internal.examples.testing;
-
-import java.util.Arrays;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.eclipse.rephraserengine.testing.combinatorial.Foreach;
+package org.eclipse.rephraserengine.core.util;
 
 /**
  * 
- * @author Jeff Overbey
+ * @author joverbey
  */
-public class ForeachExamples extends TestCase
+public class MathUtil
 {
-    public void testForeachCombination()
+    private MathUtil() {;}
+    
+    /** @return the binomial coefficient <i>n choose k</i> */
+    public static long binomialCoefficient(int n, int k)
     {
-        List<String> people = Arrays.asList("Jim", "Kathy", "Bob", "Alice");
-        for (List<String> combination : Foreach.combinationOf(2, 3, people))
-            System.out.println(combination);
+        if (k > n) return 0;
+
+        long result = 1;
+        for (int i = 1; i <= k; i++)
+             result = result * (n-k+i) / i;
+        return result;
     }
+
 }

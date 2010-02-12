@@ -18,9 +18,9 @@ import java.util.List;
  * 
  * @author joverbey
  */
-public class Foreach
+public class ForEach
 {
-    private Foreach() {;}
+    private ForEach() {;}
     
     public static <T> Iterable<List<T>> combinationOf(final List<T> list)
     {
