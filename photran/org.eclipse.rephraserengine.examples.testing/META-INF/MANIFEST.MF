@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rephraser Engine Unit Testing Examples
+Bundle-SymbolicName: org.eclipse.rephraserengine.examples.testing
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Eclipse.org - Photran
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.rephraserengine.testing.junit3,
+ org.junit,
+ org.eclipse.rephraserengine.core,
+ org.eclipse.rephraserengine.core.vpg,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.jface.text

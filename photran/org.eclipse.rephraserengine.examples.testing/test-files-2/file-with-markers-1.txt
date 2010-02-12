@@ -1,0 +1,4 @@
+This example illustrates a simple use of markers.                      <<<1,3
+For this example, the marker consists of three less-than symbols.      <<<2,7 <<<2,34
+Each marker is followed by a line and column where the substring "is"  <<<3,13 <<<3,67
+appears.
