@@ -24,20 +24,20 @@ public class Foreach
     
     public static <T> Iterable<List<T>> combinationOf(final List<T> list)
     {
-        return combinationOf(list, 1, list.size());
+        return combinationOf(1, list.size(), list);
     }
 
-    public static <T> Iterable<List<T>> combinationOf(final List<T> list.
-                                                      int minNumElementsInCombination,
-                                                      int maxNumElementsInCombination)
+    public static <T> Iterable<List<T>> combinationOf(final int minNumElementsInCombination,
+                                                      final int maxNumElementsInCombination,
+                                                      final List<T> list)
     {
         return new Iterable<List<T>>()
         {
             public Iterator<List<T>> iterator()
             {
-                return new CombinationIterator<T>(list,
-                                                  minNumElementsInCombination,
-                                                  maxNumElementsInCombination);
+                return new CombinationIterator<T>(minNumElementsInCombination,
+                                                  maxNumElementsInCombination,
+                                                  list);
             }
         };
     }
@@ -48,11 +48,19 @@ public class Foreach
         protected CombinationGenerator gen;
         protected int[] nextCombination;
         
-        public CombinationIterator(List<T> list)
+        public CombinationIterator(int minNumElementsInCombination,
+                                   int maxNumElementsInCombination,
+                                   List<T> list)
         {
+            if (minNumElementsInCombination < 1
+                || minNumElementsInCombination > list.size()
+                || maxNumElementsInCombination < 0
+                || maxNumElementsInCombination > list.size())
+                throw new IllegalArgumentException();
+            
             this.list = list;
-            this.gen = new CombinationGenerator(list.size(), list.size());
-            this.nextCombination = gen.firstCombination();
+            this.gen = new CombinationGenerator(list.size(), maxNumElementsInCombination);
+            this.nextCombination = gen.firstCombination(minNumElementsInCombination);
         }
 
         public boolean hasNext()

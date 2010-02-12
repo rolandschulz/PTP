@@ -62,6 +62,21 @@ public class CombinationGenerator implements Iterable<int[]>
     }
 
     /**
+     * Returns the first combination of <i>n</i> integers. This is always {0, 1, ..., n-1}.
+     * <p>
+     * It can be passed to {@link #nextCombination(int[])} to generate the next combination.
+     * 
+     * @return the first combination of <i>n</i> integers (always {0, 1, ..., n-1})
+     * */
+    public int[] firstCombination(int n)
+    {
+        int[] result = new int[n];
+        for (int i = 0; i < n; i++)
+            result[i] = i;
+        return result;
+    }
+
+    /**
      * Returns the next combination of integers (according to the parameters pass to this
      * {@link CombinationGenerator}'s constructor), given the previous combination returned by this
      * method or by {@link #firstCombination()}.  <i>Note that the <code>lastCombination</code>

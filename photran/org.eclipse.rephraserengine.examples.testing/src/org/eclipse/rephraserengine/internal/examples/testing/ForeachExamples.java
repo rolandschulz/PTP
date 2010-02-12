@@ -19,14 +19,14 @@ import org.eclipse.rephraserengine.testing.combinatorial.Foreach;
 
 /**
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public class ForeachExamples extends TestCase
 {
     public void testForeachCombination()
     {
         List<String> people = Arrays.asList("Jim", "Kathy", "Bob", "Alice");
-        for (List<String> combination : Foreach.combinationOf(people))
+        for (List<String> combination : Foreach.combinationOf(2, 3, people))
             System.out.println(combination);
     }
 }
