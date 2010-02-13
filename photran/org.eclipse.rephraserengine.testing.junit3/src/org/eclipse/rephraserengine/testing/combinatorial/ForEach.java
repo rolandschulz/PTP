@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.rephraserengine.core.util.Pair;
+
 /**
  * 
  * @author joverbey
@@ -22,9 +24,15 @@ public class ForEach
 {
     private ForEach() {;}
     
-    public static <T> Iterable<List<T>> combinationOf(final List<T> list)
+    public static <T> Iterable<List<T>> combinationOf(List<T> list)
     {
         return combinationOf(1, list.size(), list);
+    }
+    
+    public static <T> Iterable<List<T>> combinationOf(int numElementsToChoose,
+                                                      List<T> list)
+    {
+        return combinationOf(numElementsToChoose, numElementsToChoose, list);
     }
 
     public static <T> Iterable<List<T>> combinationOf(final int minNumElementsInCombination,
@@ -78,6 +86,65 @@ public class ForEach
             
             nextCombination = gen.nextCombination(nextCombination);
             return combination;
+        }
+
+        public void remove()
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * Returns all pairs of.
+     * @return
+     */
+    public static <T> Iterable<Pair<T,T>> pairOf(final List<T> objects)
+    {
+        return new Iterable<Pair<T,T>>()
+        {
+            public Iterator<Pair<T,T>> iterator()
+            {
+                return new PairIterator<T>(objects);
+            }
+        };
+    }
+    
+    private static class PairIterator<T> implements Iterator<Pair<T,T>>
+    {
+        /** Set of objects from which pairs will be generated */
+        protected final List<T> objects;
+        
+        /** Index of the first component of the pair in {@link #objects} */
+        protected int fstIndex;
+        
+        /** Index of the second component of the pair in {@link #objects} */
+        protected int sndIndex;
+        
+        public PairIterator(List<T> objects)
+        {
+            this.objects = objects;
+            this.fstIndex = 0;
+            this.sndIndex = 0;
+        }
+
+        public boolean hasNext()
+        {
+            return fstIndex < objects.size();
+        }
+
+        public Pair<T,T> next()
+        {
+            if (fstIndex == objects.size()) return null;
+            
+            Pair<T,T> result = new Pair<T,T>(objects.get(fstIndex), objects.get(sndIndex));
+            
+            if (++sndIndex == objects.size())
+            {
+                ++fstIndex;
+                sndIndex = 0;
+            }
+            
+            return result;
         }
 
         public void remove()
