@@ -26,6 +26,13 @@ import org.eclipse.rephraserengine.testing.combinatorial.ForEach;
  */
 public class ForEachExamples extends TestCase
 {
+    private final List<String> people = Arrays.asList("Jim", "Kathy", "Bob", "Alice", "Sam", "Eor");
+
+    private final List<Integer> numbers = Arrays.asList(Integer.MIN_VALUE, -19, -18, -17, -11, -5,
+        -2, -1, 0, 1, 2, 5, 10, 11, 16, 17, 18, 19, Integer.MAX_VALUE);
+
+    private final List<String> colors = Arrays.asList("Red", "Blue");
+
     /**
      * Illustrates a simple use of {@link ForEach#combinationOf(List)}.
      * <p>
@@ -33,7 +40,6 @@ public class ForEachExamples extends TestCase
      */
     public void testForeachCombination()
     {
-        List<String> people = Arrays.asList("Jim", "Kathy", "Bob", "Alice");
         for (List<String> combination : ForEach.combinationOf(people))
             System.out.println(combination);
     }
@@ -44,9 +50,6 @@ public class ForEachExamples extends TestCase
      */
     public void testCountCombinations()
     {
-        List<String> people = Arrays
-            .asList("Jim", "Kathy", "Bob", "Alice", "Sam", "Eor", "Crystal");
-
         for (int min = 1; min <= people.size(); min++)
         {
             for (int max = min; max <= people.size(); max++)
@@ -68,31 +71,26 @@ public class ForEachExamples extends TestCase
             }
         }
     }
-    
+
     /**
      * Illustrates a simple use of {@link ForEach#pairOf(List)}.
      * <p>
-     * This example tests that an alternative implementation of the modulo operator
-     * ({@link #mod(int, int)}) returns the same results as Java's <code>%</code>
-     * operator.
+     * This example tests that an alternative implementation of the modulo operator (
+     * {@link #mod(int, int)}) returns the same results as Java's <code>%</code> operator.
      */
     public void testForEachPair()
     {
-        List<Integer> numbers = Arrays.asList(
-            Integer.MIN_VALUE, -19, -18, -17, -11, -5, -2, -1, 0,
-            1, 2, 5, 10, 11, 16, 17, 18, 19, Integer.MAX_VALUE);
-
         for (Pair<Integer, Integer> pair : ForEach.pairOf(numbers))
         {
             if (pair.snd == 0) continue;
-            
-            System.out.println("Checking mod(" + pair.fst + ", " + pair.snd + ")");
+
             int expected = pair.fst % pair.snd;
             int actual = mod(pair.fst, pair.snd);
+            System.out.println("Checking mod(" + pair.fst + ", " + pair.snd + ") == " + expected);
             assertEquals(expected, actual);
         }
     }
-    
+
     /**
      * Alternative definition of the modulo operator.
      * <p>
@@ -102,6 +100,51 @@ public class ForEachExamples extends TestCase
      */
     private static int mod(int lhs, int rhs)
     {
-        return lhs - rhs * (lhs/rhs);
+        return lhs - rhs * (lhs / rhs);
+    }
+
+    /**
+     * Illustrates a simple use of {@link ForEach#combinationOf(List)}.
+     * <p>
+     * This example prints all combinations of 1 to 4 people to {@link System#out}.
+     */
+    @SuppressWarnings("unchecked")
+    public void testForeachTuple1()
+    {
+        for (List<Integer> tuple : ForEach.tupleOf(numbers, numbers))
+            System.out.println(tuple);
+    }
+
+    /**
+     * Illustrates a simple use of {@link ForEach#combinationOf(List)}.
+     * <p>
+     * This example prints all combinations of 1 to 4 people to {@link System#out}.
+     */
+    @SuppressWarnings("unchecked")
+    public void testForeachTuple2()
+    {
+        for (List<Object> tuple : ForEach.<Object> tupleOf(people, numbers, colors))
+            System.out.println(tuple);
+    }
+
+    /**
+     * This test verifies that {@link ForEach#combinationOf(int, int, List)} returns the expected
+     * number of results.
+     */
+    @SuppressWarnings("unused")
+    public void testCountTuples()
+    {
+        for (int tupleSize = 1; tupleSize <= 5; tupleSize++)
+        {
+            List<?>[] sets = new List<?>[tupleSize];
+            for (int i = 0; i < sets.length; i++)
+                sets[i] = numbers;
+
+            int count = 0;
+            for (List<?> tuple : ForEach.tupleOf(sets))
+                count++;
+
+            assertEquals((int)Math.pow(numbers.size(), tupleSize), count);
+        }
     }
 }

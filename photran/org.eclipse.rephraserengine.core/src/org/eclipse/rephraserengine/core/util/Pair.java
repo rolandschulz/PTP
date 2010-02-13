@@ -25,22 +25,38 @@ public final class Pair<T, U>
 
     public Pair(T fst, T snd)
     {
-        if (fst == null || snd == null) throw new IllegalArgumentException();
-        
         this.fst = fst;
         this.snd = snd;
     }
     
     @Override public int hashCode()
     {
-        return this.fst.hashCode() * 19 + this.snd.hashCode();
+        return hashCode(this.fst) * 19 + hashCode(this.snd);
     }
     
+    private int hashCode(T o)
+    {
+        if (o == null)
+            return 0;
+        else
+            return o.hashCode();
+    }
+
     @Override public boolean equals(Object obj)
     {
         if (obj == null || !obj.getClass().equals(this.getClass())) return false;
         
         Pair<?,?> that = (Pair<?,?>)obj;
-        return this.fst.equals(that.fst) && this.snd.equals(that.snd);
+        return equals(this.fst, that.fst) && equals(this.snd, that.snd);
+    }
+    
+    protected boolean equals(Object o1, Object o2)
+    {
+        if (o1 == null && o2 == null)
+            return true;
+        else if (o1 != null && o2 != null && o1.equals(o2))
+            return true;
+        else
+            return false;
     }
 }

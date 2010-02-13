@@ -95,8 +95,7 @@ public class ForEach
     }
 
     /**
-     * Returns all pairs of.
-     * @return
+     * @return all pairs of two objects from the given set
      */
     public static <T> Iterable<Pair<T,T>> pairOf(final List<T> objects)
     {
@@ -122,6 +121,10 @@ public class ForEach
         
         public PairIterator(List<T> objects)
         {
+            if (objects == null) throw new IllegalArgumentException();
+            if (objects == null || objects.isEmpty())
+                throw new IllegalArgumentException();
+            
             this.objects = objects;
             this.fstIndex = 0;
             this.sndIndex = 0;
@@ -145,6 +148,74 @@ public class ForEach
             }
             
             return result;
+        }
+
+        public void remove()
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * @return all tuples of objects with one component from each of the given sets
+     */
+    public static <T> Iterable<List<T>> tupleOf(final List<? extends T>... objects)
+    {
+        return new Iterable<List<T>>()
+        {
+            public Iterator<List<T>> iterator()
+            {
+                return new TupleIterator<T>(objects);
+            }
+        };
+    }
+    
+    private static class TupleIterator<T> implements Iterator<List<T>>
+    {
+        /** Sets of objects from which pairs will be generated */
+        protected final List<? extends T>[] objects;
+        
+        /** Indices of the components of the tuple: <code>index[i]</code> is an
+         * index into {@link #objects}[i] */
+        protected int[] indices;
+        
+        public TupleIterator(List<? extends T>... objects)
+        {
+            if (objects == null) throw new IllegalArgumentException();
+            for (List<? extends T> list : objects)
+                if (list == null || list.isEmpty())
+                    throw new IllegalArgumentException();
+            
+            this.objects = objects;
+            this.indices = new int[objects.length];
+        }
+
+        public boolean hasNext()
+        {
+            return indices[0] < objects[0].size();
+        }
+
+        public List<T> next()
+        {
+            if (indices[0] == objects[0].size()) return null;
+            
+            List<T> result = new ArrayList<T>(indices.length);
+            for (int i = 0; i < indices.length; i++)
+                result.add(objects[i].get(indices[i]));
+            incrementIndices();
+            return result;
+        }
+
+        private void incrementIndices()
+        {
+            for (int i = indices.length-1; i >= 0; i--)
+            {
+                indices[i]++;
+                if (indices[i] < objects[i].size())
+                    break;
+                else if (i > 0)
+                    indices[i] = 0;
+            }
         }
 
         public void remove()

@@ -18,7 +18,7 @@ public class MathUtil
 {
     private MathUtil() {;}
     
-    /** @return the binomial coefficient <i>n choose k</i> */
+    /** @return the binomial coefficient <i>C(n, k)</i> */
     public static long binomialCoefficient(int n, int k)
     {
         if (k > n) return 0;
@@ -28,5 +28,16 @@ public class MathUtil
              result = result * (n-k+i) / i;
         return result;
     }
+    
+    /** @return the <i>n!</i> */
+    public static long factorial(int n)
+    {
+        if (n < 0) throw new IllegalArgumentException();
+        if (n < 2) return 1;
 
+        long result = 1;
+        for (int i = n; i >= 2; i--)
+             result *= i;
+        return result;
+    }
 }
