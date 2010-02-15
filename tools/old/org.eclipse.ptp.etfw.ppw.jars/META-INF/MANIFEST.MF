@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PPW Jars for ETFW plug-in
+Bundle-SymbolicName: org.eclipse.ptp.etfw.ppw.jars
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: jfreechart.jar,
+ ppw.jar,
+ slog2sdk.jar,
+ swingutils.jar
+Bundle-Vendor: PPW Group, University of Florida
+Export-Package: edu.ufl.hcs.ppw.cmdline,
+ edu.ufl.hcs.ppw.exports,
+ edu.ufl.hcs.ppw.gui,
+ edu.ufl.hcs.ppw.pdm,
+ edu.ufl.hcs.ppw.pdm.highlevel,
+ edu.ufl.hcs.ppw.pdm.v1_1,
+ edu.ufl.hcs.ppw.tar,
+ edu.ufl.hcs.ppw.vis,
+ edu.ufl.hcs.ppw.vis.arraydist,
+ edu.ufl.hcs.ppw.vis.comm,
+ edu.ufl.hcs.ppw.vis.pcharts,
+ edu.ufl.hcs.ppw.vis.resourceview,
+ edu.ufl.hcs.ppw.vis.treetable
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
