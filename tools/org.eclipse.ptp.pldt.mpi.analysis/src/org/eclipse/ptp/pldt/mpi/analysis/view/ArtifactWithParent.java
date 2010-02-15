@@ -23,7 +23,7 @@ public class ArtifactWithParent extends Artifact {
 
 	public ArtifactWithParent(String fileName, int line, int column, String funcName, String desc,  /*String primaryFileName,*/
 			SourceInfo sourceInfo, int parentID, int myID, String name, int index) {
-		super(fileName, line, column, funcName, desc, sourceInfo);
+		super(fileName, line, column, funcName, sourceInfo);
 		this.parentID = parentID;
 		this.myID = myID;
 		this.name = name;
