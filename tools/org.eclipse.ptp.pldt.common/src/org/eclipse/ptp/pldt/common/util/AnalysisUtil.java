@@ -47,7 +47,7 @@ public class AnalysisUtil {
 		String ext = filename.substring(loc + 1);
 		ext = ext.toLowerCase();
 		boolean result = false;
-		if (ext.startsWith("c")/* ||ext.startsWith("f") */) // c or fortran
+		if (ext.startsWith("c") ||ext.startsWith("f") ) // c or fortran
 			result = true;
 		else
 			if(isCPP && ext.startsWith("h")) // C++ can have code in header files

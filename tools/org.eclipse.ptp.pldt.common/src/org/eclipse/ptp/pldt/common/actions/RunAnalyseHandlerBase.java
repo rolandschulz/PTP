@@ -272,6 +272,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			// It can be a Project, Folder, File, etc...
 			if (obj instanceof IAdaptable) {
 				// ICElement covers folders and translationunits
+				// If fortran file (*.f*) and Photran not installed, ce is null and we ignore it (first) here.
 				final ICElement ce = (ICElement) ((IAdaptable) obj)
 						.getAdapter(ICElement.class);// cdt40
 				if (ce != null) {
