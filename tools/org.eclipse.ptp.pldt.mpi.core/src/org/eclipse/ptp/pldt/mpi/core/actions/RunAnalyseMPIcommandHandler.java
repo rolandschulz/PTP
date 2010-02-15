@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.pldt.mpi.core.actions;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -61,7 +62,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 			lang = tu.getLanguage(); 
             
 			//long startTime = System.currentTimeMillis();
-      IASTTranslationUnit atu = getAST(tu); // use index; was tu.getAST();
+			IASTTranslationUnit atu = getAST(tu); // use index; was tu.getAST();
 			//long endTime = System.currentTimeMillis();
 			//System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
 			String languageID=lang.getId();
@@ -71,7 +72,17 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 			else if (languageID.equals(GPPLanguage.ID)) { // C++
 			  atu.accept(new MpiCPPASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			}
-
+			else {
+				// Attempt to handle Fortran
+				// Instantiate using reflection to avoid static Photran dependencies
+				try {
+					Class<?> c = Class.forName("org.eclipse.ptp.pldt.mpi.core.actions.AnalyseMPIFortranHandler");
+					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class);
+					method.invoke(c.newInstance(), languageID, tu, fileName, msr);
+				} catch (Exception e) {
+					System.err.println("RunAnalyseMPIcommandHandler.doArtifactAnalysis: Photran not installed");
+				}
+			}
 		} catch (CoreException e) {
 			e.printStackTrace();
 			CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project "+tu.getCProject()+" error="+e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
