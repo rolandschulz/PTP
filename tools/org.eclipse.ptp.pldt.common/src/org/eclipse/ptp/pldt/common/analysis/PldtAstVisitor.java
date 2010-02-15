@@ -60,8 +60,8 @@ import org.eclipse.ui.PlatformUI;
 public class PldtAstVisitor extends CASTVisitor {
 
 
-	protected static String ARTIFACT_CALL = "Artifact Call";
-	protected static String ARTIFACT_CONSTANT = "Artifact Constant";
+	public static String ARTIFACT_CALL = "Artifact Call";
+	public static String ARTIFACT_CONSTANT = "Artifact Constant";
 	protected static String ARTIFACT_NAME = "Artifact Name";
 	protected static String PREFIX = "";
 	private static /*final*/ boolean traceOn=false;
@@ -165,7 +165,7 @@ public class PldtAstVisitor extends CASTVisitor {
 					// note: currently rawName seems to always be empty.
 				}
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1,
-						artName, ARTIFACT_CALL, sourceInfo));
+						artName, sourceInfo));
 			}
 		}
 	}
@@ -183,7 +183,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			if (sourceInfo != null) {
 				//System.out.println("found MPI artifact: " + funcName.toString());
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1,
-						funcName.toString(), ARTIFACT_CALL, sourceInfo));
+						funcName.toString(), sourceInfo));
 			}
 		}
 	}
@@ -275,7 +275,7 @@ public class PldtAstVisitor extends CASTVisitor {
 				SourceInfo sourceInfo = getSourceInfo(astMacroExpansion);
 				if (sourceInfo != null) {
 					scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1, // column:
-							shortName, ARTIFACT_CONSTANT, sourceInfo));
+							shortName, sourceInfo));
 				}
 
 			}
@@ -368,7 +368,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			SourceInfo sourceInfo = getSourceInfo(expression, Artifact.CONSTANT);
 			if (sourceInfo != null) {
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1, // column:
-						name.toString(), ARTIFACT_CONSTANT, sourceInfo));
+						name.toString(), sourceInfo));
 			}
 		}
 	}
