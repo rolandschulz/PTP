@@ -104,6 +104,11 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
 	public boolean isPartOfTranslationUnitFile() {
 		return pragma_.isPartOfTranslationUnitFile();
 	}
+
+	public boolean isPragmaOperator() {
+		return pragma_.isPragmaOperator();
+
+	}
 	
 
 }
