@@ -73,11 +73,10 @@ public class Artifact implements IArtifact
      * @param line
      * @param column
      * @param shortName
-     * @param desc
      * @param ignore
      * @param primaryFileName
      */
-    public Artifact(String fileName, int line, int column, String shortName, String desc, SourceInfo sourceInfo)
+    public Artifact(String fileName, int line, int column, String shortName, SourceInfo sourceInfo)
     {
         this.line_ = line;
         this.newline_ = line;
@@ -116,7 +115,7 @@ public class Artifact implements IArtifact
     public Artifact(String fileName, int line, int column, String shortName, String desc, boolean ignore,
             String primaryFileName, SourceInfo sourceInfo)
     {
-        this(fileName, line, column, shortName, desc, sourceInfo);
+        this(fileName, line, column, shortName, sourceInfo);
         this.primaryfileName_ = primaryFileName;
     }
 
