@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ETFw PPW Support
+Bundle-SymbolicName: org.eclipse.ptp.etfw.ppw;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Vendor: UPC Group
+Require-Bundle: org.eclipse.ptp.etfw;bundle-version="1.0.1",
+ org.eclipse.ui;bundle-version="3.5.1",
+ org.eclipse.core.runtime;bundle-version="3.5.0",
+ org.eclipse.debug.core;bundle-version="3.5.0",
+ org.eclipse.ptp.etfw.ppw.jars;bundle-version="1.0.0",
+ org.eclipse.jface.text;bundle-version="3.5.1",
+ org.eclipse.ui.editors;bundle-version="3.5.0",
+ org.eclipse.ui.workbench.texteditor;bundle-version="3.5.0",
+ org.eclipse.ui.ide;bundle-version="3.5.1"
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.eclipse.ptp.etfw.ppw.Activator
