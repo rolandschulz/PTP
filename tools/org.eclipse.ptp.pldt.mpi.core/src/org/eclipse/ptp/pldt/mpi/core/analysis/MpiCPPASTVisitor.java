@@ -148,4 +148,12 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
   public boolean addIncludePath( IPath path,  String name, boolean dontAskAgain) {
 	  return false;
 	}
+	@Override
+	public boolean matchesPrefix(String name) {
+		boolean result=false;
+		if(name.startsWith(PREFIX1)||name.startsWith(PREFIX2)) {
+			result=true;
+		}
+		return result;
+	}
 }
