@@ -217,9 +217,6 @@ public class PldtAstVisitor extends CASTVisitor {
       }
       String filename = floc.getFileName();
       IPath path = new Path(filename);
-      if(name.startsWith("MPI")) {
-    	  System.out.println("found MPI artifact: "+name);
-      }
       if(isInIncludePath(path)) {
         //System.out.println("    found "+path+"  in artifact path (via index)!");
         return true;
