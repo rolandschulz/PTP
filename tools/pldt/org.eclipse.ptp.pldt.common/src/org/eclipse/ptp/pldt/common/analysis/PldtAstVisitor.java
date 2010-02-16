@@ -150,8 +150,8 @@ public class PldtAstVisitor extends CASTVisitor {
 	 */
 	public void processFuncName(IASTName funcName, IASTExpression astExpr) {
 		//IASTTranslationUnit tu = funcName.getTranslationUnit();
-
-		if (this.allowPrefixOnlyMatch || isArtifact(funcName)) {
+		String strName=funcName.toString();
+		if ((this.allowPrefixOnlyMatch&&matchesPrefix(strName)) || isArtifact(funcName)) { // brt C++ test 2/16/10
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				if(traceOn) System.out.println("found artifact: " + funcName.toString());
@@ -164,8 +164,9 @@ public class PldtAstVisitor extends CASTVisitor {
 					artName=artName+"  ("+rawName+")"; // indicate orig pre-pre-processor value in parens
 					// note: currently rawName seems to always be empty.
 				}
-				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1,
-						artName, sourceInfo));
+					scanReturn.addArtifact(new Artifact(fileName, sourceInfo
+							.getStartingLine(), 1, artName, sourceInfo));
+				 
 			}
 		}
 	}
@@ -177,8 +178,8 @@ public class PldtAstVisitor extends CASTVisitor {
 	public void processExprWithConstant(IASTExpression astExpr) {
 		IASTName funcName = ((IASTIdExpression) astExpr).getName();
 		//IASTTranslationUnit tu = funcName.getTranslationUnit();
-
-		if (this.allowPrefixOnlyMatch || isArtifact(funcName)) {
+		String strName=funcName.toString();
+		if ((this.allowPrefixOnlyMatch&& matchesPrefix(strName)) || isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				//System.out.println("found MPI artifact: " + funcName.toString());
@@ -216,6 +217,9 @@ public class PldtAstVisitor extends CASTVisitor {
       }
       String filename = floc.getFileName();
       IPath path = new Path(filename);
+      if(name.startsWith("MPI")) {
+    	  System.out.println("found MPI artifact: "+name);
+      }
       if(isInIncludePath(path)) {
         //System.out.println("    found "+path+"  in artifact path (via index)!");
         return true;
@@ -363,8 +367,8 @@ public class PldtAstVisitor extends CASTVisitor {
 
 	public void processIdExprAsLiteral(IASTIdExpression expression) {
 		IASTName name = expression.getName();
-
-		if (this.allowPrefixOnlyMatch || isArtifact(name)) {
+		String strName=name.toString();
+		if ((this.allowPrefixOnlyMatch&& matchesPrefix(strName)) || isArtifact(name)) {// brt C++ test 2/16/10
 			SourceInfo sourceInfo = getSourceInfo(expression, Artifact.CONSTANT);
 			if (sourceInfo != null) {
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1, // column:
@@ -548,6 +552,17 @@ public class PldtAstVisitor extends CASTVisitor {
 	    public boolean getDontAskAgain() {
 	      return dontAskAgain;
 	    }
+	  }
+	  /**
+	   * will be overridden where needed;
+	   * note that for C code, the test for if the prefix matches has already been done
+	   * before this is called so this test isn't necessary.
+	   * FIXME improve this convoluted logic
+	   * @param name
+	   * @return
+	   */
+	  public boolean matchesPrefix(String name) {
+		  return true;
 	  }
 
 }
