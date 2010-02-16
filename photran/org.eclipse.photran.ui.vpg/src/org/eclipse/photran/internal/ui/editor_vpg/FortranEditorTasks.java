@@ -137,7 +137,7 @@ public class FortranEditorTasks
                                 ? SourceForm.UNPREPROCESSED_FREE_FORM
                                 : SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject()));
                             IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
-                                                                                null,
+                                                                                editor.getIFile(),
                                                                                 editor.getIFile().getName(),
                                                                                 sourceForm,
                                                                                 true /*false*/);
