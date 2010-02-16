@@ -12,9 +12,9 @@
             name="Fortran">
          <contentType id="org.eclipse.photran.core.fixedFormFortranSource"/>
          <contentType id="org.eclipse.photran.core.freeFormFortranSource"/>
-         <!-- HACK: These have to be here since CDT doesn't seem to let us to contribute them elsewhere -->
-         <contentType id="org.eclipse.photran.core.vpg.preprocessor.c.cppFreeFormFortranSource"/>
-         <contentType id="org.eclipse.photran.core.vpg.preprocessor.c.cppFixedFormFortranSource"/>
+         <!-- NOTE: These have to be here since CDT doesn't seem to let us to contribute them elsewhere -->
+         <contentType id="org.eclipse.photran.core.cppFreeFormFortranSource"/>
+         <contentType id="org.eclipse.photran.core.cppFixedFormFortranSource"/>
       </language>
    </extension>
 
