@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.pldt.openmp.core.actions;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,8 +78,20 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			lang = tu.getLanguage();
 
 			atu = tu.getAST();
-			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
+			String languageID=lang.getId();
+			if (languageID.equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new OpenMPCASTVisitor(includes, fileName, msr));
+			}
+			else {
+				// Attempt to handle Fortran
+				// Instantiate using reflection to avoid static Photran dependencies
+				try {
+					Class<?> c = Class.forName("org.eclipse.ptp.pldt.openmp.core.actions.AnalyseOpenMPFortranHandler");
+					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class);
+					method.invoke(c.newInstance(), languageID, tu, fileName, msr);
+				} catch (Exception e) {
+					System.err.println("RunAnalyseOpenMPcommandHandler.doArtifactAnalysis: Photran not installed");
+				}
 			}
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
@@ -93,7 +106,9 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			System.out.println("RunAnalyseOpenMP.doArtifactAnalysis, file cast won't work..."); //$NON-NLS-1$
 		}
 		// Find the OpenMP #pragmas
-		processOpenMPPragmas(msr, atu, file);
+		if(atu!=null) {  // not for Fortran
+			processOpenMPPragmas(msr, atu, file);
+		}
 		return msr;
 	}
 	/**
