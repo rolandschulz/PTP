@@ -13,6 +13,8 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -304,6 +306,52 @@ public class Token implements IToken, IASTNode
         return streamOffset >= targetOffset;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Whitetext Parsing
+    ///////////////////////////////////////////////////////////////////////////
+
+    private static final Pattern ompComment = Pattern.compile(
+        "([Cc*!][ \\t]*\\$[Oo][Mm][Pp][ \\t]*)([^\\r\\n]*\\r?\\n)");
+
+    public List<Token> getOpenMPComments()
+    {
+        String whitetext = getWhiteBefore();
+        Matcher m = ompComment.matcher(whitetext);
+        int startStreamOffset = getStreamOffset() - whitetext.length();
+        int startFileOffset = getFileOffset() - whitetext.length();
+        List<Token> result = new LinkedList<Token>();
+        
+        for (int startSearchFrom = 0; m.find(startSearchFrom); startSearchFrom = m.end())
+        {
+            Token token = new Token(this);
+            token.setTerminal(Terminal.SKIP);
+            String prefix = m.group(1);
+            String directive = m.group(2).trim();
+            String suffix = directive.length() >= m.group(2).length() ? ""  : m.group(2).substring(directive.length());
+            token.setWhiteBefore(prefix);
+            token.setText(directive);
+            token.setWhiteAfter(suffix);
+            token.setStreamOffset(startStreamOffset + m.start());
+            token.setFileOffset(startFileOffset + m.start());
+            token.setLength(prefix.length() + directive.length());
+            token.setParent(null);
+            token.setLine(token.getLine() - countNewlines(whitetext.substring(m.start())));
+            token.setCol(1);
+            result.add(token);
+        }
+        
+        return result;
+    }
+
+    private int countNewlines(String s)
+    {
+        int n = 0;
+        for (int i = 0; i < s.length(); i++)
+            if (s.charAt(i) == '\n')
+                n++;
+        return n;
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     // IASTNode Implementation
     ///////////////////////////////////////////////////////////////////////////
