@@ -54,7 +54,12 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	// (since our parser declares classes with the same name)
     private static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
     private static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
-
+   
+    //Including a C-Preprocessor content type so that we can disable the refactorings if any of the files
+    // involved are C-Preprocessed
+    private static final String C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.vpg.preprocessor.c.cppFixedFormFortranSource";
+    private static final String C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.vpg.preprocessor.c.cppFreeFormFortranSource";
+    
 	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
 	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
 	public static final int BINDING_EDGE_TYPE = 2;
@@ -221,7 +226,10 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     public boolean shouldProcessFile(IFile file)
     {
         String filename = file.getName();
-        return hasFixedFormContentType(filename) || hasFreeFormContentType(filename);
+        return hasFixedFormContentType(filename)    || 
+               hasFreeFormContentType(filename)     ||
+               hasCppFixedFormContentType(filename) ||
+               hasCppFreeFormContentType(filename);
     }
 
     @Override
@@ -725,6 +733,21 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         return hasFreeFormContentType(getFilenameForIFile(file));
     }
+    
+    public static boolean hasCppFixedFormContentType(IFile file)
+    {
+        return hasCppFixedFormContentType(getFilenameForIFile(file));
+    }
+
+    public static boolean hasCppFreeFormContentType(IFile file)
+    {
+        return hasCppFreeFormContentType(getFilenameForIFile(file));
+    }
+    
+    public static boolean hasCppContentType(IFile file)
+    {
+        return hasCppContentType(getFilenameForIFile(file));
+    }
 
     protected static boolean hasFixedFormContentType(String filename)
     {
@@ -747,6 +770,34 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
             return ct != null && ct.isKindOf(freeFormContentType());
         }
     }
+    
+    protected static boolean hasCppFixedFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".F"); 
+        else
+        {
+            IContentType ct = getContentTypeOf(filename);
+            return ct != null && ct.isKindOf(cppFixedFormContentType());
+        }
+    }
+    
+    protected static boolean hasCppFreeFormContentType(String filename)
+    {
+        if (inTestingMode()) // Fortran content types not set in testing workspace
+            return filename.endsWith(".F90"); 
+        else
+        {
+            IContentType ct = getContentTypeOf(filename);
+            return ct != null && ct.isKindOf(cppFreeFormContentType());
+        }
+    }
+    
+    protected static boolean hasCppContentType(String filename)
+    {
+        return hasCppFreeFormContentType(filename) || 
+               hasCppFixedFormContentType(filename);
+    }
 
     protected static final IContentType getContentTypeOf(String filename)
     {
@@ -761,6 +812,16 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     protected static final IContentType freeFormContentType()
     {
         return Platform.getContentTypeManager().getContentType(FREE_FORM_CONTENT_TYPE);
+    }
+    
+    protected static final IContentType cppFixedFormContentType()
+    {
+        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE);
+    }
+    
+    protected static final IContentType cppFreeFormContentType()
+    {
+        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE);
     }
 
     public boolean doesProjectHaveRefactoringEnabled(IFile file)

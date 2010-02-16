@@ -134,6 +134,22 @@ public abstract class MultipleFileFortranRefactoring
 
         files.removeAll(filesToRemove);
     }
+    
+    protected void removeCpreprocessedFilesFrom(Collection<IFile> files, RefactoringStatus status)
+    {
+        Set<IFile> filesToRemove = new HashSet<IFile>();
+
+        for (IFile file : files)
+        {
+            if (!filesToRemove.contains(file) && PhotranVPG.hasCppContentType(file))
+            {
+                status.addError("The C-Preprocessed file " + file.getName() + " will not be refactored.");
+                filesToRemove.add(file);
+            }
+        }
+
+        files.removeAll(filesToRemove);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
