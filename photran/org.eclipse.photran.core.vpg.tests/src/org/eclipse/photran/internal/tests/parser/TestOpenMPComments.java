@@ -27,8 +27,9 @@ import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 
 /**
+ * Unit tests for {@link Token#getOpenMPComments()}.
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public class TestOpenMPComments extends TestCase
 {
@@ -49,7 +50,7 @@ public class TestOpenMPComments extends TestCase
             "    end if\n" +
             "    !$omp end parallel\n" +
             "end program\n");
-        System.out.println(ast);
+        //System.out.println(ast);
         
         List<Token> comments = OpenMPCommentVisitor.getOpenMPCommentsIn(ast);
         
@@ -87,7 +88,7 @@ public class TestOpenMPComments extends TestCase
             "       end if\n" +
             "c$omp  end parallel\n" +
             "       end program\n");
-        System.out.println(ast);
+        //System.out.println(ast);
         
         List<Token> comments = OpenMPCommentVisitor.getOpenMPCommentsIn(ast);
         

@@ -313,6 +313,20 @@ public class Token implements IToken, IASTNode
     private static final Pattern ompComment = Pattern.compile(
         "([Cc*!][ \\t]*\\$[Oo][Mm][Pp][ \\t]*)([^\\r\\n]*\\r?\\n)");
 
+    /**
+     * Returns a list of {@link Token}s representing OpenMP directives in the comments preceding
+     * this token (i.e., {@link #getWhiteBefore()}).  These are {@link Token} objects simply
+     * for convenience (they have text and location information); they <i>do not</i> appear in
+     * the AST, and each invocation of this method will return (pointerwise) different Tokens.
+     * <p>
+     * This method is used by the OpenMP Artifact Analysis in PLDT (the Parallel Language
+     * Development Tools in PTP).
+     * 
+     * @return a list of (artificial) {@link Token} objects, one per OpenMP directive in the
+     *         comments preceding this Token
+     * 
+     * @see org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPFortranASTVisitor
+     */
     public List<Token> getOpenMPComments()
     {
         String whitetext = getWhiteBefore();
