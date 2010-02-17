@@ -43,7 +43,6 @@
       <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="com.ibm.icu"/>
-      <import feature="org.eclipse.photran"/>
    </requires>
 
    <plugin
