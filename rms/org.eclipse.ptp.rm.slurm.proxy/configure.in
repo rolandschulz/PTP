@@ -68,9 +68,10 @@ dnl Check for header files.
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([slurm/slurm.h slurm/slurm_errno.h],[],
-				[AC_MSG_ERROR([slurm.h or slurm_errno.h not found])])
-
+AC_CHECK_HEADER([slurm/slurm.h slurm/slurm_errno.h], [], 
+	[AC_MSG_NOTICE([SLURM not installed, skipping...])
+	 AS_EXIT
+	])
 dnl
 dnl Check for types
 dnl
@@ -80,7 +81,8 @@ AC_PATH_PROG(SRUN, [srun], no)
 if test "$ac_cv_path_SRUN" != no; then
 	AC_DEFINE([HAVE_SRUN],[1],[Enable SLURM rms support.])
 else
-	AC_MSG_ERROR([srun command not found. Make sure SLURM rms installed.])
+	AC_MSG_NOTICE([SLURM not installed, skipping...])
+	AS_EXIT
 fi
 
 
