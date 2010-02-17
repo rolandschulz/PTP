@@ -24,7 +24,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.help,
  org.eclipse.cdt.doc.user,
  org.eclipse.ptp.pldt.common,
- org.eclipse.photran.cdtinterface,
- org.eclipse.photran.core,
- org.eclipse.photran.core.vpg
+ org.eclipse.photran.cdtinterface;resolution:=optional,
+ org.eclipse.photran.core;resolution:=optional,
+ org.eclipse.photran.core.vpg;resolution:=optional
 Eclipse-AutoStart: true
