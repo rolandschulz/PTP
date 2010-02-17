@@ -41,6 +41,9 @@ done
 
 BUILD_LOG=$BUILD_DIR/ptpbuild_${TAG}_`date +%Y%m%d%H%M`.log
 
+touch $BUILD_LOG
+chmod a+r $BUILD_LOG
+
 {
 # create the releng staging directory and go there
 mkdir -p $BUILD_DIR && cd $BUILD_DIR
