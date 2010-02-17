@@ -42,7 +42,6 @@
 	<copy file="${builder}/../maps/ptp.map" todir="${buildDirectory}/maps"/>
 	<replace file="${buildDirectory}/maps/ptp.map">
 		<replacefilter token="@ptpTag@" value="${ptpTag}"/>
-		<replacefilter token="@photranTag@" value="${photranTag}"/>
 	</replace>
 	<copy file="${builder}/../maps/photran.map" todir="${buildDirectory}/maps"/>
 	<replace file="${buildDirectory}/maps/photran.map">
