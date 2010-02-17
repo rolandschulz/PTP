@@ -60,7 +60,10 @@ dnl
 
 AC_CHECK_LIB([utils], [bitset_new])
 AC_CHECK_LIB([proxysvr], [proxy_svr_init])
-AC_CHECK_LIB([torque],[pbs_connect])
+AC_CHECK_LIB([torque],[pbs_connect],[],
+			[AC_MSG_NOTICE([PBS not installed, skipping...])
+	 		 AS_EXIT
+			])
 
 dnl
 dnl Check for header files.

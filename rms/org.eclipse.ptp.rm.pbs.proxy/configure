@@ -3952,6 +3952,11 @@ _ACEOF
 
   LIBS="-ltorque $LIBS"
 
+else
+  { echo "$as_me:$LINENO: PBS not installed, skipping..." >&5
+echo "$as_me: PBS not installed, skipping..." >&6;}
+	 		 { (exit 1); exit 1; }
+
 fi
 
 
