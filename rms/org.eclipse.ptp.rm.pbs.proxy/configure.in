@@ -67,9 +67,10 @@ dnl Check for header files.
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([pbs_ifl.h],[],
-				[AC_MSG_ERROR([pbs_ifl.h not found])])
-
+AC_CHECK_HEADER([pbs_ifl.h], [], 
+	[AC_MSG_NOTICE([PBS not installed, skipping...])
+	 AS_EXIT
+	])
 dnl
 dnl Check for types
 dnl
