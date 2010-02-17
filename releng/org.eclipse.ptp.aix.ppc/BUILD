@@ -11,12 +11,30 @@ if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
 	VERSION=
 fi
 
-RMS="ibm.pe ibm.ll"
-
 KNOWN_PLUGINS="\
 	org.eclipse.ptp.utils$VERSION\
 	org.eclipse.ptp.proxy$VERSION\
-	org.eclipse.ptp.debug.sdm$VERSION"
+	org.eclipse.ptp.debug.sdm$VERSION\
+	org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
+	org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
+	org.eclipse.ptp.rm.pbs.proxy$VERSION\
+	org.eclipse.ptp.rm.slurm.proxy$VERSION"
+	
+UTILS_CONFIGURE_OPTIONS=""
+PROXY_CONFIGURE_OPTIONS=""
+SDM_CONFIGURE_OPTIONS=""
+IBM_LL_CONFIGURE_OPTIONS=""
+IBM_PE_CONFIGURE_OPTIONS=""
+PBS_CONFIGURE_OPTIONS="--with-pbs=/usr/local/torque"
+SLURM_CONFIGURE_OPTIONS="--with-slurm=/usr/local/slurm"
+
+set "$UTILS_CONFIGURE_OPTIONS"\
+    "$PROXY_CONFIGURE_OPTIONS"\
+    "$SDM_CONFIGURE_OPTIONS"\
+    "$IBM_LL_CONFIGURE_OPTIONS"\
+    "$IBM_PE_CONFIGURE_OPTIONS"\
+    "$PBS_CONFIGURE_OPTIONS"\
+    "$SLURM_CONFIGURE_OPTIONS"
 		
 PARENT=`dirname $PWD`
 PLUGIN=`basename $PWD`
@@ -26,11 +44,6 @@ if [ ! -d bin ]; then
 	mkdir bin
 fi
 
-for rms in $RMS
-do
-	KNOWN_PLUGINS="$KNOWN_PLUGINS org.eclipse.ptp.rm.$rms.proxy$VERSION"
-done
-
 cd $PARENT
 
 for plugin in `echo $KNOWN_PLUGINS`
@@ -38,11 +51,12 @@ do
 	if [ -e $plugin/configure ]; then
 		echo "Building $plugin..."
 		(cd $plugin; \
-		ksh93 configure --prefix=$PREFIX && \
+		sh configure --prefix=$PREFIX $1 && \
 		chmod +x install-sh && \
 		make install)
 		echo; echo
 	fi
+	shift
 done
 
 exit 0
