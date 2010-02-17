@@ -645,8 +645,9 @@ sendNewQueueEvent(int trans_id, int id, char *name, struct attrl *attrs)
 	asprintf(&rm_id, "%d", gBaseID);
 	asprintf(&queue_id, "%d", id);
 
-	m = proxy_new_queue_event(trans_id, rm_id, queue_id, name, PTP_QUEUE_STATE_NORMAL, get_pbs_attr_count(attrs));
-	add_pbs_attributes(m, attrs);
+    m = proxy_new_queue_event(trans_id, rm_id, queue_id, name, get_pbs_attr_count(attrs) + 1);
+    proxy_msg_add_keyval_string(m, PTP_QUEUE_STATE_ATTR, PTP_QUEUE_STATE_NORMAL);
+    add_pbs_attributes(m, attrs);
 	proxy_svr_queue_msg(conn, m);
 
 	free(queue_id);
@@ -972,12 +973,12 @@ PBS_Initialize(int trans_id, int nargs, char **args)
 	 * Process arguments for the init command
 	 */
 	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(PROTOCOL_VERSION_ATTR, args[i])) {
+		if (proxy_test_attribute(PTP_PROTOCOL_VERSION_ATTR, args[i])) {
 			if (strcmp(proxy_get_attribute_value_str(args[i]), WIRE_PROTOCOL_VERSION) != 0) {
 				sendErrorEvent(trans_id, RTEV_ERROR_INIT, "wire protocol version \"%s\" not supported", args[0]);
 				return PTP_PROXY_RES_OK;
 			}
-		} else if (proxy_test_attribute(BASE_ID_ATTR, args[i])) {
+		} else if (proxy_test_attribute(PTP_BASE_ID_ATTR, args[i])) {
 			gBaseID = proxy_get_attribute_value_int(args[i]);
 		}
 	}
@@ -1544,7 +1545,7 @@ server(char *name, char *host, int port)
 				proxy_state = STATE_SHUTDOWN;
 			}
 			if (gTransID > 0) {
-				if ((poll_timeout -= PTP_PROXY_TIMEOUT) <= 0) {
+				if ((poll_timeout -= PROXY_TIMEOUT) <= 0) {
 					if (poll_pbs() < 0) {
 						break;
 					}
