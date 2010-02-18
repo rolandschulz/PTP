@@ -122,17 +122,6 @@
 	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
 		  base-type="org.eclipse.photran.core.fortranSource"/>
 
-      <!-- Content types for C-preprocessed free and fixed format -->
-      <!-- NOTE: These have to be here because CDT C preprocessed content types are referenced in
-           org.eclipse.photran.cdtinterface, and CDT attempts to load every referenced content
-           type in LanguageManager#collectContentTypeIds -->
-	  <content-type id="cppFreeFormFortranSource" name="Fortran Source File - Free Format - C Preprocessed"
-		  base-type="org.eclipse.photran.core.freeFormFortranSource"
-		  priority="high"/>
-	  <content-type id="cppFixedFormFortranSource" name="Fortran Source File - Fixed Format - C Preprocessed"
-		  base-type="org.eclipse.photran.core.fixedFormFortranSource"
-		  priority="high"/>
-
       <!-- Associated filename extensions -->
 	  <file-association 
           content-type="org.eclipse.photran.core.freeFormFortranSource"
@@ -140,6 +129,25 @@
 	  <file-association 
           content-type="org.eclipse.photran.core.fixedFormFortranSource"
           file-extensions="f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP"/>
+
+      <!-- Content types for C-preprocessed free and fixed format -->
+      <!-- NOTE:
+               These have to be here because CDT C preprocessed content types are referenced in
+           org.eclipse.photran.cdtinterface, and CDT attempts to load every referenced content
+           type in LanguageManager#collectContentTypeIds.  In other words, this guarantees that
+           CDT won't crash when Photran's C preprocessor support is not installed.
+               Note, however, that these content types are associated with the .F90, .FIX, etc.
+           filename extensions in the org.eclipse.photran.core.vpg.preprocessor.c project, not
+           here.  This ensures that, if the user has C preprocessor support installed (i.e., the
+           vpg.preprocessor.c plug-ins are present), such files will be associated with the
+           C preprocessed content type, and otherwise they will be associated with the ordinary
+           (non-prepreprocessed) content type. -->
+	  <content-type id="cppFreeFormFortranSource" name="Fortran Source File - Free Format - C Preprocessed"
+		  base-type="org.eclipse.photran.core.freeFormFortranSource"
+		  priority="high"/>
+	  <content-type id="cppFixedFormFortranSource" name="Fortran Source File - Fixed Format - C Preprocessed"
+		  base-type="org.eclipse.photran.core.fixedFormFortranSource"
+		  priority="high"/>
   </extension>
 
 <!-- =================================================================================== -->
