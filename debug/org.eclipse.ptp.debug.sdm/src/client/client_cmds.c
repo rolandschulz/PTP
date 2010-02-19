@@ -564,8 +564,6 @@ DbgClntSuspend(int tid, int nargs, char **args)
 	bitset_free(set);
 	free_proxy_msg(msg);
 
-	bitset_free(set);
-
 	return res;
 }
 
