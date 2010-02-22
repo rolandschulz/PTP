@@ -87,6 +87,10 @@
 		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
+		<copy file="index.html" todir="${buildDirectory}/site/eclipse"/>
+		<copy todir="${buildDirectory}/site/eclipse">
+			<fileset dir="web"/>
+		</copy>
 		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
 		<replace file="${buildDirectory}/site/eclipse/site.xml">
 			<replacefilter token="@timeStamp@" value="${timestamp}"/>
