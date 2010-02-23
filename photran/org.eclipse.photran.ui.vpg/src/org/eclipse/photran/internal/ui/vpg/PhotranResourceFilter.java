@@ -38,7 +38,8 @@ public class PhotranResourceFilter implements IResourceFilter
                 && PhotranVPG.getInstance().shouldProcessProject(((IFile)resource).getProject())
                 && PhotranVPG.getInstance().shouldProcessFile((IFile)resource)
                 && ((IFile)resource).isAccessible()
-                && !PhotranVPG.hasFixedFormContentType((IFile)resource);
+                && !PhotranVPG.hasFixedFormContentType((IFile)resource)
+                /*&& !PhotranVPG.hasCppContentType((IFile)resource)*/;
         else
             return true;
     }

@@ -48,6 +48,7 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
     {
         ensureProjectHasRefactoringEnabled(status);
         removeFixedFormFilesFrom(this.selectedFiles, status);
+        removeCpreprocessedFilesFrom(this.selectedFiles, status);
         // This refactoring has the prerequisite that the code is Implicit None.
         // You must use the Introduce Implicit None refactoring first.
         try{

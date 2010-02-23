@@ -2,10 +2,13 @@ package org.eclipse.photran.internal.core.vpg;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
@@ -14,6 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
@@ -57,8 +61,8 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
    
     //Including a C-Preprocessor content type so that we can disable the refactorings if any of the files
     // involved are C-Preprocessed
-    private static final String C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.vpg.preprocessor.c.cppFixedFormFortranSource";
-    private static final String C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.vpg.preprocessor.c.cppFreeFormFortranSource";
+    private static final String C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.cppFreeFormFortranSource";
+    private static final String C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.cppFixedFormFortranSource";
     
 	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
 	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
@@ -801,7 +805,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
     protected static final IContentType getContentTypeOf(String filename)
     {
-        return Platform.getContentTypeManager().findContentTypeFor(filename);
+        return findContentType(filename);
     }
 
     protected static final IContentType fixedFormContentType()
@@ -834,6 +838,60 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return vpgEnabledProperty != null && vpgEnabledProperty.equals("true");
     }
 
+    public static IContentType findContentType(String filename)
+    {
+        IContentType[] cts = Platform.getContentTypeManager().findContentTypesFor(filename);
+        if (cts.length == 0)
+            return null;
+        else if (cts.length == 1)
+            return cts[0];
+        
+        // Annoyingly, Eclipse does not do case-sensitive matching of filename
+        // extensions (at least on case-insensitive filesystems), which is
+        // important for Fortran filenames; we have to do that manually
+        
+        List<IContentType> possibilities = new ArrayList<IContentType>(cts.length);
+        
+        String ext = filename.substring(filename.lastIndexOf('.')+1);
+        for (IContentType ct : cts)
+            if (getFilenameExtensions(ct.getId()).contains(ext))
+                possibilities.add(ct);
+
+        if (possibilities.isEmpty()) return cts[0];
+
+        // Now find the most specific of the possible content types
+        
+        IContentType result = null;
+        for (IContentType ct : possibilities)
+        {
+            if (result == null)
+                result = ct;
+            else if (ct.isKindOf(result))
+                result = ct;
+        }
+        return result;
+    }
+    
+    private static Set<String> getFilenameExtensions(String contentType)
+    {
+        for (IConfigurationElement elt :
+                 Platform.getExtensionRegistry().getConfigurationElementsFor(
+                     "org.eclipse.core.contenttype.contentTypes"))
+        {
+            if (elt.getName().equals("file-association")
+                && elt.getAttribute("content-type").equals(contentType))
+            {
+                Set<String> result = new HashSet<String>();
+                String fileExts = elt.getAttribute("file-extensions");
+                if(fileExts == null)
+                    continue;
+                for (String ext : fileExts.split(","))
+                    result.add(ext.trim());
+                return result;
+            }
+        }
+        return Collections.emptySet();
+    }
 
     private boolean isDefinitionCachingEnabled = false;
     public void enableDefinitionCaching() { isDefinitionCachingEnabled = true; }

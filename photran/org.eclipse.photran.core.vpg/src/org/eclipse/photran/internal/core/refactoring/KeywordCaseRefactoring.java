@@ -47,6 +47,7 @@ public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
     {
         ensureProjectHasRefactoringEnabled(status);
         removeFixedFormFilesFrom(this.selectedFiles, status);
+        removeCpreprocessedFilesFrom(this.selectedFiles, status);
     }
 
     /** borrowed from RepObsOpersRefactoring.java */

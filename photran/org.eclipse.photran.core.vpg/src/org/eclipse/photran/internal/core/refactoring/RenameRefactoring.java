@@ -232,6 +232,39 @@ public class RenameRefactoring extends SingleFileFortranRefactoring implements I
 
         allReferences.removeAll(referencesToRemove);
     }
+    
+    private void removeCPreprocessedFormReferences(RefactoringStatus status)
+    {
+        HashSet<IFile> cppFormFiles = new HashSet<IFile>();
+        HashSet<IFile> freeFormFiles = new HashSet<IFile>();
+        HashSet<PhotranTokenRef> referencesToRemove = new HashSet<PhotranTokenRef>();
+
+        for (PhotranTokenRef reference : allReferences)
+        {
+            IFile file = reference.getFile();
+
+            if (cppFormFiles.contains(file))
+            {
+                referencesToRemove.add(reference);
+            }
+            else if (freeFormFiles.contains(file))
+            {
+                continue;
+            }
+            else if (PhotranVPG.hasCppContentType(file))
+            {
+                cppFormFiles.add(file);
+                status.addError("The C-Preprocessed form file " + file.getName() + " will not be refactored.");
+                referencesToRemove.add(reference);
+            }
+            else
+            {
+                freeFormFiles.add(file);
+            }
+        }
+
+        allReferences.removeAll(referencesToRemove);
+    }
 
     private void checkIfReferencesCanBeRenamed(IProgressMonitor pm) throws PreconditionFailure
     {

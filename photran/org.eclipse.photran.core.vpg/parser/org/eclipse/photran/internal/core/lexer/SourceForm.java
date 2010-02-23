@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.PreprocessingFreeFormLexerPhase1;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Contains constants enumerating the various Fortran source forms.
@@ -101,7 +102,7 @@ public abstract class SourceForm
     {
         try
         {
-            IContentType ct = findContentType(filename);
+            IContentType ct = PhotranVPG.findContentType(filename);
             if (ct == null) return null;
             
             IConfigurationElement[] configs =
@@ -121,56 +122,5 @@ public abstract class SourceForm
         }
     }
 
-    private static IContentType findContentType(String filename)
-    {
-        IContentType[] cts = Platform.getContentTypeManager().findContentTypesFor(filename);
-        if (cts.length == 0)
-            return null;
-        else if (cts.length == 1)
-            return cts[0];
-        
-        // Annoyingly, Eclipse does not do case-sensitive matching of filename
-        // extensions (at least on case-insensitive filesystems), which is
-        // important for Fortran filenames; we have to do that manually
-        
-        List<IContentType> possibilities = new ArrayList<IContentType>(cts.length);
-        
-        String ext = filename.substring(filename.lastIndexOf('.')+1);
-        for (IContentType ct : cts)
-            if (getFilenameExtensions(ct.getId()).contains(ext))
-                possibilities.add(ct);
-
-        if (possibilities.isEmpty()) return cts[0];
-
-        // Now find the most specific of the possible content types
-        
-        IContentType result = null;
-        for (IContentType ct : possibilities)
-        {
-            if (result == null)
-                result = ct;
-            else if (ct.isKindOf(result))
-                result = ct;
-        }
-        return result;
-    }
     
-    private static Set<String> getFilenameExtensions(String contentType)
-    {
-        for (IConfigurationElement elt :
-                 Platform.getExtensionRegistry().getConfigurationElementsFor(
-                     "org.eclipse.core.contenttype.contentTypes"))
-        {
-            if (elt.getName().equals("file-association")
-                && elt.getAttribute("content-type").equals(contentType))
-            {
-                Set<String> result = new HashSet<String>();
-                String fileExts = elt.getAttribute("file-extensions");
-                for (String ext : fileExts.split(","))
-                    result.add(ext.trim());
-                return result;
-            }
-        }
-        return Collections.emptySet();
-    }
 }

@@ -50,6 +50,7 @@ public class StandardizeStatementsRefactoring extends MultipleFileFortranRefacto
     {
         ensureProjectHasRefactoringEnabled(status);
         removeFixedFormFilesFrom(this.selectedFiles, status);
+        removeCpreprocessedFilesFrom(this.selectedFiles, status);
     }
 
     @Override

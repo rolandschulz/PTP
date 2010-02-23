@@ -66,6 +66,7 @@ public class DataToParameterRefactoring extends MultipleFileFortranRefactoring
     {
         ensureProjectHasRefactoringEnabled(status);
         removeFixedFormFilesFrom(this.selectedFiles, status);
+        removeCpreprocessedFilesFrom(this.selectedFiles, status);
     }
 
     @Override
