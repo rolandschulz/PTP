@@ -431,20 +431,14 @@ public class BitList {
 	 */
 	public String toString() {
 		String res = ""; //$NON-NLS-1$
-		boolean nonzero = false;
 		
 		if (this.nBits == 0) {
 			res = "0"; //$NON-NLS-1$
 		} else {
 			for (int i = this.nBytes-1 ; i >= 0; i--) {
-				nonzero |= this.bits[i] != 0;
-				if (nonzero) {
-					res += Integer.toHexString((this.bits[i] >> 4) & 0xf);
-					res += Integer.toHexString(this.bits[i] & 0xf);
-				}
+				res += Integer.toHexString((this.bits[i] >> 4) & 0xf);
+				res += Integer.toHexString(this.bits[i] & 0xf);
 			}
-			if (!nonzero)
-				res = "0"; //$NON-NLS-1$
 		}
 		
 		return res;
@@ -505,7 +499,7 @@ public class BitList {
 	}
 	
     /**
-     * Set the bits specified a hex representation of the {@code BitList}
+     * Set the bits specified in a hex representation of the {@code BitList}
      * 
      * @param str hex representation of the {@code BitList}
      */
