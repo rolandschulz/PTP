@@ -80,7 +80,10 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
         this.identifier = identifier;
 
-        if (identifier != null)
+        // Don't attempt to highlight identifiers that come from INCLUDE files or
+        // macro expansions.  We can't highlight something that's in another file,
+        // and likewise we'll punt on trying to highlight the macro.
+        if (identifier != null && identifier.getPreprocessorDirective() == null)
         {
             int offset = identifier.getFileOffset();
             int length = identifier.getLength();
