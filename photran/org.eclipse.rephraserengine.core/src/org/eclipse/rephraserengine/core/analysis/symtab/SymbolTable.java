@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.rephraserengine.core.util.symtab;
+package org.eclipse.rephraserengine.core.analysis.symtab;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +17,8 @@ import org.eclipse.rephraserengine.core.util.TwoKeyHashMap;
 
 /**
  * A simple, generic symbol table with nested scopes.
+ * <p>
+ * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
  * 
  * @author Jeff Overbey
  * 

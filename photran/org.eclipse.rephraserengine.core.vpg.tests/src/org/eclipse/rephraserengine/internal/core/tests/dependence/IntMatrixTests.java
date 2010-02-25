@@ -8,13 +8,13 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.tests.analysis.dependence;
+package org.eclipse.rephraserengine.internal.core.tests.dependence;
 
 import junit.framework.TestCase;
 
-import org.eclipse.photran.internal.core.analysis.dependence.GeneralizedGCDTest.IntMatrix;
-import org.eclipse.photran.internal.core.analysis.dependence.GeneralizedGCDTest.IntVector;
-import org.eclipse.photran.internal.core.analysis.dependence.GeneralizedGCDTest.IntMatrix.Reduce;
+import org.eclipse.rephraserengine.core.analysis.dependence.GeneralizedGCDTest.IntMatrix;
+import org.eclipse.rephraserengine.core.analysis.dependence.GeneralizedGCDTest.IntVector;
+import org.eclipse.rephraserengine.core.analysis.dependence.GeneralizedGCDTest.IntMatrix.Reduce;
 
 /**
  *

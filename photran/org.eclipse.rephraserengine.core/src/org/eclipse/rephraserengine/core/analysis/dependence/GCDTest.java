@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.analysis.dependence;
+package org.eclipse.rephraserengine.core.analysis.dependence;
 
 /**
  * Implements the GCD dependence test.
@@ -18,6 +18,8 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * <p>
  * Reference: Allen and Kennedy, <i>Optimizing Compilers for Modern
  * Architectures,</i> p. 96.
+ * <p>
+ * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
  *
  * @author Jeff Overbey
  * @see IDependenceTester

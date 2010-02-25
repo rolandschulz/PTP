@@ -17,6 +17,10 @@ import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNo
 import org.eclipse.photran.internal.core.analysis.loops.GenericASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
+import org.eclipse.rephraserengine.core.analysis.dependence.Dependence;
+import org.eclipse.rephraserengine.core.analysis.dependence.DependenceTestFailure;
+import org.eclipse.rephraserengine.core.analysis.dependence.Direction;
+import org.eclipse.rephraserengine.core.analysis.dependence.IDependenceTester;
 
 /**
  * Computes a set of dependences in a perfect loop nest.

@@ -17,8 +17,6 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.eclipse.photran.internal.core.SyntaxException;
-import org.eclipse.photran.internal.core.analysis.dependence.GCDTest;
-import org.eclipse.photran.internal.core.analysis.dependence.GeneralizedGCDTest;
 import org.eclipse.photran.internal.core.analysis.dependence.LoopDependences;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
@@ -30,6 +28,8 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.rephraserengine.core.analysis.dependence.GCDTest;
+import org.eclipse.rephraserengine.core.analysis.dependence.GeneralizedGCDTest;
 
 /**
  * Base class for unit tests for dependence testing classes.

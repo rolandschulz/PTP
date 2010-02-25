@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.analysis.dependence;
+package org.eclipse.rephraserengine.core.analysis.dependence;
 
 /**
  * Enumeration representing the possible entries in a direction vector:
@@ -20,6 +20,8 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * Reference: Allen and Kennedy, <i>Optimizing Compilers for Modern
  * Architectures.</i>  Direction vectors are defined on p. 46
  * (Definition 2.10); the Banerjee Inequality is described on pp. 97-111.
+ * <p>
+ * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
  * 
  * @author Jeff Overbey
  * @see IDependenceTester

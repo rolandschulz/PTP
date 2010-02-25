@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.analysis.dependence.IVariableReference;
 
 /**
  * Describes a reference to a scalar variable or a reference into an array variable where
@@ -31,10 +32,12 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  * such as A(3), A(I), A(3+I), A(2*I+1), A(3, 4), and A(I, J, K) where each subscript is
  * a function of the form <i>m*x+b</i> where <i>m</i> and <i>b</i> are integer constants
  * and <i>x</i> is a scalar variable.
- *
+  * <p>
+ * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
+*
  * @author Jeff Overbey
  */
-public /*was package-private*/ class VariableReference
+public /*was package-private*/ class VariableReference implements IVariableReference
 {
     /**
      * Represents a linear function <i>m*x+b</i>, where <i>m</i> and <i>b</i> are integer
@@ -170,7 +173,7 @@ public /*was package-private*/ class VariableReference
     public final LinearFunction[] indices;
 
     /** True iff this reference is a write; false if it is a read */
-    public final boolean isWrite;
+    protected final boolean isWrite;
 
     private VariableReference(IASTNode node, String array, LinearFunction[] indices, boolean isWrite)
     {
@@ -256,6 +259,12 @@ public /*was package-private*/ class VariableReference
     public boolean isRead()
     {
         return !isWrite;
+    }
+
+    /** @return true iff this variable reference represents a write, rather than a read, of the variable */
+    public boolean isWrite()
+    {
+        return isWrite;
     }
 
     /** @return true if this variable is a scalar or an array access with the subscripts not of the expected form */

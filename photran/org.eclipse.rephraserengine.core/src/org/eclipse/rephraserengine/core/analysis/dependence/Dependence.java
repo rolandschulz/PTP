@@ -8,15 +8,17 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.analysis.dependence;
+package org.eclipse.rephraserengine.core.analysis.dependence;
 
 /**
  * A dependence between two variable/array accesses.
+ * <p>
+ * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
  *
  * @author Jeff Overbey
  * @see LoopDependences
  */
-public final class Dependence
+public class Dependence
 {
     public static enum Type
     {
@@ -33,9 +35,9 @@ public final class Dependence
 
         public static Type of(Dependence d)
         {
-            if (d.from.isWrite && d.to.isWrite)
+            if (d.from.isWrite() && d.to.isWrite())
                 return OUTPUT_DEPENDENCE;
-            else if (d.from.isRead() && d.to.isWrite)
+            else if (d.from.isRead() && d.to.isWrite())
                 return ANTI_DEPENDENCE;
             else // (d.from.isWrite && d.to.isRead())
                 return FLOW_DEPENDENCE;
@@ -47,12 +49,14 @@ public final class Dependence
         }
     }
 
-    final VariableReference from;
-    final VariableReference to;
+    public final IVariableReference from;
+    public final IVariableReference to;
     public final Type type;
 
-    Dependence(VariableReference from, VariableReference to)
+    public Dependence(IVariableReference from, IVariableReference to)
     {
+        assert from.isRead() != from.isWrite() && to.isRead() != to.isWrite();
+        
         this.from = from;
         this.to = to;
         this.type = Type.of(this);

@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.analysis.dependence;
+package org.eclipse.rephraserengine.core.analysis.dependence;
 
 /**
  * A dependence test operating on a perfect loop nest
@@ -39,6 +39,8 @@ package org.eclipse.photran.internal.core.analysis.dependence;
  * (note that this means dependence testing is conservative).
  * <p>
  * Reference: Allen and Kennedy, <i>Optimizing Compilers for Modern Architectures,</i> pp. 95-96.
+ * <p>
+ * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
  *
  * @author Jeff Overbey
  */
