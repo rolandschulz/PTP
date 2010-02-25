@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -21,6 +23,8 @@ import org.osgi.framework.BundleContext;
  */
 public class FortranUIPlugin extends AbstractUIPlugin
 {
+    public static final String PLUGIN_ID = "org.eclipse.photran.ui";
+    
     // The shared instance.
     private static FortranUIPlugin plugin;
 
@@ -74,5 +78,17 @@ public class FortranUIPlugin extends AbstractUIPlugin
      */
     protected void initializeDefaultPluginPreferences()
     {
+    }
+    
+    public static void log(Throwable e) {
+        log("Error", e); //$NON-NLS-1$
+    }
+
+    public static void log(String message, Throwable e) {
+        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
+    }
+
+    public static void log(IStatus status) {
+        getDefault().getLog().log(status);
     }
 }
