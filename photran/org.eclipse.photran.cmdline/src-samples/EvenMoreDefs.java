@@ -73,9 +73,10 @@ public class EvenMoreDefs extends CmdLineBase
                 if (!isLHSofAssignmentStmt(node))
                 {
                     Definition def = resolveBinding(node);
-                    if (def.isLocalVariable()
-                        || def.isSubprogramArgument())
+                    if (def != null && (def.isLocalVariable() || def.isSubprogramArgument()))
+                    {
                         increment(reads, def);
+                    }
                 }
             }
         }
