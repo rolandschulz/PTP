@@ -11,9 +11,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.ui.search.ReferenceSearchResult;
 import org.eclipse.photran.internal.ui.search.VPGSearchMatch;
 import org.eclipse.photran.internal.ui.search.VPGSearchQuery;
+import org.eclipse.rephraserengine.ui.search.SearchPage;
+import org.eclipse.rephraserengine.ui.search.SearchResult;
 import org.eclipse.search.ui.IQueryListener;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
@@ -93,7 +94,7 @@ public class VPGSearchTestCase extends BaseTestFramework
         }
     }
 
-    private ReferenceSearchResult runQuery(VPGSearchQuery job)
+    private SearchResult runQuery(VPGSearchQuery job)
     {
         final ISearchResult result[]= new ISearchResult[1];
 
@@ -115,18 +116,19 @@ public class VPGSearchTestCase extends BaseTestFramework
             }
         }, job);
 
-        assertTrue(result[0] instanceof ReferenceSearchResult);
-        return (ReferenceSearchResult)result[0];
+        assertTrue(result[0] instanceof SearchResult);
+        return (SearchResult)result[0];
     }
 
     public void test() throws Exception
     {
         if (searchString == null) return; // when JUnit invokes this outside a test suite
 
-        VPGSearchQuery job = new VPGSearchQuery(scope, "Scope description", searchString,
-            searchFlags, isRegex);
+        String patternDesc = searchString.trim();
+        String patternRegex = isRegex ? patternDesc : SearchPage.convertGlobToRegex(patternDesc);
+        VPGSearchQuery job = new VPGSearchQuery(scope, "Scope description", patternDesc, patternRegex, searchFlags);
 
-        ReferenceSearchResult res = runQuery(job);
+        SearchResult res = runQuery(job);
         int count = 0;
         for (Object obj : res.getElements())
         {

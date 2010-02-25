@@ -9,35 +9,36 @@
  * QNX - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.photran.internal.ui.search;
+package org.eclipse.rephraserengine.internal.ui.search;
 
-import org.eclipse.cdt.internal.ui.util.EditorUtility;
-import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.rephraserengine.internal.ui.Activator;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.search.ui.text.Match;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * @author Doug Schaefer
- *
+ * @author Jeff Overbey
  */
 @SuppressWarnings("restriction")
-public class ReferenceSearchViewPage extends AbstractTextSearchViewPage {
+public class SearchViewPage extends AbstractTextSearchViewPage {
 
-	private IReferencesSearchContentProvider contentProvider;
+	private ISearchContentProvider contentProvider;
 	
-	public ReferenceSearchViewPage(int supportedLayouts) {
+	public SearchViewPage(int supportedLayouts) {
 		super(supportedLayouts);
 	}
 
-	public ReferenceSearchViewPage() {
+	public SearchViewPage() {
 		super();
 	}
 
@@ -55,30 +56,34 @@ public class ReferenceSearchViewPage extends AbstractTextSearchViewPage {
 
 	@Override
 	protected void configureTreeViewer(TreeViewer viewer) {
-		contentProvider = new ReferenceSearchTreeContentProvider();
-		viewer.setContentProvider((ReferenceSearchTreeContentProvider)contentProvider);
-		viewer.setLabelProvider(new ReferenceSearchTreeLabelProvider(this));
+		contentProvider = new SearchTreeContentProvider();
+		viewer.setContentProvider((SearchTreeContentProvider)contentProvider);
+		viewer.setLabelProvider(new SearchLabelProvider(this));
 	}
 
 	@Override
 	protected void configureTableViewer(TableViewer viewer) {
-		contentProvider = new ReferenceSearchListContentProvider();
-		viewer.setContentProvider((ReferenceSearchListContentProvider)contentProvider);
-		viewer.setLabelProvider(new ReferenceSearchListLabelProvider(this));
+		contentProvider = new SearchListContentProvider();
+		viewer.setContentProvider((SearchListContentProvider)contentProvider);
+		viewer.setLabelProvider(new SearchLabelProvider(this));
 	}
 
     @Override
 	protected void showMatch(Match match, int currentOffset, int currentLength, boolean activate) throws PartInitException  {
 		try {
-			IFile element= (IFile)match.getElement();
-			IPath path = element.getFullPath();
-			IEditorPart editor = EditorUtility.openInEditor(path, null);
+			IEditorPart editor = openInEditor((IFile)match.getElement());
 			if (editor instanceof ITextEditor) {
 				ITextEditor textEditor = (ITextEditor)editor;
 				textEditor.selectAndReveal(currentOffset, currentLength);
 			}
 		} catch (CoreException e) {
-			CUIPlugin.log(e);
+			Activator.log(e);
 		}
 	}
+
+    private IEditorPart openInEditor(IFile file) throws PartInitException
+    {
+        IWorkbenchPage page = Workbench.getInstance().getActiveWorkbenchWindow().getActivePage();
+        return page == null ? null : IDE.openEditor(page, file);
+    }
 }

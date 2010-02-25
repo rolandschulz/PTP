@@ -9,13 +9,17 @@
 <body>
 <h1>Introduction</h1>
 
-The Rephraser Engine is an Eclipse-based library that expedites the development of refactoring tools.  It contains two components:
+The Rephraser Engine is an Eclipse-based library that expedites the development of refactoring tools.  It contains the following components:
 <ul>
 <li> The <i>refactoring</i> component allows plug-ins to easily contribute refactorings to the Eclipse user interface.
 <li> The <i>virtual program graph (VPG)</i> component provides a language-independent program database and indexing infrastructure.
+<li> The <i>testing</i> component provides several utility classes for constructing JUnit test suites.
 </ul>
 
-<p>These components are independent; some projects may choose to use the Refactoring component without using the VPG component, for example.  The dependencies among the projects comprising the Rephraser Engine are as follows.</p>
+<p>These components share a common suite of utility classes, many of which are useful to clients as well.</p>
+
+<p>The dependencies among the projects comprising the Rephraser Engine are as follows.  Note that the Refactoring component does <i>not</i>
+require that the VPG component be used.</p>
 
 <p><img src="../../images/architecture.png" border="0" /></p>
 
@@ -51,12 +55,20 @@ Refactoring.</p>
 <li> contributes a "(Debugging)" sub-menu to the workbench Refactoring menu, which provides various actions for viewing, analyzing, and manipulating VPG databases.
 </ul></p>
 
+<h3>Testing</h3>
+
+<p>The Testing component
+<ul>
+<li> provides classes to construct a test suite (dynamically) from set of files or from a set of &quot;markers&quot; in a single file; and
+<li> provides utility classes to aid in combinatorial testing.
+</ul></p>
+
 <h3>Common Components/Miscellany</h3>
 
 <p>The Rephraser Engine also includes
 <ul>
+<li> classes to aid in contributing to the Eclipse Search UI (e.g., SearchResult),
 <li> assorted classes to aid in writing common static analyses (e.g., SymbolTable),
-<li> assorted classes to aid in writing JUnit tests for refactorings (e.g., TestSuiteFromFiles), and
 <li> several utility classes (e.g., TwoKeyHashMap, Spawner, StringUtil, OffsetLength).
 </ul>
 </p>

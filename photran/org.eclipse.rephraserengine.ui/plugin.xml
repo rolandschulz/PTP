@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- Supply a viewer for search results -->
+   <extension
+         point="org.eclipse.search.searchResultViewPages">
+      <viewPage
+            class="org.eclipse.rephraserengine.internal.ui.search.SearchViewPage"
+            id="org.eclipse.rephraserengine.ui.searchViewPage"
+            searchResultClass="org.eclipse.rephraserengine.ui.search.SearchResult"/>
+   </extension>
+
+</plugin>

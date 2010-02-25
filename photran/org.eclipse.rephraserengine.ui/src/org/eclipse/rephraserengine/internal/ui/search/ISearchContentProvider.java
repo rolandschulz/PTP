@@ -9,13 +9,13 @@
  * QNX - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.photran.internal.ui.search;
+package org.eclipse.rephraserengine.internal.ui.search;
 
 /**
  * @author Doug Schaefer
  *
  */
-public interface IReferencesSearchContentProvider {
+public interface ISearchContentProvider {
 
 	public void elementsChanged(Object[] elements);
 

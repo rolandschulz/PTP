@@ -20,10 +20,16 @@ package org.eclipse.rephraserengine.core.util;
  */
 public final class Pair<T, U>
 {
+    /** Factory method */
+    public static <X, Y> Pair<X, Y> of(X fst, Y snd)
+    {
+        return new Pair<X, Y>(fst, snd);
+    }
+    
     public final T fst;
-    public final T snd;
+    public final U snd;
 
-    public Pair(T fst, T snd)
+    public Pair(T fst, U snd)
     {
         this.fst = fst;
         this.snd = snd;
@@ -34,7 +40,7 @@ public final class Pair<T, U>
         return hashCode(this.fst) * 19 + hashCode(this.snd);
     }
     
-    private int hashCode(T o)
+    private int hashCode(Object o)
     {
         if (o == null)
             return 0;

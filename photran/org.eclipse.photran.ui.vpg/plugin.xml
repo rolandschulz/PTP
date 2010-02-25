@@ -333,13 +333,6 @@
    <!-- Find All References -->
    <!--=====================-->
    <extension
-         point="org.eclipse.search.searchResultViewPages">
-      <viewPage
-            class="org.eclipse.photran.internal.ui.search.ReferenceSearchViewPage"
-            id="searchreferences.search.ReferenceSearchViewPage"
-            searchResultClass="org.eclipse.photran.internal.ui.search.ReferenceSearchResult"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <category
             name="Fortran Search"

@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.ui.vpg.Activator;
+import org.eclipse.rephraserengine.ui.search.SearchResult;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 import org.eclipse.search.ui.NewSearchUI;
@@ -32,14 +33,14 @@ public class ReferenceSearch implements ISearchQuery
     private Definition def;
     private SearchScope searchScope;
     private IFile file;
-    private ReferenceSearchResult searchResult;
+    private SearchResult searchResult;
 
     public ReferenceSearch(Definition def, SearchScope searchScope, IFile file)
     {
         this.def = def;
         this.searchScope = searchScope;
         this.file = file;
-        this.searchResult = new ReferenceSearchResult(this);
+        this.searchResult = new SearchResult(this);
     }
 
     public boolean canRerun()
@@ -94,7 +95,7 @@ public class ReferenceSearch implements ISearchQuery
     private void filterAndAddSearchResult(PhotranTokenRef ref)
     {
         if (!searchScope.filterOut(ref, getFile()))
-            VPGSearchQuery.addSearchResultFromTokenRef(ref, (ReferenceSearchResult)getSearchResult());
+            VPGSearchQuery.addSearchResultFromTokenRef(ref, (SearchResult)getSearchResult());
     }
 
     public static void searchForReference(Definition p_def,

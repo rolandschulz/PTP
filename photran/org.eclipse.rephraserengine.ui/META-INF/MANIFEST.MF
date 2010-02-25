@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rephraser Engine User Interface Plug-in
-Bundle-SymbolicName: org.eclipse.rephraserengine.ui
+Bundle-SymbolicName: org.eclipse.rephraserengine.ui;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org - Photran
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -11,6 +11,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.ide,
  org.eclipse.rephraserengine.core,
- org.eclipse.ui.workbench.texteditor
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.search,
+ org.eclipse.ui.editors
 Export-Package: org.eclipse.rephraserengine.internal.ui,
- org.eclipse.rephraserengine.ui
+ org.eclipse.rephraserengine.ui,
+ org.eclipse.rephraserengine.ui.search
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.eclipse.rephraserengine.internal.ui.Activator

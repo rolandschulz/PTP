@@ -18,6 +18,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * Utility methods for working with strings.
  * 
@@ -27,13 +30,15 @@ public class StringUtil
 {
     private StringUtil() {;}
     
-    public static long countLines(String s) {
+    public static long countLines(String s)
+    {
         if (s.length() == 0) return 0L;
-        
+
         long numLines = 1L;
         int lastIndex = 0;
         int nextIndex = s.indexOf('\n');
-        while (nextIndex >= 0) {
+        while (nextIndex >= 0)
+        {
             numLines++;
             lastIndex = nextIndex;
             if (lastIndex + 1 >= s.length())
@@ -44,21 +49,42 @@ public class StringUtil
         return numLines;
     }
 
-    public static String read(Reader in) throws IOException {
+    public static String read(Reader in) throws IOException
+    {
         StringBuilder sb = new StringBuilder();
-        for (int ch = in.read(); ch >= 0; ch = in.read()) {
-            sb.append((char) ch);
+        for (int ch = in.read(); ch >= 0; ch = in.read())
+        {
+            sb.append((char)ch);
         }
         in.close();
         return sb.toString();
     }
-
-    public static String read(InputStream in) throws IOException {
+    
+    public static String read(InputStream in) throws IOException
+    {
         return read(new InputStreamReader(in));
     }
+    
+    public static String read(IFile file) throws IOException, CoreException
+    {
+        return read(file.getContents(true));
+    }
 
-    public static String read(File file) throws IOException {
+    public static String read(File file) throws IOException
+    {
         return read(new BufferedReader(new FileReader(file)));
+    }
+
+    public static String readOrReturnNull(IFile file)
+    {
+        try
+        {
+            return read(file);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     /**
@@ -101,17 +127,21 @@ public class StringUtil
         return -1;
     }
 
-    public static String stripNonASCIICharsAndCRs(String s) {
+    public static String stripNonASCIICharsAndCRs(String s)
+    {
         return stripNonASCIIChars(s, true);
     }
 
-    public static String stripNonASCIIChars(String s) {
+    public static String stripNonASCIIChars(String s)
+    {
         return stripNonASCIIChars(s, false);
     }
 
-    protected static String stripNonASCIIChars(String s, boolean stripCRs) {
+    protected static String stripNonASCIIChars(String s, boolean stripCRs)
+    {
         StringBuilder sb = new StringBuilder(s.length());
-        for (int i = 0, len = s.length(); i < len; i++) {
+        for (int i = 0, len = s.length(); i < len; i++)
+        {
             char ch = s.charAt(i);
             if (stripCRs && i == '\r')
                 continue;

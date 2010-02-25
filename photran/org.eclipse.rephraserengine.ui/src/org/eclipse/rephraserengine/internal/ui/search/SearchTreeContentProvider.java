@@ -10,7 +10,7 @@
  * Markus Schorn (Wind River Systems)
  *******************************************************************************/
 
-package org.eclipse.photran.internal.ui.search;
+package org.eclipse.rephraserengine.internal.ui.search;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.rephraserengine.ui.search.SearchResult;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -30,10 +31,10 @@ import org.eclipse.ui.PlatformUI;
  * @author Doug Schaefer
  *
  */
-public class ReferenceSearchTreeContentProvider implements ITreeContentProvider, IReferencesSearchContentProvider{
+public class SearchTreeContentProvider implements ITreeContentProvider, ISearchContentProvider{
 
 	private TreeViewer viewer;
-	private ReferenceSearchResult result;
+	private SearchResult result;
 	private Map<Object, Set<Object>> tree = new HashMap<Object, Set<Object>>();
 	
 	public Object[] getChildren(Object parentElement) {
@@ -67,7 +68,7 @@ public class ReferenceSearchTreeContentProvider implements ITreeContentProvider,
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = (TreeViewer)viewer;
-		result = (ReferenceSearchResult)newInput;
+		result = (SearchResult)newInput;
 		tree.clear();
 		if (result != null) {
 			Object[] elements = result.getElements();

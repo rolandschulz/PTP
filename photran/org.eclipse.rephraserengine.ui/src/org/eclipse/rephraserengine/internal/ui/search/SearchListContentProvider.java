@@ -9,21 +9,22 @@
  * QNX - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.photran.internal.ui.search;
+package org.eclipse.rephraserengine.internal.ui.search;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.rephraserengine.ui.search.SearchResult;
 
 /**
  * @author Doug Schaefer
  *
  */
-public class ReferenceSearchListContentProvider implements
-		IStructuredContentProvider, IReferencesSearchContentProvider {
+public class SearchListContentProvider implements
+		IStructuredContentProvider, ISearchContentProvider {
 
 	private TableViewer viewer;
-	private ReferenceSearchResult result;
+	private SearchResult result;
 	
 	public Object[] getElements(Object inputElement) {
 		return result.getElements();
@@ -34,7 +35,7 @@ public class ReferenceSearchListContentProvider implements
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = (TableViewer)viewer;
-		result = (ReferenceSearchResult)newInput;
+		result = (SearchResult)newInput;
 	}
 
 	public void elementsChanged(Object[] elements) {

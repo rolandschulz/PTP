@@ -23,4 +23,32 @@
       </actionSetPartAssociation>
    </extension>
 
+   <!-- Add a Text page to the Search dialog -->
+   <extension point="org.eclipse.search.searchPages">
+     <page
+        canSearchEnclosingProjects="true"
+        class="org.eclipse.rephraserengine.internal.examples.text.TextSearchPage"
+        id="org.eclipse.rephraserengine.examples.text.searchPage"
+        label="Text Search"
+        icon="icons/search_obj.gif"
+        showScopeSection="true"
+        sizeHint="460, 160"/>
+   </extension>
+   
+   <!-- Add a Search > Text menu item -->
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="Text Search"
+            id="org.eclipse.rephraserengine.examples.text.searchActionSet"
+            label="Text Search"
+            visible="true">
+         <action
+               class="org.eclipse.rephraserengine.internal.examples.text.TextSearchPage$OpenTextSearchPageAction"
+               id="org.eclipse.rephraserengine.examples.text.openTextSearchPage"
+               label="Te&amp;xt..."
+               icon="icons/search_obj.gif"
+               menubarPath="org.eclipse.search.menu/dialogGroup" />
+      </actionSet>
+   </extension>
 </plugin>

@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.ui.search;
+package org.eclipse.rephraserengine.ui.search;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -30,70 +30,54 @@ import org.eclipse.ui.editors.text.ILocationProvider;
 import org.eclipse.ui.part.FileEditorInput;
 
 /**
- * Fortran Search Results Implementation.
+ * A generic search result for a result in a text file.
+ * <p>
+ * This was originally used for Fortran Search Results.
  * 
  * @author kdecker3, slieter2
  */
-public class ReferenceSearchResult
+public class SearchResult
     extends AbstractTextSearchResult
     implements IEditorMatchAdapter, IFileMatchAdapter
 {
     private ISearchQuery query;
 
-    public ReferenceSearchResult(ISearchQuery query)
+    public SearchResult(ISearchQuery query)
     {
         super();
         this.query = query;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.search.ui.text.AbstractTextSearchResult#getEditorMatchAdapter()
-     */
     @Override
     public IEditorMatchAdapter getEditorMatchAdapter()
     {
         return this;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.search.ui.text.AbstractTextSearchResult#getFileMatchAdapter()
-     */
     @Override
     public IFileMatchAdapter getFileMatchAdapter()
     {
         return this;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.search.ui.ISearchResult#getImageDescriptor()
-     */
     public ImageDescriptor getImageDescriptor()
     {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.search.ui.ISearchResult#getLabel()
-     */
     public String getLabel()
     {
         return getQuery().getLabel();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.search.ui.ISearchResult#getQuery()
-     */
     public ISearchQuery getQuery()
     {
         return query;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.search.ui.ISearchResult#getTooltip()
-     */
     public String getTooltip()
     {
-        return SearchMessages.getString("ReferenceSearchResult_1");
+        return "Search Result";
     }
 
     /* IFileMatchAdapter Implementation */
@@ -141,8 +125,7 @@ public class ReferenceSearchResult
             try
             {
                 IStorage storage = ((IStorageEditorInput)input).getStorage();
-                if (storage.getFullPath() != null) { return storage
-                                .getFullPath(); }
+                if (storage.getFullPath() != null) { return storage.getFullPath(); }
             }
             catch (CoreException exc)
             {
