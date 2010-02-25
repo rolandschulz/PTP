@@ -24,6 +24,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.lexer.FileOrIFile;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
@@ -91,6 +92,20 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
             || resource instanceof IFile && !PhotranVPG.getInstance().shouldProcessFile((IFile)resource);
     }
 
+    /**
+     * The search proceeds in two phases.
+     * (1) Each file is parsed and searched for declarations matching the given query.  The
+     *     <i>references</i> to those declarations are accumulated in {@link #matchesToAddLater}.
+     *     (Since this is a {@link TreeSet}, the matches will be ordered by filename, then offset.)
+     * (2) The files are iterated through again, and these references are added to the result list.
+     * <p>
+     * The filename/offset/length information in a {@link PhotranTokenRef} <i>cannot</i> be used
+     * as the filename/offset/length of the search result due to preprocessing.  Instead, the
+     * {@link PhotranTokenRef} must be mapped to a {@link Token} in an AST, which can then be
+     * asked to determine what file it <i>physically</i> resides in (e.g., if file A includes file
+     * B, then a TokenRef may indicate that a token is in A, but it originated from the inclusion
+     * of file B, which can only be determined from the Token in the AST, not the TokenRef).
+     */
     private TreeSet<PhotranTokenRef> matchesToAddLater;
 
     @Override protected void prepareToSearch(IProgressMonitor monitor)
@@ -105,8 +120,8 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
         if (ast == null) return;
 
         Token searchToken = new Token(Terminal.T_IDENT, patternRegex);
-        searchToken.setFile(file);
-        searchToken.setContainerFile(file);
+        searchToken.setPhysicalFile(new FileOrIFile(file));
+        searchToken.setLogicalFile(file);
 
         if (ast.getRoot().getEmptyProgram() == null) { // manuallyResolve errs on empty file
             for (ScopingNode sNode : ast.getRoot().getAllContainedScopes()) {
@@ -223,8 +238,8 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
 
     public static void addSearchResultFromTokenRef(PhotranTokenRef tokenRef, SearchResult searchResult) {
         Token token = tokenRef.findTokenOrReturnNull();
-        if (token != null) {
-            SearchMatch match = new SearchMatch(token.getIFile(),
+        if (token != null && token.getPhysicalFile() != null && token.getPhysicalFile().getIFile() != null) {
+            SearchMatch match = new SearchMatch(token.getPhysicalFile().getIFile(),
                 token.getFileOffset(),
                 token.getLength());
             searchResult.addMatch(match);

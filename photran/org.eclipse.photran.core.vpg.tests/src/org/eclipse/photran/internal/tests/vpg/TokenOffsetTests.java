@@ -47,8 +47,7 @@ public class TokenOffsetTests extends RefactoringTestCase
         // No preprocessing in this file
         for (Token t : ast)
         {
-            assertEquals(t.getIFile(), t.getContainerIFile());
-            assertEquals(t.getJavaFile(), t.getContainerJavaFile());
+            assertEquals(t.getLogicalFile(), t.getPhysicalFile().getIFile());
             assertEquals(t.getFileOffset(), t.getStreamOffset());
         }
         

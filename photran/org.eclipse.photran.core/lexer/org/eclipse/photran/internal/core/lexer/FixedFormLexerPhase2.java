@@ -95,7 +95,7 @@ public class FixedFormLexerPhase2 implements ILexer
         return freeLexer2.getLastTokenCol();
     }
     
-    public IFile getLastTokenFile()
+    public FileOrIFile getLastTokenFile()
     {
         return freeLexer2.getLastTokenFile();
     }

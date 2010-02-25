@@ -21,7 +21,7 @@ public interface ILexer
 
     int getLastTokenCol();
     
-    IFile getLastTokenFile();
+    FileOrIFile getLastTokenFile();
     
     int getLastTokenFileOffset();
     

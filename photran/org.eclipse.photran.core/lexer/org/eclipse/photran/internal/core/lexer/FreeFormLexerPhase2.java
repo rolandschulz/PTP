@@ -18,8 +18,6 @@ import java.util.ListIterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * Phase 2 of lexical analysis: Distinguishes keywords and identifiers.
  * <p>
@@ -58,7 +56,7 @@ public class FreeFormLexerPhase2 implements ILexer
     private ListIterator lengthIt;
 
     private IToken lastToken = null;
-    private IFile lastTokenFile = null;
+    private FileOrIFile lastTokenFile = null;
     private int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
 
     private int firstTokenPos = 0;
@@ -122,14 +120,14 @@ public class FreeFormLexerPhase2 implements ILexer
 
             lastTokenLine = ((Integer)lineIt.next()).intValue();
             lastTokenCol = ((Integer)colIt.next()).intValue();
-            lastTokenFile = (IFile)fileIt.next();
+            lastTokenFile = (FileOrIFile)fileIt.next();
             lastTokenFileOffset = ((Integer)fileOffsetIt.next()).intValue();
             lastTokenStreamOffset = ((Integer)streamOffsetIt.next()).intValue();
             lastTokenLength = ((Integer)lengthIt.next()).intValue();
 
             lastToken.setLine(lastTokenLine);
             lastToken.setCol(lastTokenCol);
-            lastToken.setFile(lastTokenFile);
+            lastToken.setPhysicalFile(lastTokenFile);
             lastToken.setFileOffset(lastTokenFileOffset);
             lastToken.setStreamOffset(lastTokenStreamOffset);
             lastToken.setLength(lastTokenLength);
@@ -1598,7 +1596,7 @@ public class FreeFormLexerPhase2 implements ILexer
                 tokenStream.insertElementAt(eq, i+j+1);
                 lineNumbers.insertElementAt(lineNumbers.get(i+j), i+j+1);
                 colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
-                files.insertElementAt((IFile)files.get(i+j), i+j+1);
+                files.insertElementAt((FileOrIFile)files.get(i+j), i+j+1);
                 fileOffsets.insertElementAt(new Integer(((Integer)fileOffsets.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
                 streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
                 lengths.insertElementAt(new Integer(1), i+j+1);
@@ -1652,7 +1650,7 @@ public class FreeFormLexerPhase2 implements ILexer
             tokenStream.insertElementAt(star, i+(2*j)+1);
             lineNumbers.insertElementAt(lineNumbers.get(i+(2*j)), i+(2*j)+1);
             colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
-            files.insertElementAt((IFile)files.get(i+(2*j)), i+(2*j)+1);
+            files.insertElementAt((FileOrIFile)files.get(i+(2*j)), i+(2*j)+1);
             fileOffsets.insertElementAt(new Integer(((Integer)fileOffsets.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
             streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
             lengths.insertElementAt(new Integer(1), i+(2*j)+1);
@@ -1660,7 +1658,7 @@ public class FreeFormLexerPhase2 implements ILexer
             tokenStream.insertElementAt(num, i+(2*j)+2);
             lineNumbers.insertElementAt(lineNumbers.get(i+(2*j)+1), i+(2*j)+2);
             colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
-            files.insertElementAt((IFile)files.get(i+(2*j)), i+(2*j)+1);
+            files.insertElementAt((FileOrIFile)files.get(i+(2*j)), i+(2*j)+1);
             fileOffsets.insertElementAt(new Integer(((Integer)fileOffsets.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
             streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
             lengths.insertElementAt(new Integer(1), i+(2*j)+2);
@@ -1820,7 +1818,7 @@ public class FreeFormLexerPhase2 implements ILexer
         return lastTokenCol;
     }
 
-    public IFile getLastTokenFile()
+    public FileOrIFile getLastTokenFile()
     {
         return lastTokenFile;
     }

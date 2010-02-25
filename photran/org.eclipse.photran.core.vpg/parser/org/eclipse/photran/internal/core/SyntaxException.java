@@ -11,6 +11,7 @@
 package org.eclipse.photran.internal.core;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.photran.internal.core.lexer.FileOrIFile;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser;
 
@@ -34,7 +35,7 @@ public class SyntaxException extends Exception
         super("Syntax error: Unexpected "
             + lookahead.getTerminal().toString()
             + " ("
-            + lookahead.getFilenameToDisplayToUser() + ", "
+            + lookahead.getPhysicalFile() + ", "
             + "line " + lookahead.getLine()
             + ", column " + lookahead.getCol()
             + ")");
@@ -43,9 +44,9 @@ public class SyntaxException extends Exception
     }
     
     /** May return <code>null</code> */
-    public IFile getFile()
+    public FileOrIFile getFile()
     {
-        return lookahead.getIFile();
+        return lookahead.getPhysicalFile();
     }
     
     public int getTokenLine()

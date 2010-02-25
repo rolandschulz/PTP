@@ -77,7 +77,7 @@ import org.eclipse.core.resources.IFile;
         return prepass.getColumn(yychar);
     }
 
-    protected IFile lastTokenFile = null;
+    protected FileOrIFile lastTokenFile = null;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
 
     private IToken token(Terminal terminal)
@@ -182,7 +182,7 @@ import org.eclipse.core.resources.IFile;
     public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
     {
         this(in, _prepass, tokenFactory);
-        this.lastTokenFile = file;
+        this.lastTokenFile = new FileOrIFile(file);
         this.filename = filename;
     }
 
@@ -206,7 +206,7 @@ import org.eclipse.core.resources.IFile;
         return lastTokenCol;
     }
 
-    public IFile getLastTokenFile()
+    public FileOrIFile getLastTokenFile()
     {
         return lastTokenFile;
     }

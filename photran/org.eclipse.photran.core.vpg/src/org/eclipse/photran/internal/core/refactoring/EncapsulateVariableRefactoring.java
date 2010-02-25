@@ -231,7 +231,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
             ASTModuleNode declaringModule = varDefTok.findNearestAncestor(ASTModuleNode.class);
             if (declaringModule == null) throw new IllegalStateException();
 
-            IFile defFile = varDefTok.getIFile();
+            IFile defFile = varDefTok.getLogicalFile();
             vpg.acquirePermanentAST(defFile);
 
             for (IFile file : filesIn(allRefs))
@@ -301,7 +301,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     "Variable you want to encapsulate is used as an argument in a function." + EOL +
                     "Encapsulating this variable might change the expected behavior of that function." + EOL +
                     "Proceed at your own disgression." + EOL +
-                    "File: "+t.getFilenameToDisplayToUser()+" line: "+t.getLine()+EOL;
+                    "File: "+t.getPhysicalFile()+" line: "+t.getLine()+EOL;
 
                 RefactoringStatusContext context = createContext(t.getTokenRef()); // Highlights problematic definition in file
                 status.addWarning(message, context);
@@ -334,7 +334,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         {
             String message = "!!!WARNING!!!" + EOL +
                              "The following reference to the selected variable will not be changed" + EOL +
-                             "since it is neither written nor read: " + t.getFilenameToDisplayToUser() +
+                             "since it is neither written nor read: " + t.getPhysicalFile() +
                              " line " + t.getLine();
             RefactoringStatusContext context = createContext(t.getTokenRef());
             status.addWarning(message, context);
@@ -367,7 +367,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         {
             fail("Currently can only encapsulate variables that appear as "+
                 "expressions. This variable is used as a non-expression in " +
-                t.getFilenameToDisplayToUser() + " line " + t.getLine());
+                t.getPhysicalFile() + " line " + t.getLine());
         }
     }
 
@@ -408,14 +408,14 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
                     {
                         lst.insertAfter(newDeclNode, newAccessNode);
                         Reindenter.reindent(newDeclNode,
-                            vpg.acquireTransientAST(varDefTok.getIFile()),
+                            vpg.acquireTransientAST(varDefTok.getLogicalFile()),
                             Strategy.REINDENT_EACH_LINE);
                     }
                     else
                         lst.insertAfter(possibleTypeDec, newAccessNode);
 
                     Reindenter.reindent(newAccessNode,
-                                        vpg.acquireTransientAST(varDefTok.getIFile()),
+                                        vpg.acquireTransientAST(varDefTok.getLogicalFile()),
                                         Strategy.REINDENT_EACH_LINE);
                     break;
                 }

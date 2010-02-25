@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.lexer.FileOrIFile;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -37,12 +38,13 @@ public class FortranAST implements IFortranAST
         this.root = root;
         this.tokenList = tokenList;
         
+        FileOrIFile f = new FileOrIFile(file);
         for (Token token : new IterableWrapper<Token>(tokenList))
         {
-        	if (token.getIFile() == null)
-        		token.setFile(file);
+        	if (token.getPhysicalFile() == null)
+        		token.setPhysicalFile(f);
         	
-        	token.setContainerFile(file);
+        	token.setLogicalFile(file);
         }
     }
 
@@ -110,9 +112,11 @@ public class FortranAST implements IFortranAST
         for (int i = 0; i < tokenList.size(); i++)
         {
             Token token = (Token)tokenList.get(i);
-            if (token.getIFile() != null
-                && token.getIFile().hashCode() == file.hashCode()  //    OPTIMIZATION: Profile indicates lots
-                && token.getIFile().equals(file)                   // << of time spent in String#equals here
+            FileOrIFile physicalFile = token.getPhysicalFile();
+            if (physicalFile != null
+                && physicalFile.getIFile() != null
+                && physicalFile.getIFile().hashCode() == file.hashCode()  //    OPTIMIZATION: Profile indicates lots
+                && physicalFile.getIFile().equals(file)                   // << of time spent in String#equals here
                 && token.getFileOffset() == offset
                 && token.getLength() == length)
                 return token;

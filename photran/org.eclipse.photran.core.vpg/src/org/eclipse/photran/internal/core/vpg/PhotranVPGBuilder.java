@@ -336,18 +336,18 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (SyntaxException e)
         {
-            if (e.getFile() != null)
+            if (e.getFile() != null && e.getFile().getIFile() != null)
                 log.logError("Error parsing " + filename + ": " + e.getMessage(),
-                    new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
+                    new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
             else
                 logError(file, "Error parsing " + filename, e);
             return null;
         }
         catch (LexerException e)
         {
-            if (e.getFile() != null)
+            if (e.getFile() != null && e.getFile().getIFile() != null)
                 log.logError("Error parsing " + filename + ": " + e.getMessage(),
-                    new PhotranTokenRef(e.getFile(), e.getTokenOffset(), e.getTokenLength()));
+                    new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
             else
                 logError(file, "Error parsing " + filename, e);
             return null;

@@ -217,7 +217,7 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getJavaFile(): " + token.getJavaFile()));
+                    "getPhysicalFile(): " + token.getPhysicalFile()));
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
@@ -225,7 +225,7 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getContainerJavaFile(): " + token.getContainerJavaFile()));
+                    "getLogicalFile(): " + token.getLogicalFile()));
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),

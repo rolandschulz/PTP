@@ -975,7 +975,7 @@ public abstract class MultipleFileFortranRefactoring
 
                     private void checkForConflict(Token name)
                     {
-                        if (name.getIFile() != null)
+                        if (name.getLogicalFile() != null)
                             for (String newName : newNames)
                                 if (name != null && name.getText().equals(newName) && name.resolveBinding().isEmpty())
                                     conflictingDef.add(new Conflict(newName, name.getTokenRef()));

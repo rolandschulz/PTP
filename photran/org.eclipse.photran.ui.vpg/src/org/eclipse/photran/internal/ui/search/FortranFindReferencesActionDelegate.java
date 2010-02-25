@@ -79,8 +79,8 @@ public abstract class FortranFindReferencesActionDelegate extends FortranEditorA
                                 : defs.get(0);
 			
 			// This may be null if the user cancelled the selection dialog.
-			if (selectedDef != null)
-				FortranFindReferencesSearchQuery.searchForReference(selectedDef, getSearchScope(), token.getIFile());
+			if (selectedDef != null && token.getPhysicalFile() != null && token.getPhysicalFile().getIFile() != null)
+				FortranFindReferencesSearchQuery.searchForReference(selectedDef, getSearchScope(), token.getPhysicalFile().getIFile());
         }
         catch (Exception e)
         {

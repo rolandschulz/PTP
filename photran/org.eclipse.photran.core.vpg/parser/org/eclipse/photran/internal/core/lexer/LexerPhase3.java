@@ -12,8 +12,6 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
 
-import org.eclipse.core.resources.IFile;
-
 /**
  * This is the lexical analyzer that is used directly in the Fortran parser.
  * 
@@ -62,7 +60,7 @@ public class LexerPhase3 implements IAccumulatingLexer
         return phase2Lexer.getLastTokenLine();
     }
 
-    public IFile getLastTokenFile()
+    public FileOrIFile getLastTokenFile()
     {
         return phase2Lexer.getLastTokenFile();
     }

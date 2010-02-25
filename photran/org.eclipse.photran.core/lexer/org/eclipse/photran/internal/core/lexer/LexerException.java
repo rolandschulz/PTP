@@ -34,7 +34,7 @@ public class LexerException extends Exception
     }
     
     /** May return <code>null</code> */
-    public IFile getFile()
+    public FileOrIFile getFile()
     {
         return lexer.getLastTokenFile();
     }

@@ -500,7 +500,8 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         try
         {
             Token token = tokenRef.findToken();
-            IMarker marker = token.getIFile().createMarker(IMarker.TEXT);
+            if (token.getPhysicalFile().getIFile() == null) return null;
+            IMarker marker = token.getPhysicalFile().getIFile().createMarker(IMarker.TEXT);
             marker.setAttribute(IMarker.CHAR_START, token.getFileOffset());
             marker.setAttribute(IMarker.CHAR_END, token.getFileOffset()+token.getLength());
             return marker;

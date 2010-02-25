@@ -258,7 +258,7 @@ public abstract class ScopingNode extends ASTNode
             {
                 Token firstToken = findFirstToken();
                 if (firstToken == null) throw new Error("Empty file");
-                cachedRepresentataiveToken = new PhotranTokenRef(firstToken.getIFile(), -1, 0);
+                cachedRepresentataiveToken = new PhotranTokenRef(firstToken.getLogicalFile(), -1, 0);
             }
             else
                 cachedRepresentataiveToken = result.getTokenRef();
@@ -801,7 +801,8 @@ public abstract class ScopingNode extends ASTNode
 
         	if (firstToken == null
         	    || lastToken == null
-        	    || firstToken.getIFile() == null)
+                || firstToken.getPhysicalFile() == null
+                || firstToken.getPhysicalFile().getIFile() == null)
         	    return null;
 
             int startOffset = firstToken.getFileOffset();
@@ -810,7 +811,7 @@ public abstract class ScopingNode extends ASTNode
             int endOffset = lastToken.getFileOffset()+lastToken.getLength();
             //endOffset += lastToken.getWhiteAfter().length();
 
-            IMarker marker = firstToken.getIFile().createMarker(IMarker.TEXT);
+            IMarker marker = firstToken.getPhysicalFile().getIFile().createMarker(IMarker.TEXT);
 			marker.setAttribute(IMarker.CHAR_START, startOffset);
 			marker.setAttribute(IMarker.CHAR_END, endOffset);
             return marker;

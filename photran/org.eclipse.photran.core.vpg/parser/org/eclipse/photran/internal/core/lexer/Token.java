@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
@@ -73,11 +72,8 @@ public class Token implements IToken, IASTNode
      */
     protected IPreprocessorReplacement preprocessorDirective = null;
     
-    protected IFile ifile = null;
-    protected java.io.File javaFile = null;
-    
-    protected IFile containerIFile = null;
-    protected java.io.File containerJavaFile = null;
+    protected FileOrIFile physicalFile = null;
+    protected IFile logicalFile = null;
     
     protected int line = -1, col = -1, fileOffset = -1, streamOffset = -1, length = -1;
     
@@ -107,10 +103,8 @@ public class Token implements IToken, IASTNode
         this.text                  = copyFrom.text;
         this.whiteAfter            = copyFrom.whiteAfter;
         this.preprocessorDirective = copyFrom.preprocessorDirective;
-        this.ifile                 = copyFrom.ifile;
-        this.javaFile              = copyFrom.javaFile;
-        this.containerIFile        = copyFrom.containerIFile;
-        this.containerJavaFile     = copyFrom.containerJavaFile;
+        this.physicalFile          = copyFrom.physicalFile;
+        this.logicalFile           = copyFrom.logicalFile;
         this.line                  = copyFrom.line;
         this.col                   = copyFrom.col;
         this.fileOffset            = copyFrom.fileOffset;
@@ -193,62 +187,24 @@ public class Token implements IToken, IASTNode
         this.col = col;
     }
 
-    public String getFilenameToDisplayToUser()
+    public FileOrIFile getPhysicalFile()
     {
-        if (this.ifile != null)
-            return this.ifile.getFullPath().toOSString();
-        else if (this.javaFile != null)
-            return this.javaFile.getAbsolutePath();
-        else
-            return null;
+        return physicalFile;
+    }
+    
+    public void setPhysicalFile(FileOrIFile file)
+    {
+        this.physicalFile = file;
     }
 
-    public IFile getIFile()
+    public IFile getLogicalFile()
     {
-        return ifile;
+        return logicalFile;
     }
-
-    public java.io.File getJavaFile()
+    
+    public void setLogicalFile(IFile file)
     {
-        return javaFile;
-    }
-
-    public IFile getContainerIFile()
-    {
-        return containerIFile;
-    }
-
-    public java.io.File getContainerJavaFile()
-    {
-        return containerJavaFile;
-    }
-
-    public void setFile(IFile file)
-    {
-        this.ifile = file;
-        
-        IPath location = file == null ? null : file.getLocation();
-        this.javaFile = location == null ? null : location.toFile();
-    }
-
-    public void setFile(java.io.File file)
-    {
-        this.ifile = null;
-        this.javaFile = file;
-    }
-
-    public void setContainerFile(IFile file)
-    {
-        this.containerIFile = file;
-        
-        IPath location = file == null ? null : file.getLocation();
-        this.containerJavaFile = location == null ? null : location.toFile();
-    }
-
-    public void setContainerFile(java.io.File file)
-    {
-        this.containerIFile = null;
-        this.containerJavaFile = file;
+        this.logicalFile = file;
     }
 
     public int getFileOffset()
@@ -515,7 +471,7 @@ public class Token implements IToken, IASTNode
 
     public PhotranTokenRef getTokenRef()
     {
-    	if (tokenRef == null) tokenRef = new PhotranTokenRef(containerIFile, streamOffset, length);
+    	if (tokenRef == null) tokenRef = new PhotranTokenRef(logicalFile, streamOffset, length);
     	
     	return tokenRef;
     }

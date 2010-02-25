@@ -1,6 +1,5 @@
 package org.eclipse.photran.internal.core.lexer;
 
-import org.eclipse.core.resources.IFile;
 
 /**
  * <code>IToken</code>s are produced by the lexical analyzer and are
@@ -70,33 +69,8 @@ public interface IToken
     public int getCol();
     public void setCol(int col);
 
-    /**
-     * @return a filename that can be displayed to the user to indicate what
-     * file this token is located in.  This is not guaranteed to be a legal
-     * file path or even an actual filename.
-     * 
-     * @see #getIFile()
-     * @see #getJavaFile()
-     */
-    public String getFilenameToDisplayToUser();
-    /**
-     * @return the <code>IFile</code> in which this token occurs, or
-     * <code>null</code> if it is not located in a workspace file
-     * 
-     * @see #getFilenameToDisplayToUser()
-     * @see #getJavaFile()
-     */
-    public IFile getIFile();
-    /**
-     * @return the <code>java.io.File</code> in which this token occurs, or
-     * <code>null</code> if it is not located on the local filesystem
-     * 
-     * @see #getFilenameToDisplayToUser()
-     * @see #getJavaFile()
-     */
-    public java.io.File getJavaFile();
-    public void setFile(IFile file);
-    public void setFile(java.io.File file);
+    public FileOrIFile getPhysicalFile();
+    public void setPhysicalFile(FileOrIFile file);
     
     public int getFileOffset();
     public void setFileOffset(int fileOffset);

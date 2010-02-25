@@ -48,7 +48,7 @@ import org.eclipse.core.resources.IFile;
 %{
     protected boolean accumulateWhitetext;
     protected StringBuffer whiteBeforeSB = new StringBuffer();
-    protected IFile lastTokenFile = null;
+    protected FileOrIFile lastTokenFile = null;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
     protected IToken lastToken = null;
     protected StringBuffer whiteAfterSB = new StringBuffer();
@@ -124,7 +124,7 @@ import org.eclipse.core.resources.IFile;
     public FreeFormLexerPhase1(java.io.InputStream in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
         this(new LineAppendingInputStream(in));
-        this.lastTokenFile = file;
+        this.lastTokenFile = new FileOrIFile(file);
         this.filename = filename;
         this.tokenFactory = tokenFactory;
         this.accumulateWhitetext = accumulateWhitetext;
@@ -150,7 +150,7 @@ import org.eclipse.core.resources.IFile;
         return lastTokenCol;
     }
 
-    public IFile getLastTokenFile()
+    public FileOrIFile getLastTokenFile()
     {
         return lastTokenFile;
     }
