@@ -6,7 +6,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.eclipse.photran.internal.tests.search.VPGSearchTestCase;
-import org.eclipse.photran.internal.ui.search.VPGSearchQuery;
+import org.eclipse.photran.internal.ui.search.FortranSearchQuery;
 import org.eclipse.search.ui.text.Match;
 
 /**
@@ -30,7 +30,7 @@ public class VPGSearchTestSuite extends TestSuite
         matches.add(new Match("foo.f90",30,1));
         matches.add(new Match("implicitTest.f90",22,1));
         suite.addTest(getSuiteFor("testFour", new VPGSearchTestCase("a",
-            VPGSearchQuery.FIND_REFERENCES | VPGSearchQuery.FIND_ALL_TYPES, matches, false)));
+            FortranSearchQuery.FIND_REFERENCES | FortranSearchQuery.FIND_ALL_TYPES, matches, false)));
                
         return suite;
     }

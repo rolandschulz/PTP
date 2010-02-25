@@ -17,12 +17,13 @@ import java.util.List;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.rephraserengine.core.util.Pair;
+import org.eclipse.rephraserengine.ui.search.OpenSearchPageAction;
 import org.eclipse.rephraserengine.ui.search.SearchPage;
 import org.eclipse.search.ui.ISearchPage;
 import org.eclipse.search.ui.ISearchQuery;
 
 /**
- * A dialog used to run a {@link VPGSearchQuery}.
+ * A dialog used to run a {@link FortranSearchQuery}.
  * <p>
  * Based on org.eclipse.cdt.internal.ui.search.PDOMSearchPage
  *
@@ -30,10 +31,23 @@ import org.eclipse.search.ui.ISearchQuery;
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  * @author Jeff Overbey - Moved language-independent parts into Rephraser Engine
  * 
- * @see VPGSearchQuery
+ * @see FortranSearchQuery
  */
-//@SuppressWarnings("restriction")
-public class VPGSearchPage extends SearchPage implements ISearchPage {
+public class FortranSearchPage extends SearchPage implements ISearchPage
+{
+    /**
+     * An action that opens the Fortran Search dialog.  This appears as the Search &gt; Fortran...
+     * menu item.
+     * 
+     * @author Jeff Overbey
+     */
+    public static class OpenAction extends OpenSearchPageAction
+    {
+        @Override protected String searchPageID()
+        {
+            return FortranSearchPage.EXTENSION_ID;
+        }
+    }
     
     public static final String EXTENSION_ID = "org.eclipse.photran.ui.vpgSearchPage";
     
@@ -43,21 +57,21 @@ public class VPGSearchPage extends SearchPage implements ISearchPage {
     @Override protected List<Pair<String, Integer>> searchFor()
     {
         List<Pair<String, Integer>> searchFor = new ArrayList<Pair<String, Integer>>(6);
-        searchFor.add(Pair.of("Common block", VPGSearchQuery.FIND_COMMON_BLOCK));
-        searchFor.add(Pair.of("Function", VPGSearchQuery.FIND_FUNCTION));
-        searchFor.add(Pair.of("Subroutine", VPGSearchQuery.FIND_SUBROUTINE));
-        searchFor.add(Pair.of("Module", VPGSearchQuery.FIND_MODULE));
-        searchFor.add(Pair.of("Variable", VPGSearchQuery.FIND_VARIABLE));
-        searchFor.add(Pair.of("Program", VPGSearchQuery.FIND_PROGRAM));
+        searchFor.add(Pair.of("Common block", FortranSearchQuery.FIND_COMMON_BLOCK));
+        searchFor.add(Pair.of("Function", FortranSearchQuery.FIND_FUNCTION));
+        searchFor.add(Pair.of("Subroutine", FortranSearchQuery.FIND_SUBROUTINE));
+        searchFor.add(Pair.of("Module", FortranSearchQuery.FIND_MODULE));
+        searchFor.add(Pair.of("Variable", FortranSearchQuery.FIND_VARIABLE));
+        searchFor.add(Pair.of("Program", FortranSearchQuery.FIND_PROGRAM));
         return searchFor;
     }
 
     @Override protected List<Pair<String, Integer>> limitTo()
     {
         List<Pair<String, Integer>> searchFor = new ArrayList<Pair<String, Integer>>(3);
-        searchFor.add(Pair.of("All occurrences", VPGSearchQuery.FIND_ALL_OCCURANCES));
-        searchFor.add(Pair.of("Declarations", VPGSearchQuery.FIND_DECLARATIONS));
-        searchFor.add(Pair.of("References", VPGSearchQuery.FIND_REFERENCES));
+        searchFor.add(Pair.of("All occurrences", FortranSearchQuery.FIND_ALL_OCCURANCES));
+        searchFor.add(Pair.of("Declarations", FortranSearchQuery.FIND_DECLARATIONS));
+        searchFor.add(Pair.of("References", FortranSearchQuery.FIND_REFERENCES));
         return searchFor;
     }
 
@@ -76,11 +90,11 @@ public class VPGSearchPage extends SearchPage implements ISearchPage {
         String patternRegex,
         int searchFlags)
     {
-        return new VPGSearchQuery(scope, scopeDesc, patternDesc, patternRegex, searchFlags);
+        return new FortranSearchQuery(scope, scopeDesc, patternDesc, patternRegex, searchFlags);
     }
     
     @Override protected int defaultSearchFlags()
     {
-        return VPGSearchQuery.FIND_ALL_TYPES | VPGSearchQuery.FIND_ALL_OCCURANCES;
+        return FortranSearchQuery.FIND_ALL_TYPES | FortranSearchQuery.FIND_ALL_OCCURANCES;
     }
 }

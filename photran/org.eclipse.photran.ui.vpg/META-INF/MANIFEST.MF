@@ -36,7 +36,7 @@ Export-Package: org.eclipse.photran.internal.ui.actions,
  org.eclipse.photran.internal.ui.properties,
  org.eclipse.photran.internal.ui.refactoring,
  org.eclipse.photran.internal.ui.search,
- org.eclipse.photran.internal.ui.views,
+ org.eclipse.photran.internal.ui.views.declaration,
  org.eclipse.photran.internal.ui.views.vpgproblems,
  org.eclipse.photran.internal.ui.vpg
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -20,11 +20,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.rephraserengine.core.util.Pair;
 import org.eclipse.rephraserengine.core.util.StringUtil;
 import org.eclipse.rephraserengine.ui.search.OpenSearchPageAction;
+import org.eclipse.rephraserengine.ui.search.SearchMatch;
 import org.eclipse.rephraserengine.ui.search.SearchPage;
 import org.eclipse.rephraserengine.ui.search.SearchQuery;
 import org.eclipse.rephraserengine.ui.search.SearchResult;
 import org.eclipse.search.ui.ISearchQuery;
-import org.eclipse.search.ui.text.Match;
 
 /**
  * A new page ("Text Search") that is contributed to the workbench Search dialog and added to the
@@ -83,10 +83,10 @@ public class TextSearchPage extends SearchPage
             Matcher matcher = Pattern.compile(patternRegex).matcher(contents == null ? "" : contents);
             if ((searchFlags & FIND_ALL_OCCURRENCES) != 0)
                 while (matcher.find())
-                    result.addMatch(new Match(file, matcher.start(), matcher.end()-matcher.start()));
+                    result.addMatch(new SearchMatch(file, matcher.start(), matcher.end()-matcher.start()));
             else
                 if (matcher.find())
-                    result.addMatch(new Match(file, matcher.start(), matcher.end()-matcher.start()));
+                    result.addMatch(new SearchMatch(file, matcher.start(), matcher.end()-matcher.start()));
         }
     }
 

@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.ui.views;
+package org.eclipse.photran.internal.ui.views.declaration;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;

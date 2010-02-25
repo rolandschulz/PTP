@@ -68,7 +68,10 @@ public abstract class SearchQuery<T extends AbstractTextSearchResult> implements
 
     public String getLabel()
     {
-        return "'" + patternDescription + "' - " + result.getMatchCount() + " occurence(s) in " + scopeDesc;
+        int count = result.getMatchCount();
+        return "'" + patternDescription + "' - " + count
+            + (count == 1 ? " match in " : " matches in ")
+            + scopeDesc;
     }
 
     public boolean canRerun()

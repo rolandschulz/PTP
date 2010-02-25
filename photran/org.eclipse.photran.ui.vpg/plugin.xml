@@ -161,7 +161,7 @@
       </actionSet>
    </extension>
 
-   <!-- Associate the Refactoring action set with the Fortran perspective & editor -->
+   <!-- 4. Associate the Refactoring action set with the Fortran perspective & editor -->
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
@@ -174,19 +174,6 @@
          <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
          <!--part id="org.eclipse.photran.ui.FixedFormFortranEditor"/-->
       </actionSetPartAssociation>
-   </extension>
-
-   <!--==========================================-->
-   <!-- Contribution to the Rephraser Engine UI -->
-   <!--=========================================-->
-   <!-- This will automatically add some actions to the (Debugging) sub-menu of the Refactor
-        menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc. -->
-   <extension
-         point="org.eclipse.rephraserengine.ui.vpg.vpg">
-      <vpg
-         id="org.eclipse.photran.ui.vpg"
-         name="Fortran"
-         class="org.eclipse.photran.internal.ui.vpg.PhotranVPGContribution" />
    </extension>
 
    <!--=========================================-->
@@ -293,45 +280,25 @@
             menubarPath="group.open"/>
      </viewerContribution>
    </extension>
-   <!--================-->
-   <!-- Fortran Search -->
-   <!--================-->
+
+   <!--====================================-->
+   <!-- Fortran Search and Find References -->
+   <!--====================================-->
    <extension
       id="vpgSearchPage"
       name="vpg search name"
       point="org.eclipse.search.searchPages">
      <page
         canSearchEnclosingProjects="true"
-        class="org.eclipse.photran.internal.ui.search.VPGSearchPage"
-        extensions="f:90,f90:90,f77:90"
+        class="org.eclipse.photran.internal.ui.search.FortranSearchPage"
         icon="icons/full/obj16/fsearch_obj.gif"
         id="org.eclipse.photran.ui.vpgSearchPage"
         label="Fortran Search"
         showScopeSection="true"
         sizeHint="460, 160"/>
    </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            description="Fortran Search"
-            id="org.eclipse.photran.ui.vpg.SearchActionSet"
-            label="Fortran Search">
-         <action
-               class="org.eclipse.photran.internal.ui.search.OpenFortranSearchPageAction"
-               icon="icons/full/obj16/fsearch_obj.gif"
-               id="org.eclipse.photran.ui.vpg.actions.OpenFortranSearchPage"
-               label="F&amp;ortran..."
-               menubarPath="org.eclipse.search.menu/dialogGroup">
-         </action>
-         <menu
-               id="org.eclipse.search.menu"
-               label="Se&amp;arch">
-         </menu>
-      </actionSet>
-   </extension>
-   <!--=====================-->
-   <!-- Find All References -->
-   <!--=====================-->
+
+   <!-- 1. Define the command -->
    <extension
          point="org.eclipse.ui.commands">
       <category
@@ -344,7 +311,18 @@
             description="Searches the workspace for all references to a Fortran identifier"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
             name="Find All References in Workspace" />
+      <command
+            categoryId="org.eclipse.photran.ui.SearchCategory"
+            description="Searches the project for all references to a Fortran identifier"
+            id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
+            name="Find All References in Project" />
+      <command
+            categoryId="org.eclipse.photran.ui.SearchCategory"
+            description="Searches the file for all references to a Fortran identifier"
+            id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
+            name="Find All References in File" />
    </extension>
+   <!-- 2. Optionally associate the command with an accelerator key -->
    <extension
             point="org.eclipse.ui.bindings">
         <!--win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
@@ -356,25 +334,13 @@
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"/>
    </extension>
+   <!-- 3. Add the command to an action set -->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
             label="Fortran Search Actions"
             description="Fortran Search Actions"
             visible="false"
             id="org.eclipse.photran.ui.SearchActionSet">
-                <!-- Copied from org.eclipse.search plugin.xml to ensure menu and groups are present -->
-	      	<menu
-	            id="org.eclipse.search.menu"
-	            label="Se&amp;arch"
-	            path="navigate">
-				<groupMarker name="internalDialogGroup"/>   <!-- not to be used by clients  -->
-				<groupMarker name="dialogGroup"/>           <!-- to be used by clients      -->
-				<separator name="fileSearchContextMenuActionsGroup"/> <!-- to be used by clients      -->
-	         	<separator name="contextMenuActionsGroup"/> <!-- to be used by clients -->
-	         	<separator name="occurencesActionsGroup"/> <!-- to be used by clients -->
-	         	<separator name="extraSearchGroup"/> <!-- to be used by clients -->
-	      	</menu>
-
          <menu
                id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
                label="R&amp;eferences"
@@ -383,31 +349,45 @@
                name="FindAllReferencesGroup">
            </separator>
          </menu>
-      <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesFileActionDelegate"
+         <action
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$FileActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
             label="File"
             menubarPath="org.eclipse.search.menu/org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
-      </action>
-      <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesProjectActionDelegate"
+         </action>
+         <action
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$ProjectActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
             label="Project"
             menubarPath="org.eclipse.search.menu/org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
-      </action>
-      <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesWorkspaceActionDelegate"
+         </action>
+         <action
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$WorkspaceActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
             label="Workspace"
             menubarPath="org.eclipse.search.menu/org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
-      </action>
+         </action>
+         <action
+               class="org.eclipse.photran.internal.ui.search.FortranSearchPage$OpenAction"
+               icon="icons/full/obj16/fsearch_obj.gif"
+               id="org.eclipse.photran.ui.vpg.actions.OpenFortranSearchPage"
+               label="F&amp;ortran..."
+               menubarPath="org.eclipse.search.menu/dialogGroup">
+         </action>
       </actionSet>
+   </extension>
+   <!-- 4. Associate the action set with the Fortran perspective & editors -->
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+         <actionSet id="org.eclipse.photran.ui.SearchActionSet"/>
+      </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
@@ -416,7 +396,9 @@
          <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
       </actionSetPartAssociation>
    </extension>
+   <!-- 5. Contribute the actions to the Fortran editors' popup menus -->
    <extension point="org.eclipse.ui.popupMenus">
+     <!-- Fixed form editor -->
      <viewerContribution
          id="org.eclipse.photran.ui.vpg.FixedFortranFindReferencesContribution"
          targetID="#FixedFormFortranEditorContextMenu">
@@ -429,7 +411,7 @@
          </separator>
       </menu>
       <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesFileActionDelegate"
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$FileActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
@@ -437,7 +419,7 @@
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
       <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesProjectActionDelegate"
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$ProjectActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
@@ -445,7 +427,7 @@
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
       <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesWorkspaceActionDelegate"
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$WorkspaceActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
@@ -453,6 +435,7 @@
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
      </viewerContribution>
+     <!-- Free form editor -->
      <viewerContribution
          id="org.eclipse.photran.ui.vpg.FreeFortranFindReferencesContribution"
          targetID="#FreeFormFortranEditorContextMenu">
@@ -465,7 +448,7 @@
          </separator>
       </menu>
       <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesFileActionDelegate"
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$FileActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
@@ -473,7 +456,7 @@
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
       <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesProjectActionDelegate"
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$ProjectActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
@@ -481,7 +464,7 @@
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
       <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesWorkspaceActionDelegate"
+            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$WorkspaceActionDelegate"
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
@@ -494,6 +477,23 @@
    <!--=======================================-->
    <!-- Debugging Actions in Refactoring Menu -->
    <!--=======================================-->
+
+   <!-- Contribution to the Rephraser Engine UI -->
+   <!--     This will automatically add some actions to the (Debugging) sub-menu of the Refactor -->
+   <!--     menu in the menu bar, such as Display VPG Database, Refresh VPG Database, etc.       -->
+   <!--     All of these actions are language-independent.                                       -->
+   <extension
+         point="org.eclipse.rephraserengine.ui.vpg.vpg">
+      <vpg
+         id="org.eclipse.photran.ui.vpg"
+         name="Fortran"
+         class="org.eclipse.photran.internal.ui.vpg.PhotranVPGContribution" />
+   </extension>
+
+   <!-- Fortran-specific debugging actions -->
+   <!--     These actions (e.g., Display Symbol Table and Resolve INTERFACE Binding) are  -->
+   <!--     Fortran-specific, but they are also contributed to the Refactor > (Debugging) -->
+   <!--     menu.                                                                         -->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
             label="Fortran Debug Actions"
@@ -516,12 +516,6 @@
             <separator name="vpgstats"/>
             <separator name="vpgdb"/>
          </menu>
-         <action
-               label=""
-               definitionId="org.eclipse.photran.ui.EasterEggCommand"
-               class="org.eclipse.photran.internal.ui.actions.EasterEggAction"
-               id="org.eclipse.photran.ui.EasterEggAction"/>
-         <!-- -->
          <action
                label="Find Matching &amp;Interface Declarations"
                class="org.eclipse.photran.internal.ui.actions.FindMatchingInterfaceDeclarations"
@@ -559,6 +553,12 @@
                id="org.eclipse.photran.ui.DisplayBinderStatisticsAction"
                label="Display Binder &amp;Statistics"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
+         <!-- -->
+         <action
+               label=""
+               definitionId="org.eclipse.photran.ui.EasterEggCommand"
+               class="org.eclipse.photran.internal.ui.actions.EasterEggAction"
+               id="org.eclipse.photran.ui.EasterEggAction"/>
       </actionSet>
    </extension>
    <extension
@@ -588,60 +588,25 @@
       </actionSetPartAssociation>
    </extension>
 
-   <!--==============-->
-   <!-- Refactorings -->
-   <!--==============-->
-
-   <!--==========================================-->
-   <!-- Experimental Editor with VPG Integration -->
-   <!--==========================================-->
-   <extension
-         point="org.eclipse.ui.editors"
-         id="org.eclipse.photran.ui.VPGFortranEditor">
-
-      <!-- Since freeFormFortranSource and fixedFormFortranSource are "sub-content types" of fortranSource,
-           we will bind both editors to the fortranSource content type; however, whichever content type
-           binding is given first will be "tighter" and used as the default.
-           That way, fixed form files will open in the fixed form editor by default, but they can also
-           be opened in the free form editor (right click, and choose Open With).  Similarly, free form files
-           can be opened in the fixed form editor. -->
-      <!--editor
-            default="false"
-            name="Fortran Editor (VPG Experimental Features)"
-            icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.internal.ui.editor_vpg.OldExperimentalFreeFormFortranEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            id="org.eclipse.photran.ui.FreeFormVPGEditor">
-         <contentTypeBinding
-              contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
-         <contentTypeBinding
-              contentTypeId="org.eclipse.photran.core.fortranSource" />
-      </editor-->
-   </extension>
-
-   <!--================================================================-->
-   <!-- Views: Declaration View and Analysis/Refactoring Problems View -->
-   <!--================================================================-->
-   <!--
- 		Added for the Declaration view Project
- 		@author John Goode, Abe Hassan, Sean Kim
- 		Group: Fennel-Garlic
- 		University of Illinois at Urbana-Champaign
- 		CS 427 Fall 2007  -->
-   <extension
-         point="org.eclipse.ui.views">
+   <!--=======-->
+   <!-- Views -->
+   <!--=======-->
+   <extension point="org.eclipse.ui.views">
       <category
             id="org.eclipse.photran.ui.views"
             name="Fortran Views">
       </category>
+      
+      <!-- Declaration View -->
       <view
             category="org.eclipse.photran.ui.views"
-            class="org.eclipse.photran.internal.ui.views.DeclarationView"
+            class="org.eclipse.photran.internal.ui.views.declaration.DeclarationView"
             icon="icons/full/eview16/source.gif"
             id="org.eclipse.photran.ui.DeclarationView"
             name="Fortran Declaration">
       </view>
 
+      <!-- Analysis/Refactoring Problems View -->
       <view
             category="org.eclipse.photran.ui.views"
             class="org.eclipse.photran.internal.ui.views.vpgproblems.VGPProblemView"
@@ -650,34 +615,12 @@
             name="Fortran Analysis/Refactoring Problems">
       </view>
    </extension>
-       <!--
-   <extension
-      point="org.eclipse.ui.ide.markerSupport">
-      <markerField
-               class="org.eclipse.photran.internal.ui.views.ProjectField"
-                   id="com.eclipse-tips.markers.projectField"
-                   name="Project">
-      </markerField>
-          <markerContentGenerator
-                id="org.eclipse.photran.ui.vpg.myCustomMarkerGenerator"
-                name="My Marker Generator">
-               <markerTypeReference
-                   id="org.eclipse.core.resources.marker"/>
-               <markerFieldReference
-                   id="org.eclipse.ui.ide.descriptionField"/>
-                       <markerFieldReference
-                       id="com.eclipse-tips.markers.projectField"/>
-           </markerContentGenerator>
-       </extension>
-    -->
-
 
    <!--=================================-->
    <!-- VPG Source Viewer Configuration -->
    <!--=================================-->
-   <extension
-   	point="org.eclipse.photran.ui.sourceViewerConfig">
-   	<sourceViewerConfig
+   <extension point="org.eclipse.photran.ui.sourceViewerConfig">
+      <sourceViewerConfig
           factory="org.eclipse.photran.internal.ui.editor_vpg.FortranVPGSourceViewerConfigurationFactory" />
    </extension>
 </plugin>

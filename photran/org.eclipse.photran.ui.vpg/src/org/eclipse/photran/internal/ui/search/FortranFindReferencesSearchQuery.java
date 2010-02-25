@@ -28,14 +28,14 @@ import org.eclipse.search.ui.text.AbstractTextSearchResult;
  * 
  * @author kdecker3, slieter2
  */
-public class ReferenceSearch implements ISearchQuery
+public class FortranFindReferencesSearchQuery implements ISearchQuery
 {
     private Definition def;
     private SearchScope searchScope;
     private IFile file;
     private SearchResult searchResult;
 
-    public ReferenceSearch(Definition def, SearchScope searchScope, IFile file)
+    public FortranFindReferencesSearchQuery(Definition def, SearchScope searchScope, IFile file)
     {
         this.def = def;
         this.searchScope = searchScope;
@@ -55,10 +55,10 @@ public class ReferenceSearch implements ISearchQuery
 
     public String getLabel()
     {
-        return SearchMessages.getFormattedString("search.header", new Object[] {
-                getDef().getCanonicalizedName(),
-                Integer.valueOf(((AbstractTextSearchResult)getSearchResult()).getMatchCount())
-            });
+        int count = ((AbstractTextSearchResult)getSearchResult()).getMatchCount();
+        return "'" + getDef().getCanonicalizedName() + "' - " + count
+            + (count == 1 ? " match in " : " matches in ")
+            + searchScope;
     }
 
     public ISearchResult getSearchResult()
@@ -88,21 +88,20 @@ public class ReferenceSearch implements ISearchQuery
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
         }
 
-        return new Status(IStatus.OK, Activator.PLUGIN_ID,
-                          SearchMessages.getString("ReferenceSearch_1"));
+        return new Status(IStatus.OK, Activator.PLUGIN_ID, "Search Successful");
     }
 
     private void filterAndAddSearchResult(PhotranTokenRef ref)
     {
         if (!searchScope.filterOut(ref, getFile()))
-            VPGSearchQuery.addSearchResultFromTokenRef(ref, (SearchResult)getSearchResult());
+            FortranSearchQuery.addSearchResultFromTokenRef(ref, (SearchResult)getSearchResult());
     }
 
     public static void searchForReference(Definition p_def,
                                           SearchScope p_searchscope,
                                           IFile p_file)
     {
-        NewSearchUI.runQueryInBackground(new ReferenceSearch(p_def,
+        NewSearchUI.runQueryInBackground(new FortranFindReferencesSearchQuery(p_def,
                                                              p_searchscope,
                                                              p_file));
     }

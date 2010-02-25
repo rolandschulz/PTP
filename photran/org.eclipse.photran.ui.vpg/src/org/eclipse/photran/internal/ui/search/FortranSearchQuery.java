@@ -28,6 +28,7 @@ import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.ui.search.SearchMatch;
 import org.eclipse.rephraserengine.ui.search.SearchQuery;
 import org.eclipse.rephraserengine.ui.search.SearchResult;
 import org.eclipse.search.ui.ISearchQuery;
@@ -44,7 +45,7 @@ import org.eclipse.ui.internal.Workbench;
  * @author Jeff Overbey
  */
 @SuppressWarnings("restriction")
-public class VPGSearchQuery extends SearchQuery<SearchResult>
+public class FortranSearchQuery extends SearchQuery<SearchResult>
 {
     // First bit after the FINDs in PDOMSearchQuery.
     public static final int FIND_PROGRAM = 0x10;
@@ -63,7 +64,7 @@ public class VPGSearchQuery extends SearchQuery<SearchResult>
 
     private TreeSet<String> projectsWithRefactoringDisabled = new TreeSet<String>();
 
-    public VPGSearchQuery(
+    public FortranSearchQuery(
             List<IResource> scope,
             String scopeDesc,
             String patternDescription,
@@ -217,13 +218,13 @@ public class VPGSearchQuery extends SearchQuery<SearchResult>
     }
     
     private void addSearchResultFromTokenRef(PhotranTokenRef tokenRef) {
-        VPGSearchQuery.addSearchResultFromTokenRef(tokenRef, (SearchResult)getSearchResult());
+        FortranSearchQuery.addSearchResultFromTokenRef(tokenRef, (SearchResult)getSearchResult());
     }
 
     public static void addSearchResultFromTokenRef(PhotranTokenRef tokenRef, SearchResult searchResult) {
         Token token = tokenRef.findTokenOrReturnNull();
         if (token != null) {
-            VPGSearchMatch match = new VPGSearchMatch(token.getIFile(),
+            SearchMatch match = new SearchMatch(token.getIFile(),
                 token.getFileOffset(),
                 token.getLength());
             searchResult.addMatch(match);

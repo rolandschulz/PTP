@@ -11,8 +11,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.ui.search.VPGSearchMatch;
-import org.eclipse.photran.internal.ui.search.VPGSearchQuery;
+import org.eclipse.photran.internal.ui.search.FortranSearchQuery;
+import org.eclipse.rephraserengine.ui.search.SearchMatch;
 import org.eclipse.rephraserengine.ui.search.SearchPage;
 import org.eclipse.rephraserengine.ui.search.SearchResult;
 import org.eclipse.search.ui.IQueryListener;
@@ -35,7 +35,7 @@ public class VPGSearchTestCase extends BaseTestFramework
 
     protected String searchString;
     protected int searchFlags;
-    protected ArrayList<VPGSearchMatch> matches;
+    protected ArrayList<SearchMatch> matches;
     protected ArrayList<Match> initMatches;
     protected boolean isRegex;
     protected ArrayList<IResource> scope;
@@ -49,7 +49,7 @@ public class VPGSearchTestCase extends BaseTestFramework
         this.searchString = searchString;
         this.searchFlags = searchFlags;
         this.isRegex = isRegex;
-        this.matches = new ArrayList<VPGSearchMatch>(matches.size());
+        this.matches = new ArrayList<SearchMatch>(matches.size());
         scope = new ArrayList<IResource>();
         initMatches = matches;
     }
@@ -79,7 +79,7 @@ public class VPGSearchTestCase extends BaseTestFramework
         for (Match m : initMatches)
         {
             IFile file = getFile((String)(m.getElement()));
-            matches.add(new VPGSearchMatch(file, m.getOffset(), m.getLength()));
+            matches.add(new SearchMatch(file, m.getOffset(), m.getLength()));
         }
     }
 
@@ -94,7 +94,7 @@ public class VPGSearchTestCase extends BaseTestFramework
         }
     }
 
-    private SearchResult runQuery(VPGSearchQuery job)
+    private SearchResult runQuery(FortranSearchQuery job)
     {
         final ISearchResult result[]= new ISearchResult[1];
 
@@ -126,7 +126,7 @@ public class VPGSearchTestCase extends BaseTestFramework
 
         String patternDesc = searchString.trim();
         String patternRegex = isRegex ? patternDesc : SearchPage.convertGlobToRegex(patternDesc);
-        VPGSearchQuery job = new VPGSearchQuery(scope, "Scope description", patternDesc, patternRegex, searchFlags);
+        FortranSearchQuery job = new FortranSearchQuery(scope, "Scope description", patternDesc, patternRegex, searchFlags);
 
         SearchResult res = runQuery(job);
         int count = 0;
@@ -134,7 +134,7 @@ public class VPGSearchTestCase extends BaseTestFramework
         {
             for (Match m : res.getMatches(obj))
             {
-                if (matches.contains((VPGSearchMatch)m))
+                if (matches.contains((SearchMatch)m))
                 {
                     count++;
                 }

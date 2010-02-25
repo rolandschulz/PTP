@@ -21,16 +21,39 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.actions.FortranEditorASTActionDelegate;
 import org.eclipse.photran.internal.ui.actions.OpenDeclaration;
-import org.eclipse.photran.internal.ui.search.ReferenceSearch.SearchScope;
+import org.eclipse.photran.internal.ui.search.FortranFindReferencesSearchQuery.SearchScope;
 
 /**
  * Based on {@link OpenDeclaration}
  * 
  * @author ?
  */
-public abstract class FortranFindReferencesActionDelegate
-    extends FortranEditorASTActionDelegate
+public abstract class FortranFindReferencesActionDelegate extends FortranEditorASTActionDelegate
 {
+    public static class FileActionDelegate extends FortranFindReferencesActionDelegate
+    {
+        @Override protected SearchScope getSearchScope()
+        {
+            return SearchScope.FILE;
+        }
+    }
+    
+    public static class ProjectActionDelegate extends FortranFindReferencesActionDelegate
+    {
+        @Override protected SearchScope getSearchScope()
+        {
+            return SearchScope.PROJECT;
+        }
+    }
+    
+    public static class WorkspaceActionDelegate extends FortranFindReferencesActionDelegate
+    {
+        @Override protected SearchScope getSearchScope()
+        {
+            return SearchScope.WORKSPACE;
+        }
+    }
+    
     public void run(IProgressMonitor progressMonitor)
         throws InvocationTargetException, InterruptedException
     {
@@ -57,7 +80,7 @@ public abstract class FortranFindReferencesActionDelegate
 			
 			// This may be null if the user cancelled the selection dialog.
 			if (selectedDef != null)
-				ReferenceSearch.searchForReference(selectedDef, getSearchScope(), token.getIFile());
+				FortranFindReferencesSearchQuery.searchForReference(selectedDef, getSearchScope(), token.getIFile());
         }
         catch (Exception e)
         {
