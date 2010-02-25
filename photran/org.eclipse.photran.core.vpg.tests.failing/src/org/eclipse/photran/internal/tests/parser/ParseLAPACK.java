@@ -17,10 +17,10 @@ import junit.framework.Test;
 
 import org.eclipse.photran.internal.tests.FailingParserTestSuite;
 
-public class ParseProjectConfidentialWaltBrainerdFortran2003
+public class ParseLAPACK
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.walt-brainerd-fortran2003", false, false) {};
+        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.lapack", true, false) {};
     }
 }

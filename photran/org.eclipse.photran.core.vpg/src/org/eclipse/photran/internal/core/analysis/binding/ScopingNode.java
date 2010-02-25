@@ -234,8 +234,7 @@ public abstract class ScopingNode extends ASTNode
     /*
      * According to a profile obtained (6/24/09) by running
      *     org.eclipse.photran.cmdline/vpgstats-profiled
-     * on
-     *     org.eclipse.photran-projects.confidential.fmlib
+     * on FMLIB (one of the projects in UIUC's SVN repo),
      * caching the representative token for a scope reduced
      * the Binder's maximal times as follows:
      *                            BEFORE============   AFTER============

@@ -17,7 +17,7 @@ import junit.framework.Test;
 
 import org.eclipse.photran.internal.tests.FailingParserTestSuite;
 
-public class ParseProjectConfidentialPOP
+public class ParsePOP
 {
     public static Test suite() throws FileNotFoundException, IOException
     {

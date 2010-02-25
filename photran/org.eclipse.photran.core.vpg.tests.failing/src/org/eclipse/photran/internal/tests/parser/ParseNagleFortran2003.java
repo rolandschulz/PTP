@@ -17,10 +17,10 @@ import junit.framework.Test;
 
 import org.eclipse.photran.internal.tests.FailingParserTestSuite;
 
-public class ParseProjectConfidentialFromTheWWW
+public class ParseNagleFortran2003
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.from-the-www", false, false) {};
+        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.nagle-fortran2003", false, false) {};
     }
 }
