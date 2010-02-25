@@ -1,3 +1,8 @@
+
+*** See the Photran Developer's Guide for more information on the ***
+*** WikiToEclipse project and Photran's help plug-in.             ***
+
+====================================================================================================
 From: "Matt Scarpino" <matt.scarpino@eclipseengineer.com>
 To: "jeffrey Overbey" <overbey2@illinois.edu>
 Subject: Photran help

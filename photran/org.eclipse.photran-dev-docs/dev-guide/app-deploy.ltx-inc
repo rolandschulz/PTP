@@ -12,6 +12,9 @@ number, updating the Web site, etc.}
       correct, screenshots and step-by-step instructions are up-to-date, and
       UI labels are up-to-date (e.g., if the name of a refactoring changed).
 
+\item Regenerate the org.eclipse.photran.doc.user plug-in from the wiki.
+      See Appendix~\ref{app:help} for details.
+
 \item Update the plug-in version numbers in all projects.  Note that the URL for
       the release notes shown when the user first installs a new version of Photran
       is determined by the version of the org.eclipse.photran.ui plug-in (see

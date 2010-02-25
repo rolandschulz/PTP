@@ -1,0 +1,49 @@
+% Regenerating the Help Plug-in
+
+Photran's User's Guide and Advanced Features Guide are maintained on the Eclipse wiki (see the
+``Documentation'' link on Photran's Web site.)  However, to accommodate users without Internet
+access, the documentation is also available in Eclipse Online Help; Photran supplies this via
+the org.eclipse.photran.doc.user plug-in.
+
+The content in the org.eclipse.photran.doc.user plug-in is \textit{automatically generated} from
+the markup on the Eclipse wiki.  Before a release, assuming the wiki was edited, this content
+must be regenerated from the revised wiki markup according to the following procedure.
+
+\begin{enumerate}
+
+\item Check out the WikiToEclipse project from Subversion.  See Appendix~\ref{app:uiuc}.
+
+\item Go to the Eclipse wiki, and ``Edit'' the Photran User's Guide.  Copy the wiki markup into
+      \textit{input/basic} in the WikiToEclipse project.  Similarly, edit the Advanced Features
+      Guide, and copy the wiki markup into \textit{input/advanced}.  (These are both ordinary
+      text files.)
+
+\item If there are any new images, copy them into \textit{input/images} in the WikiToEclipse
+      project.  It is perhaps easiest to view the ``Printable'' version of each wiki page in
+      Firefox, and save it as ``Web Page (complete)'' (this will save it and all referenced
+      images); however, this will also include some irrelevant images from the Eclipse Wiki
+      (e.g., the ``search'' icon) and some CSS and JavaScript, so those should be deleted.
+
+\item Edit the Main class in the WikiToEclipse project.  Make sure the plug-in version number
+      is correct.
+
+\item Run the Main class.  If the parser fails, there is probably a problem with the wiki
+      markup (e.g., unclosed double-quotes for italics).
+
+\item Overwrite the contents of the org.eclipse.photran.doc.user project from CVS with the
+      generated content.  This can be done, for example, by using rsync as follows (don't
+      forget the final slashes on the end of the doc.user directory names!).
+      {\footnotesize
+      \begin{verbatim}
+      rsync -av --delete --cvs-exclude \
+          /your/workspace/WikiToEclipse/output/org.eclipse.photran.doc.user/ \
+          /your/workspace/org.eclipse.photran.doc.user/
+      \end{verbatim}}
+
+\item Proofread the generated content by launching a runtime workspace and viewing the online
+      help.  A common problem is HTML tags appearing literally in the output because, for
+      example, the tool converted ``$<$ol$>$'' to ``\&lt;ol\&gt;''.  If this happens, modify the
+      WikiToEclipse class \textit{MultiFileConverter.java} (around line 300) to make the
+      appropriate replacement.
+
+\end{enumerate}
