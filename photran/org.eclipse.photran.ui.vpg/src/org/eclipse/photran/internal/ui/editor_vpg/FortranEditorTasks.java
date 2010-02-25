@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
@@ -20,6 +21,7 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.rephraserengine.core.vpg.eclipse.VPGJob;
 
@@ -154,9 +156,13 @@ public class FortranEditorTasks
                             FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                         }
                     }
+                    catch (SyntaxException e)
+                    {
+                        // Ignore syntax errors
+                    }
                     catch (Throwable e)
                     {
-                        e.printStackTrace();
+                        FortranUIPlugin.log("Error running AST tasks", e);
                     }
 
                     dispatchASTTasksJob = null;
