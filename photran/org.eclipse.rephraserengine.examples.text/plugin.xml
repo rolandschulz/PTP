@@ -15,4 +15,12 @@
       </group>
    </extension>
 
+   <!-- Associate the "(Debugging)" action set with the workbench text editor -->
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation targetID="org.eclipse.rephraserengine.ui.DebugActionSet">
+         <part id="org.eclipse.ui.DefaultTextEditor"/>
+      </actionSetPartAssociation>
+   </extension>
+
 </plugin>
