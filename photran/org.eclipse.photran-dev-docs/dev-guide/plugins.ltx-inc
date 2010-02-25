@@ -182,6 +182,7 @@ workbench (sourced in org.eclipse.rephraserengine.doc.isv); this provides more i
 these plug-ins.  Starred plug-ins are not distributed to end users.
 
 \begin{itemize}
+\item \textbf{org.eclipse.rephraserengine-feature}
 \item \textbf{org.eclipse.rephraserengine-support}*
 \item \textbf{org.eclipse.rephraserengine.core}
 \item \textbf{org.eclipse.rephraserengine.core.refactoring}
@@ -189,6 +190,8 @@ these plug-ins.  Starred plug-ins are not distributed to end users.
 \item \textbf{org.eclipse.rephraserengine.core.vpg.tests}*
 \item \textbf{org.eclipse.rephraserengine.doc.isv}*
 \item \textbf{org.eclipse.rephraserengine.examples.text}*
+\item \textbf{org.eclipse.rephraserengine.examples.testing}*
+\item \textbf{org.eclipse.rephraserengine.testing.junit3}*
 \item \textbf{org.eclipse.rephraserengine.ui}
 \item \textbf{org.eclipse.rephraserengine.ui.refactoring}
 \item \textbf{org.eclipse.rephraserengine.ui.vpg}
