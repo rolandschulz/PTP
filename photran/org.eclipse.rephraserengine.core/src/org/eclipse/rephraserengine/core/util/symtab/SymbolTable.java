@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.util.symtab;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.rephraserengine.core.util.TwoKeyHashMap;
-
-
 
 /**
  * A simple, generic symbol table with nested scopes.
@@ -89,10 +90,16 @@ public class SymbolTable<N, S>
      */
     protected final TwoKeyHashMap<N, String, S> entries;
     
+    /**
+     * Named scopes contained in this symbol table.  Maps a scope name to a symbol table.
+     */
+    protected final Map<String, SymbolTable<N, S>> namedScopes;
+    
     public SymbolTable()
     {
         this.settings = new Settings<S>();
         this.entries = new TwoKeyHashMap<N, String, S>();
+        this.namedScopes = new HashMap<String, SymbolTable<N, S>>();
         this.parent = null;
     }
     
@@ -102,6 +109,7 @@ public class SymbolTable<N, S>
         
         this.settings = settings;
         this.entries = new TwoKeyHashMap<N, String, S>();
+        this.namedScopes = new HashMap<String, SymbolTable<N, S>>();
         this.parent = null;
     }
     
@@ -111,6 +119,7 @@ public class SymbolTable<N, S>
         
         this.settings = parent.settings;
         this.entries = new TwoKeyHashMap<N, String, S>();
+        this.namedScopes = new HashMap<String, SymbolTable<N, S>>();
         this.parent = parent;
     }
     
@@ -232,6 +241,22 @@ public class SymbolTable<N, S>
     }
     
     /**
+     * Returns a new symbol table for a child scope of this scope (i.e., a nested
+     * scope).
+     * <p>
+     * Note that this does not modify this {@link SymbolTable} object; the correct
+     * usage is <code>symtab = symtab.enterScope()</code>.
+     * 
+     * @return a new symbol table for a child scope of this scope
+     */
+    public SymbolTable<N, S> enterNamedScope(String name)
+    {
+        SymbolTable<N, S> namedScope = enterScope();
+        namedScopes.put(name, namedScope);
+        return namedScope;
+    }
+    
+    /**
      * Returns the symbol table for the parent scope of this scope (i.e., the next
      * outermost scope).
      * <p>
@@ -267,18 +292,29 @@ public class SymbolTable<N, S>
     @Override public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        
-        sb.append("\n\n================= SYMBOL TABLE =================\n");
+
         for (N namespace : entries.keySet())
         {
             sb.append(namespace.toString().toUpperCase() + " NAMESPACE:\n");
             
             for (String name : entries.getAllEntriesFor(namespace).keySet())
-                sb.append(name + " -> " + entries.getEntry(namespace, name) + "\n");
+                sb.append("    " + name + " -> " + entries.getEntry(namespace, name) + "\n");
             
             sb.append("\n");
         }
-        
+
+        if (!namedScopes.isEmpty())
+        {
+            sb.append("This symbol table contains the following named scopes:\n");
+            
+            for (String name : namedScopes.keySet())
+            {
+                sb.append("    ");
+                sb.append(name);
+                sb.append("\n");
+            }
+        }
+
         if (parent != null)
         {
             sb.append("\n\n==================== PARENT ====================\n");
