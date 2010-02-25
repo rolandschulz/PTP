@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Tasks" link_to="toc.xml#tasks">
+    <topic label="Contributing the VPG &quot;(Debugging)&quot; Action Set to a Perspective" href="html/tasks/contribute-vpg-actions-perspective.html" />
+    <topic label="Contributing the VPG &quot;(Debugging)&quot; Action Set to an Editor" href="html/tasks/contribute-vpg-actions-editor.html" />
+</toc>
