@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Compiling Fortran Programs</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><p>To compile a project, Photran generally executes whatever 
+<b>make
+</b> command is on your system path.  (On most systems, this will invoke GNU Make.)  As noted above, when you create a project, you can decide if Photran will auto-generate a Makefile that uses GNU Fortran, Intel Fortran, or IBM XL Fortran, or you can elect to hand-write your own Makefile.
+</p><ul><li>To use an automatically generated Makefile, choose &quot;Executable (Gnu Fortran on XYZ)&quot; from the Project type menu, where XYZ is your platform (Windows, Linux, or Mac OS X).  There are similar options available for Intel Fortran and IBM XL Fortran.
+</li><li>To create a project using a custom Makefile, in the project type selection box, expand the Makefile Project folder, and select Empty Project.
+</li></ul><p><center>
+<img src="../images/Photran-project-type.PNG" alt="Choosing a Fortran project type"></img></center>
+</p><h1> Building Projects 
+</h1><p>Compiling Fortran projects is identical to compiling C/C++ Projects.
+<b>For more information on building projects,
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+<b>C/C++ Development User Guide &gt; Concepts &gt; Build &gt; Building C/C++ Projects.
+</b> 
+<a href="http://help.eclipse.org/ganymede/topic/org.eclipse.cdt.doc.user/concepts/cdt_c_build_over.htm?resultof=%22%63%6f%6d%70%69%6c%69%6e%67%22%20%22%63%6f%6d%70%69%6c%22%20%22%63%2f%43%2b%2b%22%20">http://help.eclipse.org/ganymede/topic/org.eclipse.cdt.doc.user/concepts/cdt_c_build_over.htm?resultof=%22%63%6f%6d%70%69%6c%69%6e%67%22%20%22%63%6f%6d%70%69%6c%22%20%22%63%2f%43%2b%2b%22%20</a></p><h1> Setting Make Targets  
+</h1><p>Setting make targets for Fortran programs is also identical to setting make targets for C/C++ programs.
+<b>For more information on make targets,
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+<b>C/C++ Development User Guide &gt; Tasks &gt; Building projects &gt; Creating a make target.
+</b> 
+<a href="http://help.eclipse.org/ganymede/topic/org.eclipse.cdt.doc.user/tasks/cdt_t_addmaketarget.htm?resultof=%22%6d%61%6b%65%22%20%22%74%61%72%67%65%74%73%22%20%22%74%61%72%67%65%74%22%20">http://help.eclipse.org/ganymede/topic/org.eclipse.cdt.doc.user/tasks/cdt_t_addmaketarget.htm?resultof=%22%6d%61%6b%65%22%20%22%74%61%72%67%65%74%73%22%20%22%74%61%72%67%65%74%22%20</a></p><h1> Marking Error Messages from Your Fortran Compiler (Error Parsers)  
+</h1><p>When you build (compile) your Fortran program, the output from your Fortran compiler (including any error messages) will be displayed in the Console view.  However, for many compilers, Photran can &quot;recognize&quot; error messages, placing the problem description in the Problems view and marking the corresponding line in the source file with a red X icon.
+To do this, you must have the correct 
+<i>error parsers
+</i> selected in your Fortran project's build settings. To modify these settings, right-click on your Fortran project, go to Properties &gt; Fortran Build &gt; Settings and select the Error Parsers tab. A list of error parsers is displayed; select the one(s) corresponding to the Fortran compiler(s) you are using and click OK.
+<center>
+<img src="../images/Photran-fortran-error-parsers.PNG" alt="Fortran Error Parsers"></img></center>
+</p><h1> Recognizing Executables (Binary Parsers) 
+</h1><p>In order to run (execute) your Fortran application, you will need to tell Eclipse which Binary Parser(s) to use for your project. This can be done in the project properties (Right-click project &gt; Properties &gt; Fortran Build &gt; Settings &gt; Binary Parsers Tab).
+Which binary parser you want to use will depend on the operating system environment you are working in. For example, the default choice is the Elf Parser which is for Linux environments. Windows users would need to deselect the Elf Parser and select the PE Windows Parser and/or the Cygwin PE Parser. Mac users should choose the Mach-O parser.
+<center>
+<img src="../images/Photran-fortran-binary-parsers.PNG" alt="Fortran Binary Parsers"></img><br>
+<img src="../images/Photran-run-as-local-fortran.png" alt="Run as Local Fortran Application"></img></center>
+</p></div>
+</body>
+</html>

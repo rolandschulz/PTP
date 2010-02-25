@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Search and Navigation</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><h1>Open Declaration
+</h1><p>The <b>Open Declaration</b> command allows you to quickly find the declaration of a particular variable or subprogram.  In the Fortran editor, click on (or select) an identifier. Then either
+</p><ul><li>click on the <b>Navigate</b> menu, and select <b>Open Declaration</b>, or
+</li><li>right-click on the identifier, and, and select <b>Open Declaration</b>, or
+</li><li>press the <b>F3</b> key on your keyboard.
+</li></ul><p>This feature is particularly useful when the declaration is in another file.  For example, if your program contains a &lt;tt&gt;CALL&lt;/tt&gt; statement which invokes a subroutine imported from a module in another file, invoking <b>Open Declaration</b> on the subroutine name in the &lt;tt&gt;CALL&lt;/tt&gt; statement will open the module in a new editor, and the cursor will be located on the declaration of that subroutine.
+</p><h1>Fortran Search
+</h1><p>Fortran Search is a syntax-aware, multi-file search tool. Unlike textual searches, Fortran Search &quot;understands&quot; Fortran programs.  It is used to search for a particular type of declaration (e.g., only modules, or only subroutines), or it can find all of the uses of a particular variable or subroutine. It also allows to you to limit the scope of the search (e.g., it can search every file in the workspace, or just a particular project).
+In order to use Fortran Search, click on the <b>Search</b> menu and select <b>Fortran...</b>
+<center>
+<img src="../images/OpenSearch.jpg"></center><br>
+This will open the Eclipse Search dialog, and the Fortran tab will be active.  There, you can specify several things:
+</p><ul><li>The <b>Search for</b> frame allows you to specify whether it should search for subroutines, functions, modules, variables, etc.
+</li><li>The <b>Scope</b> frame allows you to specify what file(s) will be searched.
+</li><li>The <b>Limit to</b> frame allows you to specify whether you want to find declarations, references, or both.
+</li></ul><p><center>
+<img src="../images/SearchDeclarations.jpg"></center>
+<center><small>Notice that only the declarations of variables/functions were found. Also note the use of the wild-card character(?) in the search box</small></center><br>
+</p><h2>Wildcards
+</h2><p>Wildcards are special symbols used for pattern matching. For more information, click on Help &gt; Help Contents in Eclipse, and navigate to Workbench User Guide &gt; Reference &gt; User interface information &gt; Search.<br>
+</p><ul><li><b>*</b> - represents any number of any symbols. For example, a search for <b>*d</b> would match <b>bad, rescued, d, assembled,</b> etc.
+</li><li><b>?</b> - represents any <b>one</b> single character. For example, a search for <b>?ad</b> would match <b>bad, mad, sad, dad, zad,</b> etc.<br><br>
+</li></ul><p><b>Regular expressions</b> are an even more advanced pattern matching languages.  For more information, click on Help &gt; Help Contents in Eclipse and navigating to Workbench User Guide &gt; Getting started &gt; Basic tutorial &gt; Searching
+</p></div>
+</body>
+</html>

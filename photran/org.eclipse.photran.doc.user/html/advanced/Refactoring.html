@@ -1,0 +1,452 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Refactoring</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><h1>Introduction
+</h1><h2>What is Refactoring?
+</h2><p><i>Refactorings
+</i> are changes to a program that improve its
+internal design but do not change its behavior.  These
+include minor, coding style changes (like using IMPLICIT
+NONE statements), code readability improvements
+(like replacing a variable named N with one called
+NUM_POINTS), performance improvements (like
+interchanging loops under certain conditions), and
+even larger-scale design changes (like moving a
+procedure from one module to another).
+Although these types of changes can be done by hand,
+making them is often tedious and error-prone.  Photran
+<i>automates</i> many such refactorings.  For example,
+the Refactor &gt; Rename command can automatically
+locate the declaration(s) and uses of a particular subroutine,
+and change its name in all of those locations.  It is &quot;smart,&quot;
+too; if there is a subroutine named <i>d</i> and a variable
+named <i>d</i> in a different context, it won't confuse the
+two.  Moreover, before making such a change, Photran
+will attempt to <i>verify</i> that the change is safe to make.
+For example, a subroutine <i>A</i> cannot be renamed to
+<i>B</i> if there is already a variable named <i>B</i> in a
+context where that subroutine is called.
+For more information on refactoring, see
+M. Fowler, <i>Refactoring: Improving the Design of Existing Code,</i>
+Addison-Wesley, 1999.
+</p><h2>Refactoring in Photran
+</h2><p>Most refactorings can be accessed via the Refactor menu in the
+menu bar, as described below.  However, the most common
+refactorings also have hotkeys (e.g., Alt+Shift+R for Rename;
+hotkeys are listed in the Refactoring menu next to each command).
+Also, most refactorings can be accessed by right-clicking in an
+editor and choosing Refactor from the popup menu.
+Some refactorings (such as Introduce Implicit None and
+Replace Obsolete Operators) can be applied to several files
+at once.  As described below, this involves selecting one or more
+files in the Fortran Projects view, then right-clicking on any of
+the selected filenames and choosing Refactor from the popup
+menu.
+<ul>
+<li> Clicking on a filename in the Fortran Projects view selects
+that file (and only that file).
+<li> Ctrl+click (Command+click on Mac OS X) can be used
+to select or deselect additional files.
+<li> To select a range of files, click on one filename, and
+Shift+click on a later filename;
+those files and all of the files in between will be selected as
+well.
+</ul>
+<i><b>Caution:</b> <b>Photran can only refactor free-format Fortran
+source code.  It is not possible to refactor fixed-form code.</b>
+Make sure that only free-form Fortran files
+are selected.</i>  The Refactor menu may not be available if any
+of the files are fixed-form or non-Fortran files.
+</p><h1>Rename
+</h1><p><ul>
+<li><b>Description:</b> Rename is essentially a &quot;smart&quot;
+search and replace: It allows you to change the name of a variable,
+subprogram, etc.  It correctly observes scoping and shadowing rules
+can also rename subprograms and module entities across files.
+<li><b>Applies To:</b>
+<ol>
+<li> Local variables<sup>1,2</sup>
+<li> Subprograms<sup>3</sup> (including external and interface declarations)
+<li> Derived types
+<li> Module entities (variables and subprograms)
+<li> Main programs
+<li> Namelists
+<li> Common blocks
+<li> Block data subprograms
+</ol>
+<li><b>Operation:</b>
+<ol>
+<li> Click on the name of a local variable, subprogram, etc.
+<li> Click Refactor &gt; Rename...  The Rename dialog will appear.<br>
+<center>
+<img src="../images/Photran-rename-dialog.png" alt="Rename dialog"></img></center>
+<li> Enter a new name for the variable/subprogram/etc.
+<li> If you are renaming an external subprogram or a subprogram
+declared in an interface block, you may want to (un)check the
+box labeled <i>Match external subprograms with interfaces and
+external declarations.</i>  If this is checked, the refactoring
+will attempt to find <i>all</i> external subprograms, EXTERNAL
+statements, and subprogram declarations in INTERFACE blocks that
+have the given name, and they will all be renamed.
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-rename-1.png" alt="Simple example of the Rename refactoring"></img></center>
+</ul>
+<p>
+<small>1. Dummy subprogram arguments cannot be renamed</small><br>
+<small>2. Components of derived types cannot be renamed</small><br>
+<small>3. Intrinsic subprograms and type-bound procedures (Fortran 2003) cannot be renamed</small>
+</p>
+</p><h1>Encapsulate variable
+</h1><p><ul>
+<li><b>Description:</b> Encapsulate variable creates getter and setter methods for the selected variable
+in the module where it is defined and changes variable's visibility to <b>private</b>.
+It also replaces all uses of that variable in all files to use getter and setter method calls<sup>1</sup>.
+<li><b>Applies To:</b>
+<ol>
+<li> Variables defined in the module.
+<li> Variables of all basic as well as user-defined types
+</ol>
+<li><b>Does Not Apply To:</b>
+<ol>
+<li> Arrays
+<li> Variables that are not defined in a module
+<li> Parameters (i.e. <b>integer, parameter :: CANNOT_ENCAPSULATE</b>)
+<li> Pointers (i.e. <b>real, pointer :: CANNOT_ENCAPSULATE</b>)
+<li> Targes (i.e. <b>integer, target :: CANNOT_ENCAPSULATE</b>)
+</ol>
+<li><b>Operation:</b>
+<ol>
+<li> Click on or select the name of variable you want to encapsulate.
+<li> Click Refactor &gt; Encapsulate Variable. The Encapsulate Variable dialog will appear.<br>
+<center>
+<img src="../images/GetterSetterNames.jpg" alt="Getter and setter name menu for encapsulating variable <b>temp</b>"></img></center>
+<li> Enter names for getter and setter methods. You will be warned if the names that you want to assign to your getter and setter methods will be conflicting with some other identifier in any of the involved files.
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/EncapsulateVariablesPart1.jpg" alt="Simple example of Encapsulate Variable refactoring<b>temp</b>"></img></center>
+<br>
+<center>
+<img src="../images/EncapsulateVariablesPart2.jpg" alt="Simple example of Encapsulate Variable refactoring<b>temp</b>"></img></center>
+</ul>
+<p>
+<small>1. If a variable is used as a parameter to a function/subroutine call, and that function changes
+the value of the variable as a side-effect, that change will not be preserved.
+</small><br>
+</p>
+</p><h1>Interchange loops
+</h1><p><ul>
+<li><b>Description:</b> Swaps inner and outer loops of the selected nested do-loop<sup>1</sup>. This refactoring merely
+switches the inner and outer do-headers. It will not make any changes to the body of the loop.
+<li><b>Applies To:</b> Selected nested do-loop
+<li><b>Operation:</b>
+<ol>
+<li> Select the nested loops you wish to interchange
+<li> Click Refactor &gt; Interchange Loops. The Interchange loops dialog will appear.<br>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/InterchangeLoops.png" alt="Simple example of Interchange Loops refactoring"></img></center>
+</ul>
+<p>
+<small>1. In order for refactoring to work correctly, there must be no statements
+before the second loop. If such statements exist, correctness of the
+refactoring is not guaranteed.
+</small>
+</p>
+</p><h1>Introduce Implicit None
+</h1><p><ul>
+<li><b>Description:</b> Adds IMPLICIT NONE statements to a file
+and adds explicit declarations for all variables that were previously declared implicitly.
+<li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
+<li><b>Operation:</b>
+<ol>
+<li> This is a multiple-file refactoring.
+<ul>
+<li> <i>To Introduce Implicit None in a single file,</i>
+open the file in the editor and choose
+Refactor &gt; Introduce Implicit None
+from the menu bar.
+<li> <i>To Introduce Implicit None in multiple files,</i>
+select the files in the Fortran Projects view,
+right-click on any of the selected filenames,
+and choose
+Refactor &gt; Introduce Implicit None
+from the popup menu.
+</ul>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-intro-implicit-1.png" alt="Example of the Introduce Implicit None refactoring"></img></center>
+</ul>
+</p><h1>Move Saved Variables to Common Block
+</h1><p><ul>
+<li><b>Description:</b> Move Saved Variables to Common Block creates a common block for all &quot;saved&quot; variables of a subprogram. Declarations of these variables in the subprogram are transformed such that they are no longer &quot;saved&quot;. The generated common block is declared both in the main PROGRAM and in the affected subprogram. Variables placed in the common block are renamed such that they do not conflict or shadow other variables. The current implementation assumes that the subprogram is in the CONTAINS section of the PROGRAM.
+<li><b>Applies To:</b> Subprograms.
+<li><b>Operation:</b>
+<ol>
+<li> Click on the declaration statement of a subprogram.
+<li> Click Refactor &gt; Move Saved Variables to Common Block.
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/MoveSavedToCommonBlock.PNG" alt="Example of the Introduce Implicit None refactoring"></img></center>
+</ul>
+</p><h1>Replace Obsolete Operators
+</h1><p><ul>
+<li><b>Description:</b> Replace Obsolete Operators replaces all uses of old-style
+comparison operators (such as .LT. and .EQ.) with their newer equivalents
+(symbols such as &lt; and ==).
+and adds explicit declarations for all variables that were previously declared implicitly.
+<li><b>Applies To:</b> All uses of the following operators in one or more files:
+.LT. .LE. .EQ. .NE. .GT. .GE.
+<li><b>Operation:</b>
+<ol>
+<li> This is a multiple-file refactoring.
+<ul>
+<li> <i>To Replace Obsolete Operators in a single file,</i>
+open the file in the editor and choose
+Refactor &gt; Replace Obsolete Operators
+from the menu bar.
+<li> <i>To Replace Obsolete Operators in multiple files,</i>
+select the files in the Fortran Projects view,
+right-click on any of the selected filenames,
+and choose
+Refactor &gt; Replace Obsolete Operators
+from the popup menu.
+</ul>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-replace-obsolete-1.png" alt="Example of the Replace Obsolete Operators refactoring"></img></center>
+</ul>
+</p><h1>Standardize Statements
+</h1><p><ul>
+<li><b>Description:</b> Standardize Statements rewrites all variables declarations, transforming
+them into simple statements, always containing the two points (::) that are characteristic of Fortran,
+making the code more readable.
+<li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
+<li><b>Operation:</b>
+<ol>
+<li> This is a multiple-file refactoring.
+<ul>
+<li> <i>To Standardize Statements in a single file,</i>
+open the file in the editor and choose
+Refactor &gt; Standardize Statements
+from the menu bar.
+<li> <i>To Standardize Statements in multiple files,</i>
+select the files in the Fortran Projects view,
+right-click on any of the selected filenames,
+and choose
+Refactor &gt; Standardize Statements
+from the popup menu.
+</ul>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-Standardize-Statements.png" alt="Example of the Standardize Statements refactoring"></img></center>
+</ul>
+</p><h1>Remove Unused Variables
+</h1><p><ul>
+<li><b>Description:</b> Remove Unused Variables removes all unused variables in Fortran code,
+making it more clean and readable.
+<li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
+<li><b>Operation:</b>
+<ol>
+<li> This is a multiple-file refactoring.
+<ul>
+<li> <i>To Remove Unused Variables in a single file,</i>
+open the file in the editor and choose
+Refactor &gt; Remove Unused Variables
+from the menu bar.
+<li> <i>To Remove Unused Variables in multiple files,</i>
+select the files in the Fortran Projects view,
+right-click on any of the selected filenames,
+and choose
+Refactor &gt; Remove Unused Variables
+from the popup menu.
+</ul>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-Remove-Unused-Variables.png" alt="Example of the Remove Unused Variables refactoring"></img></center>
+</ul>
+</p><h1>Data To Parameter
+</h1><p><ul>
+<li><b>Description:</b> Data To Parameter transform variables declared as data in variables declared with
+parameter attribute, when these are intended to be constants in source code. This refactoring is generally
+used when developers who want to use constants can confuse the data statement with the attribute parameter,
+which is the most suitable in these cases. Making the substitution can generate performance gains, because
+it decreases the access to variables.
+<li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
+<li><b>Operation:</b>
+<ol>
+<li> This is a multiple-file refactoring.
+<ul>
+<li> <i>To transform variables declared as data in variables declared with parameter attribute in a single file,</i>
+open the file in the editor and choose
+Refactor &gt; Data To Parameter
+from the menu bar.
+<li> <i>To transform variables declared as data in variables declared with parameter attribute in multiple files,</i>
+select the files in the Fortran Projects view,
+right-click on any of the selected filenames,
+and choose
+Refactor &gt; Data To Parameter
+from the popup menu.
+</ul>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-Data-To-Parameter.png" alt="Example of the Data To Parameter refactoring"></img></center>
+</ul>
+</p><h1>Extract Procedure
+</h1><p><ul>
+<li><b>Description:</b> Extract Procedure removes a sequence of statements from a procedure,
+places them into a new subroutine, and replaces the original statements with a call to that
+subroutine.  Any local variables used by those statements will be passed as parameters to
+the new procedure.  This refactoring is generally used to make long procedures shorter.
+<li><b>Applies To:</b> A sequence of one or more action statements inside a procedure or main program.
+<li><b>Operation:</b>
+<ol>
+<li> Select a sequence of one or more action statements in the editor.  Be sure to include the
+newline following the last statement in the selection.
+<li> Click Refactor &gt; Extract Procedure...  The Extract Procedure dialog will appear.<br>
+<center>
+<img src="../images/Photran-extract-proc-dialog.png" alt="Extract Procedure dialog"></img></center>
+<li> Enter a name for the new procedure that will be created.
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example:</b><br>
+<center>
+<img src="../images/Photran-extract-proc-1.png" alt="Simple example of the Extract Procedure refactoring"></img></center>
+</ul>
+</p><h1>Extract Local Variable
+</h1><p><ul>
+<li><b>Description:</b> Extract Local Variable removes a subexpression from a larger expression
+and assigns that subexpression to a local variable, replacing the original subexpression
+with a reference to that variable.  This refactoring is usually used to eliminate duplicated
+subexpressions or to introduce explanatory variable names into complex expressions.
+<li><b>Caveats:</b> The refactoring will only be allowed to proceed if extracting the
+subexpression will preserve the associativity and precedence of the original expression.
+This refactoring assumes that the extracted expression has no side effects; it does
+<b>not
+</b> check whether moving the computation of the extracted expression will change the
+behavior of the program.
+<li><b>Operation:</b>
+<ol>
+<li> Select an expression in the editor.
+<li> Click Refactor &gt; Extract Local Variable...
+The Extract Local Variable dialog will appear.
+<li> Enter the type and name for the new local variable that will be created.
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+</ul>
+</p><h1>Canonicalize Keyword Capitalization
+</h1><p><ul>
+<li><b>Description:</b> Makes all applicable keywords the same case throughout the selected Fortran
+program files.
+<li><b>Applies To:</b> All keywords except those listed below.
+<li><b>Does not apply to:</b>
+<ol>
+<li> Identifiers
+<li> All constants except for integer constants and real constants
+</ol>
+<li><b>Operation:</b>
+<ol>
+<li> This is a multiple-file refactoring.
+<ul>
+<li> <i>To Canonicalize Keyword Capitalization in a single file,</i>
+open the file in the editor and choose Refactor &gt; Canonicalize
+Keyword Capitalization from the menu bar.
+<li> <i>To Introduce Implicit None in multiple files,</i> select the
+files in the Fortran Projects view, right-click on any of the selected filenames,
+and choose Refactor &gt; Canonicalize Keyword Capitalization from the popup menu.
+</ul>
+<li> Select Upper or Lower Case<br>
+<center>
+<img src="../images/Photran-canonicalize-keyword-cap-dialog.PNG" alt="Canonicalize keyword capitalization dialog."></img></center>
+<li> Click Preview to see what changes will be made, then click OK to apply them.
+</ol>
+<li><b>Example</b><br>
+<center>
+<img src="../images/Photran-canonicalize-keyword-cap-1.PNG" alt="Example of Canonicalize Keyword Capitalization refactoring."></img></center>
+</ul>
+</p><h1> Make COMMON Variable Names Consistent  
+</h1><ul><li><b>Description:
+</b> Fortran allows different definitions of a COMMON block to give the same variable different names.  This is confusing.  This refactoring gives the variables the same names in all definitions of the COMMON block.
+</li><li><b>Applies To:
+</b> All COMMON blocks with a valid name.
+</li><li><b>Does not apply to:
+</b> COMMON blocks with a NULL name.
+</li><li><b>Operation:
+</b><ol><li>Select the name of the COMMON block in the editor which you wish to make variable names consistent for.
+</li><li>Choose Refactor &gt; Make COMMON Variable Names Consistent form the menu bar.
+</li><li>Enter the new names which you wish to give the COMMON variables. The default new names are the original names in the selected block with &quot;_common&quot; appended.<br><center>
+<img src="../images/Photran-make-common-var-names-consist-dialog.PNG" alt="Make common var names consistent dialog"></img></center>
+</li><li>Click Preview to see what changes will be made, then click OK to apply them.
+</li></ol></li><li><b>Example
+</b><br> <center>
+<img src="../images/Photran-make-common-var-names-consist.PNG" alt="Example of Make COMMON variable names consistent refactoring."></img></center> <center>
+<img src="../images/Photran-make-common-var-names-consist-1.PNG" alt="Example of Make COMMON variable names consistent refactoring."></img></center>
+</li></ul><h1> Add ONLY Clause to USE Statement  
+</h1><ul><li><b>Description:
+</b> Creates a list of the symbols that are being used from a module, and adds it to the USE statement.
+</li><li><b>Applies To:
+</b> All modules containing public definitions.
+</li><li><b>Does not apply to:
+</b> Empty modules or modules with only private entities.
+</li><li><b>Operation:
+</b><ol><li>Select the name of the module in the USE statement you wish to add an ONLY clause to.
+</li><li>Choose Refactor &gt; Add ONLY clause to USE statement.
+</li><li>Select which module entities you wish to include in the ONLY list. Any entities in an existing ONLY list will already be selected and can be deselected to be removed.<br><center>
+<img src="../images/Photran-add-only-dialog.PNG" alt="Add ONLY to USE dialog"></img></center>
+</li><li>Click Preview to see what changes will be made, then click OK to apply them.
+</li></ol></li><li><b>Example
+</b><br> <center>
+<img src="../images/Photran-add-only-list.PNG" alt="Example of Add ONLY clause to USE statement refactoring."></img></center>
+</li></ul><h1> Minimize ONLY List  
+</h1><ul><li><b>Description:
+</b> Deletes symbols that are not being used from the ONLY list in a USE statement.
+</li><li><b>Applies To:
+</b> USE statements with an ONLY clause.
+</li><li><b>Operation:
+</b><ol><li>Select the name of the module in the USE statement you wish to minimize the ONLY list for.
+</li><li>Choose Refactor &gt; Minimized ONLY list for Selected module.
+</li><li>Click Preview to see what changes will be made, then click OK to apply them.
+</li></ol></li><li><b>Example
+</b><br> <center>
+<img src="../images/Photran-min-only-list.PNG" alt="Example of Minimize ONLY list refactoring."></img></center>
+</li></ul><h1> Make Private Entity Public  
+</h1><ul><li><b>Description:
+</b> Changes a module variable or subprogram from PRIVATE to PUBLIC visibility, and checks that it won't conflict with any existing name where that module is USEd.
+</li><li><b>Applies To:
+</b> Variables, subroutines, functions.
+</li><li><b>Does Not Apply To:
+</b> Intrinsics, Externals, Interfaces.
+</li><li><b>Operation:
+</b><ol><li>Select the name of the private entity you wish to make public.
+</li><li>Choose Refactor &gt; Make Private Entity Public.
+</li><li>Click Preview to see what changes will be made, then click OK to apply them.
+</li></ol></li><li><b>Example
+</b><br> <center>
+<img src="../images/Photran-priv-to-public.PNG" alt="Example of make private entity public refactoring."></img></center>
+</li></ul><p><br> <center>
+<img src="../images/Photran-priv-to-public2.PNG" alt="Example 2 of make private entity public refactoring."></img></center>
+</p></div>
+</body>
+</html>

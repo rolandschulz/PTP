@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Advanced Features" link_to="toc.xml#advanced" topic="html/advanced/top.html">
+   <topic label="Introduction" href="html/advanced/Introduction.html"/>
+   <topic label="Advanced Editing Features" href="html/advanced/AdvancedEditingFeatures.html"/>
+   <topic label="Search and Navigation" href="html/advanced/SearchNavigation.html"/>
+   <topic label="Refactoring" href="html/advanced/Refactoring.html"/>
+</toc>

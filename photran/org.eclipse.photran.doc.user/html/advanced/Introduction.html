@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Introduction</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><p>Photran 6.0 includes a number of sophisticated features
+that are designed to make it easier to write, modify,
+search, and maintain Fortran code.   These include
+<i>content assist,</i> which can &quot;auto-complete&quot; variable
+and function names as you type; a <i>declaration view,</i>
+which can show the leading comments for the selected
+variable or procedure; <i>Fortran Search,</i>
+which allows you to find declarations and references to
+modules, variables, procedures, etc.; and
+<i>refactorings,</i> which change your source code to
+improve its design while preserving its behavior.
+</p><h1>Enabling Advanced Features
+</h1><p><p><b>In order to use any of the advanced features described in this document,
+you must specifically enable them as described below.</b>  After you do this, Photran will
+<i>index</i> your project; that is, it will build a database of what modules, subprograms, etc.
+are declared in every file in your project.  This information will be updated incrementally every time
+you save a file.  Although this process is usually reasonably fast,
+it may become disruptive when working on very large projects, so it has been disabled by default.
+Note that the first time your project is indexed, it may take a while, because Photran must
+analyze every file in your project; after that, it will only index files that have changed
+(and files that depend on a file that has changed), so it will generally be much faster.</p>
+</p><h2>How to Enable Advanced Features
+</h2><p><ol>
+<li> Right-click on your project in the Fortran Projects view
+<li> Click on Properties
+<li> Expand Fortran General in the list on the left, and click on Analysis/Refactoring
+(see screenshot below)
+<li> Check the &quot;Enable Fortran analysis/refactoring&quot; check box
+<li> If you want to enable content assist, the Fortran Declaration view, etc.,
+check those boxes as well
+<li> You may also want to set module and include paths at this point (see below)
+<li> Click OK
+</ol>
+</p><h2>Setting Module and Include Paths
+</h2><p><p>If your source code contains INCLUDE lines or USE lines referencing modules in other files,
+Photran needs to know where to look in order to find these.  <i>It will not figure this out
+automatically.</i>  For each project in which you plan to use refactoring support,</p>
+<ol>
+<li> Right-click on your project's folder in the Fortran Projects view
+<li> Click on Properties
+<li> Expand Fortran General in the list on the left, and click on Analysis/Refactoring
+<li> List the folders in which Photran should search for INCLUDE files and modules when
+refactoring.  They will be searched in order from the first folder listed to the last.
+Subfolders are <i>not</i> searched automatically; you must include them explicitly.
+<li> Click OK
+</ol>
+<center>
+<img src="../images/Photran-refac-properties.png"></center>
+</p></div>
+</body>
+</html>

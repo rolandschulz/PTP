@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Running and Debugging Fortran Programs</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><p>To run a Fortran application, right-click the project in the Fortran Projects view, and click Run As &gt; Local Fortran Application. This will build and run the Fortran application, and output will be printed to the console.  (Remember, if you are using a custom makefile, the makefile will need to be written correctly for the project to be built.)
+If you want to manage the run configuration (for example, if you want to pass command line arguments to your Fortran application or set certain environment variables), right-click on the project in the Fortran Projects view, click Run As &gt; Run Configurations... Create a new launch configuration under Fortran Local Application (or edit an existing one) and modify the settings as needed.
+Debugging programs works similarly, except you can choose Debug As &gt; Local Fortran Application or Debug Configurations from the context menu.
+Running and debugging Fortran applications is similar to running and debugging C/C++ applications. 
+<b>For more information on running and debugging binary applications,
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+<b>C/C++ Development User Guide &gt; Tasks &gt; Running and debugging projects.
+</b> 
+<a href="http://help.eclipse.org/ganymede/topic/org.eclipse.cdt.doc.user/tasks/cdt_o_run.htm?resultof=%22%72%75%6e%6e%69%6e%67%22%20%22%72%75%6e%22%20">http://help.eclipse.org/ganymede/topic/org.eclipse.cdt.doc.user/tasks/cdt_o_run.htm?resultof=%22%72%75%6e%6e%69%6e%67%22%20%22%72%75%6e%22%20</a></p><h1> Setting Breakpoints  
+</h1><p>There are two ways to set breakpoints in the editor.
+The easiest way to set a breakpoint in the editor is to double click in the left margin (gray vertical bar) on the line at which you wish to set the breakpoint. A blue dot will appear in the margin on the line where the breakpoint is set. Double clicking again at the same location will remove the breakpoint.
+You can also set a breakpoint by right-clicking in the left margin on the line where you wish to set the breakpoint and clicking &quot;Toggle Breakpoint.&quot; The blue dot indicating the breakpoint will appear or disappear (if already set) in the left margin of the editor.
+<center>
+<img src="../images/Photran-set-breakpoint.png" alt="Setting Breakpoints"></img></center>
+When you switch to the Debug perspective, the breakpoints you set will be listed in the Breakpoints view.
+<b>For more information on debugging,
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+<b>C/C++ Development User Guide &gt; Tasks &gt; Running and debugging projects &gt; Debugging.
+</b></p><h1> Known Run/Debug Issues  
+</h1><p>When using Cygwin in Windows, debugging a program can result in a &quot;cannot find gcc source&quot; error as described in 
+<a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=280492">Bug 280492
+</a>. Note that this error does not have an effect on the running of the program. The program will still run correctly in Debug mode.
+</p><h1> Compiler-specific problems  
+</h1><h3> G95  
+</h3><p>In debug mode, using the step button to step through the code line-by-line sometimes jumps (&quot;leapfrog&quot; effect) around in the source code editor view. For example, pressing F6 (step) after a breakpoint several times, might sometimes result in a jump to line 1 and stepping again will return to the correct line in the code.
+</p><h3> gFortran  
+</h3><p>No known issues.
+</p><h3> Intel Fortran Compiler  
+</h3><p>No known issues.
+</p><h3> IBM XLF  
+</h3><p>No known issues.
+</p></div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Starting a New Project</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><p>One of the advantages (or disadvantages) of using Photran is that it does 
+<i>not
+</i> include a Fortran compiler.  Instead, it uses 
+<b>make
+</b> to compile Fortran programs.  This allows you to use any Fortran compiler you want, but it also means that a Makefile must be written which tells the 
+<b>make
+</b> program how to compile your Fortran program.
+</p><ul><li>For small, simple projects, Photran can 
+<b>auto-generate
+</b> a Makefile which will use the GNU Fortran compiler (gfortran).
+</li><li>For more complex projects, you can write a custom Makefile.
+</li></ul><p><b>For more information on project types,
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+<b>C/C++ Development User Guide &gt; Concepts &gt; CDT Projects.
+</b></p><h1> Starting a Project with an Auto-Generated Makefile  
+</h1><p>The following is a typical procedure for starting a new project using an auto-generated Makefile.  Your system must have the GNU Fortran (gfortran) compiler installed for this procedure to work.  To make sure that gfortran is installed, you can open a command prompt (Windows) or terminal window (Linux/Mac) and type &quot;gfortran&quot; (without the quotes); it should respond with &quot;gfortran: no input files&quot;.
+</p><ol><li>Click File &gt; New &gt; Fortran Project
+</li><li>Call it HelloFortran
+</li><li>Choose &quot;Executable (Gnu Fortran)&quot; from the project type list
+</li><li>Choose &quot;GCC Toolchain&quot; from the toolchain list (you may need to first uncheck the &quot;Show project types...&quot; check box at the bottom of the window before you can see this)
+</li><li>Click Next
+</li><li>Click on Advanced Settings
+</li><li>Expand C/C++ Build in the list on the left, and click on Settings
+</li><li>Click on the Binary Parsers tab. Check the appropriate parsers for your platform. If you are using Windows, check PE Windows Parser and/or Cygwin PE Parser; if you are using Linux, check Elf Parser; if you are using Mac, check Mach-O parser.
+</li><li>Click on the Error Parsers tab. Check the error parser(s) for the Fortran compiler(s) you will use.
+</li><li>Click OK
+</li><li>Click Finish
+</li><li>Click File &gt; New &gt; Source File
+</li><li>Call it hello.f90; click Finish
+</li><li>Type the standard &quot;Hello, World&quot; program shown below, and click File &gt; Save.
+</li><li>Open the Console view, and make sure &quot;make&quot; ran OK and compiled your program
+</li><li>In the Fortran Projects view, expand the Binaries entry, and click on your executable (e.g., &quot;HelloFortran.exe - 
+<a href="x86le">x86le</a>&quot;)
+</li><li>Run | Run As | Run Local Fortran Application
+</li><li>Choose GDB Debugger (Cygwin GDB Debugger if you're under Windows)
+</li><li>Check the Console view, and make sure &quot;Hello World&quot; appeared.
+</li></ol><p><br>
+<i>hello.f90:
+</i><pre>program hello
+print *, &quot;Hello World&quot;
+end program</pre>
+</p><h1> Starting a Project with a Hand-Written Makefile  
+</h1><p>The following is a typical procedure for starting a new project using a hand-written Makefile.  The following example uses the GNU Fortran (gfortran) compiler, but any Fortran compiler can be used instead.  We will assume that you are familiar with how to write a Makefile.  If not, there are plenty of resources on the Web, including a tutorial from an introductory Computer Science course at UIUC 
+<a href="http://www-courses.cs.uiuc.edu/%7Ecs225/cs225/_resources/_tutorials/makeTut.pdf">http://www-courses.cs.uiuc.edu/%7Ecs225/cs225/_resources/_tutorials/makeTut.pdf</a> and another from the University of Hawaii 
+<a href="http://www.eng.hawaii.edu/Tutor/Make/">http://www.eng.hawaii.edu/Tutor/Make/</a>... and, of course, you can always read the entire manual for GNU Make 
+<a href="http://www.gnu.org/software/make/manual/make.html">http://www.gnu.org/software/make/manual/make.html</a>.
+</p><ol><li>Click File &gt; New &gt; Fortran Project
+</li><li>Call it HelloFortran
+</li><li>Expand &quot;Makefile project&quot; in the project type list (it has a folder icon), and choose &quot;Empty Project&quot;
+</li><li>Select &quot;-- Other Toolchain --&quot; in the toolchain list in the right-hand column, and click Next
+</li><li>Click on Advanced Settings
+</li><li>Expand C/C++ Build in the list on the left, and click on Settings
+</li><li>Click on the Binary Parsers tab.&nbsp; Check the appropriate parsers for your platform. If you are using Windows, check PE Windows Parser and/or Cygwin PE Parser; if you are using Linux, check Elf Parser; if you are using Mac, check Mach-O parser.
+</li><li>Click on the Error Parsers tab. Check the error parser(s) for the Fortran compiler(s) you will use.
+</li><li>Click OK
+</li><li>Click Finish
+</li><li>Click File &gt; New &gt; Source File
+</li><li>Call it hello.f90
+</li><li>Click Finish
+</li><li>Type the standard &quot;Hello, World&quot; program shown below.
+</li><li>Click File &gt; New &gt; File
+</li><li>Call it Makefile
+</li><li>Click Finish
+</li><li>Create a Makefile similar to the one shown below.  Again, we assume you are familiar with the structure of a Makefile.  
+<b>You cannot simply copy-and-paste this example
+</b> because the gfortran and rm lines must start with a tab, not spaces.  The -g switch instructs gfortran to include debugging symbols in the generated executable so that it can be debugged later.  The -o switch tells it what to name the generated executable.
+</li><li>Click Project &gt; Clean, then click OK
+</li><li>Open the Console view, and make sure &quot;make&quot; ran OK and compiled your program
+</li><li>In the Fortran Projects view, expand the Binaries entry, and click on your executable (e.g., &quot;hello.exe - 
+<a href="x86le">x86le</a>&quot;)
+</li><li>Click Run &gt; Run As &gt; Local Fortran Application
+</li><li>Choose GDB Debugger (Cygwin GDB Debugger if you're under Windows)
+</li><li>Check the Console view, and make sure &quot;Hello World&quot; appeared.
+</li></ol><p><br>
+<i>hello.f90
+</i><pre>program hello
+print *, &quot;Hello World&quot;
+end program</pre>
+<br>
+<i>Makefile:
+</i> 
+<b>(You MUST replace the spaces beginning the gfortran and rm lines with a tab character!)
+</b><pre>all:
+gfortran -o hello.exe -g hello.f90
+clean:
+rm -f hello.exe
+</pre>
+</p><h1> Converting C/C++ Projects to Fortran Projects 
+</h1><p>C/C++ projects and Fortran projects can be used interchangeably; all of the functionality of CDT is available in Fortran projects, and all of the functionality of Photran is available in C/C++ projects.  The only difference is what icon appears in the Fortran Projects view.  Nevertheless, this can be a helpful indication of whether a project is primarily written in C/C++ or in Fortran.
+To convert an existing C/C++ project to a Fortran project, switch to the Fortran perspective, right-click on the project in the Fortran Projects view, and select Convert to Fortran Project from the pop-up menu.
+</p></div>
+</body>
+</html>
