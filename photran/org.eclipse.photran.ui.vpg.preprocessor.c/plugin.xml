@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <!--====================================-->
+   <!-- Display Preprocessed Source Action -->
+   <!--====================================-->
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="C Preprocessor Actions"
+            description="C Preprocessor Actions"
+            visible="false"
+            id="org.eclipse.photran.ui.vpg.preprocessor.c.CPPActionSet">
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplayPreprocessedSource"
+               id="org.eclipse.photran.ui.DisplaySymbolTableAction"
+               label="&amp;Display Preprocessed Source"
+               menubarPath="file/additions"/>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation targetID="org.eclipse.photran.ui.vpg.preprocessor.c.CPPActionSet">
+         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+      </actionSetPartAssociation>
+   </extension>
+</plugin>
