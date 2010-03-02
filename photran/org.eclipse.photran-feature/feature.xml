@@ -21,6 +21,11 @@
       <update label="Photran" url="http://download.eclipse.org/tools/ptp/releases/helios"/>
    </url>
 
+   <includes
+         id="org.eclipse.rephraserengine"
+         version="0.0.0"
+         search-location="both"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.cdt.core"/>
@@ -43,7 +48,6 @@
       <import plugin="com.ibm.icu"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.ui.intro"/>
       <import plugin="org.eclipse.ui.intro.universal"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
@@ -56,7 +60,7 @@
       <import plugin="org.eclipse.rephraserengine.ui"/>
       <import plugin="org.eclipse.rephraserengine.ui.vpg"/>
       <import feature="org.eclipse.cdt" version="7.0" match="equivalent"/>
-      <import feature="org.eclipse.rephraserengine" version="2.0" match="equivalent"/>
+      <import plugin="org.eclipse.text"/>
    </requires>
 
    <plugin
@@ -117,5 +121,25 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.core.vpg.preprocessor.c"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.ui.vpg.preprocessor.c"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.doc.user"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>
