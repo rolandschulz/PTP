@@ -388,6 +388,8 @@ public class ToolParser extends DefaultHandler{
 			
 			String cval=getAttribute("confvalue",atts);
 			
+			boolean needsVal=getBooleanAttribute(FIELDREQUIRED,false,atts);
+			
 //			if(cval!=null)
 //				val=cval;
 			
@@ -398,6 +400,7 @@ public class ToolParser extends DefaultHandler{
 				tArg.setConfValue(cval);
 			}
 			
+			tArg.setRequireValue(needsVal);
 			
 //			if(local){
 //				arg=ToolsOptionsConstants.PROJECT_LOCATION+File.separator+arg;//Must be the same as IToolLaunchConfigurationConstants.PROJECT_LOCATION

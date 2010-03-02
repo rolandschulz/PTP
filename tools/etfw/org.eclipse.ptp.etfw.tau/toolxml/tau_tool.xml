@@ -139,7 +139,7 @@
 			<togoption label="CompInst" optname="-optCompInst" tooltip="Use compiler-based instrumentation."/>
 			
 			<togoption label="PDTInst" optname="-optPDTInst" tooltip="Use PDT-based instrumentation."/>
-			
+			<togoption label="noCompInst" optname="-optNoCompInst" tooltip="Do not auto-revert to compiler based instrumentation if PDT instrumentation fails."/>
 			<togoption label="TauSelectFile" optname="-optTauSelectFile" tooltip="Specify selective instrumentation file for tau_instrumentor">
 				<optvalue type="file"/>
 			</togoption>	

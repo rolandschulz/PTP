@@ -15,7 +15,15 @@ public class ToolArgument implements IAppInput{
 	private String confVal=null;
 	private boolean localFile=false;
 	private boolean useConfValue=false;
+	private boolean requireValue=false;
 	
+	public boolean isRequireValue() {
+		return requireValue;
+	}
+
+	public void setRequireValue(boolean requireValue) {
+		this.requireValue = requireValue;
+	}
 	public static int ARG=0;
 	public static int VAR=1;
 	private int type = ARG;
@@ -38,7 +46,7 @@ public class ToolArgument implements IAppInput{
 			}
 			val+=value;
 		}
-		
+		boolean ok = true;
 		if(isUseConfValue())
 		{
 			String cval="";
@@ -47,10 +55,14 @@ public class ToolArgument implements IAppInput{
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
+			
 			val=val.replace(ToolsOptionsConstants.CONF_VALUE, cval);
+			if(requireValue&&cval.trim().length()<=0)
+				ok=false;
 		}
-		
-		map.put(flag, val);
+		if(ok){
+			map.put(flag, val);
+		}
 		return map;
 	}
 	
@@ -72,6 +84,8 @@ public class ToolArgument implements IAppInput{
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
+			if(requireValue&&cval.trim().length()<=0)
+				return "";
 			carg=carg.replace(ToolsOptionsConstants.CONF_VALUE, cval);
 			return carg;
 		}
