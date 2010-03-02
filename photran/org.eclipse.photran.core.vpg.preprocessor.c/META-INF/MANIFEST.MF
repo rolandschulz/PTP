@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Photran C Preprocessor Support - Core Plug-in
+Bundle-SymbolicName: org.eclipse.photran.core.vpg.preprocessor.c;singleton:=true
+Bundle-Version: 5.0.0.qualifier
+Bundle-Vendor: Eclipse.org
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.photran.core,
+ org.eclipse.photran.core.vpg,
+ org.eclipse.cdt.core,
+ org.eclipse.core.runtime,
+ org.eclipse.text,
+ org.eclipse.core.resources
+Export-Package: org.eclipse.photran.internal.core.lexer,
+ org.eclipse.photran.internal.core.preprocessor.c

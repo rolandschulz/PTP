@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <!-- ===========================-->
+  <!-- C-Preprocessed Source Form -->
+  <!-- ===========================-->
+   <extension
+         point="org.eclipse.photran.core.vpg.sourceform">
+      <sourceform
+            class="org.eclipse.photran.internal.core.lexer.CPreprocessedSourceForm"
+            id="org.eclipse.photran.core.vpg.preprocessor.c.sourceform"
+            name="C Preprocessed Source Form"
+            contentType="org.eclipse.photran.core.cppFreeFormFortranSource">
+      </sourceform>
+   </extension>
+   
+  <!-- ======================================-->
+  <!-- Fortran Content Types/File Extensions -->
+  <!-- ======================================-->
+  <extension point="org.eclipse.core.contenttype.contentTypes">
+
+      <!-- NOTE: CPP content types are contributed to the CDT language extension
+           in the plugin.xml file for the org.eclipse.photran.cdtinterface plug-in.
+           Obviously this isn't quite right, but it's the only way to do it, at
+           least for now (8 Dec 2009).  And because they are referenced there,
+           they are defined in org.eclipse.photran.core since CDT attempts to
+           look up every referenced content type in LanguageManager#collectContentTypeIds -->
+
+      <!-- Associated filename extensions -->
+	  <file-association 
+          content-type="org.eclipse.photran.core.cppFreeFormFortranSource"
+          file-extensions="F90,F95,F03,F08"/>
+	  <file-association 
+          content-type="org.eclipse.photran.core.cppFixedFormFortranSource"
+          file-extensions="F77,fpp,F,FOR,FTN,FIX,FPP"/>
+          
+  </extension>
+
+</plugin>
