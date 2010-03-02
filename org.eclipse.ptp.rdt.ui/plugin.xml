@@ -166,7 +166,7 @@
             class="org.eclipse.ptp.internal.rdt.ui.preferences.RemoteFastIndexerBlock"
             id="org.eclipse.ptp.rdt.ui.indexerUI"
             indexerID="org.eclipse.ptp.rdt.core.RemoteFastIndexer"
-            name="RDT Remote Fast Indexer">
+            name="%RDTRemoteFastIndexerName">
       </indexerUI>
       
    </extension>
