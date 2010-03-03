@@ -32,7 +32,7 @@ public class RemoteToolsServices implements IRemoteServices {
 	
 	private static RemoteToolsServices instance = null;
 	
-	private RemoteToolsConnectionManager connMgr = null;
+	private RemoteToolsConnectionManager connMgr = new RemoteToolsConnectionManager();
 	private Map<String, RemoteToolsFileManager> fileMgrs = new HashMap<String, RemoteToolsFileManager>();
 	
 	/**
@@ -133,9 +133,7 @@ public class RemoteToolsServices implements IRemoteServices {
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#initialize()
 	 */
 	public void initialize() {
-		if (connMgr == null) {
-			connMgr = new RemoteToolsConnectionManager();
-		}
+		// Nothing to do
 	}
 	
 	/* (non-Javadoc)

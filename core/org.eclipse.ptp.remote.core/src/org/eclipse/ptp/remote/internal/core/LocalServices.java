@@ -96,7 +96,7 @@ public class LocalServices implements IRemoteServices {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getServicesExtension(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes" })
 	public Object getServicesExtension(IRemoteConnection conn, Class extension) {
 		return null;
 	}
