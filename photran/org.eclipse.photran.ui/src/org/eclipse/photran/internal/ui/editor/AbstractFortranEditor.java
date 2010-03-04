@@ -18,9 +18,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IDocument;
@@ -53,7 +53,6 @@ import org.eclipse.photran.internal.cdtinterface.ui.editor.CDTBasedTextEditor;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
-import org.eclipse.rephraserengine.ui.menus.RefactorMenu;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.PaintEvent;
@@ -70,7 +69,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
@@ -215,8 +213,11 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         
         try
         {
+            // Instantiate RefactorMenu using reflection since it's in an optional dependency
+            IContributionItem refactorMenu = (IContributionItem)Class.forName("org.eclipse.rephraserengine.ui.menus.RefactorMenu").newInstance();
+            
             MenuManager refactorSubmenu = new MenuManager("Refactor");
-            refactorSubmenu.add(new RefactorMenu());
+            refactorSubmenu.add(refactorMenu);
             menu.appendToGroup(ITextEditorActionConstants.GROUP_EDIT, refactorSubmenu); // cf. CEditor#createActions()
             //menu.add(refactorSubmenu);
         }
