@@ -21,7 +21,6 @@ import org.eclipse.rephraserengine.ui.actions.VPGWindowActionDelegate;
  */
 public class EnsureDBUpToDateAction extends VPGWindowActionDelegate
 {
-    @SuppressWarnings("unchecked")
     @Override
     protected void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {

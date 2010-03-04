@@ -27,14 +27,14 @@ import org.eclipse.photran.internal.core.util.SemanticError;
  */
 public class CppIsolatedSourceReproductionTestCase extends AbstractCppTestCase
 {
-    private String filename;
-    private boolean print;
+    //private String filename;
+    //private boolean print;
     
     public CppIsolatedSourceReproductionTestCase(File file, boolean isFixedForm, String testCaseDescription, boolean print)
     {
         super(file, isFixedForm, testCaseDescription);
-        filename = file.getName();
-        this.print = print;
+        //filename = file.getName();
+        //this.print = print;
     }
 
     @Override

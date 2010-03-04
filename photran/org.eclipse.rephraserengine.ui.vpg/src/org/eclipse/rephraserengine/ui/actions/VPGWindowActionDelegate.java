@@ -53,7 +53,6 @@ import org.eclipse.ui.progress.IProgressService;
  * 
  * @since 1.0
  */
-@SuppressWarnings("unchecked")
 public abstract class VPGWindowActionDelegate
            implements IWorkbenchWindowActionDelegate,
                       IRunnableWithProgress
@@ -163,6 +162,7 @@ public abstract class VPGWindowActionDelegate
             return askUserWhichVPGToUse(configs);
     }
 
+    @SuppressWarnings("unchecked")
     private int askUserWhichVPGToUse(IConfigurationElement[] configs)
     {
         Map<Integer, String> vpgs = new TreeMap<Integer, String>();
@@ -190,6 +190,7 @@ public abstract class VPGWindowActionDelegate
 
     private static final class ArrayPairContentProvider implements IStructuredContentProvider
     {
+        @SuppressWarnings("unchecked")
         public Object[] getElements(Object inputElement)
         {
             return ((Map<Integer, String>)inputElement).entrySet().toArray();
@@ -201,6 +202,7 @@ public abstract class VPGWindowActionDelegate
 
     private static final class ArrayPairLabelProvider extends LabelProvider
     {
+        @SuppressWarnings("unchecked")
         @Override
         public String getText(Object element)
         {

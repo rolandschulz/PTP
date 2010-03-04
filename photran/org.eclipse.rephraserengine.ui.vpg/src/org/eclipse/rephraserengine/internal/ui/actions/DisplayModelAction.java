@@ -30,7 +30,6 @@ import org.eclipse.rephraserengine.ui.actions.VPGOutputWindowAction;
  */
 public class DisplayModelAction extends VPGOutputWindowAction
 {
-    @SuppressWarnings("unchecked")
     @Override
     protected void writeOutput(EclipseVPG vpg, PrintStream ps)
     {

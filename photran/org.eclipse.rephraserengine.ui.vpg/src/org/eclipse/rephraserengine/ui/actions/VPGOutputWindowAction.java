@@ -27,7 +27,6 @@ import org.eclipse.rephraserengine.internal.ui.UIUtil;
  */
 public abstract class VPGOutputWindowAction extends VPGWindowActionDelegate
 {
-    @SuppressWarnings("unchecked")
     @Override
     protected final void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {
@@ -53,6 +52,5 @@ public abstract class VPGOutputWindowAction extends VPGWindowActionDelegate
      *            to select a VPG, and this will be the VPG selected by the user
      * @param ps  a {@link PrintStream} to which the text to display to the user should be written
      */
-    @SuppressWarnings("unchecked")
     protected abstract void writeOutput(EclipseVPG vpg, PrintStream ps);
 }

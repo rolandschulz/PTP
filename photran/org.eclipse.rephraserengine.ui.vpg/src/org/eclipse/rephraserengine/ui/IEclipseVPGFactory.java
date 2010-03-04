@@ -26,5 +26,5 @@ public interface IEclipseVPGFactory
      * method to return the same VPG object on every invocation, as well as for different
      * {@link IEclipseVPGFactory} instantiations to return the same VPG object)
      */
-    @SuppressWarnings("unchecked") EclipseVPG getVPG();
+     EclipseVPG getVPG();
 }

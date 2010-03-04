@@ -59,7 +59,7 @@ import org.eclipse.ui.progress.IProgressService;
  * @see UserInputString
  * @see UserInputBoolean
  */
-public class RefactoringAction
+public class RefactoringAction<T extends Refactoring>
     implements IWorkbenchWindowActionDelegate,
                //IEditorActionDelegate,
                IRunnableWithProgress
@@ -68,7 +68,7 @@ public class RefactoringAction
     private Shell activeShell = null;
 
     protected IRefactoring refactoring;
-    @SuppressWarnings("unchecked") protected CustomUserInputPage customUserInputPage = null;
+    protected CustomUserInputPage<T> customUserInputPage = null;
 
     public RefactoringAction(IRefactoring refactoring)
     {
@@ -76,7 +76,7 @@ public class RefactoringAction
     }
 
     public RefactoringAction(IRefactoring refactoring,
-                             CustomUserInputPage<? extends Refactoring> customUserInputPage)
+                             CustomUserInputPage<T> customUserInputPage)
     {
         this.refactoring = refactoring;
         this.customUserInputPage = customUserInputPage;
@@ -159,7 +159,7 @@ public class RefactoringAction
             setWindowTitle(getRefactoring().getName());
 
             if (customUserInputPage != null)
-                customUserInputPage.setRefactoring(getRefactoring());
+                customUserInputPage.setRefactoring((T)getRefactoring());
         }
 
         @Override
