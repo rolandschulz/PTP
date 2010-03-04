@@ -76,7 +76,6 @@ abstract class PreprocessorMacro implements IMacroBinding {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class clazz) {
 		return null;
 	}
