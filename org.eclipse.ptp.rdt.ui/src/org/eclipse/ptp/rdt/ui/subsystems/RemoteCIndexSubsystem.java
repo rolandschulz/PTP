@@ -207,10 +207,9 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
 			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
-			    		String errorMessage = Messages.getString("RemoteCIndexSubsystem.11"); //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
-					    		String msg = reportProblem(scope, message, errorMessage);
+					    		String msg = reportProblem(scope, message);
 					    		RDTLog.logWarning(msg);
 			    			}
 			    		}
@@ -247,7 +246,7 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 	}
 
 
-	protected String reportProblem(Scope scope, String message, String errorMsg) {
+	protected String reportProblem(Scope scope, String message) {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot workspaceRoot = workspace.getRoot();
 		IProject project = workspaceRoot.getProject(scope.getName());
@@ -262,15 +261,15 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 			includeError = false;
 		
 		//parser for include/macro name
-		int includeStart = message.indexOf(": \""); //$NON-NLS-1$
-		int includeEnd = message.indexOf("\"",includeStart + 3); //$NON-NLS-1$
-		String include = message.substring(includeStart + 2, includeEnd+1);
+		int includeStart = errorMessageEnd + 2;
+		int includeEnd = message.indexOf(" in file: ",includeStart); //$NON-NLS-1$
+		String include = message.substring(includeStart, includeEnd);
 				
 		
 		//parse for file name and line number
-		int fileStart = message.indexOf("in file: "); //$NON-NLS-1$
-		int fileEnd = message.indexOf(":", fileStart + 9); //$NON-NLS-1$
-		String fileName = message.substring(fileStart + 9, fileEnd);
+		int fileStart = includeEnd+10;
+		int fileEnd = message.indexOf(":", fileStart); //$NON-NLS-1$
+		String fileName = message.substring(fileStart, fileEnd);
 		
 		int lineStart = fileEnd;
 		int lineEnd = message.indexOf(".  ", lineStart); //$NON-NLS-1$
@@ -284,7 +283,8 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 		else
 			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", info); //$NON-NLS-1$
 		
-		String wholeMessage = MessageFormat.format(Messages.getString("RemoteCIndexSubsystem.12"), new Object[] {info}) + "  " + errorMsg; //$NON-NLS-1$ //$NON-NLS-2$
+		String infoMsg = Messages.getString("RemoteCIndexSubsystem.11"); //$NON-NLS-1$
+		String wholeMessage = MessageFormat.format(Messages.getString("RemoteCIndexSubsystem.12"), new Object[] {info}) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
 		
 		IFile file = null;
 		String projectLocation = project.getLocationURI().getPath();
@@ -396,10 +396,9 @@ public class RemoteCIndexSubsystem extends SubSystem implements ICIndexSubsystem
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
 			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
-			    		String errorMessage = Messages.getString("RemoteCIndexSubsystem.11"); //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
-					    		String msg = reportProblem(scope, message, errorMessage);
+					    		String msg = reportProblem(scope, message);
 					    		RDTLog.logWarning(msg);
 			    			}
 			    		}
