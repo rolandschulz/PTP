@@ -20,6 +20,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -476,18 +477,23 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteConnection getRemoteConnection(IResourceManagerControl rm) {
 		IRemoteServices rsrv = getRemoteServices(rm);
 		if (rsrv != null) {
-			IRemoteConnection conn = rsrv.getConnectionManager().getConnection(
-					rm.getConfiguration().getConnectionName());
-			if (conn != null && !conn.isOpen()) {
-				IRemoteUIServices uiServices = getRemoteUIServices(rm);
-				if (uiServices != null) {
-					IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
-					if (connMgr != null) {
-						connMgr.openConnectionWithProgress(getShell(), conn);
+			String connName = rm.getConfiguration().getConnectionName();
+			if (connName != null) {
+				IRemoteConnectionManager mgr = rsrv.getConnectionManager();
+				if (mgr != null) {
+					IRemoteConnection conn = mgr.getConnection(connName);
+					if (conn != null && !conn.isOpen()) {
+						IRemoteUIServices uiServices = getRemoteUIServices(rm);
+						if (uiServices != null) {
+							IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
+							if (connMgr != null) {
+								connMgr.openConnectionWithProgress(getShell(), conn);
+							}
+						}
 					}
+					return conn;
 				}
 			}
-			return conn;
 		}
 		return null;
 	}
