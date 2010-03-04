@@ -7,9 +7,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,7 +22,6 @@ import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
-import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
 /**
  * Remove Unused Variables: refactoring that removes unused variables in Fortran code,
@@ -34,7 +30,12 @@ import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
  * 
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
+ * @author Jeff Overbey
  **/
+/*
+ * TODO - JO - Can we avoid running multiple times?
+ * TODO - JO - What about specification stmts?
+ */
 public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefactoring{
 
     @Override
@@ -49,9 +50,21 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
         ensureProjectHasRefactoringEnabled(status);
         removeFixedFormFilesFrom(this.selectedFiles, status);
         removeCpreprocessedFilesFrom(this.selectedFiles, status);
-        // This refactoring has the prerequisite that the code is Implicit None.
-        // You must use the Introduce Implicit None refactoring first.
-        try{
+        
+        ensureAllScopesAreImplicitNone(status);
+    }
+
+    /**
+     * Checks that all scopes contained in all selected files are IMPLICIT NONE.
+     * <p>
+     * If they are not, this issues an error, informing the user that this refactoring has
+     * the prerequisite that the code is IMPLICIT NONE.
+     */
+    private void ensureAllScopesAreImplicitNone(RefactoringStatus status)
+        throws PreconditionFailure
+    {
+        try
+        {
             for (IFile file : selectedFiles)
             {
                 IFortranAST ast = vpg.acquirePermanentAST(file);
@@ -59,18 +72,11 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
                 {
                     status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
                 }
-                List<ScopingNode> scopes = ast.getRoot().getAllContainedScopes();
-                for(ScopingNode scope : scopes)
+                else
                 {
-                    if (!(scope instanceof ASTExecutableProgramNode))
-                    {
-                        if(!scope.isImplicitNone())
-                        {
-                            fail("All of the selected files must be 'Implict None'! Please use the 'Introduce Implict None Refactoring' first to introduce the 'Implict None' statements in file "+file.getName()+"!");
-                        }
-                    }
+                    ensureAllScopesAreImplicitNone(file, ast);
+                    vpg.releaseAST(file);
                 }
-                vpg.releaseAST(file);
             }
         }
         finally
@@ -79,9 +85,21 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
         }
     }
 
+    private void ensureAllScopesAreImplicitNone(IFile file, IFortranAST ast)
+        throws PreconditionFailure
+    {
+        for (ScopingNode scope : ast.getRoot().getAllContainedScopes())
+            if (!(scope instanceof ASTExecutableProgramNode))
+                if (!scope.isImplicitNone())
+                    fail("All of the selected files must be IMPLICIT NONE. Please use the "
+                        + "Introduce Implict None refactoring first to introduce IMPLICIT "
+                        + "NONE statements in the file "+file.getName()+".");
+    }
+
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure{
-        try{
+        try
+        {
             for (IFile file : selectedFiles)
             {
                 IFortranAST ast = vpg.acquirePermanentAST(file);
@@ -89,8 +107,11 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
                 {
                     status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
                 }
-                makeChangesTo(file, ast, status, pm);
-                vpg.releaseAST(file);
+                else
+                {
+                    makeChangesTo(file, ast, status, pm);
+                    vpg.releaseAST(file);
+                }
             }
         }
         finally
@@ -99,79 +120,95 @@ public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefacto
         }    
     }
 
-    private ASTTypeDeclarationStmtNode getTypeDeclarationStmtNode(IASTNode node)
-    {
-        if(node == null)
-        {
-            return null;
-        }        
-        if(node instanceof ASTTypeDeclarationStmtNode)
-        {
-            return (ASTTypeDeclarationStmtNode)node;
-        }
-        return getTypeDeclarationStmtNode(node.getParent()); 
-    }
-
     private void makeChangesTo(IFile file, IFortranAST ast, RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
-    {        
-        boolean hasChanged = false;        
-        List<ScopingNode> scopes = ast.getRoot().getAllContainedScopes();
-        for(ScopingNode scope : scopes)
-        {
-            assert debug("Scope: " + scope.getClass().getName());
-            List<Definition> definitions = scope.getAllDefinitions();
-            for(Definition def : definitions)
-            {
-                if(def.isLocalVariable())
-                {                    
-                    Set<PhotranTokenRef> references = def.findAllReferences(true);
-                    // If the variable has not been referenced throughout the source code,
-                    // then it was never used, and should be removed.
-                    if(references.isEmpty())
-                    {
-                        hasChanged = true;
-                        assert debug("The variable [" + def.getDeclaredName() + "] was not used and will be removed.");
-                        ASTTypeDeclarationStmtNode declarationNode = getTypeDeclarationStmtNode(def.getTokenRef().findToken().getParent());
-                        if(declarationNode.getEntityDeclList().size() == 1)
-                        {
-                            declarationNode.replaceWith("\n");
-                        }
-                        else
-                        {
-                            IASTListNode<ASTEntityDeclNode> statementsInNode = declarationNode.getEntityDeclList();                            
-                            for(ASTEntityDeclNode statement : statementsInNode)
-                            {
-                                ASTObjectNameNode objectName = statement.getObjectName();
-                                String statementName = objectName.getObjectName().getText(); 
-                                if(statementName.equals(def.getDeclaredName()))
-                                {
-                                    if(!statementsInNode.remove(statement))
-                                    {
-                                        fail("Sorry, could not complete the operation.");                                        
-                                    }                                    
-                                    break;
-                                }
-                            } 
-                            //Add a whitespace so that variable names and keywords don't clump together
-                            //i.e. "integer x,y" doesn't become "integerx,y"
-                            statementsInNode.findFirstToken().setWhiteBefore(" ");
-                            declarationNode.setEntityDeclList(statementsInNode);                            
-                        }
-                    }
-                }
-            }
-        }                        
+    {
+        boolean hasChanged = false;
 
-        if(hasChanged)
+        for (ScopingNode scope : ast.getRoot().getAllContainedScopes())
+            if (removedUnusedVariablesFromScope(scope))
+                hasChanged = true;
+
+        if (hasChanged)
         {
             addChangeFromModifiedAST(file, pm);
             status.addInfo("After clicking 'Continue', do the same refactoring again to make sure that all unused variables are removed from file " + file.getName()+"!");
-            status.addWarning("This refactoring does not remove un-used variables when their dimentions are specified on another line. I.e. real a /n/n dimention a(10) will not be removed.");
+            status.addWarning("This refactoring does not remove unused variables when their dimentions are specified on another line. I.e. real a /n/n dimention a(10) will not be removed.");
         }
         else
         {
             status.addInfo("All unused variables have been removed from file " + file.getName()+"!");
         }
+    }
+
+    private boolean removedUnusedVariablesFromScope(ScopingNode scope)
+        throws PreconditionFailure
+    {
+        assert debug("Scope: " + scope.getClass().getName());
+        
+        boolean hasChanged = false;
+        
+        for (Definition def : scope.getAllDefinitions())
+        {
+            if (def.isLocalVariable() && def.findAllReferences(true).isEmpty())
+            {
+                removeVariableDeclFor(def);
+                hasChanged = true;
+            }
+        }
+
+        return hasChanged;
+    }
+
+    private void removeVariableDeclFor(Definition def) throws PreconditionFailure
+    {
+        assert debug("The variable [" + def.getDeclaredName() + "] was not used and will be removed.");
+        
+        ASTTypeDeclarationStmtNode declarationNode = getTypeDeclarationStmtNode(def.getTokenRef().findToken().getParent());
+        
+        IASTListNode<ASTEntityDeclNode> entityDeclList = declarationNode.getEntityDeclList();
+        if (entityDeclList.size() == 1)
+        {
+            declarationNode.replaceWith("\n");
+        }
+        else
+        {
+            removeVariableDeclFromList(def, entityDeclList);
+            //declarationNode.setEntityDeclList(entityDeclList); // JO -- redundant
+        }
+    }
+
+    private void removeVariableDeclFromList(Definition def,
+                                            IASTListNode<ASTEntityDeclNode> entityDeclList)
+        throws PreconditionFailure
+    {
+        for (ASTEntityDeclNode decl : entityDeclList)
+        {
+            // TODO - JO - Can we use pointer comparison rather than text comparison?
+            ASTObjectNameNode objectName = decl.getObjectName();
+            String declName = objectName.getObjectName().getText(); 
+            if (declName.equals(def.getDeclaredName()))
+            {
+                if (!entityDeclList.remove(decl))
+                {
+                    fail("Sorry, could not complete the operation.");
+                }                                    
+                break;
+            }
+        } 
+        
+        //Add a whitespace so that variable names and keywords don't clump together
+        //i.e. "integer x,y" doesn't become "integerx,y"
+        entityDeclList.findFirstToken().setWhiteBefore(" ");
+    }
+
+    private ASTTypeDeclarationStmtNode getTypeDeclarationStmtNode(IASTNode node)
+    {
+        if (node == null)
+            return null;
+        else if (node instanceof ASTTypeDeclarationStmtNode)
+            return (ASTTypeDeclarationStmtNode)node;
+        else
+            return getTypeDeclarationStmtNode(node.getParent());
     }
 
     @Override

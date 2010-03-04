@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
@@ -36,6 +37,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * 
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
+ * @author Jeff Overbey
  **/
 public class StandardizeStatementsRefactoring extends MultipleFileFortranRefactoring{
 
@@ -56,7 +58,8 @@ public class StandardizeStatementsRefactoring extends MultipleFileFortranRefacto
     @Override
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        try{
+        try
+        {
             for (IFile file : selectedFiles)
             {
                 IFortranAST ast = vpg.acquirePermanentAST(file);
@@ -71,44 +74,100 @@ public class StandardizeStatementsRefactoring extends MultipleFileFortranRefacto
         finally
         {
             vpg.releaseAllASTs();
-        }    
-    }
-
-    private boolean points(String s)
-    {        
-        for(int i=0; i<s.length()-1; i++)
-        {
-            char p1 = s.charAt(i);
-            char p2 = s.charAt(i+1);
-            if(p1 == '!' || p2 == '!')
-            {
-                return false;
-            }
-            else if(p1 == ':' && p2 ==':')
-            {
-                return true;
-            }
         }
-        return false;
-    }
-
-    private void setNodeType(IASTNode node, ASTTypeSpecNode type_node)
-    {
-        String type = ((ASTTypeDeclarationStmtNode)node).getTypeSpec().toString().trim();
-        String[] typeWithoutComments = type.split("\n");
-        type = typeWithoutComments[typeWithoutComments.length - 1].trim();
-        Token text_type = new Token(null, type);
-        type_node.setIsInteger(text_type);
     }
     
-    private String addTwoColons(ASTTypeDeclarationStmtNode new_statement)
+    @SuppressWarnings("unchecked")
+    private void makeChangesTo(IFile file, IFortranAST ast, RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    {            
+        List<ScopingNode> scopes = ast.getRoot().getAllContainedScopes();
+        for (ScopingNode scope : scopes)
+            if (!(scope instanceof ASTExecutableProgramNode) && !(scope instanceof ASTDerivedTypeDefNode))
+                standardizeStmtsInScope((IASTListNode<IASTNode>)scope.getBody(), ast);
+
+        addChangeFromModifiedAST(file, pm);
+    }
+
+    private void standardizeStmtsInScope(IASTListNode<IASTNode> body, IFortranAST ast)
     {
-        String source = SourcePrinter.getSourceCodeFromASTNode(new_statement);
-        int position_type = new_statement.getTypeSpec().toString().length();
+        List<ASTTypeDeclarationStmtNode> typeDeclStmts = createTypeDeclStmtList(body);
+        insertNewStmts(typeDeclStmts, body, ast);
+        removeOldStmts(typeDeclStmts, body);
+    }
+    
+    /**
+     *  @return a list of {@link ASTTypeDeclarationStmtNode}s where the nodes at odd-numbered
+     *  indices are old statements to remove and those at even-numbered indices are the new,
+     *  standardized statements to insert
+     */
+    private List<ASTTypeDeclarationStmtNode> createTypeDeclStmtList(IASTListNode<IASTNode> body)
+    {
+        List<ASTTypeDeclarationStmtNode> statements = new LinkedList<ASTTypeDeclarationStmtNode>(); 
+        
+        for (IASTNode node : body)
+            if (node instanceof ASTTypeDeclarationStmtNode)
+                standardizeTypeDeclStmt((ASTTypeDeclarationStmtNode)node, statements);
+        
+        return statements;
+    }
+
+    private void standardizeTypeDeclStmt(ASTTypeDeclarationStmtNode typeDeclStmt, List<ASTTypeDeclarationStmtNode> statements)
+    {
+        IASTListNode<ASTEntityDeclNode> variables = typeDeclStmt.getEntityDeclList();
+        
+        for (int i=0; i<variables.size(); i++)
+        {
+            ASTTypeDeclarationStmtNode newStmt = createNewVariableDeclaration(typeDeclStmt, i);
+            
+            // Add a reference to the old statement (this will have an even-numbered index in the list)
+            statements.add((ASTTypeDeclarationStmtNode)typeDeclStmt);
+            
+            // Then add the new declaration (this will have an odd-numbered index in the list)
+            statements.add(newStmt);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private ASTTypeDeclarationStmtNode createNewVariableDeclaration(ASTTypeDeclarationStmtNode typeDeclStmt, int i)
+    {
+        IASTListNode<ASTEntityDeclNode> variables = typeDeclStmt.getEntityDeclList();
+        
+        ASTTypeDeclarationStmtNode newStmt = (ASTTypeDeclarationStmtNode)typeDeclStmt.clone();
+        if (i>0) newStmt.setTypeSpec(createTypeSpecNodeFrom(typeDeclStmt));
+
+        IASTListNode<ASTEntityDeclNode> newVariable =  (IASTListNode<ASTEntityDeclNode>)variables.clone();
+        List<ASTEntityDeclNode> listOfVariablesToRemove = new LinkedList<ASTEntityDeclNode>();
+        for (int j=0; j<variables.size(); j++)
+            if (j != i)
+                listOfVariablesToRemove.add(newVariable.get(j));
+        newVariable.removeAll(listOfVariablesToRemove);
+        newStmt.setEntityDeclList(newVariable);
+        
+        // Insert "::" if the original statement does not contain that already
+        String source = addTwoColons(newStmt);
+                                      
+        newStmt = (ASTTypeDeclarationStmtNode)parseLiteralStatement(source);
+        return newStmt;
+    }
+
+    private ASTTypeSpecNode createTypeSpecNodeFrom(ASTTypeDeclarationStmtNode typeDeclStmt)
+    {
+        ASTTypeSpecNode typeNode = new ASTTypeSpecNode();
+        String type = typeDeclStmt.getTypeSpec().toString().trim();
+        String[] typeWithoutComments = type.split("\n");
+        type = typeWithoutComments[typeWithoutComments.length - 1].trim();
+        typeNode.setIsInteger(new Token(Terminal.T_INTEGER, type));
+        return typeNode;
+    }
+
+    private String addTwoColons(ASTTypeDeclarationStmtNode newStmt)
+    {
+        String source = SourcePrinter.getSourceCodeFromASTNode(newStmt);
+        int position_type = newStmt.getTypeSpec().toString().length();
         String twoPoints = "";
         String source_1 = source.substring(0, position_type);
         String source_2 = source.substring(position_type,source.length());
-        if (!points(source_2)) 
+        if (!containsColonColon(source_2)) 
         {
             twoPoints = " :: ";
         }
@@ -117,80 +176,57 @@ public class StandardizeStatementsRefactoring extends MultipleFileFortranRefacto
         return source;
     }
     
-    private void populateStatementsList(IASTListNode<IASTNode> body, List<ASTTypeDeclarationStmtNode> statements)
-    {
-        for(IASTNode node : body)
+    /** @return true iff <code>s</code> contains :: outside a comment */
+    private boolean containsColonColon(String s)
+    {        
+        for (int i=0; i<s.length()-1; i++)
         {
-            if(node instanceof ASTTypeDeclarationStmtNode)
+            char p1 = s.charAt(i);
+            char p2 = s.charAt(i+1);
+            if (p1 == '!' || p2 == '!')
             {
-                IASTListNode<ASTEntityDeclNode> variables = ((ASTTypeDeclarationStmtNode)node).getEntityDeclList();
-                ASTTypeSpecNode type_node = new ASTTypeSpecNode(); 
-                
-                // Get statement type.
-                setNodeType(node, type_node);
-                
-                for(int i=0; i<variables.size(); i++)
-                {
-                    ASTTypeDeclarationStmtNode new_statement = (ASTTypeDeclarationStmtNode)node.clone();
-                    if(i>0)
-                    {
-                        new_statement.setTypeSpec(type_node);
-                    }                                
-                    IASTListNode<ASTEntityDeclNode> new_variable =  (IASTListNode<ASTEntityDeclNode>)variables.clone();
-                    List<ASTEntityDeclNode> list_variables_to_remove = new LinkedList<ASTEntityDeclNode>();
-                    for(int j=0; j<variables.size(); j++)
-                    {
-                        if(j != i)
-                        {                                        
-                            list_variables_to_remove.add(new_variable.get(j));
-                        }
-                    }
-                    new_variable.removeAll(list_variables_to_remove);                                                               
-                    new_statement.setEntityDeclList(new_variable);
-                    
-                    // Put the two points (::) if the original statement does not.
-                    String source = addTwoColons(new_statement);
-                                                  
-                    new_statement = (ASTTypeDeclarationStmtNode)parseLiteralStatement(source);
-                    // Adds a reference to the old statement.
-                    statements.add((ASTTypeDeclarationStmtNode)node);
-                    // Adds a new declaration.
-                    statements.add(new_statement);
-                }
+                return false;
+            }
+            else if (p1 == ':' && p2 ==':')
+            {
+                return true;
             }
         }
+        return false;
     }
-    
-    private void makeChangesTo(IFile file, IFortranAST ast, RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
-    {            
-        List<ScopingNode> scopes = ast.getRoot().getAllContainedScopes();
-        for(ScopingNode scope : scopes)
-        {                
-            if (!(scope instanceof ASTExecutableProgramNode) && !(scope instanceof ASTDerivedTypeDefNode))
+
+    /**
+     * Insert the new, standardized statements in the AST.
+     * <p>
+     * These have odd-numbered indices in the list (see {@link #createTypeDeclStmtList(IASTListNode)})
+     */
+    private void insertNewStmts(List<ASTTypeDeclarationStmtNode> typeDeclStmts,
+                                IASTListNode<IASTNode> body,
+                                IFortranAST ast)
+    {
+        for (int i = 0; i<typeDeclStmts.size(); i+=2)
+        {
+            body.insertBefore(typeDeclStmts.get(i), typeDeclStmts.get(i+1));
+            Reindenter.reindent(typeDeclStmts.get(i+1), ast);
+        }
+    }
+
+    /**
+     * Removes the old statements from the AST.
+     * <p>
+     * These have even-numbered indices in the list (see {@link #createTypeDeclStmtList(IASTListNode)})
+     */
+    private void removeOldStmts(List<ASTTypeDeclarationStmtNode> typeDeclStmts,
+                                IASTListNode<IASTNode> body)
+    {
+        for (int i = 0; i<typeDeclStmts.size(); i+=2)
+        {
+            ASTTypeDeclarationStmtNode delete = typeDeclStmts.get(i);
+            if (body.contains(delete))
             {
-                IASTListNode<IASTNode> body = (IASTListNode<IASTNode>)scope.getBody();                    
-                List<ASTTypeDeclarationStmtNode> statements = new LinkedList<ASTTypeDeclarationStmtNode>(); 
-                
-                populateStatementsList(body, statements);
-                // Insert the new standard statements in the AST.
-                for(int i = 0; i<statements.size(); i+=2)
-                {
-                    body.insertBefore(statements.get(i), statements.get(i+1));
-                    Reindenter.reindent(statements.get(i+1), ast);
-                }
-                // Remove the old statements that were outside the standard.
-                for(int i = 0; i<statements.size(); i+=2)
-                {
-                    ASTTypeDeclarationStmtNode delete = statements.get(i);
-                    if(body.contains(delete))
-                    {
-                        delete.removeFromTree();
-                    }
-                }
+                delete.removeFromTree();
             }
-        }                        
-        // Adds changes in AST.
-        addChangeFromModifiedAST(file, pm);
+        }
     }
 
     @Override
