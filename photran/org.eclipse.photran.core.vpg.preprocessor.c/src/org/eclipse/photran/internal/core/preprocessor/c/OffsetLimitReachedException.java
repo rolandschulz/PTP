@@ -19,7 +19,6 @@
  */
 package org.eclipse.photran.internal.core.preprocessor.c;
 
-import org.eclipse.cdt.core.parser.EndOfFileException;
 /**
  * The exception is thrown, when content-assist is requested within a context that is handled
  * by the lexer or the preprocessor.
