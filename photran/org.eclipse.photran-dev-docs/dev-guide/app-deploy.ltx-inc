@@ -15,22 +15,18 @@ number, updating the Web site, etc.}
 \item Regenerate the org.eclipse.photran.doc.user plug-in from the wiki.
       See Appendix~\ref{app:help} for details.
 
-\item Update the plug-in version numbers in all projects.  Note that the URL for
-      the release notes shown when the user first installs a new version of Photran
-      is determined by the version of the org.eclipse.photran.ui plug-in (see
-      ShowReleaseNotes.java for details).
+\item Update the plug-in version numbers in all projects.
 
 \item Update the feature.xml and feature.properties files for
     \begin{itemize}
-    \item org.eclipse.photran-feature
-    \item org.eclipse.photran.intel-feature
-    \item org.eclipse.photran.xlf-feature
-    \item org.eclipse.rephraserengine-feature
+    \item org.eclipse.photran-feature,
+    \item org.eclipse.photran.intel-feature,
+    \item org.eclipse.photran.xlf-feature, and
+    \item org.eclipse.rephraserengine-feature.
     \end{itemize}
-    and change
     \begin{enumerate}
-    \item the feature version
-    \item the versions of other features/plug-ins it depends on
+    \item Change the feature version.
+    \item Change the versions of other features/plug-ins it depends on\dots
     \begin{itemize}
         \item org.eclipse.photran-feature must specify the correct versions of
             \begin{itemize}
@@ -42,6 +38,16 @@ number, updating the Web site, etc.}
     \end{itemize}
     \item the copyright year
     \item the update site URL
+    \end{enumerate}
+
+\item Update URLs to reflect the new version numbers...
+    \begin{enumerate}
+    \item Update the Welcome Page URL in org.eclipse.photran.ui/intro/overviewContent.xml
+    \item Note that the URL for the release notes shown when the user first installs a new
+          version of Photran is determined by the version of the org.eclipse.photran.ui
+          plug-in (see ShowReleaseNotes.java for details); this is not necessarily the same
+          as the Welcome Page URL.
+    \item Be sure the Web site actually contains pages at these URLs; add them if necessary
     \end{enumerate}
 
 \item If the VPG database structure (or any of the serialized classes) have
@@ -85,5 +91,11 @@ For example, in Photran 4.0 beta 5, the database filename was ``photran40b5vpg''
 \item Announce the release, e-mailing the photran, photran-dev, and ptp-announce mailing lists
 
 \item Copy the Documentation pages on the wiki and update the version numbers for the next expected release
+
+\item Update the Project Plan at the Eclipse Foundation Portal\dots
+    \begin{enumerate}
+    \item Mark the released version as ``released'' with the correct date.
+    \item Add a planned/tentative next release at some future date.
+    \end{enumerate}
 
 \end{enumerate}
