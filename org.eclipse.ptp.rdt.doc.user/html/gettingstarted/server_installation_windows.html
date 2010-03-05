@@ -14,50 +14,50 @@ start the server daemon, and make a connection to a remote Windows server.
 <a href="server_installation_unix.html">Look here</a> for setting 
 up a server on Linux, General UNIX or Mac.
 
-<p><b>Installing the server code</b></p>
+<p><span class="bold">Installing the server code</span></p>
 
 <p>
 <ol>
 <li>
 Choose a directory where you want to install the server code. 
-These instructions will use the <tt>C:/</tt> directory as an example, 
+These instructions will use the <span class="typewriter">C:/</span> directory as an example, 
 but you are free to use any directory.
 When the server archive file is expanded it will create a directory 
-named <tt>rdt-server</tt> in the location where it
+named <span class="typewriter">rdt-server</span> in the location where it
 is expanded.
 </li>
 <li> 
 Find the package that contains the server.
 </li>
 <li> 
-Copy the file <tt>rdt-server-windows-1.0.zip</tt> to 
-the <tt>C:\</tt> directory (this could be on a different machine).
+Copy the file <span class="typewriter">rdt-server-windows-1.0.zip</span> to 
+the <span class="typewriter">C:\</span> directory (this could be on a different machine).
 </li>
 <li> 
 Use an unzip utility to extract the server code.
 </li>
-<li>A directory named <tt>C:\rdt-server</tt> will be created that contains the server files.</li>
+<li>A directory named <span class="typewriter">C:\rdt-server</span> will be created that contains the server files.</li>
 </ol>
 </p>
 
-<p><b>Starting the server</b></p>
+<p><span class="bold">Starting the server</span></p>
 
 <p>
 You can start the RDT communications server manually, or as a daemon.
 </p>
 
-<p><b>To start the server as a daemon</b></p>
+<p><span class="bold">To start the server as a daemon</span></p>
 
 <p>
 Note that the server daemon does not enforce any user authentication. 
 If you run the server daemon, any user can connect to the machine, 
-work with the file system and run commands. <b>Use of the server daemon 
-on Windows systems is not recommended</b>.
+work with the file system and run commands. <strong>Use of the server daemon 
+on Windows systems is not recommended</strong>.
 </p>
  
 <p>
-Simply double click the <tt>daemon.bat</tt> program to start a server daemon. 
-You can edit the <tt>daemon.bat</tt> file to change properties for the daemon, 
+Simply double click the <span class="typewriter">daemon.bat</span> program to start a server daemon. 
+You can edit the <span class="typewriter">daemon.bat</span> file to change properties for the daemon, 
 like a specific daemon port to use or to force a port range for the server 
 (in order to comply with firewalls). 
 </p>
@@ -74,10 +74,10 @@ argument to restrict selected server ports to the range given:
 
 <pre class="command">daemon.bat 4075 10000-10010</pre>
 
-<p><b>To start the server manually</b></p> 
+<p><span class="bold">To start the server manually</span></p> 
 
 <p>
-Simply double click on the <tt>server.bat</tt> program to start the RDT server. 
+Simply double click on the <span class="typewriter">server.bat</span> program to start the RDT server. 
 The server will pick the first port available and print the port number. 
 By default, it is usually 4033. You will then have to enter this port 
 number in port property for the Files subsystem for your connection in 
