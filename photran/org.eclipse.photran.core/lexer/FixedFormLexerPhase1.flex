@@ -32,12 +32,11 @@
  */
 
 package org.eclipse.photran.internal.core.lexer;
-import java.io.IOException;
+
 import java.io.InputStream;
-import java.util.List;
-import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
+@SuppressWarnings("unused")
 %%
 
 %class FixedFormLexerPhase1
