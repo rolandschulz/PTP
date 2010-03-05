@@ -34,98 +34,124 @@ import org.eclipse.ptp.core.elements.listeners.IProcessListener;
  */
 public class ProcessInputStream extends InputStream implements IProcessListener {
 	protected List<String> buffers;
-    protected int pos;
-    protected int count;
-    private String currentBuffer;
-    private IPProcess process;
+	protected int pos;
+	protected int count;
+	private String currentBuffer;
+	private IPProcess process;
 
-    public ProcessInputStream(IPProcess process) {
-    	this.process = process;
-    	buffers = Collections.synchronizedList(new LinkedList<String>());
+	public ProcessInputStream(IPProcess process) {
+		this.process = process;
+		buffers = Collections.synchronizedList(new LinkedList<String>());
 		process.addElementListener(this);
-    }
-    public IPProcess getProcess() {
-    	return process;
-    }
-    public void addInput(String buffer) {
-    	synchronized(buffers) {
-    		buffers.add(buffer==null?"":buffer); //$NON-NLS-1$
-	    	buffers.notifyAll();
-    	}
-    }
-    private String getBuffer() {
+	}
+
+	public void addInput(String buffer) {
+		synchronized (buffers) {
+			buffers.add(buffer == null ? "" : buffer); //$NON-NLS-1$
+			buffers.notifyAll();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#close()
+	 */
+	@Override
+	public void close() {
+		addInput(""); //$NON-NLS-1$
+		process.removeElementListener(this);
+	}
+
+	public IPProcess getProcess() {
+		return process;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(
+	 * org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+	 */
+	public void handleEvent(IProcessChangeEvent e) {
+		if (e.getSource().getState() == ProcessAttributes.State.COMPLETED) {
+			close();
+		}
+
+		StringAttribute stdoutAttr = e.getAttributes().getAttribute(
+				ProcessAttributes.getStdoutAttributeDefinition());
+		if (stdoutAttr != null) {
+			addInput(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
+		}
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#read()
+	 */
+	public int read() {
+		synchronized (buffers) {
+			if (count <= pos) {
+				currentBuffer = getBuffer();
+			}
+
+			return (pos < count) ? (currentBuffer.charAt(pos++) & 0xFF) : -1;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#read(byte[], int, int)
+	 */
+	@Override
+	public int read(byte b[], int off, int len) {
+		synchronized (buffers) {
+			String buffer = getBuffer();
+			if (b == null) {
+				throw new NullPointerException();
+			} else if ((off < 0) || (off > b.length) || (len < 0)
+					|| ((off + len) > b.length) || ((off + len) < 0)) {
+				throw new IndexOutOfBoundsException();
+			}
+			if (pos >= count) {
+				return -1;
+			}
+			if (pos + len > count) {
+				len = count - pos;
+			}
+			if (len <= 0) {
+				return 0;
+			}
+			int cnt = len;
+			while (--cnt >= 0) {
+				b[off++] = (byte) buffer.charAt(pos++);
+			}
+			return len;
+		}
+	}
+
+	public void reset(int len) {
+		synchronized (buffers) {
+			pos = 0;
+			count = len;
+		}
+	}
+
+	public void restart() {
+		process.addElementListener(this);
+	}
+
+	private String getBuffer() {
 		synchronized (buffers) {
 			String buffer;
 			while (buffers.isEmpty()) {
 				try {
 					buffers.wait();
-		    	} catch (InterruptedException e) {
-		    		buffer = ""; //$NON-NLS-1$
-		    	}
+				} catch (InterruptedException e) {
+					buffer = ""; //$NON-NLS-1$
+				}
 			}
-			buffer = (String)buffers.remove(0);
+			buffer = (String) buffers.remove(0);
 			reset(buffer.length());
 			return buffer;
 		}
-    }
-    public void restart() {
-    	process.addElementListener(this);
-    }
-    public void close() {
-    	addInput(""); //$NON-NLS-1$
-    	process.addElementListener(this);
-    }
-    public int read() {
-    	synchronized (buffers) {
-    		if (count <= pos)
-    			currentBuffer = getBuffer();
-    		
-    		return (pos < count) ? (currentBuffer.charAt(pos++) & 0xFF) : -1;
-    	}
-    }
-    public int read(byte b[], int off, int len) {
-    	synchronized (buffers) {
-    		String buffer = getBuffer();
-			if (b == null) {
-			    throw new NullPointerException();
-			} else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
-			    throw new IndexOutOfBoundsException();
-			}
-			if (pos >= count) {
-			    return -1;
-			}
-			if (pos + len > count) {
-			    len = count - pos;
-			}
-			if (len <= 0) {
-			    return 0;
-			}
-			int cnt = len;
-			while (--cnt >= 0) {
-			    b[off++] = (byte)buffer.charAt(pos++);
-			}
-			return len;
-    	}
-    }
-    public void reset(int len) {
-    	synchronized (buffers) {
-	    	pos = 0;
-	    	count = len;
-    	}
-    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
-     */
-    public void handleEvent(IProcessChangeEvent e) {
-		if (e.getSource().getState() == ProcessAttributes.State.COMPLETED) {
-			close();
-		}
-		
-		StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
-		if (stdoutAttr != null) {
-			addInput(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
-		}
-
-    }
+	}
 }
