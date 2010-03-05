@@ -16,7 +16,7 @@ start the server daemon, and make a connection to a remote Linux or UNIX server.
 <a href="server_installation_windows.html">Look here</a> for setting up a server on Windows.
 </p>
 
-<p><b>Prerequisites</b></p>
+<p><span class="bold">Prerequisites</span></p>
 
 <p>
 To use the Remote System Explorer communications server daemon you need to 
@@ -25,7 +25,7 @@ steps when you connect to the server.
 </p>
 
 <!-- TODO Link to where a RDT server can be downloaded -->
-<p><b>Installing the server code</b></p>
+<p><span class="bold">Installing the server code</span></p>
 
 <p>
 <ol>
@@ -33,29 +33,29 @@ steps when you connect to the server.
 <li>Ensure that Perl is installed.</li>
 <li>Ensure that a Java Runtime Environment (JRE) version 1.5 or higher is installed.
 An IBM, Sun or equivalent JRE is required; The gcj-based jvm shipped with most Linux
-distributions does not work. If in doubt, run the command <tt>java -version</tt>
+distributions does not work. If in doubt, run the command <span class="typewriter">java -version</span>
  and check if there is a reference to gcj.</li>
 <li>Choose a directory where you want to install the server code. These 
-instructions will use the <tt>/home/user/</tt> directory as an example, 
+instructions will use the <span class="typewriter">/home/user/</span> directory as an example, 
 but you are free to use any directory. When the server archive file is expanded
-it will create a directory named <tt>rdt-server</tt> in the location where it
+it will create a directory named <span class="typewriter">rdt-server</span> in the location where it
 is expanded.
 </li>
 <li>Upload the server archive file to this directory.</li>
-<li>Switch to the <tt>/home/user/</tt> directory.
+<li>Switch to the <span class="typewriter">/home/user/</span> directory.
 </li>
-<li>Run the following command in the <tt>/home/user</tt> directory to extract the
+<li>Run the following command in the <span class="typewriter">/home/user</span> directory to extract the
 server code from the package appropriate to your operating system. For linux this command is:
 
 <pre class="command">tar -xvf rdt-server-linux-1.0.tar</pre>
 
 </li>
-<li>A directory named <tt>/home/user/rdt-server</tt> will be created that contains the server files.</li>
+<li>A directory named <span class="typewriter">/home/user/rdt-server</span> will be created that contains the server files.</li>
 </ol>
 </p>
 
 
-<p><b>Starting the server</b></p>
+<p><span class="bold">Starting the server</span></p>
 
 <p>
 You can start the RSE communications server with the server daemon, or manually. 
@@ -84,7 +84,7 @@ the java command in /usr/bin by running the following command:
 ln -s  /opt/IBMJava2-141/jre/bin/java /usr/bin/java
 </pre>
 
-<p><b>To start the server with the server daemon</b></p>
+<p><span class="bold">To start the server with the server daemon</span></p>
 
 <p> 
 Ensure that you are running using the root user ID. (If the daemon is not run under root, 
@@ -108,7 +108,7 @@ serverPortRange argument to restrict selected server ports to the range given:
 perl ./daemon.pl 4075 10000-10010
 </pre>
 
-<p><b>To start the server manually</b></p>
+<p><span class="bold">To start the server manually</span></p>
 
 <p>
 Note: In the following discussion we assume that the RSE server has been installed on Linux. 
