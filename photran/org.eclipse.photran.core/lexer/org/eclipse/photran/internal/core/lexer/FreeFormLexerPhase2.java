@@ -36,24 +36,29 @@ import java.util.regex.Pattern;
  *
  * @see FreeFormLexerPhase1
  */
+/*
+ * This class dates back to about 2004 or 2005, before Java 5 was available.  I added type
+ * parameters and @SuppressWarnings to mollify Java 5 compilers, but the use of Vectors and
+ * Iterators is clearly outdated, and it is still littered with superfluous downcasts.
+ */
 public class FreeFormLexerPhase2 implements ILexer
 {
     private ILexer yylex;
 
-    private Vector tokenStream = new Vector();
-    private Vector lineNumbers = new Vector();
-    private Vector colNumbers = new Vector();
-    private Vector files = new Vector();
-    private Vector fileOffsets = new Vector();
-    private Vector streamOffsets = new Vector();
-    private Vector lengths = new Vector();
-    private ListIterator tokenIt;
-    private ListIterator lineIt;
-    private ListIterator colIt;
-    private ListIterator fileIt;
-    private ListIterator fileOffsetIt;
-    private ListIterator streamOffsetIt;
-    private ListIterator lengthIt;
+    private Vector<IToken> tokenStream = new Vector<IToken>();
+    private Vector<Integer> lineNumbers = new Vector<Integer>();
+    private Vector<Integer> colNumbers = new Vector<Integer>();
+    private Vector<FileOrIFile> files = new Vector<FileOrIFile>();
+    private Vector<Integer> fileOffsets = new Vector<Integer>();
+    private Vector<Integer> streamOffsets = new Vector<Integer>();
+    private Vector<Integer> lengths = new Vector<Integer>();
+    private ListIterator<IToken> tokenIt;
+    private ListIterator<Integer> lineIt;
+    private ListIterator<Integer> colIt;
+    private ListIterator<FileOrIFile> fileIt;
+    private ListIterator<Integer> fileOffsetIt;
+    private ListIterator<Integer> streamOffsetIt;
+    private ListIterator<Integer> lengthIt;
 
     private IToken lastToken = null;
     private FileOrIFile lastTokenFile = null;
@@ -73,7 +78,7 @@ public class FreeFormLexerPhase2 implements ILexer
      * Map token IDs to rules that determine (based on context) the contexts
      * in which those tokens should be keywords.
      */
-    HashMap/*<Terminal, LinkedList<Rule>>*/ rules = new HashMap();
+    HashMap<Terminal, LinkedList<Rule>> rules = new HashMap<Terminal, LinkedList<Rule>>();
 
 //    /**
 //     * Creates a new scanner.
@@ -642,7 +647,7 @@ public class FreeFormLexerPhase2 implements ILexer
             Terminal thistokenTerminal = ((IToken)tokenStream.elementAt(tokenPos)).getTerminal();
             if (rules.containsKey(thistokenTerminal))
             {
-                LinkedList ruleList = (LinkedList)rules.get(thistokenTerminal);
+                LinkedList<Rule> ruleList = (LinkedList<Rule>)rules.get(thistokenTerminal);
                 if (allRulesApplyToTokenAtPosition(ruleList, tokenPos))
                     retainAsKeyword[tokenPos] = true;
             }
@@ -653,8 +658,8 @@ public class FreeFormLexerPhase2 implements ILexer
      * @param ruleList
      * @param tokenPos
      */
-    private boolean allRulesApplyToTokenAtPosition(LinkedList ruleList, int tokenPos) {
-        ListIterator it = ruleList.listIterator();
+    private boolean allRulesApplyToTokenAtPosition(LinkedList<Rule> ruleList, int tokenPos) {
+        ListIterator<Rule> it = ruleList.listIterator();
         while (it.hasNext())
         {
             Rule r = (Rule)it.next();
@@ -983,24 +988,24 @@ public class FreeFormLexerPhase2 implements ILexer
 
     /* ----- RULES ----------------------------------------------------------*/
 
-    private LinkedList ruleList;
+    private LinkedList<Rule> ruleList;
 
     private void shouldAlwaysBeKeyword(Terminal tokenTerminal)
     {
-        ruleList = new LinkedList();
+        ruleList = new LinkedList<Rule>();
         applyRulesTo(tokenTerminal);
     }
 
     private void addRule(Terminal tokenTerminal, Rule rule)
     {
-        ruleList = new LinkedList();
+        ruleList = new LinkedList<Rule>();
         ruleList.add(rule);
         applyRulesTo(tokenTerminal);
     }
 
     private void addRules(Terminal tokenTerminal, Rule rule1, Rule rule2)
     {
-        ruleList = new LinkedList();
+        ruleList = new LinkedList<Rule>();
         ruleList.add(rule1);
         ruleList.add(rule2);
         applyRulesTo(tokenTerminal);
@@ -1008,7 +1013,7 @@ public class FreeFormLexerPhase2 implements ILexer
 
     private void addRules(Terminal tokenTerminal, Rule rule1, Rule rule2, Rule rule3)
     {
-        ruleList = new LinkedList();
+        ruleList = new LinkedList<Rule>();
         ruleList.add(rule1);
         ruleList.add(rule2);
         ruleList.add(rule3);
@@ -1151,6 +1156,7 @@ public class FreeFormLexerPhase2 implements ILexer
             firstTokenPriorId = tokenTerminal;
         }
 
+        @SuppressWarnings("unused")
         public MustBePrecededBy(Terminal tokenTerminal1, Terminal tokenTerminal2)
         {
             secondTokenPriorId = tokenTerminal1;
@@ -1307,6 +1313,7 @@ public class FreeFormLexerPhase2 implements ILexer
             possibilities[2] = tokenTerminal3;
         }
 
+        @SuppressWarnings("unused")
         public StmtMustStartWithOneOf(Terminal tokenTerminal1, Terminal tokenTerminal2, Terminal tokenTerminal3, Terminal tokenTerminal4)
         {
             possibilities = new Terminal[4];
@@ -1316,6 +1323,7 @@ public class FreeFormLexerPhase2 implements ILexer
             possibilities[3] = tokenTerminal4;
         }
 
+        @SuppressWarnings("unused")
         public StmtMustStartWithOneOf(Terminal tokenTerminal1,
                                       Terminal tokenTerminal2,
                                       Terminal tokenTerminal3,
@@ -1522,8 +1530,8 @@ public class FreeFormLexerPhase2 implements ILexer
      */
     private void applyChanges()
     {
-        Vector identifiersContainingEqualSigns = new Vector();
-        Vector identifiersStarred = new Vector();
+        Vector<Integer> identifiersContainingEqualSigns = new Vector<Integer>();
+        Vector<Integer> identifiersStarred = new Vector<Integer>();
         for (int i = 0; i < tokenStream.size(); i++)
         {
             IToken t = (IToken)tokenStream.elementAt(i);

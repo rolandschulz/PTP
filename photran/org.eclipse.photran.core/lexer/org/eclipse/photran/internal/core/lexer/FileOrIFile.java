@@ -16,6 +16,17 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * Represents either an {@link IFile} or a {@link java.io.File}.
+ * <p>
+ * Since {@link IFile} and {@link java.io.File} share no common superclass other than object, this
+ * &quot;wrapper class&quot; can be used instead.  It provides a path-based equality comparison,
+ * a {@link #toString()} methods that displays a user-readable file path, and an easy way to
+ * retrieve both an {@link IFile} and a {@link java.io.File} for the same file (if possible).
+ * <p>
+ * This class was added mainly to support the C preprocessor.  A Fortran program containing C
+ * preprocessor directives may <i>#include</i> any file in the local filesystem.  When the included
+ * file is in the user's workspace, it should be represented as an {@link IFile}, since
+ * {@link IFile}s can be displayed in search results, etc.; if the file cannot be represented as
+ * an {@link IFile}, then a {@link java.io.File} must suffice.
  * 
  * @author Jeff Overbey
  */

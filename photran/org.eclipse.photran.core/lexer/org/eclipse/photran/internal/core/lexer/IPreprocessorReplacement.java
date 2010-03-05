@@ -19,5 +19,4 @@ package org.eclipse.photran.internal.core.lexer;
  */
 public interface IPreprocessorReplacement
 {
-
 }

@@ -26,6 +26,7 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  * 
  * @author Dirk Rossow
  */
+// JO -- Added type parameters to mollify Java 5 compilers
 class FixedFormLexerPrepass {
 	static final int inStart=0;
 	static final int inHollerith=1;
@@ -49,7 +50,7 @@ class FixedFormLexerPrepass {
 	private DynamicIntArray offsetMapping = new DynamicIntArray(1000);
 	
 	//Maps whitespace(string) to position in file (line, col, offset) tuple
-	private HashMap whiteSpaceMapping = new HashMap();	
+	private HashMap<PositionInFile, String> whiteSpaceMapping = new HashMap<PositionInFile, String>();	
 	//Used to accumulate whitespace between lines (multi-line comments, etc) because
 	// the string is processed on per-line basis
 	private String prevWhiteSpace = "";

@@ -11,10 +11,10 @@
 package org.eclipse.photran.internal.core.lexer;
 
 /**
- * A <code>TokenFactory</code> is used by the Fortran lexer to create {@link IToken} objects.
+ * A {@link TokenFactory} is used by the Fortran lexer to create {@link IToken} objects.
  * <p>
  * This is necessary since the parser uses a Token object that is dependent on
- * the VPG, which has purposely been separated from the Photran core.
+ * the VPG, which is separate from the Photran core.
  * 
  * @author Jeff Overbey
  */
