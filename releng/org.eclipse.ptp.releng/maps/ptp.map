@@ -60,7 +60,7 @@ plugin@org.eclipse.ptp.rm.mpi.mpich2.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.
 plugin@org.eclipse.ptp.rm.mpi.openmpi.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.core
 plugin@org.eclipse.ptp.rm.mpi.openmpi.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.ui
 plugin@org.eclipse.ptp.rm.pbs.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.core
-plugin@org.eclipse.ptp.rm.pbs.proxy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.proxy
+plugin@org.eclipse.ptp.rm.pbs.jproxy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.jproxy
 plugin@org.eclipse.ptp.rm.pbs.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.ui
 plugin@org.eclipse.ptp.rm.slurm.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.slurm.core
 plugin@org.eclipse.ptp.rm.slurm.proxy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.slurm.proxy
@@ -123,7 +123,6 @@ plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:
 plugin@org.eclipse.ptp.rdt.managedbuilder.xlc.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui
 plugin@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.xlc
 plugin@org.eclipse.ptp.rdt.make.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.make.ui
-
 
 ! ISP Plugins
 plugin@org.eclipse.ptp.isp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp
