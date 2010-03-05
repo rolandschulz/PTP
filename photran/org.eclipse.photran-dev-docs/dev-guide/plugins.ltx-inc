@@ -11,33 +11,18 @@ related Eclipse plug-ins that the user can install as a whole.
 
 \section{Overview}
 
-Figure~\ref{fig:images_photran_architecture} illustrates the relationship
-between Photran, the Rephraser Engine, CDT, and the Eclipse platform.
 Figure~\ref{fig:images_architecture_overview} illustrates the plug-in
-decomposition of Photran, and Figure~\ref{fig:images_rephraser_engine}
-illustrates the plug-in decomposition of the Rephraser Engine.
+decomposition of Photran and the Rephraser Engine, as well as their relationship
+with CDT and the Eclipse Platform.
 
-\begin{image}
+%\begin{image}
+\begin{sidewaysfigure}
 	\centering
-			\includegraphics[width=3in]{images/architecture_overview.png}
-			\caption{Relationship between Photran, the Rephraser Engine, CDT, and the Eclipse platform}
-		\label{fig:images_photran_architecture}
-\end{image}
-
-\begin{image}
-	\centering
-			\includegraphics[width=\textwidth]{images/photran_architecture.png}
-			\caption{Plug-in decomposition of Photran}
-		\label{fig:images_architecture_overview}
-\end{image}
-
-\begin{image}
-	\centering
-			\includegraphics[width=3in]{images/rephraser_engine.png}
-			\caption{Plug-in decomposition of the Rephraser Engine}
-		\label{fig:images_rephraser_engine}
-\end{image}
-
+	\includegraphics[width=\textwidth]{images/photran_architecture.png}
+	\caption{Plug-in decomposition of Photran and the Rephraser Engine}
+	\label{fig:images_architecture_overview}
+\end{sidewaysfigure}
+%\end{image}
 
 \section{Base Photran Feature: \\org.eclipse.photran-feature}
 
