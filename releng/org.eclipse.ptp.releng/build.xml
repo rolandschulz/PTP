@@ -129,11 +129,14 @@
 			<dirset dir="${copyToDir}/${buildType}.${buildId}"/>
 		</chmod>
 		<!-- Create symlink to latest build -->
-		<symlink action="delete" link="${copyToDir}/latest" failonerror="false"/>
+		<delete file="${copyToDir}/latest" followsymlinks="false" failonerror="false"/>
+		<!--symlink action="delete" link="${copyToDir}/latest" failonerror="false"/-->
 		<symlink link="${copyToDir}/latest" resource="${copyToDir}/${buildType}.${buildId}" overwrite="true"/>
-		<symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/>
+		<delete file="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" followsymlinks="false" failonerror="false"/>
+		<!--symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/-->
 		<symlink link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${ptpMasterFile}" overwrite="true"/>
-		<symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/>
+		<delete file="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
+		<!--symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/-->
 		<symlink link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
 	</target>
 	
