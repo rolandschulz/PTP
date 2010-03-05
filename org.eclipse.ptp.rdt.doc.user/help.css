@@ -31,5 +31,6 @@ strong	 { font-weight: bold}
 em	     { font-style: italic}
 var	     { font-style: italic}
 th	     { font-weight: bold }
-
+.typewriter {font-family:monospace;}
+.bold {font-weight:600;}
 

@@ -12,13 +12,13 @@
       </h2>
       <p>
          The Build Service represents the execution and file manipulation services required by a builder to execute external build commands on
-         the target system.  A <i>builder</i> is still required which utilizes the build service to execute the commands to perform the build.
+         the target system.  A <em>builder</em> is still required which utilizes the build service to execute the commands to perform the build.
       </p>
       <p>There are two implementations of the build service supplied with RDT, in the form of <a href=providers.html>Service Providers</a>:</p>
       	<UL type="disc">
-      	<li>The <b>Null Build Service</b> provider.  This implementation does nothing when asked to build.  It is useful if you wish to use other services
+      	<li>The <strong>Null Build Service</strong> provider.  This implementation does nothing when asked to build.  It is useful if you wish to use other services
       	do not need to build the project.</li>
-      	<li>The <b>RDT Remote Build Service</b> provider.  This implementation uses the PTP Remote Services API to provide build services.
+      	<li>The <strong>RDT Remote Build Service</strong> provider.  This implementation uses the PTP Remote Services API to provide build services.
       	Currently there are three possible sub-choices for these services:</li>
       	<UL type="circle">
       	<li>Local - Services are executed on the local machine.</li>
