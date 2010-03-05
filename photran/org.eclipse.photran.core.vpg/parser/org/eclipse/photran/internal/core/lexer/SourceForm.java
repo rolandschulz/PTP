@@ -12,11 +12,6 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -28,16 +23,45 @@ import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.Prep
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
- * Contains constants enumerating the various Fortran source forms.
+ * Contains constants enumerating the various Fortran source forms (fixed form, free form, free
+ * form with C preprocessor directives, etc.).
  * <p>
- * Internally, this class is used as a Strategy object in <code>LexerFactory</code>.
+ * Internally, this class is used as a Strategy object in {@link LexerFactory}.
  * 
  * @author Jeff Overbey
  */
 public abstract class SourceForm
 {
     protected SourceForm() {;}
-    
+
+    /**
+     * Creates a lexical analyzer.
+     * <p>
+     * <b>Important.</b> The parameters methods to this method are <i>not</i> redundant; they have a
+     * somewhat confusing relationship that must be obeyed by the lexical analyzer that is created:
+     * <ol>
+     * <li><i>The lexer must ALWAYS read from the supplied {@link InputStream} <code>in</code>.</i>
+     * When a file is open in an editor but the editor has unsaved changes, the unsaved changes
+     * should be parsed, not the file on disk, so that the Outline view appears correct. The current
+     * editor contents are passed as the input stream. Still, the underlying {@link IFile} is made
+     * available so that it can be used to determine the include paths used by the C preprocessor.
+     * 
+     * <li><i>If the {@link IFile} <code>file</code> is not null, it should be used to determine the
+     * path to the file;</i> in this case the (String) <code>filename</code> is used only in error
+     * messages and likely does NOT represent a valid filesystem path.
+     * 
+     * <li><i>If the {@link IFile} <code>file</code> is null, then we are parsing a file that is not
+     * available in the workspace...</i>
+     *     <ol>
+     *     <li>If possible, the (String) filename should provide a full path to a file on the local
+     *     filesystem; this will be used as the working directory when the C preprocessor processes
+     *     #include directives.
+     * 
+     *     <li>If the filename does not point to a valid path on the local filesystem, #include
+     *     directives will not be processed.
+     *     </ol>
+     * </ol>
+     */
     public abstract IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
     
     public abstract String getDescription(String filename);

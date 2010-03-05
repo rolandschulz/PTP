@@ -13,9 +13,8 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.IOException;
 
 /**
- * <code>ILexer</code> is the common interface implemented by fixed and free form Fortran lexers.
- * An <code>IAccumulatingLexer</code> is a lexer which maintains a list of tokens which can be
- * iterated through, binary searched, etc.
+ * An {@link ILexer} which collects tokens from another lexer and collects them into a
+ * {@link TokenList}; this list can be then be iterated through, binary searched, etc.
  * 
  * @author Jeff Overbey
  */

@@ -22,7 +22,7 @@ import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 import org.eclipse.photran.internal.core.util.IterableWrapper;
 
 /**
- * The root of the Fortran AST (implementation of <code>IFortranAST</code>)
+ * A Fortran abstract syntax tree container class (canonical implementation of {@link IFortranAST}).
  * 
  * @author Jeff Overbey
  */
@@ -63,7 +63,7 @@ public class FortranAST implements IFortranAST
         return root;
     }
 
-    public Iterator/*<token>*/ iterator()
+    public Iterator<Token> iterator()
     {
         return tokenList.iterator();
     }

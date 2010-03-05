@@ -30,7 +30,9 @@ import org.eclipse.rephraserengine.core.util.OffsetLength;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**
- * Implementation of <code>IToken</code> used by the Fortran parser.
+ * Tokens are returned by the lexical analyzer and serve as leaf nodes in the AST.
+ * <p>
+ * This is the implementation of {@link IToken} used by the Fortran parser.
  * 
  * @author Jeff Overbey
  */

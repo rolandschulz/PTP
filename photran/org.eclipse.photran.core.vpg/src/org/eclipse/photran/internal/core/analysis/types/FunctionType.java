@@ -19,12 +19,14 @@ import java.util.List;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
- * A <code>Type</code> corresponding to a derived type with a particular name.
+ * Represents a function type, i.e., a {@link Type} with a list of argument types and a return type.
  * 
  * @author Jeff Overbey
  */
 public class FunctionType extends Type
 {
+    private static final long serialVersionUID = 1L;
+    
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     private String name;
     private Type returnType = Type.UNKNOWN;

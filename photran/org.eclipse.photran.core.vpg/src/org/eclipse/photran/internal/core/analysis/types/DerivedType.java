@@ -17,12 +17,14 @@ import java.io.OutputStream;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
- * A <code>Type</code> corresponding to a derived type with a particular name.
+ * A {@link Type} representing a Fortran derived type with a particular name.
  * 
  * @author Jeff Overbey
  */
 public class DerivedType extends Type
 {
+    private static final long serialVersionUID = 1L;
+    
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     private String name;
 

@@ -18,7 +18,7 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
 
 /**
- * Interface implemented by the Fortran abstract syntax tree
+ * Interface implemented by a Fortran abstract syntax tree.
  * 
  * @author Jeff Overbey
  */

@@ -24,7 +24,10 @@ import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
- * Fortran type checker
+ * A type checker for Fortran programs.
+ * <p>
+ * <b>This is incomplete. It can't type check expressions containing function calls, for
+ * example.</b>
  * 
  * @author Stoyan Gaydarov
  */

@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.types;
 
+import org.eclipse.photran.internal.core.analysis.binding.Definition;
+
 /**
- * Allows for double-dispatch on a Definition in order to process its type.
+ * Allows for double-dispatch on a {@link Definition} in order to process its type.
  * 
  * @author Jeff Overbey
  * @param <T>

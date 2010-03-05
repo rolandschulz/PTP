@@ -17,18 +17,20 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
- * An incomplete representation of the type of a Fortran expression or variable.
- * 
- * Does not include any information about kinds or character lengths.
- * Does not include any information about array indexing; that is stored in the <code>Definition</code> for that variable.
+ * Represents the type of a Fortran expression or variable.
+ * <p>
+ * Does not include any information about kinds or character lengths. Does not include any
+ * information about array indexing; that is stored in the variable's {@link Definition}.
  * 
  * @author Jeff Overbey
  */
+@SuppressWarnings("serial")
 public abstract class Type implements IPhotranSerializable, Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -365,6 +367,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
         setThreeLetterSerializationCode(FunctionType.class);
     }
     
+    @SuppressWarnings("rawtypes")
     public static Type readFrom(InputStream in) throws IOException
     {
         String code = PhotranVPGSerializer.deserialize(in);

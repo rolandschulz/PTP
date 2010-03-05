@@ -14,10 +14,11 @@ import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 
 /**
- * Maintains a list of all of the tokens in a program, allowing them to be
- * located quickly by offset.
+ * A list of all of the tokens in a Fortran program; provides an efficient means of locating the
+ * token at a particular offset.
  * 
  * @author Jeff Overbey
+ * @see org.eclipse.rephraserengine.core.util.TokenList
  */
 public final class TokenList extends org.eclipse.rephraserengine.core.util.TokenList<Token>
 {

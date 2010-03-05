@@ -8,12 +8,13 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.analysis.preservation;
+package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
 import org.eclipse.rephraserengine.core.preservation.ResetOffsetLength;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
 
@@ -25,8 +26,9 @@ import org.eclipse.rephraserengine.core.util.OffsetLength;
  * </ul>
  *
  * @author Jeff Overbey
+ * @see PreservationAnalysis
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class ASTNodeAdapterFactory implements IAdapterFactory
 {
     private static final OffsetLength EMPTY_OFFSET_LENGTH = new OffsetLength(-1, 0);

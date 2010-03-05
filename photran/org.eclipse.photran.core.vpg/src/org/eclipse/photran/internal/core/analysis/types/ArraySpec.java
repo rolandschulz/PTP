@@ -27,7 +27,8 @@ import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
- * An array specification: A "smart" representation of an ArraySpec AST node.
+ * A smarter, persistable representation of an {@link ASTArraySpecNode}, i.e., an <i>ArraySpec</i>
+ * in the Fortran grammar.
  * 
  * @author Jeff Overbey
  * 
