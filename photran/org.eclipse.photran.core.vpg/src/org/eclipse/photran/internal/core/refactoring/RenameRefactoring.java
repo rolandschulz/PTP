@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
@@ -218,7 +219,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring implements I
             {
                 continue;
             }
-            else if (PhotranVPG.hasFixedFormContentType(file))
+            else if (FortranCorePlugin.hasFixedFormContentType(file))
             {
                 fixedFormFiles.add(file);
                 status.addError("The fixed form file " + file.getName() + " will not be refactored.");
@@ -251,7 +252,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring implements I
             {
                 continue;
             }
-            else if (PhotranVPG.hasCppContentType(file))
+            else if (FortranCorePlugin.hasCppContentType(file))
             {
                 cppFormFiles.add(file);
                 status.addError("The C-Preprocessed form file " + file.getName() + " will not be refactored.");

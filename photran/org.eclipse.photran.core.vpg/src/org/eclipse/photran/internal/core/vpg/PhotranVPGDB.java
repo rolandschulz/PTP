@@ -9,6 +9,7 @@ import java.io.Serializable;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.Activator;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.rephraserengine.core.vpg.db.caching.CachingDB;
@@ -25,7 +26,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
     {
         public PhotranCDTDB()
         {
-            this(PhotranVPG.inTestingMode()
+            this(FortranCorePlugin.inTestingMode()
                  ? createTempFile()
                  : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran60vpg2");
         }

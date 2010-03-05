@@ -451,5 +451,4 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 		}
 		return (IPath[]) outs.toArray(new IPath[outs.size()]);
 	}
-
 }

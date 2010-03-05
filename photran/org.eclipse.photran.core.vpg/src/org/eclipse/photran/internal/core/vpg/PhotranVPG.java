@@ -2,13 +2,10 @@ package org.eclipse.photran.internal.core.vpg;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
@@ -17,11 +14,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.cdtinterface.natures.ProjectNatures;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
@@ -54,15 +49,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	// Tested empirically on ibeam-cpp-mod: 5 does better than 3, but 10 does not do better than 5
     private static final int MODULE_SYMTAB_CACHE_SIZE = 5;
 
-    // Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
-	// (since our parser declares classes with the same name)
-    private static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
-    private static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
-   
-    //Including a C-Preprocessor content type so that we can disable the refactorings if any of the files
-    // involved are C-Preprocessed
-    private static final String C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.cppFreeFormFortranSource";
-    private static final String C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.cppFixedFormFortranSource";
+
     
 	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
 	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
@@ -172,7 +159,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
     @Override public void start()
 	{
-		if (!inTestingMode()) super.start();
+		if (!FortranCorePlugin.inTestingMode()) super.start();
 	}
 
 	protected PhotranVPG()
@@ -180,11 +167,6 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         super(new PhotranVPGLog(), new PhotranVPGDB(), "Photran indexer", 2);
         db = super.db;
     }
-
-    public static boolean inTestingMode()
-	{
-		return System.getenv("TESTING") != null;
-	}
 
     @Override
 	public String describeEdgeType(int edgeType)
@@ -230,10 +212,10 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     public boolean shouldProcessFile(IFile file)
     {
         String filename = file.getName();
-        return hasFixedFormContentType(filename)    || 
-               hasFreeFormContentType(filename)     ||
-               hasCppFixedFormContentType(filename) ||
-               hasCppFreeFormContentType(filename);
+        return FortranCorePlugin.hasFixedFormContentType(filename)    || 
+               FortranCorePlugin.hasFreeFormContentType(filename)     ||
+               FortranCorePlugin.hasCppFixedFormContentType(filename) ||
+               FortranCorePlugin.hasCppFreeFormContentType(filename);
     }
 
     @Override
@@ -243,7 +225,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         {
             if (!project.isAccessible()) return false;
             if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID)) return false;
-            return inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
+            return FortranCorePlugin.inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
         }
         catch (CoreException e)
         {
@@ -727,170 +709,15 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
         marker.setAttributes(attribs);
     }
-
-    public static boolean hasFixedFormContentType(IFile file)
-    {
-        return hasFixedFormContentType(getFilenameForIFile(file));
-    }
-
-    public static boolean hasFreeFormContentType(IFile file)
-    {
-        return hasFreeFormContentType(getFilenameForIFile(file));
-    }
     
-    public static boolean hasCppFixedFormContentType(IFile file)
-    {
-        return hasCppFixedFormContentType(getFilenameForIFile(file));
-    }
-
-    public static boolean hasCppFreeFormContentType(IFile file)
-    {
-        return hasCppFreeFormContentType(getFilenameForIFile(file));
-    }
-    
-    public static boolean hasCppContentType(IFile file)
-    {
-        return hasCppContentType(getFilenameForIFile(file));
-    }
-
-    protected static boolean hasFixedFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f");
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(fixedFormContentType());
-        }
-    }
-
-    protected static boolean hasFreeFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f90");
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(freeFormContentType());
-        }
-    }
-    
-    protected static boolean hasCppFixedFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".F"); 
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(cppFixedFormContentType());
-        }
-    }
-    
-    protected static boolean hasCppFreeFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".F90"); 
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(cppFreeFormContentType());
-        }
-    }
-    
-    protected static boolean hasCppContentType(String filename)
-    {
-        return hasCppFreeFormContentType(filename) || 
-               hasCppFixedFormContentType(filename);
-    }
-
-    protected static final IContentType getContentTypeOf(String filename)
-    {
-        return findContentType(filename);
-    }
-
-    protected static final IContentType fixedFormContentType()
-    {
-        return Platform.getContentTypeManager().getContentType(FIXED_FORM_CONTENT_TYPE);
-    }
-
-    protected static final IContentType freeFormContentType()
-    {
-        return Platform.getContentTypeManager().getContentType(FREE_FORM_CONTENT_TYPE);
-    }
-    
-    protected static final IContentType cppFixedFormContentType()
-    {
-        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE);
-    }
-    
-    protected static final IContentType cppFreeFormContentType()
-    {
-        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE);
-    }
-
     public boolean doesProjectHaveRefactoringEnabled(IFile file)
     {
-        if (PhotranVPG.inTestingMode()) return true;
+        if (FortranCorePlugin.inTestingMode()) return true;
 
         String vpgEnabledProperty = SearchPathProperties.getProperty(
             file,
             SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
         return vpgEnabledProperty != null && vpgEnabledProperty.equals("true");
-    }
-
-    public static IContentType findContentType(String filename)
-    {
-        IContentType[] cts = Platform.getContentTypeManager().findContentTypesFor(filename);
-        if (cts.length == 0)
-            return null;
-        else if (cts.length == 1)
-            return cts[0];
-        
-        // Annoyingly, Eclipse does not do case-sensitive matching of filename
-        // extensions (at least on case-insensitive filesystems), which is
-        // important for Fortran filenames; we have to do that manually
-        
-        List<IContentType> possibilities = new ArrayList<IContentType>(cts.length);
-        
-        String ext = filename.substring(filename.lastIndexOf('.')+1);
-        for (IContentType ct : cts)
-            if (getFilenameExtensions(ct.getId()).contains(ext))
-                possibilities.add(ct);
-
-        if (possibilities.isEmpty()) return cts[0];
-
-        // Now find the most specific of the possible content types
-        
-        IContentType result = null;
-        for (IContentType ct : possibilities)
-        {
-            if (result == null)
-                result = ct;
-            else if (ct.isKindOf(result))
-                result = ct;
-        }
-        return result;
-    }
-    
-    private static Set<String> getFilenameExtensions(String contentType)
-    {
-        for (IConfigurationElement elt :
-                 Platform.getExtensionRegistry().getConfigurationElementsFor(
-                     "org.eclipse.core.contenttype.contentTypes"))
-        {
-            if (elt.getName().equals("file-association")
-                && elt.getAttribute("content-type").equals(contentType))
-            {
-                Set<String> result = new HashSet<String>();
-                String fileExts = elt.getAttribute("file-extensions");
-                if(fileExts == null)
-                    continue;
-                for (String ext : fileExts.split(","))
-                    result.add(ext.trim());
-                return result;
-            }
-        }
-        return Collections.emptySet();
     }
 
     private boolean isDefinitionCachingEnabled = false;

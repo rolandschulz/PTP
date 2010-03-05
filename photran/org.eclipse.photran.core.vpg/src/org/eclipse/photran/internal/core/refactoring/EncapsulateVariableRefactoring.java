@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
 import org.eclipse.photran.internal.core.lexer.Terminal;
@@ -201,7 +202,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
 
     protected void checkForFixedForm(IFile file) throws PreconditionFailure
     {
-        if(PhotranVPG.hasFixedFormContentType(file))
+        if(FortranCorePlugin.hasFixedFormContentType(file))
         {
             fail("Fixed form files cannot currently be refactored. " +
                     "File " + file.getName() + " is in fixed form and "+

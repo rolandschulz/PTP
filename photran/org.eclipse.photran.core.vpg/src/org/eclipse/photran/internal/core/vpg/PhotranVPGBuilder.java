@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
@@ -203,7 +204,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
 
         SourceForm sourceForm;
-        if (contentType != null && contentType.isKindOf(fixedFormContentType()))
+        if (contentType != null && contentType.isKindOf(FortranCorePlugin.fixedFormContentType()))
             sourceForm = SourceForm.FIXED_FORM;
         else if (file == null || file.getProject() == null)
             sourceForm = SourceForm.UNPREPROCESSED_FREE_FORM;

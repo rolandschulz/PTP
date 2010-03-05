@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.util.Spawner;
@@ -33,7 +34,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
 
     public RefactoringTestCase()
     {
-    	if (!PhotranVPG.inTestingMode()) fail("WHEN RUNNING JUNIT TESTS, THE \"TESTING\" ENVIRONMENT VARIABLE MUST BE SET");
+    	if (!FortranCorePlugin.inTestingMode()) fail("WHEN RUNNING JUNIT TESTS, THE \"TESTING\" ENVIRONMENT VARIABLE MUST BE SET");
     }
 
     protected IFile importFile(Plugin activator, String srcDir, String filename) throws Exception

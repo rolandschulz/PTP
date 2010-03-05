@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.PreprocessingFreeFormLexerPhase1;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
@@ -126,7 +127,7 @@ public abstract class SourceForm
     {
         try
         {
-            IContentType ct = PhotranVPG.findContentType(filename);
+            IContentType ct = FortranCorePlugin.findContentType(filename);
             if (ct == null) return null;
             
             IConfigurationElement[] configs =

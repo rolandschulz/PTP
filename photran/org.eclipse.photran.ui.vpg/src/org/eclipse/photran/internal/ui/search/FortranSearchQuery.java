@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.FileOrIFile;
@@ -248,7 +249,7 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
     
     @Override protected void finishSearch()
     {
-        if (!PhotranVPG.inTestingMode()
+        if (!FortranCorePlugin.inTestingMode()
             && Workbench.getInstance().getWorkbenchWindowCount() > 0
             && !projectsWithRefactoringDisabled.isEmpty())
         {

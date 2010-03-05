@@ -29,6 +29,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
@@ -93,7 +94,7 @@ public abstract class MultipleFileFortranRefactoring
 
     protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
     {
-        if (PhotranVPG.inTestingMode()) return;
+        if (FortranCorePlugin.inTestingMode()) return;
 
         HashSet<IFile> filesToBeRemoved = new HashSet<IFile>();
 
@@ -125,7 +126,7 @@ public abstract class MultipleFileFortranRefactoring
 
         for (IFile file : files)
         {
-            if (!filesToRemove.contains(file) && PhotranVPG.hasFixedFormContentType(file))
+            if (!filesToRemove.contains(file) && FortranCorePlugin.hasFixedFormContentType(file))
             {
                 status.addError("The fixed form file " + file.getName() + " will not be refactored.");
                 filesToRemove.add(file);
@@ -141,7 +142,7 @@ public abstract class MultipleFileFortranRefactoring
 
         for (IFile file : files)
         {
-            if (!filesToRemove.contains(file) && PhotranVPG.hasCppContentType(file))
+            if (!filesToRemove.contains(file) && FortranCorePlugin.hasCppContentType(file))
             {
                 status.addError("The C-Preprocessed file " + file.getName() + " will not be refactored.");
                 filesToRemove.add(file);

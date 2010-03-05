@@ -543,13 +543,18 @@
 <!-- CDT does not yet support multiple content types so comment out these inputType attributes for now
             sourceContentType="org.eclipse.photran.core.fortranSource"
             dependencyContentType="org.eclipse.cdt.core.fortranSource"
+            
+            sources="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
+              dependencyExtensions="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90" 
+              languageId="org.eclipse.photran.cdtinterface.fortran">
 -->
 
-          <inputType
+          <inputType            
               sources="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
               dependencyExtensions="f,f90,ftn,for,i,fpp,F,FOR,FTN,FPP,F90,i90"
               dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
-              id="photran.managedbuild.tool.gnu.fortran.compiler.input">
+              id="photran.managedbuild.tool.gnu.fortran.compiler.input"
+              languageId="org.eclipse.photran.cdtinterface.fortran">
           </inputType>
           <outputType
 			  outputs="o"
