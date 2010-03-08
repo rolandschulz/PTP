@@ -575,7 +575,7 @@ set_frame_with_line(stackframe *current_f, int depth)
 }
 */
 
-/**** aysn stop ****/
+/**** aysnc stop ****/
 static int
 AsyncStop(void *data)
 {
@@ -691,6 +691,13 @@ AsyncCallback(MIEvent *evt)
 {
 	AsyncFunc = AsyncStop;
 	AsyncFuncData = (void *)evt;
+}
+
+static void
+StreamTargetCallback(char *str) {
+	dbg_event *e = NewDbgEvent(DBGEV_OUTPUT);
+	e->dbg_event_u.output = strdup(str);
+	SaveEvent(e);
 }
 
 /*
@@ -816,6 +823,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	MICommandFree(cmd);
 
 	MISessionRegisterEventCallback(sess, AsyncCallback);
+	MISessionRegisterTargetCallback(sess, StreamTargetCallback);
 
 	DebugSession = sess;
 

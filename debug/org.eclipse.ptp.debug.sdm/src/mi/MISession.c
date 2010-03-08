@@ -38,13 +38,16 @@
 
 static List *			MISessionList = NULL;
 static struct timeval	MISessionDefaultSelectTimeout = {0, 1000};
-static int				MISessionDebug = 0;
+static int				MISessionDebug = 1;
 
 static void DoOOBAsyncCallbacks(MISession *sess, List *oobs);
 static void DoOOBStreamCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
+
+extern int get_master_pty(char **);
+extern int get_slave_pty(char *);
 
 MISession *
 MISessionNew(void)
@@ -53,6 +56,7 @@ MISessionNew(void)
 	
 	sess->in_fd = -1;
 	sess->out_fd = -1;
+	sess->pty_fd = -1;
 	sess->pid = -1;
 	sess->exited = 1;
 	sess->exit_status = 0;
@@ -95,7 +99,6 @@ HandleChild(int sig)
 	if (MISessionList != NULL) {
 		for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
 			if (sess->pid == pid) {
-				fprintf(stderr, "gdb pid %d has exited\n", pid);
 				sess->exited = 1;
 				sess->exit_status = stat;
 			}
@@ -114,7 +117,6 @@ void
 MISessionSetDebug(int debug)
 {
 	MISessionDebug = debug;
-//	MISessionDebug = 1;
 }
 
 int
@@ -122,6 +124,8 @@ MISessionStartLocal(MISession *sess, char *prog)
 {
 	int			p1[2];
 	int			p2[2];
+	int			master;
+	char *		name;
 	
 	if (pipe(p1) < 0 || pipe(p2) < 0) {
 		MISetError(MI_ERROR_SYSTEM, strerror(errno));
@@ -134,6 +138,10 @@ MISessionStartLocal(MISession *sess, char *prog)
 	
 	signal(SIGCHLD, HandleChild);
 	signal(SIGPIPE, SIG_IGN);
+
+	if ((sess->pty_fd = get_master_pty(&name)) < 0 ) {
+		name = "/dev/null";
+	}
 	
 	switch (sess->pid = fork())
 	{
@@ -145,10 +153,11 @@ MISessionStartLocal(MISession *sess, char *prog)
 		close(p2[0]);
 		close(p2[1]);
 		
+		
 		if (prog == NULL)
-			execlp(sess->gdb_path, "gdb", "-q", "-tty", "/dev/null", "-i", "mi", NULL);
+			execlp(sess->gdb_path, "gdb", "-q", "-tty", name, "-i", "mi", NULL);
 		else
-			execlp(sess->gdb_path, "gdb", "-q", "-tty", "/dev/null", "-i", "mi", prog, NULL);
+			execlp(sess->gdb_path, "gdb", "-q", "-tty", name, "-i", "mi", prog, NULL);
 		
 		exit(1);
 	
@@ -296,10 +305,6 @@ ReadResponse(int fd)
 	static int		res_buf_len = MI_BUFSIZ;
 	static char *	res_buf = NULL;
 	
-	//if (res_buf != NULL) {
-		//free(res_buf);
-	//}
-	
 	if (res_buf == NULL)
 		res_buf = (char *)malloc(MI_BUFSIZ);
 
@@ -440,6 +445,18 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		if (sess->command != NULL && sess->command->completed)
 			sess->command = NULL;
 	}
+	
+    /* process application output */
+    if (sess->pty_fd != -1 && FD_ISSET(sess->pty_fd, rfds))
+    {    	
+        if ((str = ReadResponse(sess->pty_fd)) != NULL) {
+        	if (sess->target_callback != NULL) {
+        		sess->target_callback(str);
+        	}
+        } else {
+        	sess->pty_fd = -1;
+        }
+    }
 }
 
 int
@@ -599,6 +616,14 @@ MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *
 			if (sess->out_fd > n)
 				n = sess->out_fd;
 		}
+		
+        /* check if data on pty */
+        if (rfds != NULL && sess->pty_fd != -1) {
+        	FD_SET(sess->pty_fd, rfds);
+        	if (sess->pty_fd > n)
+        		n = sess->pty_fd;
+        }
+
 	}
 	
 	if (nfds != NULL)
@@ -644,6 +669,8 @@ MISessionProgress(MISession *sess, MIOutput *output)
 	if (n == 0 && EmptyList(sess->send_queue)) {
 		return 0;
 	}
+	
+
 	MISessionProcessCommandsAndResponses(sess, &rfds, NULL, output);
 	
 	return n;

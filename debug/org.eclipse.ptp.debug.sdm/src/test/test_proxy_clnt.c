@@ -68,8 +68,8 @@ event_callback(dbg_event *e, void *data)
 	case DBGEV_OK:
 		printf("command ok\n");
 		break;
-	case DBGEV_INIT:
-		printf("debugger initilized\n");
+	case DBGEV_OUTPUT:
+		printf("output: %s\n", e->dbg_event_u.output);
 		break;
 	case DBGEV_SUSPEND:
 		switch (e->dbg_event_u.suspend_event.reason) {

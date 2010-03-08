@@ -97,6 +97,7 @@ libmi_a_SOURCES =			src/mi/MIParser.c \
 							src/mi/MIMemory.c \
 							src/mi/MIMemoryCommand.c \
 							src/mi/CLICommand.c \
-							src/mi/CLIOutput.c
+							src/mi/CLIOutput.c \
+							src/mi/MIPty.c
 						
 libmi_a_CFLAGS =			-I./include $(AM_CFLAGS) -g

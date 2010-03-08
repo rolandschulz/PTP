@@ -525,7 +525,7 @@ sdm_tcpip_msgheader_receive(int sockfd, int *length)
 		len -= n;
 	}
 
-	DEBUG_PRINTF(DEBUG_LEVEL_PROTOCOL, "HEADER:<%*s>\n", MESSAGE_LENGTH_SIZE, length_str);
+	DEBUG_PRINTF(DEBUG_LEVEL_PROTOCOL, "HEADER:<%.*s>\n", MESSAGE_LENGTH_SIZE, length_str);
 
 	*length = hex_str_to_int(length_str, MESSAGE_LENGTH_SIZE, NULL) - MESSAGE_LENGTH_SIZE;
 

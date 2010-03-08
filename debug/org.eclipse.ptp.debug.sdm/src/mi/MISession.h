@@ -29,6 +29,7 @@
 struct MISession {
 	int				in_fd; /* GDB input */
 	int				out_fd; /* GDB output */
+	int				pty_fd; /* App output */
 	int				pid;
 	int				exited;
 	int				exit_status;
