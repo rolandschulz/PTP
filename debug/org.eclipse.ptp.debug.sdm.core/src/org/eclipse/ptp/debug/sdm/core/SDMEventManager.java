@@ -44,6 +44,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverInstructionRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDITerminateRequest;
+import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugArgsEvent;
@@ -54,9 +55,9 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugErrorEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugExitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugInitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugOKEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugOutputEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalExitEvent;
@@ -77,7 +78,7 @@ public class SDMEventManager extends AbstractEventManager {
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable o, final Object arg) {
-		PDebugUtils.println("Msg: SDMEventManager - update(): Event: " + ((IProxyDebugEvent)arg).toString());
+		PDebugUtils.println("Msg: SDMEventManager - update(): Event: " + ((IProxyDebugEvent)arg).toString()); //$NON-NLS-1$
 		IProxyDebugEvent event = (IProxyDebugEvent) arg;
 		IPDIEventRequest request = getCurrentRequest();
 		fireEvent(request, event);
@@ -108,12 +109,12 @@ public class SDMEventManager extends AbstractEventManager {
 	private synchronized void fireEvent(IPDIEventRequest request, IProxyDebugEvent event) {
 		BitList eTasks = ProxyDebugClient.decodeBitSet(event.getBitSet());
 
-		PDebugUtils.println("Msg: SDMEventManager - fireEvent(): event " + event);
+		PDebugUtils.println("Msg: SDMEventManager - fireEvent(): event " + event); //$NON-NLS-1$
 		
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>() {
 			private static final long serialVersionUID = 1L;
 			public boolean add(IPDIEvent e) {
-				PDebugUtils.println("Msg: SDMEventManager - fireEvent(): added PDIEvent: " + e);
+				PDebugUtils.println("Msg: SDMEventManager - fireEvent(): added PDIEvent: " + e); //$NON-NLS-1$
 				return super.add(e);
 			}
 		};
@@ -154,7 +155,7 @@ public class SDMEventManager extends AbstractEventManager {
 						IPDIBreakpoint bpt = ((IPDIDeleteBreakpointRequest)request).getBreakpoint();
 						if (bpt == null) {
 							eventList.add(session.getEventFactory().newErrorEvent(
-									session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, "Delete Breakpoint Error", "No PDI breakpoint found")));
+									session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, Messages.SDMEventManager_0, Messages.SDMEventManager_1)));
 						}
 						else {
 							eventList.add(session.getEventFactory().newDestroyedEvent(
@@ -190,7 +191,7 @@ public class SDMEventManager extends AbstractEventManager {
 				IPDIBreakpoint bpt = session.getBreakpointManager().getBreakpoint(e.getBreakpointId());
 				if (bpt == null) {
 					eventList.add(session.getEventFactory().newErrorEvent(
-							session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, "Set Breakpoint Error", "No PDI breakpoint found")));
+							session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, Messages.SDMEventManager_2, Messages.SDMEventManager_1)));
 				}
 				else {
 					eventList.add(session.getEventFactory().newCreatedEvent(
@@ -211,7 +212,7 @@ public class SDMEventManager extends AbstractEventManager {
 				}
 				catch (PDIException ex) {
 					eventList.add(session.getEventFactory().newErrorEvent(
-							session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL, "Shutdown debugger error", ex.getMessage())));
+							session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL, Messages.SDMEventManager_3, ex.getMessage())));
 				}
 			}
 		}
@@ -226,9 +227,11 @@ public class SDMEventManager extends AbstractEventManager {
 				session.getTaskManager().setTerminateTasks(true, eTasks);
 			}
 			eventList.add(session.getEventFactory().newErrorEvent(
-					session.getEventFactory().newErrorInfo(session, eTasks, actionType, "Internal Error", e.getErrorMessage())));
+					session.getEventFactory().newErrorInfo(session, eTasks, actionType, Messages.SDMEventManager_4, e.getErrorMessage())));
 		}
-		else if (event instanceof IProxyDebugInitEvent) {
+		else if (event instanceof IProxyDebugOutputEvent) {
+			IProxyDebugOutputEvent e = (IProxyDebugOutputEvent)event;
+			eventList.add(session.getEventFactory().newOutputEvent(session, eTasks, e.getOutput()));
 		}
 		else if (event instanceof IProxyDebugMemoryInfoEvent) {
 		}
@@ -245,7 +248,7 @@ public class SDMEventManager extends AbstractEventManager {
 				}
 				catch (PDIException ex) {
 					eventList.add(session.getEventFactory().newErrorEvent(
-							session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL, "Shutdown debugger error", ex.getMessage())));
+							session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL, Messages.SDMEventManager_3, ex.getMessage())));
 				}
 			}
 		}
@@ -254,7 +257,7 @@ public class SDMEventManager extends AbstractEventManager {
 			IPDIBreakpoint bpt = session.getBreakpointManager().getBreakpoint(e.getBreakpointId());
 			if (bpt == null) {
 				eventList.add(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, "Hit Breakpoint Error", "No PDI breakpoint found")));
+						session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, Messages.SDMEventManager_5, Messages.SDMEventManager_1)));
 			}
 			else {
 				eventList.add(createSuspendedEvent(session.getEventFactory().newBreakpointInfo(session, eTasks, bpt), e.getThreadId(), 0, e.getDepth(), e.getChangedVars()));

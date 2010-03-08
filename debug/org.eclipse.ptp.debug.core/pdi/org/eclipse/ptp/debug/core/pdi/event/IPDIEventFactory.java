@@ -131,6 +131,14 @@ public interface IPDIEventFactory {
 	/**
 	 * @param session
 	 * @param tasks
+	 * @param output
+	 * @return
+	 */
+	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, BitList tasks, String output);
+
+	/**
+	 * @param session
+	 * @param tasks
 	 * @param type
 	 * @return
 	 */

@@ -35,6 +35,7 @@ import org.eclipse.ptp.debug.internal.core.pdi.event.ErrorInfo;
 import org.eclipse.ptp.debug.internal.core.pdi.event.ExitInfo;
 import org.eclipse.ptp.debug.internal.core.pdi.event.LocationReachedInfo;
 import org.eclipse.ptp.debug.internal.core.pdi.event.MemoryBlockInfo;
+import org.eclipse.ptp.debug.internal.core.pdi.event.OutputEvent;
 import org.eclipse.ptp.debug.internal.core.pdi.event.ResumedEvent;
 import org.eclipse.ptp.debug.internal.core.pdi.event.SignalInfo;
 import org.eclipse.ptp.debug.internal.core.pdi.event.StartedEvent;
@@ -138,12 +139,19 @@ public abstract class AbstractEventFactory implements IPDIEventFactory {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newOutputEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 */
+	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, BitList tasks, String output) {
+		return new OutputEvent(reason, tasks, output);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newResumedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList, int)
 	 */
 	public IPDIResumedEvent newResumedEvent(IPDISessionObject reason, BitList tasks, int type) {
 		return new ResumedEvent(reason, tasks, type);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newSignalInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String, java.lang.String, org.eclipse.ptp.debug.core.pdi.model.IPDISignal, org.eclipse.ptp.debug.core.pdi.IPDILocator)
 	 */
