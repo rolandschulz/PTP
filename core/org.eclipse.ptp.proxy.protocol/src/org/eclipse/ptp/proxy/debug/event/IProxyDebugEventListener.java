@@ -24,12 +24,12 @@ public interface IProxyDebugEventListener {
 	public void handleProxyDebugBreakpointHitEvent(IProxyDebugBreakpointHitEvent e);
 	public void handleProxyDebugBreakpointSetEvent(IProxyDebugBreakpointSetEvent e);
 	public void handleProxyDebugDataEvent(IProxyDebugDataEvent e);
-	public void handleProxyDebugExitEvent(IProxyDebugExitEvent e);
 	public void handleProxyDebugErrorEvent(IProxyDebugErrorEvent e);
+	public void handleProxyDebugExitEvent(IProxyDebugExitEvent e);
 	public void handleProxyDebugInfoThreadsEvent(IProxyDebugInfoThreadsEvent e);
-	public void handleProxyDebugInitEvent(IProxyDebugInitEvent e);
 	public void handleProxyDebugMemoryInfoEvent(IProxyDebugMemoryInfoEvent e);
 	public void handleProxyDebugOKEvent(IProxyDebugOKEvent e);
+	public void handleProxyDebugOutputEvent(IProxyDebugOutputEvent e);
 	public void handleProxyDebugSetThreadSelectEvent(IProxyDebugSetThreadSelectEvent e);
 	public void handleProxyDebugSignalEvent(IProxyDebugSignalEvent e);
 	public void handleProxyDebugSignalExitEvent(IProxyDebugSignalExitEvent e);

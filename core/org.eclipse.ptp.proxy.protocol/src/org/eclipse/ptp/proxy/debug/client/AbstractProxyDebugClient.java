@@ -38,9 +38,9 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventFactory;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugExitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugInitEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugOKEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugOutputEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalExitEvent;
@@ -222,6 +222,9 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
+	 */
 	public void handleEvent(IProxyExtendedEvent e) {
 		if (e instanceof IProxyDebugArgsEvent) {
 			fireProxyDebugArgsEvent((IProxyDebugArgsEvent) e);
@@ -237,8 +240,8 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			fireProxyDebugErrorEvent((IProxyDebugErrorEvent) e);
 		} else if (e instanceof IProxyDebugInfoThreadsEvent) {
 			fireProxyDebugInfoThreadsEvent((IProxyDebugInfoThreadsEvent) e);
-		} else if (e instanceof IProxyDebugInitEvent) {
-			fireProxyDebugInitEvent((IProxyDebugInitEvent) e);
+		} else if (e instanceof IProxyDebugOutputEvent) {
+			fireProxyDebugOutputEvent((IProxyDebugOutputEvent) e);
 		} else if (e instanceof IProxyDebugMemoryInfoEvent) {
 			fireProxyDebugMemoryInfoEvent((IProxyDebugMemoryInfoEvent) e);
 		} else if (e instanceof IProxyDebugOKEvent) {
@@ -315,10 +318,10 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
-	protected void fireProxyDebugInitEvent(IProxyDebugInitEvent e) {
+	protected void fireProxyDebugOutputEvent(IProxyDebugOutputEvent e) {
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
-			listener.handleProxyDebugInitEvent(e);
+			listener.handleProxyDebugOutputEvent(e);
 		}
 	}
 
