@@ -98,7 +98,8 @@ am_libmi_a_OBJECTS = src/mi/libmi_a-MIParser.$(OBJEXT) \
 	src/mi/libmi_a-MIMemory.$(OBJEXT) \
 	src/mi/libmi_a-MIMemoryCommand.$(OBJEXT) \
 	src/mi/libmi_a-CLICommand.$(OBJEXT) \
-	src/mi/libmi_a-CLIOutput.$(OBJEXT)
+	src/mi/libmi_a-CLIOutput.$(OBJEXT) \
+	src/mi/libmi_a-MIPty.$(OBJEXT)
 libmi_a_OBJECTS = $(am_libmi_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -360,7 +361,8 @@ libmi_a_SOURCES = src/mi/MIParser.c \
 							src/mi/MIMemory.c \
 							src/mi/MIMemoryCommand.c \
 							src/mi/CLICommand.c \
-							src/mi/CLIOutput.c
+							src/mi/CLIOutput.c \
+							src/mi/MIPty.c
 
 libmi_a_CFLAGS = -I./include $(AM_CFLAGS) -g
 all: config.h
@@ -518,6 +520,8 @@ src/mi/libmi_a-CLICommand.$(OBJEXT): src/mi/$(am__dirstamp) \
 	src/mi/$(DEPDIR)/$(am__dirstamp)
 src/mi/libmi_a-CLIOutput.$(OBJEXT): src/mi/$(am__dirstamp) \
 	src/mi/$(DEPDIR)/$(am__dirstamp)
+src/mi/libmi_a-MIPty.$(OBJEXT): src/mi/$(am__dirstamp) \
+	src/mi/$(DEPDIR)/$(am__dirstamp)
 libmi.a: $(libmi_a_OBJECTS) $(libmi_a_DEPENDENCIES) 
 	-rm -f libmi.a
 	$(libmi_a_AR) libmi.a $(libmi_a_OBJECTS) $(libmi_a_LIBADD)
@@ -648,6 +652,7 @@ mostlyclean-compile:
 	-rm -f src/mi/libmi_a-MIOOBRecord.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIOutput.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIParser.$(OBJEXT)
+	-rm -f src/mi/libmi_a-MIPty.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIResult.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIResultRecord.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MISession.$(OBJEXT)
@@ -707,6 +712,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIOutput.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIParser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIPty.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MISession.Po@am__quote@
@@ -1241,6 +1247,20 @@ src/mi/libmi_a-CLIOutput.obj: src/mi/CLIOutput.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/CLIOutput.c' object='src/mi/libmi_a-CLIOutput.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-CLIOutput.obj `if test -f 'src/mi/CLIOutput.c'; then $(CYGPATH_W) 'src/mi/CLIOutput.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/CLIOutput.c'; fi`
+
+src/mi/libmi_a-MIPty.o: src/mi/MIPty.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIPty.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo -c -o src/mi/libmi_a-MIPty.o `test -f 'src/mi/MIPty.c' || echo '$(srcdir)/'`src/mi/MIPty.c
+@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo src/mi/$(DEPDIR)/libmi_a-MIPty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIPty.c' object='src/mi/libmi_a-MIPty.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIPty.o `test -f 'src/mi/MIPty.c' || echo '$(srcdir)/'`src/mi/MIPty.c
+
+src/mi/libmi_a-MIPty.obj: src/mi/MIPty.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIPty.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo -c -o src/mi/libmi_a-MIPty.obj `if test -f 'src/mi/MIPty.c'; then $(CYGPATH_W) 'src/mi/MIPty.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIPty.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo src/mi/$(DEPDIR)/libmi_a-MIPty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIPty.c' object='src/mi/libmi_a-MIPty.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIPty.obj `if test -f 'src/mi/MIPty.c'; then $(CYGPATH_W) 'src/mi/MIPty.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIPty.c'; fi`
 
 src/client/sdm-startup.o: src/client/startup.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-startup.o -MD -MP -MF src/client/$(DEPDIR)/sdm-startup.Tpo -c -o src/client/sdm-startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c

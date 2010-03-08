@@ -191,8 +191,8 @@ DbgSerializeEvent(dbg_event *e, char **result, int *len)
 		proxy_msg_add_string(p, e->dbg_event_u.error_event.error_msg);
 		break;
 
-	case DBGEV_INIT:
-		proxy_msg_add_int(p, e->dbg_event_u.num_servers);
+	case DBGEV_OUTPUT:
+		proxy_msg_add_string(p, e->dbg_event_u.output);
 		break;
 
 	case DBGEV_SUSPEND:
@@ -302,7 +302,7 @@ dbg_str_to_int(char ***args, int *nargs, int *val)
 		return -1;
 
 	proxy_get_int(*(*args)++, val);
-	*nargs--;
+	(*nargs)--;
 
 	return 0;
 }
@@ -314,7 +314,7 @@ dbg_copy_str(char ***args, int *nargs, char **str)
 		return -1;
 
 	*str = strdup(*(*args)++);
-	*nargs--;
+	(*nargs)--;
 
 	return 0;
 }
@@ -326,7 +326,7 @@ dbg_str_to_data(char ***args, int *nargs, char **data, int *len)
 		return -1;
 
 	proxy_get_data(*(*args)++, data, len);
-	*nargs--;
+	(*nargs)--;
 
 	return 0;
 }
@@ -380,7 +380,7 @@ dbg_str_to_stackframe(char ***args, int *nargs, stackframe **frame)
 
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
-		*nargs--;
+		(*nargs)--;
 		*frame = NULL;
 		return 0;
 	}
@@ -408,7 +408,7 @@ dbg_str_to_signalinfo(char ***args, int *nargs, signalinfo **sig)
 
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
-		*nargs--;
+		(*nargs)--;
 		*sig = NULL;
 		return 0;
 	}
@@ -584,7 +584,7 @@ dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info)
 
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
-		*nargs--;
+		(*nargs)--;
 		*info = NULL;
 	}
 
@@ -633,8 +633,8 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 		dbg_copy_str(&args, &nargs, &e->dbg_event_u.error_event.error_msg);
 		break;
 
-	case DBGEV_INIT:
-		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.num_servers);
+	case DBGEV_OUTPUT:
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.output);
 		break;
 
 	case DBGEV_SUSPEND:
@@ -772,7 +772,10 @@ void
 FreeDbgEvent(dbg_event *e) {
 	switch (e->event_id) {
 	case DBGEV_OK:
-	case DBGEV_INIT:
+		break;
+
+	case DBGEV_OUTPUT:
+		free(e->dbg_event_u.output);
 		break;
 
 	case DBGEV_SUSPEND:

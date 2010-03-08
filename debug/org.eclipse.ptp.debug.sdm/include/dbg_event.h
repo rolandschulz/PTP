@@ -43,7 +43,7 @@
 #define DBGEV_TYPE			DBG_EV_OFFSET + 7
 #define DBGEV_VARS			DBG_EV_OFFSET + 8
 #define DBGEV_ARGS			DBG_EV_OFFSET + 9
-#define DBGEV_INIT			DBG_EV_OFFSET + 10 /* deprecated */
+#define DBGEV_OUTPUT		DBG_EV_OFFSET + 10
 #define DBGEV_OK			DBG_EV_OFFSET + 11
 #define DBGEV_ERROR			DBG_EV_OFFSET + 12
 #define DBGEV_SUSPEND		DBG_EV_OFFSET + 13
@@ -57,9 +57,6 @@
 #define DBGEV_DATAR_MEM		DBG_EV_OFFSET + 17
 #define DBGEV_DATAW_MEM		DBG_EV_OFFSET + 18
 #define DBGEV_SIGNALS		DBG_EV_OFFSET + 19
-
-#define DBGEV_DATA_EVA_EX	DBG_EV_OFFSET + 20 /* deprecated */
-#define DBGEV_PARTIAL_AIF	DBG_EV_OFFSET + 21 /* deprecated */
 
 
 struct dbg_suspend_event {
@@ -126,9 +123,9 @@ struct dbg_event {
 
 	union {
 		/*
-		 * DBGEV_INIT
+		 * DBGEV_OUTPUT
 		 */
-		int					num_servers;
+		char *				output;
 
 		/*
 		 * DBGEV_BPSET
