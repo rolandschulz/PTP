@@ -30,6 +30,7 @@ void test_invert_mask(int tnum, int nbits);
 void test_oreq(int tnum, int nb1, int nb2);
 void test_str(int);
 void test_boundary(int);
+void test_nine(int);
 
 int
 main(int argc, char *argv[])
@@ -41,6 +42,7 @@ main(int argc, char *argv[])
 	test_oreq(3, bits_size*2,bits_size*2-4);
 	test_str(4);
 	test_boundary(5);
+	test_nine(6);
 
 	return 0;
 }
@@ -138,5 +140,24 @@ test_boundary(int tnum)
 		printf("TEST_%d_1 FAIL: %s != %s\n", tnum, str3, str2);
 	} else {
 		printf("TEST_%d_1 SUCCEDED\n", tnum);
+	}
+}
+
+void
+test_nine(int tnum)
+{
+	char *		str1 = "9:0001";
+	char *		str2;
+	char *		str3;
+	char *		end;
+	bitset *	b1 = str_to_bitset(str1, &end);
+	bitset *	b2 = bitset_new(9);
+	bitset_set(b2, 0);
+	str2 = bitset_to_str(b1);
+	str3 = bitset_to_str(b2);
+	if (strcmp(str2, str3) != 0) {
+		printf("TEST_%d FAIL: %s != %s\n", tnum, str2, str3);
+	} else {
+		printf("TEST_%d SUCCEDED\n", tnum);
 	}
 }
