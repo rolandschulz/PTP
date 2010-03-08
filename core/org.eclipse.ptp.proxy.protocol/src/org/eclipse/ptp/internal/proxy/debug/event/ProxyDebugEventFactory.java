@@ -59,7 +59,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugOKEvent(packet.getTransID(), bits);
 			break;
 			
-		/**
+		/*
 		 * [1]: error code
 		 * [2]: error message
 		 */
@@ -68,12 +68,19 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugErrorEvent(packet.getTransID(), bits, errCode, args[2]);
 			break;
 		
-		/**
+		/*
+		 * [1]: output string
+		 */
+		case IProxyDebugEvent.EVENT_DBG_OUTPUT:
+			evt = new ProxyDebugOutputEvent(packet.getTransID(), bits, args[1]);
+			break;
+
+		/*
 		 * [1]: event reason
 		 */
 		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
 			switch (Integer.parseInt(args[1])) {
-			/**
+			/*
 			 * [2]: bpt id
 			 * [3]: thread id
 			 * [4]: depth
@@ -94,7 +101,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				break;
 				
 				
-			/**
+			/*
 			 * [2]: signal info -> name
 			 * [3]: signal info -> sig_stop
 			 * [4]: signal info -> sig_print
@@ -128,7 +135,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				evt = new ProxyDebugSignalEvent(packet.getTransID(), bits, args[2], args[6], sigFrame, sigTid, sigDep, vars);
 				break;
 				
-			/**
+			/*
 			 * [2]: frame -> level
 			 * [3]: frame -> location -> file
 			 * [4]: frame -> location -> function
@@ -151,7 +158,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				evt = new ProxyDebugStepEvent(packet.getTransID(), bits, frame, stTid, stDep, vars);
 				break;
 				
-			/**
+			/*
 			 * [2]: frame -> level
 			 * [3]: frame -> location -> file
 			 * [4]: frame -> location -> function
@@ -176,7 +183,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			}
 			break;
 			
-		/**
+		/*
 		 * [1]: bpt id
 		 * [2]: breakpoint -> bpt id
 		 * [3]: breakpoint -> ignore
@@ -196,7 +203,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugBreakpointSetEvent(packet.getTransID(), bits, bpId, bpt);
 			break;
 
-		/**
+		/*
 		 * [1]: signal info list -> length
 		 * [2]: signal info list -> name
 		 * [3]: signal info list -> sig_stop
@@ -213,19 +220,19 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugSignalsEvent(packet.getTransID(), bits, signals);
 			break;
 			
-		/**
+		/*
 		 * [1]: event reason
 		 */
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
 			switch (Integer.parseInt(args[1])) {
-			/**
+			/*
 			 * [2]: exit status
 			 */
 			case IProxyDebugEvent.EVENT_DBG_EXIT_NORMAL:
 				int status = Integer.parseInt(args[2]);
 				evt = new ProxyDebugExitEvent(packet.getTransID(), bits, status);
 				break;
-			/**
+			/*
 			 * [2]: signal info -> name
 			 * [3]: signal info -> sig_stop
 			 * [4]: signal info -> sig_print
@@ -238,7 +245,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			}
 			break;
 			
-		/**
+		/*
 		 * [1]: frame list -> length
 		 * [2]: frame list -> level
 		 * [3]: frame list -> location -> file
@@ -255,7 +262,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugStackframeEvent(packet.getTransID(), bits, frames);
 			break;
 
-		/**
+		/*
 		 * [1]: thread id
 		 * [2]: frame -> level
 		 * [3]: frame -> location -> file
@@ -269,7 +276,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugSetThreadSelectEvent(packet.getTransID(), bits, current_thread_id, th_frame);
 			break;
 		
-		/**
+		/*
 		 * [1]: current thread id
 		 * [2]: thread ids list -> length
 		 * [3]: thread ids list -> thread id
@@ -284,7 +291,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugInfoThreadsEvent(packet.getTransID(), bits, thread_ids);
 			break;
 
-		/**
+		/*
 		 * [1]: stack depth
 		 */
 		case IProxyDebugEvent.EVENT_DBG_STACK_INFO_DEPTH:
@@ -292,7 +299,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugStackInfoDepthEvent(packet.getTransID(), bits, depth);
 			break;
 
-		/**
+		/*
 		 * [1]: address
 		 * [2]: next row
 		 * [3]: prev row
@@ -324,7 +331,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugMemoryInfoEvent(packet.getTransID(), bits, toMemoryInfo(args[1], args[2], args[3], args[4], args[5], args[6], args[7], memories));
 			break;
 			
-		/**
+		/*
 		 * [1]: var list -> length
 		 * [2]: var list -> name
 		 */
@@ -337,7 +344,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugVarsEvent(packet.getTransID(), bits, vars);
 			break;
 
-		/**
+		/*
 		 * [1]: arg list -> length
 		 * [2]: arg list -> name
 		 */
@@ -350,14 +357,14 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			evt = new ProxyDebugArgsEvent(packet.getTransID(), bits, arg_strs);
 			break;
 			
-		/**
+		/*
 		 * [1]: type name
 		 */
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
 			evt = new ProxyDebugTypeEvent(packet.getTransID(), bits, args[1]);
 			break;
 			
-		/**
+		/*
 		 * [1]: aif format
 		 * [2]: aif data
 		 * [3]: type description
