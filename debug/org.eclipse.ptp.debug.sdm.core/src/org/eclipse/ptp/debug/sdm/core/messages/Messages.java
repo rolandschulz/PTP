@@ -32,6 +32,18 @@ public class Messages extends NLS {
 
 	public static String SDMDebugger_15;
 
+	public static String SDMEventManager_0;
+
+	public static String SDMEventManager_1;
+
+	public static String SDMEventManager_2;
+
+	public static String SDMEventManager_3;
+
+	public static String SDMEventManager_4;
+
+	public static String SDMEventManager_5;
+
 	public static String SDMRunner_0;
 	public static String SDMRunner_2;
 	public static String SDMRunner_3;
