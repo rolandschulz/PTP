@@ -11,9 +11,11 @@
 
 package org.eclipse.ptp.core.elements.attributes;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -98,7 +100,7 @@ public class AttributeIdSet<A extends IAttribute<?, A, ?>>
 		
 		// remove these Ids from the bitsets for all values of A
 		// need to copy entry set to avoid concurrent modifications
-		Set<Entry<A, BitSet>> entrySet = new HashSet<Entry<A,BitSet>>(idSetMap.entrySet());
+		List<Entry<A, BitSet>> entrySet = new ArrayList<Entry<A,BitSet>>(idSetMap.entrySet());
 		for (Map.Entry<A, BitSet> entry : entrySet) {
 			final BitSet idsForAttr = entry.getValue();
 			idsForAttr.andNot(ids);
@@ -126,11 +128,11 @@ public class AttributeIdSet<A extends IAttribute<?, A, ?>>
 		// see if we can find the id in the extant
 		// id sets
 		for (Map.Entry<A, BitSet> entry : idSetMap.entrySet()) {
-			A aTmp = entry.getKey();
 			BitSet idsForATmp = entry.getValue();
 			if (idsForATmp.get(id)) {
 				// clone the value, so that no one can
 				// modify our value
+				A aTmp = entry.getKey();
 				return aTmp.clone();
 			}
 		}
@@ -200,14 +202,12 @@ public class AttributeIdSet<A extends IAttribute<?, A, ?>>
 		
 		// if the intersection is empty, then there is no
 		// more to do
-		if (subSet.isEmpty()) {
+		if (subSet.totalIdSet.isEmpty()) {
 			return subSet;
 		}
 		
 		// build the subSet from the current id sets
-		// need to copy entry set to avoid concurrent modifications
-		Set<Entry<A, BitSet>> entrySet = new HashSet<Entry<A,BitSet>>(idSetMap.entrySet());
-		for (Map.Entry<A, BitSet> entry : entrySet) {
+		for (Map.Entry<A, BitSet> entry : idSetMap.entrySet()) {
 			// do not modify the original bitset, so use a clone
 			BitSet idsForATmp = (BitSet) entry.getValue().clone();
 			// perform the intersection on the bitset
@@ -263,7 +263,7 @@ public class AttributeIdSet<A extends IAttribute<?, A, ?>>
 		// to maintain disjoint id sets
 		
 		// need to copy entry set to avoid concurrent modifications
-		Set<Entry<A, BitSet>> entrySet = new HashSet<Entry<A,BitSet>>(idSetMap.entrySet());
+		List<Entry<A, BitSet>> entrySet = new ArrayList<Entry<A,BitSet>>(idSetMap.entrySet());
 		for (Map.Entry<A, BitSet> entry : entrySet) {
 			A aTmp = entry.getKey();
 			if (!attribute.equals(aTmp)) {
