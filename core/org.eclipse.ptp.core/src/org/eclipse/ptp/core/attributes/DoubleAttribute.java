@@ -81,7 +81,20 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 		return getDefinition().getMaxValue();
 	}
 
-    @Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected DoubleAttribute doClone() {
+		try {
+			return new DoubleAttribute(getDefinition(), value);
+		} catch (IllegalValueException e) {
+			// shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
     protected synchronized int doCompareTo(DoubleAttribute other) {
         return value.compareTo(other.value);
     }

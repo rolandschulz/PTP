@@ -19,7 +19,12 @@
 package org.eclipse.ptp.core.attributes;
 
 public interface IAttribute<T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	extends Comparable<A> {
+	extends Comparable<A>, Cloneable {
+	
+	/**
+	 * @return a clone of this attribute
+	 */
+	public A clone();
 	
 	/**
 	 * @return the attribute definition object associated with this attribute

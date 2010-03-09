@@ -24,11 +24,16 @@ public abstract class AbstractAttribute<T,
 implements IAttribute<T,A,D> {
 
 	private final D definition;
-	private boolean enabled;
 
+	private boolean enabled;
 	public AbstractAttribute(D definition) {
 		this.definition = definition;
 		this.enabled = true;
+	}
+
+	@Override
+	public A clone() {
+		return doClone();
 	}
 	
 	/* (non-Javadoc)
@@ -51,6 +56,7 @@ implements IAttribute<T,A,D> {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -102,6 +108,16 @@ implements IAttribute<T,A,D> {
 		this.enabled = enabled;
 	}
 
+	@Override
+	public String toString() {
+		return getValueAsString();
+	}
+
+	/**
+	 * @return
+	 */
+	protected abstract A doClone();
+	
 	/**
      * @param other
      * @return
