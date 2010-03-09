@@ -13,6 +13,7 @@ package org.eclipse.ptp.core.tests.suite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.ptp.core.tests.AttributeIdSetTests;
 import org.eclipse.ptp.core.tests.RangeSetTests;
 
 public class CoreTestSuite {
@@ -20,6 +21,7 @@ public class CoreTestSuite {
 		TestSuite suite = new TestSuite(CoreTestSuite.class.getName());
 		
 		suite.addTestSuite(RangeSetTests.class);
+		suite.addTestSuite(AttributeIdSetTests.class);
 		return suite;
 	}
 
