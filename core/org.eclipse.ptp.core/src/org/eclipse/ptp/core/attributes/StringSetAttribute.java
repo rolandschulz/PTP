@@ -91,7 +91,20 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 		this.value = valueIn;
 	}
 
-    @Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected StringSetAttribute doClone() {
+		try {
+			return new StringSetAttribute(getDefinition(), value);
+		} catch (IllegalValueException e) {
+			// shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
     protected int doCompareTo(StringSetAttribute other) {
         return getValueIndex() - other.getValueIndex();
     }

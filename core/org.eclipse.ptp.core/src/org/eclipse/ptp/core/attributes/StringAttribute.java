@@ -58,7 +58,15 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 		this.value.replace(0, this.value.length(), string);
 	}
 
-    @Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected StringAttribute doClone() {
+		return new StringAttribute(getDefinition(), value.toString());
+	}
+
+	@Override
     protected synchronized int doCompareTo(StringAttribute other) {
         return value.toString().compareTo(other.value.toString());
     }

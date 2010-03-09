@@ -75,7 +75,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	 */
 	public boolean isValid(String string) {
 		try {
-			@SuppressWarnings("unused")
+			@SuppressWarnings({"unused", "unchecked"})
 			T obj = (T) string;
 		} catch (ClassCastException e) {
 			return false;
@@ -109,6 +109,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
 	 */
+	@SuppressWarnings("unchecked")
 	public void setValueAsString(String string) throws IllegalValueException {
 		String[] values = string.split(""); //$NON-NLS-1$
 		try {
@@ -118,6 +119,15 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		}
 	}
 
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected ArrayAttribute<T> doClone() {
+		return new ArrayAttribute<T>(getDefinition(), value);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

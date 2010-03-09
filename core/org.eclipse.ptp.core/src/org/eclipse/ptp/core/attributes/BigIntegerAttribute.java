@@ -101,6 +101,19 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		return getDefinition().getMaxValue();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected BigIntegerAttribute doClone() {
+		try {
+			return new BigIntegerAttribute(getDefinition(), value);
+		} catch (IllegalValueException e) {
+			// this shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
     @Override
     protected synchronized int doCompareTo(BigIntegerAttribute other) {
         return value.compareTo(other.value);

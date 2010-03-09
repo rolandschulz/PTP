@@ -174,7 +174,20 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 		return getDateFormat().format(date);
 	}
 
-    @Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected DateAttribute doClone() {
+		try {
+			return new DateAttribute(getDefinition(), value.getTime());
+		} catch (IllegalValueException e) {
+			// shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
     protected int doCompareTo(DateAttribute other) {
         return value.compareTo(other.value);
     }

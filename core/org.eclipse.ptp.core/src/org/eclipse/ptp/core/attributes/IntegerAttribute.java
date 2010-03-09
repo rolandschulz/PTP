@@ -84,7 +84,20 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 		return getDefinition().getMaxValue();
 	}
 
-    @Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected IntegerAttribute doClone() {
+		try {
+			return new IntegerAttribute(getDefinition(), value);
+		} catch (IllegalValueException e) {
+			// shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
     protected synchronized int doCompareTo(IntegerAttribute other) {
         return value.compareTo(other.value);
     }

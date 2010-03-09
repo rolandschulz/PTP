@@ -61,7 +61,15 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 		value = Boolean.valueOf(string);
 	}
 
-    @Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected BooleanAttribute doClone() {
+		return new BooleanAttribute(getDefinition(), value);
+	}
+
+	@Override
     protected synchronized int doCompareTo(BooleanAttribute other) {
         return value.compareTo(other.value);
     }

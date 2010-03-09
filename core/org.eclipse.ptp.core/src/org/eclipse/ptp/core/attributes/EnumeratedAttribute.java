@@ -145,7 +145,15 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		this.value = eval;
 	}
 
-    @Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected EnumeratedAttribute<E> doClone() {
+		return new EnumeratedAttribute<E>(getDefinition(), value);
+	}
+
+	@Override
     protected synchronized int doCompareTo(EnumeratedAttribute<E> other) {
         return value.compareTo(other.value);
     }
