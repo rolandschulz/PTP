@@ -78,18 +78,18 @@ public class AttributeIdSetTests extends TestCase {
 			definition = new IntegerAttributeDefinition("xxx", "name", "description", true, -42);
 			IntegerAttribute attr;
 			
-			attr = new IntegerAttribute(definition, 1);
+			attr = definition.create(1);
 			ids.set(0, 5);
 			ids.set(100, 105);
 			testingIdSet.setAttribute(attr, ids);
 			
-			attr = new IntegerAttribute(definition, 3);
+			attr = definition.create(3);
 			ids.clear();
 			ids.set(200, 205);
 			ids.set(300, 305);
 			testingIdSet.setAttribute(attr, ids);
 			
-			attr = new IntegerAttribute(definition, 5);
+			attr = definition.create(5);
 			ids.clear();
 			set(ids, new int[]{1,101,201,301,401});
 			testingIdSet.setAttribute(attr, ids);
@@ -163,16 +163,16 @@ public class AttributeIdSetTests extends TestCase {
 		assertEquals(expected, actual);
 		
 		Set<IntegerAttribute> actualAttrs = testingIdSet.getAttributes();
-		Set<IntegerAttribute> expectedAttrs = new HashSet<IntegerAttribute>(Arrays.asList(new IntegerAttribute(definition,1),
-				new IntegerAttribute(definition, 5)));
+		Set<IntegerAttribute> expectedAttrs = new HashSet<IntegerAttribute>(
+				Arrays.asList(definition.create(1),	definition.create(5)));
 		assertEquals(expectedAttrs, actualAttrs);
 	}
 	
 	public void testGetAttributes() throws IllegalValueException {
 		Set<IntegerAttribute> expected = new HashSet<IntegerAttribute>();
-		expected.add(new IntegerAttribute(definition, 1));
-		expected.add(new IntegerAttribute(definition, 3));
-		expected.add(new IntegerAttribute(definition, 5));
+		expected.add(definition.create(1));
+		expected.add(definition.create(3));
+		expected.add(definition.create(5));
 		Set<IntegerAttribute> actual = testingIdSet.getAttributes();
 		assertEquals(expected, actual);
 	}
@@ -180,10 +180,10 @@ public class AttributeIdSetTests extends TestCase {
 	public void testGetAtttribute() throws IllegalValueException {
 		IntegerAttribute ia;
 		ia = testingIdSet.getAttribute(1);		
-		assertEquals(new IntegerAttribute(definition, 5), ia);
+		assertEquals(definition.create(5), ia);
 		
 		ia = testingIdSet.getAttribute(2);		
-		assertEquals(new IntegerAttribute(definition, 1), ia);
+		assertEquals(definition.create(1), ia);
 		
 		ia = testingIdSet.getAttribute(500);		
 		assertNull(ia);
@@ -263,6 +263,6 @@ public class AttributeIdSetTests extends TestCase {
 	}
 	
 	private BitSet getIdSet(AttributeIdSet<IntegerAttribute> idSet, int value) throws IllegalValueException {
-		return idSet.getIdSet(new IntegerAttribute(definition, value));
+		return idSet.getIdSet(definition.create(value));
 	}
 }
