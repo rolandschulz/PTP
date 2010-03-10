@@ -42,6 +42,14 @@ public class DummyFile implements IIndexFile, Serializable {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.core.index.IIndexFile#getContentsHash()
+	 */
+	public long getContentsHash() throws CoreException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.index.IIndexFile#getIncludes()
 	 */
 	public IIndexInclude[] getIncludes() throws CoreException {
