@@ -18,16 +18,24 @@ import org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver;
 public class RemoteIndexerInputAdapter extends ASTFilePathResolver {
 
 	private final StandaloneIndexerInputAdapter adapter = new StandaloneIndexerInputAdapter(null);
-	
-	
+
 	@Override
 	public boolean doesIncludeFileExist(String includePath) {
 		return adapter.doesIncludeFileExist(includePath);
 	}
-
+	
+	
 	@Override
 	public String getASTPath(IIndexFileLocation ifl) {
 		return adapter.getASTPath(ifl);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver#getFileSize(java.lang.String)
+	 */
+	@Override
+	public long getFileSize(String astFilePath) {
+		return adapter.getFileSize(astFilePath);
 	}
 
 	@Override
