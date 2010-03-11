@@ -30,9 +30,9 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
  * @author crecoskie
  *
  */
-public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
+public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
 
-	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ptp.rdt.ui.RSECIndexServiceProvider"; //$NON-NLS-1$
 
 	
 	private RemoteSearchService fSearchService;
@@ -100,6 +100,6 @@ public class RemoteCIndexServiceProvider extends AbstractRemoteCIndexServiceProv
 	}
 	
 	public String toString() {
-		return "RemoteCIndexServiceProvider(" + getHostName() + "," + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "RSECIndexServiceProvider(" + getHostName() + "," + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

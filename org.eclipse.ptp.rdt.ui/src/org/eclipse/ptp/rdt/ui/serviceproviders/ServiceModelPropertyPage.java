@@ -79,7 +79,7 @@ public class ServiceModelPropertyPage extends PropertyPage {
 		// TODO This is a hack! 
 		// TODO This should be handled with events when we move to the new service model.
 		// get the initial value for the index location
-		IIndexServiceProvider isp = getIndexServiceProvider(RemoteCIndexServiceProvider.ID);
+		IIndexServiceProvider isp = getIndexServiceProvider(RSECIndexServiceProvider.ID);
 		if(isp != null) {
 			indexLocation = isp.getIndexLocation();
 		}
@@ -100,7 +100,7 @@ public class ServiceModelPropertyPage extends PropertyPage {
 		
 		ConfigureRemoteServices.configure(project, fModelWidget.getServiceIDToSelectedProviderID(), fModelWidget.getProviderIDToProviderMap(), new NullProgressMonitor());
 		
-		final IIndexServiceProvider isp = getIndexServiceProvider(RemoteCIndexServiceProvider.ID);
+		final IIndexServiceProvider isp = getIndexServiceProvider(RSECIndexServiceProvider.ID);
 		if(isp != null) {
 			final String newIndexLocation = isp.getIndexLocation();
 			if(indexLocation != null && !indexLocation.equals(newIndexLocation)) {
