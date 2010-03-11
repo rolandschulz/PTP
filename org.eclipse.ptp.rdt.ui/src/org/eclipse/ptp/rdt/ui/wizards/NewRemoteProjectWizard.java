@@ -12,17 +12,11 @@ package org.eclipse.ptp.rdt.ui.wizards;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
-import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
-import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.internal.rdt.ui.RDTPluginImages;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
-import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * A wizard for creating new Remote C/C++ Projects
@@ -34,16 +28,15 @@ import org.eclipse.swt.widgets.Composite;
  * @author crecoskie
  *
  */
-public class NewRemoteCppProjectWizard extends CDTCommonProjectWizard {
+public class NewRemoteProjectWizard extends RemoteCommonProjectWizard {
 	private static final String PREFIX= "CProjectWizard"; //$NON-NLS-1$
-	private static final String wz_title = Messages.getString("NewRemoteCppProjectWizard_0"); //$NON-NLS-1$
-	private static final String wz_desc = Messages.getString("NewRemoteCppProjectWizard_1"); //$NON-NLS-1$
+	private static final String wz_title = "New Remote Project"; //$NON-NLS-1$
+	private static final String wz_desc = "Create remote project of the selected type"; //$NON-NLS-1$
 	
 	/**
 	 * 
 	 */
-	public NewRemoteCppProjectWizard() {
-		
+	public NewRemoteProjectWizard() {
 		super(wz_title, wz_desc);
 	}
 
@@ -78,19 +71,5 @@ public class NewRemoteCppProjectWizard extends CDTCommonProjectWizard {
 	protected void initializeDefaultPageImageDescriptor() {
 		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#addPages()
-	 */
-	@Override
-	public void addPages() {
-		fMainPage= new RDTMainWizardPage(CUIPlugin.getResourceString(PREFIX));
-		fMainPage.setTitle(wz_title);
-		fMainPage.setDescription(wz_desc);
-		addPage(fMainPage);
-	}
-	
-	
 
 }

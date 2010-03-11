@@ -88,7 +88,7 @@
          name="Remote C/C++ Indexing Subsystem"
          point="org.eclipse.rse.core.subsystemConfigurations">
       <configuration
-            class="org.eclipse.ptp.rdt.ui.subsystems.RemoteCIndexSubsystemConfiguration"
+            class="org.eclipse.ptp.rdt.ui.subsystems.RSECIndexSubsystemConfiguration"
             description="%configuration.description.0"
             id="org.eclipse.ptp.rdt.ui.RemoteCIndexSubsystemConfiguration"
             name="%configuration.name.0"
@@ -116,7 +116,7 @@
       <wizard
             canFinishEarly="false"
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteCppProjectWizard"
+            class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteProjectWizard"
             finalPerspective="org.eclipse.ptp.rdt.ui.remoteCPerspective"
             hasPages="true"
             icon="icons/etool16/newremote_c_proj.gif"
@@ -128,20 +128,6 @@
          	</description>
       </wizard>
       
-      <wizard
-            canFinishEarly="false"
-            category="org.eclipse.cdt.ui.newCWizards"
-            class="org.eclipse.ptp.rdt.ui.wizards.NewRemoteCppProjectWizard"
-            finalPerspective="org.eclipse.ptp.rdt.ui.remoteCPerspective"
-            hasPages="true"
-            icon="icons/etool16/newremote_c_proj.gif"
-            id="org.eclipse.ptp.rdt.ui.newCRemoteProjectWizard"
-            name="%wizard.name.0"
-            project="true">
-            <description>
-             	%remoteCCPPproject.desc
-         	</description>
-      </wizard>     
       
       <wizard
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
@@ -171,12 +157,12 @@
       
    </extension>
    <extension
-		 id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
+		 id="org.eclipse.ptp.rdt.ui.RSECIndexServiceProvider"
 		 name="RDT Remote C/C++ Indexing Service"
 		 point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider"
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RSECIndexServiceProvider"
             name="%RDTRemoteCIndexingService.name"
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
@@ -189,8 +175,8 @@
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
       <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider2"
-            id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2"
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteToolsCIndexServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.RemoteToolsCIndexServiceProvider"
             name="Remote Tools C/C++ Indexing Service"
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
@@ -661,9 +647,9 @@
         <extension
            point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderContributer"
+              class="org.eclipse.ptp.rdt.ui.wizards.RSECIndexServiceProviderContributer"
               configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProviderConfigurer"
-              id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider">
+              id="org.eclipse.ptp.rdt.ui.RSECIndexServiceProvider">
         </providerContributor>
         <providerContributor
               class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
@@ -671,8 +657,8 @@
               id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider">
         </providerContributor>
         <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteCIndexServiceProvider2Contributer"
-              id="org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2">
+              class="org.eclipse.ptp.rdt.ui.wizards.RemoteToolsCIndexServiceProviderContributer"
+              id="org.eclipse.ptp.rdt.ui.RemoteToolsCIndexServiceProvider">
         </providerContributor>
      </extension>
      <extension

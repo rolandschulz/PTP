@@ -18,7 +18,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
@@ -41,9 +41,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 
-public class RemoteCIndexServiceProviderContributer implements IServiceProviderContributor {
+public class RSECIndexServiceProviderContributer implements IServiceProviderContributor {
 
-	private RemoteCIndexServiceProvider fProvider;
+	private RSECIndexServiceProvider fProvider;
 	
 	private Map<Integer, IHost> hostComboIndexToHostMap = new HashMap<Integer, IHost>();
 	
@@ -56,11 +56,11 @@ public class RemoteCIndexServiceProviderContributer implements IServiceProviderC
 			sp = ((IServiceProviderWorkingCopy)sp).getOriginal();
 		}
 		
-		if (!(sp instanceof RemoteCIndexServiceProvider)) {
+		if (!(sp instanceof RSECIndexServiceProvider)) {
 			throw new IllegalArgumentException(); // should never happen
 		}
 		
-		fProvider = (RemoteCIndexServiceProvider) sp;
+		fProvider = (RSECIndexServiceProvider) sp;
 
 		container.setLayout(new GridLayout(1, false));
 		
