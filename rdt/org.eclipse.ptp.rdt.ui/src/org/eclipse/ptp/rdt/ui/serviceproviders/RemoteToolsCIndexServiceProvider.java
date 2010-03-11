@@ -29,28 +29,30 @@ import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
 import org.eclipse.ptp.rdt.core.messages.Messages;
-import org.eclipse.ptp.rdt.ui.subsystems.RemoteCIndexSubsystem2;
+import org.eclipse.ptp.rdt.ui.subsystems.RemoteToolsCIndexSubsystem;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
-public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIndexServiceProvider2 {
+public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements IIndexServiceProvider2, IServiceProviderWorkingCopy {
 
-	protected boolean fIsConfigured;
-
-	protected IIndexLifecycleService fIndexLifecycleService;
-	protected INavigationService fNavigationService;
-	protected ICallHierarchyService fCallHierarchyService;
-	protected ITypeHierarchyService fTypeHierarchyService;
-	protected IIncludeBrowserService fIncludeBrowserService;
-	protected IModelBuilderService fModelBuilderService;
-	protected RemoteSearchService fSearchService;
-	protected IContentAssistService fContentAssistService;
-	protected RemoteCIndexSubsystem2 fSubsystem = null;
-	protected String indexLocation;
+	protected IIndexLifecycleService fIndexLifecycleService = null;
+	protected INavigationService fNavigationService = null;
+	protected ICallHierarchyService fCallHierarchyService = null;
+	protected ITypeHierarchyService fTypeHierarchyService = null;
+	protected IIncludeBrowserService fIncludeBrowserService = null;
+	protected IModelBuilderService fModelBuilderService = null;
+	protected RemoteSearchService fSearchService = null;
+	protected IContentAssistService fContentAssistService = null;
+	protected RemoteToolsCIndexSubsystem fSubsystem = null;
+	protected boolean fIsDirty = false;
+	protected RemoteToolsCIndexServiceProvider fProvider = null;
+	protected boolean fIsConfigured = false;
 	
-	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteCIndexServiceProvider2"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteToolsCIndexServiceProvider"; //$NON-NLS-1$
 	public static final String NAME = Messages.RemoteCIndexServiceProvider_0;
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.CIndexingService"; //$NON-NLS-1$
 	
@@ -61,6 +63,23 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 	private static final String DSTORE_COMMAND_KEY = "dstore-command"; //$NON-NLS-1$
 	private static final String DSTORE_ENV_KEY = "dstore-env"; //$NON-NLS-1$
 	
+	public RemoteToolsCIndexServiceProvider() {
+	}
+
+	public RemoteToolsCIndexServiceProvider(RemoteToolsCIndexServiceProvider provider) {
+		fProvider = provider;
+		setProperties(provider.getProperties());
+		setDescriptor(provider.getDescriptor());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
+	 */
+	@Override
+	public IServiceProviderWorkingCopy copy() {
+		return new RemoteToolsCIndexServiceProvider(this);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider#getCallHierarchyService()
 	 */
@@ -96,14 +115,14 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		return fContentAssistService;
 	}
 	
-	public String getDStoreEnv() {
-		initialize();
-		return getString(DSTORE_ENV_KEY, ""); //$NON-NLS-1$
-	}
-	
 	public String getDStoreCommand() {
 		initialize();
 		return getString(DSTORE_COMMAND_KEY, ""); //$NON-NLS-1$
+	}
+	
+	public String getDStoreEnv() {
+		initialize();
+		return getString(DSTORE_ENV_KEY, ""); //$NON-NLS-1$
 	}
 	
 	public String getDStoreLocation() {
@@ -123,7 +142,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		
 		return fIncludeBrowserService;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider#getIndexLifeCycleService()
 	 */
@@ -144,7 +163,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		initialize();
 		return getString(INDEX_LOCATION_KEY, ""); //$NON-NLS-1$
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider#getModelBuilderService()
 	 */
@@ -171,13 +190,20 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		return fNavigationService;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#getOriginal()
+	 */
+	public IServiceProvider getOriginal() {
+		return fProvider;
+	}
+
 	public IRemoteConnection getRemoteConnection() {
 		if (!isConfigured()) {
 			return null;
 		}
 		return getRemoteServices().getConnectionManager().getConnection(getConnectionName());
 	}
-	
+
 	public IRemoteServices getRemoteServices() {
 		if (!isConfigured()) {
 			return null;
@@ -185,7 +211,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getServiceId());
 	}
 	
- 	/* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.ui.serviceproviders.IIndexServiceProvider2#getSearchService()
 	 */
 	public ISearchService getSearchService() {
@@ -206,7 +232,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		return getString(SERVICE_ID_KEY, null);
 	}
 	
-	/* (non-Javadoc)
+ 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider#getTypeHierarchyService()
 	 */
 	public synchronized ITypeHierarchyService getTypeHierarchyService() {
@@ -218,7 +244,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		
 		return fTypeHierarchyService;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
@@ -227,6 +253,32 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		return fIsConfigured;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#isDirty()
+	 */
+	public boolean isDirty() {
+		return fIsDirty;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#putString(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void putString(String key, String value) {
+		fIsDirty = true;
+		super.putString(key, value);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#save()
+	 */
+	public void save() {
+		if (fProvider != null) {
+			fProvider.setProperties(getProperties());
+			fIsDirty = false;
+		}
+	}
+
 	/**
  	 * @param isConfigured
  	 */
@@ -254,12 +306,12 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		putString(CONNECTION_NAME_KEY, connectionName);
  	}
 	
-	public void setDStoreEnv(String env) {
-		putString(DSTORE_ENV_KEY, env);
-	}
-	
 	public void setDStoreCommand(String command) {
 		putString(DSTORE_COMMAND_KEY, command);
+	}
+	
+	public void setDStoreEnv(String env) {
+		putString(DSTORE_ENV_KEY, env);
 	}
 	
 	public void setDStoreLocation(String path) {
@@ -285,7 +337,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 	 */
 	@Override
 	public String toString() {
-		return "RemoteCIndexServiceProvider2(" + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "RemoteToolsCIndexServiceProvider(" + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void initialize() {
@@ -317,7 +369,7 @@ public class RemoteCIndexServiceProvider2 extends ServiceProvider implements IIn
 		if (fSubsystem != null) {
 			fSubsystem.dispose();
 		}
-		fSubsystem = new RemoteCIndexSubsystem2(this);
+		fSubsystem = new RemoteToolsCIndexSubsystem(this);
 		setConfigured(true);
 	}
 

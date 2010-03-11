@@ -72,7 +72,7 @@ import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider2;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteToolsCIndexServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -89,17 +89,15 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * @author crecoskie
  *
  */
-public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
+public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 	private Set<IProject> fInitializedProjects = new HashSet<IProject>();
 	private ProjectChangeListener fProjectOpenListener = new ProjectChangeListener(this);
-	private final RemoteCIndexServiceProvider2 fProvider;
+	private final RemoteToolsCIndexServiceProvider fProvider;
 	private List<String> fErrorMessages = new ArrayList<String>();
 	private DStoreServerRunner fDataStoreRunner = null;
 
-	public RemoteCIndexSubsystem2(RemoteCIndexServiceProvider2 provider) {
-//		fRemoteServices = services;
-//		fRemoteConnection = connection;
+	public RemoteToolsCIndexSubsystem(RemoteToolsCIndexServiceProvider provider) {
 		fProvider = provider;
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectOpenListener);
 	}
@@ -303,7 +301,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCallees(org.eclipse.ptp.internal.rdt.core.model.Scope, java.lang.String, java.lang.String, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public CallsToResult getCallees(Scope scope, ICElement subject, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getBaseURI(), subject }, null);
 		if (result == null) {
 			return new CallsToResult();
@@ -315,7 +313,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCallers(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.model.ICElement, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public CalledByResult getCallers(Scope scope, ICElement subject, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getBaseURI(), subject }, null);
 		if (result == null) {
 			return new CalledByResult();
@@ -327,7 +325,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCHDefinitions(org.eclipse.ptp.internal.rdt.core.model.Scope, java.lang.String, java.lang.String, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public ICElement[] getCHDefinitions(Scope scope, ICElement subject, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getBaseURI(), subject }, null);
 		if (result == null) {
 			return new ICElement[0];
@@ -341,7 +339,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCHDefinitions(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.model.ITranslationUnit, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public ICElement[] getCHDefinitions(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.7") + unit, 100); //$NON-NLS-1$
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + unit, 100); //$NON-NLS-1$
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, new Object[] { scope, getBaseURI(), unit, selectionStart, selectionLength }, null);
 		if (result == null) {
 			return new ICElement[0];
@@ -472,7 +470,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 					for (int i = 0; i < status.getNestedSize(); i ++ ){
 						DataElement element = status.get(i);
 						if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
-				    		String message = element.getAttribute(DE.A_NAME)+ ".  " + Messages.getString("RemoteCIndexSubsystem.11");  //$NON-NLS-1$//$NON-NLS-2$
+				    		String message = element.getAttribute(DE.A_NAME)+ ".  " + Messages.getString("RSECIndexSubsystem.11");  //$NON-NLS-1$//$NON-NLS-2$
 				    		for (int j = 0; j < fErrorMessages.size(); j++) {
 				    			if (message.indexOf(fErrorMessages.get(j)) > 0) {
 						    		RDTLog.logWarning(message);
@@ -516,7 +514,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#openDeclaration(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.model.ITranslationUnit, java.lang.String, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
-		monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.9"), 100); //$NON-NLS-1$
+		monitor.beginTask(Messages.getString("RSECIndexSubsystem.9"), 100); //$NON-NLS-1$
 		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] {scope, unit, selectedText, selectionStart, selectionLength}, monitor);
 		if(result == null)
 			return OpenDeclarationResult.failureUnexpectedError();
@@ -535,7 +533,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	    	
 	     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
 
-	     	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.3"), 100); //$NON-NLS-1$
+	     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.3"), 100); //$NON-NLS-1$
 	   
 	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_SCOPE_REGISTER);
             if (queryCmd != null)
@@ -616,7 +614,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 //                count = Integer.parseInt(countStatus.getSource());
 //	    	}
 //	    	
-//	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.1"), count); //$NON-NLS-1$
+//	    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.1"), count); //$NON-NLS-1$
 	     	
 	     	monitor.beginTask("Rebuilding indexing...", 100); //$NON-NLS-1$
 	   
@@ -670,7 +668,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 					for (int i = 0; i < status.getNestedSize(); i ++ ){
 						DataElement element = status.get(i);
 						if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
-				    		String message = element.getAttribute(DE.A_NAME)+ ".  " + Messages.getString("RemoteCIndexSubsystem.11");  //$NON-NLS-1$//$NON-NLS-2$
+				    		String message = element.getAttribute(DE.A_NAME)+ ".  " + Messages.getString("RSECIndexSubsystem.11");  //$NON-NLS-1$//$NON-NLS-2$
 				    		for (int j = 0; j < fErrorMessages.size(); j++) {
 				    			if (message.indexOf(fErrorMessages.get(j)) > 0) {
 						    		RDTLog.logWarning(message);
@@ -702,7 +700,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<RemoteSearchMatch> runQuery(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
 		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY, new Object[] { scope, getBaseURI(), query  }, null);
 		if (result == null) {
 			return Collections.emptyList();
@@ -750,7 +748,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 	    	
 	     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
 	    	
-	    	monitor.beginTask(Messages.getString("RemoteCIndexSubsystem.4"), 100); //$NON-NLS-1$
+	    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.4"), 100); //$NON-NLS-1$
 	   
 	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_SCOPE_UNREGISTER);
             if (queryCmd != null)
@@ -843,7 +841,7 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 		IServiceConfiguration config = serviceModelManager.getActiveConfiguration(project);
 
 		// is the indexing service associated with our service provider?
-		IService service = serviceModelManager.getService(RemoteCIndexServiceProvider2.SERVICE_ID);
+		IService service = serviceModelManager.getService(RemoteToolsCIndexServiceProvider.SERVICE_ID);
 		IServiceProvider provider = config.getServiceProvider(service);
 
 
@@ -1053,10 +1051,10 @@ public class RemoteCIndexSubsystem2 implements ICIndexSubsystem {
 		DataStore dataStore = null;
 		if (fDataStoreRunner == null) {
 			fDataStoreRunner = DStoreServerManager.getInstance().getServer(fProvider.getRemoteServices(), fProvider.getRemoteConnection());
-			fDataStoreRunner.setWorkDir(fProvider.getDStoreLocation());
-			fDataStoreRunner.setCommand(fProvider.getDStoreCommand());
-			fDataStoreRunner.setEnv(fProvider.getDStoreEnv());
 		}
+		fDataStoreRunner.setWorkDir(fProvider.getDStoreLocation());
+		fDataStoreRunner.setCommand(fProvider.getDStoreCommand());
+		fDataStoreRunner.setEnv(fProvider.getDStoreEnv());
 		dataStore = fDataStoreRunner.getDataStore();
 		if (!dataStore.isConnected()) {
 			if (fDataStoreRunner.startServer()) {
