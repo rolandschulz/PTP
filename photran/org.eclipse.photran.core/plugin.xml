@@ -122,6 +122,13 @@
 	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
 		  base-type="org.eclipse.photran.core.fortranSource"/>
 
+      <!--NOTE:
+          If you are changing file extensions in "sources" or "dependencyExtensions" keep 
+          in mind that those extensions are duplicated in the following files:
+          org.eclipse.photran.managedbuilder.intel.ui/plugin.xml
+          org.eclipse.photran.managedbuilder.gnu.ui/plugin.xml
+          org.eclipse.photran.managedbuilder.xlf.ui/plugin.xml
+          org.eclipse.photran.core/plugin.xml -->
       <!-- Associated filename extensions -->
 	  <file-association 
           content-type="org.eclipse.photran.core.freeFormFortranSource"

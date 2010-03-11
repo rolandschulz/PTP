@@ -526,9 +526,17 @@
             sourceContentType="org.eclipse.photran.core.fortranSource"
             dependencyContentType="org.eclipse.cdt.core.fortranSource"
 -->
+
+           <!--NOTE:
+          If you are changing file extensions in "sources" or "dependencyExtensions" keep 
+          in mind that those extensions are duplicated in the following files:
+          org.eclipse.photran.managedbuilder.intel.ui/plugin.xml
+          org.eclipse.photran.managedbuilder.gnu.ui/plugin.xml
+          org.eclipse.photran.managedbuilder.xlf.ui/plugin.xml
+          org.eclipse.photran.core/plugin.xml -->
           <inputType
-		      sources="f,f90,f95,f03,ftn,for,fpp,F,FOR,FTN,FPP,F90,F95,F03"
-              dependencyExtensions="f,f90,f95,f03,ftn,for,fpp,F,FOR,FTN,FPP,F90,F95,F03"
+		      sources="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
+              dependencyExtensions="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
               dependencyCalculator="org.eclipse.photran.managedbuilder.core/org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
               id="photran.managedbuild.tool.xlf.fortran.compiler.input">
           </inputType>
