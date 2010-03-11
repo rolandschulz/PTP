@@ -19,7 +19,7 @@ import org.eclipse.rse.core.subsystems.SubSystemConfiguration;
 import org.eclipse.rse.services.dstore.IDStoreService;
 
 /**
- * Handles configuration of the RemoteCIndexSubsystem
+ * Handles configuration of the RSECIndexSubsystem
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is no guarantee that this API will work or
  * that it will remain the same. Please do not use this API without consulting
@@ -28,13 +28,13 @@ import org.eclipse.rse.services.dstore.IDStoreService;
  * @author crecoskie
  *
  */
-public class RemoteCIndexSubsystemConfiguration extends SubSystemConfiguration
+public class RSECIndexSubsystemConfiguration extends SubSystemConfiguration
 		implements ISubSystemConfiguration {
 
 	/**
 	 * 
 	 */
-	public RemoteCIndexSubsystemConfiguration() {
+	public RSECIndexSubsystemConfiguration() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -43,7 +43,7 @@ public class RemoteCIndexSubsystemConfiguration extends SubSystemConfiguration
 	 */
 	@Override
 	public ISubSystem createSubSystemInternal(IHost conn) {
-		return new RemoteCIndexSubsystem(conn, getConnectorService(conn));
+		return new RSECIndexSubsystem(conn, getConnectorService(conn));
 	}
 	
 	/* (non-Javadoc)
