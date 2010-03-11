@@ -124,7 +124,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected ArrayAttribute<T> doClone() {
+	protected ArrayAttribute<T> doCopy() {
 		return new ArrayAttribute<T>(getDefinition(), value);
 	}
 	

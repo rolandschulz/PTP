@@ -31,9 +31,11 @@ implements IAttribute<T,A,D> {
 		this.enabled = true;
 	}
 
-	@Override
-	public A clone() {
-		return doClone();
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#copy()
+	 */
+	public A copy() {
+		return doCopy();
 	}
 	
 	/* (non-Javadoc)
@@ -114,17 +116,17 @@ implements IAttribute<T,A,D> {
 	}
 
 	/**
-	 * @return
-	 */
-	protected abstract A doClone();
-	
-	/**
      * @param other
      * @return
      */
     protected abstract int doCompareTo(A other);
 
     /**
+	 * @return
+	 */
+	protected abstract A doCopy();
+
+	/**
      * @param other
      * @return
      */

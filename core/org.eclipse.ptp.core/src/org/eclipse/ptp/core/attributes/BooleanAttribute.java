@@ -65,7 +65,7 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected BooleanAttribute doClone() {
+	protected BooleanAttribute doCopy() {
 		return new BooleanAttribute(getDefinition(), value);
 	}
 

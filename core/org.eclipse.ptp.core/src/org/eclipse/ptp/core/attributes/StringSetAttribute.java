@@ -95,7 +95,7 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected StringSetAttribute doClone() {
+	protected StringSetAttribute doCopy() {
 		try {
 			return new StringSetAttribute(getDefinition(), value);
 		} catch (IllegalValueException e) {

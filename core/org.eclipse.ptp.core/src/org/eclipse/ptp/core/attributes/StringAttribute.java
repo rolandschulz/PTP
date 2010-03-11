@@ -62,7 +62,7 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected StringAttribute doClone() {
+	protected StringAttribute doCopy() {
 		return new StringAttribute(getDefinition(), value.toString());
 	}
 

@@ -133,7 +133,7 @@ public class AttributeIdSet<A extends IAttribute<?, A, ?>>
 				// clone the value, so that no one can
 				// modify our value
 				A aTmp = entry.getKey();
-				return aTmp.clone();
+				return aTmp.copy();
 			}
 		}
 		// if not just return null
@@ -149,7 +149,7 @@ public class AttributeIdSet<A extends IAttribute<?, A, ?>>
 		for (A value : idSetMap.keySet()) {
 			// clone the attribute, so it cannot
 			// be modified from outside
-			valueSet.add(value.clone());
+			valueSet.add(value.copy());
 		}
 		return valueSet;
 	}
