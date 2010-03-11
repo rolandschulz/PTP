@@ -194,7 +194,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
         catch (Exception e)
         {
-            log.logError(e);
+            log.logError(e, new PhotranTokenRef(filename, 0, 0));
         }
     }
 

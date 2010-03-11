@@ -48,7 +48,7 @@ public class IncludeLoaderCallback
     {
         try
         {
-        	return getIncludedFile(fileToInclude).getContents();
+        	return getIncludedFile(fileToInclude).getContents(true);
         }
         catch (CoreException e)
         {

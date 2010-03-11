@@ -41,7 +41,7 @@ public final class LexerFactory
     
     public static IAccumulatingLexer createLexer(IFile file, SourceForm sourceForm, boolean accumulateWhitetext) throws CoreException, IOException
     {
-        return createLexer(file.getContents(), file, determineFilename(file), sourceForm, accumulateWhitetext);
+        return createLexer(file.getContents(true), file, determineFilename(file), sourceForm, accumulateWhitetext);
     }
 
     private static String determineFilename(IFile file)

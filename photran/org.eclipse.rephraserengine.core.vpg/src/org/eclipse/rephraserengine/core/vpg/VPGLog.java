@@ -188,7 +188,20 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      *
      * @param e an exception that will be displayed to the user
      */
-	public void logError(Throwable e)
+    public void logError(Throwable e)
+    {
+        logError(e, null);
+    }
+
+    /**
+     * Adds the given error to the error/warning log.
+     *
+     * @param e an exception that will be displayed to the user
+     * @param tokenRef a specific token with which the warning is associated;
+     *                 for example, if an identifier was used without being
+     *                 initialized, it could reference that identifier
+     */
+	public void logError(Throwable e, R tokenRef)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(e.getClass().getName());
@@ -199,7 +212,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 		e.printStackTrace(new PrintStream(bs));
 		sb.append(bs);
 
-		log.add(new Entry(false, sb.toString(), null));
+		log.add(new Entry(false, sb.toString(), tokenRef));
 		notifyListeners();
 	}
 

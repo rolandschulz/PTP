@@ -81,7 +81,7 @@ public abstract class RefactoringTestCase extends BaseTestFramework
 
     protected String readWorkspaceFile(String filename) throws IOException, CoreException
     {
-        return readStream(project.getFile(filename).getContents());
+        return readStream(project.getFile(filename).getContents(true));
     }
 
     /**
