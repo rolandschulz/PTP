@@ -15,8 +15,8 @@ import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.ui.newui.IncludeTab;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteCIndexServiceProvider2;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteToolsCIndexServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
@@ -72,12 +72,12 @@ public class RemoteIncludeTab extends IncludeTab {
 			if (service != null) {
 				IServiceProvider provider = config.getServiceProvider(service);
 				if (provider != null) {
-					if (provider instanceof RemoteCIndexServiceProvider) {
-						dlg.setHost(((RemoteCIndexServiceProvider)provider).getHost());
-					} else if (provider instanceof RemoteCIndexServiceProvider2) {
+					if (provider instanceof RSECIndexServiceProvider) {
+						dlg.setHost(((RSECIndexServiceProvider)provider).getHost());
+					} else if (provider instanceof RemoteToolsCIndexServiceProvider) {
 						dlg.setConnection(
-								((RemoteCIndexServiceProvider2)provider).getRemoteServices(),
-								((RemoteCIndexServiceProvider2)provider).getRemoteConnection());
+								((RemoteToolsCIndexServiceProvider)provider).getRemoteServices(),
+								((RemoteToolsCIndexServiceProvider)provider).getRemoteConnection());
 					}
 				}
 			}
