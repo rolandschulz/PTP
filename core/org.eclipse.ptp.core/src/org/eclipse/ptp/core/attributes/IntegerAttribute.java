@@ -88,7 +88,7 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected IntegerAttribute doClone() {
+	protected IntegerAttribute doCopy() {
 		try {
 			return new IntegerAttribute(getDefinition(), value);
 		} catch (IllegalValueException e) {

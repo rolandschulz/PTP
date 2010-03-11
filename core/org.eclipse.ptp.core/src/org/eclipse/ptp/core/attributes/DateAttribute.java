@@ -178,7 +178,7 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected DateAttribute doClone() {
+	protected DateAttribute doCopy() {
 		try {
 			return new DateAttribute(getDefinition(), value.getTime());
 		} catch (IllegalValueException e) {

@@ -149,7 +149,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected EnumeratedAttribute<E> doClone() {
+	protected EnumeratedAttribute<E> doCopy() {
 		return new EnumeratedAttribute<E>(getDefinition(), value);
 	}
 

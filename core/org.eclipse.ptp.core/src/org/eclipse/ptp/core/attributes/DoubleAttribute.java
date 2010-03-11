@@ -85,7 +85,7 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected DoubleAttribute doClone() {
+	protected DoubleAttribute doCopy() {
 		try {
 			return new DoubleAttribute(getDefinition(), value);
 		} catch (IllegalValueException e) {

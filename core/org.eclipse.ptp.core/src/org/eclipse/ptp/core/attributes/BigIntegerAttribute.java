@@ -105,7 +105,7 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
-	protected BigIntegerAttribute doClone() {
+	protected BigIntegerAttribute doCopy() {
 		try {
 			return new BigIntegerAttribute(getDefinition(), value);
 		} catch (IllegalValueException e) {
