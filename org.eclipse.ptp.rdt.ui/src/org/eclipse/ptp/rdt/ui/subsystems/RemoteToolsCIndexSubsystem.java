@@ -11,16 +11,15 @@
 package org.eclipse.ptp.rdt.ui.subsystems;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
@@ -43,9 +42,11 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
@@ -91,7 +92,7 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  */
 public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
-	private Set<IProject> fInitializedProjects = new HashSet<IProject>();
+	private Map<IProject, String> fInitializedProjects = new HashMap<IProject, String>();
 	private ProjectChangeListener fProjectOpenListener = new ProjectChangeListener(this);
 	private final RemoteToolsCIndexServiceProvider fProvider;
 	private List<String> fErrorMessages = new ArrayList<String>();
@@ -100,6 +101,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	public RemoteToolsCIndexSubsystem(RemoteToolsCIndexServiceProvider provider) {
 		fProvider = provider;
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectOpenListener);
+		generateErrorMessages();
 	}
 	
 	/* (non-Javadoc)
@@ -135,8 +137,18 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#checkProject(org.eclipse.core.resources.IProject, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void checkProject(IProject project, IProgressMonitor monitor) {
-		if (project == null || fInitializedProjects.contains(project)) {
+		if (project == null){ 
 			return;
+		}
+		
+		if(fInitializedProjects.containsKey(project)){
+			String projectURI = project.getLocationURI().toString();
+			if(projectURI.equals(fInitializedProjects.get(project))){
+				return;
+			}else{
+				//the project's uri is changed, so we need to initialize it again.
+				//no need to unregister its scope, since initializeScope handles it.
+			}
 		}
 		try {
 			initializeScope(project, monitor);
@@ -182,10 +194,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
     	try
         {
         	smonitor.waitForUpdate(status, monitor);
-        	if (monitor.isCanceled())
-        	{
-        		cancelOperation(monitor, status.getParent());
-        	}
         }
         catch (Exception e)
         {
@@ -231,8 +239,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectOpenListener);
 	}
 
-	// scope management
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#findInclude(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.index.IIndexFileLocation, java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -246,7 +252,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	
 		return (IIndexIncludeValue) result;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#findIncludedBy(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.index.IIndexFileLocation, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -274,7 +280,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	
 		return (IIndexIncludeValue[]) result;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#findTypeHierarchyInput(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.model.ICElement)
 	 */
@@ -295,8 +301,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			return new ICElement[] { null, null };
 		}
 		return (ICElement[]) result;
-	}
-
+	}	
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCallees(org.eclipse.ptp.internal.rdt.core.model.Scope, java.lang.String, java.lang.String, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -307,7 +313,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			return new CallsToResult();
 		}
 		return (CallsToResult) result;
-	}	
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCallers(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.model.ICElement, org.eclipse.core.runtime.IProgressMonitor)
@@ -333,8 +339,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		return (ICElement[]) result;
 	}
 	
-	// call hierarchy
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#getCHDefinitions(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.cdt.core.model.ITranslationUnit, int, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -359,130 +363,95 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		
 		//the working copy	
 		return (ITranslationUnit) result;
-	}
+	}	
+	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#indexDelta(org.eclipse.ptp.internal.rdt.core.model.Scope, java.util.List, java.util.List, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus indexDelta(Scope scope,
-			IRemoteIndexerInfoProvider provider,
-			List<ICElement> newElements, List<ICElement> changedElements,
-			List<ICElement> deletedElements, IProgressMonitor monitor,
-			RemoteIndexerTask task) {
-		removeProblems(scope);
+	public IStatus indexDelta(Scope scope, IRemoteIndexerInfoProvider provider, List<ICElement> newElements, 
+			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		
+		removeProblems(scope);
 		DataStore dataStore = getDataStore();
-		   
-	    if (dataStore != null)
-	    {
-	     	
-	    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
-	     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
-	     	
-	     	int workCount = newElements.size() + changedElements.size();
-	    	
-	    	monitor.beginTask("Incrementally Indexing...", workCount); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INDEX_DELTA);
-            if (queryCmd != null)
-            {
-                      	
-            	ArrayList<Object> args = new ArrayList<Object>();
-            	            	
-            	// need to know the scope
-               	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-               	args.add(scopeElement);
-               	
-               	
-               	String serializedProvider = null;
-            	try {
-					serializedProvider = Serializer.serialize(provider);
-				} catch (IOException e) {
-					RDTLog.logError(e);
-				}
-				
-				DataElement providerElement = dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider);
-				args.add(providerElement);
-				
-				
-               	// iterate through the additions and create an object for each addition
-               	Iterator<ICElement> iterator = newElements.iterator();
-               	
-               	while(iterator.hasNext()) {
-               		ICElement element = iterator.next();
-               		
-               		// figure out the path to the element on the remote machine
-               		String remotePath = convertURIToRemotePath(element.getLocationURI());
-               		
-                   	DataElement addedElement = dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_ADDED, remotePath);
-                   	args.add(addedElement);
-               	}
-               	
-               	// iterate through the changed elements and create an object for each change
-               	iterator = changedElements.iterator();
-               	
-               	while(iterator.hasNext()) {
-               		ICElement element = iterator.next();
-               		
-               		// figure out the path to the element on the remote machine
-               		String remotePath = convertURIToRemotePath(element.getLocationURI());
-               		
-                   	DataElement changedElement = dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_CHANGED, remotePath);
-                   	args.add(changedElement);
-               	}
-               	
-               	// iterate through the deleted elements and create an object for each change
-               	iterator = deletedElements.iterator();
-               	
-               	while(iterator.hasNext()) {
-               		ICElement element = iterator.next();
-               		
-               		// figure out the path to the element on the remote machine
-               		String remotePath = convertURIToRemotePath(element.getLocationURI());
-               		
-                   	DataElement deletedElement = dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_REMOVED, remotePath);
-                   	args.add(deletedElement);
-               	}
-            	
-                DataElement status = dataStore.command(queryCmd, args, result);   
-                
-                //poll for progress information until the operation is done or canceled
-                while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+		if(dataStore == null)
+			return Status.OK_STATUS;
 
-                	RemoteIndexerProgress progress = getIndexerProgress(status);
-                	task.updateProgressInformation(progress);
-                	try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						RDTLog.logError(e);	
-					}
-                }
-                
-				try {
-					smonitor.waitForUpdate(status, monitor);
-					if (monitor.isCanceled()) 
-						cancelOperation(monitor, status.getParent());
-				} catch (Exception e) {
+    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
+     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
+     	int workCount = newElements.size() + changedElements.size();
+    	monitor.beginTask("Incrementally Indexing...", workCount); //$NON-NLS-1$
+   
+        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INDEX_DELTA);
+        if (queryCmd != null) {
+        	ArrayList<Object> args = new ArrayList<Object>();
+        	
+        	args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+           	
+           	String serializedProvider = null;
+        	try {
+				serializedProvider = Serializer.serialize(provider);
+			} catch (IOException e) {
+				RDTLog.logError(e);
+			}
+			
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider));
+			
+           	for(ICElement element : newElements) {	
+           		String remotePath = convertURIToRemotePath(element.getLocationURI());
+               	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_ADDED, remotePath));
+           	}
+           	
+           	for(ICElement element : changedElements) {	
+           		String remotePath = convertURIToRemotePath(element.getLocationURI());
+               	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_CHANGED, remotePath));
+           	}
+           	
+           	for(ICElement element : deletedElements) {		
+           		String remotePath = convertURIToRemotePath(element.getLocationURI());
+               	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_DELTA_REMOVED, remotePath));
+           	}
+        	
+            DataElement status = dataStore.command(queryCmd, args, result);   
+            
+            //poll for progress information until the operation is done or canceled
+            while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+            	RemoteIndexerProgress progress = getIndexerProgress(status);
+            	task.updateProgressInformation(progress);
+            	try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
 					RDTLog.logError(e);	
 				}
-				
-				if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
-					for (int i = 0; i < status.getNestedSize(); i ++ ){
-						DataElement element = status.get(i);
-						if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
-				    		String message = element.getAttribute(DE.A_NAME)+ ".  " + Messages.getString("RSECIndexSubsystem.11");  //$NON-NLS-1$//$NON-NLS-2$
-				    		for (int j = 0; j < fErrorMessages.size(); j++) {
-				    			if (message.indexOf(fErrorMessages.get(j)) > 0) {
-						    		RDTLog.logWarning(message);
-						    		reportProblem(scope, message);
-				    			}
-				    		}				    
-				    	}
-					}
+            }
+            
+            try {
+				try {
+					smonitor.waitForUpdate(status, monitor);
+				} catch (InterruptedException e) { // Canceled
+					if (monitor.isCanceled()) 
+						cancelOperation(status.getParent());
 				}
-
-				monitor.done();
+            } catch(Exception e) {
+            	RDTLog.logError(e);
+            }
+			
+			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
+				for (int i = 0; i < status.getNestedSize(); i ++ ){
+					DataElement element = status.get(i);
+					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
+			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
+			    		for (int j = 0; j < fErrorMessages.size(); j++) {
+			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
+					    		String msg = reportProblem(scope, message);
+					    		RDTLog.logWarning(msg);
+			    			}
+			    		}
+			    	}
+				}
 			}
+
+			monitor.done();
 		}
 	    
 	    return Status.OK_STATUS;
@@ -560,20 +529,12 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
             	try
                 {
                 	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
                 }
                 catch (Exception e)
                 {                	
+                	RDTLog.logError(e);
                 }
-            	
-            	int i=0;
-            	i++;
             }	
-            
-            
 	    }
 	    
 	    return Status.OK_STATUS;
@@ -584,107 +545,76 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#reindexScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider, org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask)
 	 */
-	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task)
-	{
+	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task) {
 		removeProblems(scope);
 		DataStore dataStore = getDataStore();
-		   
-	    if (dataStore != null)
-	    {
-	     	
-	    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
-	     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
-	     	
-//	     	int count = 0;
-//	    	DataElement countCmd = dataStore.localDescriptorQuery(datastore.getDescriptorRoot(), CDTMiner.C_SCOPE_COUNT_ELEMENTS);
-//	    	if (countCmd != null)
-//	    	{
-//	    		DataElement countStatus  = dataStore.command(countCmd, result, true);
-//	    		try
-//                {
-//                	smonitor.waitForUpdate(countStatus, monitor, 5000);
-//                	if (monitor.isCanceled())
-//                	{
-//                		cancelOperation(monitor, countStatus.getParent());
-//                	}
-//                }
-//                catch (Exception e)
-//                {                	
-//                } 
-//                count = Integer.parseInt(countStatus.getSource());
-//	    	}
-//	    	
-//	    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.1"), count); //$NON-NLS-1$
-	     	
-	     	monitor.beginTask("Rebuilding indexing...", 100); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INDEX_REINDEX);
-            if (queryCmd != null)
-            {
-                      	
-            	ArrayList<Object> args = new ArrayList<Object>();
-            	            	
-            	// need to know the scope
-            	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
-               	args.add(scopeElement);
-            	
-            	String serializedProvider = null;
+		if(dataStore == null)
+			return Status.OK_STATUS;
+		
+    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
+     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getRemoteConnection(), dataStore);
+     	monitor.beginTask("Rebuilding indexing...", 100); //$NON-NLS-1$
+   
+        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INDEX_REINDEX);
+        if (queryCmd != null) {
+        	ArrayList<Object> args = new ArrayList<Object>();
+ 
+        	args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+        	
+        	String serializedProvider = null;
+        	try {
+				serializedProvider = Serializer.serialize(provider);
+			} catch (IOException e) {
+				RDTLog.logError(e);
+			}
+			
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider));
+			args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, indexLocation));
+			
+            DataElement status = dataStore.command(queryCmd, args, result);   
+
+            //poll for progress information until the operation is done or canceled
+            while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+            	RemoteIndexerProgress progress = getIndexerProgress(status);
+            	task.updateProgressInformation(progress);
             	try {
-					serializedProvider = Serializer.serialize(provider);
-				} catch (IOException e) {
-					RDTLog.logError(e);
-				}
-				
-				DataElement providerElement = dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider);
-				args.add(providerElement);
-            	
-				// need to know the scope config location
-            	DataElement indexLocationElement = dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, indexLocation);
-               	args.add(indexLocationElement);
-				
-                DataElement status = dataStore.command(queryCmd, args, result);   
-
-                //poll for progress information until the operation is done or canceled
-                while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
-
-                	RemoteIndexerProgress progress = getIndexerProgress(status);
-                	task.updateProgressInformation(progress);
-                	try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						RDTLog.logError(e);	
-					}
-                }
-                
-				try {
-					smonitor.waitForUpdate(status, monitor);
-					if (monitor.isCanceled()) 
-						cancelOperation(monitor, status.getParent());
-				} catch (Exception e) {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
 					RDTLog.logError(e);	
 				}
-				
-				if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
-					for (int i = 0; i < status.getNestedSize(); i ++ ){
-						DataElement element = status.get(i);
-						if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
-				    		String message = element.getAttribute(DE.A_NAME)+ ".  " + Messages.getString("RSECIndexSubsystem.11");  //$NON-NLS-1$//$NON-NLS-2$
-				    		for (int j = 0; j < fErrorMessages.size(); j++) {
-				    			if (message.indexOf(fErrorMessages.get(j)) > 0) {
-						    		RDTLog.logWarning(message);
-						    		reportProblem(scope, message);
-				    			}
-				    		}				    
-				    	}
-					}
-				}				
-				monitor.done();
             }
-	    }
+            
+			try {
+				try {
+					smonitor.waitForUpdate(status, monitor);
+				} catch (InterruptedException e) { // Canceled
+					if (monitor.isCanceled()) 
+						cancelOperation(status.getParent());
+				}
+			} catch (Exception e) {
+				RDTLog.logError(e);	
+			}
+			
+			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
+				for (int i = 0; i < status.getNestedSize(); i ++ ){
+					DataElement element = status.get(i);
+					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
+			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
+			    		for (int j = 0; j < fErrorMessages.size(); j++) {
+			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
+					    		String msg = reportProblem(scope, message);
+					    		RDTLog.logWarning(msg);
+			    			}
+			    		}
+			    	}
+				}
+			}
+			monitor.done();
+        }
 	    
 	    return Status.OK_STATUS;
-
 	}
+	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#removeIndexFile(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
@@ -693,7 +623,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		sendRequest(CDTMiner.C_REMOVE_INDEX_FILE, new Object[] {scope}, monitor);
 		return Status.OK_STATUS;
 	}
-	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#runQuery(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery, org.eclipse.core.runtime.IProgressMonitor)
@@ -718,6 +647,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		return sendRequest(requestType, arguments, monitor, true);
 	}
 	
+
 	/**
 	 * @param requestType
 	 * @param arguments
@@ -728,7 +658,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		return (String) sendRequest(requestType, arguments, monitor, false);
 	}
 	
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#unregisterScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -768,19 +697,12 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
             	try
                 {
                 	smonitor.waitForUpdate(status, monitor);
-                	if (monitor.isCanceled())
-                	{
-                		cancelOperation(monitor, status.getParent());
-                	}
                 }
                 catch (Exception e)
-                {                	
+                {            
+                	RDTLog.logError(e);
                 }
-            	
-
-            }	
-            
-            
+            }
 	    }
 		
 		return Status.OK_STATUS;
@@ -797,10 +719,12 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	}
 	
 	private void generateErrorMessages() {				
-    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.inclusionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
-    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
+//    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.inclusionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
+//    	fErrorMessages.add(ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", "")); //$NON-NLS-1$ //$NON-NLS-2$
+    	fErrorMessages.add("Unresolved inclusion:"); //$NON-NLS-1$
+    	fErrorMessages.add("Macro definition not found:"); //$NON-NLS-1$
 	}
-
+		
 	private RemoteIndexerProgress getIndexerProgress(DataElement status) {
 		int num = status.getNestedSize();
     	if (num > 0) {    	
@@ -834,7 +758,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
     	}
     	return null;
 	}
-		
+	
 	private void initializeScope(IProject project, IProgressMonitor monitor) throws CoreException {
 		// get the service model configuration for this project
 		final ServiceModelManager serviceModelManager = ServiceModelManager.getInstance();
@@ -876,10 +800,11 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		// register the new scope
 		registerScope(scope, cElements, configLocation, monitor);
 		
-		fInitializedProjects.add(project);
+		String projectURI = project.getLocationURI().toString();
+		fInitializedProjects.put(project, projectURI);
 
 	}
-
+		
 	/**
 	 * Sends a request in a set format of arguments.
 	 * 
@@ -923,9 +848,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
         {
     		monitor = monitor == null ? new NullProgressMonitor() : monitor;
         	smonitor.waitForUpdate(status, monitor);
-        	if (monitor.isCanceled()) {
-        		cancelOperation(monitor, status.getParent());
-        	}
         }
         catch (Exception e) {
         	RDTLog.logError(e);	
@@ -956,8 +878,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
     	return null;
 	}
-
-
 
 	/**
 	 * @param dataStore
@@ -997,16 +917,16 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 	}
 
-	protected void cancelOperation(IProgressMonitor monitor, DataElement cmd) throws InvocationTargetException, InterruptedException
-	{
-		DataStore dataStore = cmd.getDataStore();
-		DataElement commandDescriptor = dataStore.findCommandDescriptor(DataStoreSchema.C_CANCEL);
-		if (commandDescriptor != null)
-		{
-			dataStore.command(commandDescriptor, cmd, false, true);
-		}	
+	protected void cancelOperation(DataElement command) {
+		// send cancel command
+		DataStore dataStore = command.getDataStore();
+		DataElement cmdDescriptor = command.getDescriptor();
+		DataElement cancelDescriptor = dataStore.localDescriptorQuery(cmdDescriptor, DataStoreSchema.C_CANCEL);
+		if (cancelDescriptor != null) {
+			dataStore.command(cancelDescriptor, command);
+		}
 	}
-
+	
 	protected URI convertRemotePathToURI(String path) throws URISyntaxException {
 		return fProvider.getRemoteServices().getFileManager(fProvider.getRemoteConnection()).toURI(path);
 	}
@@ -1022,31 +942,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			throw new AssertionFailedException(e.getLocalizedMessage());
 		}
 	}
-	
-	protected void removeProblems(Scope scope) {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot workspaceRoot = workspace.getRoot();
-		IProject project = workspaceRoot.getProject(scope.getName());
-		try {
-			project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-		} catch (CoreException e) {
-			RDTLog.logError(e);
-		}
-	}
 
-	protected void reportProblem(Scope scope, String message) {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot workspaceRoot = workspace.getRoot();
-		IProject project = workspaceRoot.getProject(scope.getName());
-		try {
-			IMarker marker =  project.createMarker(IMarker.PROBLEM);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-		} catch (CoreException e) {
-			RDTLog.logError(e);
-		}
-	}
-	
 	protected DataStore getDataStore() {
 		DataStore dataStore = null;
 		if (fDataStoreRunner == null) {
@@ -1070,6 +966,91 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			return null;
 		}
 		return dataStore;
+	}
+	
+	protected void removeProblems(Scope scope) {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot workspaceRoot = workspace.getRoot();
+		IProject project = workspaceRoot.getProject(scope.getName());
+		try {
+			project.deleteMarkers("org.eclipse.ptp.rdt.ui.indexerproblemmarker", true, IResource.DEPTH_INFINITE); //$NON-NLS-1$
+		} catch (CoreException e) {
+			RDTLog.logError(e);
+		}
+	}
+	
+	protected String reportProblem(Scope scope, String message) {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot workspaceRoot = workspace.getRoot();
+		IProject project = workspaceRoot.getProject(scope.getName());
+		
+		//parser for error message
+		int errorMessageStart = message.indexOf("Indexer: "); //$NON-NLS-1$
+		int errorMessageEnd = message.indexOf(": ",errorMessageStart + 9); //$NON-NLS-1$
+		String errorMessage = message.substring(errorMessageStart + 9, errorMessageEnd);
+		
+		boolean includeError = true;
+		if (errorMessage.indexOf("inclusion") < 0) //$NON-NLS-1$
+			includeError = false;
+		
+		//parser for include/macro name
+		int includeStart = errorMessageEnd + 2;
+		int includeEnd = message.indexOf(" in file: ",includeStart); //$NON-NLS-1$
+		String include = message.substring(includeStart, includeEnd);
+				
+		
+		//parse for file name and line number
+		int fileStart = includeEnd+10;
+		int fileEnd = message.indexOf(":", fileStart); //$NON-NLS-1$
+		String fileName = message.substring(fileStart, fileEnd);
+		
+		int lineStart = fileEnd;
+		int lineEnd = message.indexOf(".  ", lineStart); //$NON-NLS-1$
+		String lineNumber = message.substring(lineStart + 1, lineEnd);
+		
+		//put error message back together
+		Object[] args = new Object[] { include, fileName, new Integer(lineNumber.replace(",", "")) }; //$NON-NLS-1$ //$NON-NLS-2$
+		String info = ParserMessages.getFormattedString("BaseProblemFactory.problemPattern", args); //$NON-NLS-1$
+		if (includeError)
+			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.inclusionNotFound", info); //$NON-NLS-1$
+		else
+			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", info); //$NON-NLS-1$
+		
+		String infoMsg = Messages.getString("RSECIndexSubsystem.11"); //$NON-NLS-1$
+		String wholeMessage = MessageFormat.format(Messages.getString("RSECIndexSubsystem.12"), new Object[] {info}) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
+		
+		IFile file = null;
+		String projectLocation = project.getLocationURI().getPath();
+		fileStart = fileName.indexOf(projectLocation);		
+		if(fileStart == -1) {
+			fileName = null;
+		}
+		else {
+			fileName = fileName.substring(fileStart + projectLocation.length() + 1);
+			IPath path = new Path(fileName);
+			file = project.getFile(path);
+		}
+		
+		
+		if (file != null) {
+			try {
+				IMarker marker = file.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
+				marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(lineNumber.replace(",", ""))); //$NON-NLS-1$ //$NON-NLS-2$
+				marker.setAttribute(IMarker.MESSAGE, wholeMessage);
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			} catch (CoreException e) {
+				RDTLog.logError(e);
+			}
+		} else {
+			try {
+				IMarker marker =  project.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
+				marker.setAttribute(IMarker.MESSAGE, wholeMessage);
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			} catch (CoreException e) {
+				RDTLog.logError(e);
+			}
+		}
+		return wholeMessage;
 	}
 	
 }
