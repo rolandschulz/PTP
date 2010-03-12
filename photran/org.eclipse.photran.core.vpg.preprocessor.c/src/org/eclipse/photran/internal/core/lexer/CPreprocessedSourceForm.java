@@ -37,6 +37,6 @@ public final class CPreprocessedSourceForm extends SourceForm
     
     @Override public String getDescription(String filename)
     {
-        return "Free Form (C Preprocessed)";
+        return "Free Form - C Preprocessed";
     }
 }

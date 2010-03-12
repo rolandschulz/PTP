@@ -176,7 +176,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
     private FortranElement createSourceFormNode(String desc) throws CModelException
     {
-        desc = "<" + desc + " Source>";
+        desc = "<" + desc + ">";
         FortranElement element = new FortranElement.UnknownNode(translationUnit, desc);
         translationUnit.addChild(element);
         this.newElements.put(element, element.getElementInfo());
