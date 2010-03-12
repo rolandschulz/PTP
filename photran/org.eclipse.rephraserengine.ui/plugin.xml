@@ -11,4 +11,26 @@
             searchResultClass="org.eclipse.rephraserengine.ui.search.SearchResult"/>
    </extension>
 
+   <!-- Search menu from org.eclipse.search
+        Duplicated here to prevent errors like
+          !ENTRY org.eclipse.ui 4 4 2010-03-12 10:45:24.324
+          !MESSAGE Plug-in 'org.eclipse.rephraserengine.examples.text' contributed an invalid Menu Extension (Path: 'org.eclipse.search.menu' is invalid): org.eclipse.rephraserengine.examples.text.openTextSearchPage
+        (Note that the original org.eclipse.search.menu is defined in an actionSet.)
+   -->
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=navigate">
+        <menu
+           id="org.eclipse.search.menu"
+           label="Se&amp;arch">
+           <!--groupMarker name="dialogGroup"/-->           <!-- to be used by clients      -->
+           <separator name="dialogGroup"/> <!-- to be used by clients      -->
+           <separator name="fileSearchContextMenuActionsGroup"/> <!-- to be used by clients      -->
+           <separator name="contextMenuActionsGroup"/> <!-- to be used by clients -->
+           <separator name="occurencesActionsGroup"/> <!-- to be used by clients -->
+           <separator name="extraSearchGroup"/> <!-- to be used by clients -->
+        </menu>
+     </menuContribution>
+  </extension>
+
 </plugin>
