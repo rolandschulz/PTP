@@ -23,12 +23,14 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
 /**
- * Syntax highlighting rule which identifies a word as a keyword or an identifier based on Sale's algorithm
+ * Syntax highlighting rule which determines whether a word should be a keyword or an identifier.
  * <p>
- * The logic is somewhat based on FreeFormLexerPhase2, although this version is much less
- * precise and is based on a character-by-character scan rather than a token stream.
+ * The logic is based on Sale's algorithm, extended to handle Fortran 90, 2003, and 2008.
+ * <p>
+ * This is only vaguely similar to FreeFormLexerPhase2; this version is much faster but less
+ * precise, as it is based on a character-by-character scan rather than a proper tokenization.
  * It only scans one line at a time and is therefore oblivious to continuation lines; this
- * makes it highlight continuation lines incorrectly (see Bug 302318 and Bug 301712).
+ * makes it highlight continuation lines incorrectly (see Bugs 302318 and 301712).
  *
  * @see org.eclipse.jface.text.rules.WordRule
  *

@@ -36,148 +36,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Scans for for Fortran keywords (for syntax highlighting)
+ * Scans for Fortran keywords to perform syntax highlighting.
  *
  * @author Jeff Overbey
  */
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Inner Classes - for handling column-based issues in fixed form sources
-    ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Rule which detects any string occurring past workspace-defined column 
-     * (72 by default) as a comment
-     */
-    private final class FixedFormColumnCommentRule implements IRule
-    {
-        public IToken evaluate(ICharacterScanner scanner)
-        {
-            IToken result = Token.UNDEFINED;
-            scanner.read();
-            if (scanner.getColumn() > FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue())
-            {
-                result = colorComments;
-                do
-                    scanner.read();
-                while (scanner.getColumn() > FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue());
-            }
-            scanner.unread();
-            return result;
-        }
-    }
-
-//    /**
-//     * Rule which detects identifiers between columns 7 and 72
-//     *
-//     * @see org.eclipse.jface.text.rules.WordRule
-//     */
-//    private static final class FixedFormIdentifierWordRule extends WordRule
-//    {
-//        private StringBuffer fBuffer = new StringBuffer();
-//
-//        private FixedFormIdentifierWordRule(IWordDetector detector, IToken token)
-//        {
-//            super(detector, token);
-//        }
-//
-//        public IToken evaluate(ICharacterScanner scanner)
-//        {
-//            // int c= scanner.read();
-//            // boolean canStart = fDetector.isWordStart((char)c) && scanner.getColumn() >= 7;
-//            // scanner.unread();
-//            // return canStart ? super.evaluate(scanner) : Token.UNDEFINED;
-//
-//            int c = scanner.read();
-//            if (fDetector.isWordStart((char)c) && scanner.getColumn() >= 7)
-//            {
-//                fBuffer.setLength(0);
-//                do
-//                {
-//                    fBuffer.append((char)c);
-//                    c = scanner.read();
-//                }
-//                while (c != ICharacterScanner.EOF && fDetector.isWordPart((char)c) && scanner.getColumn() <= 72);
-//                scanner.unread();
-//
-//                IToken token = (IToken)fWords.get(fBuffer.toString());
-//                if (token != null) return token;
-//
-//                if (fDefaultToken.isUndefined()) unreadBuffer(scanner);
-//
-//                return fDefaultToken;
-//            }
-//
-//            scanner.unread();
-//            return Token.UNDEFINED;
-//        }
-//    }
-
-    /**
-     * Word detector for Fortran identifiers and generic operators
-     */
-    private static final class FortranWordDetector implements IWordDetector
-    {
-        public boolean isWordStart(char c)
-        {
-            return Character.isJavaIdentifierStart(c);
-        }
-
-        public boolean isWordPart(char c)
-        {
-            return Character.isJavaIdentifierPart(c);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Inner Class - updates the display when the editor's colors are changed
-    ///////////////////////////////////////////////////////////////////////////
-
-    private final class PreferenceChangeListener implements IPropertyChangeListener
-    {
-        private ISourceViewer sourceViewer;
-
-        PreferenceChangeListener(ISourceViewer sourceViewer)
-        {
-            this.sourceViewer = sourceViewer;
-        }
-
-        public void propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent event)
-        {
-            String property = event.getProperty();
-            String newVal = event.getNewValue() instanceof String ? (String)event.getNewValue() : null;
-
-            if (property.equals(FortranPreferences.COLOR_COMMENTS.getName()))
-                updateToken(colorComments, newVal);
-            else if (property.equals(FortranPreferences.COLOR_CPP.getName()))
-                updateToken(colorCpp, newVal);
-            else if (property.equals(FortranPreferences.COLOR_STRINGS.getName()))
-                updateToken(colorStrings, newVal);
-            else if (property.equals(FortranPreferences.COLOR_IDENTIFIERS.getName()))
-                updateToken(colorIdentifiers, newVal);
-            else if (property.equals(FortranPreferences.COLOR_INTRINSICS.getName()))
-                updateToken(colorIntrinsics, newVal);
-            else if (property.equals(FortranPreferences.COLOR_KEYWORDS.getName()))
-                updateToken(colorKeywords, newVal);
-        }
-
-        private void updateToken(Token token, String newColor)
-        {
-            Object data = token.getData();
-            if (data instanceof TextAttribute)
-            {
-                TextAttribute oldAttr = (TextAttribute)data;
-                token.setData(new TextAttribute(new Color(null, StringConverter.asRGB(newColor)),
-                                                oldAttr.getBackground(),
-                                                oldAttr.getStyle()));
-            }
-
-            // Force redraw of entire editor text
-            sourceViewer.invalidateTextPresentation();
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Constants - Words to highlight
     ///////////////////////////////////////////////////////////////////////////
@@ -324,15 +188,6 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
          "random_seed"
     };
 
-    /* { "ABS", "ACHAR", "ACOS", "ADJUSTL", "ADJUSTR", "AIMAG", "AINT", "ALL", "ALLOCATED", "AND", "ANINT", "ANY", "ASIN",
-        "ASSOCIATED", "ATAN", "ATAN2", "BIT_SIZE", "BTEST", "CEILING", "CHAR", "CMPLX", "CONJG", "COS", "COSH", "COUNT", "CSHIFT", "DATE_AND_TIME", "DBLE", "DIGITS",
-        "DIM", "DOT_PRODUCT", "DPROD", "EOSHIFT", "EPSILON", "EQV", "EXP", "EXPONENT", "FALSE", "FLOOR", "FRACTION", "HUGE", "IACHAR", "IAND", "IBCLR", "IBITS", "IBSET",
-        "ICHAR", "IEOR", "INDEX", "INT", "IOR", "ISHFT", "ISHFTC", "KIND", "LBOUND", "LEN", "LEN_TRIM", "LGE", "LGT", "LLE", "LLT", "LOG", "LOG10", "LOGICAL", "MATMUL",
-        "MAX", "MAXEXPONENT", "MAXLOC", "MAXVAL", "MERGE", "MIN", "MINEXPONENT", "MINLOC", "MINVAL", "MOD", "MODULO", "MVBITS", "NEAREST", "NEQV", "NINT", "NOT", "OR",
-        "PACK", "PRECISION", "PRESENT", "PRODUCT", "RADIX", "RANDOM_NUMBER", "RANDOM_SEED", "RANGE", "REAL", "REPEAT", "RESHAPE", "RRSPACING", "SCALE", "SCAN",
-        "SELECTED_INT_KIND", "SELECTED_REAL_KIND", "SET_EXPONENT", "SHAPE", "SIGN", "SIN", "SINH", "SIZE", "SPACING", "SPREAD", "SQRT", "SUM", "SYSTEM_CLOCK", "TAN",
-        "TANH", "TINY", "TRANSFER", "TRANSPOSE", "TRIM", "TRUE", "UBOUND", "UNPACK", "VERIFY" }; */
-
     private static String[] fgTypes = { "REAL", "INTEGER", "CHARACTER", "LOGICAL", "COMPLEX" };
 
     private static String[] fgPreprocessor = { "INCLUDE", "#include", "#error", "#warning", "#pragma", "#ifdef", "#ifndef", "#if", "#else", "#elif", "#endif", "#line" };
@@ -429,6 +284,102 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         for (int i = 0; i < fgKeywords.length; i++)
             salesRule.addWord(fgKeywords[i], colorKeywords);
     }
+
+    /**
+     * Updates the display when the editor's colors are changed
+     */
+    private final class PreferenceChangeListener implements IPropertyChangeListener
+    {
+        private ISourceViewer sourceViewer;
+
+        PreferenceChangeListener(ISourceViewer sourceViewer)
+        {
+            this.sourceViewer = sourceViewer;
+        }
+
+        public void propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent event)
+        {
+            String property = event.getProperty();
+            String newVal = event.getNewValue() instanceof String ? (String)event.getNewValue() : null;
+
+            if (property.equals(FortranPreferences.COLOR_COMMENTS.getName()))
+                updateToken(colorComments, newVal);
+            else if (property.equals(FortranPreferences.COLOR_CPP.getName()))
+                updateToken(colorCpp, newVal);
+            else if (property.equals(FortranPreferences.COLOR_STRINGS.getName()))
+                updateToken(colorStrings, newVal);
+            else if (property.equals(FortranPreferences.COLOR_IDENTIFIERS.getName()))
+                updateToken(colorIdentifiers, newVal);
+            else if (property.equals(FortranPreferences.COLOR_INTRINSICS.getName()))
+                updateToken(colorIntrinsics, newVal);
+            else if (property.equals(FortranPreferences.COLOR_KEYWORDS.getName()))
+                updateToken(colorKeywords, newVal);
+        }
+
+        private void updateToken(Token token, String newColor)
+        {
+            Object data = token.getData();
+            if (data instanceof TextAttribute)
+            {
+                TextAttribute oldAttr = (TextAttribute)data;
+                token.setData(new TextAttribute(new Color(null, StringConverter.asRGB(newColor)),
+                                                oldAttr.getBackground(),
+                                                oldAttr.getStyle()));
+            }
+
+            // Force redraw of entire editor text
+            sourceViewer.invalidateTextPresentation();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Inner Class - for handling column-based issues in fixed form sources
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Rule for highlighting fixed form code which detects tokens past column 72
+     * (or whatever column the user specified in their workspace preferences)
+     * as a comment.
+     */
+    private final class FixedFormColumnCommentRule implements IRule
+    {
+        public IToken evaluate(ICharacterScanner scanner)
+        {
+            final int commentColumn = FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue();
+            
+            IToken result = Token.UNDEFINED;
+            scanner.read();
+            if (scanner.getColumn() > commentColumn)
+            {
+                result = colorComments;
+                do
+                    scanner.read();
+                while (scanner.getColumn() > commentColumn);
+            }
+            scanner.unread();
+            return result;
+        }
+    }
+
+    /**
+     * Word detector for Fortran identifiers and generic operators.
+     */
+    private static final class FortranWordDetector implements IWordDetector
+    {
+        public boolean isWordStart(char c)
+        {
+            return Character.isJavaIdentifierStart(c);
+        }
+
+        public boolean isWordPart(char c)
+        {
+            return Character.isJavaIdentifierPart(c);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Inner Class - WordRule from Eclipse 3.3
+    ///////////////////////////////////////////////////////////////////////////
 
     /*******************************************************************************
      * Copyright (c) 2000, 2006 IBM Corporation and others.
