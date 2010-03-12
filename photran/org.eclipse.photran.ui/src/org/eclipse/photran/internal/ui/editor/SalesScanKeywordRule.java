@@ -27,6 +27,8 @@ import org.eclipse.jface.text.rules.WordRule;
  * <p>
  * The logic is somewhat based on FreeFormLexerPhase2, although this version is much less
  * precise and is based on a character-by-character scan rather than a token stream.
+ * It only scans one line at a time and is therefore oblivious to continuation lines; this
+ * makes it highlight continuation lines incorrectly (see Bug 302318 and Bug 301712).
  *
  * @see org.eclipse.jface.text.rules.WordRule
  *
@@ -400,7 +402,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                         if (justClosedParen && firstParenthetical)
                         {
                             firstParenthetical = false;
-                            tokenFollowingParentheticalPos = pos;
+                            tokenFollowingParentheticalPos = nextPos();
 
                             letterFollowsParenthetical = letterIsNext();
                         }
@@ -454,11 +456,24 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             return false;
         }
 
+        private int nextPos()
+        {
+            for (int i = pos; i < length; i++)
+            {
+                if (Character.isWhitespace(line.charAt(i)))
+                    continue;
+                else
+                    return i;
+            }
+            return length-1;
+        }
+
         public boolean retainAsKeyword(int column)
         {
 //            System.out.println();
 //            System.out.println("Column " + column + ": " + line.substring(column));
 //            System.out.println("OC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical);
+//            System.out.println("Token following parenthetical starts at column " + tokenFollowingParentheticalPos);
 //            int precedingKeywordOffset = findPrecedingKeyword(column);
 //            String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
 //            System.out.println("Preceding token is " + precedingKeyword + " (column " + precedingKeywordOffset + ")");
@@ -487,7 +502,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos));
             // BEGIN FORTRAN 2003
             else if (keyword.equalsIgnoreCase("bind"))
-                return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos));
+                return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos))
+                    || match("function", firstTokenPos)
+                    || match("subroutine", firstTokenPos);
             else if (keyword.equalsIgnoreCase("procedure"))
                 return match("procedure", firstTokenPos) || match("module", firstTokenPos) /* F08 */  || match("end", firstTokenPos);
             else if (keyword.equalsIgnoreCase("pointer"))

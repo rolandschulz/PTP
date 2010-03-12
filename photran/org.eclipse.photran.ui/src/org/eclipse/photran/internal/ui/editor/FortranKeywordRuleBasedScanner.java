@@ -184,7 +184,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE", "ALLOCATABLE", "ALLOCATE", "ASSIGN", "ASSIGNMENT", "ASSOCIATE", "ASYNCHRONOUS", "BACKSPACE",
         "BIND", "BLANK", "BLOCK", "BLOCKDATA", "CALL", "CASE", "CLOSE", "CLASS", "COMMON", "CONTAINS", "CONTINUE", "CYCLE", "DATA", "DEALLOCATE", "DEFAULT", "DELIM", "DIMENSION",
-        "DIRECT", "DO", "DOUBLE", "DOUBLEPRECISION", "ELSE", "ELSEIF", "ELSEWHERE", "END", "ENDBLOCK", "ENDBLOCKDATA", "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", "EQUIVALENCE", "ERR", "EXIST", "EXIT",
+        "DIRECT", "DO", "DOUBLE", "DOUBLEPRECISION", "ELEMENTAL", "ELSE", "ELSEIF", "ELSEWHERE", "END", "ENDBLOCK", "ENDBLOCKDATA", "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", "EQUIVALENCE", "ERR", "EXIST", "EXIT",
         "EXTENDS", "EXTENSIBLE", "EXTERNAL", "FILE", "FMT", "FLUSH", "FORALL", "FORM", "FORMAT", "FORMATTED", "FUNCTION", "GO", "IF", "IMPLICIT", "IN", "INOUT",
         "INCLUDE", "INQUIRE", "INTENT", "INTERFACE", "INTRINSIC", "IOLENGTH", "IOSTAT", "INSTRINSIC", "KIND", "LEN", "MODULE", "NAME", "NAMED", "NAMELIST", "NEXTREC",
         "NML", "NONE", "NON_OVERRIDABLE", "NOPASS", "NULLIFY", "NUMBER", "ONLY", "OPEN", "OPENED", "OPERATOR", "OPTIONAL", "OUT", "PAD", "PARAMETER", "PASS", "PAUSE",
@@ -374,7 +374,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     {
         FortranCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(new PreferenceChangeListener(sourceViewer));
 
-        IRule[] rules = new IRule[isFixedForm ? 6+(128-33+1) : 6];
+        IRule[] rules = new IRule[isFixedForm ? 6+4+1 : 6];
         int i = 0;
 
         rules[i++] = new EndOfLineRule("#", colorCpp);
@@ -386,7 +386,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
         if (isFixedForm)
         {
-            for (char ch = 33; ch < 128; ch++)
+            for (char ch : new char[] { 'c', 'C', '!', '*' })
             {
                 EndOfLineRule c1 = new EndOfLineRule(new String(new char[] { ch }), colorComments);
                 c1.setColumnConstraint(0);
