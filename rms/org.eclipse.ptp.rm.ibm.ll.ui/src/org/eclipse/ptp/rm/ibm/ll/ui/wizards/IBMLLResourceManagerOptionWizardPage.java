@@ -52,75 +52,14 @@ import org.eclipse.swt.widgets.Text;
 
 public class IBMLLResourceManagerOptionWizardPage extends
 		RMConfigurationWizardPage {
-	private Composite preferencePane;
-
-	private Text proxyLibraryTextWidget = null;
-	private EventMonitor libraryListener = null;
-	private Button libraryBrowseButton = null;;
-
-	private Button proxyTraceMessageButton = null;
-	private Button proxyInfoMessageButton = null;
-	private Button proxyWarningMessageButton = null;
-	private Button proxyErrorMessageButton = null;
-	private Button proxyFatalMessageButton = null;
-	private Button proxyArgsMessageButton = null;
-	private Button proxyDebugLoopButton = null;
-
-	private Button proxyForceLocalRadioButton = null;
-	private Button proxyForceMulticlusterRadioButton = null;
-	private Button proxyLLDefaultRadioButton = null;
-
-	private Text proxyTemplateTextWidget = null;
-	private EventMonitor templateListener = null;
-	private Button proxyTemplateNeverRadioButton = null;
-	private Button proxyTemplateAlwaysRadioButton = null;
-	private Button templateBrowseButton = null;;
-
-	private Button guiTraceMessageButton = null;
-	private Button guiInfoMessageButton = null;
-	private Button guiWarningMessageButton = null;
-	private Button guiErrorMessageButton = null;
-	private Button guiFatalMessageButton = null;
-	private Button guiArgsMessageButton = null;
-
-	private Spinner proxyPollingNodeMin = null;
-	private Spinner proxyPollingNodeMax = null;
-	private Spinner proxyPollingJob = null;
-
-	private EventMonitor eventMonitor = null;
-
-	private IIBMLLResourceManagerConfiguration config;
-
 	private class EventMonitor implements SelectionListener, ModifyListener {
 		public EventMonitor() {
-//			 System.err.println("wizard: EventMonitor entered");
-			updateConfigOptions();
-		}
-
-		public void widgetDefaultSelected(SelectionEvent e) {
-//			 System.err.println("wizard: widgetDefaultSelected entered");
-			updateConfigOptions();
-		}
-
-		public void widgetSelected(SelectionEvent e) {
-//			 System.err.println("wizard: widgetSelected entered");
-			Object source = e.getSource();
-			if (source == libraryBrowseButton) {
-				proxyLibraryTextWidget.setText(getRemoteDirectory(Messages.getString("IBMLLResourceManagerOptionWizardPage.0"), proxyLibraryTextWidget.getText())); //$NON-NLS-1$
-			}
-			else if (source == templateBrowseButton) {
-				proxyTemplateTextWidget.setText(getRemotePath(Messages.getString("IBMLLResourceManagerOptionWizardPage.1"), proxyTemplateTextWidget.getText())); //$NON-NLS-1$
-			}
-			updateConfigOptions();
-		}
-
-		public void widgetModified(SelectionEvent e) {
-//			 System.err.println("wizard: widgetModified entered");
+			// System.err.println("wizard: EventMonitor entered");
 			updateConfigOptions();
 		}
 
 		public void modifyText(ModifyEvent e) {
-//			 System.err.println("preferences: modifyText entered");
+			// System.err.println("preferences: modifyText entered");
 			// System.err.println("widget entered is "+ e.widget.toString());
 			if (e.widget.equals(proxyPollingJob)) {
 				// System.err.println("widget entered is proxyPollingJob");
@@ -143,201 +82,114 @@ public class IBMLLResourceManagerOptionWizardPage extends
 				}
 			}
 			if (e.widget.equals(proxyLibraryTextWidget)) {
-				String correctPath = getFieldContent(proxyLibraryTextWidget.getText().trim());
+				String correctPath = getFieldContent(proxyLibraryTextWidget
+						.getText().trim());
 				if (validatePath(correctPath, true)) {
 					setErrorMessage(null);
-				}
-				else {
-					setErrorMessage(Messages
-							.getString("Invalid.llLibraryPath")); //$NON-NLS-1$
+				} else {
+					setErrorMessage(Messages.getString("Invalid.llLibraryPath")); //$NON-NLS-1$
 					return;
 				}
 			}
 			if (e.widget.equals(proxyTemplateTextWidget)) {
-				String correctPath = getFieldContent(proxyTemplateTextWidget.getText().trim());
+				String correctPath = getFieldContent(proxyTemplateTextWidget
+						.getText().trim());
 				if (validatePath(correctPath, false)) {
 					setErrorMessage(null);
-				}
-				else {
+				} else {
 					setErrorMessage(Messages
 							.getString("Invalid.llJobCommandFileTemplate")); //$NON-NLS-1$
 					return;
 				}
-				
+
 			}
-			
+
 			updateConfigOptions();
 			// TODO - check for valid file here - or else implement a browse
 			// button to select and check somewhere
 
 		}
+
+		public void widgetDefaultSelected(SelectionEvent e) {
+			// System.err.println("wizard: widgetDefaultSelected entered");
+			updateConfigOptions();
+		}
+
+		public void widgetModified(SelectionEvent e) {
+			// System.err.println("wizard: widgetModified entered");
+			updateConfigOptions();
+		}
+
+		public void widgetSelected(SelectionEvent e) {
+			// System.err.println("wizard: widgetSelected entered");
+			Object source = e.getSource();
+			if (source == libraryBrowseButton) {
+				proxyLibraryTextWidget
+						.setText(getRemoteDirectory(
+								Messages
+										.getString("IBMLLResourceManagerOptionWizardPage.0"), proxyLibraryTextWidget.getText())); //$NON-NLS-1$
+			} else if (source == templateBrowseButton) {
+				proxyTemplateTextWidget
+						.setText(getRemotePath(
+								Messages
+										.getString("IBMLLResourceManagerOptionWizardPage.1"), proxyTemplateTextWidget.getText())); //$NON-NLS-1$
+			}
+			updateConfigOptions();
+		}
 	}
+
+	private Composite preferencePane;
+	private Text proxyLibraryTextWidget = null;
+	private EventMonitor libraryListener = null;;
+
+	private Button libraryBrowseButton = null;
+	private Button proxyTraceMessageButton = null;
+	private Button proxyInfoMessageButton = null;
+	private Button proxyWarningMessageButton = null;
+	private Button proxyErrorMessageButton = null;
+	private Button proxyFatalMessageButton = null;
+	private Button proxyArgsMessageButton = null;
+
+	private Button proxyDebugLoopButton = null;
+	private Button proxyForceLocalRadioButton = null;
+	private Button proxyForceMulticlusterRadioButton = null;
+
+	private Button proxyLLDefaultRadioButton = null;
+	private Text proxyTemplateTextWidget = null;
+	private EventMonitor templateListener = null;
+	private Button proxyTemplateNeverRadioButton = null;
+	private Button proxyTemplateAlwaysRadioButton = null;;
+
+	private Button templateBrowseButton = null;
+	private Button guiTraceMessageButton = null;
+	private Button guiInfoMessageButton = null;
+	private Button guiWarningMessageButton = null;
+	private Button guiErrorMessageButton = null;
+	private Button guiFatalMessageButton = null;
+
+	private Button guiArgsMessageButton = null;
+	private Spinner proxyPollingNodeMin = null;
+	private Spinner proxyPollingNodeMax = null;
+
+	private Spinner proxyPollingJob = null;
+
+	private EventMonitor eventMonitor = null;
+
+	private IIBMLLResourceManagerConfiguration config;
 
 	public IBMLLResourceManagerOptionWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
-		this.config = (IIBMLLResourceManagerConfiguration)wizard.getConfiguration();
+		this.config = (IIBMLLResourceManagerConfiguration) wizard
+				.getConfiguration();
 		setTitle(Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
 		setDescription(Messages.getString("Wizard.InvocationOptions")); //$NON-NLS-1$
-	}
-	
-	/**
-	 * Prompt the user to select a file on the remote system
-	 * @param message Title for the file selector dialog
-	 * @param currentPath The current path to use as a starting point when opening the file selector
-	 * @return Pathname to the selected file or null
-	 */
-	protected String getRemotePath(String message, String currentPath) {
-		IRemoteServices services;
-		IRemoteConnection connection;
-		String serviceID;
-		IRemoteConnectionManager connectionManager;
-
-		serviceID = config.getRemoteServicesId();
-		if (serviceID == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
-		if (services == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		connectionManager = services.getConnectionManager();
-		if (connectionManager == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		connection = connectionManager.getConnection(config.getConnectionName());
-		if (connection == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
-		if (remoteUIServices != null) {
-			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
-			if (fileMgr != null) {
-				fileMgr.setConnection(connection);
-				return fileMgr.browseFile(getShell(), message, currentPath, 0);
-			}
-		}
-		Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.11")); //$NON-NLS-1$ //$NON-NLS-2$
-		return null;
-	}
-	
-	/**
-	 * Prompt the user to select a directory on the remote system
-	 * @param message Title for the directory selector dialog
-	 * @param currentPath The current path to use as a starting point when opening the directory selector
-	 * @return Pathname to the selected directory or null
-	 */
-	protected String getRemoteDirectory(String message, String currentPath) {
-		IRemoteServices services;
-		IRemoteConnection connection;
-		String serviceID;
-		IRemoteConnectionManager connectionManager;
-		
-		serviceID = config.getRemoteServicesId();
-		if (serviceID == null) {
-			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
-		if (services == null) {
-			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		connectionManager = services.getConnectionManager();
-		if (connectionManager == null) {
-			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		connection = connectionManager.getConnection(config.getConnectionName());
-		if (connection == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
-		if (remoteUIServices != null) {
-			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
-			if (fileMgr != null) {
-				fileMgr.setConnection(connection);
-				return fileMgr.browseDirectory(getShell(), message, currentPath, 0);
-			}
-		}
-		Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.21")); //$NON-NLS-1$ //$NON-NLS-2$
-		return null;
-	}
-
-	/**
-	 * Validate a pathname on the remote system
-	 * @param path pathname to validate
-	 * @param needDirectory Flag indicating if path specifies a directory
-	 * @return true if the pathname is valid, false otherwise
-	 */
-	protected boolean validatePath(String path, boolean needDirectory) {
-		IRemoteServices services;
-		IRemoteConnection connection;
-		IRemoteConnectionManager connectionManager;
-		IRemoteFileManager fileManager;
-		IFileStore file;
-		IFileInfo fileInfo;
-		String serviceID;
-		
-		if (path == null) {
-			return true;
-		}
-		serviceID = config.getRemoteServicesId();
-		if (serviceID == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
-			return false;
-		}
-		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
-		if (services == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
-			return false;
-		}
-		connectionManager = services.getConnectionManager();
-		if (connectionManager == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
-			return false;
-		}
-		connection = connectionManager.getConnection(config.getConnectionName());
-		if (connection == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
-			return false;
-		}
-		fileManager = services.getFileManager(connection);
-		if (fileManager == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.31")); //$NON-NLS-1$ //$NON-NLS-2$
-			return false;
-		}
-		file = fileManager.getResource(path);
-		if (file == null) {
-			return false;
-		}
-		try {
-			fileInfo = file.fetchInfo(EFS.NONE, new NullProgressMonitor());
-			return fileInfo.exists() && (fileInfo.isDirectory() == needDirectory);
-		}
-		catch (CoreException e) {
-			return false;
-		}
-	}
-
-	/**
-	 * Get the preferences object for the IBMLL implementation
-	 * 
-	 * @return the preferences object
-	 */
-	public Preferences getPreferences() {
-		return IBMLLPreferenceManager.getPreferences();
 	}
 
 	/**
 	 * Create the widgets for this proxy configuration page
 	 * 
-	 * @param parent -
-	 *            The parent widget for this class
+	 * @param parent
+	 *            - The parent widget for this class
 	 */
 	@Override
 	public void createControl(Composite parent) {
@@ -350,7 +202,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		Group proxyTemplateGroup = null;
 		Group proxyTemplateOptionsGroup = null;
 		Group proxyPollingGroup = null;
-		//Preferences preferences = null;
+		// Preferences preferences = null;
 		libraryBrowseButton = null;
 		templateBrowseButton = null;
 		String preferenceValue;
@@ -386,11 +238,10 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyLibraryTextWidget.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyLibraryToolTip")); //$NON-NLS-1$
 
-		 libraryBrowseButton =
-			 SWTUtil.createPushButton(proxyLibraryGroup, Messages
-			 .getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
-			 null);
-			 libraryBrowseButton.addSelectionListener(libraryListener);
+		libraryBrowseButton = SWTUtil.createPushButton(proxyLibraryGroup,
+				Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
+				null);
+		libraryBrowseButton.addSelectionListener(libraryListener);
 
 		// *********************************************************************
 		// Check box group for proxy messages
@@ -409,7 +260,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyTraceMessageButton.setSelection(true);
 		}
-		 proxyTraceMessageButton.addSelectionListener(eventMonitor);
+		proxyTraceMessageButton.addSelectionListener(eventMonitor);
 
 		proxyInfoMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyInfoMessageButton.setText(Messages
@@ -420,7 +271,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyInfoMessageButton.setSelection(true);
 		}
-		 proxyInfoMessageButton.addSelectionListener(eventMonitor);
+		proxyInfoMessageButton.addSelectionListener(eventMonitor);
 
 		proxyWarningMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyWarningMessageButton.setText(Messages
@@ -431,7 +282,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyWarningMessageButton.setSelection(true);
 		}
-		 proxyWarningMessageButton.addSelectionListener(eventMonitor);
+		proxyWarningMessageButton.addSelectionListener(eventMonitor);
 
 		proxyErrorMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyErrorMessageButton.setText(Messages
@@ -442,7 +293,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyErrorMessageButton.setSelection(true);
 		}
-		 proxyErrorMessageButton.addSelectionListener(eventMonitor);
+		proxyErrorMessageButton.addSelectionListener(eventMonitor);
 
 		proxyFatalMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyFatalMessageButton.setText(Messages
@@ -453,7 +304,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyFatalMessageButton.setSelection(true);
 		}
-		 proxyFatalMessageButton.addSelectionListener(eventMonitor);
+		proxyFatalMessageButton.addSelectionListener(eventMonitor);
 
 		proxyArgsMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyArgsMessageButton.setText(Messages
@@ -464,7 +315,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyArgsMessageButton.setSelection(true);
 		}
-		 proxyArgsMessageButton.addSelectionListener(eventMonitor);
+		proxyArgsMessageButton.addSelectionListener(eventMonitor);
 
 		// *********************************************************************
 		// Check box group for proxy debug
@@ -483,7 +334,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyDebugLoopButton.setSelection(true);
 		}
-		 proxyDebugLoopButton.addSelectionListener(eventMonitor);
+		proxyDebugLoopButton.addSelectionListener(eventMonitor);
 
 		// *********************************************************************
 		// Check box group for gui messages
@@ -502,7 +353,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiTraceMessageButton.setSelection(true);
 		}
-		 guiTraceMessageButton.addSelectionListener(eventMonitor);
+		guiTraceMessageButton.addSelectionListener(eventMonitor);
 
 		guiInfoMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiInfoMessageButton.setText(Messages
@@ -513,7 +364,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiInfoMessageButton.setSelection(true);
 		}
-		 guiInfoMessageButton.addSelectionListener(eventMonitor);
+		guiInfoMessageButton.addSelectionListener(eventMonitor);
 
 		guiWarningMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiWarningMessageButton.setText(Messages
@@ -524,7 +375,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiWarningMessageButton.setSelection(true);
 		}
-		 guiWarningMessageButton.addSelectionListener(eventMonitor);
+		guiWarningMessageButton.addSelectionListener(eventMonitor);
 
 		guiErrorMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiErrorMessageButton.setText(Messages
@@ -535,7 +386,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiErrorMessageButton.setSelection(true);
 		}
-		 guiErrorMessageButton.addSelectionListener(eventMonitor);
+		guiErrorMessageButton.addSelectionListener(eventMonitor);
 
 		guiFatalMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiFatalMessageButton.setText(Messages
@@ -546,7 +397,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiFatalMessageButton.setSelection(true);
 		}
-		 guiFatalMessageButton.addSelectionListener(eventMonitor);
+		guiFatalMessageButton.addSelectionListener(eventMonitor);
 
 		guiArgsMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiArgsMessageButton.setText(Messages
@@ -557,7 +408,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiArgsMessageButton.setSelection(true);
 		}
-		 guiArgsMessageButton.addSelectionListener(eventMonitor);
+		guiArgsMessageButton.addSelectionListener(eventMonitor);
 
 		// *********************************************************************
 		// Radio box group for multicluster
@@ -576,20 +427,21 @@ public class IBMLLResourceManagerOptionWizardPage extends
 			proxyLLDefaultRadioButton.setSelection(true);
 		}
 		proxyLLDefaultRadioButton.setData(new Integer(SWT.IMAGE_BMP));
-		 proxyLLDefaultRadioButton.addSelectionListener(eventMonitor);
+		proxyLLDefaultRadioButton.addSelectionListener(eventMonitor);
 		proxyLLDefaultRadioButton.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultToolTip")); //$NON-NLS-1$
 
 		proxyForceLocalRadioButton = new Button(proxyMulticlusterGroup,
 				SWT.RADIO);
-		proxyForceLocalRadioButton.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalLabel")); //$NON-NLS-1$
+		proxyForceLocalRadioButton
+				.setText(Messages
+						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalLabel")); //$NON-NLS-1$
 		preferenceValue = config.getForceProxyLocal();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyForceLocalRadioButton.setSelection(true);
 		}
 		proxyForceLocalRadioButton.setData(new Integer(SWT.IMAGE_BMP));
-		 proxyForceLocalRadioButton.addSelectionListener(eventMonitor);
+		proxyForceLocalRadioButton.addSelectionListener(eventMonitor);
 		proxyForceLocalRadioButton
 				.setToolTipText(Messages
 						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalToolTip")); //$NON-NLS-1$
@@ -604,7 +456,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 			proxyForceMulticlusterRadioButton.setSelection(true);
 		}
 		proxyForceMulticlusterRadioButton.setData(new Integer(SWT.IMAGE_BMP));
-		 proxyForceMulticlusterRadioButton.addSelectionListener(eventMonitor);
+		proxyForceMulticlusterRadioButton.addSelectionListener(eventMonitor);
 		proxyForceMulticlusterRadioButton
 				.setToolTipText(Messages
 						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
@@ -632,11 +484,10 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyTemplateTextWidget.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyTemplateToolTip")); //$NON-NLS-1$
 
-		 templateBrowseButton =
-			 SWTUtil.createPushButton(proxyTemplateGroup,
-			 Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
-			 null);
-			 templateBrowseButton.addSelectionListener(templateListener);
+		templateBrowseButton = SWTUtil.createPushButton(proxyTemplateGroup,
+				Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
+				null);
+		templateBrowseButton.addSelectionListener(templateListener);
 
 		// *********************************************************************
 		// Template options group
@@ -656,7 +507,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyTemplateNeverRadioButton.setSelection(true);
 		}
-		 proxyTemplateNeverRadioButton.addSelectionListener(eventMonitor);
+		proxyTemplateNeverRadioButton.addSelectionListener(eventMonitor);
 		proxyTemplateNeverRadioButton.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyTemplateNeverToolTip")); //$NON-NLS-1$
 
@@ -669,7 +520,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 			proxyTemplateAlwaysRadioButton.setSelection(true);
 		}
 		proxyTemplateAlwaysRadioButton.setData(new Integer(SWT.IMAGE_BMP));
-		 proxyTemplateAlwaysRadioButton.addSelectionListener(eventMonitor);
+		proxyTemplateAlwaysRadioButton.addSelectionListener(eventMonitor);
 		proxyTemplateAlwaysRadioButton.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysToolTip")); //$NON-NLS-1$
 
@@ -723,6 +574,175 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		setControl(preferencePane);
 	}
 
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh,
+			int mw) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals("")) //$NON-NLS-1$
+			return null;
+
+		return text;
+	}
+
+	/**
+	 * Get the preferences object for the IBMLL implementation
+	 * 
+	 * @return the preferences object
+	 */
+	public Preferences getPreferences() {
+		return IBMLLPreferenceManager.getPreferences();
+	}
+
+	/**
+	 * Prompt the user to select a directory on the remote system
+	 * 
+	 * @param message
+	 *            Title for the directory selector dialog
+	 * @param currentPath
+	 *            The current path to use as a starting point when opening the
+	 *            directory selector
+	 * @return Pathname to the selected directory or null
+	 */
+	protected String getRemoteDirectory(String message, String currentPath) {
+		IRemoteServices services;
+		IRemoteConnection connection;
+		String serviceID;
+		IRemoteConnectionManager connectionManager;
+
+		serviceID = config.getRemoteServicesId();
+		if (serviceID == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		services = PTPRemoteCorePlugin.getDefault()
+				.getRemoteServices(serviceID);
+		if (services == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		connectionManager = services.getConnectionManager();
+		if (connectionManager == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		connection = connectionManager
+				.getConnection(config.getConnectionName());
+		if (connection == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault()
+				.getRemoteUIServices(services);
+		if (remoteUIServices != null) {
+			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
+			if (fileMgr != null) {
+				fileMgr.setConnection(connection);
+				return fileMgr.browseDirectory(getShell(), message,
+						currentPath, 0);
+			}
+		}
+		Activator
+				.getDefault()
+				.logError(
+						"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.21")); //$NON-NLS-1$ //$NON-NLS-2$
+		return null;
+	}
+
+	/**
+	 * Prompt the user to select a file on the remote system
+	 * 
+	 * @param message
+	 *            Title for the file selector dialog
+	 * @param currentPath
+	 *            The current path to use as a starting point when opening the
+	 *            file selector
+	 * @return Pathname to the selected file or null
+	 */
+	protected String getRemotePath(String message, String currentPath) {
+		IRemoteServices services;
+		IRemoteConnection connection;
+		String serviceID;
+		IRemoteConnectionManager connectionManager;
+
+		serviceID = config.getRemoteServicesId();
+		if (serviceID == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		services = PTPRemoteCorePlugin.getDefault()
+				.getRemoteServices(serviceID);
+		if (services == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		connectionManager = services.getConnectionManager();
+		if (connectionManager == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		connection = connectionManager
+				.getConnection(config.getConnectionName());
+		if (connection == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault()
+				.getRemoteUIServices(services);
+		if (remoteUIServices != null) {
+			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
+			if (fileMgr != null) {
+				fileMgr.setConnection(connection);
+				return fileMgr.browseFile(getShell(), message, currentPath, 0);
+			}
+		}
+		Activator
+				.getDefault()
+				.logError(
+						"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.11")); //$NON-NLS-1$ //$NON-NLS-2$
+		return null;
+	}
+
+	protected GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1)
+			gd = new GridData();
+		else
+			gd = new GridData(style);
+		gd.horizontalSpan = space;
+		return gd;
+	}
+
 	/**
 	 * Retrieve the settings specified on this panel and create the string
 	 * containing proxy invocation options corresponding to those values
@@ -743,7 +763,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyTraceMessageButton != null) {
 			selection = proxyTraceMessageButton.getSelection();
-			config.setTraceOption(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setTraceOption(selection ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--trace_messages=y "; //$NON-NLS-1$
 			}
@@ -751,7 +772,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyInfoMessageButton != null) {
 			selection = proxyInfoMessageButton.getSelection();
-			config.setInfoMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setInfoMessage(selection ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--info_messages=y "; //$NON-NLS-1$
 			}
@@ -759,7 +781,9 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyWarningMessageButton != null) {
 			selection = proxyWarningMessageButton.getSelection();
-			config.setWarningMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config
+					.setWarningMessage(selection ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--warning_messages=y "; //$NON-NLS-1$
 			}
@@ -767,7 +791,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyErrorMessageButton != null) {
 			selection = proxyErrorMessageButton.getSelection();
-			config.setErrorMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setErrorMessage(selection ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--error_messages=y "; //$NON-NLS-1$
 			}
@@ -775,7 +800,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyFatalMessageButton != null) {
 			selection = proxyFatalMessageButton.getSelection();
-			config.setFatalMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setFatalMessage(selection ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--fatal_messages=y "; //$NON-NLS-1$
 			}
@@ -783,7 +809,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyArgsMessageButton != null) {
 			selection = proxyArgsMessageButton.getSelection();
-			config.setArgsMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setArgsMessage(selection ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--args_messages=y "; //$NON-NLS-1$
 			}
@@ -791,7 +818,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyDebugLoopButton != null) {
 			selection = proxyDebugLoopButton.getSelection();
-			config.setDebugLoop(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setDebugLoop(selection ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--debug_loop=y "; //$NON-NLS-1$
 			}
@@ -808,20 +836,24 @@ public class IBMLLResourceManagerOptionWizardPage extends
 				options = options + "--multicluster=y "; //$NON-NLS-1$
 			}
 		}
-		
+
 		if (proxyLLDefaultRadioButton != null) {
-			config.setDefaultMulticluster(proxyLLDefaultRadioButton.getSelection() ? 
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setDefaultMulticluster(proxyLLDefaultRadioButton
+					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
-		
+
 		if (proxyForceLocalRadioButton != null) {
-			config.setForceProxyLocal(proxyForceLocalRadioButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config
+					.setForceProxyLocal(proxyForceLocalRadioButton
+							.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
 		}
-		
+
 		if (proxyForceMulticlusterRadioButton != null) {
-			config.setForceProxyMulticluster(proxyForceMulticlusterRadioButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setForceProxyMulticluster(proxyForceMulticlusterRadioButton
+					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (proxyTemplateTextWidget != null) {
@@ -839,15 +871,17 @@ public class IBMLLResourceManagerOptionWizardPage extends
 				options = options + "--template_write=a "; //$NON-NLS-1$
 			}
 		}
-		
+
 		if (proxyTemplateNeverRadioButton != null) {
-			config.setSuppressTemplateWrite(proxyTemplateNeverRadioButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setSuppressTemplateWrite(proxyTemplateNeverRadioButton
+					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
-		
+
 		if (proxyTemplateAlwaysRadioButton != null) {
-			config.setTemplateWriteAlways(proxyTemplateAlwaysRadioButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config.setTemplateWriteAlways(proxyTemplateAlwaysRadioButton
+					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (proxyPollingNodeMin != null) {
@@ -867,70 +901,125 @@ public class IBMLLResourceManagerOptionWizardPage extends
 			options = options + "--job_polling=" //$NON-NLS-1$
 					+ proxyPollingJob.getSelection() + " "; //$NON-NLS-1$
 		}
-		
+
 		if (guiTraceMessageButton != null) {
-			config.setGuiTraceMessage(guiTraceMessageButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
-		}
-		
-		if (guiArgsMessageButton != null) {
-			config.setGuiArgsMessage(guiArgsMessageButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
-		}
-		
-		if (guiInfoMessageButton != null) {
-			config.setGuiInfoMessage(guiInfoMessageButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
-		}
-		
-		if (guiWarningMessageButton != null) {
-			config.setGuiWarningMessage(guiWarningMessageButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
-		}
-		
-		if (guiErrorMessageButton != null) {
-			config.setGuiErrorMessage(guiErrorMessageButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
-		}
-		
-		if (guiFatalMessageButton != null) {
-			config.setGuiFatalMessage(guiFatalMessageButton.getSelection() ?
-					IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
+			config
+					.setGuiTraceMessage(guiTraceMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
 		}
 
-//		 System.err.println("Options from wizard page are now set to: " +
-//		 options );
+		if (guiArgsMessageButton != null) {
+			config
+					.setGuiArgsMessage(guiArgsMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
+		}
+
+		if (guiInfoMessageButton != null) {
+			config
+					.setGuiInfoMessage(guiInfoMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
+		}
+
+		if (guiWarningMessageButton != null) {
+			config
+					.setGuiWarningMessage(guiWarningMessageButton
+							.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
+		}
+
+		if (guiErrorMessageButton != null) {
+			config
+					.setGuiErrorMessage(guiErrorMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
+		}
+
+		if (guiFatalMessageButton != null) {
+			config
+					.setGuiFatalMessage(guiFatalMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+							: IBMLLPreferenceConstants.LL_NO);
+		}
+
+		// System.err.println("Options from wizard page are now set to: " +
+		// options );
 
 		config.setInvocationOptions(options);
 
 		return true;
 	}
 
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
+	/**
+	 * Validate a pathname on the remote system
+	 * 
+	 * @param path
+	 *            pathname to validate
+	 * @param needDirectory
+	 *            Flag indicating if path specifies a directory
+	 * @return true if the pathname is valid, false otherwise
+	 */
+	protected boolean validatePath(String path, boolean needDirectory) {
+		IRemoteServices services;
+		IRemoteConnection connection;
+		IRemoteConnectionManager connectionManager;
+		IRemoteFileManager fileManager;
+		IFileStore file;
+		IFileInfo fileInfo;
+		String serviceID;
 
-	protected GridData spanGridData(int style, int space) {
-		GridData gd = null;
-		if (style == -1)
-			gd = new GridData();
-		else
-			gd = new GridData(style);
-		gd.horizontalSpan = space;
-		return gd;
-	}
-	
-	protected String getFieldContent(String text) 
-	{
-		if (text.trim().length() == 0 || text.equals("")) //$NON-NLS-1$
-			return null;
-
-		return text;
+		if (path == null) {
+			return true;
+		}
+		serviceID = config.getRemoteServicesId();
+		if (serviceID == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			return false;
+		}
+		services = PTPRemoteCorePlugin.getDefault()
+				.getRemoteServices(serviceID);
+		if (services == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			return false;
+		}
+		connectionManager = services.getConnectionManager();
+		if (connectionManager == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			return false;
+		}
+		connection = connectionManager
+				.getConnection(config.getConnectionName());
+		if (connection == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			return false;
+		}
+		fileManager = services.getFileManager(connection);
+		if (fileManager == null) {
+			Activator
+					.getDefault()
+					.logError(
+							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.31")); //$NON-NLS-1$ //$NON-NLS-2$
+			return false;
+		}
+		file = fileManager.getResource(path);
+		if (file == null) {
+			return false;
+		}
+		try {
+			fileInfo = file.fetchInfo(EFS.NONE, new NullProgressMonitor());
+			return fileInfo.exists()
+					&& (fileInfo.isDirectory() == needDirectory);
+		} catch (CoreException e) {
+			return false;
+		}
 	}
 }
