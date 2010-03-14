@@ -8,6 +8,7 @@
 
 package org.eclipse.ptp.rm.ibm.ll.ui;
 
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -55,6 +56,10 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
+	}
+	
+	public void logError(String message) {
+		getLog().log(new Status(Status.ERROR, "org.eclipse.ptp.rm.ibm.ll.ui", message));
 	}
 
 }
