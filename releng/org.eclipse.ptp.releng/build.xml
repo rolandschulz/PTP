@@ -4,7 +4,7 @@
 	</target>
 	
 	<target name="build" depends="zips,test"/>
-	<target name="nightly" depends="tag,zips,sign,test,copy,check"/>
+	<target name="nightly" depends="tag,zips,sign,p2,test,copy,check"/>
 	<target name="testbuild" depends="zips,test,copy"/>
 	<target name="buildcopy" depends="zips,copy"/>
 	
@@ -45,6 +45,7 @@
 		<property name="tagname" value="v${timestamp}"/>
 		<property name="testReports" value="${zipsdir}/testReports"/>
 		<property name="junit-report-output" value="${testReports}"/>
+		<property name="jvm1.5" value="/opt/public/common/ibm-java2-ppc-50/bin/java"/>
 		<condition property="onWindows">
 			<os family="windows"/>
 		</condition>
@@ -138,6 +139,43 @@
 		<delete file="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/-->
 		<symlink link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
+	</target>
+	
+	<target name="p2" depends="init" unless="hasErrors">
+		<!-- unzip the signed master site -->
+		<property name="p2dir" value="${zipsdir}/p2"/>
+		<property name="destination" value="${zipsdir}/${ptpMasterFile}"/>
+		
+		<unzip src="${destination}" dest="${p2dir}"/>
+		
+		<!-- generate p2 metadata -->
+		<antcall target="p2.metadata.generator">
+			<param name="p2site" value="${p2dir}"/>
+		</antcall>
+		
+		<!-- zip everything back up -->
+		<zip destfile="${destination}"
+			basedir="${p2dir}"/>
+		<delete dir="${p2dir}"/>
+	</target>
+		
+    <target name="p2.metadata.generator">
+    	<echo message="Generate p2 Metadata" />
+    	<property name="p2site" value="${zipsdir}/p2"/>
+    	<property name="launcher" value="${basedir}/tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar"/>
+    	<java jar="${launcher}" fork="true" timeout="10800000" jvm="${jvm1.5}" failonerror="true" maxmemory="768m" dir="${buildDirectory}/eclipse">
+            <arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator" />
+            <arg line="-updateSite ${p2site}"/>
+        	<arg line="-site file:${p2site}/site.xml"/>
+        	<arg line="-metadataRepository file:${p2site}"/>
+        	<arg line="-metadataRepositoryName PTP Update Site"/>
+        	<arg line="-artifactRepository file:${p2site}"/>
+        	<arg line="-artifactRepositoryName PTP Artifacts"/>
+        	<arg line="-compress"/>
+        	<arg line="-reusePack200Files"/>
+        	<arg line="-noDefaultIUs"/>
+        	<arg line="-vmargs -Xmx256M"/>
+        </java>
 	</target>
 	
 	<target name="tagone">
