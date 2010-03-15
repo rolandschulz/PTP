@@ -163,21 +163,21 @@
       <provider
             class="org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider"
             id="org.eclipse.ptp.rdt.ui.RSECIndexServiceProvider"
-            name="%RDTRemoteCIndexingService.name"
+            name="%RSERemoteCIndexingService.name"
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
       </provider>
       <provider
             class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider"
             id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"
-            name="%RDTRemoteBuildService.name"
+            name="%RemoteBuildService.name"
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
       <provider
             class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteToolsCIndexServiceProvider"
             id="org.eclipse.ptp.rdt.ui.RemoteToolsCIndexServiceProvider"
-            name="Remote Tools C/C++ Indexing Service"
+            name="%RemoteToolsCIndexingService.name"
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
       </provider>
