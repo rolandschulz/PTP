@@ -11,6 +11,7 @@
 package org.eclipse.photran.internal.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -64,7 +65,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
         }
     }
     
-    private static class OpenDeclarationASTTask implements IFortranEditorASTTask
+    private class OpenDeclarationASTTask implements IFortranEditorASTTask
     {
         @SuppressWarnings("unused") private AbstractFortranEditor editor;
         private TextSelection selection;
@@ -86,10 +87,45 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
         {
             if (defMap == null) return true;
             
-            final Definition def = defMap.lookup(selection, tokenList);
+            Definition def = defMap.lookup(selection, tokenList);
+            ArrayList<Definition> externalDefs = null;
+            
+            if(def == null || def.isExternal() || def.isImplicitExternalSubprogram())
+            {
+                externalDefs = PhotranVPG.getInstance().findAllExternalSubprogramsNamed(def.getCanonicalizedName());
+                def = chooseExternalDef(externalDefs);
+            }
 
             // Run this in the UI thread
-            Display.getDefault().asyncExec(new Runnable()
+            runUIThread(def);
+
+            // Remove this task
+            return false;
+        }
+        
+        private Definition chooseExternalDef(final ArrayList<Definition> defList)
+        {
+            class ChooseDefinition implements Runnable
+            {
+                Definition def;
+                
+                public void run()
+                {
+                    if (defList.size() > 1)
+                        def = openSelectionDialog(defList);
+                    else
+                        def = defList.get(0);
+                }
+            };
+            
+            ChooseDefinition chooseDefinition = new ChooseDefinition();
+            Display.getDefault().syncExec(chooseDefinition);
+            return chooseDefinition.def;
+        }
+        
+        private void runUIThread(final Definition def)
+        {
+            Display.getDefault().syncExec(new Runnable()
             {
                 public void run()
                 {
@@ -99,9 +135,6 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
                         openEditorOn(def);
                 }
             });
-
-            // Remove this task
-            return false;
         }
 
         private void openEditorOn(Definition def)
