@@ -141,6 +141,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private static final int LL_PTP_SUBMIT_MODE_RADIOBOX = 100;
 	private static final int LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR = 19;
 	private static final int LL_PTP_JOB_TYPE_SELECTOR = 20;
+	private static final int LL_PTP_STDERR_SELECTOR = 1;
+	private static final int LL_PTP_STDOUT_SELECTOR = 2;
+	private static final int LL_PTP_STDIN_SELECTOR = 3;
+	private static final int LL_PTP_EXECUTABLE_SELECTOR = 4;
+	private static final int LL_PTP_INITIALDIR_SELECTOR = 5;
+	private static final int LL_PTP_SHELL_SELECTOR = 6;
 
 	private static final int KBYTE = 1024;
 	private static final int MBYTE = 1024 * 1024;
@@ -194,12 +200,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	/*
 	 * Widgets for Runtime
 	 */
-	private TextRowWidget llError = null;
-	private TextRowWidget llInput = null;
-	private TextRowWidget llOutput = null;
-	private TextRowWidget llInitialDir = null;
-	private TextRowWidget llShell = null;
-	private TextRowWidget llExecutable = null;
+	private FileSelectorRowWidget llError = null;
+	private FileSelectorRowWidget llInput = null;
+	private FileSelectorRowWidget llOutput = null;
+	private FileSelectorRowWidget llInitialDir = null;
+	private FileSelectorRowWidget llShell = null;
+	private FileSelectorRowWidget llExecutable = null;
 	private TextRowWidget llEnvironment = null;
 	/*
 	 * Widgets for Nodes/Network Tab
@@ -302,6 +308,36 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 							"File.llJobCommandFileTemplateTitle",
 							"llJobCommandFileTemplatePath");
 					break;
+				case LL_PTP_STDERR_SELECTOR:
+					getInputFile(llError,
+						"File.stderrSelectorTitle",
+						"llStderrPath");
+					break;
+				case LL_PTP_STDOUT_SELECTOR:
+					getInputFile(llOutput,
+							"File.stdoutSelectorTitle",
+							"llStdoutPath");
+						break;
+				case LL_PTP_STDIN_SELECTOR:
+					getInputFile(llInput,
+							"File.stdinSelectorTitle",
+							"llStdinPath");
+						break;
+				case LL_PTP_EXECUTABLE_SELECTOR:
+					getInputFile(llExecutable,
+							"File.executableSelectorTitle",
+							"llExecutablePath");
+						break;
+				case LL_PTP_INITIALDIR_SELECTOR:
+					getDirectory(llInitialDir,
+							"File.initialDirSelectorTitle",
+							"llInitialDirPath");
+						break;
+				case LL_PTP_SHELL_SELECTOR:
+					getInputFile(llShell,
+							"File.shellSelectorTitle",
+							"llShellPath");
+						break;
 				case LL_PTP_SUBMIT_MODE_RADIOBOX:
 					setLaunchPanelMode();
 					validateAllFields();
@@ -1204,13 +1240,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setControl(runtimeTabPane);
 		tab.setText(Messages.getString("RuntimeTab.title"));
 		runtimeTabPane.setLayout(createTabPaneLayout());
-		llError = createTextWidget(runtimeTabPane, rm, LL_PTP_ERROR);
-		llOutput = createTextWidget(runtimeTabPane, rm, LL_PTP_OUTPUT);
-		llInput = createTextWidget(runtimeTabPane, rm, LL_PTP_INPUT);
-		llExecutable = createTextWidget(runtimeTabPane, rm, LL_PTP_EXECUTABLE);
-		llInitialDir = createTextWidget(runtimeTabPane, rm, LL_PTP_INITIALDIR);
+		llError = createFileSelector(runtimeTabPane, rm,
+				LL_PTP_ERROR, LL_PTP_STDERR_SELECTOR);
+		llOutput = createFileSelector(runtimeTabPane, rm, LL_PTP_OUTPUT, LL_PTP_STDOUT_SELECTOR);
+		llInput = createFileSelector(runtimeTabPane, rm, LL_PTP_INPUT, LL_PTP_STDIN_SELECTOR);
+		llExecutable = createFileSelector(runtimeTabPane, rm, LL_PTP_EXECUTABLE, LL_PTP_EXECUTABLE_SELECTOR);
+		llInitialDir = createFileSelector(runtimeTabPane, rm, LL_PTP_INITIALDIR, LL_PTP_INITIALDIR_SELECTOR);
 		llEnvironment = createTextWidget(runtimeTabPane, rm, LL_PTP_ENVIRONMENT);
-		llShell = createTextWidget(runtimeTabPane, rm, LL_PTP_SHELL);
+		llShell = createFileSelector(runtimeTabPane, rm, LL_PTP_SHELL, LL_PTP_SHELL_SELECTOR);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":createRuntimeTab returning.");
@@ -2241,25 +2278,37 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in the system resources
+	 * Validate all text and editable fields in the runtime
 	 * tab, top to bottom
 	 * 
 	 * @throws ValidationException
 	 */
 	private void validateRuntimeTab() throws ValidationException {
+		String s;
+		
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":validateRuntimeTab entered.");
-		// no checks will be performed on the following widgets at this time
-		// llError = createTextWidget(runtimeTabPane, rm, LL_PTP_ERROR);
-		// llOutput = createTextWidget(runtimeTabPane, rm, LL_PTP_OUTPUT);
-		// llInput = createTextWidget(runtimeTabPane, rm, LL_PTP_INPUT);
-		// llExecutable = createTextWidget(runtimeTabPane, rm,
-		// LL_PTP_EXECUTABLE);
-		// llInitialDir = createTextWidget(runtimeTabPane, rm,
-		// LL_PTP_INITIALDIR);
-		// llEnvironment = createTextWidget(runtimeTabPane, rm,
-		// LL_PTP_ENVIRONMENT);
-		// llShell = createTextWidget(runtimeTabPane, rm, LL_PTP_SHELL);
+		s = llError.getValue().trim();
+		if (s.length() > 0) {
+			validateOutputPath(s, "Invalid.stderr");
+		}
+		s = llOutput.getValue().trim();
+		if (s.length() > 0) {
+			validateOutputPath(s, "Invalid.stdout");
+		}
+		s = llInput.getValue().trim();
+		if (s.length() > 0) {
+			validateInputPath(s, "Invalid.stdin");
+		}
+		s = llExecutable.getValue().trim();
+		if (s.length() > 0) {
+			validateInputPath(s, "Invalid.executable");
+		}
+		validateDirectory(llInitialDir, "Invalid.initialDir");
+		s = llShell.getValue().trim();
+		if (s.length() > 0) {
+			validateInputPath(s, "Invalid.shell");
+		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":validateRuntimeTab returning.");
 	}
@@ -2447,10 +2496,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			} catch (ValidationException e) {
 				selector.setFieldInError();
 				throw e;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
 		}
 	}
 
@@ -2495,7 +2541,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws IOException
 	 */
 	private void validateInputPath(String path, String errorID)
-			throws ValidationException, IOException {
+			throws ValidationException {
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
@@ -2523,7 +2569,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws IOException
 	 */
 	private void validateOutputPath(String path, String errorID)
-			throws ValidationException, IOException {
+			throws ValidationException {
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
@@ -2551,7 +2597,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws IOException
 	 */
 	private void validateDirectory(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException, IOException {
+			String errorID) throws ValidationException {
 		String path;
 		IPath testPath;
 		IFileStore remoteResource;
