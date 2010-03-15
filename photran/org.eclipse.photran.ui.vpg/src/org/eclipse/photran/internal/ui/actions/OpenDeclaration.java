@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2007, 2010 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     UIUC - Initial API and implementation
+ *     UIUC - Initial API and implementation (JO)
+ *            Updated to resolve external subprograms (KH)
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.actions;
 
@@ -41,6 +42,7 @@ import org.eclipse.ui.ide.IDE;
  * TODO: Open Declaration does not work on module names in USE statements since these are not in the DefinitionMap 
  * 
  * @author Jeff Overbey
+ * @author Kurt Hendle
  */
 public class OpenDeclaration extends FortranEditorASTActionDelegate
 {
@@ -85,21 +87,17 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
                            TokenList tokenList,
                            DefinitionMap<Definition> defMap)
         {
+            // If defMap has not been created, we can't do this now, so we'll run this task the next
+            // time the editor is reconciled; hopefully the defMap will have been created by then
             if (defMap == null) return true;
             
             Definition def = defMap.lookup(selection, tokenList);
-            ArrayList<Definition> externalDefs = null;
-            
-            if(def == null || def.isExternal() || def.isImplicitExternalSubprogram())
-            {
-                externalDefs = PhotranVPG.getInstance().findAllExternalSubprogramsNamed(def.getCanonicalizedName());
-                def = chooseExternalDef(externalDefs);
-            }
+            if (def == null || def.isExternal() || def.isImplicitExternalSubprogram())
+                def = chooseExternalDef(PhotranVPG.getInstance().findAllExternalSubprogramsNamed(def.getCanonicalizedName()));
 
-            // Run this in the UI thread
-            runUIThread(def);
+            showDeclInUIThread(def);
 
-            // Remove this task
+            // Remove this task so it will not be run the next time the editor is reconciled
             return false;
         }
         
@@ -123,7 +121,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
             return chooseDefinition.def;
         }
         
-        private void runUIThread(final Definition def)
+        private void showDeclInUIThread(final Definition def)
         {
             Display.getDefault().syncExec(new Runnable()
             {
@@ -144,7 +142,6 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
             try
             {
                 IMarker marker = def.createMarker();
-                if (marker == null) return;
                 if (marker == null)
                     MessageDialog.openError(shell, "Error", "Unable to create marker");
                 else

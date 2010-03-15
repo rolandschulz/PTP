@@ -239,6 +239,11 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         return classification == Classification.EXTERNAL;
     }
 
+    public boolean isImplicitExternalSubprogram()
+    {
+        return classification == Classification.IMPLICIT_EXTERNAL_SUBPROGRAM;
+    }
+
     public boolean isInterface()
     {
         return classification == Classification.INTERFACE;
