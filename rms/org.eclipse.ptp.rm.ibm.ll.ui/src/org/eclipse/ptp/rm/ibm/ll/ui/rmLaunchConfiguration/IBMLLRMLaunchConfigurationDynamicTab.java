@@ -81,183 +81,6 @@ import org.eclipse.swt.widgets.Widget;
 
 public class IBMLLRMLaunchConfigurationDynamicTab extends
 		AbstractRMLaunchConfigurationDynamicTab {
-	private static final int INFO_MESSAGE = 0;
-	private static final int TRACE_MESSAGE = 1;
-	private static final int WARNING_MESSAGE = 2;
-	private static final int ERROR_MESSAGE = 3;
-	private static final int FATAL_MESSAGE = 4;
-	private static final int ARGS_MESSAGE = 5;
-
-	private static int state_trace = 0; /* 0=message off, 1=message on */
-	private static int state_info = 0; /* 0=message off, 1=message on */
-	private static int state_warning = 1; /* 0=message off, 1=message on */
-	private static int state_error = 1; /* 0=message off, 1=message on */
-	private static int state_args = 0; /* 0=message off, 1=message on */
-	private static int state_fatal = 1; /* 0=message off, 1=message on */
-
-	/*
-	 * The following constants define the names of all attributes which may be
-	 * known by the IBMLL proxy.
-	 */
-	private static final String LL_PTP_JOB_COMMAND_FILE = "LL_PTP_JOB_COMMAND_FILE";
-	private static final String LL_PTP_JOB_COMMAND_FILE_TEMPLATE = "LL_PTP_JOB_COMMAND_FILE_TEMPLATE";
-	private static final String LL_PTP_SUBMIT_MODE = "LL_PTP_SUBMIT_MODE";
-	private static final String LL_PTP_CLASS = "LL_PTP_CLASS";
-	private static final String LL_PTP_COMMENT = "LL_PTP_COMMENT";
-	private static final String LL_PTP_ERROR = "LL_PTP_ERROR";
-	private static final String LL_PTP_INPUT = "LL_PTP_INPUT";
-	private static final String LL_PTP_OUTPUT = "LL_PTP_OUTPUT";
-	private static final String LL_PTP_INITIALDIR = "LL_PTP_INITIALDIR";
-	private static final String LL_PTP_JOB_NAME = "LL_PTP_JOB_NAME";
-	private static final String LL_PTP_JOB_TYPE = "LL_PTP_JOB_TYPE";
-	private static final String LL_PTP_NETWORK_MPI = "LL_PTP_NETWORK_MPI";
-	private static final String LL_PTP_NETWORK_LAPI = "LL_PTP_NETWORK_LAPI";
-	private static final String LL_PTP_NETWORK_MPI_LAPI = "LL_PTP_NETWORK_MPI_LAPI";
-	private static final String LL_PTP_REQUIREMENTS = "LL_PTP_REQUIREMENTS";
-	private static final String LL_PTP_RESOURCES = "LL_PTP_RESOURCES";
-	private static final String LL_PTP_SHELL = "LL_PTP_SHELL";
-	private static final String LL_PTP_TASK_GEOMETRY = "LL_PTP_TASK_GEOMETRY";
-	private static final String LL_PTP_BULK_XFER = "LL_PTP_BULK_XFER";
-	private static final String LL_PTP_LARGE_PAGE = "LL_PTP_LARGE_PAGE";
-	private static final String LL_PTP_NODE_MIN = "LL_PTP_NODE_MIN";
-	private static final String LL_PTP_NODE_MAX = "LL_PTP_NODE_MAX";
-	private static final String LL_PTP_BLOCKING = "LL_PTP_BLOCKING";
-	private static final String LL_PTP_TOTAL_TASKS = "LL_PTP_TOTAL_TASKS";
-	private static final String LL_PTP_WALLCLOCK_HARD = "LL_PTP_WALLCLOCK_HARD";
-	private static final String LL_PTP_WALLCLOCK_SOFT = "LL_PTP_WALLCLOCK_SOFT";
-	private static final String LL_PTP_TASKS_PER_NODE = "LL_PTP_TASKS_PER_NODE";
-	private static final String LL_PTP_EXECUTABLE = "LL_PTP_EXECUTABLE";
-	private static final String LL_PTP_ENVIRONMENT = "LL_PTP_ENVIRONMENT";
-	private static final String LL_PTP_MAX_INT = "LL_PTP_MAX_INT";
-
-	/*
-	 * End of attribute name list.
-	 */
-	private static final String ENABLE_STATE = "ENABLE_STATE";
-	private static final RMLaunchValidation success = new RMLaunchValidation(
-			true, "");
-
-	private static final int LL_PTP_JOB_COMMAND_FILE_SELECTOR = 18;
-	private static final int LL_PTP_SUBMIT_MODE_RADIOBOX = 100;
-	private static final int LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR = 19;
-	private static final int LL_PTP_JOB_TYPE_SELECTOR = 20;
-	private static final int LL_PTP_STDERR_SELECTOR = 1;
-	private static final int LL_PTP_STDOUT_SELECTOR = 2;
-	private static final int LL_PTP_STDIN_SELECTOR = 3;
-	private static final int LL_PTP_EXECUTABLE_SELECTOR = 4;
-	private static final int LL_PTP_INITIALDIR_SELECTOR = 5;
-	private static final int LL_PTP_SHELL_SELECTOR = 6;
-
-	private static final int KBYTE = 1024;
-	private static final int MBYTE = 1024 * 1024;
-	private static final int GBYTE = 1024 * 1024 * 1024;
-
-	private boolean ignoreModifyEvents = false;
-	private EventMonitor eventMonitor;
-	private Composite mainPanel;
-	private TabFolder tabbedPane;
-	private ILaunchConfigurationWorkingCopy currentLaunchConfig;
-	private IResourceManager currentRM;
-	private BooleanRowWidget llSubmitMode;
-	private boolean allFieldsValid = true;
-	private String errorMessage;
-	private Vector<Object> activeWidgets;
-	private IRemoteConnection remoteConnection;
-	private IRemoteServices remoteService;
-	private IRemoteUIServices remoteUIService;
-	private Shell parentShell;
-
-	private Composite generalTabPane = null;
-	private Composite schedulingBasicTabPane = null;
-	private Composite schedulingRequirementsTabPane = null;
-	private Composite schedulingResourcesTabPane = null;
-	private Composite runtimeTabPane = null;
-	private Composite nodesNetworkTabPane = null;
-	private Composite limitsTabPane = null;
-
-	private FileSelectorRowWidget llJobCommandFile = null;
-	private FileSelectorRowWidget llJobCommandFileTemplate = null;
-
-	/*
-	 * Widgets for General Tab
-	 */
-	private TextRowWidget llComment = null;
-	private TextRowWidget llJobName = null;
-	private ComboRowWidget llJobType = null;
-	/*
-	 * Widgets for Scheduling (Basic) Tab
-	 */
-	private TextRowWidget llClass = null;
-	private ComboRowWidget llLargePage = null;
-	/*
-	 * Widgets for Scheduling (Requirements) Tab
-	 */
-	private TextRowWidget llRequirements = null;
-	/*
-	 * Widgets for Scheduling (Resources) Tab
-	 */
-	private TextRowWidget llResources = null;
-	/*
-	 * Widgets for Runtime
-	 */
-	private FileSelectorRowWidget llError = null;
-	private FileSelectorRowWidget llInput = null;
-	private FileSelectorRowWidget llOutput = null;
-	private FileSelectorRowWidget llInitialDir = null;
-	private FileSelectorRowWidget llShell = null;
-	private FileSelectorRowWidget llExecutable = null;
-	private TextRowWidget llEnvironment = null;
-	/*
-	 * Widgets for Nodes/Network Tab
-	 */
-	private TextRowWidget llBlocking = null;
-	private ComboRowWidget llBulkxfer = null;
-	private TextRowWidget llNetwork_mpi = null;
-	private TextRowWidget llNetwork_lapi = null;
-	private TextRowWidget llNetwork_mpi_lapi = null;
-	private TextRowWidget llNodeMin = null;
-	private TextRowWidget llNodeMax = null;
-	private TextRowWidget llTaskGeometry = null;
-	private TextRowWidget llTasksPerNode = null;
-	private TextRowWidget llTotalTasks = null;
-	/*
-	 * Widgets for Limits Tab Note: llWallClockLimitHard and
-	 * llWallClockLimitSoft are duplicated here.
-	 */
-	private TextRowWidget llWallClockLimitHard = null;
-	private TextRowWidget llWallClockLimitSoft = null;
-
-	Preferences myPreferences = null;
-
-	/**
-	 * Exception class intended for use in validating fields within this panel.
-	 * When a validation error occurs, the validation code should create and
-	 * throw a ValidationException, which is intended to be caught by the top
-	 * level validation method.
-	 */
-	public class ValidationException extends Exception {
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = 1L;
-
-		@SuppressWarnings("unused")
-		private ValidationException() {
-			throw new IllegalAccessError(
-					"ValidationException default constructor should not be called");
-		}
-
-		/**
-		 * Create a ValidationException with error message
-		 * 
-		 * @param message
-		 *            The error message
-		 */
-		public ValidationException(String message) {
-			super(message);
-		}
-	}
-
 	/**
 	 * Internal class which handles events of interest to this panel
 	 */
@@ -267,6 +90,30 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 					+ ":EventMonitor entered.");
 			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 					+ ":EventMonitor returning.");
+		}
+
+		/**
+		 * Handle events sent when registered Text and Combo widgets have their
+		 * text field modified.
+		 */
+		public void modifyText(ModifyEvent e) {
+			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+					+ ":modifyText entered.");
+			// Text and Combo widgets send ModifyEvents any time their text
+			// value is modified, including
+			// when the value is modified by a setText() call. The only time
+			// ModifyEvents are of interest is
+			// when the user has entered text. Code which calls setText() on a
+			// widget should set the
+			// ignoreModifyEvents before calling setText() and reset
+			// ignoreModifyEvents after the call.
+			setFieldValidationRequired((Widget) e.getSource());
+			if (!ignoreModifyEvents) {
+				validateAllFields();
+			}
+
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+					+ ":modifyText returning.");
 		}
 
 		public void widgetDefaultSelected(SelectionEvent e) {
@@ -309,35 +156,29 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 							"llJobCommandFileTemplatePath");
 					break;
 				case LL_PTP_STDERR_SELECTOR:
-					getInputFile(llError,
-						"File.stderrSelectorTitle",
-						"llStderrPath");
+					getInputFile(llError, "File.stderrSelectorTitle",
+							"llStderrPath");
 					break;
 				case LL_PTP_STDOUT_SELECTOR:
-					getInputFile(llOutput,
-							"File.stdoutSelectorTitle",
+					getInputFile(llOutput, "File.stdoutSelectorTitle",
 							"llStdoutPath");
-						break;
+					break;
 				case LL_PTP_STDIN_SELECTOR:
-					getInputFile(llInput,
-							"File.stdinSelectorTitle",
+					getInputFile(llInput, "File.stdinSelectorTitle",
 							"llStdinPath");
-						break;
+					break;
 				case LL_PTP_EXECUTABLE_SELECTOR:
-					getInputFile(llExecutable,
-							"File.executableSelectorTitle",
+					getInputFile(llExecutable, "File.executableSelectorTitle",
 							"llExecutablePath");
-						break;
+					break;
 				case LL_PTP_INITIALDIR_SELECTOR:
-					getDirectory(llInitialDir,
-							"File.initialDirSelectorTitle",
+					getDirectory(llInitialDir, "File.initialDirSelectorTitle",
 							"llInitialDirPath");
-						break;
+					break;
 				case LL_PTP_SHELL_SELECTOR:
-					getInputFile(llShell,
-							"File.shellSelectorTitle",
+					getInputFile(llShell, "File.shellSelectorTitle",
 							"llShellPath");
-						break;
+					break;
 				case LL_PTP_SUBMIT_MODE_RADIOBOX:
 					setLaunchPanelMode();
 					validateAllFields();
@@ -351,31 +192,184 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 					+ ":widgetSelected returning.");
 		}
+	}
+	/**
+	 * Exception class intended for use in validating fields within this panel.
+	 * When a validation error occurs, the validation code should create and
+	 * throw a ValidationException, which is intended to be caught by the top
+	 * level validation method.
+	 */
+	public class ValidationException extends Exception {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@SuppressWarnings("unused")
+		private ValidationException() {
+			throw new IllegalAccessError(
+					"ValidationException default constructor should not be called");
+		}
 
 		/**
-		 * Handle events sent when registered Text and Combo widgets have their
-		 * text field modified.
+		 * Create a ValidationException with error message
+		 * 
+		 * @param message
+		 *            The error message
 		 */
-		public void modifyText(ModifyEvent e) {
-			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-					+ ":modifyText entered.");
-			// Text and Combo widgets send ModifyEvents any time their text
-			// value is modified, including
-			// when the value is modified by a setText() call. The only time
-			// ModifyEvents are of interest is
-			// when the user has entered text. Code which calls setText() on a
-			// widget should set the
-			// ignoreModifyEvents before calling setText() and reset
-			// ignoreModifyEvents after the call.
-			setFieldValidationRequired((Widget) e.getSource());
-			if (!ignoreModifyEvents) {
-				validateAllFields();
-			}
-
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":modifyText returning.");
+		public ValidationException(String message) {
+			super(message);
 		}
 	}
+	private static final int INFO_MESSAGE = 0;
+	private static final int TRACE_MESSAGE = 1;
+	private static final int WARNING_MESSAGE = 2;
+	private static final int ERROR_MESSAGE = 3;
+
+	private static final int FATAL_MESSAGE = 4;
+	private static final int ARGS_MESSAGE = 5;
+	private static int state_trace = 0; /* 0=message off, 1=message on */
+	private static int state_info = 0; /* 0=message off, 1=message on */
+	private static int state_warning = 1; /* 0=message off, 1=message on */
+	private static int state_error = 1; /* 0=message off, 1=message on */
+
+	private static int state_args = 0; /* 0=message off, 1=message on */
+	private static int state_fatal = 1; /* 0=message off, 1=message on */
+	/*
+	 * The following constants define the names of all attributes which may be
+	 * known by the IBMLL proxy.
+	 */
+	private static final String LL_PTP_JOB_COMMAND_FILE = "LL_PTP_JOB_COMMAND_FILE";
+	private static final String LL_PTP_JOB_COMMAND_FILE_TEMPLATE = "LL_PTP_JOB_COMMAND_FILE_TEMPLATE";
+	private static final String LL_PTP_SUBMIT_MODE = "LL_PTP_SUBMIT_MODE";
+	private static final String LL_PTP_CLASS = "LL_PTP_CLASS";
+	private static final String LL_PTP_COMMENT = "LL_PTP_COMMENT";
+	private static final String LL_PTP_ERROR = "LL_PTP_ERROR";
+	private static final String LL_PTP_INPUT = "LL_PTP_INPUT";
+	private static final String LL_PTP_OUTPUT = "LL_PTP_OUTPUT";
+	private static final String LL_PTP_INITIALDIR = "LL_PTP_INITIALDIR";
+	private static final String LL_PTP_JOB_NAME = "LL_PTP_JOB_NAME";
+	private static final String LL_PTP_JOB_TYPE = "LL_PTP_JOB_TYPE";
+	private static final String LL_PTP_NETWORK_MPI = "LL_PTP_NETWORK_MPI";
+	private static final String LL_PTP_NETWORK_LAPI = "LL_PTP_NETWORK_LAPI";
+	private static final String LL_PTP_NETWORK_MPI_LAPI = "LL_PTP_NETWORK_MPI_LAPI";
+	private static final String LL_PTP_REQUIREMENTS = "LL_PTP_REQUIREMENTS";
+	private static final String LL_PTP_RESOURCES = "LL_PTP_RESOURCES";
+	private static final String LL_PTP_SHELL = "LL_PTP_SHELL";
+	private static final String LL_PTP_TASK_GEOMETRY = "LL_PTP_TASK_GEOMETRY";
+	private static final String LL_PTP_BULK_XFER = "LL_PTP_BULK_XFER";
+	private static final String LL_PTP_LARGE_PAGE = "LL_PTP_LARGE_PAGE";
+	private static final String LL_PTP_NODE_MIN = "LL_PTP_NODE_MIN";
+	private static final String LL_PTP_NODE_MAX = "LL_PTP_NODE_MAX";
+	private static final String LL_PTP_BLOCKING = "LL_PTP_BLOCKING";
+	private static final String LL_PTP_TOTAL_TASKS = "LL_PTP_TOTAL_TASKS";
+	private static final String LL_PTP_WALLCLOCK_HARD = "LL_PTP_WALLCLOCK_HARD";
+	private static final String LL_PTP_WALLCLOCK_SOFT = "LL_PTP_WALLCLOCK_SOFT";
+	private static final String LL_PTP_TASKS_PER_NODE = "LL_PTP_TASKS_PER_NODE";
+	private static final String LL_PTP_EXECUTABLE = "LL_PTP_EXECUTABLE";
+
+	private static final String LL_PTP_ENVIRONMENT = "LL_PTP_ENVIRONMENT";
+	private static final String LL_PTP_MAX_INT = "LL_PTP_MAX_INT";
+
+	/*
+	 * End of attribute name list.
+	 */
+	private static final String ENABLE_STATE = "ENABLE_STATE";
+	private static final RMLaunchValidation success = new RMLaunchValidation(
+			true, "");
+	private static final int LL_PTP_JOB_COMMAND_FILE_SELECTOR = 18;
+	private static final int LL_PTP_SUBMIT_MODE_RADIOBOX = 100;
+	private static final int LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR = 19;
+	private static final int LL_PTP_JOB_TYPE_SELECTOR = 20;
+	private static final int LL_PTP_STDERR_SELECTOR = 1;
+	private static final int LL_PTP_STDOUT_SELECTOR = 2;
+	private static final int LL_PTP_STDIN_SELECTOR = 3;
+	private static final int LL_PTP_EXECUTABLE_SELECTOR = 4;
+
+	private static final int LL_PTP_INITIALDIR_SELECTOR = 5;
+	private static final int LL_PTP_SHELL_SELECTOR = 6;
+	private static final int KBYTE = 1024;
+
+	private static final int MBYTE = 1024 * 1024;
+	private static final int GBYTE = 1024 * 1024 * 1024;
+	private boolean ignoreModifyEvents = false;
+	private EventMonitor eventMonitor;
+	private Composite mainPanel;
+	private TabFolder tabbedPane;
+	private ILaunchConfigurationWorkingCopy currentLaunchConfig;
+	private IResourceManager currentRM;
+	private BooleanRowWidget llSubmitMode;
+	private boolean allFieldsValid = true;
+	private String errorMessage;
+	private Vector<Object> activeWidgets;
+	private IRemoteConnection remoteConnection;
+	private IRemoteServices remoteService;
+
+	private IRemoteUIServices remoteUIService;
+	private Shell parentShell;
+	private Composite generalTabPane = null;
+	private Composite schedulingBasicTabPane = null;
+	private Composite schedulingRequirementsTabPane = null;
+	private Composite schedulingResourcesTabPane = null;
+	private Composite runtimeTabPane = null;
+
+	private Composite nodesNetworkTabPane = null;
+	private Composite limitsTabPane = null;
+
+	private FileSelectorRowWidget llJobCommandFile = null;
+	private FileSelectorRowWidget llJobCommandFileTemplate = null;
+	/*
+	 * Widgets for General Tab
+	 */
+	private TextRowWidget llComment = null;
+	private TextRowWidget llJobName = null;
+	private ComboRowWidget llJobType = null;
+	/*
+	 * Widgets for Scheduling (Basic) Tab
+	 */
+	private TextRowWidget llClass = null;
+	private ComboRowWidget llLargePage = null;
+	/*
+	 * Widgets for Scheduling (Requirements) Tab
+	 */
+	private TextRowWidget llRequirements = null;
+	/*
+	 * Widgets for Scheduling (Resources) Tab
+	 */
+	private TextRowWidget llResources = null;
+	/*
+	 * Widgets for Runtime
+	 */
+	private FileSelectorRowWidget llError = null;
+	private FileSelectorRowWidget llInput = null;
+	private FileSelectorRowWidget llOutput = null;
+	private FileSelectorRowWidget llInitialDir = null;
+	private FileSelectorRowWidget llShell = null;
+	private FileSelectorRowWidget llExecutable = null;
+	private TextRowWidget llEnvironment = null;
+	/*
+	 * Widgets for Nodes/Network Tab
+	 */
+	private TextRowWidget llBlocking = null;
+	private ComboRowWidget llBulkxfer = null;
+	private TextRowWidget llNetwork_mpi = null;
+	private TextRowWidget llNetwork_lapi = null;
+	private TextRowWidget llNetwork_mpi_lapi = null;
+	private TextRowWidget llNodeMin = null;
+	private TextRowWidget llNodeMax = null;
+	private TextRowWidget llTaskGeometry = null;
+	private TextRowWidget llTasksPerNode = null;
+	private TextRowWidget llTotalTasks = null;
+
+	/*
+	 * Widgets for Limits Tab Note: llWallClockLimitHard and
+	 * llWallClockLimitSoft are duplicated here.
+	 */
+	private TextRowWidget llWallClockLimitHard = null;
+
+	private TextRowWidget llWallClockLimitSoft = null;
+
+	Preferences myPreferences = null;
 
 	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManager rm) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
@@ -432,6 +426,63 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":IBMLLRMLaunchConfigurationDynamicTab returning.");
 	}
 
+	/**
+	 * Add an attribute to the set of launch attributes if not same as default
+	 * sent from proxy
+	 * 
+	 * @param rm
+	 *            The resource manager associated with the current launch
+	 *            configuration
+	 * @param config
+	 *            The current launch configuration
+	 * @param attrs
+	 *            The attributes vector containing the set of launch attributes
+	 * @param attrName
+	 *            The name of the attribute to be added to launch attributes
+	 */
+	private void addAttribute(IResourceManager rm, ILaunchConfiguration config,
+			Vector<StringAttribute> attrs, String attrName) {
+		String attrValue;
+		String defaultValue;
+		StringAttribute attr;
+		StringAttributeDefinition attrDef;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":addAttribute entered.");
+		if (rm.getAttributeDefinition(attrName) != null) {
+			try {
+				attrValue = config.getAttribute(attrName, "");
+			} catch (CoreException e) {
+				attrValue = "";
+			}
+
+			defaultValue = getAttrDefaultValue(rm, attrName);
+
+			if ((attrValue.trim().length() > 0)
+					&& ((!attrValue.equals(defaultValue))
+							|| (attrName.equals("LL_PTP_JOB_TYPE"))
+							|| (attrName
+									.equals("LL_PTP_JOB_COMMAND_FILE_TEMPLATE"))
+							|| (attrName.equals("LL_PTP_SUBMIT_MODE"))
+							|| (attrName.equals("LL_PTP_CLASS"))
+							|| (attrName.equals("LL_PTP_INPUT"))
+							|| (attrName.equals("LL_PTP_OUTPUT"))
+							|| (attrName.equals("LL_PTP_ERROR"))
+							|| (attrName.equals("LL_PTP_ENVIRONMENT"))
+							|| (attrName.equals("LL_PTP_JOB_TYPE")) || (attrName
+							.equals("LL_PTP_JOB_COMMAND_FILE")))) {
+				attrDef = new StringAttributeDefinition(attrName, "", "",
+						false, "");
+				attr = new StringAttribute(attrDef, attrValue);
+				attrs.add(attr);
+			}
+
+		}
+
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":addAttribute returning.");
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -452,618 +503,6 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":canSave returning.");
 		return new RMLaunchValidation(false, errorMessage);
-	}
-
-	/**
-	 * Get the directory path from the launch configuration
-	 * 
-	 * @param attrName
-	 *            Launch configuration attribute name for this directory
-	 * @return Directory path
-	 */
-	private String getFileDialogPath(String attrName) {
-		String dir;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getFileDialogPath entered.");
-		dir = "/";
-		if (currentLaunchConfig != null) {
-			try {
-				dir = currentLaunchConfig.getAttribute(attrName, "/");
-			} catch (CoreException e) {
-				dir = "/";
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getFileDialogPath returning.");
-		return dir;
-	}
-
-	/**
-	 * Save directory path in the launch configuration
-	 * 
-	 * @param attrName
-	 *            Launch configuration attribute name for this directory
-	 * @param path
-	 *            Directory path
-	 */
-	private void saveFileDialogPath(String attrName, String path) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":saveFileDialogPath entered.");
-		if (currentLaunchConfig != null) {
-			currentLaunchConfig.setAttribute(attrName, path);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":saveFileDialogPath returning.");
-	}
-
-	/**
-	 * Display a file selector dialog prompting the user for the path of an
-	 * input file. If the user clicks 'open', then set the pathname into the
-	 * text field of the specified FileSelector object.
-	 * 
-	 * @param selector
-	 *            The FileSelector object to hold path name
-	 * @param titleID
-	 *            Title for the dialog
-	 * @param pathAttrID
-	 *            Launch configuration attribute id for saving path info
-	 */
-	protected void getInputFile(FileSelectorRowWidget selector, String titleID,
-			String pathAttrID) {
-		String selectedFile = null;
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getInputFile entered.");
-		if (remoteUIService != null) {
-			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
-			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0);
-		}
-		if (selectedFile != null) {
-			saveFileDialogPath(pathAttrID, selectedFile);
-			selector.setPath(selectedFile);
-			selector.setFocus();
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getInputFile returning.");
-	}
-
-	/**
-	 * Display a file selector dialog prompting the user for the path of an
-	 * output file. If the user clicks 'save', then set the pathname into the
-	 * text field of the specified FileSelector object.
-	 * 
-	 * @param selector
-	 *            The FileSelector object to hold path name
-	 * @param titleID
-	 *            Title for the dialog
-	 * @param pathAttrID
-	 *            Launch configuration attribute id for saving path info
-	 */
-	protected void getOutputFile(FileSelectorRowWidget selector,
-			String titleID, String pathAttrID) {
-		String selectedFile = null;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getOutputFile entered.");
-		if (remoteUIService != null) {
-			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
-			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0);
-		}
-		if (selectedFile != null) {
-			saveFileDialogPath(pathAttrID, selectedFile);
-			selector.setPath(selectedFile);
-			selector.setFocus();
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getOutputFile returning.");
-	}
-
-	/**
-	 * Display a directory selector dialog prompting the user for the pathname
-	 * of a directory. If the user clocks 'ok', then set the pathname into the
-	 * text field of the specified FileSelector.
-	 * 
-	 * @param selector
-	 *            FileSelector object to be updated
-	 * @param titleID
-	 *            Title for the dialog
-	 * @param pathAttrID
-	 *            Launch configuration attribute id for saving path info
-	 */
-	protected void getDirectory(FileSelectorRowWidget selector, String titleID,
-			String pathAttrID) {
-		String selectedFile = null;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getDirectory entered.");
-		if (remoteUIService != null) {
-			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
-			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseDirectory(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0).toString();
-		}
-		if (selectedFile != null) {
-			String parentDir;
-
-			parentDir = new File(selectedFile).getParent();
-			if (parentDir == null) {
-				saveFileDialogPath(pathAttrID, "/");
-			} else {
-				saveFileDialogPath(pathAttrID, parentDir);
-			}
-			selector.setPath(selectedFile);
-			selector.setFocus();
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getDirectory returning.");
-	}
-
-	/**
-	 * Mark the validation state for the specified widget to indicate that the
-	 * widget value must be validated.
-	 * 
-	 * @param source
-	 *            The widget to validate.
-	 */
-	protected void setFieldValidationRequired(Widget source) {
-		// Iterate thru the list of widgets looking for the widget which needs
-		// to be validated. When found, set
-		// that widget's validation state to indicate validation is needed.
-		// Widget class needs
-		// to be checked since although these widgets perform similar functions,
-		// they do not comprise a set of
-		// logically related widgets that can be easily organized in a class
-		// hierarchy.
-		Iterator<Object> i;
-
-		i = activeWidgets.iterator();
-		while (i.hasNext()) {
-			Object widget;
-
-			widget = i.next();
-			if (widget instanceof BooleanRowWidget) {
-				if (((BooleanRowWidget) widget).isMatchingWidget(source)) {
-					((BooleanRowWidget) widget).setValidationRequired();
-					return;
-				}
-			} else if (widget instanceof CheckboxRowWidget) {
-				if (((CheckboxRowWidget) widget).isMatchingWidget(source)) {
-					((CheckboxRowWidget) widget).setValidationRequired();
-					return;
-				}
-			} else if (widget instanceof ComboRowWidget) {
-				if (((ComboRowWidget) widget).isMatchingWidget(source)) {
-					((ComboRowWidget) widget).setValidationRequired();
-					return;
-				}
-			} else if (widget instanceof DualFieldRowWidget) {
-				if (((DualFieldRowWidget) widget).isMatchingWidget(source)) {
-					((DualFieldRowWidget) widget).setValidationRequired();
-					return;
-				}
-			} else if (widget instanceof FileSelectorRowWidget) {
-				if (((FileSelectorRowWidget) widget).isMatchingWidget(source)) {
-					((FileSelectorRowWidget) widget).setValidationRequired();
-					return;
-				}
-			} else if (widget instanceof TextRowWidget) {
-				if (((TextRowWidget) widget).isMatchingWidget(source)) {
-					((TextRowWidget) widget).setValidationRequired();
-					return;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Mark all widget's validation state to indicate that the widget value has
-	 * changed, meaning validation is required.
-	 */
-	private void markAllFieldsChanged() {
-		Iterator<Object> i;
-
-		i = activeWidgets.iterator();
-		while (i.hasNext()) {
-			Object widget;
-
-			widget = i.next();
-			if (widget instanceof BooleanRowWidget) {
-				((BooleanRowWidget) widget).setValidationRequired();
-			} else if (widget instanceof CheckboxRowWidget) {
-				((CheckboxRowWidget) widget).setValidationRequired();
-			} else if (widget instanceof ComboRowWidget) {
-				((ComboRowWidget) widget).setValidationRequired();
-			} else if (widget instanceof DualFieldRowWidget) {
-				((DualFieldRowWidget) widget).setValidationRequired();
-			} else if (widget instanceof FileSelectorRowWidget) {
-				((FileSelectorRowWidget) widget).setValidationRequired();
-			} else if (widget instanceof TextRowWidget) {
-				((TextRowWidget) widget).setValidationRequired();
-			}
-		}
-	}
-
-	/**
-	 * Disable the tab pane widget and all children of the tab pane. Calling
-	 * setEnabled(false) on the tab pane widget disables the tab pane and
-	 * prevents interaction with child widgets, but does not change the visible
-	 * state of the child widget. This method changes the state of all widgets
-	 * to correctly indicate they are disabled.
-	 * 
-	 * @param widget
-	 *            The widget to be disabled.
-	 */
-	private void disableTabPaneWidget(Control widget) {
-		Control children[];
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":disableTabPaneWidget entered.");
-		// For any Composite widget, recursively call this method for each child
-		// of the Composite. This must be
-		// done before disabling the Composite since disabling the Composite
-		// also marks its children disabled
-		// and the real enable/disable state of the child cannot be preserved.
-		if (widget instanceof Composite) {
-			children = ((Composite) widget).getChildren();
-			for (int i = 0; i < children.length; i++) {
-				disableTabPaneWidget(children[i]);
-			}
-		}
-		// Remember the current state of the widget, then disable it.
-		widget.setData(ENABLE_STATE, Boolean.valueOf(widget.isEnabled()));
-		widget.setEnabled(false);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":disableTabPaneWidget returning.");
-	}
-
-	/**
-	 * Restore widget back to its previous enable/disable state
-	 * 
-	 * @param widget
-	 *            The widget whose state is to be restored.
-	 */
-	private void restoreTabPaneWidgetState(Control widget) {
-		Control children[];
-		Boolean state;
-		boolean enableFlag;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":restoreTabPaneWidgetState entered.");
-		// Get widget's previous enable/disable state. If there is no saved
-		// state, such as when initially
-		// creating the parallel tab in basic mode, then enable the widget.
-		state = (Boolean) widget.getData(ENABLE_STATE);
-		if (state == null) {
-			enableFlag = true;
-		} else {
-			enableFlag = state.booleanValue();
-		}
-		widget.setEnabled(enableFlag);
-		// Recursively call this method to handle children of a Composite
-		// widget. Note that ordering of processing
-		// here does not matter since enabling a Composite widget does not
-		// automatically enable its children.
-		if (widget instanceof Composite) {
-			children = ((Composite) widget).getChildren();
-			for (int i = 0; i < children.length; i++) {
-				restoreTabPaneWidgetState(children[i]);
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":restoreTabPaneWidgetState returning.");
-	}
-
-	/**
-	 * Restore widget back to its previous enable/disable state
-	 * 
-	 * @param widget
-	 *            The widget whose state is to be restored.
-	 */
-	private void enableTabPaneWidgetState(Control widget) {
-		Control children[];
-		Boolean state;
-		boolean enableFlag;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":enableTabPaneWidgetState entered.");
-		// Enable the widget.
-		widget.setEnabled(true);
-		// Recursively call this method to handle children of a Composite
-		// widget. Note that ordering of processing
-		// here does not matter since enabling a Composite widget does not
-		// automatically enable its children.
-		if (widget instanceof Composite) {
-			children = ((Composite) widget).getChildren();
-			for (int i = 0; i < children.length; i++) {
-				enableTabPaneWidgetState(children[i]);
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":enableTabPaneWidgetState returning.");
-	}
-
-	/**
-	 * Set launch panel mode based on llSubmitMode setting. If checked, then set
-	 * submit mode, where the user supplies a LL setup script. Otherwise set
-	 * basic mode, where the user chooses LL options from a tabbed dialog panel.
-	 */
-	protected void setLaunchPanelMode() {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setLaunchPanelMode entered.");
-		if (llSubmitMode != null) {
-			if (llSubmitMode.getValue().equals("Advanced")) {
-				if (llJobCommandFile != null) {
-					llJobCommandFile.setEnabled(true);
-				}
-				if (llJobCommandFileTemplate != null) {
-					llJobCommandFileTemplate.setEnabled(false);
-				}
-				disableTabPaneWidget(tabbedPane);
-			} else {
-				if (llJobCommandFile != null) {
-					llJobCommandFile.setEnabled(false);
-				}
-				if (llJobCommandFileTemplate != null) {
-					llJobCommandFileTemplate.setEnabled(true);
-				}
-				enableTabPaneWidgetState(tabbedPane);
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setLaunchPanelMode returning.");
-
-	}
-
-	/**
-	 * Create a text widget in the tabbed view. The text field spans columns 2
-	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id
-	 *            Attribute id for rm attribute this widget represents
-	 * @return TextRowWidget entry widget
-	 */
-	private TextRowWidget createTextWidget(Composite parent,
-			IResourceManager rm, String id) {
-		TextRowWidget widget;
-		IAttributeDefinition<?, ?, ?> attr;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createTextWidget entered.");
-		widget = null;
-		attr = rm.getAttributeDefinition(id);
-		if (attr != null) {
-			widget = new TextRowWidget(parent, id, attr);
-			widget.addModifyListener(eventMonitor);
-			widget.setValidationRequired();
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createTextWidget returning.");
-		return widget;
-	}
-
-	/**
-	 * Create a text widget in the tabbed view. The text field spans columns 2
-	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id1
-	 *            Attribute id for first rm attribute this widget represents
-	 * @param id2
-	 *            Attribute id for second rm attribute this widget represents
-	 * @return Text entry widget
-	 */
-	private DualFieldRowWidget createDualField(Composite parent,
-			IResourceManager rm, String id1, String id2) {
-		DualFieldRowWidget widget;
-		IAttributeDefinition<?, ?, ?> attr1;
-		IAttributeDefinition<?, ?, ?> attr2;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createDualField entered.");
-		widget = null;
-		attr1 = rm.getAttributeDefinition(id1);
-		attr2 = rm.getAttributeDefinition(id2);
-		if ((attr1 != null) && (attr2 != null)) {
-			widget = new DualFieldRowWidget(parent, id1, id2, attr1, attr2);
-			widget.addModifyListener(eventMonitor);
-			widget.setValidationRequired();
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createDualField returning.");
-		return widget;
-	}
-
-	/**
-	 * Create a checkbox widget in the tabbed view. The checkbox is in column 2
-	 * and column 3 is a filler (Label) widget. To ensure consistent alignment,
-	 * this method allocates extra horizontal space to the 2nd column. The label
-	 * and tooltip text are obtained from the attribute definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id
-	 *            Attribute id for rm attribute this widget represents
-	 * @return Checkbox button for this attribute
-	 */
-	private CheckboxRowWidget createCheckbox(Composite parent,
-			IResourceManager rm, String id) {
-		CheckboxRowWidget widget;
-		StringAttributeDefinition attrDef;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createCheckbox entered.");
-		widget = null;
-		attrDef = (StringAttributeDefinition) rm.getAttributeDefinition(id);
-		if (attrDef != null) {
-			widget = new CheckboxRowWidget(parent, id, attrDef);
-			widget.setValidationRequired();
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createCheckbox returning.");
-		return widget;
-	}
-
-	/**
-	 * Create a radio button pair in the tabbed view. The label, button labels,
-	 * and tooltip text are obtained from the attribute definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id
-	 *            Attribute id for rm attribute this widget represents
-	 * @return Checkbox button for this attribute
-	 */
-	private BooleanRowWidget createBooleanOption(Composite parent,
-			IResourceManager rm, String id) {
-		BooleanRowWidget widget;
-		StringSetAttributeDefinition attrDef;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createBooleanOption entered.");
-		widget = null;
-		attrDef = (StringSetAttributeDefinition) rm.getAttributeDefinition(id);
-		if (attrDef != null) {
-			widget = new BooleanRowWidget(parent, id, attrDef,
-					LL_PTP_SUBMIT_MODE_RADIOBOX);
-			widget.setValidationRequired();
-			widget.addSelectionListener(eventMonitor);
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createBooleanOption returning.");
-		return widget;
-	}
-
-	/**
-	 * Create a text field and pushbutton in this row. The text field is in
-	 * column 2 and the pushbutton in column 3. The user either fills in the
-	 * text field with a pathname, or clicks the button to pop up a file
-	 * selector dialog that then fills in the text field. To ensure consistent
-	 * alignment, this method allocates extra horizontal space to the 2nd
-	 * column. The label and tooltip text are obtained from the attribute
-	 * definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id
-	 *            Attribute id for rm attribute this widget represents
-	 * @param selectorID
-	 *            Identifier used to identify the browse button associated with
-	 *            this widget
-	 * @return Text entry field for this attribute
-	 */
-	private FileSelectorRowWidget createFileSelector(Composite parent,
-			IResourceManager rm, String id, int selectorID) {
-		FileSelectorRowWidget widget;
-		StringAttributeDefinition attr;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createFileSelector entered.");
-		widget = null;
-		attr = (StringAttributeDefinition) rm.getAttributeDefinition(id);
-		if (attr != null) {
-			widget = new FileSelectorRowWidget(parent, id, selectorID, attr);
-			widget.setData(id);
-			widget.setValidationRequired();
-			widget.addModifyListener(eventMonitor);
-			widget.addSelectionListener(eventMonitor);
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createFileSelector returning.");
-		return widget;
-	}
-
-	/**
-	 * Create a combobox widget in the tabbed view. The widget spans columns 2
-	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id
-	 *            Attribute id for rm attribute this widget represents
-	 * @return ComboRowWidget used by this attribute
-	 */
-	private ComboRowWidget createCombobox(Composite parent,
-			IResourceManager rm, String id, int selector_id) {
-		ComboRowWidget widget;
-		IAttributeDefinition<?, ?, ?> attr;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createCombobox entered.");
-		widget = null;
-		attr = rm.getAttributeDefinition(id);
-		if (attr != null) {
-			widget = new ComboRowWidget(parent, id, attr, true, selector_id);
-			widget.setValidationRequired();
-			widget.addSelectionListener(eventMonitor);
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createCombobox returning.");
-		return widget;
-	}
-
-	/**
-	 * Create an editable combobox in the tabbed view. The widget spans columns
-	 * 2 and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
-	 * 
-	 * @param parent
-	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
-	 * @param id
-	 *            Attribute id for rm attribute this widget represents
-	 * @return Editable ComboRowWidget used by this attribute
-	 */
-	private ComboRowWidget createEditableCombobox(Composite parent,
-			IResourceManager rm, String id, int selector_id) {
-		ComboRowWidget widget;
-		IAttributeDefinition<?, ?, ?> attr;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createEditableCombobox entered.");
-		widget = null;
-		attr = rm.getAttributeDefinition(id);
-		if (attr != null) {
-			widget = new ComboRowWidget(parent, id, attr, false, selector_id);
-			widget.setValidationRequired();
-			widget.addSelectionListener(eventMonitor);
-			widget.addModifyListener(eventMonitor);
-			activeWidgets.add(widget);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createEditableCombobox returning.");
-		return widget;
 	}
 
 	/**
@@ -1111,22 +550,261 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	}
 
 	/**
-	 * Create the layout object for a pane in the TabFolder
+	 * Create a radio button pair in the tabbed view. The label, button labels,
+	 * and tooltip text are obtained from the attribute definition object.
 	 * 
-	 * @return Layout for use in the tabbed pane
+	 * @param parent
+	 *            Parent widget (the pane in the tabbed view)
+	 * @param rm
+	 *            Resource manager used by this launch config
+	 * @param id
+	 *            Attribute id for rm attribute this widget represents
+	 * @return Checkbox button for this attribute
 	 */
-	private Layout createTabPaneLayout() {
-		GridLayout layout;
+	private BooleanRowWidget createBooleanOption(Composite parent,
+			IResourceManager rm, String id) {
+		BooleanRowWidget widget;
+		StringSetAttributeDefinition attrDef;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createTabPaneLayout entered.");
-		layout = new GridLayout(4, false);
-		layout.marginWidth = 4;
-		layout.horizontalSpacing = 8;
-		layout.verticalSpacing = 4;
+				+ ":createBooleanOption entered.");
+		widget = null;
+		attrDef = (StringSetAttributeDefinition) rm.getAttributeDefinition(id);
+		if (attrDef != null) {
+			widget = new BooleanRowWidget(parent, id, attrDef,
+					LL_PTP_SUBMIT_MODE_RADIOBOX);
+			widget.setValidationRequired();
+			widget.addSelectionListener(eventMonitor);
+			activeWidgets.add(widget);
+		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createTabPaneLayout returning.");
-		return layout;
+				+ ":createBooleanOption returning.");
+		return widget;
+	}
+
+	/**
+	 * Create a checkbox widget in the tabbed view. The checkbox is in column 2
+	 * and column 3 is a filler (Label) widget. To ensure consistent alignment,
+	 * this method allocates extra horizontal space to the 2nd column. The label
+	 * and tooltip text are obtained from the attribute definition object.
+	 * 
+	 * @param parent
+	 *            Parent widget (the pane in the tabbed view)
+	 * @param rm
+	 *            Resource manager used by this launch config
+	 * @param id
+	 *            Attribute id for rm attribute this widget represents
+	 * @return Checkbox button for this attribute
+	 */
+	private CheckboxRowWidget createCheckbox(Composite parent,
+			IResourceManager rm, String id) {
+		CheckboxRowWidget widget;
+		StringAttributeDefinition attrDef;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createCheckbox entered.");
+		widget = null;
+		attrDef = (StringAttributeDefinition) rm.getAttributeDefinition(id);
+		if (attrDef != null) {
+			widget = new CheckboxRowWidget(parent, id, attrDef);
+			widget.setValidationRequired();
+			activeWidgets.add(widget);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createCheckbox returning.");
+		return widget;
+	}
+
+	/**
+	 * Create a combobox widget in the tabbed view. The widget spans columns 2
+	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
+	 * the attribute definition object.
+	 * 
+	 * @param parent
+	 *            Parent widget (the pane in the tabbed view)
+	 * @param rm
+	 *            Resource manager used by this launch config
+	 * @param id
+	 *            Attribute id for rm attribute this widget represents
+	 * @return ComboRowWidget used by this attribute
+	 */
+	private ComboRowWidget createCombobox(Composite parent,
+			IResourceManager rm, String id, int selector_id) {
+		ComboRowWidget widget;
+		IAttributeDefinition<?, ?, ?> attr;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createCombobox entered.");
+		widget = null;
+		attr = rm.getAttributeDefinition(id);
+		if (attr != null) {
+			widget = new ComboRowWidget(parent, id, attr, true, selector_id);
+			widget.setValidationRequired();
+			widget.addSelectionListener(eventMonitor);
+			activeWidgets.add(widget);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createCombobox returning.");
+		return widget;
+	}
+
+	/**
+	 * This method creates all of the GUI elements of the resource-manager
+	 * specific pane within the parallel tab of the launch configuration dialog.
+	 * 
+	 * @param parent
+	 *            This control's parent
+	 * @param rm
+	 *            The resource manager associated with this launch configuration
+	 * @param queue
+	 *            Currently selected queue
+	 */
+	public void createControl(Composite parent, IResourceManager rm,
+			IPQueue queue) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createControl entered.");
+		IIBMLLResourceManagerConfiguration config;
+		IRemoteConnectionManager connMgr;
+
+		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm)
+				.getConfiguration();
+		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
+				config.getRemoteServicesId());
+		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
+				remoteService);
+		connMgr = remoteService.getConnectionManager();
+		remoteConnection = connMgr.getConnection(config.getConnectionName());
+		parentShell = parent.getShell();
+		clearAllWidgets();
+		activeWidgets = new Vector<Object>();
+		eventMonitor = new EventMonitor();
+		mainPanel = new Composite(parent, SWT.NONE);
+		mainPanel.setLayout(new GridLayout(1, false));
+		createModeBox(rm);
+		tabbedPane = new TabFolder(mainPanel, SWT.TOP);
+		createGeneralTab(rm);
+		createSchedulingBasicTab(rm);
+		createSchedulingRequirementsTab(rm);
+		createSchedulingResourcesTab(rm);
+		createRuntimeTab(rm);
+		createNodesNetworkTab(rm);
+		createLimitsTab(rm);
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createControl returning.");
+		currentRM = rm;
+	}
+
+	/**
+	 * Create a text widget in the tabbed view. The text field spans columns 2
+	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
+	 * the attribute definition object.
+	 * 
+	 * @param parent
+	 *            Parent widget (the pane in the tabbed view)
+	 * @param rm
+	 *            Resource manager used by this launch config
+	 * @param id1
+	 *            Attribute id for first rm attribute this widget represents
+	 * @param id2
+	 *            Attribute id for second rm attribute this widget represents
+	 * @return Text entry widget
+	 */
+	private DualFieldRowWidget createDualField(Composite parent,
+			IResourceManager rm, String id1, String id2) {
+		DualFieldRowWidget widget;
+		IAttributeDefinition<?, ?, ?> attr1;
+		IAttributeDefinition<?, ?, ?> attr2;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createDualField entered.");
+		widget = null;
+		attr1 = rm.getAttributeDefinition(id1);
+		attr2 = rm.getAttributeDefinition(id2);
+		if ((attr1 != null) && (attr2 != null)) {
+			widget = new DualFieldRowWidget(parent, id1, id2, attr1, attr2);
+			widget.addModifyListener(eventMonitor);
+			widget.setValidationRequired();
+			activeWidgets.add(widget);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createDualField returning.");
+		return widget;
+	}
+
+	/**
+	 * Create an editable combobox in the tabbed view. The widget spans columns
+	 * 2 and 3 of the tabbed pane. The label and tooltip text are obtained from
+	 * the attribute definition object.
+	 * 
+	 * @param parent
+	 *            Parent widget (the pane in the tabbed view)
+	 * @param rm
+	 *            Resource manager used by this launch config
+	 * @param id
+	 *            Attribute id for rm attribute this widget represents
+	 * @return Editable ComboRowWidget used by this attribute
+	 */
+	private ComboRowWidget createEditableCombobox(Composite parent,
+			IResourceManager rm, String id, int selector_id) {
+		ComboRowWidget widget;
+		IAttributeDefinition<?, ?, ?> attr;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createEditableCombobox entered.");
+		widget = null;
+		attr = rm.getAttributeDefinition(id);
+		if (attr != null) {
+			widget = new ComboRowWidget(parent, id, attr, false, selector_id);
+			widget.setValidationRequired();
+			widget.addSelectionListener(eventMonitor);
+			widget.addModifyListener(eventMonitor);
+			activeWidgets.add(widget);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createEditableCombobox returning.");
+		return widget;
+	}
+
+	/**
+	 * Create a text field and pushbutton in this row. The text field is in
+	 * column 2 and the pushbutton in column 3. The user either fills in the
+	 * text field with a pathname, or clicks the button to pop up a file
+	 * selector dialog that then fills in the text field. To ensure consistent
+	 * alignment, this method allocates extra horizontal space to the 2nd
+	 * column. The label and tooltip text are obtained from the attribute
+	 * definition object.
+	 * 
+	 * @param parent
+	 *            Parent widget (the pane in the tabbed view)
+	 * @param rm
+	 *            Resource manager used by this launch config
+	 * @param id
+	 *            Attribute id for rm attribute this widget represents
+	 * @param selectorID
+	 *            Identifier used to identify the browse button associated with
+	 *            this widget
+	 * @return Text entry field for this attribute
+	 */
+	private FileSelectorRowWidget createFileSelector(Composite parent,
+			IResourceManager rm, String id, int selectorID) {
+		FileSelectorRowWidget widget;
+		StringAttributeDefinition attr;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createFileSelector entered.");
+		widget = null;
+		attr = (StringAttributeDefinition) rm.getAttributeDefinition(id);
+		if (attr != null) {
+			widget = new FileSelectorRowWidget(parent, id, selectorID, attr);
+			widget.setData(id);
+			widget.setValidationRequired();
+			widget.addModifyListener(eventMonitor);
+			widget.addSelectionListener(eventMonitor);
+			activeWidgets.add(widget);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createFileSelector returning.");
+		return widget;
 	}
 
 	/**
@@ -1152,6 +830,139 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":createGeneralTab returning.");
+	}
+
+	/**
+	 * Create the first performance tab of the attributes pane. Due to the
+	 * number of performance related attributes, there are two performance tabs.
+	 * 
+	 * @param rm
+	 *            resource manager associated with this launch configuration
+	 */
+	private void createLimitsTab(IResourceManager rm) {
+		TabItem tab;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createLimitsTab entered.");
+		tab = new TabItem(tabbedPane, SWT.NONE);
+		limitsTabPane = new Composite(tabbedPane, SWT.NONE);
+		tab.setControl(limitsTabPane);
+		tab.setText(Messages.getString("LimitsTab.title"));
+		limitsTabPane.setLayout(createTabPaneLayout());
+		llWallClockLimitHard = createTextWidget(limitsTabPane, rm,
+				LL_PTP_WALLCLOCK_HARD);
+		llWallClockLimitSoft = createTextWidget(limitsTabPane, rm,
+				LL_PTP_WALLCLOCK_SOFT);
+
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createLimitsTab returning.");
+	}
+
+	/**
+	 * Create a pane containing the submit mode radio box
+	 * 
+	 * @param rm
+	 *            The resource manager associated with this launch configuration
+	 */
+	private void createModeBox(IResourceManager rm) {
+		GridData gd;
+		GridLayout layout;
+		Composite pane;
+
+		pane = new Composite(mainPanel, SWT.NONE);
+		layout = new GridLayout(4, false);
+		layout.marginWidth = 4;
+		layout.horizontalSpacing = 8;
+		layout.verticalSpacing = 4;
+		pane.setLayout(layout);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.grabExcessHorizontalSpace = true;
+		pane.setLayoutData(gd);
+
+		llSubmitMode = createBooleanOption(pane, rm, LL_PTP_SUBMIT_MODE);
+		if (llSubmitMode != null) {
+			llSubmitMode.addSelectionListener(eventMonitor);
+			llJobCommandFile = createFileSelector(pane, rm,
+					LL_PTP_JOB_COMMAND_FILE, LL_PTP_JOB_COMMAND_FILE_SELECTOR);
+			llJobCommandFileTemplate = createFileSelector(pane, rm,
+					LL_PTP_JOB_COMMAND_FILE_TEMPLATE,
+					LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createModeBox returning.");
+
+	}
+
+	/**
+	 * Create the node allocation tab of the attributes pane
+	 * 
+	 * @param rm
+	 *            resource manager associated with this launch configuration
+	 */
+	private void createNodesNetworkTab(IResourceManager rm) {
+		TabItem tab;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createNodesNetworkTab entered.");
+		tab = new TabItem(tabbedPane, SWT.NONE);
+		nodesNetworkTabPane = new Composite(tabbedPane, SWT.NONE);
+		tab.setControl(nodesNetworkTabPane);
+		tab.setText(Messages.getString("NodesNetworkTab.title"));
+		nodesNetworkTabPane.setLayout(createTabPaneLayout());
+		llBlocking = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_BLOCKING);
+		llBulkxfer = createCombobox(nodesNetworkTabPane, rm, LL_PTP_BULK_XFER,
+				0);
+		llNetwork_mpi = createTextWidget(nodesNetworkTabPane, rm,
+				LL_PTP_NETWORK_MPI);
+		llNetwork_lapi = createTextWidget(nodesNetworkTabPane, rm,
+				LL_PTP_NETWORK_LAPI);
+		llNetwork_mpi_lapi = createTextWidget(nodesNetworkTabPane, rm,
+				LL_PTP_NETWORK_MPI_LAPI);
+		llNodeMin = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NODE_MIN);
+		llNodeMax = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NODE_MAX);
+		llTaskGeometry = createTextWidget(nodesNetworkTabPane, rm,
+				LL_PTP_TASK_GEOMETRY);
+		llTasksPerNode = createTextWidget(nodesNetworkTabPane, rm,
+				LL_PTP_TASKS_PER_NODE);
+		llTotalTasks = createTextWidget(nodesNetworkTabPane, rm,
+				LL_PTP_TOTAL_TASKS);
+
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createNodesNetworkTab returning.");
+	}
+
+	/**
+	 * Create the system resources tab of the attributes pane
+	 * 
+	 * @param rm
+	 *            resource manager associated with this launch configuration
+	 */
+	private void createRuntimeTab(IResourceManager rm) {
+		TabItem tab;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createRuntimeTab entered.");
+		tab = new TabItem(tabbedPane, SWT.NONE);
+		runtimeTabPane = new Composite(tabbedPane, SWT.NONE);
+		tab.setControl(runtimeTabPane);
+		tab.setText(Messages.getString("RuntimeTab.title"));
+		runtimeTabPane.setLayout(createTabPaneLayout());
+		llError = createFileSelector(runtimeTabPane, rm, LL_PTP_ERROR,
+				LL_PTP_STDERR_SELECTOR);
+		llOutput = createFileSelector(runtimeTabPane, rm, LL_PTP_OUTPUT,
+				LL_PTP_STDOUT_SELECTOR);
+		llInput = createFileSelector(runtimeTabPane, rm, LL_PTP_INPUT,
+				LL_PTP_STDIN_SELECTOR);
+		llExecutable = createFileSelector(runtimeTabPane, rm,
+				LL_PTP_EXECUTABLE, LL_PTP_EXECUTABLE_SELECTOR);
+		llInitialDir = createFileSelector(runtimeTabPane, rm,
+				LL_PTP_INITIALDIR, LL_PTP_INITIALDIR_SELECTOR);
+		llEnvironment = createTextWidget(runtimeTabPane, rm, LL_PTP_ENVIRONMENT);
+		llShell = createFileSelector(runtimeTabPane, rm, LL_PTP_SHELL,
+				LL_PTP_SHELL_SELECTOR);
+
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":createRuntimeTab returning.");
 	}
 
 	/**
@@ -1225,234 +1036,149 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	}
 
 	/**
-	 * Create the system resources tab of the attributes pane
+	 * Create the layout object for a pane in the TabFolder
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
+	 * @return Layout for use in the tabbed pane
 	 */
-	private void createRuntimeTab(IResourceManager rm) {
-		TabItem tab;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createRuntimeTab entered.");
-		tab = new TabItem(tabbedPane, SWT.NONE);
-		runtimeTabPane = new Composite(tabbedPane, SWT.NONE);
-		tab.setControl(runtimeTabPane);
-		tab.setText(Messages.getString("RuntimeTab.title"));
-		runtimeTabPane.setLayout(createTabPaneLayout());
-		llError = createFileSelector(runtimeTabPane, rm,
-				LL_PTP_ERROR, LL_PTP_STDERR_SELECTOR);
-		llOutput = createFileSelector(runtimeTabPane, rm, LL_PTP_OUTPUT, LL_PTP_STDOUT_SELECTOR);
-		llInput = createFileSelector(runtimeTabPane, rm, LL_PTP_INPUT, LL_PTP_STDIN_SELECTOR);
-		llExecutable = createFileSelector(runtimeTabPane, rm, LL_PTP_EXECUTABLE, LL_PTP_EXECUTABLE_SELECTOR);
-		llInitialDir = createFileSelector(runtimeTabPane, rm, LL_PTP_INITIALDIR, LL_PTP_INITIALDIR_SELECTOR);
-		llEnvironment = createTextWidget(runtimeTabPane, rm, LL_PTP_ENVIRONMENT);
-		llShell = createFileSelector(runtimeTabPane, rm, LL_PTP_SHELL, LL_PTP_SHELL_SELECTOR);
-
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createRuntimeTab returning.");
-	}
-
-	/**
-	 * Create the node allocation tab of the attributes pane
-	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
-	 */
-	private void createNodesNetworkTab(IResourceManager rm) {
-		TabItem tab;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createNodesNetworkTab entered.");
-		tab = new TabItem(tabbedPane, SWT.NONE);
-		nodesNetworkTabPane = new Composite(tabbedPane, SWT.NONE);
-		tab.setControl(nodesNetworkTabPane);
-		tab.setText(Messages.getString("NodesNetworkTab.title"));
-		nodesNetworkTabPane.setLayout(createTabPaneLayout());
-		llBlocking = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_BLOCKING);
-		llBulkxfer = createCombobox(nodesNetworkTabPane, rm, LL_PTP_BULK_XFER,
-				0);
-		llNetwork_mpi = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_NETWORK_MPI);
-		llNetwork_lapi = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_NETWORK_LAPI);
-		llNetwork_mpi_lapi = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_NETWORK_MPI_LAPI);
-		llNodeMin = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NODE_MIN);
-		llNodeMax = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NODE_MAX);
-		llTaskGeometry = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_TASK_GEOMETRY);
-		llTasksPerNode = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_TASKS_PER_NODE);
-		llTotalTasks = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_TOTAL_TASKS);
-
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createNodesNetworkTab returning.");
-	}
-
-	/**
-	 * Create the first performance tab of the attributes pane. Due to the
-	 * number of performance related attributes, there are two performance tabs.
-	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
-	 */
-	private void createLimitsTab(IResourceManager rm) {
-		TabItem tab;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createLimitsTab entered.");
-		tab = new TabItem(tabbedPane, SWT.NONE);
-		limitsTabPane = new Composite(tabbedPane, SWT.NONE);
-		tab.setControl(limitsTabPane);
-		tab.setText(Messages.getString("LimitsTab.title"));
-		limitsTabPane.setLayout(createTabPaneLayout());
-		llWallClockLimitHard = createTextWidget(limitsTabPane, rm,
-				LL_PTP_WALLCLOCK_HARD);
-		llWallClockLimitSoft = createTextWidget(limitsTabPane, rm,
-				LL_PTP_WALLCLOCK_SOFT);
-
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createLimitsTab returning.");
-	}
-
-	/**
-	 * Create a pane containing the submit mode radio box
-	 * 
-	 * @param rm
-	 *            The resource manager associated with this launch configuration
-	 */
-	private void createModeBox(IResourceManager rm) {
-		GridData gd;
+	private Layout createTabPaneLayout() {
 		GridLayout layout;
-		Composite pane;
 
-		pane = new Composite(mainPanel, SWT.NONE);
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createTabPaneLayout entered.");
 		layout = new GridLayout(4, false);
 		layout.marginWidth = 4;
 		layout.horizontalSpacing = 8;
 		layout.verticalSpacing = 4;
-		pane.setLayout(layout);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.grabExcessHorizontalSpace = true;
-		pane.setLayoutData(gd);
-
-		llSubmitMode = createBooleanOption(pane, rm, LL_PTP_SUBMIT_MODE);
-		if (llSubmitMode != null) {
-			llSubmitMode.addSelectionListener(eventMonitor);
-			llJobCommandFile = createFileSelector(pane, rm,
-					LL_PTP_JOB_COMMAND_FILE, LL_PTP_JOB_COMMAND_FILE_SELECTOR);
-			llJobCommandFileTemplate = createFileSelector(pane, rm,
-					LL_PTP_JOB_COMMAND_FILE_TEMPLATE,
-					LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR);
-		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createModeBox returning.");
-
+				+ ":createTabPaneLayout returning.");
+		return layout;
 	}
 
 	/**
-	 * This method creates all of the GUI elements of the resource-manager
-	 * specific pane within the parallel tab of the launch configuration dialog.
+	 * Create a text widget in the tabbed view. The text field spans columns 2
+	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
+	 * the attribute definition object.
 	 * 
 	 * @param parent
-	 *            This control's parent
+	 *            Parent widget (the pane in the tabbed view)
 	 * @param rm
-	 *            The resource manager associated with this launch configuration
-	 * @param queue
-	 *            Currently selected queue
+	 *            Resource manager used by this launch config
+	 * @param id
+	 *            Attribute id for rm attribute this widget represents
+	 * @return TextRowWidget entry widget
 	 */
-	public void createControl(Composite parent, IResourceManager rm,
-			IPQueue queue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createControl entered.");
-		IIBMLLResourceManagerConfiguration config;
-		IRemoteConnectionManager connMgr;
+	private TextRowWidget createTextWidget(Composite parent,
+			IResourceManager rm, String id) {
+		TextRowWidget widget;
+		IAttributeDefinition<?, ?, ?> attr;
 
-		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm)
-				.getConfiguration();
-		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-				config.getRemoteServicesId());
-		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
-				remoteService);
-		connMgr = remoteService.getConnectionManager();
-		remoteConnection = connMgr.getConnection(config.getConnectionName());
-		parentShell = parent.getShell();
-		clearAllWidgets();
-		activeWidgets = new Vector<Object>();
-		eventMonitor = new EventMonitor();
-		mainPanel = new Composite(parent, SWT.NONE);
-		mainPanel.setLayout(new GridLayout(1, false));
-		createModeBox(rm);
-		tabbedPane = new TabFolder(mainPanel, SWT.TOP);
-		createGeneralTab(rm);
-		createSchedulingBasicTab(rm);
-		createSchedulingRequirementsTab(rm);
-		createSchedulingResourcesTab(rm);
-		createRuntimeTab(rm);
-		createNodesNetworkTab(rm);
-		createLimitsTab(rm);
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":createTextWidget entered.");
+		widget = null;
+		attr = rm.getAttributeDefinition(id);
+		if (attr != null) {
+			widget = new TextRowWidget(parent, id, attr);
+			widget.addModifyListener(eventMonitor);
+			widget.setValidationRequired();
+			activeWidgets.add(widget);
+		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createControl returning.");
-		currentRM = rm;
+				+ ":createTextWidget returning.");
+		return widget;
 	}
 
 	/**
-	 * Add an attribute to the set of launch attributes if not same as default
-	 * sent from proxy
+	 * Disable the tab pane widget and all children of the tab pane. Calling
+	 * setEnabled(false) on the tab pane widget disables the tab pane and
+	 * prevents interaction with child widgets, but does not change the visible
+	 * state of the child widget. This method changes the state of all widgets
+	 * to correctly indicate they are disabled.
 	 * 
-	 * @param rm
-	 *            The resource manager associated with the current launch
-	 *            configuration
-	 * @param config
-	 *            The current launch configuration
-	 * @param attrs
-	 *            The attributes vector containing the set of launch attributes
-	 * @param attrName
-	 *            The name of the attribute to be added to launch attributes
+	 * @param widget
+	 *            The widget to be disabled.
 	 */
-	private void addAttribute(IResourceManager rm, ILaunchConfiguration config,
-			Vector<StringAttribute> attrs, String attrName) {
-		String attrValue;
-		String defaultValue;
-		StringAttribute attr;
-		StringAttributeDefinition attrDef;
+	private void disableTabPaneWidget(Control widget) {
+		Control children[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":addAttribute entered.");
-		if (rm.getAttributeDefinition(attrName) != null) {
-			try {
-				attrValue = config.getAttribute(attrName, "");
-			} catch (CoreException e) {
-				attrValue = "";
+				+ ":disableTabPaneWidget entered.");
+		// For any Composite widget, recursively call this method for each child
+		// of the Composite. This must be
+		// done before disabling the Composite since disabling the Composite
+		// also marks its children disabled
+		// and the real enable/disable state of the child cannot be preserved.
+		if (widget instanceof Composite) {
+			children = ((Composite) widget).getChildren();
+			for (int i = 0; i < children.length; i++) {
+				disableTabPaneWidget(children[i]);
 			}
-
-			defaultValue = getAttrDefaultValue(rm, attrName);
-
-			if ((attrValue.trim().length() > 0)
-					&& ((!attrValue.equals(defaultValue))
-							|| (attrName.equals("LL_PTP_JOB_TYPE"))
-							|| (attrName
-									.equals("LL_PTP_JOB_COMMAND_FILE_TEMPLATE"))
-							|| (attrName.equals("LL_PTP_SUBMIT_MODE"))
-							|| (attrName.equals("LL_PTP_CLASS"))
-							|| (attrName.equals("LL_PTP_INPUT"))
-							|| (attrName.equals("LL_PTP_OUTPUT"))
-							|| (attrName.equals("LL_PTP_ERROR"))
-							|| (attrName.equals("LL_PTP_ENVIRONMENT"))
-							|| (attrName.equals("LL_PTP_JOB_TYPE")) || (attrName
-							.equals("LL_PTP_JOB_COMMAND_FILE")))) {
-				attrDef = new StringAttributeDefinition(attrName, "", "",
-						false, "");
-				attr = new StringAttribute(attrDef, attrValue);
-				attrs.add(attr);
-			}
-
 		}
-
+		// Remember the current state of the widget, then disable it.
+		widget.setData(ENABLE_STATE, Boolean.valueOf(widget.isEnabled()));
+		widget.setEnabled(false);
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":addAttribute returning.");
+				+ ":disableTabPaneWidget returning.");
+	}
+
+	/**
+	 * Restore widget back to its previous enable/disable state
+	 * 
+	 * @param widget
+	 *            The widget whose state is to be restored.
+	 */
+	private void enableTabPaneWidgetState(Control widget) {
+		Control children[];
+		Boolean state;
+		boolean enableFlag;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":enableTabPaneWidgetState entered.");
+		// Enable the widget.
+		widget.setEnabled(true);
+		// Recursively call this method to handle children of a Composite
+		// widget. Note that ordering of processing
+		// here does not matter since enabling a Composite widget does not
+		// automatically enable its children.
+		if (widget instanceof Composite) {
+			children = ((Composite) widget).getChildren();
+			for (int i = 0; i < children.length; i++) {
+				enableTabPaneWidgetState(children[i]);
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":enableTabPaneWidgetState returning.");
+	}
+
+	/**
+	 * Get the default value for an attribute from the resource manager
+	 * 
+	 * @param rm
+	 *            The resource manager currently associated with the launch
+	 *            configuration
+	 * @param attrName
+	 *            The name of the attribute
+	 * @return The value of the attribute
+	 */
+	private String getAttrDefaultValue(IResourceManager rm, String attrName) {
+		IAttributeDefinition<?, ?, ?> attrDef;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":getAttrDefaultValue entered.");
+		attrDef = rm.getAttributeDefinition(attrName);
+		if (attrDef != null) {
+			try {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":getAttrDefaultValue returning.");
+				return attrDef.create().getValueAsString();
+			} catch (IllegalValueException e) {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":getAttrDefaultValue returning.");
+				return "";
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":getAttrDefaultValue returning.");
+		return "";
 	}
 
 	/**
@@ -1496,101 +1222,6 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":getAttributes returning.");
 		return attrs.toArray(attrArray);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getControl()
-	 */
-	public Control getControl() {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getControl entered.");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getControl returning.");
-		return mainPanel;
-	}
-
-	/**
-	 * Get the default value for an attribute from the resource manager, giving
-	 * preference to a user override of the default value (which the user does
-	 * by setting of the corresponding environment variable before starting the
-	 * proxy.) The user's override is passed to the front end by the proxy as a
-	 * string attribute where the leading 'MP_' of the attribute name is
-	 * replaced with 'EN_'
-	 * 
-	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
-	 * @param attrName
-	 *            The name of the attribute
-	 * @return The value of the attribute
-	 */
-	private String getAttrLocalDefaultValue(IResourceManager rm, String attrName) {
-		IAttributeDefinition<?, ?, ?> attrDef;
-		String localDefaultEnv;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getAttrLocalDefaultValue entered.");
-		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_");
-		attrDef = rm.getAttributeDefinition(localDefaultEnv);
-		if (attrDef != null) {
-			try {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrLocalDefaultValue returning.");
-				return attrDef.create().getValueAsString();
-			} catch (IllegalValueException e) {
-			}
-		}
-		attrDef = rm.getAttributeDefinition(attrName);
-		if (attrDef != null) {
-			try {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrLocalDefaultValue returning.");
-				return attrDef.create().getValueAsString();
-			} catch (IllegalValueException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrLocalDefaultValue returning.");
-				return "";
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getAttrLocalDefaultValue returning.");
-		return "";
-	}
-
-	/**
-	 * Get the default value for an attribute from the resource manager
-	 * 
-	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
-	 * @param attrName
-	 *            The name of the attribute
-	 * @return The value of the attribute
-	 */
-	private String getAttrDefaultValue(IResourceManager rm, String attrName) {
-		IAttributeDefinition<?, ?, ?> attrDef;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getAttrDefaultValue entered.");
-		attrDef = rm.getAttributeDefinition(attrName);
-		if (attrDef != null) {
-			try {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrDefaultValue returning.");
-				return attrDef.create().getValueAsString();
-			} catch (IllegalValueException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrDefaultValue returning.");
-				return "";
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getAttrDefaultValue returning.");
-		return "";
 	}
 
 	/**
@@ -1676,117 +1307,753 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	}
 
 	/**
-	 * Set checkbox to checked state if attribute has value equal to checkValue
-	 * otherwise set it unchecked
+	 * Get the default value for an attribute from the resource manager, giving
+	 * preference to a user override of the default value (which the user does
+	 * by setting of the corresponding environment variable before starting the
+	 * proxy.) The user's override is passed to the front end by the proxy as a
+	 * string attribute where the leading 'MP_' of the attribute name is
+	 * replaced with 'EN_'
 	 * 
-	 * @param checkbox
-	 *            The checkbox to set
-	 * @param attrValue
-	 *            The attribute value to check
-	 * @param checkValue
-	 *            The value corresponding to a checked checkbox
+	 * @param rm
+	 *            The resource manager currently associated with the launch
+	 *            configuration
+	 * @param attrName
+	 *            The name of the attribute
+	 * @return The value of the attribute
 	 */
-	private void setValue(CheckboxRowWidget checkbox, String attrValue,
-			String checkValue) {
+	private String getAttrLocalDefaultValue(IResourceManager rm, String attrName) {
+		IAttributeDefinition<?, ?, ?> attrDef;
+		String localDefaultEnv;
+
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
-		if (checkbox != null) {
-			if (attrValue.equals(checkValue)) {
-				checkbox.setSelection(true);
-			} else {
-				checkbox.setSelection(false);
+				+ ":getAttrLocalDefaultValue entered.");
+		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_");
+		attrDef = rm.getAttributeDefinition(localDefaultEnv);
+		if (attrDef != null) {
+			try {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":getAttrLocalDefaultValue returning.");
+				return attrDef.create().getValueAsString();
+			} catch (IllegalValueException e) {
+			}
+		}
+		attrDef = rm.getAttributeDefinition(attrName);
+		if (attrDef != null) {
+			try {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":getAttrLocalDefaultValue returning.");
+				return attrDef.create().getValueAsString();
+			} catch (IllegalValueException e) {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":getAttrLocalDefaultValue returning.");
+				return "";
 			}
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+				+ ":getAttrLocalDefaultValue returning.");
+		return "";
 	}
 
-	private void setValue(BooleanRowWidget option, String checkValue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
-		if (option != null) {
-			option.setValue(checkValue);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
-	}
-
-	/**
-	 * Set the text value for a Text widget to the specified value if the widget
-	 * is not null.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param widget
-	 *            The widget to set
-	 * @param value
-	 *            The value to be set
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #getControl()
 	 */
-	private void setValue(TextRowWidget widget, String value) {
+	public Control getControl() {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
-		if (widget != null) {
-			widget.setValue(value);
-		}
+				+ ":getControl entered.");
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+				+ ":getControl returning.");
+		return mainPanel;
 	}
 
 	/**
-	 * Set the text value for a DualField widget to the specified value if the
-	 * widget is not null.
-	 * 
-	 * @param widget
-	 *            The widget to set
-	 * @param value1
-	 *            The value to be set in field 1
-	 * @param value2
-	 *            The value to be set in field 2
-	 */
-	private void setValue(DualFieldRowWidget widget, String value1,
-			String value2) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
-		if (widget != null) {
-			widget.setValue(value1, value2);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
-	}
-
-	/**
-	 * Set the text value for a ComboRowWidget to the specified value if the
-	 * widget is not null.
-	 * 
-	 * @param widget
-	 *            The widget to set
-	 * @param value
-	 *            The value to be set
-	 */
-	private void setValue(ComboRowWidget widget, String value) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
-		if (widget != null) {
-			widget.setValue(value);
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
-	}
-
-	/**
-	 * Set the pathname for a file selector if the file selector is not null
+	 * Display a directory selector dialog prompting the user for the pathname
+	 * of a directory. If the user clocks 'ok', then set the pathname into the
+	 * text field of the specified FileSelector.
 	 * 
 	 * @param selector
-	 *            File selector to be updated
-	 * @param path
-	 *            Pathname
+	 *            FileSelector object to be updated
+	 * @param titleID
+	 *            Title for the dialog
+	 * @param pathAttrID
+	 *            Launch configuration attribute id for saving path info
 	 */
-	private void setValue(FileSelectorRowWidget selector, String path) {
+	protected void getDirectory(FileSelectorRowWidget selector, String titleID,
+			String pathAttrID) {
+		String selectedFile = null;
+
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
-		if (selector != null) {
-			selector.setPath(path);
+				+ ":getDirectory entered.");
+		if (remoteUIService != null) {
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseDirectory(parentShell,
+					Messages.getString(titleID), getFileDialogPath(pathAttrID),
+					0).toString();
+		}
+		if (selectedFile != null) {
+			String parentDir;
+
+			parentDir = new File(selectedFile).getParent();
+			if (parentDir == null) {
+				saveFileDialogPath(pathAttrID, "/");
+			} else {
+				saveFileDialogPath(pathAttrID, parentDir);
+			}
+			selector.setPath(selectedFile);
+			selector.setFocus();
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+				+ ":getDirectory returning.");
+	}
+
+	/**
+	 * Get the directory path from the launch configuration
+	 * 
+	 * @param attrName
+	 *            Launch configuration attribute name for this directory
+	 * @return Directory path
+	 */
+	private String getFileDialogPath(String attrName) {
+		String dir;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":getFileDialogPath entered.");
+		dir = "/";
+		if (currentLaunchConfig != null) {
+			try {
+				dir = currentLaunchConfig.getAttribute(attrName, "/");
+			} catch (CoreException e) {
+				dir = "/";
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":getFileDialogPath returning.");
+		return dir;
+	}
+
+	/**
+	 * Display a file selector dialog prompting the user for the path of an
+	 * input file. If the user clicks 'open', then set the pathname into the
+	 * text field of the specified FileSelector object.
+	 * 
+	 * @param selector
+	 *            The FileSelector object to hold path name
+	 * @param titleID
+	 *            Title for the dialog
+	 * @param pathAttrID
+	 *            Launch configuration attribute id for saving path info
+	 */
+	protected void getInputFile(FileSelectorRowWidget selector, String titleID,
+			String pathAttrID) {
+		String selectedFile = null;
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":getInputFile entered.");
+		if (remoteUIService != null) {
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseFile(parentShell, Messages
+					.getString(titleID), getFileDialogPath(pathAttrID), 0);
+		}
+		if (selectedFile != null) {
+			saveFileDialogPath(pathAttrID, selectedFile);
+			selector.setPath(selectedFile);
+			selector.setFocus();
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":getInputFile returning.");
+	}
+
+	/**
+	 * Convert a string which may have a suffix 'k', 'm' or 'g' to it's actual
+	 * numeric value, multiplying by the appropriate multiplier
+	 * 
+	 * @param value
+	 *            The number to be converted
+	 * @return The converted number
+	 */
+	private String getIntegerValue(String value) {
+		int testValue;
+		int len;
+		char suffix;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":getIntegerValue entered.");
+		testValue = 0;
+		len = value.length();
+		if (len == 0) {
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+					+ ":getIntegerValue returning.");
+			return "";
+		} else {
+			suffix = value.charAt(len - 1);
+			if (Character.isDigit(suffix)) {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":getIntegerValue returning.");
+				return value;
+			} else {
+				if (len >= 2) {
+					testValue = Integer.valueOf(value.substring(0, len - 1));
+					if ((suffix == 'G') || (suffix == 'g')) {
+						testValue = testValue * GBYTE;
+					} else if ((suffix == 'M') || (suffix == 'm')) {
+						testValue = testValue * MBYTE;
+					} else if ((suffix == 'K') || (suffix == 'k')) {
+						testValue = testValue * KBYTE;
+					} else {
+						print_message(TRACE_MESSAGE, "<<< "
+								+ this.getClass().getName()
+								+ ":getIntegerValue returning.");
+						return "";
+					}
+				}
+			}
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+					+ ":getIntegerValue returning.");
+			return String.valueOf(testValue);
+		}
+	}
+
+	/**
+	 * Display a file selector dialog prompting the user for the path of an
+	 * output file. If the user clicks 'save', then set the pathname into the
+	 * text field of the specified FileSelector object.
+	 * 
+	 * @param selector
+	 *            The FileSelector object to hold path name
+	 * @param titleID
+	 *            Title for the dialog
+	 * @param pathAttrID
+	 *            Launch configuration attribute id for saving path info
+	 */
+	protected void getOutputFile(FileSelectorRowWidget selector,
+			String titleID, String pathAttrID) {
+		String selectedFile = null;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":getOutputFile entered.");
+		if (remoteUIService != null) {
+			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
+			fmgr.setConnection(remoteConnection);
+			selectedFile = fmgr.browseFile(parentShell, Messages
+					.getString(titleID), getFileDialogPath(pathAttrID), 0);
+		}
+		if (selectedFile != null) {
+			saveFileDialogPath(pathAttrID, selectedFile);
+			selector.setPath(selectedFile);
+			selector.setFocus();
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":getOutputFile returning.");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public RMLaunchValidation initializeFrom(Control control,
+			IResourceManager rm, IPQueue queue,
+			ILaunchConfiguration configuration) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":initializeFrom entered.");
+		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
+			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
+		}
+		setInitialValues(configuration, rm);
+		setInitialWidgetState();
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":initializeFrom returning.");
+		return success;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 */
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration,
+			IResourceManager rm, IPQueue queue) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":isValid entered.");
+		if (allFieldsValid) {
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+					+ ":isValid returning.");
+			return success;
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":isValid returning.");
+		return new RMLaunchValidation(false, errorMessage);
+	}
+
+	/**
+	 * Verify that the value selected or entered in an editable combobox is a
+	 * valid value, as determined by checking the attribute definition for the
+	 * attribute.
+	 * 
+	 * @param widget
+	 *            The combobox to be checked
+	 * @param attrName
+	 *            The attribute name
+	 * @return true if the value is a valid selection, false otherwise
+	 */
+	private boolean isValidListSelection(ComboRowWidget widget, String attrName) {
+		StringSetAttributeDefinition attrDef;
+		@SuppressWarnings("unused")
+		StringSetAttribute attr;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":isValidListSelection entered.");
+		attrDef = (StringSetAttributeDefinition) currentRM
+				.getAttributeDefinition(attrName);
+		if (attrDef != null) {
+			try {
+				attr = attrDef.create(widget.getValue());
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":isValidListSelection returning.");
+				return true;
+			} catch (IllegalValueException e) {
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+						+ ":isValidListSelection returning.");
+				return false;
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":isValidListSelection returning.");
+		return true;
+	}
+
+	/**
+	 * Mark all widget's validation state to indicate that the widget value has
+	 * changed, meaning validation is required.
+	 */
+	private void markAllFieldsChanged() {
+		Iterator<Object> i;
+
+		i = activeWidgets.iterator();
+		while (i.hasNext()) {
+			Object widget;
+
+			widget = i.next();
+			if (widget instanceof BooleanRowWidget) {
+				((BooleanRowWidget) widget).setValidationRequired();
+			} else if (widget instanceof CheckboxRowWidget) {
+				((CheckboxRowWidget) widget).setValidationRequired();
+			} else if (widget instanceof ComboRowWidget) {
+				((ComboRowWidget) widget).setValidationRequired();
+			} else if (widget instanceof DualFieldRowWidget) {
+				((DualFieldRowWidget) widget).setValidationRequired();
+			} else if (widget instanceof FileSelectorRowWidget) {
+				((FileSelectorRowWidget) widget).setValidationRequired();
+			} else if (widget instanceof TextRowWidget) {
+				((TextRowWidget) widget).setValidationRequired();
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 */
+	public RMLaunchValidation performApply(
+			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
+			IPQueue queue) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":performApply entered.");
+		currentLaunchConfig = configuration;
+		saveConfigurationData(configuration, rm);
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":performApply returning.");
+		return new RMLaunchValidation(true, "");
+	}
+
+	/**
+	 * Print a message: Info, Trace, Arg and Warning messages go to stdout.
+	 * Error and Fatal messages go to stderr. *
+	 */
+	private void print_message(int type, String message) {
+		switch (type) {
+		case INFO_MESSAGE:
+			if (state_info == 1) {
+				System.out.println("Info: " + message);
+			}
+			break;
+		case TRACE_MESSAGE:
+			if (state_trace == 1) {
+				System.out.println("Trace: " + message);
+			}
+			break;
+		case WARNING_MESSAGE:
+			if (state_warning == 1) {
+				System.out.println("Warning: " + message);
+			}
+			break;
+		case ARGS_MESSAGE:
+			if (state_args == 1) {
+				System.out.println("Args: " + message);
+			}
+			break;
+		case ERROR_MESSAGE:
+			if (state_error == 1) {
+				System.err.println("Error: " + message);
+			}
+			break;
+		case FATAL_MESSAGE:
+			if (state_fatal == 1) {
+				System.err.println("Fatal " + message);
+			}
+			break;
+		default:
+			System.out.println(message);
+			break;
+		}
+	}
+
+	/**
+	 * Restore widget back to its previous enable/disable state
+	 * 
+	 * @param widget
+	 *            The widget whose state is to be restored.
+	 */
+	private void restoreTabPaneWidgetState(Control widget) {
+		Control children[];
+		Boolean state;
+		boolean enableFlag;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":restoreTabPaneWidgetState entered.");
+		// Get widget's previous enable/disable state. If there is no saved
+		// state, such as when initially
+		// creating the parallel tab in basic mode, then enable the widget.
+		state = (Boolean) widget.getData(ENABLE_STATE);
+		if (state == null) {
+			enableFlag = true;
+		} else {
+			enableFlag = state.booleanValue();
+		}
+		widget.setEnabled(enableFlag);
+		// Recursively call this method to handle children of a Composite
+		// widget. Note that ordering of processing
+		// here does not matter since enabling a Composite widget does not
+		// automatically enable its children.
+		if (widget instanceof Composite) {
+			children = ((Composite) widget).getChildren();
+			for (int i = 0; i < children.length; i++) {
+				restoreTabPaneWidgetState(children[i]);
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":restoreTabPaneWidgetState returning.");
+	}
+
+	/**
+	 * Save the values entered in this panel in the launch configuration
+	 * 
+	 * @param config
+	 */
+	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config,
+			IResourceManager rm) {
+		Object widget;
+		Iterator<Object> i;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":saveConfigurationData entered.");
+		i = activeWidgets.iterator();
+		while (i.hasNext()) {
+			widget = i.next();
+			if (widget instanceof TextRowWidget) {
+				setConfigAttr(config, rm, ((TextRowWidget) widget)
+						.getData(WidgetAttributes.ATTR_NAME),
+						(TextRowWidget) widget);
+			} else if (widget instanceof ComboRowWidget) {
+				setConfigAttr(config, (String) ((ComboRowWidget) widget)
+						.getData(WidgetAttributes.ATTR_NAME),
+						(ComboRowWidget) widget);
+			} else if (widget instanceof CheckboxRowWidget) {
+				setConfigAttr(config, (String) ((CheckboxRowWidget) widget)
+						.getData(WidgetAttributes.ATTR_NAME),
+						(CheckboxRowWidget) widget, "yes", "no");
+			} else if (widget instanceof BooleanRowWidget) {
+				setConfigAttr(config, (String) ((BooleanRowWidget) widget)
+						.getData(), (BooleanRowWidget) widget);
+			} else if (widget instanceof FileSelectorRowWidget) {
+				setConfigAttr(config, (String) ((FileSelectorRowWidget) widget)
+						.getData(), (FileSelectorRowWidget) widget);
+			} else if (widget instanceof DualFieldRowWidget) {
+				setConfigAttr(config, (String) ((DualFieldRowWidget) widget)
+						.getData1(), (String) ((DualFieldRowWidget) widget)
+						.getData2(), (DualFieldRowWidget) widget);
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":saveConfigurationData returning.");
+	}
+
+	/**
+	 * Save directory path in the launch configuration
+	 * 
+	 * @param attrName
+	 *            Launch configuration attribute name for this directory
+	 * @param path
+	 *            Directory path
+	 */
+	private void saveFileDialogPath(String attrName, String path) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":saveFileDialogPath entered.");
+		if (currentLaunchConfig != null) {
+			currentLaunchConfig.setAttribute(attrName, path);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":saveFileDialogPath returning.");
+	}
+
+	/**
+	 * Store the value from a Text widget into the specified launch
+	 * configuration if the widget is not null
+	 * 
+	 * @param config
+	 *            The launch configuration
+	 * @param rm
+	 *            The resource manager currently used by the launch
+	 *            configuration
+	 * @param attr
+	 *            The name of the attribute
+	 * @param control
+	 *            The widget to obtain the value from
+	 */
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
+			IResourceManager rm, String attr, TextRowWidget control) {
+		IAttributeDefinition<?, ?, ?> attrDef;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setConfigAttr entered.");
+		if (control != null) {
+			String attrValue;
+
+			attrDef = rm.getAttributeDefinition(attr);
+			try {
+				if ((attrDef instanceof IntegerAttributeDefinition)
+						|| (attrDef instanceof BigIntegerAttributeDefinition)) {
+					attrValue = getIntegerValue(control.getValue());
+				} else {
+					attrValue = control.getValue();
+				}
+				config.setAttribute(attr, attrValue);
+			} catch (NumberFormatException e) {
+				// If the field has an invalid numeric value, then don't save it
+				// in the launch configuration
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setConfigAttr returning.");
+	}
+
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
+			String attr, BooleanRowWidget control) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setConfigAttr entered.");
+		if (control != null) {
+			config.setAttribute(attr, control.getValue());
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setConfigAttr returning.");
+	}
+
+	/**
+	 * Store the value from a Button widget into the specified launch
+	 * configuration if the widget is not null
+	 * 
+	 * @param config
+	 *            The launch configuration
+	 * @param attr
+	 *            The name of the attribute
+	 * @param control
+	 *            The widget to obtain the value from
+	 * @param trueVal
+	 *            The value to set if the button is selected
+	 */
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
+			String attr, CheckboxRowWidget control, String trueVal,
+			String falseVal) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setConfigAttr entered.");
+		if (control != null) {
+			config.setAttribute(attr, (control.getSelection() ? trueVal
+					: falseVal));
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setConfigAttr returning.");
+	}
+
+	/**
+	 * Store the value from a ComboRowWidget into the specified launch
+	 * configuration if the widget is not null
+	 * 
+	 * @param config
+	 *            The launch configuration
+	 * @param attr
+	 *            The name of the attribute
+	 * @param control
+	 *            The widget to obtain the value from
+	 */
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
+			String attr, ComboRowWidget control) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setConfigAttr entered.");
+		if (control != null) {
+			config.setAttribute(attr, control.getValue());
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setConfigAttr returning.");
+	}
+
+	/**
+	 * Store the value from a file selector into the specified launch
+	 * configuration if the file selector is not null
+	 * 
+	 * @param config
+	 *            The launch configuration
+	 * @param attr
+	 *            The name of the attribute
+	 * @param control
+	 *            The widget to obtain the value from
+	 */
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
+			String attr, FileSelectorRowWidget control) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setConfigAttr entered.");
+		if (control != null) {
+			config.setAttribute(attr, control.getValue());
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setConfigAttr returning.");
+	}
+
+	/**
+	 * Store the value from a DialField widget into the specified launch
+	 * configuration if the widget is not null
+	 * 
+	 * @param config
+	 *            The launch configuration
+	 * @param attr
+	 *            The name of the attribute
+	 * @param control
+	 *            The widget to obtain the value from
+	 */
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
+			String attr1, String attr2, DualFieldRowWidget control) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setConfigAttr entered.");
+		if (control != null) {
+			String value[];
+
+			value = control.getValue();
+			config.setAttribute(attr1, value[0].trim());
+			config.setAttribute(attr2, value[1].trim());
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setConfigAttr returning.");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 */
+	public RMLaunchValidation setDefaults(
+			ILaunchConfigurationWorkingCopy config, IResourceManager rm,
+			IPQueue queue) {
+		IAttribute<?, ?, ?> rmAttrs[];
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setDefaults entered.");
+		currentLaunchConfig = config;
+		rmAttrs = rm.getAttributes();
+		for (int i = 0; i < rmAttrs.length; i++) {
+			try {
+				config.setAttribute(rmAttrs[i].getDefinition().getId(),
+						rmAttrs[i].getDefinition().create().getValueAsString());
+			} catch (IllegalValueException e) {
+			}
+		}
+		// setDefaultValues(config, rm);
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setDefaults returning.");
+		return success;
+	}
+
+	/**
+	 * Mark the validation state for the specified widget to indicate that the
+	 * widget value must be validated.
+	 * 
+	 * @param source
+	 *            The widget to validate.
+	 */
+	protected void setFieldValidationRequired(Widget source) {
+		// Iterate thru the list of widgets looking for the widget which needs
+		// to be validated. When found, set
+		// that widget's validation state to indicate validation is needed.
+		// Widget class needs
+		// to be checked since although these widgets perform similar functions,
+		// they do not comprise a set of
+		// logically related widgets that can be easily organized in a class
+		// hierarchy.
+		Iterator<Object> i;
+
+		i = activeWidgets.iterator();
+		while (i.hasNext()) {
+			Object widget;
+
+			widget = i.next();
+			if (widget instanceof BooleanRowWidget) {
+				if (((BooleanRowWidget) widget).isMatchingWidget(source)) {
+					((BooleanRowWidget) widget).setValidationRequired();
+					return;
+				}
+			} else if (widget instanceof CheckboxRowWidget) {
+				if (((CheckboxRowWidget) widget).isMatchingWidget(source)) {
+					((CheckboxRowWidget) widget).setValidationRequired();
+					return;
+				}
+			} else if (widget instanceof ComboRowWidget) {
+				if (((ComboRowWidget) widget).isMatchingWidget(source)) {
+					((ComboRowWidget) widget).setValidationRequired();
+					return;
+				}
+			} else if (widget instanceof DualFieldRowWidget) {
+				if (((DualFieldRowWidget) widget).isMatchingWidget(source)) {
+					((DualFieldRowWidget) widget).setValidationRequired();
+					return;
+				}
+			} else if (widget instanceof FileSelectorRowWidget) {
+				if (((FileSelectorRowWidget) widget).isMatchingWidget(source)) {
+					((FileSelectorRowWidget) widget).setValidationRequired();
+					return;
+				}
+			} else if (widget instanceof TextRowWidget) {
+				if (((TextRowWidget) widget).isMatchingWidget(source)) {
+					((TextRowWidget) widget).setValidationRequired();
+					return;
+				}
+			}
+		}
 	}
 
 	/**
@@ -1880,291 +2147,150 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":setInitialWidgetState returning.");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
-	 */
-	public RMLaunchValidation initializeFrom(Control control,
-			IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":initializeFrom entered.");
-		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
-			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
-		}
-		setInitialValues(configuration, rm);
-		setInitialWidgetState();
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":initializeFrom returning.");
-		return success;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
-	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration,
-			IResourceManager rm, IPQueue queue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":isValid entered.");
-		if (allFieldsValid) {
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":isValid returning.");
-			return success;
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":isValid returning.");
-		return new RMLaunchValidation(false, errorMessage);
-	}
-
 	/**
-	 * Store the value from a Text widget into the specified launch
-	 * configuration if the widget is not null
-	 * 
-	 * @param config
-	 *            The launch configuration
-	 * @param rm
-	 *            The resource manager currently used by the launch
-	 *            configuration
-	 * @param attr
-	 *            The name of the attribute
-	 * @param control
-	 *            The widget to obtain the value from
+	 * Set launch panel mode based on llSubmitMode setting. If checked, then set
+	 * submit mode, where the user supplies a LL setup script. Otherwise set
+	 * basic mode, where the user chooses LL options from a tabbed dialog panel.
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			IResourceManager rm, String attr, TextRowWidget control) {
-		IAttributeDefinition<?, ?, ?> attrDef;
-
+	protected void setLaunchPanelMode() {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
-		if (control != null) {
-			String attrValue;
-
-			attrDef = rm.getAttributeDefinition(attr);
-			try {
-				if ((attrDef instanceof IntegerAttributeDefinition)
-						|| (attrDef instanceof BigIntegerAttributeDefinition)) {
-					attrValue = getIntegerValue(control.getValue());
-				} else {
-					attrValue = control.getValue();
+				+ ":setLaunchPanelMode entered.");
+		if (llSubmitMode != null) {
+			if (llSubmitMode.getValue().equals("Advanced")) {
+				if (llJobCommandFile != null) {
+					llJobCommandFile.setEnabled(true);
 				}
-				config.setAttribute(attr, attrValue);
-			} catch (NumberFormatException e) {
-				// If the field has an invalid numeric value, then don't save it
-				// in the launch configuration
+				if (llJobCommandFileTemplate != null) {
+					llJobCommandFileTemplate.setEnabled(false);
+				}
+				disableTabPaneWidget(tabbedPane);
+			} else {
+				if (llJobCommandFile != null) {
+					llJobCommandFile.setEnabled(false);
+				}
+				if (llJobCommandFileTemplate != null) {
+					llJobCommandFileTemplate.setEnabled(true);
+				}
+				enableTabPaneWidgetState(tabbedPane);
 			}
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+				+ ":setLaunchPanelMode returning.");
+
+	}
+
+	private void setValue(BooleanRowWidget option, String checkValue) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setValue entered.");
+		if (option != null) {
+			option.setValue(checkValue);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setValue returning.");
 	}
 
 	/**
-	 * Store the value from a DialField widget into the specified launch
-	 * configuration if the widget is not null
+	 * Set checkbox to checked state if attribute has value equal to checkValue
+	 * otherwise set it unchecked
 	 * 
-	 * @param config
-	 *            The launch configuration
-	 * @param attr
-	 *            The name of the attribute
-	 * @param control
-	 *            The widget to obtain the value from
+	 * @param checkbox
+	 *            The checkbox to set
+	 * @param attrValue
+	 *            The attribute value to check
+	 * @param checkValue
+	 *            The value corresponding to a checked checkbox
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr1, String attr2, DualFieldRowWidget control) {
+	private void setValue(CheckboxRowWidget checkbox, String attrValue,
+			String checkValue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
-		if (control != null) {
-			String value[];
-
-			value = control.getValue();
-			config.setAttribute(attr1, value[0].trim());
-			config.setAttribute(attr2, value[1].trim());
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
-	}
-
-	/**
-	 * Store the value from a ComboRowWidget into the specified launch
-	 * configuration if the widget is not null
-	 * 
-	 * @param config
-	 *            The launch configuration
-	 * @param attr
-	 *            The name of the attribute
-	 * @param control
-	 *            The widget to obtain the value from
-	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, ComboRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
-		if (control != null) {
-			config.setAttribute(attr, control.getValue());
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
-	}
-
-	/**
-	 * Store the value from a file selector into the specified launch
-	 * configuration if the file selector is not null
-	 * 
-	 * @param config
-	 *            The launch configuration
-	 * @param attr
-	 *            The name of the attribute
-	 * @param control
-	 *            The widget to obtain the value from
-	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, FileSelectorRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
-		if (control != null) {
-			config.setAttribute(attr, control.getValue());
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
-	}
-
-	/**
-	 * Store the value from a Button widget into the specified launch
-	 * configuration if the widget is not null
-	 * 
-	 * @param config
-	 *            The launch configuration
-	 * @param attr
-	 *            The name of the attribute
-	 * @param control
-	 *            The widget to obtain the value from
-	 * @param trueVal
-	 *            The value to set if the button is selected
-	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, CheckboxRowWidget control, String trueVal,
-			String falseVal) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
-		if (control != null) {
-			config.setAttribute(attr, (control.getSelection() ? trueVal
-					: falseVal));
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
-	}
-
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, BooleanRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
-		if (control != null) {
-			config.setAttribute(attr, control.getValue());
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
-	}
-
-	/**
-	 * Save the values entered in this panel in the launch configuration
-	 * 
-	 * @param config
-	 */
-	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config,
-			IResourceManager rm) {
-		Object widget;
-		Iterator<Object> i;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":saveConfigurationData entered.");
-		i = activeWidgets.iterator();
-		while (i.hasNext()) {
-			widget = i.next();
-			if (widget instanceof TextRowWidget) {
-				setConfigAttr(config, rm, ((TextRowWidget) widget)
-						.getData(WidgetAttributes.ATTR_NAME),
-						(TextRowWidget) widget);
-			} else if (widget instanceof ComboRowWidget) {
-				setConfigAttr(config, (String) ((ComboRowWidget) widget)
-						.getData(WidgetAttributes.ATTR_NAME),
-						(ComboRowWidget) widget);
-			} else if (widget instanceof CheckboxRowWidget) {
-				setConfigAttr(config, (String) ((CheckboxRowWidget) widget)
-						.getData(WidgetAttributes.ATTR_NAME),
-						(CheckboxRowWidget) widget, "yes", "no");
-			} else if (widget instanceof BooleanRowWidget) {
-				setConfigAttr(config, (String) ((BooleanRowWidget) widget)
-						.getData(), (BooleanRowWidget) widget);
-			} else if (widget instanceof FileSelectorRowWidget) {
-				setConfigAttr(config, (String) ((FileSelectorRowWidget) widget)
-						.getData(), (FileSelectorRowWidget) widget);
-			} else if (widget instanceof DualFieldRowWidget) {
-				setConfigAttr(config, (String) ((DualFieldRowWidget) widget)
-						.getData1(), (String) ((DualFieldRowWidget) widget)
-						.getData2(), (DualFieldRowWidget) widget);
+				+ ":setValue entered.");
+		if (checkbox != null) {
+			if (attrValue.equals(checkValue)) {
+				checkbox.setSelection(true);
+			} else {
+				checkbox.setSelection(false);
 			}
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":saveConfigurationData returning.");
+				+ ":setValue returning.");
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Set the text value for a ComboRowWidget to the specified value if the
+	 * widget is not null.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @param widget
+	 *            The widget to set
+	 * @param value
+	 *            The value to be set
 	 */
-	public RMLaunchValidation performApply(
-			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue) {
+	private void setValue(ComboRowWidget widget, String value) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":performApply entered.");
-		currentLaunchConfig = configuration;
-		saveConfigurationData(configuration, rm);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":performApply returning.");
-		return new RMLaunchValidation(true, "");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
-	 */
-	public RMLaunchValidation setDefaults(
-			ILaunchConfigurationWorkingCopy config, IResourceManager rm,
-			IPQueue queue) {
-		IAttribute<?, ?, ?> rmAttrs[];
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setDefaults entered.");
-		currentLaunchConfig = config;
-		rmAttrs = rm.getAttributes();
-		for (int i = 0; i < rmAttrs.length; i++) {
-			try {
-				config.setAttribute(rmAttrs[i].getDefinition().getId(),
-						rmAttrs[i].getDefinition().create().getValueAsString());
-			} catch (IllegalValueException e) {
-			}
+				+ ":setValue entered.");
+		if (widget != null) {
+			widget.setValue(value);
 		}
-		// setDefaultValues(config, rm);
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setDefaults returning.");
-		return success;
+				+ ":setValue returning.");
+	}
+
+	/**
+	 * Set the text value for a DualField widget to the specified value if the
+	 * widget is not null.
+	 * 
+	 * @param widget
+	 *            The widget to set
+	 * @param value1
+	 *            The value to be set in field 1
+	 * @param value2
+	 *            The value to be set in field 2
+	 */
+	private void setValue(DualFieldRowWidget widget, String value1,
+			String value2) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setValue entered.");
+		if (widget != null) {
+			widget.setValue(value1, value2);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setValue returning.");
+	}
+
+	/**
+	 * Set the pathname for a file selector if the file selector is not null
+	 * 
+	 * @param selector
+	 *            File selector to be updated
+	 * @param path
+	 *            Pathname
+	 */
+	private void setValue(FileSelectorRowWidget selector, String path) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setValue entered.");
+		if (selector != null) {
+			selector.setPath(path);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setValue returning.");
+	}
+
+	/**
+	 * Set the text value for a Text widget to the specified value if the widget
+	 * is not null.
+	 * 
+	 * @param widget
+	 *            The widget to set
+	 * @param value
+	 *            The value to be set
+	 */
+	private void setValue(TextRowWidget widget, String value) {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":setValue entered.");
+		if (widget != null) {
+			widget.setValue(value);
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":setValue returning.");
 	}
 
 	/**
@@ -2224,6 +2350,146 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validateAllFields returning.");
 	}
 
+	private void validateAlphaNumeric(String value, String errorID)
+			throws ValidationException {
+		int i;
+		String stripped = value.trim();
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateAlphaNumeric entered.");
+		for (i = 0; i < stripped.length(); i++) {
+			if (stripped.matches("[a-zA-Z_0-9]*") == false) {
+				throw new ValidationException(Messages.getString(errorID));
+			}
+		}
+
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateAlphaNumeric returning.");
+	}
+
+	private void validateAlphaNumeric(TextRowWidget control, String errorID)
+			throws ValidationException {
+		String value;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateAlphaNumeric entered.");
+		if (control != null) {
+			value = control.getValue();
+			if (value.length() > 0) {
+				validateAlphaNumeric(value, errorID);
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateAlphaNumeric returning.");
+	}
+
+	private void validateClockValue(String value, String errorID)
+			throws ValidationException {
+		int i;
+		String stripped = value.trim();
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateClockValue entered.");
+		for (i = 0; i < stripped.length(); i++) {
+			if (stripped.matches("[0-9]+(:[0-9]+){0,2}") == false) {
+				throw new ValidationException(Messages.getString(errorID));
+			}
+		}
+
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateClockValue returning.");
+	}
+
+	private void validateClockValue(TextRowWidget control, String errorID)
+			throws ValidationException {
+		String value;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateClockValue entered.");
+		if (control != null) {
+			value = control.getValue();
+			if (value.length() > 0) {
+				validateClockValue(value, errorID);
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateClockValue returning.");
+	}
+
+	/**
+	 * Validate that the directory pathname is valid
+	 * 
+	 * @param selector
+	 *            File selector containing the directory name
+	 * @param errorID
+	 *            id of the error string used if the directory is invalid
+	 * @throws ValidationException
+	 * @throws IOException
+	 */
+	private void validateDirectory(FileSelectorRowWidget selector,
+			String errorID) throws ValidationException {
+		String path;
+		IPath testPath;
+		IFileStore remoteResource;
+		IFileInfo fileInfo;
+
+		if ((selector != null) && selector.isEnabled()
+				&& selector.isValidationRequired()) {
+			path = selector.getValue();
+			try {
+				if (path.length() == 0) {
+					selector.resetValidationState();
+					return;
+				}
+
+				testPath = new Path(path);
+				if (!testPath.isValidPath(path)) {
+					throw new ValidationException(Messages.getString(errorID));
+				}
+				remoteResource = remoteService.getFileManager(remoteConnection)
+						.getResource(testPath.toString());
+				fileInfo = remoteResource.fetchInfo();
+				if (!fileInfo.isDirectory()) {
+					throw new ValidationException(Messages.getString(errorID));
+				}
+				selector.resetValidationState();
+			} catch (ValidationException e) {
+				selector.setFieldInError();
+				throw e;
+			}
+		}
+	}
+
+	/**
+	 * Validate that an output file is accessible
+	 * 
+	 * @param selector
+	 *            The file selector containing the pathname
+	 * @param errorID
+	 *            id of the error string used if the file is inaccessible
+	 * @throws ValidationException
+	 */
+	// private void validateOutputPath(FileSelectorRowWidget selector,
+	// String errorID) throws ValidationException {
+	// String path;
+	//
+	// if ((selector != null) && selector.isEnabled()
+	// && selector.isValidationRequired()) {
+	// path = selector.getValue();
+	// if (path.length() == 0) {
+	// selector.resetValidationState();
+	// return;
+	// }
+	// try {
+	// validateOutputPath(path, errorID);
+	// selector.resetValidationState();
+	// } catch (ValidationException e) {
+	// selector.setFieldInError();
+	// throw e;
+	// }
+	// }
+	// }
+
 	/**
 	 * Validate fields in task specification tab
 	 * 
@@ -2238,79 +2504,109 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in the I/O tab, top to
-	 * bottom
+	 * Validate that an input file is accessible
 	 * 
+	 * @param selector
+	 *            The file selector containing the pathname
+	 * @param errorID
+	 *            id of the error string used if file is inaccessible
 	 * @throws ValidationException
 	 */
-	private void validateSchedulingBasicTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateSchedulingBasicTab entered.");
-		validateAlphaNumeric(llClass, "Invalid.llClass");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateSchedulingBasicTab returning.");
+	private void validateInputPath(FileSelectorRowWidget selector,
+			String errorID) throws ValidationException {
+		String path;
+
+		if ((selector != null) && selector.isEnabled()
+				&& selector.isValidationRequired()) {
+			path = selector.getValue();
+			if (path.length() == 0) {
+				selector.resetValidationState();
+				return;
+			}
+			try {
+				validateInputPath(path, errorID);
+				selector.resetValidationState();
+			} catch (ValidationException e) {
+				selector.setFieldInError();
+				throw e;
+			}
+		}
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in diagnostic tab, top to
-	 * bottom
+	 * Validate that in input file is accessible
 	 * 
+	 * @param path
+	 *            Pathname of the input file
+	 * @param errorID
+	 *            id of the error string used if the file is inaccessible
 	 * @throws ValidationException
+	 * @throws IOException
 	 */
-	private void validateSchedulingRequirementsTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateSchedulingRequirementsTab entered.");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateSchedulingRequirementsTab returning.");
+	private void validateInputPath(String path, String errorID)
+			throws ValidationException {
+		IPath testPath;
+		IFileStore remoteResource;
+		IFileInfo fileInfo;
+
+		testPath = new Path(path);
+		if (!testPath.isValidPath(path)) {
+			throw new ValidationException(Messages.getString(errorID));
+		}
+		remoteResource = remoteService.getFileManager(remoteConnection)
+				.getResource(testPath.toString());
+		fileInfo = remoteResource.fetchInfo();
+		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
+			throw new ValidationException(Messages.getString(errorID));
+		}
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in the debug tab, top to
-	 * bottom
+	 * Validate all text and editable combobox fields in performance tab 1, top
+	 * to bottom
 	 * 
 	 * @throws ValidationException
 	 */
-	private void validateSchedulingResourcesTab() throws ValidationException {
+	private void validateLimitsTab() throws ValidationException {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateSchedulingResourcesTab entered.");
+				+ ":validateLimitsTab entered.");
+		validateClockValue(llWallClockLimitHard, "Invalid.llWallClockLimitHard");
+		validateClockValue(llWallClockLimitSoft, "Invalid.llWallClockLimitSoft");
+
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateSchedulingResourcesTab returning.");
+				+ ":validateLimitsTab returning.");
 	}
 
 	/**
-	 * Validate all text and editable fields in the runtime
-	 * tab, top to bottom
+	 * Validate that a BigInteger value is within the range allowed for the
+	 * attribute.
 	 * 
+	 * @param value
+	 *            The value to be verified
+	 * @param attrName
+	 *            The name of the attribute
+	 * @param errorID
+	 *            The id of the error message used if validation fails
 	 * @throws ValidationException
+	 *             Indicates that Text widget failed validation
 	 */
-	private void validateRuntimeTab() throws ValidationException {
-		String s;
-		
+	private void validateLongNumericRange(String value, String attrName,
+			String errorID) throws ValidationException {
+		BigIntegerAttributeDefinition attrDef;
+		@SuppressWarnings("unused")
+		BigIntegerAttribute attr;
+
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateRuntimeTab entered.");
-		s = llError.getValue().trim();
-		if (s.length() > 0) {
-			validateOutputPath(s, "Invalid.stderr");
-		}
-		s = llOutput.getValue().trim();
-		if (s.length() > 0) {
-			validateOutputPath(s, "Invalid.stdout");
-		}
-		s = llInput.getValue().trim();
-		if (s.length() > 0) {
-			validateInputPath(s, "Invalid.stdin");
-		}
-		s = llExecutable.getValue().trim();
-		if (s.length() > 0) {
-			validateInputPath(s, "Invalid.executable");
-		}
-		validateDirectory(llInitialDir, "Invalid.initialDir");
-		s = llShell.getValue().trim();
-		if (s.length() > 0) {
-			validateInputPath(s, "Invalid.shell");
+				+ ":validateLongNumericRange entered.");
+		attrDef = (BigIntegerAttributeDefinition) currentRM
+				.getAttributeDefinition(attrName);
+		try {
+			attr = attrDef.create(value);
+		} catch (IllegalValueException e) {
+			throw new ValidationException(Messages.getString(errorID));
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateRuntimeTab returning.");
+				+ ":validateLongNumericRange returning.");
 	}
 
 	/**
@@ -2455,219 +2751,6 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in performance tab 1, top
-	 * to bottom
-	 * 
-	 * @throws ValidationException
-	 */
-	private void validateLimitsTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateLimitsTab entered.");
-		validateClockValue(llWallClockLimitHard, "Invalid.llWallClockLimitHard");
-		validateClockValue(llWallClockLimitSoft, "Invalid.llWallClockLimitSoft");
-
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateLimitsTab returning.");
-	}
-
-	/**
-	 * Validate that an input file is accessible
-	 * 
-	 * @param selector
-	 *            The file selector containing the pathname
-	 * @param errorID
-	 *            id of the error string used if file is inaccessible
-	 * @throws ValidationException
-	 */
-	private void validateInputPath(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
-		String path;
-
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
-			path = selector.getValue();
-			if (path.length() == 0) {
-				selector.resetValidationState();
-				return;
-			}
-			try {
-				validateInputPath(path, errorID);
-				selector.resetValidationState();
-			} catch (ValidationException e) {
-				selector.setFieldInError();
-				throw e;
-			} 
-		}
-	}
-
-	/**
-	 * Validate that an output file is accessible
-	 * 
-	 * @param selector
-	 *            The file selector containing the pathname
-	 * @param errorID
-	 *            id of the error string used if the file is inaccessible
-	 * @throws ValidationException
-	 */
-	// private void validateOutputPath(FileSelectorRowWidget selector,
-	// String errorID) throws ValidationException {
-	// String path;
-	//
-	// if ((selector != null) && selector.isEnabled()
-	// && selector.isValidationRequired()) {
-	// path = selector.getValue();
-	// if (path.length() == 0) {
-	// selector.resetValidationState();
-	// return;
-	// }
-	// try {
-	// validateOutputPath(path, errorID);
-	// selector.resetValidationState();
-	// } catch (ValidationException e) {
-	// selector.setFieldInError();
-	// throw e;
-	// }
-	// }
-	// }
-
-	/**
-	 * Validate that in input file is accessible
-	 * 
-	 * @param path
-	 *            Pathname of the input file
-	 * @param errorID
-	 *            id of the error string used if the file is inaccessible
-	 * @throws ValidationException
-	 * @throws IOException
-	 */
-	private void validateInputPath(String path, String errorID)
-			throws ValidationException {
-		IPath testPath;
-		IFileStore remoteResource;
-		IFileInfo fileInfo;
-
-		testPath = new Path(path);
-		if (!testPath.isValidPath(path)) {
-			throw new ValidationException(Messages.getString(errorID));
-		}
-		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath.toString());
-		fileInfo = remoteResource.fetchInfo();
-		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
-			throw new ValidationException(Messages.getString(errorID));
-		}
-	}
-
-	/**
-	 * Validate that an output file is accessible
-	 * 
-	 * @param path
-	 *            Pathname of the output file
-	 * @param errorID
-	 *            id of the error string used if the file is not accessible
-	 * @throws ValidationException
-	 * @throws IOException
-	 */
-	private void validateOutputPath(String path, String errorID)
-			throws ValidationException {
-		IPath testPath;
-		IFileStore remoteResource;
-		IFileInfo fileInfo;
-
-		testPath = new Path(path);
-		if (!testPath.isValidPath(path)) {
-			throw new ValidationException(Messages.getString(errorID));
-		}
-		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath.toString());
-		fileInfo = remoteResource.fetchInfo();
-		if (fileInfo.isDirectory()) {
-			throw new ValidationException(Messages.getString(errorID));
-		}
-	}
-
-	/**
-	 * Validate that the directory pathname is valid
-	 * 
-	 * @param selector
-	 *            File selector containing the directory name
-	 * @param errorID
-	 *            id of the error string used if the directory is invalid
-	 * @throws ValidationException
-	 * @throws IOException
-	 */
-	private void validateDirectory(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
-		String path;
-		IPath testPath;
-		IFileStore remoteResource;
-		IFileInfo fileInfo;
-
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
-			path = selector.getValue();
-			try {
-				if (path.length() == 0) {
-					selector.resetValidationState();
-					return;
-				}
-
-				testPath = new Path(path);
-				if (!testPath.isValidPath(path)) {
-					throw new ValidationException(Messages.getString(errorID));
-				}
-				remoteResource = remoteService.getFileManager(remoteConnection)
-						.getResource(testPath.toString());
-				fileInfo = remoteResource.fetchInfo();
-				if (!fileInfo.isDirectory()) {
-					throw new ValidationException(Messages.getString(errorID));
-				}
-				selector.resetValidationState();
-			} catch (ValidationException e) {
-				selector.setFieldInError();
-				throw e;
-			}
-		}
-	}
-
-	/**
-	 * Verify that the value selected or entered in an editable combobox is a
-	 * valid value, as determined by checking the attribute definition for the
-	 * attribute.
-	 * 
-	 * @param widget
-	 *            The combobox to be checked
-	 * @param attrName
-	 *            The attribute name
-	 * @return true if the value is a valid selection, false otherwise
-	 */
-	private boolean isValidListSelection(ComboRowWidget widget, String attrName) {
-		StringSetAttributeDefinition attrDef;
-		@SuppressWarnings("unused")
-		StringSetAttribute attr;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":isValidListSelection entered.");
-		attrDef = (StringSetAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
-		if (attrDef != null) {
-			try {
-				attr = attrDef.create(widget.getValue());
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":isValidListSelection returning.");
-				return true;
-			} catch (IllegalValueException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":isValidListSelection returning.");
-				return false;
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":isValidListSelection returning.");
-		return true;
-	}
-
-	/**
 	 * Validate that the minValue is less than or equal to the maxValue.
 	 * 
 	 * @param controlMin
@@ -2723,8 +2806,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * Validate that an integer value is within the range allowed for the
 	 * attribute.
 	 * 
-	 * @param control
-	 *            The Text widget to be verified
+	 * @param value
+	 *            The value to be verified
 	 * @param attrName
 	 *            The name of the attribute
 	 * @param errorID
@@ -2732,17 +2815,52 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(TextRowWidget control, String attrName,
-			String errorID) throws ValidationException {
-		String value;
+	private void validateNumericRange(int value, String attrName, String errorID)
+			throws ValidationException {
+		IntegerAttributeDefinition attrDef;
+		@SuppressWarnings("unused")
+		IntegerAttribute attr;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":validateNumericRange entered.");
-		if (control != null) {
-			value = control.getValue();
-			if (value.length() > 0) {
-				validateNumericRange(value, attrName, errorID);
+		attrDef = (IntegerAttributeDefinition) currentRM
+				.getAttributeDefinition(attrName);
+		try {
+			attr = attrDef.create(value);
+		} catch (IllegalValueException e) {
+			throw new ValidationException(Messages.getString(errorID));
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateNumericRange returning.");
+	}
+
+	/**
+	 * Validate a String's value to verify it is within the allowed range
+	 * 
+	 * @param value
+	 *            String to be verified
+	 * @param lowLimit
+	 *            Low limit of range
+	 * @param highLimit
+	 *            High limit of range
+	 * @param errorID
+	 *            id of the error message used if value is not in allowable
+	 *            range
+	 * @throws ValidationException
+	 */
+	private void validateNumericRange(String value, int lowLimit,
+			int highLimit, String errorID) throws ValidationException {
+		int n;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateNumericRange entered.");
+		try {
+			n = Integer.valueOf(value);
+			if ((n < lowLimit) || (n > highLimit)) {
+				throw new ValidationException(Messages.getString(errorID));
 			}
+		} catch (NumberFormatException e) {
+			throw new ValidationException(Messages.getString(errorID));
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":validateNumericRange returning.");
@@ -2802,8 +2920,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * Validate that an integer value is within the range allowed for the
 	 * attribute.
 	 * 
-	 * @param value
-	 *            The value to be verified
+	 * @param control
+	 *            The Text widget to be verified
 	 * @param attrName
 	 *            The name of the attribute
 	 * @param errorID
@@ -2811,267 +2929,48 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(int value, String attrName, String errorID)
-			throws ValidationException {
-		IntegerAttributeDefinition attrDef;
-		@SuppressWarnings("unused")
-		IntegerAttribute attr;
+	private void validateNumericRange(TextRowWidget control, String attrName,
+			String errorID) throws ValidationException {
+		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
 				+ ":validateNumericRange entered.");
-		attrDef = (IntegerAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
-		try {
-			attr = attrDef.create(value);
-		} catch (IllegalValueException e) {
-			throw new ValidationException(Messages.getString(errorID));
+		if (control != null) {
+			value = control.getValue();
+			if (value.length() > 0) {
+				validateNumericRange(value, attrName, errorID);
+			}
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
 				+ ":validateNumericRange returning.");
 	}
 
 	/**
-	 * Convert a string which may have a suffix 'k', 'm' or 'g' to it's actual
-	 * numeric value, multiplying by the appropriate multiplier
+	 * Validate that an output file is accessible
 	 * 
-	 * @param value
-	 *            The number to be converted
-	 * @return The converted number
-	 */
-	private String getIntegerValue(String value) {
-		int testValue;
-		int len;
-		char suffix;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getIntegerValue entered.");
-		testValue = 0;
-		len = value.length();
-		if (len == 0) {
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":getIntegerValue returning.");
-			return "";
-		} else {
-			suffix = value.charAt(len - 1);
-			if (Character.isDigit(suffix)) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getIntegerValue returning.");
-				return value;
-			} else {
-				if (len >= 2) {
-					testValue = Integer.valueOf(value.substring(0, len - 1));
-					if ((suffix == 'G') || (suffix == 'g')) {
-						testValue = testValue * GBYTE;
-					} else if ((suffix == 'M') || (suffix == 'm')) {
-						testValue = testValue * MBYTE;
-					} else if ((suffix == 'K') || (suffix == 'k')) {
-						testValue = testValue * KBYTE;
-					} else {
-						print_message(TRACE_MESSAGE, "<<< "
-								+ this.getClass().getName()
-								+ ":getIntegerValue returning.");
-						return "";
-					}
-				}
-			}
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":getIntegerValue returning.");
-			return String.valueOf(testValue);
-		}
-	}
-
-	/**
-	 * Validate that a BigInteger value is within the range allowed for the
-	 * attribute.
-	 * 
-	 * @param value
-	 *            The value to be verified
-	 * @param attrName
-	 *            The name of the attribute
+	 * @param path
+	 *            Pathname of the output file
 	 * @param errorID
-	 *            The id of the error message used if validation fails
+	 *            id of the error string used if the file is not accessible
 	 * @throws ValidationException
-	 *             Indicates that Text widget failed validation
+	 * @throws IOException
 	 */
-	private void validateLongNumericRange(String value, String attrName,
-			String errorID) throws ValidationException {
-		BigIntegerAttributeDefinition attrDef;
-		@SuppressWarnings("unused")
-		BigIntegerAttribute attr;
+	private void validateOutputPath(String path, String errorID)
+			throws ValidationException {
+		IPath testPath;
+		IFileStore remoteResource;
+		IFileInfo fileInfo;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateLongNumericRange entered.");
-		attrDef = (BigIntegerAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
-		try {
-			attr = attrDef.create(value);
-		} catch (IllegalValueException e) {
+		testPath = new Path(path);
+		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateLongNumericRange returning.");
-	}
-
-	/**
-	 * Validate a String's value to verify it is within the allowed range
-	 * 
-	 * @param value
-	 *            String to be verified
-	 * @param lowLimit
-	 *            Low limit of range
-	 * @param highLimit
-	 *            High limit of range
-	 * @param errorID
-	 *            id of the error message used if value is not in allowable
-	 *            range
-	 * @throws ValidationException
-	 */
-	private void validateNumericRange(String value, int lowLimit,
-			int highLimit, String errorID) throws ValidationException {
-		int n;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNumericRange entered.");
-		try {
-			n = Integer.valueOf(value);
-			if ((n < lowLimit) || (n > highLimit)) {
-				throw new ValidationException(Messages.getString(errorID));
-			}
-		} catch (NumberFormatException e) {
+		remoteResource = remoteService.getFileManager(remoteConnection)
+				.getResource(testPath.toString());
+		fileInfo = remoteResource.fetchInfo();
+		if (fileInfo.isDirectory()) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNumericRange returning.");
-	}
-
-	/**
-	 * Print a message: Info, Trace, Arg and Warning messages go to stdout.
-	 * Error and Fatal messages go to stderr. *
-	 */
-	private void print_message(int type, String message) {
-		switch (type) {
-		case INFO_MESSAGE:
-			if (state_info == 1) {
-				System.out.println("Info: " + message);
-			}
-			break;
-		case TRACE_MESSAGE:
-			if (state_trace == 1) {
-				System.out.println("Trace: " + message);
-			}
-			break;
-		case WARNING_MESSAGE:
-			if (state_warning == 1) {
-				System.out.println("Warning: " + message);
-			}
-			break;
-		case ARGS_MESSAGE:
-			if (state_args == 1) {
-				System.out.println("Args: " + message);
-			}
-			break;
-		case ERROR_MESSAGE:
-			if (state_error == 1) {
-				System.err.println("Error: " + message);
-			}
-			break;
-		case FATAL_MESSAGE:
-			if (state_fatal == 1) {
-				System.err.println("Fatal " + message);
-			}
-			break;
-		default:
-			System.out.println(message);
-			break;
-		}
-	}
-
-	private void validateAlphaNumeric(TextRowWidget control, String errorID)
-			throws ValidationException {
-		String value;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateAlphaNumeric entered.");
-		if (control != null) {
-			value = control.getValue();
-			if (value.length() > 0) {
-				validateAlphaNumeric(value, errorID);
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateAlphaNumeric returning.");
-	}
-
-	private void validateAlphaNumeric(String value, String errorID)
-			throws ValidationException {
-		int i;
-		String stripped = value.trim();
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateAlphaNumeric entered.");
-		for (i = 0; i < stripped.length(); i++) {
-			if (stripped.matches("[a-zA-Z_0-9]*") == false) {
-				throw new ValidationException(Messages.getString(errorID));
-			}
-		}
-
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateAlphaNumeric returning.");
-	}
-
-	private void validatePositiveOrUnlimitedNumeric(TextRowWidget control,
-			String errorID) throws ValidationException {
-		String value;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric entered.");
-		if (control != null) {
-			value = control.getValue();
-			if (value.trim().equalsIgnoreCase("unlimited")) {
-				// nothing to do - unlimited is valid value
-			} else {
-				if (value.length() > 0) {
-					validatePositiveOrUnlimitedNumeric(value, errorID);
-				}
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric returning.");
-	}
-
-	private void validatePositiveOrUnlimitedNumeric(String value, String errorID)
-			throws ValidationException {
-		int n;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric entered.");
-		try {
-			n = Integer.valueOf(value);
-			if ((n < 1) || (n > Integer.MAX_VALUE)) {
-				throw new ValidationException(Messages.getString(errorID));
-			}
-		} catch (NumberFormatException e) {
-			throw new ValidationException(Messages.getString(errorID));
-		}
-
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric returning.");
-	}
-
-	private void validatePositiveNumeric(TextRowWidget control, String errorID)
-			throws ValidationException {
-		String value;
-
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveNumeric entered.");
-		if (control != null) {
-			value = control.getValue();
-			if (value.length() > 0) {
-				validatePositiveNumeric(value, errorID);
-			}
-		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveNumeric returning.");
 	}
 
 	private int validatePositiveNumeric(String value, String errorID)
@@ -3094,36 +2993,133 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		return n;
 	}
 
-	private void validateClockValue(TextRowWidget control, String errorID)
+	private void validatePositiveNumeric(TextRowWidget control, String errorID)
 			throws ValidationException {
 		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateClockValue entered.");
+				+ ":validatePositiveNumeric entered.");
 		if (control != null) {
 			value = control.getValue();
 			if (value.length() > 0) {
-				validateClockValue(value, errorID);
+				validatePositiveNumeric(value, errorID);
 			}
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateClockValue returning.");
+				+ ":validatePositiveNumeric returning.");
 	}
 
-	private void validateClockValue(String value, String errorID)
+	private void validatePositiveOrUnlimitedNumeric(String value, String errorID)
 			throws ValidationException {
-		int i;
-		String stripped = value.trim();
+		int n;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateClockValue entered.");
-		for (i = 0; i < stripped.length(); i++) {
-			if (stripped.matches("[0-9]+(:[0-9]+){0,2}") == false) {
+				+ ":validatePositiveOrUnlimitedNumeric entered.");
+		try {
+			n = Integer.valueOf(value);
+			if ((n < 1) || (n > Integer.MAX_VALUE)) {
 				throw new ValidationException(Messages.getString(errorID));
 			}
+		} catch (NumberFormatException e) {
+			throw new ValidationException(Messages.getString(errorID));
 		}
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateClockValue returning.");
+				+ ":validatePositiveOrUnlimitedNumeric returning.");
+	}
+
+	private void validatePositiveOrUnlimitedNumeric(TextRowWidget control,
+			String errorID) throws ValidationException {
+		String value;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validatePositiveOrUnlimitedNumeric entered.");
+		if (control != null) {
+			value = control.getValue();
+			if (value.trim().equalsIgnoreCase("unlimited")) {
+				// nothing to do - unlimited is valid value
+			} else {
+				if (value.length() > 0) {
+					validatePositiveOrUnlimitedNumeric(value, errorID);
+				}
+			}
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validatePositiveOrUnlimitedNumeric returning.");
+	}
+
+	/**
+	 * Validate all text and editable fields in the runtime tab, top to bottom
+	 * 
+	 * @throws ValidationException
+	 */
+	private void validateRuntimeTab() throws ValidationException {
+		String s;
+
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateRuntimeTab entered.");
+		s = llError.getValue().trim();
+		if (s.length() > 0) {
+			validateOutputPath(s, "Invalid.stderr");
+		}
+		s = llOutput.getValue().trim();
+		if (s.length() > 0) {
+			validateOutputPath(s, "Invalid.stdout");
+		}
+		s = llInput.getValue().trim();
+		if (s.length() > 0) {
+			validateInputPath(s, "Invalid.stdin");
+		}
+		s = llExecutable.getValue().trim();
+		if (s.length() > 0) {
+			validateInputPath(s, "Invalid.executable");
+		}
+		validateDirectory(llInitialDir, "Invalid.initialDir");
+		s = llShell.getValue().trim();
+		if (s.length() > 0) {
+			validateInputPath(s, "Invalid.shell");
+		}
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateRuntimeTab returning.");
+	}
+
+	/**
+	 * Validate all text and editable combobox fields in the I/O tab, top to
+	 * bottom
+	 * 
+	 * @throws ValidationException
+	 */
+	private void validateSchedulingBasicTab() throws ValidationException {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateSchedulingBasicTab entered.");
+		validateAlphaNumeric(llClass, "Invalid.llClass");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateSchedulingBasicTab returning.");
+	}
+
+	/**
+	 * Validate all text and editable combobox fields in diagnostic tab, top to
+	 * bottom
+	 * 
+	 * @throws ValidationException
+	 */
+	private void validateSchedulingRequirementsTab() throws ValidationException {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateSchedulingRequirementsTab entered.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateSchedulingRequirementsTab returning.");
+	}
+
+	/**
+	 * Validate all text and editable combobox fields in the debug tab, top to
+	 * bottom
+	 * 
+	 * @throws ValidationException
+	 */
+	private void validateSchedulingResourcesTab() throws ValidationException {
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
+				+ ":validateSchedulingResourcesTab entered.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
+				+ ":validateSchedulingResourcesTab returning.");
 	}
 }
