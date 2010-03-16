@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -108,6 +108,7 @@ public class RemoteIndexManager {
 		indexer.setScannerInfoProvider(provider);
 		indexer.setLanguageMapper(new RemoteLanguageMapper(provider, dataStore));
 		indexer.setFilesToParseUpFront(provider.getFilesToParseUpFront().toArray(new String[]{}));
+		indexer.setFileEncodingRegistry(provider.getFileEncodingRegistry());
 		
 		if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {
 			indexer.setSkipReferences(PDOMWriter.SKIP_ALL_REFERENCES);
@@ -187,7 +188,7 @@ public class RemoteIndexManager {
 
 		try {
 			IParserLogService LOG = new RemoteLogService(dataStore, status);
-			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, LOG);
+			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, null, LOG);
 
 			scopeToIndexerMap.put(scope, indexer);
 		} catch (CoreException e) {
