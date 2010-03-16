@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ public class RemoteXlcCPPLanguage extends GPPLanguage implements IConfigurableLa
 	
 	
 	boolean getPref(XlcPref key) {
-		return Boolean.valueOf(remoteProperties.get(key));
+		return Boolean.valueOf(remoteProperties.get(key.toString()));
 	}
 	
 	
@@ -49,7 +49,9 @@ public class RemoteXlcCPPLanguage extends GPPLanguage implements IConfigurableLa
 		boolean supportDecimals = getPref(XlcPref.SUPPORT_DECIMAL_FLOATING_POINT_TYPES);
 		boolean supportComplex  = getPref(XlcPref.SUPPORT_COMPLEX_IN_CPP);
 		boolean supportRestrict = getPref(XlcPref.SUPPORT_RESTRICT_IN_CPP);
-		IDOMTokenMap tokenMap = new XlcCPPTokenMap(supportVectors, supportDecimals, supportComplex, supportRestrict);
+		boolean supportStaticAssert = getPref(XlcPref.SUPPORT_STATIC_ASSERT);
+		
+		IDOMTokenMap tokenMap = new XlcCPPTokenMap(supportVectors, supportDecimals, supportComplex, supportRestrict, supportStaticAssert);
 		
 		XlcCPPParser parser = new XlcCPPParser(scanner, tokenMap, getBuiltinBindingsProvider(), index, properties);
 		return parser;
@@ -66,7 +68,8 @@ public class RemoteXlcCPPLanguage extends GPPLanguage implements IConfigurableLa
 	}
 	
 	
-	@SuppressWarnings("unchecked")
+
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if(ICLanguageKeywords.class.equals(adapter))
