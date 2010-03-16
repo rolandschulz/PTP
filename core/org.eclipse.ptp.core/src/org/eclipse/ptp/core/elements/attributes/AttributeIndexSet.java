@@ -23,25 +23,24 @@ import java.util.Map.Entry;
 import org.eclipse.ptp.core.attributes.IAttribute;
 
 /**
- * AttributeIndexSet associates sets of indices
+ * {@code AttributeIndexSet} associates sets of indices
  * with attribute values.
  * The index sets are enforced to be
  * disjoint among distinct attribute
  * values.
  * <br><br>
- * AttributeIndexSet will make copies
+ * {@code AttributeIndexSet} will make copies
  * of any attributes set within it.
  * <br>
- * AttributeIndexSet will not modify
+ * {@code AttributeIndexSet} will not modify
  * the attributes stored in it, nor allow anyone else
  * to.
  *
  * @author Randy M. Roberts
  *
- * @param <A> the attribute type that implements IAttribute
+ * @param <A> the attribute type that implements {@code IAttribute}
  */
-public class AttributeIndexSet<A extends IAttribute<?, A, ?>> 
-	implements Cloneable {
+public class AttributeIndexSet<A extends IAttribute<?, A, ?>> {
 	
 	private final Map<A, BitSet> indexSetMap = new HashMap<A, BitSet>();
 	private final BitSet totalIndexSet;
@@ -77,7 +76,7 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>>
 	}
 
 	/**
-	 * clear this AttributeIndexSet 
+	 * clear this {@code AttributeIndexSet} 
 	 */
 	public void clear() {
 		this.totalIndexSet.clear();
@@ -112,11 +111,10 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>>
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
+	/**
+	 * @return a copy of this {@code AttributeIndexSet}
 	 */
-	@Override
-	public AttributeIndexSet<A> clone() {
+	public AttributeIndexSet<A> copy() {
 		return new AttributeIndexSet<A>(this);
 	}
 	
@@ -164,11 +162,11 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>>
 	}
 	
 	/**
-	 * Retrieve the BitSet representing the indices that
+	 * Retrieve the {@code BitSet} representing the indices that
 	 * contain this value for their attribute.
 	 * 
 	 * @param attribute may not be null
-	 * @return the bitset of all indices containing that value
+	 * @return the {@code BitSet} of indices containing this value
 	 * for the attribute
 	 * @throws NullPointerException if provided a null attribute
 	 */
@@ -186,11 +184,11 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>>
 	}
 
 	/**
-	 * Retrieve an AttributeIndexSet for a subSet of its indices.
+	 * Retrieve an {@code AttributeIndexSet} for a subSet of its indices.
 	 * 
 	 * @param indices
-	 * @return the AttributeIndexSet determined from the intersection of the
-	 * given indices with the indices contained in this AttributeIndexSet
+	 * @return the {@code AttributeIndexSet} determined from the intersection of the
+	 * given indices with the indices contained in this {@code AttributeIndexSet}
 	 */
 	public AttributeIndexSet<A> getSubset(BitSet indices) {
 		
