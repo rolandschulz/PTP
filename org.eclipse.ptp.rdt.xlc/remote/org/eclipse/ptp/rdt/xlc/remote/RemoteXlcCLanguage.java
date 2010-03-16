@@ -56,7 +56,8 @@ public class RemoteXlcCLanguage extends GCCLanguage implements IConfigurableLang
 	}
 
 	
-	@SuppressWarnings("unchecked")
+
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if(ICLanguageKeywords.class.equals(adapter))
