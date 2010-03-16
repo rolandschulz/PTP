@@ -46,10 +46,11 @@ public class RemoteCPerspectiveFactory implements IPerspectiveFactory {
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
 		IFolderLayout folder2= layout.createFolder("bottomLeft", IPageLayout.BOTTOM, (float)0.75, editorArea); //$NON-NLS-1$
-		folder2.addView(IPageLayout.ID_PROBLEM_VIEW);
-		folder2.addView(IPageLayout.ID_TASK_LIST);
 		folder2.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-		folder2.addView(IPageLayout.ID_PROP_SHEET);
+		folder2.addView(IPageLayout.ID_PROBLEM_VIEW);
+		//task view not yet implemented
+//		folder2.addView(IPageLayout.ID_TASK_LIST);
+//		folder2.addView(IPageLayout.ID_PROP_SHEET);
 		folder2.addView(UIPlugin.CALL_HIERARCHY_VIEW_ID);
 		folder2.addView(UIPlugin.TYPE_HIERARCHY_VIEW_ID);
 		//folder2.addView(UIPlugin.INCLUDE_BROWSER_VIEW_ID);

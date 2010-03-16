@@ -381,8 +381,7 @@
          <view
                id="org.eclipse.rse.shells.ui.view.commandsView"
                minimized="false"
-               ratio="0.5"
-               relationship="right"
+               relationship="stack"
                relative="org.eclipse.ptp.rdt.ui.callHierarchy">
          </view>
          <viewShortcut
@@ -396,6 +395,26 @@
          </newWizardShortcut>
       </perspectiveExtension>
    </extension>
+   <extension
+   		 name="Add Remote C/C++ Development Perspective Shortcut to CDT"
+   		 point="org.eclipse.ui.perspectiveExtensions">
+   	  <perspectiveExtension
+   	  		targetID="org.eclipse.cdt.ui.CPerspective">
+   	  	 <perspectiveShortcut
+   	  	 	   id="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+   	  	 </perspectiveShortcut>
+   	  </perspectiveExtension>
+   </extension>
+   <extension
+   		 name="Add Remote System Explorer Perspective Shortcut to CDT"
+   		 point="org.eclipse.ui.perspectiveExtensions">
+   	  <perspectiveExtension
+   	  		targetID="org.eclipse.cdt.ui.CPerspective">
+   	  	 <perspectiveShortcut
+   	  	 	   id="org.eclipse.rse.ui.view.SystemPerspective">
+   	  	 </perspectiveShortcut>
+   	  </perspectiveExtension>
+   </extension>	  		
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
