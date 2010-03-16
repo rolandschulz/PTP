@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -24,6 +25,7 @@ import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.internal.core.indexer.ILanguageMapper;
 import org.eclipse.dstore.core.model.DataStore;
+import org.eclipse.dstore.core.model.DataStoreAttributes;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.rdt.core.IConfigurableLanguage;
 import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
@@ -120,9 +122,19 @@ public class RemoteLanguageMapper implements ILanguageMapper {
 				languageIdToClassName.setProperty(GCCLanguage.ID, GCCLanguage.class.getCanonicalName());
 				
 				// defaults may be overridden when the file is loaded
-				File file = new File(LANGUAGE_CLASS_FILE_NAME);
-				if(file.canRead())
-					languageIdToClassName.load(new FileInputStream(file));
+				String pluginDir = dataStore.getAttribute(DataStoreAttributes.A_PLUGIN_PATH);
+				String dataFile = pluginDir + File.separator + LANGUAGE_CLASS_FILE_NAME;
+				File file = new File(dataFile);
+				if(file.canRead()) {
+					InputStream in = new FileInputStream(file);
+					languageIdToClassName.load(in);
+					in.close();
+					if(dataStore != null)
+						UniversalServerUtilities.logInfo(LOG_TAG, "Loaded language mappings from " + file.getAbsolutePath(), dataStore); //$NON-NLS-1$
+				}
+				else if(dataStore != null) {
+					UniversalServerUtilities.logWarning(LOG_TAG, "Cannot load language mappings file: " + file.getAbsolutePath(), dataStore); //$NON-NLS-1$
+				}
 
 			} catch (FileNotFoundException e) {
 				if(dataStore != null)
