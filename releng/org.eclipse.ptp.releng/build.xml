@@ -89,7 +89,8 @@
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="index.html" todir="${buildDirectory}/site/eclipse"/>
-		<copy todir="${buildDirectory}/site/eclipse">
+		<mkdir dir="${buildDirectory}/site/eclipse/web"/>
+		<copy todir="${buildDirectory}/site/eclipse/web">
 			<fileset dir="web"/>
 		</copy>
 		<copy file="buildsite.xml" tofile="${buildDirectory}/site/eclipse/site.xml"/>
