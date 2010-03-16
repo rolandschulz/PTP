@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.core.parser.IScannerInfo;
+import org.eclipse.cdt.internal.core.indexer.FileEncodingRegistry;
 
 /**
  * Holds on to info that is needed by the remote indexer.
@@ -42,7 +43,7 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 	private Set<String> headerSet; // (path -> isHeaderUnit(boolean))
 	private Set<String> indexerPreferences; // (preference key -> boolean)
 	private List<String> filesToParseUpFront;
-	
+	private FileEncodingRegistry fFileEncodingRegistry;
 	
 	//
 	RemoteIndexerInfoProvider() { }
@@ -53,7 +54,8 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 			                  Map<String, Map<String,String>> languagePropertyMap,
 			                  Set<String> headerSet, 
 			                  Set<String> indexerPreferences,
-			                  List<String> filesToParseUpFront) {
+			                  List<String> filesToParseUpFront,
+			                  FileEncodingRegistry fileEncodingRegistry) {
 		
 		this.pathMap = pathMap;
 		this.linkageMap = linkageMap;
@@ -62,6 +64,7 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		this.headerSet = headerSet;
 		this.indexerPreferences = indexerPreferences;
 		this.filesToParseUpFront = filesToParseUpFront;
+		this.fFileEncodingRegistry = fileEncodingRegistry;
 	}
 	
 	
@@ -133,6 +136,9 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		return languagePropertyMap.get(languageId);
 	}
 	
+	public FileEncodingRegistry getFileEncodingRegistry() {
+		return fFileEncodingRegistry;
+	}
 
 	public String toString() {
 		return "pathMap:" + pathMap +  //$NON-NLS-1$
@@ -141,7 +147,8 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		       " languagePropertyMap" + languagePropertyMap + //$NON-NLS-1$
 		       " isHeaderMap:" + headerSet + //$NON-NLS-1$
 		       " preferences: " + indexerPreferences + //$NON-NLS-1$
-		       " filesToParseUpFront: " + filesToParseUpFront; //$NON-NLS-1$
+		       " filesToParseUpFront: " + filesToParseUpFront + //$NON-NLS-1$
+		       " fFileEncodingRegistry: " + fFileEncodingRegistry; //$NON-NLS-1$
 	}
 
 }
