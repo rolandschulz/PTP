@@ -7,6 +7,7 @@ Fragment-Host: org.eclipse.ptp.etfw;bundle-version="1.0.0"
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ptp.core,
  org.eclipse.ptp.launch,
- org.eclipse.ptp.debug.core
+ org.eclipse.ptp.debug.core,
+ org.eclipse.ptp.remote.core
 Export-Package: org.eclipse.ptp.etfw.parallel
 Bundle-Vendor: %pluginProvider
