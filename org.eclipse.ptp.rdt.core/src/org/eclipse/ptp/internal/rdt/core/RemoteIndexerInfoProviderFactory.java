@@ -30,6 +30,7 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.LanguageManager;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
+import org.eclipse.cdt.internal.core.indexer.FileEncodingRegistry;
 import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -251,6 +252,13 @@ public class RemoteIndexerInfoProviderFactory {
 
 		RemoteScannerInfoCache cache = new RemoteScannerInfoCache();
 		
+		FileEncodingRegistry fileEncodingRegistry = null;
+		try {
+			fileEncodingRegistry = new FileEncodingRegistry(project.getDefaultCharset());
+		} catch (CoreException e) {
+			RDTLog.logError(e);
+		}
+		
 		for(ICElement element : elements) {
 			if(element instanceof ITranslationUnit) {
 				ITranslationUnit tu = (ITranslationUnit) element;
@@ -269,6 +277,10 @@ public class RemoteIndexerInfoProviderFactory {
 					
 					if(!languagePropertyMap.containsKey(id))
 						languagePropertyMap.put(id, getLanguageProperties(id, project));
+					
+					if(fileEncodingRegistry != null){
+						registerFileEncoding(fileEncodingRegistry, tu, path);
+					}
 					
 				} catch (CoreException e) {
 					RDTLog.logError(e);
@@ -305,9 +317,20 @@ public class RemoteIndexerInfoProviderFactory {
 		}
 
 		return new RemoteIndexerInfoProvider(scannerInfoMap, linkageMap, languageMap, languagePropertyMap, 
-				                             headerSet, preferences, filesToParseUpFront);
+				                             headerSet, preferences, filesToParseUpFront, fileEncodingRegistry);
 	}
 
+	
+	private static void registerFileEncoding(FileEncodingRegistry fileEncodingRegistry, ITranslationUnit tu, String filePath) throws CoreException {
+		IResource resource = tu.getResource();
+		String specificEncoding = null;
+		if (resource instanceof IFile) {
+			specificEncoding = ((IFile) resource).getCharset(false);
+		}
+		if (filePath != null && specificEncoding != null) {
+			fileEncodingRegistry.registerFileEncoding(filePath, specificEncoding);
+		}
+	}
 	
 	
 	private static Set<String> computeIndexerPreferences(Properties props) {
