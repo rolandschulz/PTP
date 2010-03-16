@@ -16,7 +16,7 @@ import org.eclipse.cdt.internal.core.model.ASTCache.ASTRunnable;
 import org.eclipse.cdt.internal.core.parser.ParserException;
 import org.eclipse.cdt.internal.ui.editor.ASTProvider;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
-import org.eclipse.cdt.ui.tests.text.EditorTestHelper;
+import org.eclipse.cdt.ui.testplugin.EditorTestHelper;
 import org.eclipse.cdt.ui.tests.text.selection.CPPSelectionTestsAnyIndexer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
