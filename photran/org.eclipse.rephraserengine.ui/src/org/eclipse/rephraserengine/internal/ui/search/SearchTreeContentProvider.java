@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.rephraserengine.ui.search.SearchResult;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -123,7 +124,12 @@ public class SearchTreeContentProvider implements ITreeContentProvider, ISearchC
 		tree.clear();
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				viewer.refresh();
+			    try {
+			        viewer.refresh();
+			    } catch (SWTException x) {
+			        // Widget is disposed
+			        // (occurs when running JUnit tests)
+			    }
 			}
 		});
 	}
