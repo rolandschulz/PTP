@@ -325,48 +325,62 @@ public class PhotranVPGBuilder extends PhotranVPG
         if (filename == null || isVirtualFile(filename)) return null;
 
         IFile file = getIFileForFilename(filename); if (file == null) return null;
-        SourceForm sourceForm = determineSourceForm(filename);
         try
         {
-            if (stream == null) stream = file.getContents(true);
-            IAccumulatingLexer lexer = LexerFactory.createLexer(stream, file, filename, sourceForm, true);
-            long start = System.currentTimeMillis();
-            ASTExecutableProgramNode ast = parser.parse(lexer);
-            debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
-            return new FortranAST(file, ast, lexer.getTokenList());
-        }
-        catch (SyntaxException e)
-        {
-            if (e.getFile() != null && e.getFile().getIFile() != null)
-                log.logError("Error parsing " + filename + ": " + e.getMessage(),
-                    new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
-            else
+            SourceForm sourceForm = determineSourceForm(filename);
+            try
+            {
+                if (stream == null) stream = file.getContents(true);
+                IAccumulatingLexer lexer = LexerFactory.createLexer(stream, file, filename, sourceForm, true);
+                long start = System.currentTimeMillis();
+                ASTExecutableProgramNode ast = parser.parse(lexer);
+                debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
+                return new FortranAST(file, ast, lexer.getTokenList());
+            }
+            catch (SyntaxException e)
+            {
+                if (e.getFile() != null && e.getFile().getIFile() != null)
+                    log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                        new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
+                else
+                    logError(file, "Error parsing " + filename, e);
+                return null;
+            }
+            catch (LexerException e)
+            {
+                if (e.getFile() != null && e.getFile().getIFile() != null)
+                    log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                        new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
+                else
+                    logError(file, "Error parsing " + filename, e);
+                return null;
+            }
+    //        catch (CoreException e)
+    //        {
+    //            IFile errorFile = getFileFromStatus(e.getStatus());
+    //            if (errorFile != null)
+    //                log.logError("Error parsing " + filename + ": " + e.getMessage(),
+    //                    new PhotranTokenRef(errorFile, 0, 0));
+    //            else
+    //                logError(file, "Error parsing " + filename, e);
+    //            return null;
+    //        }
+            catch (Throwable e)
+            {
                 logError(file, "Error parsing " + filename, e);
-            return null;
+                return null;
+            }
         }
-        catch (LexerException e)
+        finally
         {
-            if (e.getFile() != null && e.getFile().getIFile() != null)
-                log.logError("Error parsing " + filename + ": " + e.getMessage(),
-                    new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
-            else
-                logError(file, "Error parsing " + filename, e);
-            return null;
-        }
-//        catch (CoreException e)
-//        {
-//            IFile errorFile = getFileFromStatus(e.getStatus());
-//            if (errorFile != null)
-//                log.logError("Error parsing " + filename + ": " + e.getMessage(),
-//                    new PhotranTokenRef(errorFile, 0, 0));
-//            else
-//                logError(file, "Error parsing " + filename, e);
-//            return null;
-//        }
-        catch (Throwable e)
-        {
-            logError(file, "Error parsing " + filename, e);
-            return null;
+            try
+            {
+                if (stream != null) stream.close();
+            }
+            catch (Throwable x)
+            {
+                // Ignore
+            }
         }
     }
 
