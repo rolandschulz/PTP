@@ -61,6 +61,9 @@ abstract public class BaseTestFramework extends TestCase {
 			workspace = ResourcesPlugin.getWorkspace();
 			
 	        try {
+	            PhotranVPG.getInstance().releaseAllASTs();
+	            PhotranVPG.getDatabase().clearDatabase();
+	            
 	            cproject = CProjectHelper.createCCProject("PhotranTestProject" + (++n), "bin", IPDOMManager.ID_NO_INDEXER); //$NON-NLS-1$ //$NON-NLS-2$
 	        
 	            project = cproject.getProject();
@@ -93,16 +96,6 @@ abstract public class BaseTestFramework extends TestCase {
     public BaseTestFramework(String name)
     {
         super(name);
-    }
-      
-    public void cleanupProject() throws Exception {
-        try{
-	        project.delete( true, false, monitor );
-	    } catch( Throwable e ){
-	        /*boo*/
-	    } finally {
-	    	project= null;
-	    }
     }
     
 	@Override
