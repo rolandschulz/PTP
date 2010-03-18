@@ -33,6 +33,7 @@
 
 package org.eclipse.photran.internal.core.lexer;
 
+import java.util.regex.Pattern;
 import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 
@@ -79,6 +80,13 @@ import org.eclipse.core.resources.IFile;
     protected FileOrIFile lastTokenFile = null;
     protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
 
+    private static final Pattern eol = Pattern.compile("(\\r|\\n)+");
+
+    protected boolean isEOL(String string)
+    {
+        return eol.matcher(string).matches();
+    }
+
     private IToken token(Terminal terminal)
     {
         //For some there are 2 terminals of type Terminal.END_OF_INPUT that get here in a row
@@ -114,7 +122,9 @@ import org.eclipse.core.resources.IFile;
         // actual separator is '/r/n'
         if(terminal == Terminal.T_EOS)
         {
-            tokenText = prepass.getFileEOL();
+            tokenText = yytext();
+            if (isEOL(tokenText))
+                tokenText = prepass.getFileEOL();
         }
         //If it is the end of input, use the Lexer's text.
         else if(terminal == Terminal.END_OF_INPUT)

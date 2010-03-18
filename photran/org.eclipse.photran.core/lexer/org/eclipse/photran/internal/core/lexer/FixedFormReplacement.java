@@ -37,4 +37,9 @@ public class FixedFormReplacement implements IPreprocessorReplacement
     {
         return replacementText;
     }
+    
+    public void setReplacementText(String newText)
+    {
+        replacementText = newText;
+    }
 }

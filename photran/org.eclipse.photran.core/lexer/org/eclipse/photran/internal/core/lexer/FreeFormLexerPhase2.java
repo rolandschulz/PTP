@@ -1376,6 +1376,11 @@ public class FreeFormLexerPhase2 implements ILexer
             return parenDepth[tokenPos] == depth;
         }
     }
+    
+    protected void modifyPreprocessorDirective(IToken t)
+    {
+        
+    }
 
     /**
      * The token must appear in the spec list for an OPEN, CLOSE, READ,
@@ -1609,8 +1614,10 @@ public class FreeFormLexerPhase2 implements ILexer
                 streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
                 lengths.insertElementAt(new Integer(1), i+j+1);
             }
+            modifyPreprocessorDirective(t);
         }
 
+        
         // If, say, "integer*3" was changed into an identifier, split it into
         // three tokens: the identifier "integer", the asterisk, and the number 3
         for (int j = 0; j < identifiersStarred.size(); j++)
