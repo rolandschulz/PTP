@@ -36,16 +36,16 @@
 	<property name="icuBaseZip" value="com.ibm.icu.base-3.6M6.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.2.1.v20100212.jar"/>
 	
-	<property name="cdtCoreVersion" value="5.2.0.201003151310"/>
+	<property name="cdtCoreVersion" value="5.2.0.201003221356"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 	
-	<property name="cdtLRParserVersion" value="5.1.0.201003151310"/>
+	<property name="cdtLRParserVersion" value="5.1.0.201003221356"/>
 	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
 	
-	<property name="cdtUPCParserVersion" value="5.1.0.201003151310"/>
+	<property name="cdtUPCParserVersion" value="5.1.0.201003221356"/>
 	<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
 	
-	<property name="cdtLRParserXLCVersion" value="1.0.0.201003151310"/>
+	<property name="cdtLRParserXLCVersion" value="1.0.0.201003221356"/>
 	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
