@@ -110,7 +110,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.utils.core.linux.ArgumentParser;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  *
@@ -955,9 +955,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	protected String[] getProgramArguments(ILaunchConfiguration configuration) throws CoreException {
 		String temp = getArguments(configuration);
 		if (temp != null && temp.length() > 0) {
-			// Replaced PTPs ArgumentParser with better ArgumentParser contributed with RemoteTools.
-//			ArgumentParser ap = new ArgumentParser(temp);
-//			List<String> args = ap.getArguments();
 			ArgumentParser ap = new ArgumentParser(temp);
 			List<String> args = ap.getTokenList();
 			if (args != null) {
