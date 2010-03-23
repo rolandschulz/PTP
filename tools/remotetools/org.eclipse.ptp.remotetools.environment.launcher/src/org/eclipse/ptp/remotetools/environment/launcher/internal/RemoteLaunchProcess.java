@@ -556,7 +556,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		try {
 			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_22 + remoteDirectory);
 			IRemoteFileTools irft = manager.getRemoteFileTools();
-			irft.removeFile(remoteDirectory,null);
+			irft.removeFile(remoteDirectory);
 			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_23);
 		} catch (RemoteOperationException e) {
 			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_24 + e.getMessage());
