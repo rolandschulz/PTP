@@ -56,7 +56,7 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
-import org.eclipse.ptp.utils.core.linux.ArgumentParser;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
@@ -348,17 +348,17 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		try {
 			String command = configuration.getBeforeCommand();
 			if (command == null) {
-				launchProcessOutputWriter.println("* Launch configuration does not require running a bash script before launch.");
+				launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_0);
 				return;
 			}
 			command = command.trim();
 			if (command.length() == 0) {
-				launchProcessOutputWriter.println("* Launch configuration does not require running a bash script before launch.");
+				launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_0);
 				return;
 			}
 			
-			launchProcessOutputWriter.println("* Prepare launch by executing:");
-			launchProcessOutputWriter.println("   " + command);
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_1);
+			launchProcessOutputWriter.println("   " + command); //$NON-NLS-1$
 			
 			IRemoteExecutionTools ret = manager.getExecutionTools();
 			IRemoteScript script = ret.createScript();
@@ -370,22 +370,22 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			/*
 			 * Change the current directory from home to the actual working directory.
 			 */
-			command = "cd " + configuration.getRemoteDirectoryPath() + "\n" + command + "\n";
+			command = "cd " + configuration.getRemoteDirectoryPath() + "\n" + command + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-			script.setScript(command.split("\n"));
+			script.setScript(command.split("\n")); //$NON-NLS-1$
 			
 			IRemoteScriptExecution execution = ret.executeScript(script);
 			execution.waitForEndOfExecution();
 			if (execution.getReturnCode() == 0) {
-				launchProcessOutputWriter.println("   Script executed successfully.");
+				launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_2);
 			} else {
-				launchProcessErrorWriter.println("   Script returned " + Integer.toString(execution.getReturnCode()));
+				launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_3 + Integer.toString(execution.getReturnCode()));
 			}
 			execution.close();			
 		} catch (RemoteExecutionException e) {
-			launchProcessOutputWriter.println("   Script failed: " + e.getErrorMessage());
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_4 + e.getErrorMessage());
 		} catch (RemoteConnectionException e) {
-			abortWithError("Connection to host failed.", e);
+			abortWithError(Messages.RemoteLaunchProcess_5, e);
 		}		
 	}
 
@@ -395,17 +395,17 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		try {
 			String command = configuration.getAfterCommand();
 			if (command == null) {
-				launchProcessOutputWriter.println("* Launch configuration does not require running a bash script after launch.");
+				launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_6);
 				return;			
 			}
 			command = command.trim();
 			if (command.length() == 0) {
-				launchProcessOutputWriter.println("* Launch configuration does not require running a bash script after launch.");
+				launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_6);
 				return;
 			}
 			
-			launchProcessOutputWriter.println("* Finalize launch by executing:");
-			launchProcessOutputWriter.println("   " + command);
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_7);
+			launchProcessOutputWriter.println("   " + command); //$NON-NLS-1$
 			
 			IRemoteExecutionTools ret = manager.getExecutionTools();
 			IRemoteScript script = ret.createScript();
@@ -417,28 +417,28 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			/*
 			 * Change the current directory from home to the actual working directory.
 			 */
-			command = "cd " + configuration.getRemoteDirectoryPath() + "\n" + command + "\n";
+			command = "cd " + configuration.getRemoteDirectoryPath() + "\n" + command + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
-			script.setScript(command.split("\n"));
+			script.setScript(command.split("\n")); //$NON-NLS-1$
 			
 			IRemoteScriptExecution execution = ret.executeScript(script);
 			execution.waitForEndOfExecution();
 			if (execution.getReturnCode() == 0) {
-				launchProcessOutputWriter.println("   Script executed successfully.");
+				launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_2);
 			} else {
-				launchProcessErrorWriter.println("   Script returned " + Integer.toString(execution.getReturnCode()));
+				launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_3 + Integer.toString(execution.getReturnCode()));
 			}
 			execution.close();			
 		} catch (RemoteExecutionException e) {
-			launchProcessOutputWriter.println("   Script failed: " + e.getErrorMessage());
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_4 + e.getErrorMessage());
 		} catch (RemoteConnectionException e) {
-			abortWithError("Connection to host failed.", e);
+			abortWithError(Messages.RemoteLaunchProcess_8, e);
 		}		
 	}
 	
 	protected void runApplication() throws CoreException, CancelException {
 		if (! launchIntegration.getDoLaunchApplication()) {
-			launchProcessOutputWriter.println("* Launch configuration does not require running the executable.");
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_9);
 			return;
 		}
 		
@@ -448,7 +448,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			iret = manager.getExecutionTools();
 			script = iret.createScript();
 		} catch (RemoteConnectionException e) {
-			abortWithError("Connection to host failed.", e);
+			abortWithError(Messages.RemoteLaunchProcess_8, e);
 		}
 		
 		String[] environmentVariables = configuration.getEnvironmentVariablesArray();
@@ -460,11 +460,11 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		ArrayList commandsList = new ArrayList(Arrays.asList(launchScript));
 		String remoteWorkingDirectory = LinuxPath.toString(configuration.getRemoteDirectoryPath());
 		IRemotePathTools pathTools = manager.getRemotePathTools();
-		commandsList.add(0, "cd " + pathTools.quote(remoteWorkingDirectory, true));
+		commandsList.add(0, "cd " + pathTools.quote(remoteWorkingDirectory, true)); //$NON-NLS-1$
 		if (configuration.getDoAllocateTerminal()) {
 			// If terminal is allocated, then turn off echo, since Eclipse console already
 			// echo user input.
-			commandsList.add(0, "stty -echo");
+			commandsList.add(0, "stty -echo"); //$NON-NLS-1$
 		}
 		String commands[] = new String[commandsList.size()];
 		commands = (String[]) commandsList.toArray(commands);
@@ -477,11 +477,11 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		RemoteProcess remoteProcess = null;
 		executionResult = new ExecutionResult();
 		try {
-			launchProcessOutputWriter.println("* Started application on target.");
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_10);
 			
 			launchIntegration.prepareLaunch();
 			remoteProcess = manager.getExecutionTools().executeProcess(script);
-			applicationProgress = DebugPlugin.newProcess(launch, remoteProcess, "Remote process");
+			applicationProgress = DebugPlugin.newProcess(launch, remoteProcess, Messages.RemoteLaunchProcess_11);
 			IStreamsProxy proxy = applicationProgress.getStreamsProxy();
 			if (proxy != null) {
 				/*
@@ -503,40 +503,40 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			executionResult.setExitValue(execution.getReturnCode());
 			
 			if (execution.wasCanceled()) {
-				launchProcessErrorWriter.println("   Execution was canceled");
+				launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_12);
 				executionResult.setStatus(ExecutionResult.CANCELLED);
 			} else if (execution.wasOK()) {
 				if (execution.getReturnCode() > 0) {
-					launchProcessOutputWriter.println("   Finished with exit code: " + Integer.toString(executionResult.getExitValue()));
+					launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_13 + Integer.toString(executionResult.getExitValue()));
 					executionResult.setStatus(ExecutionResult.SUCCESS_WITH_CODE);
 				} else {
-					launchProcessOutputWriter.println("   Finished successfully");
+					launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_14);
 					executionResult.setStatus(ExecutionResult.SUCCESS);
 				}
 			} else if (execution.wasException()) {
-				launchProcessErrorWriter.println("   Finished with exception: " + execution.getFinishStatusText(execution.getFinishStatus()));
+				launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_15 + execution.getFinishStatusText(execution.getFinishStatus()));
 				executionResult.setStatus(ExecutionResult.EXCEPTION);				
 			} else if (execution.wasCommandError()) {
-				launchProcessErrorWriter.println("   Could not run application: " + execution.getFinishStatusText(execution.getFinishStatus()));
+				launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_16 + execution.getFinishStatusText(execution.getFinishStatus()));
 				executionResult.setStatus(ExecutionResult.COMMAND_ERROR);								
 			} else {
-				launchProcessErrorWriter.println("   Failed.");
+				launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_17);
 				executionResult.setStatus(ExecutionResult.UNKNOWN);
 			}
 		} catch (CoreException e) {
-			launchProcessErrorWriter.println("   Failed: " + e.getMessage());
+			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_18 + e.getMessage());
 			IStatus status = e.getStatus();
 			if (status.isMultiStatus()) {
-				launchProcessErrorWriter.println("     " + status.getException().getMessage());
+				launchProcessErrorWriter.println("     " + status.getException().getMessage()); //$NON-NLS-1$
 			}
 			executionResult.setStatus(ExecutionResult.ERROR);
 			throw e;
 		} catch (RemoteConnectionException e) {
 			executionResult.setStatus(ExecutionResult.ERROR);
-			abortWithError("Connection to host failed.", e);
+			abortWithError(Messages.RemoteLaunchProcess_19, e);
 		} catch (RemoteExecutionException e) {
 			executionResult.setStatus(ExecutionResult.ERROR);
-			launchProcessErrorWriter.println("   Failed to execute: " + e.getErrorMessage());
+			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_20 + e.getErrorMessage());
 		} catch (InterruptedException e) {
 			executionResult.setStatus(ExecutionResult.ERROR);
 			// TODO Auto-generated catch block
@@ -547,33 +547,26 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 
 	protected void cleanUp() throws CoreException, CancelException {
 		if (! configuration.getDoCleanup()) {
-			launchProcessOutputWriter.println("* Launch configuration does not require cleaning up remote working directory.");
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_21);
 			return;
 		}
 
 		IPath remotePath = configuration.getRemoteDirectoryPath();
 		String remoteDirectory = LinuxPath.toString(remotePath);
 		try {
-			launchProcessOutputWriter.println("* Cleaning up remote working directory: " + remoteDirectory);
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_22 + remoteDirectory);
 			IRemoteFileTools irft = manager.getRemoteFileTools();
-			irft.removeFile(remoteDirectory);
-			launchProcessOutputWriter.println("   Clean up complete");
+			irft.removeFile(remoteDirectory,null);
+			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_23);
 		} catch (RemoteOperationException e) {
-			launchProcessErrorWriter.println("   Clean up failed: " + e.getMessage());
-			abortWithError("Could not clean up target.", e);
+			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_24 + e.getMessage());
+			abortWithError(Messages.RemoteLaunchProcess_25, e);
 		} catch (RemoteConnectionException e) {
-			abortWithError("Connection to host failed.", e);
+			abortWithError(Messages.RemoteLaunchProcess_26, e);
 		}
 	}
 
 	public static String createCommandLine(String remoteExecutableName, String[] argumentsArray) {
-//		String result = remoteExecutableName;
-//		for (int i = 0; i < argumentsArray.length; i++) {
-//			// TODO: which kind of quoting is needed?
-//			String argument = argumentsArray[i].replaceAll(" ", "\\ ");
-//			result += " " + argument;
-//		}
-//		return result;
 		ArgumentParser parser = new ArgumentParser(remoteExecutableName, argumentsArray);
 		return parser.getCommandLine(true);
 	}
@@ -664,8 +657,8 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 			}
 			forcedCleanUp(manager);
 			launchProcessErrorWriter.println();
-			launchProcessErrorWriter.println("*** The launch did not work correctly ***");
-			launchProcessErrorWriter.println("    An exception was thrown during the launch: " + e.getMessage());
+			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_27);
+			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_28 + e.getMessage());
 			launchProcessErrorWriter.println();
 			notifyInterrupt();
 		} finally {
