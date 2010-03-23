@@ -27,7 +27,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.utils.core.linux.ArgumentParser;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * Abstract implementation of a job that executes a command on the remote host and parses its output.
