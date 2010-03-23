@@ -50,7 +50,7 @@ import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.utils.core.linux.ArgumentParser;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * Implements a job that controls the parallel application launched with a command line tool.
@@ -686,7 +686,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			 * Execute remote command for the job.
 			 */
 			try {
-				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: start", getJobID()); //$NON-NLS-1$
+				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: running command \"{1}\"", getJobID(), command); //$NON-NLS-1$
 				setProcess(processBuilder.start());
 			} catch (IOException e) {
 				changeJobState(JobAttributes.State.COMPLETED);
