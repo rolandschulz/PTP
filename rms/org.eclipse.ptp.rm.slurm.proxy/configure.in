@@ -3,7 +3,7 @@ dnl
 
 AC_PREREQ([2.50])
 
-AC_INIT([org.eclipse.ptp.slurm], [4.0.0])
+AC_INIT([org.eclipse.ptp.slurm], [@buildVersion@])
 AC_CONFIG_SRCDIR([src/ptp_slurm_proxy.c])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
@@ -14,9 +14,13 @@ dnl
 dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
+VERSION="$PACKAGE_VERSION"
+if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+	VERSION=
+fi
 UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
-	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	UTILS="`echo ${UTILS}_${VERSION}`"
 	if test ! -d $UTILS; then
 		AC_MSG_ERROR([utils directory not found])
 	fi
@@ -24,7 +28,7 @@ fi
 
 PROXY="../org.eclipse.ptp.proxy"
 if test ! -d $PROXY; then
-	PROXY="`echo ${PROXY}_${PACKAGE_VERSION}.*`"
+	PROXY="`echo ${PROXY}_${VERSION}`"
 	if test ! -d $PROXY; then
 		AC_MSG_ERROR([proxy directory not found])
 	fi
