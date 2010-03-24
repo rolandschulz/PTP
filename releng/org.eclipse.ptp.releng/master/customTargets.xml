@@ -123,19 +123,37 @@
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.debug.sdm/configure">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.debug.sdm/configure.in">
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
+	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.proxy/configure">
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.proxy/configure.in">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.utils/configure">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.utils/configure.in">
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
+	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.rm.ibm.ll.proxy/configure">
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.rm.ibm.ll.proxy/configure.in">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.rm.ibm.pe.proxy/configure">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.rm.ibm.pe.proxy/configure.in">
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
+	</replace>
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.rm.slurm.proxy/configure">
+		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
+	</replace>
+	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.rm.slurm.proxy/configure.in">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
 
