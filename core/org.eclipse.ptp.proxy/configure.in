@@ -3,7 +3,7 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT(org.eclipse.ptp.proxy, 4.0.0)
+AC_INIT(org.eclipse.ptp.proxy, [@buildVersion@])
 AC_CONFIG_SRCDIR(src/proxy.c)
 AC_CONFIG_HEADERS(config.h)
 
@@ -15,9 +15,13 @@ dnl
 dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
+VERSION="$PACKAGE_VERSION"
+if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+	VERSION=
+fi
 UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
-	UTILS="`echo ${UTILS}_${PACKAGE_VERSION}.*`"
+	UTILS="`echo ${UTILS}_${VERSION}`"
 	if test ! -d $UTILS; then
 		AC_MSG_ERROR([utils directory not found])
 	fi
