@@ -2224,13 +2224,13 @@ case $build_os in *\ *) build_os=`echo "$build_os" | sed 's/ /-/g'`;; esac
 
 
 
-VERSION="$PACKAGE_VERSION"
+VERSION="_$PACKAGE_VERSION"
 if  `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
 	VERSION=
 fi
 UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
-	UTILS="`echo ${UTILS}_${VERSION}`"
+	UTILS="`echo ${UTILS}${VERSION}`"
 	if test ! -d $UTILS; then
 		{ { echo "$as_me:$LINENO: error: utils directory not found" >&5
 echo "$as_me: error: utils directory not found" >&2;}
