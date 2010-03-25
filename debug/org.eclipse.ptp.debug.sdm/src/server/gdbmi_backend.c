@@ -70,7 +70,7 @@ struct varmap {
 static double		GDB_Version;
 static int			ADDRESS_LENGTH = 0;
 static MISession *	DebugSession;
-static dbg_event *	LastEvent;
+static List *		EventList;
 static void			(*EventCallback)(dbg_event *);
 static int			ServerExit;
 static int			Started;
@@ -181,10 +181,7 @@ GetLastErrorStr(void)
 static void
 SaveEvent(dbg_event *e)
 {
-	if (LastEvent != NULL)
-		FreeDbgEvent(LastEvent);
-
-	LastEvent = e;
+	AddToList(EventList, (void *)e);
 }
 
 /**** Variable ****/
@@ -708,7 +705,7 @@ GDBMIInit(void (*event_callback)(dbg_event *))
 {
 	EventCallback = event_callback;
 	DebugSession = NULL;
-	LastEvent = NULL;
+	EventList = NewList();
 	GDB_Version = -1.0;
 	ServerExit = 0;
 
@@ -852,20 +849,21 @@ GDBMIProgress(void)
 	/*
 	 * Check for existing events
 	 */
-	if (LastEvent != NULL) {
+	if (!EmptyList(EventList)) {
+		e = (dbg_event *)RemoveFirst(EventList);
+
 		if (EventCallback != NULL) {
-			EventCallback(LastEvent);
+			EventCallback(e);
 		}
 
-		if (ServerExit && LastEvent->event_id == DBGEV_OK) {
+		if (ServerExit && e->event_id == DBGEV_OK) {
 			if (DebugSession != NULL) {
 				MISessionFree(DebugSession);
 				DebugSession = NULL;
 			}
 		}
 
-		FreeDbgEvent(LastEvent);
-		LastEvent = NULL;
+		FreeDbgEvent(e);
 		return 0;
 	}
 
