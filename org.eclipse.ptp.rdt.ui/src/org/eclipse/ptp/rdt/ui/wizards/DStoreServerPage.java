@@ -59,6 +59,7 @@ public class DStoreServerPage extends Composite {
 		text = new Text(textComp, SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.heightHint = text.getLineHeight() * 3;
+		data.widthHint = 300;
 		text.setLayoutData(data);
 		text.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
