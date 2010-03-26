@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPWatchpoint;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
@@ -33,6 +34,7 @@ public class PBreakpointWorkbenchAdapterFactory implements IAdapterFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType != IWorkbenchAdapter.class || !(adaptableObject instanceof IPBreakpoint)) {
 			return null;
@@ -41,10 +43,10 @@ public class PBreakpointWorkbenchAdapterFactory implements IAdapterFactory {
 			public String getLabel(Object o) {
 				// for now
 				if (o instanceof IPLineBreakpoint) {
-					return PDebugUIMessages.getString("PBreakpointWorkbenchAdapterFactory.0");
+					return Messages.PBreakpointWorkbenchAdapterFactory_0;
 				}
 				if (o instanceof IPWatchpoint) {
-					return PDebugUIMessages.getString("PBreakpointWorkbenchAdapterFactory.1");
+					return Messages.PBreakpointWorkbenchAdapterFactory_1;
 				}
 				return super.getLabel(o); 
 			}
@@ -53,6 +55,7 @@ public class PBreakpointWorkbenchAdapterFactory implements IAdapterFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
 		return new Class[] { IWorkbenchAdapter.class };
 	}
