@@ -82,7 +82,13 @@ public class SDMEventManager extends AbstractEventManager {
 		IProxyDebugEvent event = (IProxyDebugEvent) arg;
 		IPDIEventRequest request = getCurrentRequest();
 		fireEvent(request, event);
-		verifyEvent(request, event);
+		/*
+		 * IProxyDebugOutputEvent can occur at any time, so make sure
+		 * that it is not used to update a request.
+		 */
+		if (!(event instanceof IProxyDebugOutputEvent)) {
+			verifyEvent(request, event);
+		}
 	}
 	
 	/**
