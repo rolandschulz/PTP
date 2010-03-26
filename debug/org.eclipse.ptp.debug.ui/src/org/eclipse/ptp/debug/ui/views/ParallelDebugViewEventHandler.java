@@ -74,7 +74,6 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 							ArrayList<IElement> regElementArray = new ArrayList<IElement>();
 							for (int j=0; j<c_regTask_array.length; j++) {
 								IPProcess proc = job.getProcessByIndex(c_regTask_array[j]);
-								((UIDebugManager) getPView().getUIManager()).addConsoleWindow(job, proc);
 								IElement element = elementHandler.getSetRoot().getElementByID(proc.getID());
 								if (element != null) {
 									regElementArray.add(element);
@@ -114,7 +113,6 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 							IElement[] regElementArray = new IElement[t_regTask_array.length];
 							for (int j = 0; j < t_regTask_array.length; j++) {
 								IPProcess proc = job.getProcessByIndex(t_regTask_array[j]);
-								((UIDebugManager) getPView().getUIManager()).removeConsoleWindow(job, proc);
 								regElementArray[j] = elementHandler.getSetRoot().getElementByID(proc.getID());
 							}
 							elementHandler.removeFromRegister(regElementArray);
@@ -211,7 +209,6 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 								IElement[] regElementArray = new IElement[e_regTask_array.length];
 								for (int j = 0; j < e_regTask_array.length; j++) {
 									IPProcess proc = job.getProcessByIndex(e_regTask_array[j]);
-									((UIDebugManager) getPView().getUIManager()).removeConsoleWindow(job, proc);
 									regElementArray[j] = eHandler.getSetRoot().getElementByID(proc.getID());
 								}
 								eHandler.removeFromRegister(regElementArray);
