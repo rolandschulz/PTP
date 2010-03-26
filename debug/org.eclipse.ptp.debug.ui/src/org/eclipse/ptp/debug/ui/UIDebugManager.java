@@ -24,9 +24,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -34,7 +34,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.DebugJobStorage;
@@ -42,12 +41,10 @@ import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.internal.ui.PAnnotationManager;
 import org.eclipse.ptp.ui.IElementManager;
-import org.eclipse.ptp.ui.OutputConsole;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -132,17 +129,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		debugModel = PTPDebugCorePlugin.getDebugModel();
 		annotationMgr = new PAnnotationManager(this);
 		initializePreferences();
-	}
-	
-	/**
-	 * Add process to console window if it is register into Debug View
-	 * @param proc
-	 */
-	public void addConsoleWindow(IPJob job, IPProcess proc) {
-		if (consoleStorage.getValue(job.getID(), proc.getID()) == null) {
-			OutputConsole outputConsole = new OutputConsole(proc.getName(), new ProcessInputStream(proc));
-			consoleStorage.addValue(job.getID(), proc.getID(), outputConsole);
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -464,24 +450,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		});
 	}
 	
-	/**
-	 * Remove process from console list and close its output
-	 * @param proc
-	 */
-	public void removeConsoleWindow(IPJob job, IPProcess proc) {
-		OutputConsole outputConsole = (OutputConsole) consoleStorage.removeValue(job.getID(), proc.getID());
-		if (outputConsole != null) {
-			outputConsole.kill();
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IElementManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
 			debugModel.shutdownSession(job);
-			removeConsoleWindows(job);
 		}
 		super.removeJob(job);
 	}
@@ -745,18 +719,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			tasks.set(convertToInt(element.getName()));
 		}
 		return tasks;
-	}
-
-	/**
-	 * @param job
-	 */
-	private void removeConsoleWindows(IPJob job) {
-		for (OutputConsole outputConsole : consoleStorage.getValueCollection(job.getID()).toArray(new OutputConsole[0])) {
-			if (outputConsole != null) {
-				outputConsole.kill();
-			}
-		}
-		consoleStorage.removeJobStorage(job.getID());
 	}
 
 	/**
