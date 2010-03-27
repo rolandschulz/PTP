@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.analysis.symtab;
 
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -291,7 +292,12 @@ public class SymbolTable<N, S>
      */
     public Map<String, S> getLocalEntriesIn(N namespace)
     {
-        return entries.getAllEntriesFor(namespace);
+        Map<String, S> result = entries.getAllEntriesFor(namespace);
+
+        if (result == null)
+            return Collections.<String, S>emptyMap();
+        else
+            return result;
     }
 
     /**
