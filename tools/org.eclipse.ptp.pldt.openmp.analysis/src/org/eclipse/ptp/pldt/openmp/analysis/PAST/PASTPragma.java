@@ -56,9 +56,7 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
     }
 
 	/**
-	 * *NOTE* must get Don's CDT parser changes
-	 * for this to compile successfully!
-	 * 
+	 * Is this the pragma statement itself, or the state to which it implies? (immediately following, "scope" of pragma)
 	 * @return
 	 */
 	public String getContent()
