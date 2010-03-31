@@ -71,7 +71,9 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
      */
     public int getOffset()
     {
-        return getStartLocation();
+    	// return getStartLocation();
+    	// https://bugs.eclipse.org/bugs/show_bug.cgi?id=253200  fixed
+    	return astNode_.getOffset(); 
     }
     
     /**
