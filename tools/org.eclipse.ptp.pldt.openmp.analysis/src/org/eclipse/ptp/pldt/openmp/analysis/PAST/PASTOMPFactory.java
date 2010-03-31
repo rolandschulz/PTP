@@ -1037,8 +1037,8 @@ public class PASTOMPFactory
     public static final int LOCATION_ONLY      = RegionDeterminationVisitor.LOCATION_ONLY;
     
     /**
-     * Determine that code region affilated with a pragma & the peer node
-     * @param type - int (see constatns above)
+     * Determine that code region affiliated with a pragma & the peer node
+     * @param type - int (see constants above)
      * @param ompPragma - PASTOMPPragma
      */
     protected void determineRegion(int type, PASTOMPPragma ompPragma)
@@ -1112,22 +1112,31 @@ public class PASTOMPFactory
          * @param statement - IASTStatement
          * @return int
          */
-        public int visit(IASTStatement statement) {
+        @SuppressWarnings("restriction")//remove later
+		public int visit(IASTStatement statement) {    //BRT debugging here. region is being set wrong, needs to be drilled down more
             ASTNode node = (statement instanceof ASTNode ? (ASTNode)statement : null);
             if (node==null)  return PROCESS_CONTINUE;
             
             // ensure the node is in the same file as the pragma
             if (node.getContainingFilename().equals(oPragma_.getFileLocation().getFileName())) {
               int              totalOffset = node.getOffset();
+              // test use of IASTNode vs ASTNode. compare with Utility.getLocation which uses a combination of the two
+              IASTNode inode = (IASTNode) node;
+              int ilen=inode.getNodeLocations()[0].getNodeLength();
+              int ioff=inode.getNodeLocations()[0].getNodeOffset();
+              System.out.println("    ilen="+ilen+" ioff="+ioff);
+              
               Utility.Location loc = Utility.getLocation(node);
               assert(loc!=null);
               int localOffset = loc.getLow();  // this is the offset local to the file
               int length      = loc.getHigh()-loc.getLow()+1;
               
               // We look at all nodes that occur before the pragma - 2 cases
-              // 1) if the node scope encompases the pragam, pragma is a child of node
+              // 1) if the node scope encompases the pragma, pragma is a child of node
               // 2) otherwise we call it a peer (even when it isn't)
               // Corrections occur by continuing for the tightest fit
+              //// https://bugs.eclipse.org/bugs/show_bug.cgi?id=253200  fixed (see PASTPragma.getOffset(); this println helps, should be called several times as it zeroes in on the statement closest to the pragma
+              if(traceOn)System.out.println("totalOffset "+totalOffset+" < pragmaLocation "+pragmaLocation_);// from ptp20
               if (totalOffset<pragmaLocation_) {
                   if (pragmaLocation_+pragmaLength_<totalOffset+length) { // encompassing
                       oPragma_.setLocation(statement, PASTOMPPragma.ChildProximity);
