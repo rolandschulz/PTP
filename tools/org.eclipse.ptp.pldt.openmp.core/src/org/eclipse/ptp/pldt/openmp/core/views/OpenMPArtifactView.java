@@ -30,6 +30,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
  * 
  */
 public class OpenMPArtifactView extends SimpleTableMarkerView {
+
 	public OpenMPArtifactView() {
 		// if you need to read icon images, etc. from the plug-in, be sure to
 		// pass in an actual Plugin class instance for first arg
@@ -51,13 +52,19 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		if (temp != null) {
 			Integer constructType = (Integer) temp;
 			int i = constructType.intValue();
-			String val;// = CONSTRUCT_TYPE_NAMES[i];
+			String val="";
+			if (i < Artifact.CONSTRUCT_TYPE_NAMES.length)
+				val = Artifact.CONSTRUCT_TYPE_NAMES[i];
+			else
+				val = "value is " + i;
+		
+			/*
 			val = "value is " + i; // BRT need a more robust lookup
 			if (i == 0)
 				val = "OpenMP Pragma";
 			if (i == 1)
 				val = "Function Call";
-
+	*/
 			return val;
 		} else
 			return " ";
@@ -66,6 +73,7 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 
     /**
      * Make "show info" action to display artifact information
+     * This is the "show pragma region" action for OpenMP artifacts
      */
     protected void makeShowInfoAction()
     {
@@ -119,7 +127,8 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
                     {
                         int offset = ompPragma.getRegionOffset(); //ifl.getNodeOffset();  //locs[0].getNodeOffset();
                         int length = ompPragma.getRegionLength(); //ifl.getNodeLength();  //region.getLength(); 
-                         ((AbstractTextEditor)aPart).selectAndReveal( offset, length);
+                        //System.out.println("OMPAV: Pragma offset: "+offset+" length: "+length);
+                        ((AbstractTextEditor)aPart).selectAndReveal( offset, length);
                     }  
                      
                     
