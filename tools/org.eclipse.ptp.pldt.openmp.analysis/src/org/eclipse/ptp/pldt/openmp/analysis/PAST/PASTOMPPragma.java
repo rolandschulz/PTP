@@ -372,4 +372,8 @@ public class PASTOMPPragma extends PASTPragma
 
     public void setLocation(IASTStatement location, int proximity) 
     { locationNode_=location;   locationProximity_=proximity;  }
+    
+    public String toString() {
+    	return "PASTOMPPragma: "+getType()+" offset: "+regionOffset_+"  length: "+regionLength_;
+    }
 }
