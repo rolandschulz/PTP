@@ -127,8 +127,10 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 
 		for (int i = 0; i < pList.length; i++) {
 			if (pList[i] instanceof PASTOMPPragma) {
-				PASTOMPPragma pop = (PASTOMPPragma) pList[i];
-				SourceInfo si = getSourceInfo(pop, 0);
+				
+				PASTOMPPragma pop = (PASTOMPPragma) pList[i];  
+				if(traceOn)System.out.println("found #pragma, line "+pop.getStartingLine());
+				SourceInfo si = getSourceInfo(pop, Artifact.PRAGMA);
 				Artifact a = new Artifact(pop.getFilename(), pop
 						.getStartingLine(), pop.getStartLocation(), pop
 						.getContent(), OPENMP_DIRECTIVE, si, pop);
