@@ -77,11 +77,6 @@ public class RemoteToolsServices implements IRemoteServices {
 		return connMgr;
 	}
 
-	public String getDirectorySeparator(IRemoteConnection conn) {
-		// dunno if there is a way to do this for Remote Tools... just return the forward slash
-		return "/"; //$NON-NLS-1$
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */

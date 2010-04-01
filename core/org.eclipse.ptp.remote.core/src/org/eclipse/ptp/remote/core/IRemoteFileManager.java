@@ -30,6 +30,13 @@ public interface IRemoteFileManager {
 	public IFileStore getResource(String path);
 	
 	/**
+	 * Gets the directory separator on the target system.
+	 * 
+	 * @return String
+	 */
+	public String getDirectorySeparator();
+	
+	/**
 	 * Convert URI to a remote path. This path is suitable for
 	 * direct file operations <i>on the remote system</i>.
 	 * 

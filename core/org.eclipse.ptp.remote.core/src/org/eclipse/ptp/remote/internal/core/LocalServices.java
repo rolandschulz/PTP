@@ -39,13 +39,6 @@ public class LocalServices implements IRemoteServices {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getDirectorySeparator(org.eclipse.ptp.remote.core.IRemoteConnection)
-	 */
-	public String getDirectorySeparator(IRemoteConnection conn) {
-		return System.getProperty("file.separator", "/"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {

@@ -21,13 +21,6 @@ public interface IRemoteServices extends IRemoteServicesDescriptor {
 	public IRemoteConnectionManager getConnectionManager();
 	
 	/**
-	 * Gets the directory separator on the target system.
-	 * 
-	 * @return String
-	 */
-	public String getDirectorySeparator(IRemoteConnection conn);
-	
-	/**
 	 * Get a file manager for managing remote files
 	 * 
 	 * @param conn connection to use for managing files
