@@ -25,6 +25,14 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getDirectorySeparator()
+	 */
+	public String getDirectorySeparator() {
+		// dunno if there is a way to do this for Remote Tools... just return the forward slash
+		return "/"; //$NON-NLS-1$
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
 	 */
 	public IFileStore getResource(String pathStr) {
@@ -34,7 +42,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 		}
 		return new RemoteToolsFileStore(fConnection.getName(), path.toString());
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toPath(java.net.URI)
 	 */
@@ -52,7 +60,7 @@ public class RemoteToolsFileManager implements IRemoteFileManager {
 			return null;
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
 	 */

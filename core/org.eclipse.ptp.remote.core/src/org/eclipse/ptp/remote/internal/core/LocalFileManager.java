@@ -25,6 +25,13 @@ public class LocalFileManager implements IRemoteFileManager {
 	public LocalFileManager(LocalConnection conn) {
 		fConnection = conn;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getDirectorySeparator()
+	 */
+	public String getDirectorySeparator() {
+		return System.getProperty("file.separator", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
