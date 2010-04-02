@@ -33,8 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
-import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
@@ -661,7 +661,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		assert (localServices != null);
 		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 		assert (lconnMgr != null);
-		IRemoteConnection lconn = lconnMgr.getConnection(null); // Since it's a local service, doesn't matter which parameter is passed
+		IRemoteConnection lconn = lconnMgr.getConnection(""); //$NON-NLS-1$ // Since it's a local service, doesn't matter which parameter is passed 
 		assert (lconn != null);
 		IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
 		assert (localFileManager != null);
