@@ -181,20 +181,6 @@ public class PTPRemoteCorePlugin extends Plugin {
 		Arrays.sort(services, new RemoteServicesSorter());
 		return services;
 	}
-	
-	/**
-	 * Get the connection identified by a URI
-	 * 
-	 * @param uri
-	 * @return connection
-	 */
-	public IRemoteConnection getConnection(URI uri) {
-		IRemoteServices services = getRemoteServices(uri);
-		if (services != null) {
-			return services.getConnectionManager().getConnection(uri.getHost());
-		}
-		return null;
-	}
 
 	/**
 	 * Retrieve the default remote services plugin. The default is the LocalServices

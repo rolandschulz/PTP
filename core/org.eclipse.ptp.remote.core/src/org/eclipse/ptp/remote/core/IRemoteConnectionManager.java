@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -24,6 +25,14 @@ public interface IRemoteConnectionManager {
 	 * @return remote connection or null if no connection exists
 	 */
 	public IRemoteConnection getConnection(String name);
+	
+	/**
+	 * Gets the remote connection corresponding to the supplied URI.
+	 * 
+	 * @param uri URI containing a schema for this remote connection
+	 * @return remote connection or null if no connection exists or the schema is incorrect
+	 */
+	public IRemoteConnection getConnection(URI uri);
 
 	/**
 	 * Get all the connections for this service provider.

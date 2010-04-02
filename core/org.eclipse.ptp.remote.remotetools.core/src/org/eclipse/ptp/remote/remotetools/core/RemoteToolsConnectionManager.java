@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,13 +44,24 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.net.URI)
+	 */
+	public IRemoteConnection getConnection(URI uri) {
+		String connName = RemoteToolsFileSystem.getConnectionNameFor(uri);
+		if (connName != null) {
+			return getConnection(connName);
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
 		return connections.values().toArray(new IRemoteConnection[connections.size()]);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java.lang.String, java.util.Map)
 	 */
@@ -59,14 +71,14 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		remoteHost.addElement(element);
 		return createConnection(element);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public void removeConnection(IRemoteConnection conn) {
 		connections.remove(conn);
 	}
-
+	
 	/**
 	 * Create a connection using information from the target element.
 	 * 
@@ -91,6 +103,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 			throw new RemoteConnectionException(e.getMessage());
 		}
 	}
+	
 	
 	/**
 	 * Refresh the list of connections that we know about. Deals with connection that are added or deleted
