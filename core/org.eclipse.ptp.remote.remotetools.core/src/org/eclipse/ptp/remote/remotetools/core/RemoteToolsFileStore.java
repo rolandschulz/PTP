@@ -12,9 +12,7 @@ package org.eclipse.ptp.remote.remotetools.core;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,15 +53,12 @@ public class RemoteToolsFileStore extends FileStore {
 			RemoteToolsFileStore store = (RemoteToolsFileStore) instanceMap
 					.get(uri.toString());
 			if (store == null) {
-				String name = uri.getAuthority();
-				try {
-					name = URLDecoder.decode(name, "UTF-8"); //$NON-NLS-1$
-				} catch (UnsupportedEncodingException e) {
-					// Should not happen
+				String name = RemoteToolsFileSystem.getConnectionNameFor(uri);
+				if (name != null) {
+					String path = uri.getPath();
+					store = new RemoteToolsFileStore(name, path);
+					instanceMap.put(uri.toString(), store);
 				}
-				String path = uri.getPath();
-				store = new RemoteToolsFileStore(name, path);
-				instanceMap.put(uri.toString(), store);
 			}
 			return store;
 		}
@@ -88,7 +83,7 @@ public class RemoteToolsFileStore extends FileStore {
 		IRemoteItem[] items;
 		try {
 			items = getExecutionManager(monitor).getRemoteFileTools()
-					.listItems(fRemotePath.toString());
+					.listItems(fRemotePath.toString(), monitor);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
@@ -121,7 +116,7 @@ public class RemoteToolsFileStore extends FileStore {
 		IRemoteItem[] items;
 		try {
 			items = getExecutionManager(monitor).getRemoteFileTools()
-					.listItems(fRemotePath.toString());
+					.listItems(fRemotePath.toString(), monitor);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
@@ -151,19 +146,19 @@ public class RemoteToolsFileStore extends FileStore {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		System.out.println("DELETE: " + fRemotePath.toString()); //$NON-NLS-1$
-
 		IRemoteItem item = getRemoteItem(monitor);
 
+		System.out.println("DELETE: " + fRemotePath.toString() + ", exists: " + item.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		if (item.exists()) {
 			try {
 				cacheRemoteItem(null);
 				if (item.isDirectory()) {
 					getExecutionManager(monitor).getRemoteFileTools()
-							.removeDirectory(fRemotePath.toString());
+							.removeDirectory(fRemotePath.toString(),monitor);
 				} else {
 					getExecutionManager(monitor).getRemoteFileTools()
-							.removeFile(fRemotePath.toString());
+							.removeFile(fRemotePath.toString(),monitor);
 				}
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
@@ -267,7 +262,7 @@ public class RemoteToolsFileStore extends FileStore {
 
 			try {
 				getExecutionManager(monitor).getRemoteFileTools()
-						.createDirectory(fRemotePath.toString());
+						.createDirectory(fRemotePath.toString(), monitor);
 				cacheRemoteItem(null);
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
@@ -403,7 +398,7 @@ public class RemoteToolsFileStore extends FileStore {
 		}
 		if (modified) {
 			try {
-				item.commitAttributes();
+				item.commitAttributes(monitor);
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
 						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
@@ -570,8 +565,9 @@ public class RemoteToolsFileStore extends FileStore {
 			}
 
 			try {
-				fRemoteItem.refreshAttributes();
+				fRemoteItem.refreshAttributes(monitor);
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new CoreException(new Status(IStatus.ERROR,
 						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
 								.getSymbolicName(), EFS.ERROR_INTERNAL, e

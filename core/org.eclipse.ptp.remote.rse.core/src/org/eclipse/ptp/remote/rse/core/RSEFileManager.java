@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.core;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -49,7 +48,11 @@ public class RSEFileManager implements IRemoteFileManager {
 		if (!path.isAbsolute()) {
 			path = new Path(fConnection.getWorkingDirectory()).append(path);
 		}
-		return fConnection.getFileSystem().getStore(toURI(path));
+		try {
+			return EFS.getFileSystem("rse").getStore(toURI(path)); //$NON-NLS-1$
+		} catch (CoreException e) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -63,15 +66,9 @@ public class RSEFileManager implements IRemoteFileManager {
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI toURI(IPath path) {
-		String authority = fConnection.getHost().getHostName();
 		try {
-			authority = URLEncoder.encode(authority, "UTF-8"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			// Should not happen
-		}
-		try {
-			return new URI("rse", authority, path.makeAbsolute().toPortableString(), null, null); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
+			return EFS.getFileSystem("rse").getStore(path).toURI(); //$NON-NLS-1$
+		} catch (CoreException e) {
 			return null;
 		}
 	}

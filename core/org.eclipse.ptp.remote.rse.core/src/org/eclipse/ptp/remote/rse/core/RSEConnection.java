@@ -13,7 +13,6 @@ package org.eclipse.ptp.remote.rse.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -50,7 +49,6 @@ public class RSEConnection implements IRemoteConnection {
 	private IPath fWorkingDir = null;
 
 	private final IHost rseHost;
-	private final IFileSystem fileSystem;
 	private final IRemoteConnection fConnection = this;
 	private final ListenerList fListeners = new ListenerList();
 	
@@ -78,9 +76,8 @@ public class RSEConnection implements IRemoteConnection {
 		
 	};
 	
-	public RSEConnection(IHost host, IFileSystem fileSystem) {
+	public RSEConnection(IHost host) {
 		this.rseHost = host;
-		this.fileSystem = fileSystem;
 	}
 
 	/* (non-Javadoc)
@@ -191,15 +188,6 @@ public class RSEConnection implements IRemoteConnection {
 			getEnv();
 		}
 		return fEnv.get(name);
-	}
-	
-	/**
-	 * Get the file system for this fConnection
-	 * 
-	 * @return
-	 */
-	public IFileSystem getFileSystem() {
-		return fileSystem;
 	}
 
 	/**

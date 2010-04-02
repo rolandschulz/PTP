@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.core;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileSystem;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -24,18 +22,11 @@ import org.eclipse.rse.core.model.ISystemRegistry;
 
 
 public class RSEConnectionManager implements IRemoteConnectionManager {
-	private IFileSystem fileSystem = null;
-	
-	private final ISystemRegistry registry;
+	private final ISystemRegistry fRegistry;
 	private final Map<String, RSEConnection> connections = new HashMap<String, RSEConnection>();
 	
 	public RSEConnectionManager(ISystemRegistry registry) {
-		this.registry = registry;
-		try {
-			this.fileSystem = EFS.getFileSystem("rse"); //$NON-NLS-1$
-		} catch (CoreException e) {
-			// Could not find the rse filesystem!
-		}
+		fRegistry = registry;
 	}
 	
 	/* (non-Javadoc)
@@ -47,6 +38,20 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 			return connections.get(name);
 		}
 		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.net.URI)
+	 */
+	public IRemoteConnection getConnection(URI uri) {
+		/*
+		 * See org.eclipse.rse.internal.efs.RSEFileSystem for definition
+		 */
+		String name = uri.getQuery();
+		if (name == null) {
+			name = uri.getHost();
+		}
+		return getConnection(name);
 	}
 	
 	/* (non-Javadoc)
@@ -70,22 +75,20 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * Check for new connections
 	 */
 	public void refreshConnections() {
-		if (fileSystem != null) {
-			Map<String, RSEConnection> newConns = new HashMap<String, RSEConnection>();
-			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
-			for (IHost host : hosts) {
-				RSEConnection conn = connections.get(host);
-				if (conn == null) {
-					conn = new RSEConnection(host, fileSystem);
-					if (!conn.initialize()) {
-						continue;
-					}
+		Map<String, RSEConnection> newConns = new HashMap<String, RSEConnection>();
+		IHost[] hosts = fRegistry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
+		for (IHost host : hosts) {
+			RSEConnection conn = connections.get(host);
+			if (conn == null) {
+				conn = new RSEConnection(host);
+				if (!conn.initialize()) {
+					continue;
 				}
-				newConns.put(host.getAliasName(), conn);
 			}
-			connections.clear();
-			connections.putAll(newConns);
+			newConns.put(host.getAliasName(), conn);
 		}
+		connections.clear();
+		connections.putAll(newConns);
 	}
 
 	/* (non-Javadoc)

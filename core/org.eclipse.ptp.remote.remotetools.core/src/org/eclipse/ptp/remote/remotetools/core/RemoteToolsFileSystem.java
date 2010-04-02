@@ -26,6 +26,7 @@ package org.eclipse.ptp.remote.remotetools.core;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import org.eclipse.core.filesystem.EFS;
@@ -37,10 +38,19 @@ public class RemoteToolsFileSystem extends FileSystem {
 	private static RemoteToolsFileSystem instance = new RemoteToolsFileSystem();
 
 	/**
-	 * Default constructor.
+	 * Return the connection name encoded in the URI.
+	 * 
+	 * @param uri URI specifying a remote tools connection
+	 * @return name of the connection or null if the URI is invalid
 	 */
-	public RemoteToolsFileSystem() {
-		super();
+	public static String getConnectionNameFor(URI uri) {
+		String name = uri.getAuthority();
+		try {
+			name = URLDecoder.decode(name, "UTF-8"); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
+		return name;
 	}
 	
 	/**
@@ -49,47 +59,6 @@ public class RemoteToolsFileSystem extends FileSystem {
 	 */
 	public static RemoteToolsFileSystem getInstance() {
 		return instance;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.IFileSystem#attributes()
-	 */
-	public int attributes() {
-		//Attributes supported by RSE IFileService
-		return EFS.ATTRIBUTE_READ_ONLY | EFS.ATTRIBUTE_EXECUTABLE
-		     | EFS.ATTRIBUTE_SYMLINK | EFS.ATTRIBUTE_LINK_TARGET;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileSystem#canDelete()
-	 */
-	public boolean canDelete() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileSystem#canWrite()
-	 */
-	public boolean canWrite() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileSystem#getStore(java.net.URI)
-	 */
-	public IFileStore getStore(URI uri) {
-		try  {
-			return RemoteToolsFileStore.getInstance(uri);
-		} 
-		catch (Exception e) {
-			//Could be an URI format exception
-			PTPRemoteCorePlugin.log(e);
-			return EFS.getNullFileSystem().getStore(uri);
-		}
 	}
 	
 	/**
@@ -110,6 +79,54 @@ public class RemoteToolsFileSystem extends FileSystem {
 			return new URI("remotetools", authority, path, null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Default constructor.
+	 */
+	public RemoteToolsFileSystem() {
+		super();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.IFileSystem#attributes()
+	 */
+	public int attributes() {
+		//Attributes supported by RSE IFileService
+		return EFS.ATTRIBUTE_READ_ONLY | EFS.ATTRIBUTE_EXECUTABLE
+		     | EFS.ATTRIBUTE_SYMLINK | EFS.ATTRIBUTE_LINK_TARGET;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.provider.FileSystem#canDelete()
+	 */
+	public boolean canDelete() {
+		return true;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.provider.FileSystem#canWrite()
+	 */
+	public boolean canWrite() {
+		return true;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.provider.FileSystem#getStore(java.net.URI)
+	 */
+	public IFileStore getStore(URI uri) {
+		try  {
+			return RemoteToolsFileStore.getInstance(uri);
+		} 
+		catch (Exception e) {
+			//Could be an URI format exception
+			PTPRemoteCorePlugin.log(e);
+			return EFS.getNullFileSystem().getStore(uri);
 		}
 	}
 }
