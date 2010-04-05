@@ -303,7 +303,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			label.setText(Messages.RMServicesConfigurationWizard_8);
 			fServiceProviderList = new List(container, SWT.SINGLE | SWT.BORDER
 					| SWT.V_SCROLL);
-			fServiceProviderList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			fServiceProviderList.setLayoutData(new GridData(GridData.FILL_BOTH));
 			fServiceProviderList.setItems(providerNames);
 			fServiceProviderList.setEnabled(fProviders.length > 0);
 			fServiceProviderList.addSelectionListener(new SelectionAdapter() {
