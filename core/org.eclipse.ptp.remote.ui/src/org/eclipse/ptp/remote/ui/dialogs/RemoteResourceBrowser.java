@@ -10,42 +10,36 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.dialogs;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.internal.ui.RemoteUIImages;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.messages.Messages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -60,6 +54,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.eclipse.ui.progress.PendingUpdateAdapter;
 
 /**
  * Generic file/directory browser for remote resources.
@@ -83,6 +78,7 @@ public class RemoteResourceBrowser extends Dialog {
 	private Button okButton = null;
 	private Combo connectionCombo = null;
 	private Button newButton = null;
+	private Button upButton = null;
 
 	private int browserType;
 	private String dialogTitle;
@@ -92,37 +88,37 @@ public class RemoteResourceBrowser extends Dialog {
 	private String remotePath = EMPTY_STRING;
 	private String remotePaths[];
 	private String initialPath = null;
-	private IRemoteServices services = null;
-	private IRemoteFileManager fileMgr = null;
-	private IRemoteConnection connection = null;
-	private IRemoteConnectionManager connMgr = null;
-	private IRemoteUIConnectionManager uiConnMgr = null;
+	private IRemoteServices fServices = null;
+	private IRemoteFileManager fFileMgr = null;
+	private IRemoteConnection fConnection = null;
+	private IRemoteConnectionManager fConnMgr = null;
+	private IRemoteUIConnectionManager fUIConnMgr = null;
 	private int optionFlags = SINGLE;
 
 	public RemoteResourceBrowser(IRemoteServices services,
 			IRemoteConnection conn, Shell parent, int flags) {
 		super(parent);
 		setShellStyle(SWT.RESIZE | getShellStyle());
-		this.services = services;
-		this.connection = conn;
+		fServices = services;
+		fConnection = conn;
 		this.optionFlags = flags;
 		if (conn == null) {
 			showConnections = true;
 		}
-		this.connMgr = services.getConnectionManager();
-		this.uiConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
+		fConnMgr = services.getConnectionManager();
+		fUIConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
 				services).getUIConnectionManager();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
 		setType(FILE_BROWSER | DIRECTORY_BROWSER);
 	}
 
 	/**
-	 * Get the connection that was selected
+	 * Get the fConnection that was selected
 	 * 
-	 * @return selected connection
+	 * @return selected fConnection
 	 */
 	public IRemoteConnection getConnection() {
-		return connection;
+		return fConnection;
 	}
 
 	/**
@@ -202,10 +198,10 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Change the viewers input. Called when a new connection is selected.
+	 * Change the viewers input. Called when a new fConnection is selected.
 	 * 
 	 * @param conn
-	 *            new connection
+	 *            new fConnection
 	 * @return true if input successfully changed
 	 */
 	private boolean changeInput(final IRemoteConnection conn) {
@@ -214,36 +210,14 @@ public class RemoteResourceBrowser extends Dialog {
 		}
 
 		if (!conn.isOpen()) {
-			IRunnableWithProgress op = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor)
-						throws InvocationTargetException, InterruptedException {
-					try {
-						conn.open(monitor);
-					} catch (RemoteConnectionException e) {
-						ErrorDialog.openError(getShell(), Messages.RemoteResourceBrowser_1,
-								Messages.RemoteResourceBrowser_2, new Status(
-										IStatus.ERROR,
-										PTPRemoteUIPlugin.PLUGIN_ID, e
-												.getMessage()));
-					}
-				}
-
-			};
-			try {
-				new ProgressMonitorDialog(getShell()).run(true, true, op);
-			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(getShell(), Messages.RemoteResourceBrowser_1,
-						Messages.RemoteResourceBrowser_2, new Status(IStatus.ERROR,
-								PTPRemoteUIPlugin.PLUGIN_ID, e.getMessage()));
-			} catch (InterruptedException e) {
-				ErrorDialog.openError(getShell(), Messages.RemoteResourceBrowser_1,
-						Messages.RemoteResourceBrowser_2, new Status(IStatus.ERROR,
-								PTPRemoteUIPlugin.PLUGIN_ID, e.getMessage()));
+			fUIConnMgr.openConnectionWithProgress(getShell(), conn);
+			if (!conn.isOpen()) {
+				return false;
 			}
 		}
 
-		fileMgr = services.getFileManager(conn);
-		if (fileMgr != null) {
+		fFileMgr = fServices.getFileManager(conn);
+		if (fFileMgr != null) {
 			/*
 			 * Note: the call to findInitialPath must happen before the
 			 * treeViewer input is set or the treeViewer fails. No idea why this
@@ -253,38 +227,43 @@ public class RemoteResourceBrowser extends Dialog {
 			IPath initial = findInitialPath(cwd, initialPath);
 			remotePathText.setText(initial.toString());
 
-			IFileStore root = fileMgr.getResource(cwd);
+			setInput(cwd);
 
-			treeViewer.setInput(new DeferredFileStore(root));
-
-			connection = conn;
+			fConnection = conn;
 			return true;
 		}
 
 		return false;
 	}
+	
+	private void setInput(String path) {
+		if (fFileMgr != null) {
+			IFileStore root = fFileMgr.getResource(path);
+			treeViewer.setInput(new DeferredFileStore(root));
+		}
+	}
 
 	/**
-	 * When a new connection is selected, make sure it is open before using it.
+	 * When a new fConnection is selected, make sure it is open before using it.
 	 */
 	private void connectionSelected() {
 		int i = connectionCombo.getSelectionIndex();
 		if (i >= 0) {
 			/*
-			 * Make sure the connection is open before we try and read from the
-			 * connection.
+			 * Make sure the fConnection is open before we try and read from the
+			 * fConnection.
 			 */
-			final IRemoteConnection conn = connMgr
+			final IRemoteConnection conn = fConnMgr
 					.getConnection(connectionCombo.getItem(i));
 			if (!changeInput(conn)) {
 				/*
 				 * Reset combo back to the previous selection
 				 */
-				if (connection == null) {
+				if (fConnection == null) {
 					connectionCombo.deselectAll();
 				} else {
 					for (i = 0; i < connectionCombo.getItemCount(); i++) {
-						if (connection.equals(connectionCombo.getItem(i))) {
+						if (fConnection.equals(connectionCombo.getItem(i))) {
 							connectionCombo.select(i);
 							break;
 						}
@@ -295,7 +274,7 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Create composite to allow connection selection and creation.
+	 * Create composite to allow fConnection selection and creation.
 	 * 
 	 * @param comp
 	 */
@@ -333,8 +312,8 @@ public class RemoteResourceBrowser extends Dialog {
 		newButton.setLayoutData(gd);
 		newButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
-				if (uiConnMgr != null) {
-					IRemoteConnection conn = uiConnMgr
+				if (fUIConnMgr != null) {
+					IRemoteConnection conn = fUIConnMgr
 							.newConnection(getShell());
 					if (conn != null) {
 						updateConnectionCombo(conn);
@@ -365,7 +344,7 @@ public class RemoteResourceBrowser extends Dialog {
 			if (pathToCheck.matchingFirstSegments(path) != path.segmentCount()) {
 				return path;
 			}
-			if (fileMgr.getResource(initialPath).fetchInfo().exists()) {
+			if (fFileMgr.getResource(initialPath).fetchInfo().exists()) {
 				path = pathToCheck;
 			}
 		}
@@ -373,14 +352,14 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Update connection combo dropdown with current connections. If supplied
+	 * Update fConnection combo dropdown with current connections. If supplied
 	 * conn will be selected in the list.
 	 * 
 	 * @param conn
-	 *            connection to select in the list
+	 *            fConnection to select in the list
 	 */
 	private void updateConnectionCombo(IRemoteConnection conn) {
-		IRemoteConnectionManager mgr = services.getConnectionManager();
+		IRemoteConnectionManager mgr = fServices.getConnectionManager();
 		IRemoteConnection[] conns = mgr.getConnections();
 
 		if (conns.length > 0) {
@@ -411,26 +390,22 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	private void updateDialog() {
-		if (remotePathText.getText().equals(EMPTY_STRING)) {
-			okButton.setEnabled(false);
-		} else {
-			okButton.setEnabled(true);
+		if (remotePathText != null && okButton != null) {
+			if (remotePathText.getText().equals(EMPTY_STRING)) {
+				okButton.setEnabled(false);
+			} else {
+				okButton.setEnabled(true);
+			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
-	@Override
-	protected Control createButtonBar(Composite parent) {
-		Control buttons = super.createButtonBar(parent);
-		okButton = getButton(IDialogConstants.OK_ID);
-		okButton.setEnabled(false);
-		return buttons;
+		if (remotePathText != null && upButton != null) {
+			boolean enabled = false;
+			String pathText = remotePathText.getText();
+			if (!pathText.equals("")) { //$NON-NLS-1$
+				IPath path = new Path(pathText);
+				enabled = !path.isRoot();
+			}
+			upButton.setEnabled(enabled);
+		}
 	}
 
 	/*
@@ -446,13 +421,13 @@ public class RemoteResourceBrowser extends Dialog {
 		setTitle(dialogTitle);
 		remotePathText.setText(remotePath);
 		if (showConnections) {
-			updateConnectionCombo(connection);
+			updateConnectionCombo(fConnection);
 		} else {
-			changeInput(connection);
+			changeInput(fConnection);
 		}
 		return contents;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -468,28 +443,60 @@ public class RemoteResourceBrowser extends Dialog {
 		dialogComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
 				false));
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
+		layout.numColumns = 2;
 		dialogComp.setLayout(layout);
 
 		Label label = new Label(dialogComp, SWT.NONE);
 		label.setText(dialogLabel);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
 		if (showConnections) {
 			createConnectionChooser(dialogComp);
 		}
 
-		remotePathText = new Text(main, SWT.BORDER | SWT.SINGLE);
+		remotePathText = new Text(dialogComp, SWT.BORDER | SWT.SINGLE);
 		remotePathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				remotePath = remotePathText.getText();
 				updateDialog();
 			}
 		});
+		remotePathText.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				getShell().setDefaultButton(null); // allow text widget to receive SWT.DefaultSelection event
+			}
+			public void focusLost(FocusEvent e) {
+				getShell().setDefaultButton(okButton);
+			}
+		});
+		remotePathText.addSelectionListener(new SelectionAdapter(){
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				setInput(remotePathText.getText());
+			}
+			
+		});
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.widthHint = widthHint;
 		remotePathText.setLayoutData(gd);
+		
+		upButton = new Button(dialogComp, SWT.PUSH|SWT.FLAT);
+		upButton.setImage(RemoteUIImages.get(RemoteUIImages.IMG_ELCL_UP_NAV));
+		upButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String pathText = remotePathText.getText();
+				if (!pathText.equals("")) { //$NON-NLS-1$
+					IPath path = new Path(pathText);
+					if (!path.isRoot()) {
+						path = path.removeLastSegments(1);
+						remotePathText.setText(path.toOSString());
+						setInput(path.toOSString());
+					}
+				}
+			}
+		});
 
 		if ((optionFlags & MULTI) == MULTI) {
 			tree = new Tree(main, SWT.MULTI | SWT.BORDER);
@@ -497,31 +504,15 @@ public class RemoteResourceBrowser extends Dialog {
 			tree = new Tree(main, SWT.SINGLE | SWT.BORDER);
 		}
 
-		GridData data = new GridData(GridData.FILL_BOTH);
-
+		gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
 		// see bug 158380
-		data.heightHint = Math.max(main.getParent().getSize().y, heightHint);
-		tree.setLayoutData(data);
+		gd.heightHint = Math.max(main.getParent().getSize().y, heightHint);
+		tree.setLayoutData(gd);
 
-		treeViewer = new TreeViewer(tree) {
-			/*
-			 * Fix to allow filtering to be used without triggering fetching of
-			 * the contents of all children (see bug 62268)
-			 */
-			public boolean isExpandable(Object element) {
-				ITreeContentProvider cp = (ITreeContentProvider) getContentProvider();
-				if (cp == null)
-					return false;
-
-				return cp.hasChildren(element);
-			}
-		};
+		treeViewer = new TreeViewer(tree);
 		treeViewer.setContentProvider(new RemoteContentProvider());
 		treeViewer.setLabelProvider(new WorkbenchLabelProvider());
-		treeViewer.getTree().addMouseListener(new MouseAdapter() {
-			public void mouseDoubleClick(MouseEvent e) {
-			}
-		});
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection selection = event.getSelection();
@@ -531,44 +522,45 @@ public class RemoteResourceBrowser extends Dialog {
 					Object element = ss.getFirstElement();
 					if (element instanceof DeferredFileStore) {
 						DeferredFileStore dfs = (DeferredFileStore) element;
-						if (browserType == DIRECTORY_BROWSER) {
-							if (dfs.isContainer()) {
-								remotePathText.setText(dfs.getFileStore()
-										.toURI().getPath());
-							}
-						} else {
-							if (dfs.isContainer()) {
-								event.getSelectionProvider().setSelection(null);
-							} else {
-								remotePathText.setText(dfs.getFileStore()
-										.toURI().getPath());
-							}
-						}
+						remotePathText.setText(dfs.getFileStore()
+								.toURI().getPath());
 					}
 					Vector<String> selectedPaths = new Vector<String>(ss.size());
-					Iterator<IStructuredSelection> selectionIterator = ss
-							.iterator();
-					while (selectionIterator.hasNext()) {
-						Object currentSelection = selectionIterator.next();
+					for (Object currentSelection : ss.toArray()) {
 						if (currentSelection instanceof DeferredFileStore) {
-							if (!((DeferredFileStore) currentSelection)
-									.isContainer()) {
-								selectedPaths
-										.add(((DeferredFileStore) currentSelection)
-												.getFileStore().toURI()
-												.getPath());
-							}
+							selectedPaths.add(((DeferredFileStore) currentSelection)
+											.getFileStore().toURI()
+											.getPath());
 						}
 					}
-					remotePaths = new String[selectedPaths.size()];
-					int i = 0;
-					for (String s : selectedPaths) {
-						remotePaths[i++] = s;
-					}
+					remotePaths = selectedPaths.toArray(new String[0]);
 				}
 			}
 		});
 		treeViewer.setComparator(new RemoteResourceComparator());
+		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				IStructuredSelection s = (IStructuredSelection) event.getSelection();
+				Object o = s.getFirstElement();
+				if (treeViewer.isExpandable(o)) {
+					treeViewer.setExpandedState(o, !treeViewer.getExpandedState(o));
+				}			
+			}
+			
+		});
+		if (browserType == DIRECTORY_BROWSER) {
+			treeViewer.addFilter(new ViewerFilter() {
+				public boolean select(Viewer viewer, Object parentElement,
+						Object element) {
+					if ((element instanceof DeferredFileStore)) {
+						return ((DeferredFileStore)element).isContainer();
+					}
+					return element instanceof PendingUpdateAdapter;
+				}
+			});
+		}
+		
+		updateDialog();
 
 		return main;
 	}
