@@ -24,8 +24,8 @@ import org.eclipse.rse.core.model.ISystemRegistry;
 
 
 public class RSEServices implements IRemoteServices {
-	private ISystemRegistry registry = null;
-	private IRemoteConnectionManager connMgr = null;
+	private ISystemRegistry fRegistry = null;
+	private IRemoteConnectionManager fConnMgr = null;
 	
 	private final IRemoteServicesDescriptor fDescriptor;
 	
@@ -61,10 +61,10 @@ public class RSEServices implements IRemoteServices {
 		if (!isInitialized()) {
 			return null;
 		}
-		if (connMgr == null) {
-			connMgr = new RSEConnectionManager(registry);
+		if (fConnMgr == null) {
+			fConnMgr = new RSEConnectionManager(fRegistry, this);
 		}
-		return connMgr;
+		return fConnMgr;
 	}
 	
 	/* (non-Javadoc)
@@ -107,14 +107,14 @@ public class RSEServices implements IRemoteServices {
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
 	public void initialize() {
-		if (registry == null) {
+		if (fRegistry == null) {
 			try {
 				RSECorePlugin.waitForInitCompletion();
 			} catch (InterruptedException e) {
 				RSEAdapterCorePlugin.log(e);
 			}
 			if (RSECorePlugin.isTheSystemRegistryActive()) {
-				registry = RSECorePlugin.getTheSystemRegistry();
+				fRegistry = RSECorePlugin.getTheSystemRegistry();
 			} else {
 				RSEAdapterCorePlugin.log(Messages.RSEServices_0);
 			}
@@ -126,7 +126,7 @@ public class RSEServices implements IRemoteServices {
 	 */
 	public boolean isInitialized() {
 		initialize();
-		if (registry == null) {
+		if (fRegistry == null) {
 			return false;
 		}
 		return true;

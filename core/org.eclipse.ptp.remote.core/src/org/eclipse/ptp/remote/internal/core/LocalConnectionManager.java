@@ -16,17 +16,22 @@ import java.util.Map;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 
 public class LocalConnectionManager implements IRemoteConnectionManager {
-	private IRemoteConnection localConnection = new LocalConnection();
+	private final IRemoteConnection fLocalConnection;
 
+	public LocalConnectionManager(IRemoteServices services) {
+		fLocalConnection = new LocalConnection(services);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
-		return localConnection;
+		return fLocalConnection;
 	}
 
 	/* (non-Javadoc)
@@ -34,7 +39,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 */
 	public IRemoteConnection getConnection(URI uri) {
 		if (uri.getScheme().equals(EFS.getLocalFileSystem().getScheme())) {
-			return localConnection;
+			return fLocalConnection;
 		}
 		return null;
 	}
@@ -43,7 +48,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
-		return new IRemoteConnection[]{localConnection};
+		return new IRemoteConnection[]{fLocalConnection};
 	}
 	
 	/* (non-Javadoc)
@@ -51,7 +56,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 */
 	public IRemoteConnection newConnection(String name,
 			Map<String, String> attributes) throws RemoteConnectionException {
-		return localConnection;
+		return fLocalConnection;
 	}
 
 	/* (non-Javadoc)

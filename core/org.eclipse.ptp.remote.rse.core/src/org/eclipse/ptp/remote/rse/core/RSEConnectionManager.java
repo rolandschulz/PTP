@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
@@ -23,10 +24,12 @@ import org.eclipse.rse.core.model.ISystemRegistry;
 
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private final ISystemRegistry fRegistry;
-	private final Map<String, RSEConnection> connections = new HashMap<String, RSEConnection>();
+	private final IRemoteServices fRemoteServices;
+	private final Map<String, RSEConnection> fConnections = new HashMap<String, RSEConnection>();
 	
-	public RSEConnectionManager(ISystemRegistry registry) {
+	public RSEConnectionManager(ISystemRegistry registry, IRemoteServices services) {
 		fRegistry = registry;
+		fRemoteServices = services;
 	}
 	
 	/* (non-Javadoc)
@@ -35,7 +38,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	public IRemoteConnection getConnection(String name) {
 		refreshConnections();
 		if (name != null) {
-			return connections.get(name);
+			return fConnections.get(name);
 		}
 		return null;
 	}
@@ -59,7 +62,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 */
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
-		return connections.values().toArray(new IRemoteConnection[connections.size()]);
+		return fConnections.values().toArray(new IRemoteConnection[fConnections.size()]);
 	}
 
 	/* (non-Javadoc)
@@ -72,23 +75,23 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	}
 	
 	/**
-	 * Check for new connections
+	 * Check for new fConnections
 	 */
 	public void refreshConnections() {
 		Map<String, RSEConnection> newConns = new HashMap<String, RSEConnection>();
 		IHost[] hosts = fRegistry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
 		for (IHost host : hosts) {
-			RSEConnection conn = connections.get(host);
+			RSEConnection conn = fConnections.get(host);
 			if (conn == null) {
-				conn = new RSEConnection(host);
+				conn = new RSEConnection(host, fRemoteServices);
 				if (!conn.initialize()) {
 					continue;
 				}
 			}
 			newConns.put(host.getAliasName(), conn);
 		}
-		connections.clear();
-		connections.putAll(newConns);
+		fConnections.clear();
+		fConnections.putAll(newConns);
 	}
 
 	/* (non-Javadoc)
@@ -98,6 +101,6 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		if (conn instanceof RSEConnection) {
 			((RSEConnection)conn).dispose();
 		}
-		connections.remove(conn.getName());
+		fConnections.remove(conn.getName());
 	}
 }

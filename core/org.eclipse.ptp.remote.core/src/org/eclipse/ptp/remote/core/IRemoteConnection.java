@@ -147,6 +147,13 @@ public interface IRemoteConnection {
 	public String getProperty(String key);
 
 	/**
+	 * Get the remote services provider for this connection.
+	 * 
+	 * @return remote services provider
+	 */
+	public IRemoteServices getRemoteServices();
+	
+	/**
 	 * Gets the username for this connection
 	 * 
 	 * return username
@@ -193,14 +200,14 @@ public interface IRemoteConnection {
 	 * @param address
 	 */
 	public void setAddress(String address);
-	
+
 	/**
 	 * Set the name for this connection
 	 * 
 	 * @param name
 	 */
 	public void setName(String name);
-
+	
 	/**
 	 * Set the username for this connection
 	 * 

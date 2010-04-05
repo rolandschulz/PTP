@@ -27,13 +27,10 @@ import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
 
 public class RemoteToolsServices implements IRemoteServices {
-	private static String TARGET_ELEMENT_NAME = "PTP Remote Host"; //$NON-NLS-1$
-	private static String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
+	private static final String TARGET_ELEMENT_NAME = "PTP Remote Host"; //$NON-NLS-1$
+	private static final String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
 	
 	private static RemoteToolsServices instance = null;
-	
-	private RemoteToolsConnectionManager connMgr = new RemoteToolsConnectionManager();
-	private Map<String, RemoteToolsFileManager> fileMgrs = new HashMap<String, RemoteToolsFileManager>();
 	
 	/**
 	 * Get shared instance of this class
@@ -64,6 +61,8 @@ public class RemoteToolsServices implements IRemoteServices {
 		return null;
 	}
 	
+	private final RemoteToolsConnectionManager connMgr = new RemoteToolsConnectionManager(this);
+	private final Map<String, RemoteToolsFileManager> fileMgrs = new HashMap<String, RemoteToolsFileManager>();
 	private final IRemoteServicesDescriptor fDescriptor;
 	
 	public RemoteToolsServices(IRemoteServicesDescriptor descriptor) {
