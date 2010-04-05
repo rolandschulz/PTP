@@ -18,6 +18,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -87,7 +88,8 @@ public class RemoteResourceBrowser extends Dialog {
 	private boolean showConnections = false;
 	private String remotePath = EMPTY_STRING;
 	private String remotePaths[];
-	private String initialPath = null;
+	private String fInitialPath = null;
+	private IPath fRootPath = null;
 	private IRemoteServices fServices = null;
 	private IRemoteFileManager fFileMgr = null;
 	private IRemoteConnection fConnection = null;
@@ -150,7 +152,7 @@ public class RemoteResourceBrowser extends Dialog {
 	 * @param path
 	 */
 	public void setInitialPath(String path) {
-		initialPath = path;
+		fInitialPath = path;
 	}
 
 	/**
@@ -224,10 +226,9 @@ public class RemoteResourceBrowser extends Dialog {
 			 * is.
 			 */
 			String cwd = conn.getWorkingDirectory();
-			IPath initial = findInitialPath(cwd, initialPath);
-			remotePathText.setText(initial.toString());
+			IPath initial = findInitialPath(cwd, fInitialPath);
 
-			setInput(cwd);
+			setRoot(initial.toOSString());
 
 			fConnection = conn;
 			return true;
@@ -236,13 +237,6 @@ public class RemoteResourceBrowser extends Dialog {
 		return false;
 	}
 	
-	private void setInput(String path) {
-		if (fFileMgr != null) {
-			IFileStore root = fFileMgr.getResource(path);
-			treeViewer.setInput(new DeferredFileStore(root));
-		}
-	}
-
 	/**
 	 * When a new fConnection is selected, make sure it is open before using it.
 	 */
@@ -324,31 +318,39 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Determine the initial path for the browser. This is the initialPath, if:
-	 * 
-	 * 1. it was supplied 
-	 * 2. if it exists on the remote machine 
-	 * 3. if it is relative to the cwd
-	 * 
-	 * If none of these conditions are satisfied, then the initial path will be
-	 * the cwd.
+	 * Determine the initial path for the browser. If the initial path is
+	 * not supplied or does not exist on the remote machine, then the
+	 * initial path will be the cwd.
 	 * 
 	 * @param cwd
 	 * @param initialPath
 	 * @return
 	 */
 	private IPath findInitialPath(String cwd, String initialPath) {
-		IPath path = new Path(cwd);
 		if (initialPath != null) {
-			IPath pathToCheck = new Path(initialPath);
-			if (pathToCheck.matchingFirstSegments(path) != path.segmentCount()) {
-				return path;
-			}
-			if (fFileMgr.getResource(initialPath).fetchInfo().exists()) {
-				path = pathToCheck;
+			IPath path = new Path(initialPath);
+			if (path.isAbsolute() &&
+				fFileMgr.getResource(initialPath).fetchInfo().exists()) {
+				return new Path(initialPath);
 			}
 		}
-		return path;
+		return new Path(cwd);
+	}
+
+	/**
+	 * Set the root directory for the browser. This will also update
+	 * the text field with the path.
+	 * 
+	 * @param path path of root directory
+	 */
+	private void setRoot(String path) {
+		if (fFileMgr != null) {
+			IFileStore root = fFileMgr.getResource(path);
+			treeViewer.setInput(new DeferredFileStore(root));
+			remotePathText.setText(path);
+			remotePathText.setSelection(remotePathText.getText().length());
+			fRootPath = new Path(path);
+		}
 	}
 
 	/**
@@ -406,6 +408,19 @@ public class RemoteResourceBrowser extends Dialog {
 			}
 			upButton.setEnabled(enabled);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createButton(org.eclipse.swt.widgets.Composite, int, java.lang.String, boolean)
+	 */
+	@Override
+	protected Button createButton(Composite parent, int id, String label,
+			boolean defaultButton) {
+		Button button = super.createButton(parent, id, label, defaultButton);
+		if (id == IDialogConstants.OK_ID) {
+			okButton = button;
+		}
+		return button;
 	}
 
 	/*
@@ -474,7 +489,8 @@ public class RemoteResourceBrowser extends Dialog {
 		remotePathText.addSelectionListener(new SelectionAdapter(){
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				setInput(remotePathText.getText());
+				remotePathText.setSelection(remotePathText.getText().length());
+				setRoot(remotePathText.getText());
 			}
 			
 		});
@@ -486,14 +502,8 @@ public class RemoteResourceBrowser extends Dialog {
 		upButton.setImage(RemoteUIImages.get(RemoteUIImages.IMG_ELCL_UP_NAV));
 		upButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String pathText = remotePathText.getText();
-				if (!pathText.equals("")) { //$NON-NLS-1$
-					IPath path = new Path(pathText);
-					if (!path.isRoot()) {
-						path = path.removeLastSegments(1);
-						remotePathText.setText(path.toOSString());
-						setInput(path.toOSString());
-					}
+				if (!fRootPath.isRoot()) {
+					setRoot(fRootPath.removeLastSegments(1).toOSString());
 				}
 			}
 		});
