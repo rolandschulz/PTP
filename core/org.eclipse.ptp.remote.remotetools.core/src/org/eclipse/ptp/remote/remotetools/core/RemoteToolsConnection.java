@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.AddressInUseException;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
@@ -41,17 +42,19 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private String fWorkingDir = null;
 	private Map<String, String> fEnv = null;
 	private Map<String, String> fProperties = null;
+	private final IRemoteServices fRemoteServices;
 
 	private final ITargetElement fTargetElement;
 	private final PTPTargetControl fTargetControl;
 	private final ListenerList fListeners = new ListenerList();
 	
-	public RemoteToolsConnection(String name, String address, String userName, ITargetElement element) throws CoreException {
+	public RemoteToolsConnection(String name, String address, String userName, ITargetElement element, IRemoteServices services) throws CoreException {
 		fTargetElement = element;
 		fTargetControl = (PTPTargetControl)element.getControl();
 		fConnName = name;
 		fAddress = address;
 		fUserName = userName;
+		fRemoteServices = services;
 	}
 	
 	/* (non-Javadoc)
@@ -78,7 +81,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			monitor.done();
 		}
 	}
-
+	
 	/**
 	 * Create a new execution manager. Required because script execution 
 	 * closes channel after execution.
@@ -89,7 +92,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public IRemoteExecutionManager createExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
 		return fTargetControl.createExecutionManager();
 	}
-	
+
 	/**
 	 * Notify all fListeners when this connection's status changes.
 	 * 
@@ -108,7 +111,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			((IRemoteConnectionChangeListener)listener).connectionChanged(event);
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(int, java.lang.String, int)
 	 */
@@ -127,7 +130,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new RemoteConnectionException(e.getMessage());
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -167,7 +170,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		}
 		return -1;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(int, java.lang.String, int)
 	 */
@@ -186,7 +189,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new AddressInUseException(e.getMessage());
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -240,7 +243,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public Map<String, String> getAttributes() {
 		return fTargetControl.getAttributes();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv()
 	 */
@@ -294,6 +297,13 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public String getProperty(String key) {
 		loadProperties();
 		return fProperties.get(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getRemoteServices()
+	 */
+	public IRemoteServices getRemoteServices() {
+		return fRemoteServices;
 	}
 
 	/* (non-Javadoc)

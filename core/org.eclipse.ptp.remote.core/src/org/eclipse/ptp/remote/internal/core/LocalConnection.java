@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.core.messages.Messages;
@@ -32,15 +33,21 @@ public class LocalConnection implements IRemoteConnection {
 	private IPath fWorkingDir = null;
 	
 	private final IRemoteConnection fConnection = this;
+	private final IRemoteServices fRemoteServices;
+	
 	private final ListenerList fListeners = new ListenerList();
-
+	
+	public LocalConnection(IRemoteServices services) {
+		fRemoteServices = services;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener(org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
 	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
 		fListeners.add(listener);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
@@ -58,7 +65,7 @@ public class LocalConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(java.lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -89,7 +96,7 @@ public class LocalConnection implements IRemoteConnection {
 	public String getAddress() {
 		return fAddress;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
 	 */
@@ -123,6 +130,13 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public String getProperty(String key) {
 		return System.getProperty(key);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getRemoteServices()
+	 */
+	public IRemoteServices getRemoteServices() {
+		return fRemoteServices;
 	}
 	
 	/* (non-Javadoc)
