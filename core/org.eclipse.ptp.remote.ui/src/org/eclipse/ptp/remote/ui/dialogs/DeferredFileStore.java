@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.dialogs;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -101,19 +103,16 @@ public class DeferredFileStore implements IDeferredWorkbenchAdapter {
 	 */
 	public void fetchDeferredChildren(Object object,
 			IElementCollector collector, IProgressMonitor monitor) {
-		DeferredFileStore[] children = null;
+		ArrayList<DeferredFileStore> children = new ArrayList<DeferredFileStore>();
 		try {
-			IFileInfo[] info = fileStore.childInfos(EFS.NONE, monitor);
-			IFileStore[] wrapped = new IFileStore[info.length];
-			children = new DeferredFileStore[info.length];
-			for (int i = 0; i < wrapped.length; i++) {
-				wrapped[i] = fileStore.getChild(info[i].getName());
-				children[i] = new DeferredFileStore(wrapped[i], info[i]);
+			IFileInfo[] childInfos = fileStore.childInfos(EFS.NONE, monitor);
+			for (IFileInfo info : childInfos) {
+				children.add(new DeferredFileStore(fileStore.getChild(info.getName()), info));
 			}
 		} catch (CoreException e) {
 		}
 		if (children != null) {
-			collector.add(children, monitor);
+			collector.add(children.toArray(), monitor);
 		}
 	}
 
