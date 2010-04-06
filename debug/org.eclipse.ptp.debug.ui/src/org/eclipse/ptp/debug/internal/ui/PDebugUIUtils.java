@@ -60,12 +60,43 @@ import org.eclipse.ui.part.FileEditorInput;
  * 
  */
 public class PDebugUIUtils {
+	/** Show tasks with standard format
+	 * @param array
+	 * @return
+	 */
+	public static String arrayToString(int[] array) {
+		if (array.length == 0) {
+			return ""; //$NON-NLS-1$
+		}
+		String msg = ""; //$NON-NLS-1$
+		int preTask = array[0];
+		msg += preTask;
+		boolean isContinue = false;
+		for (int i = 1; i < array.length; i++) {
+			if (preTask == (array[i] - 1)) {
+				preTask = array[i];
+				isContinue = true;
+				if (i == (array.length - 1)) {
+					msg += "-" + array[i]; //$NON-NLS-1$
+					break;
+				}
+				continue;
+			}
+			if (isContinue)
+				msg += "-" + preTask; //$NON-NLS-1$
+			msg += "," + array[i]; //$NON-NLS-1$
+			isContinue = false;
+			preTask = array[i];
+		}
+		return msg;
+	}
+
 	/** Find region by given offset in given document
 	 * @param document
 	 * @param offset
 	 * @return
 	 */
-	static public IRegion findWord(IDocument document, int offset) {
+	public static IRegion findWord(IDocument document, int offset) {
 		int start = -1;
 		int end = -1;
 		try {
@@ -102,46 +133,40 @@ public class PDebugUIUtils {
 		}
 		return null;
 	}
-
+	
 	/** Get current stack frame
 	 * @return
 	 */
-	static public IPStackFrame getCurrentStackFrame() {
+	public static IPStackFrame getCurrentStackFrame() {
 		IAdaptable context = DebugUITools.getDebugContext();
 		return ( context != null ) ? (IPStackFrame)context.getAdapter( IPStackFrame.class ) : null;
 	}
 	
-	/** Show tasks with standard format
-	 * @param array
-	 * @return
-	 */
-	static public String arrayToString(int[] array) {
-		if (array.length == 0) {
-			return "";
+	public static String getEditorId(IEditorInput input, Object element) {
+		if (input != null) {
+			return getEditorId(input);
 		}
-		String msg = "";
-		int preTask = array[0];
-		msg += preTask;
-		boolean isContinue = false;
-		for (int i = 1; i < array.length; i++) {
-			if (preTask == (array[i] - 1)) {
-				preTask = array[i];
-				isContinue = true;
-				if (i == (array.length - 1)) {
-					msg += "-" + array[i];
-					break;
-				}
-				continue;
-			}
-			if (isContinue)
-				msg += "-" + preTask;
-			msg += "," + array[i];
-			isContinue = false;
-			preTask = array[i];
-		}
-		return msg;
+		return null;
 	}
-	static public IEditorInput getEditorInput(Object element) {
+	
+	public static String getEditorId(Object element) {
+		String name = null;
+		if (element instanceof IFile) {
+			name = ((IFile)element).getName();
+		}
+		if (element instanceof IEditorInput) {
+			name = ((IEditorInput)element).getName();
+		}
+		if (name == null) {
+			return IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
+		}
+		
+		IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
+		IEditorDescriptor descriptor = registry.getDefaultEditor(name);
+		return (descriptor != null) ? descriptor.getId() : CUIPlugin.EDITOR_ID;
+	}
+	
+	public static IEditorInput getEditorInput(Object element) {
 		if (element instanceof IMarker) {
 			IResource resource = ((IMarker) element).getResource();
 			if (resource instanceof IFile) {
@@ -208,44 +233,22 @@ public class PDebugUIUtils {
 		}
 		return null;
 	}
-	static public String getEditorId(Object element) {
-		String name = null;
-		if (element instanceof IFile) {
-			name = ((IFile)element).getName();
-		}
-		if (element instanceof IEditorInput) {
-			name = ((IEditorInput)element).getName();
-		}
-		//if (element instanceof PSourceNotFoundElement)
-			//return IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
-		if (name == null)
-			return IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
-		
-		IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
-		IEditorDescriptor descriptor = registry.getDefaultEditor(name);
-		return (descriptor != null) ? descriptor.getId() : CUIPlugin.EDITOR_ID;
-	}
-	static public String getEditorId(IEditorInput input, Object element) {
-		if (input != null) {
-			return getEditorId(input);
-		}
-		return null;
-	}
 	
+	
+	//self testing
+	public static void main(String[] args) {
+		BitList tasks = new BitList(0);
+		System.out.println(showBitList(tasks));
+	}
 	
 	/** Show tasks with standard format
 	 * @param tasks
 	 * @return
 	 */
-	static public String showBitList(BitList tasks) {
+	public static String showBitList(BitList tasks) {
 		if (tasks == null || tasks.isEmpty()) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		return arrayToString(tasks.toArray());
-	}
-	//self testing
-	public static void main(String[] args) {
-		BitList tasks = new BitList(0);
-		System.out.println(showBitList(tasks));
 	}
 }

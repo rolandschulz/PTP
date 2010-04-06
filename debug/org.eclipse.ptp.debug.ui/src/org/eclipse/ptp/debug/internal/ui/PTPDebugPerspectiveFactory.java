@@ -36,15 +36,15 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
  		String editorArea = layout.getEditorArea();
 
-		IFolderLayout folder1= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.8, editorArea);
+		IFolderLayout folder1= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.8, editorArea); //$NON-NLS-1$
 		folder1.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-		folder1.addView("org.eclipse.debug.ui.MemoryView");
-		folder1.addView("org.eclipse.pde.runtime.LogView");
+		folder1.addView("org.eclipse.debug.ui.MemoryView"); //$NON-NLS-1$
+		folder1.addView("org.eclipse.pde.runtime.LogView"); //$NON-NLS-1$
 		
-		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea);
+		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea); //$NON-NLS-1$
 		folder2.addView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 
-		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp");
+		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp"); //$NON-NLS-1$ //$NON-NLS-2$
 		folder4.addView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 		folder4.addView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
@@ -52,10 +52,10 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		folder4.addView(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		folder4.addView(IPTPDebugUIConstants.ID_VIEW_VARIABLE);
 
-		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp");
+		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp"); //$NON-NLS-1$ //$NON-NLS-2$
 		folder3.addView(IDebugUIConstants.ID_DEBUG_VIEW);
 
-		IFolderLayout folder5= layout.createFolder("right", IPageLayout.RIGHT,(float)0.8, editorArea);
+		IFolderLayout folder5= layout.createFolder("right", IPageLayout.RIGHT,(float)0.8, editorArea); //$NON-NLS-1$
 		folder5.addView(IPageLayout.ID_OUTLINE);
 		
 		// set toolbar or menu icon
@@ -64,7 +64,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		
 		// views - short cut
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
-		layout.addShowViewShortcut("org.eclipse.debug.ui.MemoryView");
+		layout.addShowViewShortcut("org.eclipse.debug.ui.MemoryView"); //$NON-NLS-1$
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_ARRAY);
@@ -77,7 +77,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
 		//layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
-		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
+		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView"); //$NON-NLS-1$
 
 		// link - things we should do
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);

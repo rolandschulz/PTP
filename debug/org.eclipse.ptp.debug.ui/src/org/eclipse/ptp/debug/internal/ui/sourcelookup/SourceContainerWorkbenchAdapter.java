@@ -6,8 +6,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.debug.core.sourcelookup.MappingSourceContainer;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.MapEntrySourceContainer;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
@@ -27,13 +26,9 @@ public class SourceContainerWorkbenchAdapter implements IWorkbenchAdapter {
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
 	 */
 	public ImageDescriptor getImageDescriptor(Object o) {
-		if (o instanceof MappingSourceContainer) {
+		if (o instanceof ResourceMappingSourceContainer) {
 			//TODO change image
-			return PDebugImage.getDescriptor(PDebugImage.ICON_REGISTER_NORMAL);
-		}
-		if (o instanceof MapEntrySourceContainer) {
-			//TODO change image
-			return PDebugImage.getDescriptor(PDebugImage.ICON_REGISTER_NORMAL);
+			return PDebugImage.getDescriptor(PDebugImage.IMG_OBJS_PATH_MAPPING);
 		}
 		if (o instanceof ProjectSourceContainer) {
 			IProject project = ((ProjectSourceContainer)o).getProject();
@@ -55,11 +50,8 @@ public class SourceContainerWorkbenchAdapter implements IWorkbenchAdapter {
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	public String getLabel(Object o) {
-		if (o instanceof MappingSourceContainer) {
-			return SourceLookupUIMessages.getString("SourceContainerWorkbenchAdapter.0") + ((MappingSourceContainer)o).getName(); 
-		}
-		if (o instanceof MapEntrySourceContainer) {
-			return ((MapEntrySourceContainer)o).getName();
+		if (o instanceof ResourceMappingSourceContainer) {
+			return ((ResourceMappingSourceContainer)o).getName();
 		}
 		return null;
 	}

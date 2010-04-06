@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
@@ -38,6 +37,8 @@ public class PDebugImage {
 	public final static String TOOLICONPATH = ICONPATH + "tool/"; //$NON-NLS-1$
 	public final static String PROCESSICONPATH = ICONPATH + "process/"; //$NON-NLS-1$
 	public final static String DEBUGICONPATH = ICONPATH + "debug/"; //$NON-NLS-1$
+	public final static String OBJICONPATH = ICONPATH + "obj16/"; //$NON-NLS-1$
+	public final static String WIZBANICONPATH = ICONPATH + "wizban/"; //$NON-NLS-1$
 	
     //array view
 	public static final String ICON_ADD_VAR_NORMAL = "add_variable_normal.gif"; //$NON-NLS-1$
@@ -124,6 +125,11 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_EN = "function_ovr.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_DI = "function_ovr_disabled.gif"; //$NON-NLS-1$
 	
+	public static final String IMG_OBJS_PATH_MAPPING = "mapping_obj.gif"; //$NON-NLS-1$
+	public static final String IMG_OBJS_PATH_MAP_ENTRY = "mapentry_obj.gif"; //$NON-NLS-1$
+	public static final String IMG_WIZBAN_PATH_MAPPING = "mapping_wiz.gif"; //$NON-NLS-1$
+	public static final String IMG_WIZBAN_PATH_MAP_ENTRY = "mapentry_wiz.gif"; //$NON-NLS-1$
+
 	public static void initializeImageRegistry(ImageRegistry reg) {
 		Bundle bundle = PTPDebugUIPlugin.getDefault().getBundle();
 
@@ -181,6 +187,11 @@ public class PDebugImage {
 		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_ADDR_DI);
 		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_FUNC_EN);
 		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_FUNC_DI);
+
+		registerImage(bundle, reg, OBJICONPATH, IMG_OBJS_PATH_MAPPING);
+		registerImage(bundle, reg, OBJICONPATH, IMG_OBJS_PATH_MAP_ENTRY);
+		registerImage(bundle, reg, WIZBANICONPATH, IMG_WIZBAN_PATH_MAPPING);
+		registerImage(bundle, reg, WIZBANICONPATH, IMG_WIZBAN_PATH_MAP_ENTRY);
 	}
 	
 	private static void registerImage(Bundle bundle, ImageRegistry registry, String basePath, String file) {

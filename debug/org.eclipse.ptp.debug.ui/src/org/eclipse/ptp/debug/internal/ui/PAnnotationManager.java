@@ -67,6 +67,7 @@ import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.ui.IElementManager;
@@ -109,6 +110,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			instance = this;
 		}
 	}
+	
 	/* Get instance of PAnnotationManager
 	 * @return
 	 */
@@ -117,6 +119,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			instance = new PAnnotationManager(PTPDebugUIPlugin.getUIDebugManager());
 		return instance;
 	}
+	
 	/* Clean all settings and listeners
 	 * 
 	 */
@@ -126,6 +129,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		uiDebugManager.removeJobChangedListener(this);
 		annotationMap = null;
 	}
+	
 	/* Clean all stored annotations
 	 * 
 	 */
@@ -137,6 +141,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			annotationMap.clear();
 		}
 	}
+	
 	/* Remove annotation group by given job
 	 * @param job_id job ID
 	 */
@@ -148,6 +153,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}
 	}
+	
 	/* Add annotation to given job
 	 * @param job_id Job ID
 	 * @param annotationGroup
@@ -157,6 +163,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			annotationMap.put(job_id, annotationGroup);
 		}
 	}
+	
 	/* Get annotation by given hob ID
 	 * @param job_id job ID
 	 * @return
@@ -180,13 +187,14 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				try {
 					editor[0] = page.openEditor(input, id, false);
 				} catch (PartInitException e) {
-					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot open editor", e);
+					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), Messages.PAnnotationManager_0, Messages.PAnnotationManager_1, e);
 				}
 			}
 		};
 		BusyIndicator.showWhile(Display.getDefault(), r);
 		return editor[0];
 	}
+	
 	/* Get editor part
 	 * @param file
 	 * @return
@@ -231,8 +239,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		});
 		return editor[0];
 	}
+	
 	protected void displaySource(final ISourceLookupResult result) {
-		UIJob uiJob = new UIJob("Display source editor...") {
+		UIJob uiJob = new UIJob(Messages.PAnnotationManager_2) {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				IWorkbenchPage page = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage();
 				if (!monitor.isCanceled() && result != null && page != null) {
@@ -243,6 +252,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		};
 		uiJob.schedule();
 	}
+	
 	/* Find file
 	 * @param fileName
 	 * @return
@@ -250,32 +260,26 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected IFile findFile(String filename) {
 		return findFile(new Path(filename));
 	}
+	
 	protected IFile findFile(IPath location) {
 		IPath normalized = FileBuffers.normalizeLocation(location);
 		if (normalized.segmentCount() >= 2) {
 			return ResourcesPlugin.getWorkspace().getRoot().getFile(normalized);
 		}
 		return null;
-		/*
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IFile file= workspaceRoot.getFileForLocation(path);
-		if (file != null && file.exists())
-			return file;
-		
-		if (path.segmentCount() > 2)
-			return workspaceRoot.getFile(path.makeAbsolute());
-		return null;
-		*/
 	}
+	
 	/* Get text editor
 	 * @param editorPart
 	 * @return
 	 */
 	protected ITextEditor getTextEditor(IEditorPart editorPart) {
-		if (editorPart instanceof ITextEditor)
+		if (editorPart instanceof ITextEditor) {
 			return (ITextEditor) editorPart;
+		}
 		return (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 	}
+	
 	/* Get file
 	 * @param editorInput
 	 * @return
@@ -295,6 +299,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return null;
 	}
+	
 	/* Create position in the source file
 	 * @param lineNumber
 	 * @param doc
@@ -314,6 +319,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return null;
 		}
 	}
+	
 	/* Get tasks from debug target
 	 * @param debugTarget
 	 * @return
@@ -324,6 +330,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return null;
 	}
+	
 	/* Get tasks from thread
 	 * @param thread
 	 * @return
@@ -331,6 +338,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected BitList getTasks(IThread thread) {
 		return getTasks(thread.getDebugTarget());
 	}
+	
 	/* Is given type register type
 	 * @param type
 	 * @return
@@ -338,6 +346,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected boolean isRegisterType(String type) {
 		return (type.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || type.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY));
 	}
+	
 	/* Focus to annotation in source editor
 	 * @param editorPart
 	 * @param stackFrame
@@ -357,6 +366,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			textEditor.selectAndReveal(region.getOffset(), 0);
 		}
 	}
+	
 	/* Get line region in source editor
 	 * @param editor
 	 * @param lineNumber
@@ -380,6 +390,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return null;
 	}
+	
 	// called by debug view - PDebugModelPresentation
 	/* Add annotation called from Debug View
 	 * @param editorPart
@@ -390,14 +401,19 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		IPStackFrame selectedFrame = stackFrame;
 		
 		BitList tasks = getTasks(stackFrame.getDebugTarget());
-		if (tasks == null)
+		if (tasks == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
+		
 		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
+		if (textEditor == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
+		
 		IFile file = getFile(textEditor.getEditorInput());
-		if (file == null)
+		if (file == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 		
 		//try to find the stack frame with line number
 		if (selectedFrame.getLineNumber() == 0) {
@@ -409,6 +425,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				}
 			}
 		}
+		
 		if (selectedFrame.getLineNumber() > 0) {
 			String job_id = uiDebugManager.getCurrentJobId();
 			synchronized (LOCK) {
@@ -422,6 +439,13 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}
 	}
+	
+	/**
+	 * Get the source locator for this debug launch
+	 * 
+	 * @param job_id id of debug job
+	 * @return source locator or null if not found
+	 */
 	private PSourceLookupDirector getSourceLocator(String job_id) {
 		IPSession session = uiDebugManager.getDebugSession(job_id);
 		if (session != null) {
@@ -432,6 +456,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return null;
 	}
+	
 	private IPath getFilePath(String job_id, String filename) {
 		PSourceLookupDirector locator = getSourceLocator(job_id);
 		if (locator != null) {
@@ -448,6 +473,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return new Path(filename);
 	}
+	
 	// called by event
 	/*
 	 * Add annotation called from debug event
@@ -457,7 +483,6 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return;
 
 		IFile file = findFile(getFilePath(job_id, filename));
-		//IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 
@@ -477,18 +502,33 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, ((level > 1)?IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT:((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)));				
 		}
 	}
+	
+	/**
+	 * Add annotation given filename and line number
+	 * 
+	 * @param job_id
+	 * @param level
+	 * @param filename
+	 * @param lineNumber
+	 * @param rTasks
+	 * @param uTasks
+	 * @throws CoreException
+	 */
 	protected void addAnnotation(String job_id, int level, String filename, int lineNumber, BitList rTasks, BitList uTasks) throws CoreException {
 		IFile file = findFile(getFilePath(job_id, filename));
-		//IFile file = findFile(fullPathFileName);
-		if (file == null)
+		if (file == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 
 		IEditorPart editorPart = getEditorPart(file);
-		if (editorPart == null)
+		if (editorPart == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
+		
 		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
+		if (textEditor == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 		
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -500,6 +540,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			addAnnotation(annotationGroup, textEditor, file, lineNumber, uTasks, ((level > 1)?IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT:((containsCurrentSet(uTasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)));				
 		}
 	}
+	
 	/* Is given tasks in the current set
 	 * @param aTasks
 	 * @return
@@ -516,6 +557,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return false;
 		}
 	}
+	
 	// generic
 	/* Add annotation
 	 * @param annotationGroup
@@ -552,6 +594,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			});
 		}
 	}
+	
 	/* Find annotation
 	 * @param annotationGroup
 	 * @param position
@@ -570,6 +613,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return null;
 		}
 	}
+	
 	// called by debug view
 	/* Remove annotation called from Debug View
 	 * @param editorPart
@@ -579,6 +623,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected void removeAnnotation(IEditorPart editorPart, IPThread thread) throws CoreException {
 		removeAnnotation(uiDebugManager.getCurrentJobId(), getTasks(thread));
 	}
+	
 	// called by event
 	/* Remove annotation called from debug event
 	 * @param job_id
@@ -597,6 +642,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}
 	}
+	
 	// generic
 	/* Remove annotation
 	 * @param annotationGroup
@@ -618,6 +664,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			annotationGroup.removeAnnotations(removedList);
 		}
 	}
+	
 	/* Get iterator of stored annotations
 	 * @param annotationGroup
 	 * @param type
@@ -634,6 +681,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return foundAnnotations.toArray(new PInstructionPointerAnnotation2[0]);
 		}
 	}
+	
 	protected PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, BitList tasks) {
 		synchronized (LOCK) {
 			List<PInstructionPointerAnnotation2> foundAnnotations = new ArrayList<PInstructionPointerAnnotation2>();
@@ -649,6 +697,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return foundAnnotations.toArray(new PInstructionPointerAnnotation2[0]);
 		}
 	}
+	
 	/* Find other annotation
 	 * @param annotationGroup
 	 * @param position
@@ -672,6 +721,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			return null;
 		}
 	}
+	
 	/* Change annotation type
 	 * @param annotation
 	 * @param type
@@ -681,6 +731,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			annotation.setType(type);
 		}
 	}
+	
 	protected void register(String job_id, BitList tasks) {
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -701,6 +752,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}
 	}
+	
 	protected void unregister(String job_id, BitList tasks) {
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -721,6 +773,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}
 	}
+	
 	/* Remove tasks from existed annotation
 	 * @param annotationGroup
 	 * @param annotation
@@ -756,6 +809,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}
 	}
+	
 	/***************************************************************************************************************************************************************************************************
 	 * Set Change Event
 	 **************************************************************************************************************************************************************************************************/
@@ -765,7 +819,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @throws CoreException
 	 */
 	public void updateAnnotation(final IElementSet currentSet, final IElementSet preSet) {
-		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
+		WorkbenchJob uiJob = new WorkbenchJob(Messages.PAnnotationManager_3) {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				AnnotationGroup annotationGroup = getAnnotationGroup(uiDebugManager.getCurrentJobId());
 				if (annotationGroup != null) {
@@ -796,6 +850,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
+	
 	/***************************************************************************************************************************************************************************************************
 	 * Job Change Listener
 	 **************************************************************************************************************************************************************************************************/
@@ -803,7 +858,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @see org.eclipse.ptp.ui.listeners.IJobChangedListener#jobChangedEvent(int, java.lang.String, java.lang.String)
 	 */
 	public void jobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
-		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
+		WorkbenchJob uiJob = new WorkbenchJob(Messages.PAnnotationManager_3) {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				doJobChangedEvent(type, cur_job_id, pre_job_id, monitor);
 				monitor.done();
@@ -814,6 +869,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
+	
 	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
 		if (type == IJobChangedListener.REMOVED || (pre_job_id != null && !pre_job_id.equals(IElementManager.EMPTY_ID))) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
@@ -828,11 +884,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 		}		
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPDebugEventListener#handleDebugEvent(org.eclipse.ptp.debug.core.events.IPDebugEvent)
 	 */
 	public void handleDebugEvent(final IPDebugEvent event) {
-		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
+		WorkbenchJob uiJob = new WorkbenchJob(Messages.PAnnotationManager_3) {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				doHandleDebugEvent(event, monitor);
 				monitor.done();
@@ -843,6 +900,13 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
+	
+	/**
+	 * Process the debug event
+	 * 
+	 * @param event
+	 * @param monitor
+	 */
 	private void doHandleDebugEvent(IPDebugEvent event, IProgressMonitor monitor) {
 		IPDebugInfo info = event.getInfo();
 		IPJob job = info.getJob();
@@ -878,11 +942,10 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				IPDebugSuspendInfo susInfo = (IPDebugSuspendInfo)info;
 				try {
 					addAnnotation(job, susInfo);
-				}
-				catch (final CoreException e) {
+				} catch (final CoreException e) {
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							PTPDebugUIPlugin.errorDialog("Error", e);
+							PTPDebugUIPlugin.errorDialog(Messages.PAnnotationManager_0, e);
 						}
 					});
 				}
@@ -894,6 +957,14 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				break;
 		}
 	}
+	
+	/**
+	 * Add annotation for a suspend event
+	 * 
+	 * @param job debug job
+	 * @param info suspend event information
+	 * @throws CoreException
+	 */
 	private void addAnnotation(IPJob job, IPDebugSuspendInfo info) throws CoreException {
 		int line = info.getLineNumber();
 		if (line == 0) {
@@ -904,6 +975,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			addAnnotation(job.getID(), info.getLevel(), info.getFilename(), line, info.getAllRegisteredTasks(), info.getAllUnregisteredTasks());
 		}
 	}
+	
 	private void addAnnotationWithSourceFound(IPJob job, BitList tasks, int low, int high) throws CoreException {
 		if (tasks.isEmpty())
 			return;
@@ -946,7 +1018,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		catch (final CoreException e) {
 			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					PTPDebugUIPlugin.errorDialog("Error", e);
+					PTPDebugUIPlugin.errorDialog(Messages.PAnnotationManager_0, e);
 				}
 			});
 		}

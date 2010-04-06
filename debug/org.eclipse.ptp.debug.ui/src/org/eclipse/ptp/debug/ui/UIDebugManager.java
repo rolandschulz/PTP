@@ -36,14 +36,12 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.DebugJobStorage;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
-import org.eclipse.ptp.debug.internal.ui.PAnnotationManager;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -87,16 +85,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	    }
 	}
 	
-	private DebugJobStorage consoleStorage = new DebugJobStorage("Console");
 	private PVariableManager jobVarMgr = new PVariableManager();
-	private PAnnotationManager annotationMgr = null;
-
 	private PDebugModel debugModel = null;
 	private IPSession currentSession = null;
 	private boolean prefAutoUpdateVarOnSuspend = false;
-	
 	private boolean prefAutoUpdateVarOnChange = false;
-	
 	private boolean prefRegisterProc0 = true;
 	
 	private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
@@ -127,7 +120,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		PTPDebugCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		debugModel = PTPDebugCorePlugin.getDebugModel();
-		annotationMgr = new PAnnotationManager(this);
 		initializePreferences();
 	}
 	
@@ -163,15 +155,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {}
-	
-	/**
-	 * Convert string to integer
-	 * @param id
-	 * @return
-	 */
-	public int convertToInt(String id) {
-		return Integer.parseInt(id);
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.managers.AbstractElementManager#fireJobChangedEvent(int, java.lang.String, java.lang.String)
@@ -497,7 +480,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void shutdown() {
 		PTPDebugCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
-		annotationMgr.shutdown();
 		jobVarMgr.shutdown();
 		super.shutdown();
 	}
@@ -716,7 +698,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	private BitList convertElementsToBitList(IPSession session, IElement[] elements) {
 		BitList tasks = session.getTasks(-1);
 		for (IElement element : elements) {
-			tasks.set(convertToInt(element.getName()));
+			tasks.set(Integer.parseInt(element.getName()));
 		}
 		return tasks;
 	}
