@@ -56,7 +56,6 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITargetExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
-import org.eclipse.ptp.debug.internal.core.PSession;
 
 /**
  * @author Clement chu
@@ -499,7 +498,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	public void jumpToLine(IFile file, int lineNumber) throws DebugException {
 		if (!canJumpToLine(file, lineNumber))
 			return;
-		jumpToLine(file.getLocation().lastSegment(), lineNumber);
+		jumpToLine(file.getFullPath().lastSegment(), lineNumber);
 	}
 
 	/* (non-Javadoc)

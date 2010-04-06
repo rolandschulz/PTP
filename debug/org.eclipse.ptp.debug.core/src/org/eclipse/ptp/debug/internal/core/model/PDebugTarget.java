@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.core.model;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -28,17 +29,14 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -105,10 +103,10 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIWatchpointTriggerInfo;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
-import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
+import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer;
 
 /**
  * @author Clement chu
@@ -663,7 +661,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		disposeSignalManager();
 		disposeRegisterManager();
 		disposeMemoryManager();
-		disposeSourceManager();
+//		disposeSourceManager();
 		disposeSourceLookupPath();
 		removeAllExpressions();
 		disposePreferences();
@@ -713,12 +711,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 			if (containers[i] instanceof ProjectSourceContainer) {
 				IProject project = ((ProjectSourceContainer) containers[i]).getProject();
 				if (project != null && project.exists())
-					list.add(project.getLocation().toPortableString());
+					list.add(project.getLocationURI().getPath());
 			}
 			if (containers[i] instanceof FolderSourceContainer) {
 				IContainer container = ((FolderSourceContainer) containers[i]).getContainer();
 				if (container != null && container.exists())
-					list.add(container.getLocation().toPortableString());
+					list.add(container.getLocationURI().getPath());
 			}
 			if (containers[i] instanceof DirectorySourceContainer) {
 				File dir = ((DirectorySourceContainer) containers[i]).getDirectory();
@@ -1001,19 +999,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	}
 
 	/**
-	 * 
-	 */
-	protected void disposeSourceManager() {
-		ISourceLocator locator = getLaunch().getSourceLocator();
-		if (locator instanceof IAdaptable) {
-			IResourceChangeListener listener = (IResourceChangeListener) ((IAdaptable) locator)
-					.getAdapter(IResourceChangeListener.class);
-			if (listener != null)
-				PTPDebugCorePlugin.getWorkspace().removeResourceChangeListener(listener);
-		}
-	}
-
-	/**
 	 * @return
 	 * @throws DebugException
 	 */
@@ -1037,12 +1022,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * 
 	 */
 	protected void initialize() {
-		// initializeSourceLookupPath();
+		initializeSourceLookupPath();
 		ArrayList<DebugEvent> debugEvents = new ArrayList<DebugEvent>(1);
 		debugEvents.add(createCreateEvent());
 		initializeThreads(debugEvents);
 		initializeRegisters();
-		initializeSourceManager();
 		initializeMemoryBlocks();
 		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
@@ -1066,33 +1050,16 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 */
 	protected void initializeSourceLookupPath() {
 		ISourceLocator locator = getLaunch().getSourceLocator();
-		if (locator instanceof ISourceLookupDirector) {
-			ISourceLookupParticipant[] participants = ((ISourceLookupDirector) locator).getParticipants();
-			for (int i = 0; i < participants.length; ++i) {
-				if (participants[i] instanceof PSourceLookupParticipant) {
-					((PSourceLookupParticipant) participants[i]).addSourceLookupChangeListener(this);
-				}
-			}
-			setSourceLookupPath(((ISourceLookupDirector) locator).getSourceContainers());
-		}
-	}
-
-	/**
-	 * 
-	 */
-	protected void initializeSourceManager() {
-		ISourceLocator locator = getLaunch().getSourceLocator();
-		if (locator instanceof IAdaptable) {
-			IPSourceLocator clocator = (IPSourceLocator) ((IAdaptable) locator).getAdapter(IPSourceLocator.class);
-			if (clocator instanceof IAdaptable) {
-				PSourceManager sm = (PSourceManager) ((IAdaptable) clocator).getAdapter(PSourceManager.class);
-				if (sm != null)
-					sm.setDebugTarget(this);
-			}
-			IResourceChangeListener listener = (IResourceChangeListener) ((IAdaptable) locator)
-					.getAdapter(IResourceChangeListener.class);
-			if (listener != null)
-				ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
+		if (locator instanceof PSourceLookupDirector) {
+			PSourceLookupDirector director = (PSourceLookupDirector)locator;
+			ISourceContainer[] sc = director.getSourceContainers();
+			List<ISourceContainer> list = new ArrayList<ISourceContainer>(Arrays.asList(sc));
+			IPath backend = new Path(getSession().getProject().getLocationURI().getPath());
+			ResourceMappingSourceContainer container = new ResourceMappingSourceContainer();
+			container.setPath(backend);
+			container.setContainer(getSession().getProject());
+			list.add(container);
+			director.setSourceContainers(list.toArray(new ISourceContainer[0]));
 		}
 	}
 

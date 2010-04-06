@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.sourcelookup;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,8 +36,8 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer;
 
 public class PSourceLookupDirector extends AbstractSourceLookupDirector implements IPSourceLookupDirector {
 	private static Set<String> fSupportedTypes;
@@ -48,18 +47,24 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		fSupportedTypes.add(ProjectSourceContainer.TYPE_ID);
 		fSupportedTypes.add(FolderSourceContainer.TYPE_ID);
 		fSupportedTypes.add(DirectorySourceContainer.TYPE_ID);
-		/**
-		 *	No Mapping
-		 * 	fSupportedTypes.add(MappingSourceContainer.TYPE_ID);
-		 */
+		fSupportedTypes.add(ResourceMappingSourceContainer.TYPE_ID);
+
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceLookupDirector#initializeParticipants()
+	 */
 	public void initializeParticipants() {
 		addParticipants(new ISourceLookupParticipant[] { new PSourceLookupParticipant() });
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector#supportsSourceContainerType(org.eclipse.debug.core.sourcelookup.ISourceContainerType)
+	 */
 	public boolean supportsSourceContainerType(ISourceContainerType type) {
 		return fSupportedTypes.contains(type.getId());
 	}
+	
 	public boolean contains(IPBreakpoint breakpoint) {
 		try {
 			String handle = breakpoint.getSourceHandle();
@@ -72,6 +77,7 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		return false;
 	}
+	
 	public boolean contains(IProject project) {
 		ISourceContainer[] containers = getSourceContainers();
 		for (int i = 0; i < containers.length; ++i) {
@@ -80,6 +86,7 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		return false;
 	}
+	
 	private boolean contains(ISourceContainer container, IProject project) {
 		if (container instanceof ProjectSourceContainer && ((ProjectSourceContainer) container).getProject().equals(project)) {
 			return true;
@@ -95,13 +102,15 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		return false;
 	}
+	
 	private boolean contains(ISourceContainer container, String sourceName) {
 		IPath path = new Path(sourceName);
-		if (!path.isValidPath(sourceName))
+		if (!path.isValidPath(sourceName)) {
 			return false;
+		}
 		if (container instanceof ProjectSourceContainer) {
 			IProject project = ((ProjectSourceContainer) container).getProject();
-			IPath projPath = project.getLocation();
+			IPath projPath = new Path(project.getLocationURI().getPath());
 			if (projPath.isPrefixOf(path)) {
 				IFile file = ((ProjectSourceContainer) container).getProject().getFile(path.removeFirstSegments(projPath.segmentCount()));
 				return (file != null && file.exists());
@@ -109,21 +118,14 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		if (container instanceof FolderSourceContainer) {
 			IContainer folder = ((FolderSourceContainer) container).getContainer();
-			IPath folderPath = folder.getLocation();
+			IPath folderPath = new Path(folder.getLocationURI().getPath());
 			if (folderPath.isPrefixOf(path)) {
 				IFile file = ((FolderSourceContainer) container).getContainer().getFile(path.removeFirstSegments(folderPath.segmentCount()));
 				return (file != null && file.exists());
 			}
 		}
-		if (container instanceof PDirectorySourceContainer) {
-			File dir = ((PDirectorySourceContainer) container).getDirectory();
-			boolean searchSubfolders = ((PDirectorySourceContainer) container).searchSubfolders();
-			IPath dirPath = new Path(dir.getAbsolutePath());
-			if (searchSubfolders || dirPath.segmentCount() + 1 == path.segmentCount())
-				return dirPath.isPrefixOf(path);
-		}
-		if (container instanceof MappingSourceContainer) {
-			return (((MappingSourceContainer) container).getCompilationPath(sourceName) != null);
+		if (container instanceof ResourceMappingSourceContainer) {
+			return (((ResourceMappingSourceContainer) container).getCompilationPath(sourceName) != null);
 		}
 		try {
 			ISourceContainer[] containers;
@@ -136,6 +138,10 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		return false;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLookupDirector#getCompilationPath(java.lang.String)
+	 */
 	public IPath getCompilationPath(String sourceName) {
 		IPath path = null;
 		ISourceContainer[] containers = getSourceContainers();
@@ -148,10 +154,11 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		return path;
 	}
+	
 	private IPath getCompilationPath(ISourceContainer container, String sourceName) {
 		IPath path = null;
-		if (container instanceof MappingSourceContainer) {
-			path = ((MappingSourceContainer) container).getCompilationPath(sourceName);
+		if (container instanceof ResourceMappingSourceContainer) {
+			path = ((ResourceMappingSourceContainer) container).getCompilationPath(sourceName);
 		} else {
 			try {
 				ISourceContainer[] containers;

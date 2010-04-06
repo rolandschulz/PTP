@@ -54,6 +54,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugBreakpointInfo;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
@@ -107,14 +108,6 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 		public IPBreakpoint[] getAllPBreakpoints() {
 			Collection<IPBreakpoint> collection = fPBreakpoints.values();
 			return collection.toArray(new IPBreakpoint[collection.size()]);
-		}
-
-		/**
-		 * @return
-		 */
-		public IPDIBreakpoint[] getAllPDIBreakpoints() {
-			Collection<IPDIBreakpoint> collection = fPDIBreakpoints.values();
-			return collection.toArray(new IPDIBreakpoint[collection.size()]);
 		}
 
 		/**
@@ -186,7 +179,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 					if (!isEmpty(file)) {
 						Object sourceElement = getSourceElement(file);
 						if (sourceElement instanceof IFile) {
-							sourceHandle = ((IFile) sourceElement).getLocation().toOSString();
+							sourceHandle = ((IFile) sourceElement).getLocationURI().getPath();
 						} else if (sourceElement instanceof IStorage) {
 							sourceHandle = ((IStorage) sourceElement).getFullPath().toOSString();
 						}
@@ -351,6 +344,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(PBreakpointManager.class))
 			return this;
@@ -436,7 +430,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 */
 	public void setStopInMain(BitList tasks) throws PDIException {
 		IPDIBreakpointManager pdiBptMgr = getPDISession().getBreakpointManager();
-		IPDIFunctionLocation location = pdiBptMgr.createFunctionLocation("", "main");
+		IPDIFunctionLocation location = pdiBptMgr.createFunctionLocation("", "main"); //$NON-NLS-1$ //$NON-NLS-2$
 		pdiBptMgr.setFunctionBreakpoint(tasks, IPDIBreakpoint.TEMPORARY, location, null, true, true);
 	}
 
@@ -501,7 +495,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 			int ignoreCount = breakpoint.getIgnoreCount();
 			int oldIgnoreCount = (delta != null) ? delta.getAttribute(IPBreakpoint.IGNORE_COUNT, 0) : ignoreCount;
 			String condition = breakpoint.getCondition();
-			String oldCondition = (delta != null) ? delta.getAttribute(IPBreakpoint.CONDITION, "") : condition;
+			String oldCondition = (delta != null) ? delta.getAttribute(IPBreakpoint.CONDITION, "") : condition; //$NON-NLS-1$
 			// TODO not support thread breakpoint
 			Boolean enabled0 = null;
 			IPDICondition condition0 = null;
@@ -750,7 +744,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 		IPDIBreakpoint pdiBpt = getBreakpointMap().getPDIBreakpoint(pBpt);
 		if (pdiBpt == null) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
-					"No pdi breakpoint found", null));
+					Messages.PBreakpointManager_0, null));
 		}
 		return pdiBpt.getTasks().copy();
 	}
@@ -938,7 +932,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 					IPAddressBreakpoint breakpoint = (IPAddressBreakpoint) bpt;
 					String address = breakpoint.getAddress();
 					IPDIAddressLocation location = pdiBptMgr.createAddressLocation(new BigInteger(
-							(address.startsWith("0x")) ? address.substring(2) : address, 16));
+							(address.startsWith("0x")) ? address.substring(2) : address, 16)); //$NON-NLS-1$
 					IPDICondition condition = createCondition(breakpoint);
 					b = pdiBptMgr.setAddressBreakpoint(getBreakpointTasks(bpt), IPDIBreakpoint.REGULAR, location, condition, true,
 							bpt.isEnabled());

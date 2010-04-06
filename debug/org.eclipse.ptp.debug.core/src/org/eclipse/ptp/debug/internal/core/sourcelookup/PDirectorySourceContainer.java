@@ -50,25 +50,13 @@ public class PDirectorySourceContainer extends CompositeSourceContainer {
 	 * Unique identifier for the PTP directory source container type
 	 * (value <code>org.eclipse.ptp.debug.core.containerType.directory</code>).
 	 */
-	public static final String TYPE_ID = PTPDebugCorePlugin.getUniqueIdentifier() + ".containerType.directory";
+	public static final String TYPE_ID = PTPDebugCorePlugin.getUniqueIdentifier() + ".containerType.directory"; //$NON-NLS-1$
 
 	// root directory
 	private File fDirectory;
 	// whether to search subfolders
 	private boolean fSubfolders = false;
 
-	/**
-	 * Consutructs an external folder container for the
-	 * directory identified by the given path.
-	 * 
-	 * @param dirPath path to a directory in the local file system
-	 * @param subfolders whether folders within the root directory
-	 *  should be searched for source elements
-	 */
-	public PDirectorySourceContainer( IPath dirPath, boolean subfolders ) {
-		this( dirPath.toFile(), subfolders );
-	}
-	
 	/**
 	 * Consutructs an external folder container for the
 	 * directory identified by the given file.
@@ -80,37 +68,31 @@ public class PDirectorySourceContainer extends CompositeSourceContainer {
 	public PDirectorySourceContainer( File dir, boolean subfolders ) {
 		fDirectory = dir;
 		fSubfolders = subfolders;
+	}
+	
+	/**
+	 * Consutructs an external folder container for the
+	 * directory identified by the given path.
+	 * 
+	 * @param dirPath path to a directory in the local file system
+	 * @param subfolders whether folders within the root directory
+	 *  should be searched for source elements
+	 */
+	public PDirectorySourceContainer( IPath dirPath, boolean subfolders ) {
+		this( dirPath.toFile(), subfolders );
 	}	
 		
 	/* (non-Javadoc)
-	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#getName()
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public String getName() {
-		return fDirectory.getName();
+	public boolean equals( Object obj ) {
+		if ( obj instanceof PDirectorySourceContainer ) {
+			PDirectorySourceContainer container = (PDirectorySourceContainer)obj;
+			return container.getDirectory().equals( getDirectory() );
+		}
+		return false;
 	}	
 	
-	/**
-	 * Returns the root directory in the local file system associated
-	 * with this source container.
-	 * 
-	 * @return the root directory in the local file system associated
-	 * with this source container
-	 */
-	public File getDirectory() {
-		return fDirectory;
-	}
-
-	public boolean searchSubfolders() {
-		return fSubfolders;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#getType()
-	 */
-	public ISourceContainerType getType() {
-		return getSourceContainerType( TYPE_ID );
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
 	 */
@@ -144,22 +126,29 @@ public class PDirectorySourceContainer extends CompositeSourceContainer {
 		return sources.toArray();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#isComposite()
+	/**
+	 * Returns the root directory in the local file system associated
+	 * with this source container.
+	 * 
+	 * @return the root directory in the local file system associated
+	 * with this source container
 	 */
-	public boolean isComposite() {
-		return fSubfolders;
+	public File getDirectory() {
+		return fDirectory;
 	}
 
 	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#getName()
 	 */
-	public boolean equals( Object obj ) {
-		if ( obj instanceof PDirectorySourceContainer ) {
-			PDirectorySourceContainer container = (PDirectorySourceContainer)obj;
-			return container.getDirectory().equals( getDirectory() );
-		}
-		return false;
+	public String getName() {
+		return fDirectory.getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#getType()
+	 */
+	public ISourceContainerType getType() {
+		return getSourceContainerType( TYPE_ID );
 	}
 
 	/* (non-Javadoc)
@@ -167,6 +156,17 @@ public class PDirectorySourceContainer extends CompositeSourceContainer {
 	 */
 	public int hashCode() {
 		return getDirectory().hashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#isComposite()
+	 */
+	public boolean isComposite() {
+		return fSubfolders;
+	}
+
+	public boolean searchSubfolders() {
+		return fSubfolders;
 	}
 
 	/* (non-Javadoc)

@@ -32,6 +32,6 @@ public class AbsolutePathSourceContainerType extends AbstractSourceContainerType
 		return new AbsolutePathSourceContainer();
 	}
 	public String getMemento(ISourceContainer container) throws CoreException {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 }

@@ -278,24 +278,6 @@ public class PTPDebugCorePlugin extends Plugin {
 	}
 
 	/**
-	 * @return
-	 */
-	public IPDebugConfiguration getDefaultDebugConfiguration() {
-		IPDebugConfiguration result = null;
-		try {
-			result = getDebugConfiguration(getPluginPreferences().getString(
-					IPDebugConstants.PREF_DEFAULT_DEBUGGER_TYPE));
-		} catch (CoreException e) {
-		}
-		return result;
-	}
-
-	public boolean isDefaultDebugConfiguration(String id) {
-		return (id.compareTo(getPluginPreferences().getString(
-				IPDebugConstants.PREF_DEFAULT_DEBUGGER_TYPE)) == 0);
-	}
-
-	/**
 	 * Returns whether debug events are being dispatched
 	 */
 	public synchronized boolean isDispatching() {
@@ -316,19 +298,6 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public void removeDebugEventListener(IPDebugEventListener listener) {
 		fEventListeners.remove(listener);
-	}
-
-	/**
-	 * @param locations
-	 */
-	public void saveCommonSourceLocations(IPSourceLocation[] locations) {
-		getPluginPreferences().setValue(IPDebugConstants.PREF_SOURCE_LOCATIONS,
-				SourceUtils.getCommonSourceLocationsMemento(locations));
-	}
-
-	public void saveDefaultDebugConfiguration(String id) {
-		getPluginPreferences().setValue(IPDebugConstants.PREF_DEFAULT_DEBUGGER_TYPE,
-				(id != null) ? id : "");
 	}
 
 	/**
@@ -366,13 +335,6 @@ public class PTPDebugCorePlugin extends Plugin {
 	}
 
 	/**
-	 * @param director
-	 */
-	private void convertSourceLocations(CommonSourceLookupDirector director) {
-		director.setSourceContainers(SourceUtils.convertSourceLocations(getCommonSourceLocations()));
-	}
-
-	/**
 	 * 
 	 */
 	private void disposeCommonSourceLookupDirector() {
@@ -404,7 +366,7 @@ public class PTPDebugCorePlugin extends Plugin {
 					IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS);
 			if (newMemento.length() == 0) {
 				// Convert source locations to source containers
-				convertSourceLocations(fCommonSourceLookupDirector);
+				fCommonSourceLookupDirector.setSourceContainers(SourceUtils.convertSourceLocations(getCommonSourceLocations()));
 			} else {
 				try {
 					fCommonSourceLookupDirector.initializeFromMemento(newMemento);

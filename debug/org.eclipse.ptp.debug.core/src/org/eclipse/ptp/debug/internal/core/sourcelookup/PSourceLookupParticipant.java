@@ -32,15 +32,54 @@ import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
  * 
  */
 public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
-	static private class NoSourceElement {}
+	private static class NoSourceElement {}
 
 	private static final NoSourceElement gfNoSource = new NoSourceElement();
-	private ListenerList fListeners;
+	private final ListenerList fListeners = new ListenerList(1);
 
-	public PSourceLookupParticipant() {
-		super();
-		fListeners = new ListenerList(1);
+	/**
+	 * Add a listener for source lookup changes.
+	 * 
+	 * @param listener
+	 */
+	public void addSourceLookupChangeListener(ISourceLookupChangeListener listener) {
+		fListeners.add(listener);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#dispose()
+	 */
+	@Override
+	public void dispose() {
+		fListeners.clear();
+		super.dispose();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#findSourceElements(java.lang.Object)
+	 */
+	@Override
+	public Object[] findSourceElements(Object object) throws CoreException {
+		// Workaround for cases when the stack frame doesn't contain the source file name
+		if (object instanceof IAdaptable) {
+			IPStackFrame frame = (IPStackFrame) ((IAdaptable) object).getAdapter(IPStackFrame.class);
+			if (frame != null) {
+				String name = frame.getFile().trim();
+				if (name == null || name.length() == 0) {
+					return new Object[] { gfNoSource };
+				}
+			}
+		}
+		Object[] foundElements = super.findSourceElements(object);
+		if (foundElements.length == 0 && (object instanceof IDebugElement)) {
+			foundElements = new Object[] { new PSourceNotFoundElement((IDebugElement)object) };
+		}
+		return foundElements;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant#getSourceName(java.lang.Object)
+	 */
 	public String getSourceName(Object object) throws CoreException {
 		if (object instanceof String) {
 			return (String) object;
@@ -54,46 +93,24 @@ public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
 		}
 		return null;
 	}
-	public Object[] findSourceElements(Object object) throws CoreException {
-		// Workaround for cases when the stack frame doesn't contain the source file name
-		String name = null;
-		if (object instanceof IAdaptable) {
-			IPStackFrame frame = (IPStackFrame) ((IAdaptable) object).getAdapter(IPStackFrame.class);
-			if (frame != null) {
-				name = frame.getFile().trim();
-				if (name == null || name.length() == 0)
-					return new Object[] { gfNoSource };
-			}
-		} else if (object instanceof String) {
-			name = (String) object;
-		}
-		Object[] foundElements = super.findSourceElements(object);
-		if (foundElements.length == 0 && (object instanceof IDebugElement))
-			foundElements = new Object[] { new PSourceNotFoundElement((IDebugElement)object) };
-		return foundElements;
-	}
-	/*
-	private Object[] findSourceElementByFile(File file) {
-		IFile[] wfiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(file.getPath()));
-		if (wfiles.length > 0)
-			return wfiles;
-		return new LocalFileStorage[] { new LocalFileStorage(file) };
-	}
-	*/
-	public void dispose() {
-		fListeners.clear();
-		super.dispose();
-	}
-	public void addSourceLookupChangeListener(ISourceLookupChangeListener listener) {
-		fListeners.add(listener);
-	}
+	
+	/**
+	 * Remove a listener for source lookup changes.
+	 * 
+	 * @param listener
+	 */
 	public void removeSourceLookupChangeListener(ISourceLookupChangeListener listener) {
 		fListeners.remove(listener);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#sourceContainersChanged(org.eclipse.debug.core.sourcelookup.ISourceLookupDirector)
+	 */
 	public void sourceContainersChanged(ISourceLookupDirector director) {
 		Object[] listeners = fListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i)
+		for (int i = 0; i < listeners.length; ++i) {
 			((ISourceLookupChangeListener) listeners[i]).sourceContainersChanged(director);
+		}
 		super.sourceContainersChanged(director);
 	}
 }
