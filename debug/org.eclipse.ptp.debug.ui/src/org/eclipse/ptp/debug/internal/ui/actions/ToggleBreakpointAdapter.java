@@ -39,6 +39,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ui.IEditorInput;
@@ -72,21 +73,21 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 			ITextEditor textEditor = (ITextEditor)part;
 			IEditorInput input = textEditor.getEditorInput();
 			if (input == null) {
-				errorMessage = ActionMessages.getString("ToggleBreakpointAdapter.Empty_editor_1");
+				errorMessage = Messages.ToggleBreakpointAdapter_Empty_editor_1;
 			}
 			else {
 				IDocument document = textEditor.getDocumentProvider().getDocument( input );
 				if (document == null) {
-					errorMessage = ActionMessages.getString("ToggleBreakpointAdapter.Missing_document_1");
+					errorMessage = Messages.ToggleBreakpointAdapter_Missing_document_1;
 				} else {
 					IResource resource = getResource(textEditor);
 					if (resource == null) {
-						errorMessage = ActionMessages.getString("ToggleBreakpointAdapter.Missing_resource_1");
+						errorMessage = Messages.ToggleBreakpointAdapter_Missing_resource_1;
 					} else {
 						BreakpointLocationVerifier bv = new BreakpointLocationVerifier();
 						int lineNumber = bv.getValidLineBreakpointLocation(document, ((ITextSelection)selection).getStartLine());
 						if (lineNumber == -1) {
-							errorMessage = ActionMessages.getString("ToggleBreakpointAdapter.Invalid_line_1");
+							errorMessage = Messages.ToggleBreakpointAdapter_Invalid_line_1;
 						} else {
 							IPJob job = uiDebugManager.getJob();
 							String sid = uiDebugManager.getCurrentSetId();
@@ -105,10 +106,10 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 										}
 									}
 								} else {// create a new breakpoint
-									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job);
+									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job); //$NON-NLS-1$
 								}
 							} else {// no breakpoint found and create a new one
-								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job);
+								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job); //$NON-NLS-1$
 							}
 							return;
 						}
@@ -117,7 +118,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 			}
 		}
 		else {
-			errorMessage = ActionMessages.getString("RunToLineAdapter.Operation_is_not_supported_1");
+			errorMessage = Messages.ToggleBreakpointAdapter_Operation_is_not_supported_1;
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
@@ -136,7 +137,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
-		PDebugUtils.println("*** Not Implemented YET ***");
+		PDebugUtils.println("*** Not Implemented YET ***"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -206,7 +207,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 */
 	private String getSourceHandle(IEditorInput input) throws CoreException {
 		if (input instanceof IFileEditorInput) {
-			return ((IFileEditorInput)input).getFile().getLocation().toOSString();
+			return ((IFileEditorInput)input).getFile().getProjectRelativePath().toOSString();
 		}
 		if (input instanceof IStorageEditorInput) {
 			return ((IStorageEditorInput)input).getStorage().getFullPath().toOSString();
@@ -214,7 +215,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		/*
 		 * TODO DisassemblyView
 		 */
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	private class BreakpointLocationVerifier {

@@ -411,36 +411,36 @@
 				<selection class="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"/>
 			</action>
 		</viewerContribution>
-  <viewerContribution
-        id="org.eclipse.ptp.debug.ui.RemoteCEditorRulerActions"
-        targetID="#RemoteCEditorRulerContext">
-     <menu
-           id="org.eclipse.ptp.debug.ui.popupmenu.submenu"
-           label="%EditorRulerAction.label"
-           path="debug">
-        <groupMarker
-              name="ptpGroup">
-        </groupMarker>
-     </menu>
-     <action
-           class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
-           id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
-           label="%PBreakpointProperties.label"
-           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
-     </action>
-     <action
-           class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-           id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-           label="%EnableDisableBreakpoint.label"
-           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
-     </action>
-     <action
-           class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-           id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-           label="%ToggleBreakpoint.label"
-           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
-     </action>
-  </viewerContribution>
+	  	<viewerContribution
+	        id="org.eclipse.ptp.debug.ui.RemoteCEditorRulerActions"
+	        targetID="#RemoteCEditorRulerContext">
+	    	<menu
+				id="org.eclipse.ptp.debug.ui.popupmenu.submenu"
+				label="%EditorRulerAction.label"
+				path="debug">
+				<groupMarker
+					name="ptpGroup">
+		        </groupMarker>
+	     	</menu>
+	     	<action
+	           class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
+	           id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
+	           label="%PBreakpointProperties.label"
+	           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
+	    	</action>
+	     	<action
+	           class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+	           id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+	           label="%EnableDisableBreakpoint.label"
+	           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
+	     	</action>
+	     	<action
+	           class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+	           id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+	           label="%ToggleBreakpoint.label"
+	           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
+	     	</action>
+	  	</viewerContribution>
 		<!-- debug view end -->
 		<!-- variable view start -->
 		<!--//
@@ -828,12 +828,7 @@
 			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
 		</factory>
 		<factory
-			adaptableType="org.eclipse.cdt.debug.core.sourcelookup.MappingSourceContainer"
-			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
-			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
-		</factory>
-		<factory
-			adaptableType="org.eclipse.cdt.debug.internal.core.sourcelookup.MapEntrySourceContainer"
+			adaptableType="org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer"
 			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
 			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
 		</factory>
@@ -867,18 +862,10 @@
 	<extension
 		point="org.eclipse.debug.ui.sourceContainerPresentations">
 		<sourceContainerPresentation
-			browserClass="org.eclipse.ptp.debug.internal.ui.sourcelookup.MappingSourceContainerBrowser"
-			containerTypeID="org.eclipse.ptp.debug.core.containerType.mapping"
+			browserClass="org.eclipse.ptp.debug.internal.ui.sourcelookup.ResourceMappingSourceContainerBrowser"
+			containerTypeID="org.eclipse.ptp.debug.core.containerType.resourceMapping"
 			icon="icons/obj16/mapping_obj.gif"
-			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.mapping"/>
-		<sourceContainerPresentation
-			containerTypeID="org.eclipse.ptp.debug.core.containerType.mapEntry"
-			icon="icons/obj16/mapentry_obj.gif"
-			id="org.eclipse.ppt.debug.ui.sourceContainerPresentation.mapEntry"/>
-		<sourceContainerPresentation
-			containerTypeID="org.eclipse.ptp.debug.core.containerType.absolutePath"
-			icon="icons/obj16/abspath_obj.gif"
-			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.absolutePath"/>
+			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.resourceMapping"/>
 	</extension>
 
 </plugin>
