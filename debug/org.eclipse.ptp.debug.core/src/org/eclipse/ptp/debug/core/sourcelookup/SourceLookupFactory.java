@@ -22,8 +22,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceLocation;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PProjectSourceLocation;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLocator;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
 
 /**
  * @author Clement chu
@@ -38,8 +36,5 @@ public class SourceLookupFactory {
 	}
 	public static IDirectorySourceLocation createDirectorySourceLocation(IPath directory, IPath association, boolean searchSubfolders) {
 		return new PDirectorySourceLocation(directory, association, searchSubfolders);
-	}
-	public static IPSourceLocator createSourceLocator(IProject project) {
-		return new PSourceManager(new PSourceLocator(project));
 	}
 }

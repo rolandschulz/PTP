@@ -154,25 +154,16 @@
 	<extension
 		point="org.eclipse.debug.core.sourceContainerTypes">
 		<sourceContainerType
-			class="org.eclipse.ptp.debug.internal.core.sourcelookup.MappingSourceContainerType"
+			class="org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainerType"
 			description="%containerDescription.mapping"
-			id="org.eclipse.ptp.debug.core.containerType.mapping"
+			id="org.eclipse.ptp.debug.core.containerType.resourceMapping"
 			name="%containerName.mapping"/>
 		<sourceContainerType
-			class="org.eclipse.ptp.debug.internal.core.sourcelookup.MapEntrySourceContainerType"
-			description="%containerDescription.mapEntry"
-			id="org.eclipse.ptp.debug.core.containerType.mapEntry"
-			name="%containerName.mapEntry"/>
-		<sourceContainerType
-			class="org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceContainerType"
-			description="%containerDescription.directory"
-			id="org.eclipse.ptp.debug.core.containerType.directory"
-			name="%containerName.directory"/>
-      <sourceContainerType
-            class="org.eclipse.ptp.debug.internal.core.sourcelookup.AbsolutePathSourceContainerType"
-            description="%containerDescription.absolutePath"
-            id="org.eclipse.ptp.debug.core.containerType.absolutePath"
-            name="%containerName.absolutePath"/>
+        class="org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceContainerType"
+        description="%containerDescription.directory"
+        id="org.eclipse.ptp.debug.core.containerType.directory"
+        name="%containerName.directory">
+  </sourceContainerType>
 	</extension>
 
 </plugin>

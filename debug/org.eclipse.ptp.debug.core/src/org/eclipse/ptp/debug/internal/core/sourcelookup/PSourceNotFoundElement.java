@@ -31,16 +31,28 @@ import org.eclipse.ptp.debug.core.model.IPStackFrame;
 public class PSourceNotFoundElement implements IDebugElement {
 	private IDebugElement element;
 
-	public IDebugElement getElement() {
-		return element;
-	}
-
 	public PSourceNotFoundElement(IDebugElement element) {
 		this.element = element;
 	}
 
+	public Object getAdapter(Class adapter) {
+		return element.getAdapter(adapter);
+	}
+
 	public IDebugTarget getDebugTarget() {
 		return element.getDebugTarget();
+	}
+
+	public IDebugElement getElement() {
+		return element;
+	}
+
+	public String getFile() {
+		IPStackFrame frame = (IPStackFrame) ((IAdaptable) element).getAdapter(IPStackFrame.class);
+		if (frame != null) {
+			return frame.getFile().trim();
+		}
+		return ""; //$NON-NLS-1$
 	}
 
 	public ILaunch getLaunch() {
@@ -49,17 +61,5 @@ public class PSourceNotFoundElement implements IDebugElement {
 
 	public String getModelIdentifier() {
 		return element.getModelIdentifier();
-	}
-
-	public Object getAdapter(Class adapter) {
-		return element.getAdapter(adapter);
-	}
-
-	public String getFile() {
-		IPStackFrame frame = (IPStackFrame) ((IAdaptable) element).getAdapter(IPStackFrame.class);
-		if (frame != null) {
-			return frame.getFile().trim();
-		}
-		return "";
 	}
 }
