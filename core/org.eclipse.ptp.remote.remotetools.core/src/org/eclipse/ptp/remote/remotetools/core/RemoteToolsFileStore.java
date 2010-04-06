@@ -83,7 +83,7 @@ public class RemoteToolsFileStore extends FileStore {
 		IRemoteItem[] items;
 		try {
 			items = getExecutionManager(monitor).getRemoteFileTools()
-					.listItems(fRemotePath.toString(), monitor);
+					.listItems(fRemotePath.toString());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
@@ -116,7 +116,7 @@ public class RemoteToolsFileStore extends FileStore {
 		IRemoteItem[] items;
 		try {
 			items = getExecutionManager(monitor).getRemoteFileTools()
-					.listItems(fRemotePath.toString(), monitor);
+					.listItems(fRemotePath.toString());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					RemoteToolsAdapterCorePlugin.getDefault().getBundle()
@@ -155,10 +155,10 @@ public class RemoteToolsFileStore extends FileStore {
 				cacheRemoteItem(null);
 				if (item.isDirectory()) {
 					getExecutionManager(monitor).getRemoteFileTools()
-							.removeDirectory(fRemotePath.toString(),monitor);
+							.removeDirectory(fRemotePath.toString());
 				} else {
 					getExecutionManager(monitor).getRemoteFileTools()
-							.removeFile(fRemotePath.toString(),monitor);
+							.removeFile(fRemotePath.toString());
 				}
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
@@ -262,7 +262,7 @@ public class RemoteToolsFileStore extends FileStore {
 
 			try {
 				getExecutionManager(monitor).getRemoteFileTools()
-						.createDirectory(fRemotePath.toString(), monitor);
+						.createDirectory(fRemotePath.toString());
 				cacheRemoteItem(null);
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
@@ -398,7 +398,7 @@ public class RemoteToolsFileStore extends FileStore {
 		}
 		if (modified) {
 			try {
-				item.commitAttributes(monitor);
+				item.commitAttributes();
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR,
 						RemoteToolsAdapterCorePlugin.getDefault().getBundle()
@@ -565,7 +565,7 @@ public class RemoteToolsFileStore extends FileStore {
 			}
 
 			try {
-				fRemoteItem.refreshAttributes(monitor);
+				fRemoteItem.refreshAttributes();
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new CoreException(new Status(IStatus.ERROR,
