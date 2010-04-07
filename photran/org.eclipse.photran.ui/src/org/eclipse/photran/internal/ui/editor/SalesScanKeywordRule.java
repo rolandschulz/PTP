@@ -501,7 +501,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else if (keyword.equalsIgnoreCase("result"))
                 return letterFollowsParenthetical;
             else if (keyword.equalsIgnoreCase("then"))
-                return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos));
+                return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos) || match("forall", firstTokenPos));
             // BEGIN FORTRAN 2003
             else if (keyword.equalsIgnoreCase("bind"))
                 return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos))
@@ -599,7 +599,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else if (openContextEquals && !openContextComma)
                 return !lineContainsColonColon
                     && letterFollowsParenthetical
-                    && (match("if", firstTokenPos) || match("where", firstTokenPos));
+                    && (match("if", firstTokenPos) || match("where", firstTokenPos) || match("forall", firstTokenPos));
             else if (openContextComma)
                 return true;
             else if (letterFollowsParenthetical)
@@ -610,7 +610,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
         private boolean retainTokenFollowingParentheticalAsKeyword()
         {
-            return letterFollowsParenthetical && match("if", firstTokenPos) && !openContextEquals;
+            return letterFollowsParenthetical
+            && (match("if", firstTokenPos) || match("forall", firstTokenPos))
+            && !openContextEquals;
         }
 
         private boolean isType(String kw)
