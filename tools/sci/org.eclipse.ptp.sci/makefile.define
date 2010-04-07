@@ -1,0 +1,81 @@
+#------------------------------------------------------------
+#
+#	makefile    : General definitions for makefile
+#
+# 	Description: 
+# 	Common definition for makefile 
+#
+#------------------------------------------------------------
+
+ARCH := $(shell uname -m)
+OS := $(shell uname)
+AR = ar
+
+SRCS := $(wildcard *.c) $(wildcard *.cpp) $(wildcard *.cxx) 
+
+# Machine dependent flags
+ifeq ($(OS), AIX)
+    # power architecture
+    M_DEP_FLAGS = -DPOWER_ARCH
+else
+    ifeq ($(ARCH), i686)
+        # intel architecture
+        M_DEP_FLAGS = -DINTEL_ARCH
+    endif
+    ifeq ($(ARCH), x86_64)
+        # intel architecture
+        M_DEP_FLAGS = -DINTEL_ARCH
+    endif
+    ifeq ($(ARCH), ppc64)
+        # power architecture
+        M_DEP_FLAGS = -DPOWER_ARCH
+    endif
+endif
+
+# OS dependent flags
+ifeq ($(OS), AIX) 
+    OS_DEP_FLAGS =
+    CC32 = xlC_r -q32
+    CC64 = xlC_r -q64
+    MPCC32 = mpCC_r -q32
+    MPCC64 = mpCC_r -q64
+    WARN_OPTIONS =
+    ARFLAGS = -X32 -rv
+    AR64FLAGS = -X64 -rv
+    SCI_FLAGS = -lsci_r
+else
+    OS_DEP_FLAGS = -D_SCI_LINUX
+    CC32 = g++ -m32
+    CC64 = g++ -m64 -D__64BIT__
+    MPCC32 = mpCC -q32
+    MPCC64 = mpCC -q64 -D__64BIT__
+    WARN_OPTIONS = -Wall
+    ARFLAGS = -rv
+    AR64FLAGS = -rv 
+    SCI_FLAGS = -lsci
+endif
+
+OBJS := $(addsuffix .o, $(basename $(SRCS)))
+ifeq ($(ARCH), i686)
+    OBJS64 =
+else
+    OBJS64 := $(addsuffix .64o, $(basename $(SRCS)))
+endif
+
+MISSING_DEPS := $(filter-out $(wildcard $(DEPS)),$(DEPS) )
+
+.PHONY : all install
+
+MY_FLAGS = -g $(WARN_OPTIONS) $(M_DEP_FLAGS) $(OS_DEP_FLAGS) -DREENTRANT -D_SCI_DEBUG -I../include \
+    -I../common
+
+INC_DIR = /opt/sci/include
+BIN_DIR = /opt/sci/bin
+LIB_DIR = /opt/sci/lib
+
+%.o: %.cpp
+	$(CC32) -c $(CPPFLAGS) -o $@ $< 
+
+%.64o: %.cpp
+	$(CC64) -c $(CPPFLAGS) -o $@ $< 
+
