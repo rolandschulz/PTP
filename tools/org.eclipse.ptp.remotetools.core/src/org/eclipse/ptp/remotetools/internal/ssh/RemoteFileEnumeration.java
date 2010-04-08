@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
@@ -52,7 +53,7 @@ public class RemoteFileEnumeration implements IRemoteFileEnumeration {
 		// don't need, listItems(root) will test
 		// fileTools.test();
 
-		this.items = fileTools.listItems(directoryPath);
+		this.items = fileTools.listItems(directoryPath, null);
 		this.currentItem = 0;
 	}
 	

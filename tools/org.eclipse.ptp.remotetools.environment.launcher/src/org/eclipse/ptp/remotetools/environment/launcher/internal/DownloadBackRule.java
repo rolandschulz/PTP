@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.environment.launcher.internal;
@@ -18,12 +19,11 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.remotetools.environment.launcher.data.ISynchronizationRule;
-import org.eclipse.ptp.remotetools.environment.launcher.data.OverwritePolicies;
 
 
 public class DownloadBackRule implements ISynchronizationRule {
-	List remoteFiles = new ArrayList();
-	List localFiles = new ArrayList();
+	List<IPath> remoteFiles = new ArrayList<IPath>();
+	List<File> localFiles = new ArrayList<File>();
 	
 	public DownloadBackRule() {
 	}
@@ -58,7 +58,7 @@ public class DownloadBackRule implements ISynchronizationRule {
 	}
 
 	public String toLabel() {
-		return "Internal download back rule"; //$NON-NLS-1$
+		return Messages.DownloadBackRule_0;
 	}
 
 	public void validate() throws CoreException {

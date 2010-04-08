@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
@@ -28,16 +29,13 @@ import org.eclipse.ptp.remotetools.internal.common.Debug;
 import org.eclipse.ptp.utils.core.file.FileEnumeration;
 import org.eclipse.ptp.utils.core.file.FileRecursiveEnumeration;
 
-import com.jcraft.jsch.SftpException;
 
 public class CopyTools implements IRemoteCopyTools {
 	
-	private ExecutionManager manager;
 	private FileTools remoteFileTools;
 	
-	public CopyTools(ExecutionManager manager) {
-		this.manager = manager;
-		remoteFileTools = new FileTools(manager);
+	public CopyTools(ExecutionManager manager) throws RemoteConnectionException {
+		remoteFileTools = (FileTools)manager.getRemoteFileTools(); //TODO update interface
 	}
 
 	/* (non-Javadoc)
@@ -90,7 +88,7 @@ public class CopyTools implements IRemoteCopyTools {
 	public void uploadFileToDir(File localFile, String remotePath) throws RemoteConnectionException, CancelException, RemoteOperationException {
 //		remoteFileTools.validateRemotePath(localFile);
 		remoteFileTools.validateRemotePath(remotePath);
-		remoteFileTools.assureDirectory(remotePath);
+		remoteFileTools.assureDirectory(remotePath, null);
 		remotePath = remoteFileTools.concatenateRemotePath(remotePath, localFile.getName());
 		doUploadFileToFile(localFile, remotePath);
 	}
@@ -108,7 +106,7 @@ public class CopyTools implements IRemoteCopyTools {
 	 */
 	public void uploadFileToFile(File localFile, String remotePath) throws RemoteConnectionException, CancelException, RemoteOperationException {
 		remoteFileTools.validateRemotePath(remotePath);
-		remoteFileTools.assureDirectory(remoteFileTools.parentOfRemotePath(remotePath));
+		remoteFileTools.assureDirectory(remoteFileTools.parentOfRemotePath(remotePath), null);
 		doUploadFileToFile(localFile, remotePath);
 	}
 
@@ -121,32 +119,34 @@ public class CopyTools implements IRemoteCopyTools {
 	}
 
 	private void doDownloadFileToFile(String remotePath, File localFile) throws RemoteConnectionException, CancelException, RemoteOperationException {
-		FileOutputStream sink;
+		FileOutputStream sink = null;
 		try {
 			sink = new FileOutputStream(localFile);
+			remoteFileTools.downloadIntoOutputStream(remotePath, sink, null);
 		} catch (FileNotFoundException e) {
 			throw new RemoteOperationException(NLS.bind(Messages.CopyTools_doDownloadFileToFile_CannotWriteFile, e.getMessage()), e);
-		}
-		
-		try {
-			manager.getConnection().getDefaultSFTPChannel().get(remotePath, sink);
-		} catch (SftpException ex) {
-			throw new RemoteOperationException(ex);
+		} finally {
+			try {
+				if (sink!=null) sink.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private void doUploadFileToFile(File localFile, String remotePath) throws RemoteConnectionException, CancelException, RemoteOperationException {
-		FileInputStream source;
+		FileInputStream source = null;
 		try {
 			source = new FileInputStream(localFile); 
+			remoteFileTools.uploadFromInputStream(source, remotePath, null);
 		} catch (FileNotFoundException e) {
 			throw new RemoteOperationException(NLS.bind(Messages.CopyTools_doUploadFileFromFile_CannotReadFile, e.getMessage()), e);
-		}
-		
-		try {
-			manager.getConnection().getDefaultSFTPChannel().put(source,remotePath);
-		} catch (SftpException ex) {
-			throw new RemoteOperationException(ex);
+		} finally {
+			try {
+				if (source!=null) source.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -180,7 +180,7 @@ public class CopyTools implements IRemoteCopyTools {
 			String relativePath = remoteFilePath.substring(remotePath.length());
 			File localFile = new File(localDir, relativePath);
 		
-			if (remoteFileTools.hasDirectory(remoteFilePath)) {
+			if (remoteFileTools.hasDirectory(remoteFilePath, null)) {
 				// Create directory on the remote host
 				Debug.println("Create: " + remoteFilePath); //$NON-NLS-1$
 				if (!localFile.exists()) {
@@ -211,7 +211,7 @@ public class CopyTools implements IRemoteCopyTools {
 	public void uploadDirToDir(File localDir, String remotePath, boolean recursive) throws RemoteConnectionException, RemoteOperationException, CancelException {
 //		remoteFileTools.validateLocalDir(localDir);
 		remoteFileTools.validateRemotePath(remotePath);
-		remoteFileTools.assureDirectory(remotePath);
+		remoteFileTools.assureDirectory(remotePath, null);
 		
 		Enumeration<File> enumeration;
 		try {
@@ -245,7 +245,7 @@ public class CopyTools implements IRemoteCopyTools {
 			if (file.isDirectory()) {
 				// Create directory on the remote host
 				Debug.println("Create: " + remoteFilePath); //$NON-NLS-1$
-				remoteFileTools.assureDirectory(remoteFilePath);
+				remoteFileTools.assureDirectory(remoteFilePath, null);
 				remoteFileTools.uploadPermissions(file.getAbsoluteFile(), remoteFilePath);
 			} else {
 				// Copy to the remote host

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.environment.launcher.internal;
@@ -17,6 +18,7 @@ import java.io.PrintWriter;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -27,7 +29,6 @@ import org.eclipse.ptp.remotetools.environment.launcher.data.ExecutionConfigurat
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
-
 
 public class DownloadBackAction implements IRuleAction {
 	
@@ -62,11 +63,11 @@ public class DownloadBackAction implements IRuleAction {
 		for (int i = 0; i < rule.count(); i++) {
 			File localFile = rule.getLocalFile(i);
 			IPath remotePath = rule.getRemoteFile(i);
-			downloadFile(localFile, remotePath);
+			downloadFile(localFile, remotePath, null);
 		}
 	}
 
-	private void downloadFile(File localFile, IPath remotePath) throws CoreException, CancelException, RemoteConnectionException {
+	private void downloadFile(File localFile, IPath remotePath, IProgressMonitor monitor) throws CoreException, CancelException, RemoteConnectionException {
 		String remotePathAsString = LinuxPath.toString(remotePath);
 		
 		IRemoteCopyTools copyTools = manager.getRemoteCopyTools();
@@ -74,7 +75,7 @@ public class DownloadBackAction implements IRuleAction {
 				
 		IRemoteItem remoteFile = null;
 		try {
-			remoteFile = fileTools.getFile(remotePathAsString);
+			remoteFile = fileTools.getFile(remotePathAsString, monitor);
 		} catch (RemoteOperationException e) {
 			errorWriter.println(NLS.bind(Messages.DownloadBackAction_FailedFetchRemoteProperties, e.getMessage()));
 			return;

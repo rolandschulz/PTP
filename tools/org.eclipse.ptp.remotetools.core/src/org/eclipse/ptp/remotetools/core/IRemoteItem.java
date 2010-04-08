@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,12 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.core;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
@@ -24,8 +26,10 @@ public interface IRemoteItem {
 	/**
 	 * Apply all the attributes to the item on remote host.
 	 * For efficiency, only changed attributes may be written.
+	 * 
+	 * @param monitor progress monitor used to report operation progress to the user
 	 */
-	public void commitAttributes() throws RemoteConnectionException, RemoteOperationException, CancelException;
+	public void commitAttributes(IProgressMonitor monitor) throws RemoteConnectionException, RemoteOperationException, CancelException;
 	
 	/**
 	 * Test if this remote item actually exists on the remote system.
@@ -96,9 +100,11 @@ public interface IRemoteItem {
 	
 	/**
 	 * Fetch all the attributes from the item on remote host.
+	 * 
+	 * @param monitor progress monitor used to report operation progress to the user
 	 * @throws RemoteOperationException 
 	 */
-	public void refreshAttributes() throws RemoteConnectionException, RemoteOperationException, CancelException;
+	public void refreshAttributes(IProgressMonitor monitor) throws RemoteConnectionException, RemoteOperationException, CancelException;
 	
 	/**
 	 * Set the executable status of the remote item
