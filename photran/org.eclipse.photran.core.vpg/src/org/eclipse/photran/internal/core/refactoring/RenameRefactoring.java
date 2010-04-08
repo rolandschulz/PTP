@@ -156,7 +156,7 @@ public class RenameRefactoring extends SingleFileFortranRefactoring implements I
         if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
 
         allReferences = definitionToRename.findAllReferences(shouldBindInterfacesAndExternals);
-        removeFixedFormReferences(status);
+        //removeFixedFormReferences(status);
         checkIfReferencesCanBeRenamed(pm);
 
         checkForConflictingBindings(

@@ -51,7 +51,7 @@ public class StandardizeStatementsRefactoring extends MultipleFileFortranRefacto
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        removeFixedFormFilesFrom(this.selectedFiles, status);
+        //removeFixedFormFilesFrom(this.selectedFiles, status);
         removeCpreprocessedFilesFrom(this.selectedFiles, status);
     }
 

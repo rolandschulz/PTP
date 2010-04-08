@@ -64,7 +64,7 @@ public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
         throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        removeFixedFormFilesFrom(this.selectedFiles, status);
+        //removeFixedFormFilesFrom(this.selectedFiles, status);
         removeCpreprocessedFilesFrom(this.selectedFiles, status);        
     }
 

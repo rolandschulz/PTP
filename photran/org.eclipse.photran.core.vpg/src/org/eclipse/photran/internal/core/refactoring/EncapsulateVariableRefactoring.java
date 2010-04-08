@@ -166,7 +166,7 @@ public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
         checkCanBeEncapsulated(selectedTokenDef);
 
         allRefs = selectedTokenDef.findAllReferences(true);
-        processTokenRefs(allRefs);
+        //processTokenRefs(allRefs);
     }
 
     protected void checkCanBeEncapsulated(Definition def) throws PreconditionFailure

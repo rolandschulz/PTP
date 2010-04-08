@@ -163,6 +163,8 @@ class FixedFormLexerPrepass {
 				} 
 				else if(actLine.type==PreLexerLine.COMMENT)
 				{
+				    if(prevLine.type != PreLexerLine.COMMENT && actLine.length() > 0)
+				        markPosition(prevLine.linePos, actLinePos, prevLine.offset+prevLine.length());
 				    prevWhiteSpace=prevWhiteSpace.concat(actLine.getText());
 				    prevWhiteSpace=prevWhiteSpace.concat(in.getFileEOL());
 				    actLinePos = actLine.length();
@@ -172,6 +174,7 @@ class FixedFormLexerPrepass {
 					actLinePos=0;
 					hollerithLength=-2;
 					state=inStart;
+					//TODO: If previous line is a comment, handle this in a special way
 					markPosition(prevLine.linePos,prevLine.length(),prevLine.offset+prevLine.length());
 					return '\n';
 				}

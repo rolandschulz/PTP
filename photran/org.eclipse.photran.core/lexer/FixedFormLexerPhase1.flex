@@ -606,8 +606,8 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 }
 
 <QUOTED> {
-"''"                                            { stringBuffer.append('\''); }
-"'"                                             { stringBuffer.append('\'');
+"''"                                            { stringBuffer.append("''"); }
+"'"                                             { stringBuffer.append("'");
                                                   yybegin(YYSTANDARD);
                                                   wantEos = true;
                                                   return token(Terminal.T_SCON); }
@@ -617,7 +617,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 }
 
 <DBLQUOTED> {
-\"\"                                            { stringBuffer.append('\"'); }
+\"\"                                            { stringBuffer.append("\"\""); }
 \"                                              { stringBuffer.append('\"');
                                                   yybegin(YYSTANDARD);
                                                   wantEos = true;

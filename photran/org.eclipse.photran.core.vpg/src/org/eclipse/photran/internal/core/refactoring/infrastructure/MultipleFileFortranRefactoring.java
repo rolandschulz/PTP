@@ -83,7 +83,18 @@ public abstract class MultipleFileFortranRefactoring
     @Override
     protected final void preCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
+        boolean fixForm = false;
         status.addWarning("C preprocessor directives are IGNORED by the refactoring engine.  Use at your own risk.");
+     
+        for(IFile file : this.selectedFiles)
+        {
+            if(FortranCorePlugin.hasFixedFormContentType(file))
+                fixForm = true;
+        }
+        
+        if(fixForm)
+            status.addWarning("Indentation and line length is NOT checked when refactoring FIXED form files. " +
+                   "Use at your own risk.");
     }
 
     @Override
