@@ -34,13 +34,8 @@ program test
   p = 5
   call init
   
-  ! gfortran 4.4.2 fails on this line,
-  ! claiming that n is an ambiguous reference.
-  ! IBM XL Fortran 12.1 allows the local n to
-  ! shadow the module entity n.
-  ! I believe gfortran exhibits the correct behavior.
-  ! According to the Fortran 95 standard
-  ! (ISO/IEC 1539-1), Section 11.3.2:
+  ! There is ambiguity in the Fortran 95 standard as to how the following
+  ! statement should be handled.  According to Section 11.3.2:
   ! "Two or more accessible entities, other than
   ! generic interfaces, may have the same name only if
   ! the name is not used to refer to an entity in the
@@ -49,5 +44,10 @@ program test
   ! from the local names of all other entities accessible
   ! to the scoping unit through USE statements and
   ! otherwise."
+  ! GNU Fortran 4.4.2:   Compilation fails: n is an ambiguous reference
+  ! IBM XL Fortran 12.1: Outputs 2 3 5
+  ! Intel Fortran 10.1:  Outputs 2 3 5
+  ! PGI Fortran 10.0:    Outputs 1 3 5
   print *, n, o, p
+  
 end program
