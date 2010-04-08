@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.environment.launcher.internal;
@@ -37,7 +38,6 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 import org.eclipse.ptp.utils.core.file.FileRecursiveEnumeration;
-
 
 public class UploadRuleAction implements IRuleAction {
 	
@@ -80,14 +80,14 @@ public class UploadRuleAction implements IRuleAction {
 				remoteTime = statusTools.getTime();
 				clockSkew = localTime -remoteTime;
 			} catch (RemoteOperationException e) {
-				errorWriter.println(NLS.bind("   Could not calculate clock difference with remote host: {0}", e.getMessage()));			
-				errorWriter.println("   Assuming same a remote clock synchronized with local clock.");
+				errorWriter.println(NLS.bind(Messages.UploadRuleAction_0, e.getMessage()));			
+				errorWriter.println(Messages.UploadRuleAction_1);
 				clockSkew = 0;
 			}
 			if (clockSkew < -15000) {
-				errorWriter.println("   Warning! Clock at remote target is more recent than local clock. File synchronization may not be correct.");
+				errorWriter.println(Messages.UploadRuleAction_2);
 			} else if (clockSkew > 15000) {
-				errorWriter.println("   Warning! Clock at remote target is older than local clock. File synchronization may not be correct.");				
+				errorWriter.println(Messages.UploadRuleAction_3);				
 			}
 		}
 		
@@ -105,7 +105,7 @@ public class UploadRuleAction implements IRuleAction {
 			}
 		}
 		remotePath = remotePath.removeTrailingSeparator();
-		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()");
+		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()"); //$NON-NLS-1$
 		
 		/*
 		 * Determine list of local paths. Make them absolute.
@@ -118,7 +118,7 @@ public class UploadRuleAction implements IRuleAction {
 				localPath = workspace.append(localPath);
 			}
 			localPath = localPath.removeTrailingSeparator();
-			Assert.isTrue(localPath.isAbsolute(), "localPath.isAbsolute()");
+			Assert.isTrue(localPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
 			localPaths[i] = localPath;
 		}
 		
@@ -130,14 +130,14 @@ public class UploadRuleAction implements IRuleAction {
 			
 			File localFile = localPath.toFile();
 			if (! localFile.exists()) {
-				errorWriter.println(NLS.bind("   Ignoring {0}: Path does not exist locally", localFile.toString()));
+				errorWriter.println(NLS.bind(Messages.UploadRuleAction_4, localFile.toString()));
 				continue;
 			} else if (localFile.isDirectory()) {
 				uploadDirectory(localFile, remotePath);
 			} else if (localFile.isFile()) {
 				uploadFile(localFile, remotePath);
 			} else {
-				errorWriter.println(NLS.bind("   Ignoring {0}: Path is not a file nor directory", localFile.toString()));
+				errorWriter.println(NLS.bind(Messages.UploadRuleAction_5, localFile.toString()));
 				continue;				
 			}
 		}
@@ -152,25 +152,25 @@ public class UploadRuleAction implements IRuleAction {
 	}
 
 	private void uploadFile(File localFile, IPath remoteDirectoryPath) throws CoreException, CancelException, RemoteConnectionException {
-		Assert.isTrue(localFile.isAbsolute(), "localFile.isAbsolute()");
-		Assert.isTrue(remoteDirectoryPath.isAbsolute(), "remoteDirectoryPath.isAbsolute()");
+		Assert.isTrue(localFile.isAbsolute(), "localFile.isAbsolute()"); //$NON-NLS-1$
+		Assert.isTrue(remoteDirectoryPath.isAbsolute(), "remoteDirectoryPath.isAbsolute()"); //$NON-NLS-1$
 		
 		IPath remoteFile = remoteDirectoryPath.append(localFile.getName());
-		outputWriter.println(NLS.bind("   Copying file {0} (local)", localFile.toString()));
-		outputWriter.println(NLS.bind("   to file {0} (remote)", LinuxPath.toString(remoteFile)));
+		outputWriter.println(NLS.bind(Messages.UploadRuleAction_6, localFile.toString()));
+		outputWriter.println(NLS.bind(Messages.UploadRuleAction_7, LinuxPath.toString(remoteFile)));
 
 		doFileUpload(localFile, remoteFile);
 	}
 
 	private void doFileUpload(File localFile, IPath remotePath) throws CoreException, CancelException, RemoteConnectionException {		
 		if (! localFile.exists()) {
-			errorWriter.println(NLS.bind("   Ignoring {0}: File does not exist locally", localFile.toString()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_8, localFile.toString()));
 			return;
 		}
 
-		Assert.isTrue(localFile.isAbsolute(), "localFile.isAbsolute()");
-		Assert.isTrue(localFile.isFile(), "localFile.isFile()");
-		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()");
+		Assert.isTrue(localFile.isAbsolute(), "localFile.isAbsolute()"); //$NON-NLS-1$
+		Assert.isTrue(localFile.isFile(), "localFile.isFile()"); //$NON-NLS-1$
+		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()"); //$NON-NLS-1$
 		
 		String remotePathAsString = LinuxPath.toString(remotePath);
 
@@ -190,20 +190,20 @@ public class UploadRuleAction implements IRuleAction {
 			 */
 			IRemoteItem remoteFile = null;
 			try {
-				remoteFile = fileTools.getFile(remotePathAsString);
+				remoteFile = fileTools.getFile(remotePathAsString, null);
 			} catch (RemoteOperationException e) {
-				errorWriter.println(NLS.bind("   Could not fetch properties for remote file, ignoring it: {0}", e.getMessage()));
+				errorWriter.println(NLS.bind(Messages.UploadRuleAction_9, e.getMessage()));
 				return;
 			}
 			if (rule.getOverwritePolicy() == OverwritePolicies.SKIP) {
 				if (remoteFile.exists()) {
-					outputWriter.println(NLS.bind("   File alredy exists on remote target, ignoring it: {0}", remotePath));
+					outputWriter.println(NLS.bind(Messages.UploadRuleAction_10, remotePath));
 					return;
 				}
 			} else if (rule.getOverwritePolicy() == OverwritePolicies.NEWER) {
 				long difference = localFile.lastModified() - remoteFile.getModificationTime();
 				if (difference < 1000) {
-					outputWriter.println(NLS.bind("   A newer file alredy exists on remote target, ignoring it: {0}", remotePath));
+					outputWriter.println(NLS.bind(Messages.UploadRuleAction_11, remotePath));
 					return;					
 				}
 			}
@@ -215,7 +215,7 @@ public class UploadRuleAction implements IRuleAction {
 		try {
 			copyTools.uploadFileToFile(localFile, remotePathAsString);
 		} catch (RemoteOperationException e) {
-			errorWriter.println(NLS.bind("   Could not upload file: {0}", e.getMessage()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_12, e.getMessage()));
 			return;
 		}
 	
@@ -234,9 +234,9 @@ public class UploadRuleAction implements IRuleAction {
 		 */
 		IRemoteItem remoteFile = null;
 		try {
-			remoteFile = fileTools.getFile(remotePathAsString);
+			remoteFile = fileTools.getFile(remotePathAsString, null);
 		} catch (RemoteOperationException e) {
-			errorWriter.println(NLS.bind("   Could not fetch properties for uploaded file: {0}", e.getMessage()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_13, e.getMessage()));
 			return;
 		}
 		
@@ -275,22 +275,22 @@ public class UploadRuleAction implements IRuleAction {
 		 * Commit changes
 		 */
 		try {
-			remoteFile.commitAttributes();
+			remoteFile.commitAttributes(null);
 		} catch (RemoteOperationException e) {
-			errorWriter.println(NLS.bind("   Could not write properties for uploaded file: {0}", e.getMessage()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_14, e.getMessage()));
 			return;
 		}
 	}
 	
 	private void doDirectoryUpload(File localDir, IPath remotePath) throws RemoteConnectionException, CancelException {
 		if (! localDir.exists()) {
-			errorWriter.println(NLS.bind("   Ignoring {0}: Directory does not exist locally", localDir.toString()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_15, localDir.toString()));
 			return;
 		}
 
-		Assert.isTrue(localDir.isDirectory(), "localFile.isDirectory()");
-		Assert.isTrue(localDir.isAbsolute(), "localFile.isAbsolute()");
-		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()");
+		Assert.isTrue(localDir.isDirectory(), "localFile.isDirectory()"); //$NON-NLS-1$
+		Assert.isTrue(localDir.isAbsolute(), "localFile.isAbsolute()"); //$NON-NLS-1$
+		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()"); //$NON-NLS-1$
 
 		IRemoteFileTools fileTools = manager.getRemoteFileTools();
 		
@@ -298,9 +298,9 @@ public class UploadRuleAction implements IRuleAction {
 		 * Create remote directory if not already exists.
 		 */
 		try {
-			fileTools.assureDirectory(LinuxPath.toString(remotePath));
+			fileTools.assureDirectory(LinuxPath.toString(remotePath), null);
 		} catch (RemoteOperationException e) {
-			errorWriter.println(NLS.bind("   Could not create remote directory: {0}", e.getMessage()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_16, e.getMessage()));
 			return;
 		}
 	
@@ -309,9 +309,9 @@ public class UploadRuleAction implements IRuleAction {
 		 */
 		IRemoteItem remoteDirectory = null;
 		try {
-			remoteDirectory = fileTools.getDirectory(LinuxPath.toString(remotePath));
+			remoteDirectory = fileTools.getDirectory(LinuxPath.toString(remotePath), null);
 		} catch (RemoteOperationException e) {
-			errorWriter.println(NLS.bind("   Could not fetch properties for created remote directory: {0}", e.getMessage()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_17, e.getMessage()));
 			return;
 		}
 		
@@ -342,20 +342,20 @@ public class UploadRuleAction implements IRuleAction {
 		 * Commit changes
 		 */
 		try {
-			remoteDirectory.commitAttributes();
+			remoteDirectory.commitAttributes(null);
 		} catch (RemoteOperationException e) {
-			errorWriter.println(NLS.bind("   Could not write properties for uploaded directory: {0}", e.getMessage()));
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_18, e.getMessage()));
 			return;
 		}		
 	}
 
 
 	private void uploadDirectory(File localDir, IPath remotePath) throws CoreException, CancelException, RemoteConnectionException {
-		Assert.isTrue(localDir.isAbsolute(), "localDir.isAbsolute()");
-		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()");
+		Assert.isTrue(localDir.isAbsolute(), "localDir.isAbsolute()"); //$NON-NLS-1$
+		Assert.isTrue(remotePath.isAbsolute(), "remotePath.isAbsolute()"); //$NON-NLS-1$
 
-		outputWriter.println(NLS.bind("   Copying contents of directory {0} (local)", localDir.toString()));
-		outputWriter.println(NLS.bind("   into directory {0} (remote)", LinuxPath.toString(remotePath)));
+		outputWriter.println(NLS.bind(Messages.UploadRuleAction_19, localDir.toString()));
+		outputWriter.println(NLS.bind(Messages.UploadRuleAction_20, LinuxPath.toString(remotePath)));
 
 		FileRecursiveEnumeration enumeration = null;
 		enumeration = new FileRecursiveEnumeration(localDir);
@@ -364,22 +364,22 @@ public class UploadRuleAction implements IRuleAction {
 		int rootPathLength = rootPath.segmentCount();
 		while (enumeration.hasMoreElements()) {
 			while (enumeration.hasMoreExceptions()) {
-				errorWriter.println(NLS.bind("   Could not read file/directory: {0}", enumeration.nextException()));	
+				errorWriter.println(NLS.bind(Messages.UploadRuleAction_21, enumeration.nextException()));	
 			}
 			File file = (File) enumeration.nextElement();
 			IPath filePath = new Path(file.getAbsolutePath());
 			IPath relativePath = filePath.removeFirstSegments(rootPathLength);
 			IPath remoteFilePath = remotePath.append(relativePath);
 			if (file.isDirectory()) {
-				outputWriter.println(NLS.bind("   Create remote directory {0}", LinuxPath.toString(remoteFilePath)));
+				outputWriter.println(NLS.bind(Messages.UploadRuleAction_22, LinuxPath.toString(remoteFilePath)));
 				doDirectoryUpload(file, remoteFilePath);
 			} else {
-				outputWriter.println(NLS.bind("   Upload {0}", LinuxPath.toString(relativePath)));
+				outputWriter.println(NLS.bind(Messages.UploadRuleAction_23, LinuxPath.toString(relativePath)));
 				doFileUpload(file, remoteFilePath);
 			}
 		}
 		while (enumeration.hasMoreExceptions()) {
-			errorWriter.println(NLS.bind("   Could not read file/directory: {0}", enumeration.nextException()));	
+			errorWriter.println(NLS.bind(Messages.UploadRuleAction_24, enumeration.nextException()));	
 		}
 	}
 }

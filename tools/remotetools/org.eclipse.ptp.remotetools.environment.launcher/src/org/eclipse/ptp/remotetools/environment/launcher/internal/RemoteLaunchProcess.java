@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
+ *     Roland Schulz, University of Tennessee
  *
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.environment.launcher.internal;
@@ -160,7 +161,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		launchProcessOutputWriter.println(NLS.bind(Messages.RemoteLaunchProcess_PrepareWorkingDir_Title, remoteDirectoryAsPath));
 		try {
 			IRemoteFileTools fileTools = manager.getRemoteFileTools();
-			fileTools.createDirectory(remoteDirectoryAsPath);
+			fileTools.createDirectory(remoteDirectoryAsPath, null);
 		} catch (RemoteOperationException e) {
 			launchProcessErrorWriter.println(NLS.bind(Messages.RemoteLaunchProcess_PrepareWorkingDir_FailedCreate, e.getMessage()));
 			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_PrepareWorkingDir_FailedCreateHint);
@@ -174,11 +175,11 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		 */
 		try {
 			IRemoteFileTools fileTools = manager.getRemoteFileTools();
-			IRemoteItem remoteExecutable = fileTools.getDirectory(remoteDirectoryAsPath);
+			IRemoteItem remoteExecutable = fileTools.getDirectory(remoteDirectoryAsPath, null);
 			remoteExecutable.setExecutable(true);
 			remoteExecutable.setReadable(true);
 			remoteExecutable.setWriteable(true);
-			remoteExecutable.commitAttributes();
+			remoteExecutable.commitAttributes(null);
 		} catch (RemoteOperationException e) {
 			launchProcessErrorWriter.println(NLS.bind(Messages.RemoteLaunchProcess_PrepareWorkingDir_FailedPermissions, e.getMessage()));
 			abortWithError(Messages.RemoteLaunchProcess_PrepareWorkingDir_Failed, e);
@@ -278,10 +279,10 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		 */
 		try {
 			IRemoteFileTools fileTools = manager.getRemoteFileTools();
-			IRemoteItem remoteFile = fileTools.getFile(remoteExecutable);
+			IRemoteItem remoteFile = fileTools.getFile(remoteExecutable, null);
 			remoteFile.setReadable(true);
 			remoteFile.setExecutable(true);
-			remoteFile.commitAttributes();
+			remoteFile.commitAttributes(null);
 		} catch (RemoteOperationException e) {
 			launchProcessErrorWriter.println(NLS.bind(Messages.RemoteLaunchProcess_FailedPermissions, e.getMessage()));
 			abortWithError(Messages.RemoteLaunchProcess_Failed, e);
@@ -556,7 +557,7 @@ public class RemoteLaunchProcess implements ILaunchProcess, ILaunchProcessCallba
 		try {
 			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_22 + remoteDirectory);
 			IRemoteFileTools irft = manager.getRemoteFileTools();
-			irft.removeFile(remoteDirectory);
+			irft.removeFile(remoteDirectory, null);
 			launchProcessOutputWriter.println(Messages.RemoteLaunchProcess_23);
 		} catch (RemoteOperationException e) {
 			launchProcessErrorWriter.println(Messages.RemoteLaunchProcess_24 + e.getMessage());

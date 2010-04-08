@@ -24,6 +24,8 @@ public class Messages extends NLS {
 	private Messages() {
 	}
 
+	public static String Connection_0;
+	public static String Connection_1;
 	public static String Connection_AuthenticationTypeNotSupported;
 	public static String Connection_Connect_FailedConnect;
 	public static String Connection_Connect_FailedUnsupportedKeySize;
@@ -59,6 +61,20 @@ public class Messages extends NLS {
 	public static String ExecutionTools_ExecuteBashCommand_FailedRunBashCommand;
 	public static String FileTools_0;
 	public static String FileTools_1;
+	public static String FileTools_10;
+	public static String FileTools_11;
+	public static String FileTools_12;
+	public static String FileTools_13;
+	public static String FileTools_14;
+	public static String FileTools_15;
+	public static String FileTools_2;
+	public static String FileTools_3;
+	public static String FileTools_4;
+	public static String FileTools_5;
+	public static String FileTools_6;
+	public static String FileTools_7;
+	public static String FileTools_8;
+	public static String FileTools_9;
 	public static String KillableExecution_Debug_1;
 	public static String KillableExecution_FinishStatus_AlarmClock;
 	public static String KillableExecution_FinishStatus_BackgroundProcessReadTTY;
