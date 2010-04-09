@@ -53,7 +53,7 @@ public class SignalActionDelegate extends ActionDelegate implements IObjectActio
 	 */
 	public void run(IAction action) {
 		if (getSignal() != null) {
-			final MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, ActionMessages.getString("SignalActionDelegate.0"), null); //$NON-NLS-1$
+			final MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, "Unable to deliver the signal to the target.", null); //$NON-NLS-1$
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 				public void run() {
 					try {
@@ -67,7 +67,7 @@ public class SignalActionDelegate extends ActionDelegate implements IObjectActio
 			if (!ms.isOK()) {
 				IWorkbenchWindow window = PTPDebugUIPlugin.getActiveWorkbenchWindow();
 				if (window != null) {
-					PTPDebugUIPlugin.errorDialog(ActionMessages.getString("SignalActionDelegate.1"), ms); //$NON-NLS-1$
+					PTPDebugUIPlugin.errorDialog("Operation failed.", ms); //$NON-NLS-1$
 				}
 				else {
 					PTPDebugUIPlugin.log(ms);

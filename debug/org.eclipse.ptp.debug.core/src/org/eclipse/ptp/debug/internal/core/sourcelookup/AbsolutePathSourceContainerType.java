@@ -25,12 +25,19 @@ import org.eclipse.ptp.debug.core.sourcelookup.AbsolutePathSourceContainer;
 
 /**
  * @author clement
- *
+ * 
  */
 public class AbsolutePathSourceContainerType extends AbstractSourceContainerTypeDelegate {
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainerTypeDelegate#createSourceContainer(java.lang.String)
+	 */
 	public ISourceContainer createSourceContainer(String memento) throws CoreException {
 		return new AbsolutePathSourceContainer();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainerTypeDelegate#getMemento(org.eclipse.debug.core.sourcelookup.ISourceContainer)
+	 */
 	public String getMemento(ISourceContainer container) throws CoreException {
 		return ""; //$NON-NLS-1$
 	}

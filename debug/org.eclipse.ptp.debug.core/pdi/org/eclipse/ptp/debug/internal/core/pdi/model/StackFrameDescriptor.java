@@ -30,6 +30,6 @@ public class StackFrameDescriptor implements IPDIStackFrameDescriptor {
 	 * @see org.eclipse.ptp.debug.internal.core.pdi.model.IPDIStackFrameDescriptor#toString()
 	 */
 	public String toString() {
-		return getLevel() + " " + loc.toString();	 
+		return getLevel() + " " + loc.toString();	  //$NON-NLS-1$
 	}
 }

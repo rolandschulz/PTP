@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
@@ -26,7 +27,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 public class AIF implements IAIF {
 	private IAIFType aifType;
 	private IAIFValue aifValue;
-	private String typeDesc = "";
+	private String typeDesc = ""; //$NON-NLS-1$
 
 	public AIF(IAIFType aifType, IAIFValue aifValue) {
 		this.aifType = aifType;
@@ -69,9 +70,9 @@ public class AIF implements IAIF {
 	 */
 	public String toString() {
 		try {
-			return "<" + aifType.toString() + "," + aifValue.toString() + ">";
+			return "<" + aifType.toString() + "," + aifValue.toString() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (Exception e) {
-			return "err: " + e.getMessage();
+			return Messages.AIF_4 + e.getMessage();
 		}
 	}
 	

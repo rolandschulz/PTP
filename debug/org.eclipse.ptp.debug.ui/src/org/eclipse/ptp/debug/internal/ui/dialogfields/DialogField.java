@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui.dialogfields;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -40,7 +41,7 @@ public class DialogField {
 	public DialogField() {
 		fEnabled= true;
 		fLabel= null;
-		fLabelText= "";
+		fLabelText= ""; //$NON-NLS-1$
 	}
 	
 	/**
@@ -137,11 +138,11 @@ public class DialogField {
 			fLabel= new Label(parent, SWT.LEFT | SWT.WRAP);
 			fLabel.setFont(parent.getFont());
 			fLabel.setEnabled(fEnabled);		
-			if (fLabelText != null && !"".equals(fLabelText)) {
+			if (fLabelText != null && !"".equals(fLabelText)) { //$NON-NLS-1$
 				fLabel.setText(fLabelText);
 			} else {
 				// XXX: to avoid a 16 pixel wide empty label - revisit
-				fLabel.setText(".");
+				fLabel.setText("."); //$NON-NLS-1$
 				fLabel.setVisible(false);
 			}			
 		}
@@ -211,10 +212,10 @@ public class DialogField {
 	}
 
 	protected final void assertCompositeNotNull(Composite comp) {
-		Assert.isNotNull(comp, "uncreated control requested with composite null");
+		Assert.isNotNull(comp, Messages.DialogField_3);
 	}
 
 	protected final void assertEnoughColumns(int nColumns) {
-		Assert.isTrue(nColumns >= getNumberOfControls(), "given number of columns is too small");
+		Assert.isTrue(nColumns >= getNumberOfControls(), Messages.DialogField_4);
 	}
 }

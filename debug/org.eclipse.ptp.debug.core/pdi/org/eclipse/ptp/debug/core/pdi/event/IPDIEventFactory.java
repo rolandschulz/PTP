@@ -12,7 +12,7 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
@@ -31,7 +31,7 @@ public interface IPDIEventFactory {
 	 * @param bpt
 	 * @return
 	 */
-	public IPDIBreakpointInfo newBreakpointInfo(IPDISession session, BitList tasks, IPDIBreakpoint bpt);
+	public IPDIBreakpointInfo newBreakpointInfo(IPDISession session, TaskSet tasks, IPDIBreakpoint bpt);
 	
 	/**
 	 * @param reason
@@ -44,7 +44,7 @@ public interface IPDIEventFactory {
 	 * @param tasks
 	 * @return
 	 */
-	public IPDIConnectedEvent newConnectedEvent(IPDISessionObject reason, BitList tasks);
+	public IPDIConnectedEvent newConnectedEvent(IPDISessionObject reason, TaskSet tasks);
 	
 	/**
 	 * @param reason
@@ -77,7 +77,7 @@ public interface IPDIEventFactory {
 	 * @param tasks
 	 * @return
 	 */
-	public IPDIDisconnectedEvent newDisconnectedEvent(IPDISessionObject reason, BitList tasks);
+	public IPDIDisconnectedEvent newDisconnectedEvent(IPDISessionObject reason, TaskSet tasks);
 	
 	/**
 	 * @param reason
@@ -85,7 +85,7 @@ public interface IPDIEventFactory {
 	 * @param locator
 	 * @return
 	 */
-	public IPDIEndSteppingRangeInfo newEndSteppingRangeInfo(IPDISession session, BitList tasks, IPDILocator locator);
+	public IPDIEndSteppingRangeInfo newEndSteppingRangeInfo(IPDISession session, TaskSet tasks, IPDILocator locator);
 	
 	/**
 	 * @param reason
@@ -101,7 +101,7 @@ public interface IPDIEventFactory {
 	 * @param detailMsg
 	 * @return
 	 */
-	public IPDIErrorInfo newErrorInfo(IPDISession session, BitList tasks, int code, String msg, String detailMsg);
+	public IPDIErrorInfo newErrorInfo(IPDISession session, TaskSet tasks, int code, String msg, String detailMsg);
 	
 	/**
 	 * @param reason
@@ -109,7 +109,7 @@ public interface IPDIEventFactory {
 	 * @param code
 	 * @return
 	 */
-	public IPDIExitInfo newExitInfo(IPDISession session, BitList tasks, int code);
+	public IPDIExitInfo newExitInfo(IPDISession session, TaskSet tasks, int code);
 	
 	/**
 	 * @param session
@@ -117,7 +117,7 @@ public interface IPDIEventFactory {
 	 * @param locator
 	 * @return
 	 */
-	public IPDILocationReachedInfo newLocationReachedInfo(IPDISession session, BitList tasks, IPDILocator locator);
+	public IPDILocationReachedInfo newLocationReachedInfo(IPDISession session, TaskSet tasks, IPDILocator locator);
 	
 	/**
 	 * @param session
@@ -126,7 +126,7 @@ public interface IPDIEventFactory {
 	 * @param block
 	 * @return
 	 */
-	public IPDISessionObject newMemoryBlockInfo(IPDISession session, BitList tasks, BigInteger[] bigIntegers, IPDIMemoryBlock block);
+	public IPDISessionObject newMemoryBlockInfo(IPDISession session, TaskSet tasks, BigInteger[] bigIntegers, IPDIMemoryBlock block);
 
 	/**
 	 * @param session
@@ -134,7 +134,7 @@ public interface IPDIEventFactory {
 	 * @param output
 	 * @return
 	 */
-	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, BitList tasks, String output);
+	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, TaskSet tasks, String output);
 
 	/**
 	 * @param session
@@ -142,7 +142,7 @@ public interface IPDIEventFactory {
 	 * @param type
 	 * @return
 	 */
-	public IPDIResumedEvent newResumedEvent(IPDISessionObject reason, BitList tasks, int type);
+	public IPDIResumedEvent newResumedEvent(IPDISessionObject reason, TaskSet tasks, int type);
 
 	/**
 	 * @param reason
@@ -153,14 +153,14 @@ public interface IPDIEventFactory {
 	 * @param locator
 	 * @return
 	 */
-	public IPDISignalInfo newSignalInfo(IPDISession session, BitList tasks, String name, String desc, IPDISignal signal, IPDILocator locator);
+	public IPDISignalInfo newSignalInfo(IPDISession session, TaskSet tasks, String name, String desc, IPDISignal signal, IPDILocator locator);
 
 	/**
 	 * @param session
 	 * @param tasks
 	 * @return
 	 */
-	public IPDIStartedEvent newStartedEvent(IPDISessionObject reason, BitList tasks);
+	public IPDIStartedEvent newStartedEvent(IPDISessionObject reason, TaskSet tasks);
 	
 	/**
 	 * @param reason
@@ -179,7 +179,7 @@ public interface IPDIEventFactory {
 	 * @param thread
 	 * @return
 	 */
-	public IPDISessionObject newThreadInfo(IPDISession session, BitList tasks, int id, IPDIThread thread);
+	public IPDISessionObject newThreadInfo(IPDISession session, TaskSet tasks, int id, IPDIThread thread);
 
 	/**
 	 * @param session
@@ -187,5 +187,5 @@ public interface IPDIEventFactory {
 	 * @param name
 	 * @param var
 	 */
-	public IPDIVariableInfo newVariableInfo(IPDISession session, BitList tasks, String name, IPDIVariable var);
+	public IPDIVariableInfo newVariableInfo(IPDISession session, TaskSet tasks, String name, IPDIVariable var);
 }

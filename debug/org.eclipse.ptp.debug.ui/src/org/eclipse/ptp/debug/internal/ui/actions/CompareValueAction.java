@@ -22,12 +22,13 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 
 /**
  * @author Clement chu
  */
 public class CompareValueAction extends Action {
-	public static final String name = "Compare value";
+	public static final String name = Messages.CompareValueAction_0;
 	private PVariableView view = null;
 
 	/** Constructor

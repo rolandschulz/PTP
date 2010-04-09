@@ -35,13 +35,14 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -130,7 +131,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (PTPDebugUIPlugin.isPTPDebugPerspective()) {
 			if (breakpoint instanceof ICLineBreakpoint) {
 				//delete c breakpoint if the ptp debug perspective is active
-				WorkbenchJob uiJob = new WorkbenchJob("Removing C-Line breakpoint...") {
+				WorkbenchJob uiJob = new WorkbenchJob(Messages.UIDebugManager_0) {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
 							DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
@@ -174,7 +175,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (session != null) {
 			switch (eventType) {
 			case CREATE_SET_TYPE:
-				BitList cTasks = convertElementsToBitList(session, elements);
+				TaskSet cTasks = convertElementsToBitList(session, elements);
 				debugModel.createSet(session, cur_set.getName(), cTasks);
 				break;
 			case DELETE_SET_TYPE:
@@ -188,11 +189,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				}
 				break;
 			case ADD_ELEMENT_TYPE:
-				BitList aTasks = convertElementsToBitList(session, elements);
+				TaskSet aTasks = convertElementsToBitList(session, elements);
 				debugModel.addTasks(session, cur_set.getName(), aTasks);
 				break;
 			case REMOVE_ELEMENT_TYPE:
-				BitList rTasks = convertElementsToBitList(session, elements);
+				TaskSet rTasks = convertElementsToBitList(session, elements);
 				debugModel.removeTasks(session, cur_set.getName(), rTasks);
 				break;
 			}
@@ -253,7 +254,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param obj
 	 * @return
 	 */
-	public BitList getSelectedRegisteredTasks(Object obj) {
+	public TaskSet getSelectedRegisteredTasks(Object obj) {
 		IDebugTarget target = null;
 		if (obj instanceof IStackFrame) {
 			target = ((IStackFrame)obj).getDebugTarget();
@@ -278,7 +279,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @return
 	 * @throws CoreException
 	 */
-	public BitList getTasks(IPSession session, String set_id) throws CoreException {
+	public TaskSet getTasks(IPSession session, String set_id) throws CoreException {
 		return debugModel.getTasks(session, set_id);
 	}
 
@@ -287,7 +288,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @return
 	 * @throws CoreException
 	 */
-	public BitList getTasks(String set_id) throws CoreException {
+	public TaskSet getTasks(String set_id) throws CoreException {
 		return getTasks(getCurrentJobId(), set_id);
 	}
 	
@@ -297,10 +298,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @return
 	 * @throws CoreException
 	 */
-	public BitList getTasks(String job_id, String set_id) throws CoreException {
+	public TaskSet getTasks(String job_id, String set_id) throws CoreException {
 		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_1, null));
 		return getTasks(session, set_id);
 	}
 	
@@ -312,7 +313,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public String getValueText(int taskID, IToolTipProvider provider) {
 		IPJob job = getJob();
 		if (job == null)
-			return "No job found";
+			return Messages.UIDebugManager_2;
 		
 		return getJobVariableManager().getValue(getJob(), taskID, provider);
 	}
@@ -385,12 +386,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param elements
 	 */
 	public void registerElements(final IElement[] elements) {
-		new UIDebugWorkbenchJob(false, "Registered elements", getJob(), new IDebugProgressMonitor() {
+		new UIDebugWorkbenchJob(false, Messages.UIDebugManager_3, getJob(), new IDebugProgressMonitor() {
 			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
 				if (job == null || session == null)
 					return Status.CANCEL_STATUS;
 
-				BitList tasks = session.getTasks(-1);
+				TaskSet tasks = session.getTasks(-1);
 				for (IElement element : elements) {
 					// only register some unregistered elements
 					if (!element.isRegistered()) {
@@ -412,7 +413,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param session
 	 * @param tasks
 	 */
-	public void registerTasks(IPSession session, BitList tasks) {
+	public void registerTasks(IPSession session, TaskSet tasks) {
 		session.createDebugTarget(tasks, true, true);
 	}
 	
@@ -421,7 +422,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param job_id job ID
 	 */
 	public void removeAllRegisterElements(final String job_id){
-		new UIDebugWorkbenchJob(false, "Removing registered processes", findJobById(job_id), new IDebugProgressMonitor() {
+		new UIDebugWorkbenchJob(false, Messages.UIDebugManager_4, findJobById(job_id), new IDebugProgressMonitor() {
 			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
 				if (job == null || session == null)
 					return Status.CANCEL_STATUS;
@@ -458,7 +459,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void resume(final String job_id, final String set_id) throws CoreException {
 		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_5, null));
 		try {
 			session.getPDISession().resume(getTasks(session, set_id), false);
 		} catch (PDIException e) {
@@ -499,9 +500,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void stepInto(final String job_id, final String set_id) throws CoreException {
 		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_6, null));
 		try {
-			BitList tasks = getTasks(session, set_id);
+			TaskSet tasks = getTasks(session, set_id);
 			//filterRunningTasks(tasks, STEP_INTO);
 			session.getPDISession().stepInto(tasks, 1);
 		} catch (PDIException e) {
@@ -524,9 +525,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void stepOver(final String job_id, final String set_id) throws CoreException {
 		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_7, null));
 		try {
-			BitList tasks = getTasks(session, set_id);
+			TaskSet tasks = getTasks(session, set_id);
 			//filterRunningTasks(tasks, STEP_OVER);
 			session.getPDISession().stepOver(tasks, 1);
 		} catch (PDIException e) {
@@ -550,9 +551,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void stepReturn(final String job_id, final String set_id) throws CoreException {
 		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_8, null));
 		try {
-			BitList tasks = getTasks(session, set_id);
+			TaskSet tasks = getTasks(session, set_id);
 			//filterRunningTasks(tasks, STEP_RETURN);
 			session.getPDISession().stepReturn(tasks, 0);
 		} catch (PDIException e) {
@@ -575,7 +576,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void suspend(final String job_id, final String set_id) throws CoreException {
 		IPSession session = getDebugSession(job_id);
 		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_9, null));
 		try {
 			session.getPDISession().suspend(getTasks(session, set_id));
 		} catch (PDIException e) {
@@ -600,7 +601,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (isDebugMode(job)) {
 			IPSession session = getDebugSession(job);
 			if (session == null)
-				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.UIDebugManager_10, null));
 			try {
 				session.getPDISession().terminate(getTasks(session, set_id));
 			} catch (PDIException e) {
@@ -614,12 +615,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param elements
 	 */
 	public void unregisterElements(final IElement[] elements) {
-		new UIDebugWorkbenchJob(false, "Unregistered elements", getJob(), new IDebugProgressMonitor() {
+		new UIDebugWorkbenchJob(false, Messages.UIDebugManager_11, getJob(), new IDebugProgressMonitor() {
 			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
 				if (job == null || session == null)
 					return Status.CANCEL_STATUS;
 				
-				BitList tasks = session.getTasks(-1);
+				TaskSet tasks = session.getTasks(-1);
 				for (IElement element : elements) {
 					if (element.isRegistered()) {
 						// only unregister some registered elements
@@ -641,7 +642,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param session
 	 * @param tasks
 	 */
-	public void unregisterTasks(IPSession session, BitList tasks) {
+	public void unregisterTasks(IPSession session, TaskSet tasks) {
 		session.deleteDebugTarget(tasks, true, true);
 	}
 	
@@ -650,7 +651,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param cur_sid current set ID
 	 */
 	public void updateBreakpointMarker(final String cur_sid) {
-		WorkbenchJob uiJob = new WorkbenchJob("Updating breakpoint marker...") {
+		WorkbenchJob uiJob = new WorkbenchJob(Messages.UIDebugManager_12) {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
 					PDebugModel.updatePBreakpoints(cur_sid,  monitor);
@@ -678,7 +679,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param job_id
 	 */
 	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) {
-		new UIDebugWorkbenchJob(false, "Updating registered/unregistered processes", findJobById(job_id), new IDebugProgressMonitor() {
+		new UIDebugWorkbenchJob(false, Messages.UIDebugManager_13, findJobById(job_id), new IDebugProgressMonitor() {
 			public IStatus runDebugJob(IPJob job, IPSession session, IProgressMonitor monitor) {
 				if (job == null || session == null)
 					return Status.CANCEL_STATUS;
@@ -695,8 +696,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param elements
 	 * @return
 	 */
-	private BitList convertElementsToBitList(IPSession session, IElement[] elements) {
-		BitList tasks = session.getTasks(-1);
+	private TaskSet convertElementsToBitList(IPSession session, IElement[] elements) {
+		TaskSet tasks = session.getTasks(-1);
 		for (IElement element : elements) {
 			tasks.set(Integer.parseInt(element.getName()));
 		}

@@ -24,12 +24,13 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 
 /**
  * @author Clement chu
  */
 public class AddPExpressionAction extends Action {
-	public static final String name = "Add";
+	public static final String name = Messages.AddPExpressionAction_0;
 	private PVariableView view = null;
 
 	/** Constructor

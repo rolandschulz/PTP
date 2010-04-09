@@ -32,59 +32,95 @@ import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.messages.Messages;
 
 /**
  * @author clement
  * 
  */
 public class AbsolutePathSourceContainer extends AbstractSourceContainer {
-	public static final String TYPE_ID = PTPDebugCorePlugin.getUniqueIdentifier() + ".containerType.absolutePath";
+	public static final String TYPE_ID = PTPDebugCorePlugin.getUniqueIdentifier() + ".containerType.absolutePath"; //$NON-NLS-1$
 
-	private Object[] findSourceElementByFile(File file) {
-		IFile[] wfiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(file.getAbsolutePath()));
-		if (wfiles.length > 0)
-			return wfiles;
-
-		try {
-			// Check the canonical path as well to support case insensitive file systems like Windows.
-			wfiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(file.getCanonicalPath()));
-			if (wfiles.length > 0)
-				return wfiles;
-
-			// The file is not already in the workspace so try to create an external translation unit for it.
-			String projectName = getDirector().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			if (project != null) {
-				IPath path = Path.fromOSString(file.getCanonicalPath());
-				//TODO
-				//String id = CoreModel.getRegistedContentTypeId(project.getProject(), path.lastSegment());
-				//return new ExternalTranslationUnit[] { new ExternalTranslationUnit(project, new Path(file.getCanonicalPath()), id) };
-			}
-		} catch (IOException e) { // ignore if getCanonicalPath throws
-		} catch (CoreException e) {
-		}
-		// If we can't create an ETU then fall back on LocalFileStorage.
-		return new LocalFileStorage[] { new LocalFileStorage(file) };
-	}
-	public boolean isValidAbsoluteFilePath(String name) {
-		return isValidAbsoluteFilePath(new File(name));
-	}
-	public boolean isValidAbsoluteFilePath(File file) {
-		return file.isAbsolute() && file.exists() && file.isFile();
-	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
+	 */
 	public Object[] findSourceElements(String name) throws CoreException {
 		if (name != null) {
-			File file = new File(name);
+			final File file = new File(name);
 			if (isValidAbsoluteFilePath(file)) {
 				return findSourceElementByFile(file);
 			}
 		}
 		return new Object[0];
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getName()
+	 */
 	public String getName() {
-		return SourceLookupMessages.getString("AbsolutePathSourceContainer.0");
+		return Messages.AbsolutePathSourceContainer_2;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getType()
+	 */
 	public ISourceContainerType getType() {
 		return getSourceContainerType(TYPE_ID);
+	}
+
+	/**
+	 * @param file
+	 * @return
+	 */
+	public boolean isValidAbsoluteFilePath(File file) {
+		return file.isAbsolute() && file.exists() && file.isFile();
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public boolean isValidAbsoluteFilePath(String name) {
+		return isValidAbsoluteFilePath(new File(name));
+	}
+
+	/**
+	 * @param file
+	 * @return
+	 */
+	private Object[] findSourceElementByFile(File file) {
+		IFile[] wfiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(file.getAbsolutePath()));
+		if (wfiles.length > 0) {
+			return wfiles;
+		}
+
+		try {
+			// Check the canonical path as well to support case insensitive file
+			// systems like Windows.
+			wfiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(file.getCanonicalPath()));
+			if (wfiles.length > 0) {
+				return wfiles;
+			}
+
+			// The file is not already in the workspace so try to create an
+			// external translation unit for it.
+			final String projectName = getDirector().getLaunchConfiguration().getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""); //$NON-NLS-1$
+			final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			if (project != null) {
+				final IPath path = Path.fromOSString(file.getCanonicalPath());
+				// TODO
+				// String id =
+				// CoreModel.getRegistedContentTypeId(project.getProject(),
+				// path.lastSegment());
+				// return new ExternalTranslationUnit[] { new
+				// ExternalTranslationUnit(project, new
+				// Path(file.getCanonicalPath()), id) };
+			}
+		} catch (final IOException e) { // ignore if getCanonicalPath throws
+		} catch (final CoreException e) {
+		}
+		// If we can't create an ETU then fall back on LocalFileStorage.
+		return new LocalFileStorage[] { new LocalFileStorage(file) };
 	}
 }

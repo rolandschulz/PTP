@@ -25,11 +25,9 @@ import org.eclipse.debug.core.DebugException;
  * 
  */
 public interface IExecFileInfo {
-	/** Get binary file
-	 * @return
-	 */
-	//public IBinaryObject getExecFile();
-	/** Get global variable descriptor
+	/**
+	 * Get global variable descriptor
+	 * 
 	 * @return
 	 * @throws DebugException
 	 */

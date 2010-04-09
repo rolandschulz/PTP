@@ -49,6 +49,6 @@ public class SDMDebugUIPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.debug.sdm.ui", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.debug.sdm.ui", path); //$NON-NLS-1$
 	}
 }

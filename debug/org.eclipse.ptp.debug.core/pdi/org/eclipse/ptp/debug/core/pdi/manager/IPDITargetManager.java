@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
 
 /**
@@ -32,7 +32,7 @@ public interface IPDITargetManager extends IPDIManager {
 	 * @param qTasks
 	 * @return target of specify tasks
 	 */
-	IPDITarget getTarget(BitList qTasks);
+	IPDITarget getTarget(TaskSet qTasks);
 
 	/**
 	 * Returns all targets
@@ -45,14 +45,14 @@ public interface IPDITargetManager extends IPDIManager {
 	 * @param qTasks
 	 * @return created target
 	 */
-	IPDITarget addTarget(BitList qTasks);
+	IPDITarget addTarget(TaskSet qTasks);
 
 	/**
 	 * Returns whether given tasks are deleted its target
 	 * @param qTasks
 	 * @return true if given tasks are deleted its target
 	 */
-	boolean removeTarget(BitList qTasks);
+	boolean removeTarget(TaskSet qTasks);
 	
 	/**
 	 * Cleans up storage

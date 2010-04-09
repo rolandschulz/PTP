@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
@@ -35,20 +36,24 @@ public class PFloatingPointValue extends PValue {
 	public PFloatingPointValue(PVariable parent, IPDIVariable variable) {
 		super(parent, variable);
 	}
+
+	/**
+	 * @return
+	 * @throws DebugException
+	 * @throws AIFException
+	 */
 	public Number getFloatingPointValue() throws DebugException, AIFException {
 		if (fFloatingPointValue == null) {
-			IAIF aif = getAIF();
+			final IAIF aif = getAIF();
 			if (aif != null) {
 				if (aif.getType() instanceof IAIFTypeFloat) {
-					IAIFValueFloat floatValue = (IAIFValueFloat)aif.getValue();
+					final IAIFValueFloat floatValue = (IAIFValueFloat) aif.getValue();
 					if (floatValue.isDouble()) {
 						fFloatingPointValue = new Double(floatValue.doubleValue());
-					}
-					else if (floatValue.isFloat()) {
+					} else if (floatValue.isFloat()) {
 						fFloatingPointValue = new Float(floatValue.floatValue());
-					}
-					else {
-						targetRequestFailed("Unknown floating point value", null);
+					} else {
+						targetRequestFailed(Messages.PFloatingPointValue_0, null);
 					}
 				}
 			}

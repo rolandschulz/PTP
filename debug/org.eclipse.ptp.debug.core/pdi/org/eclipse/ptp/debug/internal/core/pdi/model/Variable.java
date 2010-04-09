@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
@@ -50,7 +51,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	protected String language;
 	protected boolean isUpdated = true;
 			
-	public Variable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varId) {
+	public Variable(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varId) {
 		super(session, tasks, thread, frame, name, fullName, pos, depth);
 		this.varId = varId;
 	}
@@ -127,9 +128,9 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 					children = new Variable[values.length];
 					for (int i=0; i<children.length; i++) {
 						int index = castingIndex + i;
-						String ch_fn = "(" + fn + ")[" + index + "]";
-						String ch_n = getName() + "[" + index + "]";
-						String ch_k = varId + "." + i;
+						String ch_fn = "(" + fn + ")[" + index + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						String ch_n = getName() + "[" + index + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+						String ch_k = varId + "." + i; //$NON-NLS-1$
 						IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);					
 						v.setAIF(AIFFactory.newAIF(baseType, values[i]));
 						children[i] = v;
@@ -140,9 +141,9 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 						ITypeAggregate aggrType = (ITypeAggregate)baseType;
 						children = new Variable[aggrType.getNumberOfChildren()];
 						for (int i=0; i<children.length; i++) {
-							String ch_fn = "(" + fn + ")->" + aggrType.getField(i);
+							String ch_fn = "(" + fn + ")->" + aggrType.getField(i); //$NON-NLS-1$ //$NON-NLS-2$
 							String ch_n = aggrType.getField(i); 
-							String ch_k = varId + "." + ch_n;
+							String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 							IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 							v.setAIF(AIFFactory.newAIF(aggrType.getType(i), ((IValueAggregate)value).getValue(i)));
 							children[i] = v;
@@ -150,9 +151,9 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 					}
 					else {
 						children = new Variable[1];
-						String ch_fn = "*(" + fn + ")";
+						String ch_fn = "*(" + fn + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 						String ch_n = ch_varid;
-						String ch_k = varId + "." + ch_n;
+						String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 						IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 						v.setAIF(AIFFactory.newAIF(type, value));
 						children[0] = v;					
@@ -161,9 +162,9 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 			}
 			else if (type instanceof IAIFTypeReference) {
 				children = new Variable[1];
-				String ch_fn = "(" + fn + ")->" + ((IAIFTypeReference)type).getName();
+				String ch_fn = "(" + fn + ")->" + ((IAIFTypeReference)type).getName(); //$NON-NLS-1$ //$NON-NLS-2$
 				String ch_n = ((IAIFTypeReference)type).getName();
-				String ch_k = varId + "." + ch_n;
+				String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 				IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 				v.setAIF(AIFFactory.newAIF(type, value));
 				children[0] = v;					
@@ -172,9 +173,9 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 				ITypeAggregate aggrType = (ITypeAggregate)type;
 				children = new Variable[aggrType.getNumberOfChildren()];
 				for (int i=0; i<children.length; i++) {
-					String ch_fn = "(" + fn + ")." + aggrType.getField(i);
+					String ch_fn = "(" + fn + ")." + aggrType.getField(i); //$NON-NLS-1$ //$NON-NLS-2$
 					String ch_n = aggrType.getField(i); 
-					String ch_k = varId + "." + ch_n;
+					String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 					IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 					v.setAIF(AIFFactory.newAIF(aggrType.getType(i), ((IValueAggregate)value).getValue(i)));
 					children[i] = v;
@@ -184,7 +185,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 				children = new Variable[1];
 				String ch_fn = fn;
 				String ch_n = ch_varid;
-				String ch_k = varId + "." + ch_n;
+				String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 				IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 				v.setAIF(AIFFactory.newAIF(type, value));
 				children[0] = v;
@@ -226,9 +227,9 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	 */
 	public boolean isEditable() throws PDIException {
 		if (editable == null) {
-			throw new PDIException(getTasks(), "Not implement yet - Variable: isEditable()");
+			throw new PDIException(getTasks(), Messages.Variable_0);
 		}
-		return (editable == null) ? false : editable.equalsIgnoreCase("true");
+		return (editable == null) ? false : editable.equalsIgnoreCase("true"); //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)
@@ -242,7 +243,7 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariable#setValue(java.lang.String)
 	 */
 	public void setValue(String expression) throws PDIException {
-		throw new PDIException(getTasks(), "Not implemented setValue(String) yet.");
+		throw new PDIException(getTasks(), Messages.Variable_1);
 	}
 	
 	/**
@@ -257,5 +258,5 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 	 * @param varId
 	 * @return
 	 */
-	protected abstract IPDIVariable createVariable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varId);
+	protected abstract IPDIVariable createVariable(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varId);
 }

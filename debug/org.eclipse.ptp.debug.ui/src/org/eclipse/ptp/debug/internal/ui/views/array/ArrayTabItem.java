@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui.views.array;
 
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,6 +36,7 @@ import org.eclipse.ptp.debug.internal.ui.views.ICTableCellSelectionListener;
 import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
 import org.eclipse.ptp.debug.internal.ui.views.PTabItem;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -58,8 +58,8 @@ import org.eclipse.swt.widgets.Spinner;
  *
  */
 public class ArrayTabItem extends PTabItem {
-	private final String COL_TYPE = "col";
-	private final String ROW_TYPE = "row";
+	private final String COL_TYPE = "col"; //$NON-NLS-1$
+	private final String ROW_TYPE = "row"; //$NON-NLS-1$
 	private SashForm sashForm = null;
 	private CTable cTable = null;
 	private Composite leftContent = null;
@@ -83,7 +83,7 @@ public class ArrayTabItem extends PTabItem {
 					monitor = new NullProgressMonitor();
 
 				int dim = 0;
-				monitor.beginTask(MessageFormat.format("{0}", new Object[]{ ArrayMessages.getString("ArrayTabItem.initVariable")}), 10);
+				monitor.beginTask(Messages.ArrayTabItem_0, 10);
 				try {
 					name = variable.getName();
 					type = variable.getReferenceTypeName();
@@ -156,7 +156,7 @@ public class ArrayTabItem extends PTabItem {
 	protected Menu createPopupMenu() {
 		Menu menu = new Menu(cTable);
 		MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-		mItem.setText(ArrayMessages.getString("ArrayTabItem.resetRange"));
+		mItem.setText(Messages.ArrayTabItem_1);
 		mItem.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent e) {
 	    	}
@@ -165,7 +165,7 @@ public class ArrayTabItem extends PTabItem {
 	}
 	public void updateTable(int colIndex, int rowIndex) {
 		if (colIndex == -1 && rowIndex == -1) {
-			PTPDebugUIPlugin.errorDialog(fPageBook.getShell(), ArrayMessages.getString("ArrayTabItem.noIndexErrTitle"), new Exception(ArrayMessages.getString("ArrayTabItem.noIndexErrMsg")));
+			PTPDebugUIPlugin.errorDialog(fPageBook.getShell(), Messages.ArrayTabItem_2, new Exception(Messages.ArrayTabItem_3));
 			return;
 		}
 	}
@@ -189,11 +189,11 @@ public class ArrayTabItem extends PTabItem {
 		sc.setExpandVertical(true);
 		sc.setExpandHorizontal(true);
 
-		new Label(leftContent, SWT.READ_ONLY).setText("col");
-		new Label(leftContent, SWT.READ_ONLY).setText("row");
+		new Label(leftContent, SWT.READ_ONLY).setText("col"); //$NON-NLS-1$
+		new Label(leftContent, SWT.READ_ONLY).setText("row"); //$NON-NLS-1$
 		Label sliceLabel = new Label(leftContent, SWT.READ_ONLY);
 		sliceLabel.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, false));
-		sliceLabel.setText("Slice");
+		sliceLabel.setText(Messages.ArrayTabItem_4);
 		/*
 		Composite composite = new Composite(content, SWT.NONE);		
 		composite.setLayout(createGridLayout(3, false, 0, 0));
@@ -234,7 +234,7 @@ public class ArrayTabItem extends PTabItem {
 			}
 		}
 		if (reloadVariable)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No variable found", null));
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.ArrayTabItem_5, null));
 	}
 	public void refreshTable() {
 		if (reloadVariable) {
@@ -242,7 +242,7 @@ public class ArrayTabItem extends PTabItem {
 				reload();
 			}
 			catch (CoreException e) {
-				PTPDebugUIPlugin.errorDialog(fPageBook.getShell(), "Error", e.getStatus());
+				PTPDebugUIPlugin.errorDialog(fPageBook.getShell(), Messages.ArrayTabItem_2, e.getStatus());
 				return;
 			}
 		}
@@ -435,12 +435,12 @@ public class ArrayTabItem extends PTabItem {
 		}
 		public Object getContentAt(int col, int row) {
 			if (col == getFixedColumnCount()-1)
-				return "" + (row-1);
+				return "" + (row-1); //$NON-NLS-1$
 			if (row == getFixedRowCount()-1)
-				return "" + (col-1);
+				return "" + (col-1); //$NON-NLS-1$
 
 			if (data[col][row] == null)
-				return "";
+				return ""; //$NON-NLS-1$
 			return data[col][row];
 		}
 		public void setRowCount(int rows) {
@@ -491,7 +491,7 @@ public class ArrayTabItem extends PTabItem {
 			for (int i=0; i<dimension; i++) {
 				IVariable[] vars = var.getValue().getVariables();
 				if (vars.length == 0)
-					throw new DebugException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No Value found", null));
+					throw new DebugException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.ArrayTabItem_6, null));
 
 				if (values[i][0] == 1) {
 					var = vars[col-1];
@@ -517,7 +517,7 @@ public class ArrayTabItem extends PTabItem {
 				//public IStatus runInUIThread(IProgressMonitor monitor) {
 					if (monitor == null)
 						monitor = new NullProgressMonitor();
-					monitor.beginTask("Retrieving values...", (cols*rows));
+					monitor.beginTask(Messages.ArrayTabItem_7, (cols*rows));
 					data = new Object[cols][rows];
 					try {
 						for (int c=getFixedColumnCount(); c<cols; c++) {

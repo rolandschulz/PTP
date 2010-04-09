@@ -24,10 +24,18 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * @author clement
- *
+ * 
  */
 public interface IPValue extends IValue, IPDebugElement {
-	IAIF getAIF() throws DebugException;
-	String evaluateAsExpression(IPStackFrame frame);
-}
+	/**
+	 * @param frame
+	 * @return
+	 */
+	public String evaluateAsExpression(IPStackFrame frame);
 
+	/**
+	 * @return
+	 * @throws DebugException
+	 */
+	public IAIF getAIF() throws DebugException;
+}

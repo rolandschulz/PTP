@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
@@ -35,7 +35,7 @@ public class Exceptionpoint extends Breakpoint implements IPDIExceptionpoint {
 	private boolean stopOnCatch;
 	private IPDIFunctionBreakpoint[] funcBpts = {};
 	
-	public Exceptionpoint(IPDISession session, BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch, IPDICondition condition, boolean enabled, IPDIFunctionBreakpoint[] funcBpts) {
+	public Exceptionpoint(IPDISession session, TaskSet tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch, IPDICondition condition, boolean enabled, IPDIFunctionBreakpoint[] funcBpts) {
 		super(session, tasks, IPDIBreakpoint.REGULAR, condition, enabled);
 		this.clazz = clazz;
 		this.stopOnThrow = stopOnThrow;

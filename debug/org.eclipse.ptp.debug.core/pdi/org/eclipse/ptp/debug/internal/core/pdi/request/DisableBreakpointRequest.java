@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDisableBreakpointRequest;
 
@@ -30,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIDisableBreakpointRequest;
  *
  */
 public class DisableBreakpointRequest extends BreakpointRequest implements IPDIDisableBreakpointRequest {
-	public DisableBreakpointRequest(BitList tasks, IPDIBreakpoint bpt) {
+	public DisableBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt) {
 		super(tasks, bpt);
 	}
 	
@@ -45,6 +46,6 @@ public class DisableBreakpointRequest extends BreakpointRequest implements IPDID
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Disable Breakpoint Request";
+		return Messages.DisableBreakpointRequest_0;
 	}
 }

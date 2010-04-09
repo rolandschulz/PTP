@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,7 +29,9 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IJumpToAddress;
 import org.eclipse.ptp.debug.core.model.IJumpToLine;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
@@ -435,7 +436,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		try {
 			result = getName();
 		} catch (DebugException e) {
@@ -712,8 +713,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		try {
 			return getPDIThread().getStackFrames(lowFrame, highFrame);
 		} catch (PDIException e) {
-			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.0"), new Object[] { e
-					.getMessage() }));
+			setStatus(IPDebugElementStatus.WARNING, NLS.bind(Messages.PThread_0, new Object[] { e.getMessage() }));
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return new IPDIStackFrame[0];
@@ -735,8 +735,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		try {
 			depth = getPDIThread().getStackFrameCount();
 		} catch (PDIException e) {
-			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.1"), new Object[] { e
-					.getMessage() }));
+			setStatus(IPDebugElementStatus.WARNING, NLS.bind(Messages.PThread_0, new Object[] { e.getMessage() }));
 		}
 		return depth;
 	}

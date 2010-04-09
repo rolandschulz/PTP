@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 
@@ -34,7 +34,7 @@ public interface IPDISignalManager extends IPDIManager {
 	 * @return the array of signals
 	 * @throws PDIException on failure
 	 */
-	public IPDISignal[] getSignals(BitList tasks) throws PDIException;
+	public IPDISignal[] getSignals(TaskSet tasks) throws PDIException;
 	
 	/**
 	 * @param sig

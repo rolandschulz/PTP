@@ -1,6 +1,6 @@
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
@@ -14,7 +14,7 @@ public class ErrorInfo extends SessionObject implements IPDIErrorInfo {
 	private String detailMsg;
 	private String msg;
 
-	public ErrorInfo(IPDISession session, BitList tasks, int code, String msg, String detailMsg) {
+	public ErrorInfo(IPDISession session, TaskSet tasks, int code, String msg, String detailMsg) {
 		super(session, tasks);
 		this.code = code;
 		this.msg = msg;

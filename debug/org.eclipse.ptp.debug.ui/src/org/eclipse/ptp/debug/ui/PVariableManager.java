@@ -20,9 +20,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
@@ -122,12 +122,12 @@ public class PVariableManager {
 			ce.printStackTrace();
 		}
 	}
-	public void updateValues(final IPJob job, final BitList tasks) {
+	public void updateValues(final IPJob job, final TaskSet tasks) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			  public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				  try {
 					  IPDISession session = getSession(job).getPDISession();
-					  BitList targetTasks = session.getTaskManager().getSuspendedTasks(tasks);
+					  TaskSet targetTasks = session.getTaskManager().getSuspendedTasks(tasks);
 					  if (targetTasks.isEmpty())
 						  monitor.done();
 					  else
@@ -224,7 +224,7 @@ public class PVariableManager {
 		};
 		queueRunnable(runnable);
 	}
-	public void resetValue(final IPJob job, final BitList tasks) {
+	public void resetValue(final IPJob job, final TaskSet tasks) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			  public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				  try {

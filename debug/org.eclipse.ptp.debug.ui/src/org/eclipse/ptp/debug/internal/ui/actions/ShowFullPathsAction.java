@@ -48,7 +48,7 @@ public class ShowFullPathsAction extends ViewFilterAction {
 					public void run() {
 						viewer.refresh();
 						Preferences store = getPreferences();
-						String key = getView().getSite().getId() + "." + getPreferenceKey();
+						String key = getView().getSite().getId() + "." + getPreferenceKey(); //$NON-NLS-1$
 						store.setValue(key, getValue());
 						PTPDebugUIPlugin.getDefault().savePluginPreferences();						
 					}

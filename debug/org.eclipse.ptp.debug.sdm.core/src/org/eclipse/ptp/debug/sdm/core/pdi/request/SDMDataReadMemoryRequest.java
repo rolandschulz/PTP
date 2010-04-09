@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMemory;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractDataReadMemoryRequest;
@@ -21,15 +21,15 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
 public class SDMDataReadMemoryRequest extends AbstractDataReadMemoryRequest {
 	private IPDISession session;
 	
-	public SDMDataReadMemoryRequest(IPDISession session, BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
+	public SDMDataReadMemoryRequest(IPDISession session, TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
 		super(tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
 		this.session = session;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugMemoryInfoEvent) {
 			ProxyDebugMemoryInfo info = ((IProxyDebugMemoryInfoEvent)result).getMemoryInfo();
 			ProxyDebugMemory[] proxyMems = info.getMemories();

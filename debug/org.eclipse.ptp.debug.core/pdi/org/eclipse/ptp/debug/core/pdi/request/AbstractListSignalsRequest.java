@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
@@ -29,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 public abstract class AbstractListSignalsRequest extends AbstractEventResultRequest implements IPDIListSignalsRequest {
 	private String name;
 	
-	public AbstractListSignalsRequest(BitList tasks, String name) {
+	public AbstractListSignalsRequest(TaskSet tasks, String name) {
 		super(tasks);
 		this.name = name;
 	}
@@ -45,6 +46,6 @@ public abstract class AbstractListSignalsRequest extends AbstractEventResultRequ
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "List signals request";
+		return Messages.AbstractListSignalsRequest_0;
 	}
 }

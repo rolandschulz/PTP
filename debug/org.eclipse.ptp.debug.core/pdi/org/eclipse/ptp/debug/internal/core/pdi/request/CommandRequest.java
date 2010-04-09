@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDICommandRequest;
 
@@ -31,7 +32,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDICommandRequest;
 public class CommandRequest extends AbstractEventResultRequest implements IPDICommandRequest {
 	private String command;
 	
-	public CommandRequest(BitList tasks, String command) {
+	public CommandRequest(TaskSet tasks, String command) {
 		super(tasks);
 		this.command = command;
 	}
@@ -40,7 +41,7 @@ public class CommandRequest extends AbstractEventResultRequest implements IPDICo
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Command request";
+		return Messages.CommandRequest_0;
 	}
 	
 	/* (non-Javadoc)
@@ -51,9 +52,9 @@ public class CommandRequest extends AbstractEventResultRequest implements IPDICo
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		
 	}
 }

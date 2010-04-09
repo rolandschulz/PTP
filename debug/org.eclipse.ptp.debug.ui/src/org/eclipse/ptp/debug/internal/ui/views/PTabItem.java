@@ -25,6 +25,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyledText;
@@ -48,7 +49,7 @@ public abstract class PTabItem implements IRunnableContext {
 	protected PTabFolder view = null;
 	
 	public PTabItem(PTabFolder view) {
-		this(view, "");
+		this(view, ""); //$NON-NLS-1$
 	}
 	public PTabItem(PTabFolder view, String tabName) {
 		this.view = view;
@@ -92,7 +93,7 @@ public abstract class PTabItem implements IRunnableContext {
 		displayError = true;
 		StyledText styleText = fTextViewer.getTextWidget();
 		if (styleText != null)
-			styleText.setText("Error: " + e.getMessage());
+			styleText.setText(Messages.PTabItem_0 + e.getMessage());
 
 		fPageBook.showPage(fTextViewer.getControl());
 		clearContext();

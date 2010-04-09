@@ -25,7 +25,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
@@ -40,17 +40,17 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIListSignalsRequest;
  */
 public class SignalManager extends AbstractPDIManager implements IPDISignalManager {
 	private IPDISignal[] EMPTY_SIGNALS = {};
-	private Map<BitList, List<IPDISignal>> signalsMap;
+	private Map<TaskSet, List<IPDISignal>> signalsMap;
 
 	public SignalManager(IPDISession session) {
 		super(session, false);
-		signalsMap = new Hashtable<BitList, List<IPDISignal>>();
+		signalsMap = new Hashtable<TaskSet, List<IPDISignal>>();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDISignalManager#getSignals(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDISignalManager#getSignals(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDISignal[] getSignals(BitList qTasks) throws PDIException {
+	public IPDISignal[] getSignals(TaskSet qTasks) throws PDIException {
 		List<IPDISignal> signalsList = signalsMap.get(qTasks);
 		if (signalsList == null) {
 			update(qTasks);
@@ -67,17 +67,17 @@ public class SignalManager extends AbstractPDIManager implements IPDISignalManag
 	 */
 	public void handle(IPDISignal sig, boolean isIgnore, boolean isStop) throws PDIException {
 		StringBuffer buffer = new StringBuffer(sig.getName());
-		buffer.append(" ");
+		buffer.append(" "); //$NON-NLS-1$
 		if (isIgnore) {
-			buffer.append("ignore");
+			buffer.append("ignore"); //$NON-NLS-1$
 		} else {
-			buffer.append("noignore");
+			buffer.append("noignore"); //$NON-NLS-1$
 		}
-		buffer.append(" ");
+		buffer.append(" "); //$NON-NLS-1$
 		if (isStop) {
-			buffer.append("stop");
+			buffer.append("stop"); //$NON-NLS-1$
 		} else  {
-			buffer.append("nostop");
+			buffer.append("nostop"); //$NON-NLS-1$
 		}
 		
 		IPDICommandRequest request = session.getRequestFactory().getCommandRequest(sig.getTasks(), buffer.toString());
@@ -97,9 +97,9 @@ public class SignalManager extends AbstractPDIManager implements IPDISignalManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) throws PDIException {
+	public void update(TaskSet qTasks) throws PDIException {
 		IPDISignalDescriptor[] new_sigs = createSignals(qTasks);
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>(new_sigs.length);
 		List<IPDISignal> signalsList = getSignalsList(qTasks);
@@ -125,7 +125,7 @@ public class SignalManager extends AbstractPDIManager implements IPDISignalManag
 	 * @return
 	 * @throws PDIException
 	 */
-	private IPDISignalDescriptor[] createSignals(BitList qTasks) throws PDIException {
+	private IPDISignalDescriptor[] createSignals(TaskSet qTasks) throws PDIException {
 		return createSignals(qTasks, null);
 	}
 	
@@ -135,7 +135,7 @@ public class SignalManager extends AbstractPDIManager implements IPDISignalManag
 	 * @return
 	 * @throws PDIException
 	 */
-	private IPDISignalDescriptor[] createSignals(BitList qTasks, String name) throws PDIException {
+	private IPDISignalDescriptor[] createSignals(TaskSet qTasks, String name) throws PDIException {
 		IPDIListSignalsRequest request = session.getRequestFactory().getListSignalsRequest(session, qTasks, name);
 		session.getEventRequestManager().addEventRequest(request);
 		return request.getSignals(qTasks);
@@ -145,7 +145,7 @@ public class SignalManager extends AbstractPDIManager implements IPDISignalManag
 	 * @param qTasks
 	 * @return
 	 */
-	private synchronized List<IPDISignal> getSignalsList(BitList qTasks) {
+	private synchronized List<IPDISignal> getSignalsList(TaskSet qTasks) {
 		List<IPDISignal> signalsList = signalsMap.get(qTasks);
 		if (signalsList == null) {
 			signalsList = Collections.synchronizedList(new ArrayList<IPDISignal>());
@@ -168,7 +168,7 @@ public class SignalManager extends AbstractPDIManager implements IPDISignalManag
 	 * @param name
 	 * @return
 	 */
-	protected IPDISignal findSignal(BitList qTasks, String name) {
+	protected IPDISignal findSignal(TaskSet qTasks, String name) {
 		IPDISignal sig = null;
 		List<IPDISignal> signalsList = signalsMap.get(qTasks);
 		if (signalsList != null) {

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDILocation;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint;
  *
  */
 public class LineBreakpoint extends LocationBreakpoint implements IPDILineBreakpoint {
-	public LineBreakpoint(IPDISession session, BitList tasks, int type, IPDILocation location, IPDICondition condition, boolean enabled) {
+	public LineBreakpoint(IPDISession session, TaskSet tasks, int type, IPDILocation location, IPDICondition condition, boolean enabled) {
 		super(session, tasks, type, location, condition, enabled);
 	}
 }

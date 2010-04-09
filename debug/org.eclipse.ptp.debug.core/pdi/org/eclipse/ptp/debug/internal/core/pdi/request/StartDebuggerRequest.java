@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStartDebuggerRequest;
 
@@ -35,7 +36,7 @@ public class StartDebuggerRequest extends AbstractEventResultRequest implements 
 	private String dir;
 	private String[] args;
 	
-	public StartDebuggerRequest(BitList tasks, String app, String path, String dir, String[] args) {
+	public StartDebuggerRequest(TaskSet tasks, String app, String path, String dir, String[] args) {
 		super(tasks);
 		this.app = app;
 		this.path = path;
@@ -53,7 +54,7 @@ public class StartDebuggerRequest extends AbstractEventResultRequest implements 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Start debugger request";
+		return Messages.StartDebuggerRequest_0;
 	}
 	
 	/* (non-Javadoc)
@@ -64,8 +65,8 @@ public class StartDebuggerRequest extends AbstractEventResultRequest implements 
     }
     
     /* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 	}
 }

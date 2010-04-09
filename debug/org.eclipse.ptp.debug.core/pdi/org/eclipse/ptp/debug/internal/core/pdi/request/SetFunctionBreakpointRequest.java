@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.request.IPDISetFunctionBreakpointRequest;
 
@@ -30,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDISetFunctionBreakpointRequest;
  *
  */
 public class SetFunctionBreakpointRequest extends BreakpointRequest implements IPDISetFunctionBreakpointRequest {
-	public SetFunctionBreakpointRequest(BitList tasks, IPDIFunctionBreakpoint bpt, boolean allowUpdate) {
+	public SetFunctionBreakpointRequest(TaskSet tasks, IPDIFunctionBreakpoint bpt, boolean allowUpdate) {
 		super(tasks, bpt, allowUpdate);
 	}
 	
@@ -45,6 +46,6 @@ public class SetFunctionBreakpointRequest extends BreakpointRequest implements I
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Set Function Breakpoint Request";
+		return Messages.SetFunctionBreakpointRequest_0;
 	}
 }

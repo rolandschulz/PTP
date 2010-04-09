@@ -43,7 +43,7 @@ public class AIFValueString extends AIFValue implements IAIFValueString {
 	}
 	
 	public int getSize(SimpleByteBuffer buffer) {
-		String hex = "";
+		String hex = ""; //$NON-NLS-1$
 		for (int i=0; i<2; i++) {
 			hex += Integer.toHexString(0x0100 + (buffer.get() & 0x00FF)).substring(1);
 		}
@@ -55,7 +55,7 @@ public class AIFValueString extends AIFValue implements IAIFValueString {
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = "";
+			result = ""; //$NON-NLS-1$
 		}
 		return result;
 	}
@@ -66,12 +66,12 @@ public class AIFValueString extends AIFValue implements IAIFValueString {
 		bytes[0] = (byte)((length >> 8) & 0xff);
 		bytes[1] = (byte)(length & 0xff);
 		
-		System.err.println("---- bytes: " + bytes);
+		System.err.println("---- bytes: " + bytes); //$NON-NLS-1$
 
-		String hex = "";
+		String hex = ""; //$NON-NLS-1$
 		for (int i=0; i<2; i++) {
 			hex += Integer.toHexString(0x0100 + (bytes[i] & 0x00FF));
-			System.err.println("hex: " + hex);
+			System.err.println("hex: " + hex); //$NON-NLS-1$
 		}
 
 		int test = 0;
@@ -80,7 +80,7 @@ public class AIFValueString extends AIFValue implements IAIFValueString {
 		} catch (NumberFormatException e) {
 			test = -1;
 		}
-		System.out.println("---- test: " +  test);
+		System.out.println("---- test: " +  test); //$NON-NLS-1$
 	}
 		/*
 		int len = data.get();

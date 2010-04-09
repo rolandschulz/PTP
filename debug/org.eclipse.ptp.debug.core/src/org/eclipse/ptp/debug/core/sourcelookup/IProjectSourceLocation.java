@@ -25,6 +25,13 @@ import org.eclipse.core.resources.IProject;
  * 
  */
 public interface IProjectSourceLocation extends IPSourceLocation {
-	IProject getProject();
-	boolean isGeneric();
+	/**
+	 * @return
+	 */
+	public IProject getProject();
+
+	/**
+	 * @return
+	 */
+	public boolean isGeneric();
 }

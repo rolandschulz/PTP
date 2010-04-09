@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor;
 public class Signal extends SessionObject implements IPDISignal {
 	private IPDISignalDescriptor desc;
 
-	public Signal(IPDISession session, BitList tasks, IPDISignalDescriptor desc) {
+	public Signal(IPDISession session, TaskSet tasks, IPDISignalDescriptor desc) {
 		super(session, tasks);
 		this.desc = desc;
 	}

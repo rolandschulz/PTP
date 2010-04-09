@@ -31,6 +31,7 @@ import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.internal.ui.dialogfields.SelectionButtonDialogField;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -63,7 +64,7 @@ public class SignalPropertyPage extends PropertyPage {
 		try {
 			String description = getSignal().getDescription();
 			Label label = new Label(composite, SWT.WRAP);
-			label.setText(MessageFormat.format(PropertyPageMessages.getString("SignalPropertyPage.0"), new Object[] { description }));
+			label.setText(MessageFormat.format(Messages.SignalPropertyPage_0, new Object[] { description }));
 			GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
 			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
@@ -76,7 +77,7 @@ public class SignalPropertyPage extends PropertyPage {
 		try {
 			boolean pass = getSignal().isPassEnabled();
 			fPassButton = new SelectionButtonDialogField(SWT.CHECK);
-			fPassButton.setLabelText(PropertyPageMessages.getString("SignalPropertyPage.1"));
+			fPassButton.setLabelText(Messages.SignalPropertyPage_1);
 			fPassButton.setSelection(pass);
 			fPassButton.setEnabled(getSignal().canModify());
 			fPassButton.doFillIntoGrid(composite, 1);
@@ -88,7 +89,7 @@ public class SignalPropertyPage extends PropertyPage {
 		try {
 			boolean stop = getSignal().isStopEnabled();
 			fStopButton = new SelectionButtonDialogField(SWT.CHECK);
-			fStopButton.setLabelText(PropertyPageMessages.getString("SignalPropertyPage.2"));
+			fStopButton.setLabelText(Messages.SignalPropertyPage_2);
 			fStopButton.setSelection(stop);
 			fStopButton.setEnabled(getSignal().canModify());
 			fStopButton.doFillIntoGrid(composite, 1);
@@ -128,7 +129,7 @@ public class SignalPropertyPage extends PropertyPage {
 									getSignal().setPassEnabled(getPassButton().isSelected());
 								}
 								catch(DebugException e) {
-									failed(PropertyPageMessages.getString("SignalPropertyPage.5"), e);
+									failed(Messages.SignalPropertyPage_3, e);
 								}
 							}
 							if (getStopButton() != null) { 
@@ -136,7 +137,7 @@ public class SignalPropertyPage extends PropertyPage {
 									getSignal().setStopEnabled(getStopButton().isSelected());
 								}
 								catch(DebugException e) {
-									failed(PropertyPageMessages.getString("SignalPropertyPage.5"), e);
+									failed(Messages.SignalPropertyPage_4, e);
 								}
 							}
 						}

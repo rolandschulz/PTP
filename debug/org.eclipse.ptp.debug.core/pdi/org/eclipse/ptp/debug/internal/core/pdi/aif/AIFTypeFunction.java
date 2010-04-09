@@ -34,12 +34,12 @@ public class AIFTypeFunction extends TypeDerived implements IAIFTypeFunction {
 		args = fmt.split(AIFFactory.SIGN_COMMA);
 	}
 	public String toString() {
-		String content = "&";
+		String content = "&"; //$NON-NLS-1$
 		for (int i = 0; i<args.length; i++) {
 			content += args[i];
 			if (i < args.length - 1)
-				content += ",";
+				content += ","; //$NON-NLS-1$
 		}
-		return content + "/" + super.toString();
+		return content + "/" + super.toString(); //$NON-NLS-1$
 	}
 }

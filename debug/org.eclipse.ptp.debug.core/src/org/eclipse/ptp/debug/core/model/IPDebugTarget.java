@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IRegisterGroup;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
 
 /**
@@ -81,7 +81,7 @@ public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IR
 	/**
 	 * @return
 	 */
-	public BitList getTasks();
+	public TaskSet getTasks();
 
 	/**
 	 * @return

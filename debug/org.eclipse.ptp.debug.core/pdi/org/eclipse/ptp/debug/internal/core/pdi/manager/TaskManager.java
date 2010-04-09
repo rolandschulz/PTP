@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager;
@@ -29,32 +29,32 @@ import org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager;
  *
  */
 public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
-	private BitList terminatedTasks;
-	private BitList suspendedTasks;
-	private BitList registeredTasks;
-	private BitList pendingTasks;
-	private BitList canStepReturnTasks;
+	private TaskSet terminatedTasks;
+	private TaskSet suspendedTasks;
+	private TaskSet registeredTasks;
+	private TaskSet pendingTasks;
+	private TaskSet canStepReturnTasks;
 
 	public TaskManager(IPDISession session) {
 		super(session, false);
-		terminatedTasks = new BitList(session.getTotalTasks());
-		suspendedTasks = new BitList(session.getTotalTasks());
-		registeredTasks = new BitList(session.getTotalTasks());
-		pendingTasks = new BitList(session.getTotalTasks());
-		canStepReturnTasks = new BitList(session.getTotalTasks());
+		terminatedTasks = new TaskSet(session.getTotalTasks());
+		suspendedTasks = new TaskSet(session.getTotalTasks());
+		registeredTasks = new TaskSet(session.getTotalTasks());
+		pendingTasks = new TaskSet(session.getTotalTasks());
+		canStepReturnTasks = new TaskSet(session.getTotalTasks());
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#canAllStepReturn(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#canAllStepReturn(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean canAllStepReturn(BitList tasks) {
+	public boolean canAllStepReturn(TaskSet tasks) {
 		return getCannotStepReturnTasks(tasks.copy()).isEmpty();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getCannotStepReturnTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getCannotStepReturnTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getCannotStepReturnTasks(BitList tasks) {
+	public TaskSet getCannotStepReturnTasks(TaskSet tasks) {
 		tasks.andNot(getCanStepReturnTasks());
 		return tasks;
 	}
@@ -62,46 +62,46 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getCanStepReturnTasks()
 	 */
-	public BitList getCanStepReturnTasks() {
+	public TaskSet getCanStepReturnTasks() {
 		return canStepReturnTasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getCanStepReturnTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getCanStepReturnTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getCanStepReturnTasks(BitList tasks) {
+	public TaskSet getCanStepReturnTasks(TaskSet tasks) {
 		tasks.and(getCanStepReturnTasks());
 		return tasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonPendingTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonPendingTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getNonPendingTasks(BitList tasks) {
+	public TaskSet getNonPendingTasks(TaskSet tasks) {
 		tasks.andNot(getPendingTasks());
 		return tasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonRunningTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonRunningTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getNonRunningTasks(BitList tasks) {
+	public TaskSet getNonRunningTasks(TaskSet tasks) {
 		tasks.andNot(getRunningTasks(tasks.copy()));
 		return tasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonSuspendedTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonSuspendedTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getNonSuspendedTasks(BitList tasks) {
+	public TaskSet getNonSuspendedTasks(TaskSet tasks) {
 		tasks.andNot(getSuspendedTasks());
 		return tasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonTerminatedTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getNonTerminatedTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getNonTerminatedTasks(BitList tasks) {
+	public TaskSet getNonTerminatedTasks(TaskSet tasks) {
 		tasks.andNot(getTerminatedTasks());
 		return tasks;
 	}
@@ -109,14 +109,14 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getPendingTasks()
 	 */
-	public BitList getPendingTasks() {
+	public TaskSet getPendingTasks() {
 		return pendingTasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getPendingTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getPendingTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getPendingTasks(BitList tasks) {
+	public TaskSet getPendingTasks(TaskSet tasks) {
 		tasks.and(getPendingTasks());
 		return tasks;
 	}
@@ -124,22 +124,22 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getRegisteredTasks()
 	 */
-	public BitList getRegisteredTasks() {
+	public TaskSet getRegisteredTasks() {
 		return registeredTasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getRegisteredTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getRegisteredTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getRegisteredTasks(BitList tasks) {
+	public TaskSet getRegisteredTasks(TaskSet tasks) {
 		tasks.and(getRegisteredTasks());
 		return tasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getRunningTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getRunningTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getRunningTasks(BitList tasks) {
+	public TaskSet getRunningTasks(TaskSet tasks) {
 		tasks.andNot(getTerminatedTasks());
 		tasks.andNot(getSuspendedTasks());
 		return tasks;
@@ -148,14 +148,14 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getSuspendedTasks()
 	 */
-	public BitList getSuspendedTasks() {
+	public TaskSet getSuspendedTasks() {
 		return suspendedTasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getSuspendedTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getSuspendedTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getSuspendedTasks(BitList tasks) {
+	public TaskSet getSuspendedTasks(TaskSet tasks) {
 		tasks.and(getSuspendedTasks());
 		return tasks;
 	}
@@ -163,65 +163,65 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getTerminatedTasks()
 	 */
-	public BitList getTerminatedTasks() {
+	public TaskSet getTerminatedTasks() {
 		return terminatedTasks;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getTerminatedTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getTerminatedTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getTerminatedTasks(BitList tasks) {
+	public TaskSet getTerminatedTasks(TaskSet tasks) {
 		tasks.and(getTerminatedTasks());
 		return tasks;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getUnregisteredTasks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#getUnregisteredTasks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public BitList getUnregisteredTasks(BitList tasks) {
+	public TaskSet getUnregisteredTasks(TaskSet tasks) {
 		tasks.andNot(getRegisteredTasks());
 		return tasks;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllPending(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllPending(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isAllPending(BitList tasks) {
+	public boolean isAllPending(TaskSet tasks) {
 		return getNonPendingTasks(tasks.copy()).isEmpty();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllRegistered(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllRegistered(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isAllRegistered(BitList tasks) {
+	public boolean isAllRegistered(TaskSet tasks) {
 		return getUnregisteredTasks(tasks.copy()).isEmpty();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllRunning(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllRunning(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isAllRunning(BitList tasks) {
+	public boolean isAllRunning(TaskSet tasks) {
 		return (!isAllSuspended(tasks) && !isAllTerminated(tasks));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllSuspended(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllSuspended(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isAllSuspended(BitList tasks) {
+	public boolean isAllSuspended(TaskSet tasks) {
 		return getNonSuspendedTasks(tasks.copy()).isEmpty();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllTerminated(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#isAllTerminated(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isAllTerminated(BitList tasks) {
+	public boolean isAllTerminated(TaskSet tasks) {
 		return getNonTerminatedTasks(tasks.copy()).isEmpty();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setCanStepReturnTasks(boolean, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setCanStepReturnTasks(boolean, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void setCanStepReturnTasks(boolean isAdd, BitList tasks) {
+	public void setCanStepReturnTasks(boolean isAdd, TaskSet tasks) {
 		if (isAdd)
 			canStepReturnTasks = addTasks(canStepReturnTasks, tasks);
 		else
@@ -229,9 +229,9 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setPendingTasks(boolean, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setPendingTasks(boolean, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void setPendingTasks(boolean isAdd, BitList tasks) {
+	public void setPendingTasks(boolean isAdd, TaskSet tasks) {
 		if (isAdd)
 			pendingTasks = addTasks(pendingTasks, tasks);
 		else
@@ -239,9 +239,9 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setRegisterTasks(boolean, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setRegisterTasks(boolean, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void setRegisterTasks(boolean isAdd, BitList tasks) {
+	public void setRegisterTasks(boolean isAdd, TaskSet tasks) {
 		if (isAdd)
 			registeredTasks = addTasks(registeredTasks, tasks);
 		else
@@ -249,9 +249,9 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setSuspendTasks(boolean, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setSuspendTasks(boolean, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void setSuspendTasks(boolean isAdd, BitList tasks) {
+	public void setSuspendTasks(boolean isAdd, TaskSet tasks) {
 		if (isAdd)
 			suspendedTasks = addTasks(suspendedTasks, tasks);
 		else {
@@ -261,9 +261,9 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setTerminateTasks(boolean, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager#setTerminateTasks(boolean, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void setTerminateTasks(boolean isAdd, BitList tasks) {
+	public void setTerminateTasks(boolean isAdd, TaskSet tasks) {
 		if (isAdd) {
 			terminatedTasks = addTasks(terminatedTasks, tasks);
 			setSuspendTasks(false, tasks);//remove suspended tasks
@@ -286,18 +286,18 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	@Override
-	public void update(BitList tasks) throws PDIException {
+	public void update(TaskSet tasks) throws PDIException {
 	}
 	
 	/**
 	 * @param curTasks
 	 * @param newTasks
 	 */
-	private synchronized BitList addTasks(BitList curTasks, BitList newTasks) {
-		if (curTasks.size() < newTasks.size()) {
+	private synchronized TaskSet addTasks(TaskSet curTasks, TaskSet newTasks) {
+		if (curTasks.taskSize() < newTasks.taskSize()) {
 			newTasks.or(curTasks);
 			curTasks =  newTasks.copy();
 		}
@@ -309,7 +309,7 @@ public class TaskManager extends AbstractPDIManager implements IPDITaskManager {
 	 * @param curTasks
 	 * @param newTasks
 	 */
-	private synchronized void removeTasks(BitList curTasks, BitList newTasks) {
+	private synchronized void removeTasks(TaskSet curTasks, TaskSet newTasks) {
 		curTasks.andNot(newTasks);
 	}	
 }

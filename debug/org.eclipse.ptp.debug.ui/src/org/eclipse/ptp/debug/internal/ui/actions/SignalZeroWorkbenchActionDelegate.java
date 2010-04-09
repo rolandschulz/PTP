@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.model.IResumeWithoutSignal;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 
 /**
  * @author Clement chu
@@ -52,21 +53,21 @@ public class SignalZeroWorkbenchActionDelegate extends AbstractListenerActionDel
 	 * @see AbstractDebugActionDelegate#getStatusMessage()
 	 */
 	protected String getStatusMessage() {
-		return ActionMessages.getString("SignalZeroWorkbenchActionDelegate.0");
+		return Messages.SignalZeroWorkbenchActionDelegate_0;
 	}
 
 	/**
 	 * @see AbstractDebugActionDelegate#getErrorDialogMessage()
 	 */
 	protected String getErrorDialogMessage() {
-		return ActionMessages.getString("SignalZeroWorkbenchActionDelegate.1");
+		return Messages.SignalZeroWorkbenchActionDelegate_1;
 	}
 
 	/**
 	 * @see AbstractDebugActionDelegate#getErrorDialogTitle()
 	 */
 	protected String getErrorDialogTitle() {
-		return ActionMessages.getString("SignalZeroWorkbenchActionDelegate.2");
+		return Messages.SignalZeroWorkbenchActionDelegate_2;
 	}
 
 	/* (non-Javadoc)

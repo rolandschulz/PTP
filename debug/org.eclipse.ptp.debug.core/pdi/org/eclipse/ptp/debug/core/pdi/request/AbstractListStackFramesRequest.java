@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
@@ -30,7 +31,7 @@ public abstract class AbstractListStackFramesRequest extends AbstractEventResult
 	private int low = 0;
 	private int high = 0;
 	
-	public AbstractListStackFramesRequest(BitList tasks, int low, int high) {
+	public AbstractListStackFramesRequest(TaskSet tasks, int low, int high) {
 		super(tasks);
 		this.low = low;
 		this.high = high;
@@ -47,6 +48,6 @@ public abstract class AbstractListStackFramesRequest extends AbstractEventResult
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "List stack frames request";
+		return Messages.AbstractListStackFramesRequest_0;
 	}
 }

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents stackframe management
@@ -33,7 +33,7 @@ public interface IPDIStackframeManagement {
 	 * @param depth depth of frame
 	 * @throws PDIException on failure
 	 */
-	void listStackFrames(BitList tasks, int low, int depth) throws PDIException;
+	void listStackFrames(TaskSet tasks, int low, int depth) throws PDIException;
 	
 	/**
 	 * Sets current stack frame with given level
@@ -41,5 +41,5 @@ public interface IPDIStackframeManagement {
 	 * @param level level of stack frame
 	 * @throws PDIException on failure
 	 */
-	void setCurrentStackFrame(BitList tasks, int level) throws PDIException;
+	void setCurrentStackFrame(TaskSet tasks, int level) throws PDIException;
 }

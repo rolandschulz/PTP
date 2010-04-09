@@ -10,32 +10,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.PDILocationFactory;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractListStackFramesRequest;
+import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugStackframeEvent;
 
 public class SDMListStackFramesRequest extends AbstractListStackFramesRequest {
 	private IPDISession session;
 
-	public SDMListStackFramesRequest(IPDISession session, BitList tasks) {
+	public SDMListStackFramesRequest(IPDISession session, TaskSet tasks) {
 		this(session, tasks, 0, 0);
 	}
 	
-	public SDMListStackFramesRequest(IPDISession session, BitList tasks, int low, int high) {
+	public SDMListStackFramesRequest(IPDISession session, TaskSet tasks, int low, int high) {
 		super(tasks, low, high);
 		this.session = session;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest#getStackFrames(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest#getStackFrames(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIStackFrameDescriptor[] getStackFrames(BitList qTasks) throws PDIException {
+	public IPDIStackFrameDescriptor[] getStackFrames(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof ProxyDebugStackFrame[]) {
@@ -48,13 +49,13 @@ public class SDMListStackFramesRequest extends AbstractListStackFramesRequest {
 			}
 			return desc;
 		}
-		throw new PDIException(qTasks, "No stack frames found");
+		throw new PDIException(qTasks, Messages.SDMListStackFramesRequest_0);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugStackframeEvent) {
 			results.put(rTasks, ((IProxyDebugStackframeEvent)result).getFrames());
 		}

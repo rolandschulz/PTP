@@ -25,6 +25,10 @@ import org.eclipse.core.runtime.IPath;
  * 
  */
 public interface IPSourceLookupDirector {
+	/**
+	 * @param sourceName
+	 * @return
+	 */
 	public IPath getCompilationPath(String sourceName);
 }
 

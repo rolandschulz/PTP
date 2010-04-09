@@ -25,6 +25,11 @@ import org.eclipse.debug.core.model.IThread;
  * 
  */
 public interface IPThread extends IThread, IPDebugElement {
-	IPDebugTarget getDebugTarget();
+	/**
+	 * Returns the debug target this element is contained in.
+	 * 
+	 * @return the debug target this element is contained in
+	 */
+	public IPDebugTarget getDebugTarget();
 }
 

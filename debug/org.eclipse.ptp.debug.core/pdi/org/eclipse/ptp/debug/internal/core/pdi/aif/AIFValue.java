@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
@@ -48,7 +49,7 @@ public abstract class AIFValue implements IAIFValue {
 		try {
 			return getValueString();
 		} catch (AIFException e) {
-			return "err: " + e.getMessage();
+			return Messages.AIFValue_0 + e.getMessage();
 		}
 	}
 	

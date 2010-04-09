@@ -32,6 +32,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.debug.core.model.IJumpToLine;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -54,12 +55,12 @@ public class ResumeAtLineAdapter implements IResumeAtLineTarget {
 			ITextEditor textEditor = (ITextEditor)part;
 			IEditorInput input = textEditor.getEditorInput();
 			if (input == null) {
-				errorMessage = ActionMessages.getString("ResumeAtLineAdapter.0");
+				errorMessage = Messages.ResumeAtLineAdapter_0;
 			}
 			else {
 				IDocument document = textEditor.getDocumentProvider().getDocument( input );
 				if (document == null) {
-					errorMessage = ActionMessages.getString("ResumeAtLineAdapter.1");
+					errorMessage = Messages.ResumeAtLineAdapter_1;
 				}
 				else {
 					final String fileName = getFileName(input);
@@ -116,7 +117,7 @@ public class ResumeAtLineAdapter implements IResumeAtLineTarget {
 		}
 		*/
 		else {
-			errorMessage = ActionMessages.getString("ResumeAtLineAdapter.3");
+			errorMessage = Messages.ResumeAtLineAdapter_2;
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
@@ -200,7 +201,7 @@ public class ResumeAtLineAdapter implements IResumeAtLineTarget {
 	 * @param e
 	 */
 	protected void failed(Throwable e) {
-		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, ActionMessages.getString("ResumeAtLineAdapter.4"), null);
+		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, Messages.ResumeAtLineAdapter_3, null);
 		ms.add(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, e.getMessage(), e));
 		IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(ms);
 		if (handler != null) {

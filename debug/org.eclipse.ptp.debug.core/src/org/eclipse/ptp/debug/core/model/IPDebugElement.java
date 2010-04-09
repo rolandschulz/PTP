@@ -26,8 +26,23 @@ import org.eclipse.ptp.debug.core.IPSession;
  * 
  */
 public interface IPDebugElement extends IDebugElement {
-	PDebugElementState getState();
-	Object getCurrentStateInfo();
-	IPSession getSession();
-	int getID();
+	/**
+	 * @return
+	 */
+	public Object getCurrentStateInfo();
+
+	/**
+	 * @return
+	 */
+	public int getID();
+
+	/**
+	 * @return
+	 */
+	public IPSession getSession();
+
+	/**
+	 * @return
+	 */
+	public PDebugElementState getState();
 }

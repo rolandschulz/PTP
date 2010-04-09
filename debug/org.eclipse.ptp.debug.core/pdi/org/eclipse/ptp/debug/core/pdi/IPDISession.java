@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.core.pdi;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager;
@@ -52,7 +52,7 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	/**
 	 * @param tasks
 	 */
-	public void processRunningEvent(BitList tasks);
+	public void processRunningEvent(TaskSet tasks);
 	
 	/**
 	 * @return
@@ -64,7 +64,7 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	 * @param thread_id
 	 * @param vars
 	 */
-	public void processSupsendedEvent(BitList tasks, final int thread_id, final String[] vars);
+	public void processSupsendedEvent(TaskSet tasks, final int thread_id, final String[] vars);
 
 	/**
 	 * @param monitor
@@ -88,7 +88,7 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	 * @return debug target
 	 * @throws PDIException on failure
 	 */
-	public IPDITarget findTarget(BitList task) throws PDIException;
+	public IPDITarget findTarget(TaskSet task) throws PDIException;
 
 	/**
 	 * Returns the breakpoint manager for this session
@@ -186,7 +186,7 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	 * Returns all tasks of this session
 	 * @return all tasks of this session
 	 */
-	public BitList getTasks();
+	public TaskSet getTasks();
 	
 	/**
 	 * Returns the thread manager for this session
@@ -216,14 +216,14 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	 * @param tasks target process
 	 * @return whether this target/thread is currently suspended
 	 */
-	public boolean isSuspended(BitList tasks);
+	public boolean isSuspended(TaskSet tasks);
 	
 	/**
 	 * Returns whether this target/thread is currently terminated.
 	 * @param tasks target process
 	 * @return whether this target/thread is currently terminated
 	 */
-	public boolean isTerminated(BitList tasks);
+	public boolean isTerminated(TaskSet tasks);
 	
 	/**
 	 * @param runnable
@@ -252,5 +252,5 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	 * @param tasks
 	 * @throws PDIException
 	 */
-	public void validateStepReturn(BitList tasks) throws PDIException;	
+	public void validateStepReturn(TaskSet tasks) throws PDIException;	
 }

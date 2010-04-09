@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
 
@@ -33,5 +33,5 @@ public interface IPDIDataReadMemoryRequest extends IPDIEventRequest {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIDataReadMemoryInfo getDataReadMemoryInfo(BitList qTasks) throws PDIException;
+	public IPDIDataReadMemoryInfo getDataReadMemoryInfo(TaskSet qTasks) throws PDIException;
 }

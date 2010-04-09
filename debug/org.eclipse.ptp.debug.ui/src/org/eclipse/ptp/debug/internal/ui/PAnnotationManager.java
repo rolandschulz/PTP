@@ -51,10 +51,10 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.resources.FileStorage;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugEventListener;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.IPDebugSuspendInfo;
@@ -324,7 +324,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param debugTarget
 	 * @return
 	 */
-	protected BitList getTasks(IDebugTarget debugTarget) {
+	protected TaskSet getTasks(IDebugTarget debugTarget) {
 		if (debugTarget instanceof IPDebugTarget) {
 			return ((IPDebugTarget) debugTarget).getTasks();
 		}
@@ -335,7 +335,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param thread
 	 * @return
 	 */
-	protected BitList getTasks(IThread thread) {
+	protected TaskSet getTasks(IThread thread) {
 		return getTasks(thread.getDebugTarget());
 	}
 	
@@ -400,7 +400,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	public void addAnnotation(IEditorPart editorPart, IPStackFrame stackFrame) throws CoreException {
 		IPStackFrame selectedFrame = stackFrame;
 		
-		BitList tasks = getTasks(stackFrame.getDebugTarget());
+		TaskSet tasks = getTasks(stackFrame.getDebugTarget());
 		if (tasks == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
 		}
@@ -478,7 +478,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	/*
 	 * Add annotation called from debug event
 	 */
-	protected void addUnregisterAnnotation(String job_id, int level, String filename, int lineNumber, BitList tasks) throws CoreException {
+	protected void addUnregisterAnnotation(String job_id, int level, String filename, int lineNumber, TaskSet tasks) throws CoreException {
 		if (tasks.isEmpty())
 			return;
 
@@ -514,7 +514,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param uTasks
 	 * @throws CoreException
 	 */
-	protected void addAnnotation(String job_id, int level, String filename, int lineNumber, BitList rTasks, BitList uTasks) throws CoreException {
+	protected void addAnnotation(String job_id, int level, String filename, int lineNumber, TaskSet rTasks, TaskSet uTasks) throws CoreException {
 		IFile file = findFile(getFilePath(job_id, filename));
 		if (file == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
@@ -545,12 +545,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param aTasks
 	 * @return
 	 */
-	protected boolean containsCurrentSet(BitList aTasks) {
+	protected boolean containsCurrentSet(TaskSet aTasks) {
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
 			return true;
 		try {
-			BitList tasks = uiDebugManager.getTasks(set_id);
+			TaskSet tasks = uiDebugManager.getTasks(set_id);
 			return (tasks != null && tasks.intersects(aTasks));
 		}
 		catch (CoreException e) {
@@ -568,7 +568,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param type
 	 * @throws CoreException
 	 */
-	protected void addAnnotation(AnnotationGroup annotationGroup, final ITextEditor textEditor, final IFile file, final int lineNumber, final BitList tasks, final String type) throws CoreException {
+	protected void addAnnotation(AnnotationGroup annotationGroup, final ITextEditor textEditor, final IFile file, final int lineNumber, final TaskSet tasks, final String type) throws CoreException {
 		if (!tasks.isEmpty()) {
 			IDocumentProvider docProvider = textEditor.getDocumentProvider();
 			IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
@@ -630,7 +630,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param tasks
 	 * @throws CoreException
 	 */
-	protected void removeAnnotation(String job_id, BitList tasks) throws CoreException {
+	protected void removeAnnotation(String job_id, TaskSet tasks) throws CoreException {
 		if (tasks == null || tasks.isEmpty())
 			throw new CoreException(Status.CANCEL_STATUS);
 		synchronized (LOCK) {
@@ -649,7 +649,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param tasks
 	 * @throws CoreException
 	 */
-	protected void removeAnnotation(AnnotationGroup annotationGroup, BitList tasks) throws CoreException {
+	protected void removeAnnotation(AnnotationGroup annotationGroup, TaskSet tasks) throws CoreException {
 		synchronized (LOCK) {
 			List<PInstructionPointerAnnotation2> removedList = new ArrayList<PInstructionPointerAnnotation2>(0);
 			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
@@ -682,7 +682,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 	}
 	
-	protected PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, BitList tasks) {
+	protected PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, TaskSet tasks) {
 		synchronized (LOCK) {
 			List<PInstructionPointerAnnotation2> foundAnnotations = new ArrayList<PInstructionPointerAnnotation2>();
 			if (tasks.isEmpty())
@@ -732,12 +732,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 	}
 	
-	protected void register(String job_id, BitList tasks) {
+	protected void register(String job_id, TaskSet tasks) {
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
 				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, tasks)) {
-					BitList cpTasks = tasks.copy();
+					TaskSet cpTasks = tasks.copy();
 					cpTasks.and(annotation.getTasks());
 					if (cpTasks.isEmpty())
 						continue;
@@ -753,12 +753,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 	}
 	
-	protected void unregister(String job_id, BitList tasks) {
+	protected void unregister(String job_id, TaskSet tasks) {
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
 				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, tasks)) {
-					BitList cpTasks = tasks.copy();
+					TaskSet cpTasks = tasks.copy();
 					cpTasks.and(annotation.getTasks());
 					if (cpTasks.isEmpty())
 						continue;
@@ -781,7 +781,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param isRegister
 	 * @throws CoreException
 	 */
-	protected void updateExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation2 annotation, BitList tasks, boolean isRegister) {
+	protected void updateExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation2 annotation, TaskSet tasks, boolean isRegister) {
 		synchronized (LOCK) {
 			IResource file = annotation.getMakerResource();
 			Position position = annotation.getPosition();
@@ -824,7 +824,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				AnnotationGroup annotationGroup = getAnnotationGroup(uiDebugManager.getCurrentJobId());
 				if (annotationGroup != null) {
 					try {
-						BitList tasks = uiDebugManager.getTasks(currentSet.getID());
+						TaskSet tasks = uiDebugManager.getTasks(currentSet.getID());
 						synchronized (LOCK) {
 							for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 								// change icon for unregistered processes only if the set is changed
@@ -976,7 +976,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 	}
 	
-	private void addAnnotationWithSourceFound(IPJob job, BitList tasks, int low, int high) throws CoreException {
+	private void addAnnotationWithSourceFound(IPJob job, TaskSet tasks, int low, int high) throws CoreException {
 		if (tasks.isEmpty())
 			return;
 
@@ -989,9 +989,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					tasks, low, high);
 			try {
 				session.getPDISession().getEventRequestManager().addEventRequest(request);
-				Map<BitList, Object> map = request.getResultMap(tasks);
-				for (Iterator<BitList> i = map.keySet().iterator(); i.hasNext();) {
-					BitList sTasks = i.next();
+				Map<TaskSet, Object> map = request.getResultMap(tasks);
+				for (Iterator<TaskSet> i = map.keySet().iterator(); i.hasNext();) {
+					TaskSet sTasks = i.next();
 					Object value = map.get(sTasks);
 					if (value instanceof ProxyDebugStackFrame[]) {
 						ProxyDebugStackFrame[] frames = (ProxyDebugStackFrame[])value;
@@ -1011,7 +1011,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 	}
 	
-	private void removeAnnotationAction(IPJob job, BitList tasks) {
+	private void removeAnnotationAction(IPJob job, TaskSet tasks) {
 		try {
 			removeAnnotation(job.getID(), tasks);
 		}

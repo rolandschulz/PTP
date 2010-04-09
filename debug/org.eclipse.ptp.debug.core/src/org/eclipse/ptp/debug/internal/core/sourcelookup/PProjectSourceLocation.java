@@ -118,6 +118,9 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return result;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IPSourceLocation.class))
@@ -201,14 +204,23 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return fGenerated;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation#searchForDuplicateFiles()
+	 */
 	public boolean searchForDuplicateFiles() {
 		return fSearchForDuplicateFiles;
 	}
 	
+	/**
+	 * @param b
+	 */
 	public void setGenerated(boolean b) {
 		fGenerated = b;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation#setSearchForDuplicateFiles(boolean)
+	 */
 	public void setSearchForDuplicateFiles(boolean search) {
 		fCache.clear();
 		fNotFoundCache.clear();
@@ -223,28 +235,52 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return (getProject() != null) ? fProject.toString() : ""; //$NON-NLS-1$
 	}
 	
+	/**
+	 * @param message
+	 * @param e
+	 * @throws CoreException
+	 */
 	private void abort(String message, Throwable e) throws CoreException {
 		IStatus s = new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, message, e);
 		throw new CoreException(s);
 	}
 	
+	/**
+	 * @param name
+	 * @return
+	 */
 	private Object cacheLookup(String name) {
 		return fCache.get(name);
 	}
 	
+	/**
+	 * @param name
+	 */
 	private void cacheNotFound(String name) {
 		fNotFoundCache.add(name);
 	}
 	
+	/**
+	 * @param name
+	 * @param element
+	 */
 	private void cacheSourceElement(String name, Object element) {
 		fCache.put(name, element);
 	}
 	
+	/**
+	 * @param name
+	 * @return
+	 */
 	private Object doFindSourceElement(String name) {
 		File file = new File(name);
 		return (file.isAbsolute()) ? findFileByAbsolutePath(file) : findFileByRelativePath(name);
 	}
 	
+	/**
+	 * @param file
+	 * @return
+	 */
 	private Object findFileByAbsolutePath(File file) {
 		LinkedList<IFile> list = new LinkedList<IFile>();
 		if (file.exists()) {
@@ -260,6 +296,10 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return (list.size() > 0) ? ((list.size() == 1) ? list.getFirst() : list) : null;
 	}
 	
+	/**
+	 * @param fileName
+	 * @return
+	 */
 	private Object findFileByRelativePath(String fileName) {
 		IResource[] folders = getFolders();
 		LinkedList<IFile> list = new LinkedList<IFile>();
@@ -284,6 +324,9 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return (list.size() > 0) ? ((list.size() == 1) ? list.getFirst() : list) : null;
 	}
 	
+	/**
+	 * 
+	 */
 	private void initializeFolders() {
 		final LinkedList<IResource> list = new LinkedList<IResource>();
 		if (getProject() != null && getProject().exists()) {
@@ -311,18 +354,32 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		}
 	}
 	
+	/**
+	 * @param string
+	 * @return
+	 */
 	private boolean isEmpty(String string) {
 		return string == null || string.length() == 0;
 	}
 	
+	/**
+	 * @param name
+	 * @return
+	 */
 	private boolean notFoundCacheLookup(String name) {
 		return fNotFoundCache.contains(name);
 	}
 	
+	/**
+	 * @param project
+	 */
 	private void setProject(IProject project) {
 		fProject = project;
 	}
 	
+	/**
+	 * @return
+	 */
 	protected IResource[] getFolders() {
 		if (fFolders == null)
 			initializeFolders();

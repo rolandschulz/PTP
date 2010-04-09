@@ -43,60 +43,242 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 
 /**
  * @author clement
- *
+ * 
  */
 public class PRegister extends PVariable implements IPRegister {
+	/**
+	 * @author greg
+	 *
+	 */
 	private class InternalVariable implements IInternalVariable {
-		private PVariable fVariable;
-		private IPDIVariableDescriptor fPDIVariableObject;
+		private boolean fChanged = false;
 		private IPDIRegister fPDIRegister;
+		private IPDIVariableDescriptor fPDIVariableObject;
 		private String fQualifiedName;
 		private IPValue fValue = PValueFactory.NULL_VALUE;
-		private boolean fChanged = false;
+		private PVariable fVariable;
 
-		InternalVariable(PVariable var, IPDIVariableDescriptor varObject) {
+		public InternalVariable(PVariable var, IPDIVariableDescriptor varObject) {
 			setVariable(var);
 			setPDIVariableObject(varObject);
-			setPDIRegister((varObject instanceof IPDIRegister) ? (IPDIRegister)varObject : null);
+			setPDIRegister((varObject instanceof IPDIRegister) ? (IPDIRegister) varObject : null);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#createShadow(int, int)
+		 */
 		public IInternalVariable createShadow(int start, int length) throws DebugException {
 			IInternalVariable iv = null;
 			try {
 				iv = new InternalVariable(getVariable(), getPDIVariableObject().getVariableDescriptorAsArray(start, length));
-			}
-			catch(PDIException e) {
+			} catch (final PDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#createShadow(java.lang.String)
+		 */
 		public IInternalVariable createShadow(String type) throws DebugException {
 			IInternalVariable iv = null;
 			try {
 				iv = new InternalVariable(getVariable(), getPDIVariableObject().getVariableDescriptorAsType(type));
-			}
-			catch(PDIException e) {
+			} catch (final PDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
 		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#dispose(boolean)
+		 */
+		public void dispose(boolean destroy) {
+			invalidate(destroy);
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof InternalVariable) {
+				return getPDIVariableObject().equals(((InternalVariable) obj).getPDIVariableObject());
+			}
+			return false;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#getQualifiedName()
+		 */
+		public String getQualifiedName() throws DebugException {
+			if (fQualifiedName == null) {
+				try {
+					fQualifiedName = (fPDIVariableObject != null) ? fPDIVariableObject.getQualifiedName() : null;
+				} catch (final PDIException e) {
+					requestFailed(e.getMessage(), null);
+				}
+			}
+			return fQualifiedName;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#getValue()
+		 */
+		public synchronized IPValue getValue() throws DebugException {
+			if (fValue.equals(PValueFactory.NULL_VALUE)) {
+				final IPDIRegister reg = getPDIRegister();
+				if (reg != null) {
+					try {
+						final IAIF aif = reg.getAIF(getCurrentStackFrame().getPDIStackFrame());
+						if (aif != null && aif.getType() instanceof IAIFTypeArray) {
+							final int[] dims = ((IAIFTypeArray) aif.getType()).getDimensionDetails();
+							if (dims.length > 0 && dims[0] > 0) {
+								fValue = PValueFactory.createIndexedValue(getVariable(), reg, 0, dims[0]);
+							}
+						} else {
+							fValue = PValueFactory.createValue(getVariable(), reg);
+						}
+					} catch (final PDIException e) {
+						requestFailed(e.getMessage(), e);
+					}
+				}
+			}
+			return fValue;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#invalidateValue()
+		 */
+		public void invalidateValue() {
+			if (fValue instanceof AbstractPValue) {
+				((AbstractPValue) fValue).dispose();
+				fValue = PValueFactory.NULL_VALUE;
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isArgument()
+		 */
+		public boolean isArgument() {
+			return (getPDIVariableObject() instanceof IPDIArgumentDescriptor);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isChanged()
+		 */
+		public boolean isChanged() {
+			return fChanged;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isEditable()
+		 */
+		public boolean isEditable() throws DebugException {
+			final IPDIRegister reg = getPDIRegister();
+			if (reg != null) {
+				try {
+					return reg.isEditable();
+				} catch (final PDIException e) {
+				}
+			}
+			return false;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isSameDescriptor(org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor)
+		 */
+		public boolean isSameDescriptor(IPDIVariableDescriptor desc) {
+			return getPDIVariableObject().equals(desc);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isSameVariable(org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
+		 */
+		public boolean isSameVariable(IPDIVariable pdiVar) {
+			return (fPDIRegister != null) ? fPDIRegister.equals(pdiVar) : false;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#preserve()
+		 */
+		public synchronized void preserve() {
+			setChanged(false);
+			if (fValue instanceof AbstractPValue) {
+				((AbstractPValue) fValue).preserve();
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#resetValue()
+		 */
+		public void resetValue() {
+			if (fValue instanceof AbstractPValue) {
+				((AbstractPValue) fValue).reset();
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#setChanged(boolean)
+		 */
+		public synchronized void setChanged(boolean changed) {
+			if (changed) {
+				invalidateValue();
+			}
+			if (fValue instanceof AbstractPValue) {
+				((AbstractPValue) fValue).setChanged(changed);
+			}
+			fChanged = changed;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#setValue(java.lang.String)
+		 */
+		public void setValue(String expression) throws DebugException {
+			IPDIRegister pdiRegister = null;
+			try {
+				pdiRegister = getPDIRegister();
+				if (pdiRegister != null) {
+					pdiRegister.setValue(expression);
+				} else {
+					requestFailed("CoreModelMessages", null); //$NON-NLS-1$
+				}
+			} catch (final PDIException e) {
+				targetRequestFailed(e.getMessage(), null);
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#sizeof()
+		 */
+		public int sizeof() {
+			if (getPDIVariableObject() != null) {
+				try {
+					return getPDIVariableObject().sizeof();
+				} catch (final PDIException e) {
+				}
+			}
+			return 0;
+		}
+
+		/**
+		 * @return
+		 * @throws DebugException
+		 */
 		private synchronized IPDIRegister getPDIRegister() throws DebugException {
 			if (fPDIRegister == null) {
 				try {
-					fPDIRegister = getPDITarget().createRegister((IPDIRegisterDescriptor)getPDIVariableObject());
-				}
-				catch(PDIException e) {
+					fPDIRegister = getPDITarget().createRegister((IPDIRegisterDescriptor) getPDIVariableObject());
+				} catch (final PDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
 			return fPDIRegister;
 		}
 
-		private void setPDIRegister(IPDIRegister register) {
-			fPDIRegister = register;
-		}
-
+		/**
+		 * @return
+		 */
 		private IPDIVariableDescriptor getPDIVariableObject() {
 			if (fPDIRegister != null) {
 				return fPDIRegister;
@@ -104,199 +286,154 @@ public class PRegister extends PVariable implements IPRegister {
 			return fPDIVariableObject;
 		}
 
-		private void setPDIVariableObject(IPDIVariableDescriptor variableObject) {
-			fPDIVariableObject = variableObject;
-		}
-
-		public String getQualifiedName() throws DebugException {
-			if (fQualifiedName == null) {
-				try {
-					fQualifiedName = (fPDIVariableObject != null) ? fPDIVariableObject.getQualifiedName() : null;
-				}
-				catch(PDIException e) {
-					requestFailed(e.getMessage(), null);
-				}
-			}
-			return fQualifiedName;
-		}
+		/**
+		 * @param destroy
+		 */
 		private synchronized void invalidate(boolean destroy) {
 			try {
-				if (destroy && fPDIRegister != null)
+				if (destroy && fPDIRegister != null) {
 					fPDIRegister.dispose();
-			}
-			catch(PDIException e) {
+				}
+			} catch (final PDIException e) {
 				logError(e.getMessage());
 			}
 			invalidateValue();
 			setPDIRegister(null);
 		}
-		public void dispose(boolean destroy) {
-			invalidate(destroy);
+
+		/**
+		 * @param register
+		 */
+		private void setPDIRegister(IPDIRegister register) {
+			fPDIRegister = register;
 		}
-		public boolean isSameVariable(IPDIVariable pdiVar) {
-			return (fPDIRegister != null) ? fPDIRegister.equals(pdiVar) : false;
+
+		/**
+		 * @param variableObject
+		 */
+		private void setPDIVariableObject(IPDIVariableDescriptor variableObject) {
+			fPDIVariableObject = variableObject;
 		}
-		public int sizeof() {
-			if (getPDIVariableObject() != null) {
-				try {
-					return getPDIVariableObject().sizeof();
-				}
-				catch(PDIException e) {
-				}
-			}
-			return 0;
-		}
-		public boolean isArgument() {
-			return (getPDIVariableObject() instanceof IPDIArgumentDescriptor);
-		}
-		public void setValue(String expression) throws DebugException {
-			IPDIRegister pdiRegister = null;
-			try {
-				pdiRegister = getPDIRegister();
-				if (pdiRegister != null)
-					pdiRegister.setValue(expression);
-				else
-					requestFailed(CoreModelMessages.getString("CModificationVariable.0"), null);
-			}
-			catch(PDIException e) {
-				targetRequestFailed(e.getMessage(), null);
-			}
-		}
-		public synchronized IPValue getValue() throws DebugException {
-			if (fValue.equals(PValueFactory.NULL_VALUE)) {
-				IPDIRegister reg = getPDIRegister();
-				if (reg != null) {
-					try {
-						IAIF aif = reg.getAIF(getCurrentStackFrame().getPDIStackFrame());
-						if (aif != null && aif.getType() instanceof IAIFTypeArray) {
-							int[] dims = ((IAIFTypeArray)aif.getType()).getDimensionDetails();
-							if (dims.length > 0 && dims[0] > 0)
-								fValue = PValueFactory.createIndexedValue(getVariable(), reg, 0, dims[0]);
-						}
-						else {
-							fValue = PValueFactory.createValue(getVariable(), reg);
-						}
-					}
-					catch(PDIException e) {
-						requestFailed(e.getMessage(), e);
-					}
-				}
-			}
-			return fValue;
-		}
-		public void invalidateValue() {
-			if (fValue instanceof AbstractPValue) {
-				((AbstractPValue)fValue).dispose();
-				fValue = PValueFactory.NULL_VALUE;
-			}
-		}
-		public boolean isChanged() {
-			return fChanged;
-		}
-		public synchronized void setChanged(boolean changed) {
-			if (changed) {
-				invalidateValue();
-			}
-			if (fValue instanceof AbstractPValue) {
-				((AbstractPValue)fValue).setChanged(changed);
-			}
-			fChanged = changed;
-		}
-		public synchronized void preserve() {
-			setChanged(false);
-			if (fValue instanceof AbstractPValue) {
-				((AbstractPValue)fValue).preserve();
-			}
-		}
-		PVariable getVariable() {
-			return fVariable;
-		}
+
+		/**
+		 * @param variable
+		 */
 		private void setVariable(PVariable variable) {
 			fVariable = variable;
 		}
-		public void resetValue() {
-			if (fValue instanceof AbstractPValue) {
-				((AbstractPValue)fValue).reset();
-			}
-		}
-		public boolean isEditable() throws DebugException {
-			IPDIRegister reg = getPDIRegister();
-			if (reg != null) {
-				try {
-					return reg.isEditable();
-				}
-				catch(PDIException e) {
-				}
-			}
-			return false;
-		}
-		public boolean equals(Object obj) {
-			if (obj instanceof InternalVariable) {
-				return getPDIVariableObject().equals(((InternalVariable)obj).getPDIVariableObject());
-			}
-			return false;
-		}
-		public boolean isSameDescriptor(IPDIVariableDescriptor desc) {
-			return getPDIVariableObject().equals(desc);
+
+		/**
+		 * @return
+		 */
+		private PVariable getVariable() {
+			return fVariable;
 		}
 	}
+
 	protected PRegister(PRegisterGroup parent, IPRegisterDescriptor descriptor) {
-		super(parent, ((PRegisterDescriptor)descriptor).getPDIDescriptor());
-		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT)));
+		super(parent, ((PRegisterDescriptor) descriptor).getPDIDescriptor());
+		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(
+				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT)));
 	}
+
 	protected PRegister(PRegisterGroup parent, IPRegisterDescriptor descriptor, String message) {
-		super(parent, ((PRegisterDescriptor)descriptor).getPDIDescriptor(), message);
-		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT)));
+		super(parent, ((PRegisterDescriptor) descriptor).getPDIDescriptor(), message);
+		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(
+				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT)));
 	}
-	public IRegisterGroup getRegisterGroup() throws DebugException {
-		return (IRegisterGroup)getParent();
-	}
-	protected boolean isBookkeepingEnabled() {
-		boolean result = false;
-		return result;
-	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#canEnableDisable()
+	 */
+	@Override
 	public boolean canEnableDisable() {
 		return true;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#dispose()
+	 */
+	@Override
+	public void dispose() {
+		internalDispose(true);
+		setDisposed(true);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPVariable#getAIF()
+	 */
+	public IAIF getAIF() throws DebugException {
+		return getValue().getAIF();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IRegister#getRegisterGroup()
+	 */
+	public IRegisterGroup getRegisterGroup() throws DebugException {
+		return (IRegisterGroup) getParent();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	 */
+	@Override
 	public void handleDebugEvents(IPDIEvent[] events) {
-		for(int i = 0; i < events.length; i++) {
-			IPDIEvent event = events[i];
-			if (!event.contains(getTasks()))
+		for (final IPDIEvent event2 : events) {
+			final IPDIEvent event = event2;
+			if (!event.contains(getTasks())) {
 				continue;
+			}
 
 			if (event instanceof IPDIChangedEvent) {
-				IPDISessionObject reason = ((IPDIChangedEvent)event).getReason();
+				final IPDISessionObject reason = ((IPDIChangedEvent) event).getReason();
 				if (reason instanceof IPDIMemoryBlockInfo) {
 					resetValue();
-					return;	// avoid similar but logic inappropriate for us in PVariable
+					return; // avoid similar but logic inappropriate for us in
+							// PVariable
 				}
-			}
-			else if (event instanceof IPDIResumedEvent) {
+			} else if (event instanceof IPDIResumedEvent) {
 				setChanged(false);
 			}
 		}
 		super.handleDebugEvents(events);
 	}
-	public void dispose() {
-		internalDispose(true);
-		setDisposed(true);
-	}
-	protected IPStackFrame getStackFrame() {
-		IPStackFrame frame = super.getStackFrame();
-		if (frame == null)
-			frame = getCurrentStackFrame();
-		return frame;
-	}
-	protected IPStackFrame getCurrentStackFrame() {
-		return fSession.getRegisterManager().getCurrentFrame(getTasks());
-	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#createOriginal(org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor)
+	 */
+	@Override
 	protected void createOriginal(IPDIVariableDescriptor vo) {
 		if (vo != null) {
 			setName(vo.getName());
 			setOriginal(new InternalVariable(this, vo));
 		}
 	}
-	public IAIF getAIF() throws DebugException {
-		return getValue().getAIF();
+
+	/**
+	 * @return
+	 */
+	protected IPStackFrame getCurrentStackFrame() {
+		return fSession.getRegisterManager().getCurrentFrame(getTasks());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getStackFrame()
+	 */
+	@Override
+	protected IPStackFrame getStackFrame() {
+		IPStackFrame frame = super.getStackFrame();
+		if (frame == null) {
+			frame = getCurrentStackFrame();
+		}
+		return frame;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#isBookkeepingEnabled()
+	 */
+	@Override
+	protected boolean isBookkeepingEnabled() {
+		final boolean result = false;
+		return result;
 	}
 }

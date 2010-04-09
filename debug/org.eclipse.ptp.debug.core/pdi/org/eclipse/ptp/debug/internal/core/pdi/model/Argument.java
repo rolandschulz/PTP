@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIArgument;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIArgumentDescriptor;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
  *
  */
 public class Argument extends Variable implements IPDIArgument {
-	public Argument(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
+	public Argument(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
 		super(session, tasks, thread, frame, name, fullName, pos, depth, varid);
 	}
 	
@@ -40,9 +40,9 @@ public class Argument extends Variable implements IPDIArgument {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.model.Variable#createVariable(org.eclipse.ptp.debug.internal.core.pdi.Session, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.internal.core.pdi.model.Thread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int, java.lang.String)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.model.Variable#createVariable(org.eclipse.ptp.debug.internal.core.pdi.Session, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.internal.core.pdi.model.Thread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int, java.lang.String)
 	 */
-	protected IPDIVariable createVariable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
+	protected IPDIVariable createVariable(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
 		return new Argument(session, tasks, thread, frame, name, fullName, pos, depth, varid);
 	}
 }

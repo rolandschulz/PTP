@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
@@ -35,7 +35,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 public class PInstructionPointerAnnotation2 {
 	private Annotation annotation = null;
 	private IAnnotationModel annotationModel = null;
-	private BitList tasks = null;
+	private TaskSet tasks = null;
 	private Position position = null;
 	private IResource file = null;
 	private IMarker marker = null;
@@ -73,11 +73,11 @@ public class PInstructionPointerAnnotation2 {
 	 * 
 	 * @param aTasks
 	 */
-	public void addTasks(BitList aTasks) {
+	public void addTasks(TaskSet aTasks) {
 		if (tasks == null) {
 			tasks = aTasks.copy();
 		}
-		if (tasks.size() < aTasks.size()) {
+		if (tasks.taskSize() < aTasks.taskSize()) {
 			aTasks.or(tasks);
 			tasks = aTasks.copy();
 		} else
@@ -90,7 +90,7 @@ public class PInstructionPointerAnnotation2 {
 	 * @param aTasks
 	 * @return
 	 */
-	public boolean contains(BitList aTasks) {
+	public boolean contains(TaskSet aTasks) {
 		return tasks.intersects(aTasks);
 	}
 
@@ -100,7 +100,7 @@ public class PInstructionPointerAnnotation2 {
 	 * @param aTasks
 	 * @return
 	 */
-	public int[] containTasks(BitList aTasks) {
+	public int[] containTasks(TaskSet aTasks) {
 		aTasks.and(tasks);
 		return aTasks.toArray();
 	}
@@ -132,7 +132,7 @@ public class PInstructionPointerAnnotation2 {
 	 * 
 	 * @return
 	 */
-	public BitList getTasks() {
+	public TaskSet getTasks() {
 		return tasks;
 	}
 
@@ -171,7 +171,7 @@ public class PInstructionPointerAnnotation2 {
 	 * 
 	 * @param aTasks
 	 */
-	public void removeTasks(BitList aTasks) {
+	public void removeTasks(TaskSet aTasks) {
 		tasks.andNot(aTasks);
 	}
 
@@ -203,7 +203,7 @@ public class PInstructionPointerAnnotation2 {
 	 * 
 	 * @param tasks
 	 */
-	public void setTasks(BitList tasks) {
+	public void setTasks(TaskSet tasks) {
 		this.tasks = tasks;
 	}
 

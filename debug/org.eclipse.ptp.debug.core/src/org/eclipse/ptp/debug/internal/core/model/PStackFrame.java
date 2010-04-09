@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +36,8 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IJumpToAddress;
 import org.eclipse.ptp.debug.core.model.IJumpToLine;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
@@ -376,11 +377,11 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	 */
 	public String getName() throws DebugException {
 		IPDILocator locator = (IPDILocator) getPDIStackFrame().getLocator();
-		String func = "";
-		String file = "";
-		String line = "";
+		String func = ""; //$NON-NLS-1$
+		String file = ""; //$NON-NLS-1$
+		String line = ""; //$NON-NLS-1$
 		if (locator.getFunction() != null && locator.getFunction().trim().length() > 0)
-			func += locator.getFunction() + "() ";
+			func += locator.getFunction() + "() "; //$NON-NLS-1$
 		if (locator.getFile() != null && locator.getFile().trim().length() > 0) {
 			file = locator.getFile();
 			if (locator.getLineNumber() != 0) {
@@ -389,7 +390,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		} else {
 			return func;
 		}
-		return MessageFormat.format(CoreModelMessages.getString("PStackFrame.0"), new Object[] { func, file, line });
+		return NLS.bind(Messages.PStackFrame_0, new Object[] { func, file, line });
 	}
 
 	/* (non-Javadoc)

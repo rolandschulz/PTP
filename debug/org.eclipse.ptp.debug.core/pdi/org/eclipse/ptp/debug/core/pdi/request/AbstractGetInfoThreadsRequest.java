@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 
 /**
@@ -28,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  *
  */
 public abstract class AbstractGetInfoThreadsRequest extends AbstractEventResultRequest implements IPDIGetInfoThreadsRequest {
-	public AbstractGetInfoThreadsRequest(BitList tasks) {
+	public AbstractGetInfoThreadsRequest(TaskSet tasks) {
 		super(tasks);
 	}
 	
@@ -43,18 +44,18 @@ public abstract class AbstractGetInfoThreadsRequest extends AbstractEventResultR
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Get info thread request";
+		return Messages.AbstractGetInfoThreadsRequest_0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetInfoThreadsRequest#getThreadIds(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetInfoThreadsRequest#getThreadIds(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public String[] getThreadIds(BitList qTasks) throws PDIException {
+	public String[] getThreadIds(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof String[]) {
 			return (String[])obj;
 		}
-		throw new PDIException(qTasks, "No thread ids found");
+		throw new PDIException(qTasks, Messages.AbstractGetInfoThreadsRequest_1);
 	}
 }

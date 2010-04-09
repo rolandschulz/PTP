@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegister;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterDescriptor;
@@ -59,5 +59,5 @@ public interface IPDIRegisterManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIRegisterGroup[] getRegisterGroups(BitList qTasks) throws PDIException;
+	public IPDIRegisterGroup[] getRegisterGroups(TaskSet qTasks) throws PDIException;
 }

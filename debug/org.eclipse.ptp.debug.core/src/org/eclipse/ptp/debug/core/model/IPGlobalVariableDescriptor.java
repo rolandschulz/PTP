@@ -25,7 +25,13 @@ import org.eclipse.core.runtime.IPath;
  * 
  */
 public interface IPGlobalVariableDescriptor {
+	/**
+	 * @return
+	 */
 	public String getName();
+
+	/**
+	 * @return
+	 */
 	public IPath getPath();
 }
-

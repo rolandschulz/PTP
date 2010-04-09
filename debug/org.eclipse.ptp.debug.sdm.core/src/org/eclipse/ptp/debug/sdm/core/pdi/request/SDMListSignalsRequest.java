@@ -10,26 +10,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractListSignalsRequest;
+import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugSignal;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalsEvent;
 
 public class SDMListSignalsRequest extends AbstractListSignalsRequest {
 	private IPDISession session;
 	
-	public SDMListSignalsRequest(IPDISession session, BitList tasks, String name) {
+	public SDMListSignalsRequest(IPDISession session, TaskSet tasks, String name) {
 		super(tasks, name);
 		this.session = session;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListSignalsRequest#getSignals(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListSignalsRequest#getSignals(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDISignalDescriptor[] getSignals(BitList qTasks) throws PDIException {
+	public IPDISignalDescriptor[] getSignals(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof ProxyDebugSignal[]) {
@@ -41,13 +42,13 @@ public class SDMListSignalsRequest extends AbstractListSignalsRequest {
 			}
 			return signals;
 		}
-		throw new PDIException(qTasks, "No signals found");
+		throw new PDIException(qTasks, Messages.SDMListSignalsRequest_0);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugSignalsEvent) {
 			results.put(rTasks, ((IProxyDebugSignalsEvent)result).getSignals());
 		}

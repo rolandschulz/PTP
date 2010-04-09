@@ -28,12 +28,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 import org.eclipse.ptp.debug.ui.PVariableManager.PVariableInfo;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 
 /**
  * @author Clement chu
  */
 public class DeletePExpressionAction extends Action {
-	public static final String name = "Delete";
+	public static final String name = Messages.DeletePExpressionAction_0;
 	private PVariableView view = null;
 
 	/** Constructor

@@ -28,13 +28,31 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.PProjectSourceLocation;
  * 
  */
 public class SourceLookupFactory {
+	/**
+	 * @param directory
+	 * @param association
+	 * @param searchSubfolders
+	 * @return
+	 */
+	public static IDirectorySourceLocation createDirectorySourceLocation(IPath directory, IPath association,
+			boolean searchSubfolders) {
+		return new PDirectorySourceLocation(directory, association, searchSubfolders);
+	}
+
+	/**
+	 * @param project
+	 * @return
+	 */
 	public static IProjectSourceLocation createProjectSourceLocation(IProject project) {
 		return new PProjectSourceLocation(project);
 	}
+
+	/**
+	 * @param project
+	 * @param generated
+	 * @return
+	 */
 	public static IProjectSourceLocation createProjectSourceLocation(IProject project, boolean generated) {
 		return new PProjectSourceLocation(project, generated);
-	}
-	public static IDirectorySourceLocation createDirectorySourceLocation(IPath directory, IPath association, boolean searchSubfolders) {
-		return new PDirectorySourceLocation(directory, association, searchSubfolders);
 	}
 }

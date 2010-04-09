@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 
 /**
@@ -27,9 +27,9 @@ import org.eclipse.ptp.core.util.BitList;
  */
 public class SessionObject implements IPDISessionObject {
 	protected IPDISession session = null;
-	protected BitList tasks = null;
+	protected TaskSet tasks = null;
 
-	public SessionObject(IPDISession s, BitList t) {
+	public SessionObject(IPDISession s, TaskSet t) {
 		this.session = s;
 		if (t != null)
 			this.tasks = t.copy();
@@ -45,7 +45,7 @@ public class SessionObject implements IPDISessionObject {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISet#getTasks()
 	 */
-	public BitList getTasks() {
+	public TaskSet getTasks() {
 		return tasks;
 	}
 }

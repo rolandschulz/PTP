@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
@@ -36,7 +36,7 @@ public interface IPDIEvaluatePartialExpressionRequest extends IPDIInternalEventR
 	 * @return
 	 * @throws PDIException
 	 */
-	public IAIF getPartialAIF(BitList qTasks) throws PDIException;
+	public IAIF getPartialAIF(TaskSet qTasks) throws PDIException;
 	
 	/**
 	 * Retrieve the ID assigned to this expression. This ID can be used to retrieve additional
@@ -46,5 +46,5 @@ public interface IPDIEvaluatePartialExpressionRequest extends IPDIInternalEventR
 	 * @return
 	 * @throws PDIException
 	 */
-	public String getId(BitList qTasks) throws PDIException;
+	public String getId(TaskSet qTasks) throws PDIException;
 }

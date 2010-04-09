@@ -13,7 +13,6 @@ package org.eclipse.ptp.debug.core;
 import java.math.BigInteger;
 
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
@@ -28,7 +27,7 @@ public interface IPBreakpointManager {
 	 * @param tasks new tasks being added to the set
 	 * @param breakpoints breakpoints that are to be updated
 	 */
-	public void addSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints);
+	public void addSetBreakpoints(TaskSet tasks, IPBreakpoint[] breakpoints);
 
 	/**
 	 * Called when tasks are removed from a task set. This causes the
@@ -37,7 +36,7 @@ public interface IPBreakpointManager {
 	 * @param tasks tasks being removed from the set
 	 * @param breakpoints breakpoints that are to be updated
 	 */
-	public void deleteSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints);
+	public void deleteSetBreakpoints(TaskSet tasks, IPBreakpoint[] breakpoints);
 
 	/**
 	 * Delete a breakpoint. Removes the breakpoint and its marker.
@@ -67,6 +66,6 @@ public interface IPBreakpointManager {
 	 * @param tasks
 	 * @param pdiWatchpoint
 	 */
-	public void watchpointOutOfScope(BitList tasks, IPDIWatchpoint pdiWatchpoint);
+	public void watchpointOutOfScope(TaskSet tasks, IPDIWatchpoint pdiWatchpoint);
 
 }

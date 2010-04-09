@@ -18,14 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.debug.internal.ui.PixelConverter;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -44,16 +45,16 @@ public class PVariableCheckboxTableViewer extends TableViewer implements IChecka
 	private ICheckProvider checkProvider = null;
 	
 	// String constants
-	protected static final String YES_VALUE = PVariableMessages.getString("PExpressionViewer.yes");
-	protected static final String NO_VALUE = PVariableMessages.getString("PExpressionViewer.no");
+	protected static final String YES_VALUE = Messages.PVariableCheckboxTableViewer_0;
+	protected static final String NO_VALUE = Messages.PVariableCheckboxTableViewer_1;
 
 	// Column properties
-	private static final String CP_NAME = "name";
-	private static final String CP_JOB = "job";
+	private static final String CP_NAME = "name"; //$NON-NLS-1$
+	private static final String CP_JOB = "job"; //$NON-NLS-1$
 
 	// Column labels
-	private static final String CL_NAME = PVariableMessages.getString("PExpressionViewer.name");
-	private static final String CL_JOB = PVariableMessages.getString("PExpressionViewer.job");
+	private static final String CL_NAME = Messages.PVariableCheckboxTableViewer_2;
+	private static final String CL_JOB = Messages.PVariableCheckboxTableViewer_3;
 
 	/**
 	 * Constructor for PExpressionViewer
@@ -77,7 +78,7 @@ public class PVariableCheckboxTableViewer extends TableViewer implements IChecka
 		columns[1].setResizable(true);
 		columns[2].setResizable(true);
 
-		columns[0].setText("");
+		columns[0].setText(""); //$NON-NLS-1$
 		columns[1].setText(CL_NAME);
 		columns[2].setText(CL_JOB);
 
@@ -105,7 +106,7 @@ public class PVariableCheckboxTableViewer extends TableViewer implements IChecka
 		columns[1].setWidth(pc.convertWidthInCharsToPixels(20));
 		columns[2].setWidth(pc.convertWidthInCharsToPixels(20));
 
-		setColumnProperties(new String[]{ "", CP_NAME, CP_JOB });
+		setColumnProperties(new String[]{ "", CP_NAME, CP_JOB }); //$NON-NLS-1$
 	}
 	
     public void addCheckStateListener(ICheckStateListener listener) {

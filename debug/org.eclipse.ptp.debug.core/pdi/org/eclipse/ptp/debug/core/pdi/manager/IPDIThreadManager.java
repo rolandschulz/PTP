@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 
@@ -29,5 +29,5 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
  *
  */
 public interface IPDIThreadManager extends IPDIManager {
-	public IPDIThread[] getThreads(BitList qTasks) throws PDIException;
+	public IPDIThread[] getThreads(TaskSet qTasks) throws PDIException;
 }

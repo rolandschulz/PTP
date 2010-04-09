@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
@@ -32,7 +33,7 @@ public class AIFValueUnknown extends AIFValue {
 	
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = "NOT SUPPORTED";
+			result = Messages.AIFValueUnknown_0;
 		}
 		return result;
 	}

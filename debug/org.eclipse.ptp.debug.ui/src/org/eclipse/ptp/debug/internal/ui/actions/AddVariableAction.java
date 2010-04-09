@@ -29,6 +29,7 @@ import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.dialogs.ArrayVariableDialog;
 import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -37,7 +38,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class AddVariableAction extends Action {
 	protected PTabFolder folder = null;
-	public static final String name = "Add Variable"; 
+	public static final String name = Messages.AddVariableAction_0; 
 
 	/** 
 	 * Constructor
@@ -66,7 +67,7 @@ public class AddVariableAction extends Action {
 				try {
 					openDialog(folder.getStackFrame());
 				} catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());
+					PTPDebugUIPlugin.errorDialog(getShell(), Messages.AddVariableAction_1, e.getStatus());
 				}
 			}
 		} );

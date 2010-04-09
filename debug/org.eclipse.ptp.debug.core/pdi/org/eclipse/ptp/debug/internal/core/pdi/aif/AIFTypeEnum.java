@@ -63,7 +63,7 @@ public class AIFTypeEnum extends TypeIntegral implements IAIFTypeEnum {
 		name = fmt.substring(0, pos);
 		int last_pos = fmt.lastIndexOf(AIFFactory.FDS_ENUM_END);
 		if (last_pos == -1)
-			return "";
+			return ""; //$NON-NLS-1$
 		
 		return fmt.substring(pos+1, last_pos);
 	}
@@ -88,13 +88,13 @@ public class AIFTypeEnum extends TypeIntegral implements IAIFTypeEnum {
 	}
 	
 	public String toString() {
-		String content = "<" + getName() + AIFFactory.SIGN_STROKE;
+		String content = "<" + getName() + AIFFactory.SIGN_STROKE; //$NON-NLS-1$
 		for (int i=0; i<fields.size(); i++) {
-			content += (String)fields.get(i) + "=" + (String)values.get(i);
+			content += (String)fields.get(i) + "=" + (String)values.get(i); //$NON-NLS-1$
 			if (i < fields.size()-1) {
-				content += ",";
+				content += ","; //$NON-NLS-1$
 			}
 		}
-		return content + ">" + super.toString();		
+		return content + ">" + super.toString();		 //$NON-NLS-1$
 	}
 }

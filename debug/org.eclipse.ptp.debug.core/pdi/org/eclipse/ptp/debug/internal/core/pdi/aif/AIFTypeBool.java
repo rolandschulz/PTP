@@ -33,6 +33,6 @@ public class AIFTypeBool extends TypeIntegral implements IAIFTypeBool {
 		return AIFFactory.SIZE_BOOL;
 	}
 	public String toString() {
-		return "b" + sizeof();
+		return "b" + sizeof(); //$NON-NLS-1$
 	}
 }

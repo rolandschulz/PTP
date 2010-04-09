@@ -12,7 +12,7 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDILocation;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
@@ -47,10 +47,10 @@ import org.eclipse.ptp.debug.internal.core.pdi.model.Watchpoint;
 public abstract class AbstractModelFactory implements IPDIModelFactory {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newAddressBreakpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int, org.eclipse.ptp.debug.core.pdi.IPDILocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newAddressBreakpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.IPDILocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
 	 */
 	public IPDIAddressBreakpoint newAddressBreakpoint(IPDISession session,
-			BitList tasks, int type, IPDILocation location,
+			TaskSet tasks, int type, IPDILocation location,
 			IPDICondition condition, boolean enabled) {
 		return new AddressBreakpoint(session, tasks, type, location, condition, enabled);
 	}
@@ -64,10 +64,10 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newArgumentDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newArgumentDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
 	 */
 	public IPDIArgumentDescriptor newArgumentDescriptor(IPDISession session,
-			BitList tasks, IPDIThread thread, IPDIStackFrame frame,
+			TaskSet tasks, IPDIThread thread, IPDIStackFrame frame,
 			String name, String fullName, int pos, int depth) {
 		return new ArgumentDescriptor(session, tasks, thread, frame, name, fullName, pos, depth);
 	}
@@ -80,28 +80,28 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newExceptionpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String, boolean, boolean, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint[])
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newExceptionpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String, boolean, boolean, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint[])
 	 */
 	public IPDIExceptionpoint newExceptionpoint(IPDISession session,
-			BitList tasks, String clazz, boolean stopOnThrow,
+			TaskSet tasks, String clazz, boolean stopOnThrow,
 			boolean stopOnCatch, IPDICondition condition, boolean enabled,
 			IPDIFunctionBreakpoint[] funcBpts) {
 		return new Exceptionpoint(session, tasks, clazz, stopOnThrow, stopOnCatch, condition, enabled, funcBpts);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newExpression(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newExpression(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public IPDITargetExpression newExpression(IPDISession session,
-			BitList tasks, String ex) {
+			TaskSet tasks, String ex) {
 		return new Expression(session, tasks, ex);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newFunctionBreakpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int, org.eclipse.ptp.debug.core.pdi.IPDILocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newFunctionBreakpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.IPDILocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
 	 */
 	public IPDIFunctionBreakpoint newFunctionBreakpoint(IPDISession session,
-			BitList tasks, int type, IPDILocation location,
+			TaskSet tasks, int type, IPDILocation location,
 			IPDICondition condition, boolean enabled) {
 		return new FunctionBreakpoint(session, tasks, type, location, condition, enabled);
 	}
@@ -115,29 +115,29 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newGlobalVariableDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newGlobalVariableDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
 	 */
 	public IPDIGlobalVariableDescriptor newGlobalVariableDescriptor(
-			IPDISession session, BitList tasks, IPDIThread thread,
+			IPDISession session, TaskSet tasks, IPDIThread thread,
 			IPDIStackFrame frame, String name, String fullName, int pos,
 			int depth) {
 		return new GlobalVariableDescriptor(session, tasks, thread, frame, name, fullName, pos, depth);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newLineBreakpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int, org.eclipse.ptp.debug.core.pdi.IPDILocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newLineBreakpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.IPDILocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
 	 */
 	public IPDILineBreakpoint newLineBreakpoint(IPDISession session,
-			BitList tasks, int type, IPDILocation location,
+			TaskSet tasks, int type, IPDILocation location,
 			IPDICondition condition, boolean enabled) {
 		return new LineBreakpoint(session, tasks, type, location, condition, enabled);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newLocalVariable(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newLocalVariable(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int, java.lang.String)
 	 */
 	public IPDILocalVariable newLocalVariable(IPDISession session,
-			BitList tasks, IPDIThread thread, IPDIStackFrame frame,
+			TaskSet tasks, IPDIThread thread, IPDIStackFrame frame,
 			String name, String fullName, int pos, int depth, String varid) {
 		return new LocalVariable(session, tasks, thread, frame, name, fullName, pos, depth, varid);
 	}
@@ -151,10 +151,10 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newLocalVariableDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newLocalVariableDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
 	 */
 	public IPDILocalVariableDescriptor newLocalVariableDescriptor(
-			IPDISession session, BitList tasks, IPDIThread thread,
+			IPDISession session, TaskSet tasks, IPDIThread thread,
 			IPDIStackFrame frame, String name, String fullName, int pos,
 			int depth) {
 		return new LocalVariableDescriptor(session, tasks, thread, frame, name, fullName, pos, depth);
@@ -168,34 +168,34 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newMemoryBlock(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String, int, boolean, org.eclipse.ptp.debug.core.pdi.model.IPDIDataReadMemoryInfo)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newMemoryBlock(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String, int, boolean, org.eclipse.ptp.debug.core.pdi.model.IPDIDataReadMemoryInfo)
 	 */
-	public IPDIMemoryBlock newMemoryBlock(IPDISession session, BitList tasks,
+	public IPDIMemoryBlock newMemoryBlock(IPDISession session, TaskSet tasks,
 			String exp, int wordSize, boolean b, IPDIDataReadMemoryInfo info) {
 		return new MemoryBlock(session, tasks, exp, wordSize, b, info);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newMultiExpressions(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newMultiExpressions(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String, boolean)
 	 */
 	public IPDIMultiExpressions newMultiExpressions(IPDISession session,
-			BitList tasks, String ex, boolean enabled) {
+			TaskSet tasks, String ex, boolean enabled) {
 		return new MultiExpressions(session, tasks, ex, enabled);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newRegisterDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newRegisterDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
 	 */
 	public IPDIVariableDescriptor newRegisterDescriptor(IPDISession session,
-			BitList tasks, IPDIThread thread, IPDIStackFrame frame,
+			TaskSet tasks, IPDIThread thread, IPDIStackFrame frame,
 			String name, String fullName, int pos, int depth) {
 		return new RegisterDescriptor(session, tasks, thread, frame, name, fullName, pos, depth);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newSignal(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newSignal(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor)
 	 */
-	public IPDISignal newSignal(IPDISession session, BitList tasks,
+	public IPDISignal newSignal(IPDISession session, TaskSet tasks,
 			IPDISignalDescriptor signalDescriptor) {
 		return new Signal(session, tasks, signalDescriptor);
 	}
@@ -233,9 +233,9 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newTarget(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newTarget(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDITarget newTarget(IPDISession session, BitList tasks) {
+	public IPDITarget newTarget(IPDISession session, TaskSet tasks) {
 		return new Target(session, tasks);
 	}
 
@@ -248,19 +248,19 @@ public abstract class AbstractModelFactory implements IPDIModelFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newThreadStorageDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newThreadStorageDescriptor(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIThread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int)
 	 */
 	public IPDIVariableDescriptor newThreadStorageDescriptor(
-			IPDISession session, BitList tasks, IPDIThread thread,
+			IPDISession session, TaskSet tasks, IPDIThread thread,
 			IPDIStackFrame frame, String name, String fullName, int pos,
 			int depth) {
 		return new ThreadStorageDescriptor(session, tasks, thread, frame, name, fullName, pos, depth);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newWatchpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int, java.lang.String, int, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory#newWatchpoint(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, java.lang.String, int, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
 	 */
-	public IPDIWatchpoint newWatchpoint(IPDISession session, BitList tasks,
+	public IPDIWatchpoint newWatchpoint(IPDISession session, TaskSet tasks,
 			int type, String expression, int type2, IPDICondition condition,
 			boolean enabled) {
 		return new Watchpoint(session, tasks, type, expression, type2, condition, enabled);

@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIHaltRequest;
 
@@ -32,11 +33,11 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIHaltRequest;
 public class SuspendRequest extends AbstractEventRequest implements IPDIHaltRequest {
 	private boolean sendEvent;
 
-	public SuspendRequest(BitList tasks) {
+	public SuspendRequest(TaskSet tasks) {
 		this(tasks, true);
 	}
 	
-	public SuspendRequest(BitList tasks, boolean sendEvent) {
+	public SuspendRequest(TaskSet tasks, boolean sendEvent) {
 		super(tasks);
 		this.sendEvent = sendEvent;
 	}
@@ -57,7 +58,7 @@ public class SuspendRequest extends AbstractEventRequest implements IPDIHaltRequ
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Suspend request";
+		return Messages.SuspendRequest_0;
 	}
 	
 	/* (non-Javadoc)

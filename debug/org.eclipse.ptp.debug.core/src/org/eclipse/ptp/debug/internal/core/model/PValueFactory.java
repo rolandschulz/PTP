@@ -35,63 +35,149 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  * 
  */
 public class PValueFactory {
-	static public final IPValue NULL_VALUE = new IPValue() {
-		public IAIF getAIF() {
-			return null;
+	public static final IPValue NULL_VALUE = new IPValue() {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.core.model.IPValue#evaluateAsExpression(org.eclipse.ptp.debug.core.model.IPStackFrame)
+		 */
+		public String evaluateAsExpression(IPStackFrame frame) {
+			return ""; //$NON-NLS-1$
 		}
-		public IPSession getSession() {
-			return null;
-		}
-		public String getReferenceTypeName() throws DebugException {
-			return "";
-		}
-		public String getValueString() throws DebugException {
-			return "";
-		}
-		public boolean isAllocated() throws DebugException {
-			return true;
-		}
-		public IVariable[] getVariables() throws DebugException {
-			return new IVariable[0];
-		}
-		public boolean hasVariables() throws DebugException {
-			return false;
-		}
-		public String getModelIdentifier() {
-			return PTPDebugCorePlugin.getUniqueIdentifier();
-		}
-		public IDebugTarget getDebugTarget() {
-			return null;
-		}
-		public ILaunch getLaunch() {
-			return null;
-		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
+		@SuppressWarnings("rawtypes")
 		public Object getAdapter(Class adapter) {
 			return null;
 		}
-		public String evaluateAsExpression(IPStackFrame frame) {
-			return "";
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.core.model.IPValue#getAIF()
+		 */
+		public IAIF getAIF() {
+			return null;
 		}
-		public PDebugElementState getState() {
-			return PDebugElementState.UNDEFINED;
-		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getCurrentStateInfo()
+		 */
 		public Object getCurrentStateInfo() {
 			return null;
 		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
+		 */
+		public IDebugTarget getDebugTarget() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getID()
+		 */
 		public int getID() {
 			return -1;
 		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
+		 */
+		public ILaunch getLaunch() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
+		 */
+		public String getModelIdentifier() {
+			return PTPDebugCorePlugin.getUniqueIdentifier();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IValue#getReferenceTypeName()
+		 */
+		public String getReferenceTypeName() throws DebugException {
+			return ""; //$NON-NLS-1$
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getSession()
+		 */
+		public IPSession getSession() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getState()
+		 */
+		public PDebugElementState getState() {
+			return PDebugElementState.UNDEFINED;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IValue#getValueString()
+		 */
+		public String getValueString() throws DebugException {
+			return ""; //$NON-NLS-1$
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IValue#getVariables()
+		 */
+		public IVariable[] getVariables() throws DebugException {
+			return new IVariable[0];
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IValue#hasVariables()
+		 */
+		public boolean hasVariables() throws DebugException {
+			return false;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.model.IValue#isAllocated()
+		 */
+		public boolean isAllocated() throws DebugException {
+			return true;
+		}
 	};
-	static public PValue createValue(PVariable parent, IPDIVariable variable) {
-		return new PValue(parent, variable);
+
+	/**
+	 * @param parent
+	 * @param variable
+	 * @return
+	 */
+	static public PValue createGlobalValue(PVariable parent, IPDIVariable variable) {
+		return new PGlobalValue(parent, variable);
 	}
+
+	/**
+	 * @param parent
+	 * @param variable
+	 * @param start
+	 * @param length
+	 * @return
+	 */
 	static public PIndexedValue createIndexedValue(AbstractPVariable parent, IPDIVariable variable, int start, int length) {
 		return new PIndexedValue(parent, variable, start, length);
 	}
+
+	/**
+	 * @param parent
+	 * @param variable
+	 * @return
+	 */
+	static public PValue createValue(PVariable parent, IPDIVariable variable) {
+		return new PValue(parent, variable);
+	}
+
+	/**
+	 * @param parent
+	 * @param message
+	 * @return
+	 */
 	static public PValue createValueWithError(PVariable parent, String message) {
 		return new PValue(parent, message);
-	}
-	static public PValue createGlobalValue(PVariable parent, IPDIVariable variable) {
-		return new PGlobalValue(parent, variable);
 	}
 }

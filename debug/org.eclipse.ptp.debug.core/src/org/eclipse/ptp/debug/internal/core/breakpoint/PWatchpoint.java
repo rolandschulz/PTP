@@ -18,55 +18,91 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.breakpoint;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPWatchpoint;
 
 /**
  * @author clement
- *
+ * 
  */
 public class PWatchpoint extends PBreakpoint implements IPWatchpoint {
-	private static final String P_WATCHPOINT = "org.eclipse.ptp.debug.core.pWatchpointMarker";
+	private static final String P_WATCHPOINT = "org.eclipse.ptp.debug.core.pWatchpointMarker"; //$NON-NLS-1$
 
-	public PWatchpoint() {
-	}
-	public PWatchpoint(IResource resource, Map<?,?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
-	}
-	public boolean isWriteType() throws CoreException {
-		return ensureMarker().getAttribute(WRITE, true);
-	}
-	public boolean isReadType() throws CoreException {
-		return ensureMarker().getAttribute(READ, false);
-	}
-	public String getExpression() throws CoreException {
-		return ensureMarker().getAttribute(EXPRESSION, "");
-	}
+	/**
+	 * @return
+	 */
 	public static String getMarkerType() {
 		return P_WATCHPOINT;
 	}
-	protected String getMarkerMessage() throws CoreException {
-		String format = BreakpointMessages.getString("PWatchpoint.3");
-		if (isWriteType() && !isReadType())
-			format = BreakpointMessages.getString("PWatchpoint.0");
-		else if (!isWriteType() && isReadType())
-			format = BreakpointMessages.getString("PWatchpoint.1");
-		else if (isWriteType() && isReadType())
-			format = BreakpointMessages.getString("PWatchpoint.2");
-		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new Object[] { format });
+
+	public PWatchpoint() {
 	}
-	public int getLineNumber() throws CoreException {
-		return ensureMarker().getAttribute(IMarker.LINE_NUMBER, -1);
+
+	public PWatchpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getCharEnd()
+	 */
+	public int getCharEnd() throws CoreException {
+		return ensureMarker().getAttribute(IMarker.CHAR_END, -1);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getCharStart()
+	 */
 	public int getCharStart() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.CHAR_START, -1);
 	}
-	public int getCharEnd() throws CoreException {
-		return ensureMarker().getAttribute(IMarker.CHAR_END, -1);
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPWatchpoint#getExpression()
+	 */
+	public String getExpression() throws CoreException {
+		return ensureMarker().getAttribute(EXPRESSION, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getLineNumber()
+	 */
+	public int getLineNumber() throws CoreException {
+		return ensureMarker().getAttribute(IMarker.LINE_NUMBER, -1);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPWatchpoint#isReadType()
+	 */
+	public boolean isReadType() throws CoreException {
+		return ensureMarker().getAttribute(READ, false);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPWatchpoint#isWriteType()
+	 */
+	public boolean isWriteType() throws CoreException {
+		return ensureMarker().getAttribute(WRITE, true);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	 */
+	@Override
+	protected String getMarkerMessage() throws CoreException {
+		String format = Messages.PWatchpoint_0;
+		if (isWriteType() && !isReadType()) {
+			format = Messages.PWatchpoint_1;
+		} else if (!isWriteType() && isReadType()) {
+			format = Messages.PWatchpoint_2;
+		} else if (isWriteType() && isReadType()) {
+			format = Messages.PWatchpoint_3;
+		}
+		return getJobSetFormat() + " " + NLS.bind(Messages.PWatchpoint_4, new Object[] { format }); //$NON-NLS-1$
 	}
 }

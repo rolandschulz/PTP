@@ -17,15 +17,28 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
+
 /**
  * @author Clement chu
  * 
  */
 public interface IPDebugElementStatus {
+	public static final int ERROR = 2;
 	public static final int OK = 0;
 	public static final int WARNING = 1;
-	public static final int ERROR = 2;
-	boolean isOK();
-	int getSeverity();
-	String getMessage();
+
+	/**
+	 * @return
+	 */
+	public String getMessage();
+
+	/**
+	 * @return
+	 */
+	public int getSeverity();
+
+	/**
+	 * @return
+	 */
+	public boolean isOK();
 }

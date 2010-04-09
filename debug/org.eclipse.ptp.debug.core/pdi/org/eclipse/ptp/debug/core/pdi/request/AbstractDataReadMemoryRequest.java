@@ -18,10 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
@@ -36,7 +37,7 @@ public abstract class AbstractDataReadMemoryRequest extends AbstractEventResultR
 	private int cols;
 	private Character asChar;
 	
-	public AbstractDataReadMemoryRequest(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
+	public AbstractDataReadMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
 		super(tasks);
 		this.offset = offset;
 		this.address = address;
@@ -55,21 +56,21 @@ public abstract class AbstractDataReadMemoryRequest extends AbstractEventResultR
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIDataReadMemoryRequest#getDataReadMemoryInfo(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIDataReadMemoryRequest#getDataReadMemoryInfo(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIDataReadMemoryInfo getDataReadMemoryInfo(BitList qTasks) throws PDIException {
+	public IPDIDataReadMemoryInfo getDataReadMemoryInfo(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof IPDIDataReadMemoryInfo) {
 			return (IPDIDataReadMemoryInfo)obj;
 		}
-		throw new PDIException(qTasks, "No data read memory info");
+		throw new PDIException(qTasks, Messages.AbstractDataReadMemoryRequest_0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Create data read memory request";
+		return Messages.AbstractDataReadMemoryRequest_1;
 	}
 }

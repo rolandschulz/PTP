@@ -31,6 +31,6 @@ public class AIFTypeVoid extends AIFType implements IAIFTypeVoid {
 		return size;
 	}
 	public String toString() {
-		return "v" + sizeof();
+		return "v" + sizeof(); //$NON-NLS-1$
 	}
 }

@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.views.signals;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.debug.internal.ui.PixelConverter;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -32,20 +33,20 @@ import org.eclipse.swt.widgets.TableColumn;
 public class SignalsViewer extends TableViewer {
 
 	// String constants
-	protected static final String YES_VALUE = SignalsMessages.getString("SignalsViewer.8");
-	protected static final String NO_VALUE = SignalsMessages.getString("SignalsViewer.9");
+	protected static final String YES_VALUE = Messages.SignalsViewer_0;
+	protected static final String NO_VALUE = Messages.SignalsViewer_1;
 
 	// Column properties
-	private static final String CP_NAME = "name";
-	private static final String CP_PASS = "pass";
-	private static final String CP_SUSPEND = "suspend";
-	private static final String CP_DESCRIPTION = "description";
+	private static final String CP_NAME = "name"; //$NON-NLS-1$
+	private static final String CP_PASS = "pass"; //$NON-NLS-1$
+	private static final String CP_SUSPEND = "suspend"; //$NON-NLS-1$
+	private static final String CP_DESCRIPTION = "description"; //$NON-NLS-1$
 
 	// Column labels
-	private static final String CL_NAME = SignalsMessages.getString("SignalsViewer.4");
-	private static final String CL_PASS = SignalsMessages.getString("SignalsViewer.5");
-	private static final String CL_SUSPEND = SignalsMessages.getString("SignalsViewer.6");
-	private static final String CL_DESCRIPTION = SignalsMessages.getString("SignalsViewer.7");
+	private static final String CL_NAME = Messages.SignalsViewer_2;
+	private static final String CL_PASS = Messages.SignalsViewer_3;
+	private static final String CL_SUSPEND = Messages.SignalsViewer_4;
+	private static final String CL_DESCRIPTION = Messages.SignalsViewer_5;
 
 	/**
 	 * Constructor for SignalsViewer

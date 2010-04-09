@@ -49,6 +49,6 @@ public class AIFTypeFloat extends AIFType implements IAIFTypeFloat {
 		return size;
 	}
 	public String toString() {
-		return "f" + sizeof();
+		return "f" + sizeof(); //$NON-NLS-1$
 	}
 }

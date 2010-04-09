@@ -18,32 +18,46 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.breakpoint;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.messages.Messages;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class PLineBreakpoint extends AbstractLineBreakpoint {
-	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.core.pLineBreakpointMarker";
-	
-	public PLineBreakpoint() {
-	}	
-	public PLineBreakpoint(IResource resource, Map<?,?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
-	}
+	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.core.pLineBreakpointMarker"; //$NON-NLS-1$
+
+	/**
+	 * @return
+	 */
 	public static String getMarkerType() {
 		return P_LINE_BREAKPOINT;
 	}
+
+	public PLineBreakpoint() {
+	}
+
+	public PLineBreakpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	 */
+	@Override
 	protected String getMarkerMessage() throws CoreException {
 		String fileName = ensureMarker().getResource().getName();
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PLineBreakpoint"), new Object[] { fileName, new Integer(getLineNumber()), getConditionText() });
+		return getJobSetFormat()
+				+ " " //$NON-NLS-1$
+				+ NLS.bind(Messages.PLineBreakpoint_0, new Object[] { fileName, new Integer(getLineNumber()),
+						getConditionText() });
 	}
 }

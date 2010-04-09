@@ -42,6 +42,7 @@ public abstract class AbstractPVariable extends PDebugElement implements IPVaria
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IEnableDisableTarget.class))
 			return this;

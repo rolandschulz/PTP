@@ -19,9 +19,10 @@
 package org.eclipse.ptp.debug.core.pdi.request;
 
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 
@@ -35,15 +36,15 @@ public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractE
 	private boolean listChildren = false;
 	private boolean express = false;
 	
-	public AbstractEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId) {
+	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId) {
 		this(tasks, expr, exprId, false, (exprId != null));
 	}
 	
-	public AbstractEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId, boolean listChildren) {
+	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren) {
 		this(tasks, expr, exprId, listChildren, false);
 	}
 	
-	public AbstractEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId, boolean listChildren, boolean express) {
+	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren, boolean express) {
 		super(tasks);
 		this.expr = expr;
 		this.exprId = exprId;
@@ -62,39 +63,40 @@ public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractE
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Partial expression evaluation";
+		return Messages.AbstractEvaluatePartialExpressionRequest_0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getPartialAIF(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getPartialAIF(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IAIF getPartialAIF(BitList qTasks) throws PDIException {
+	public IAIF getPartialAIF(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
 			Object[] returnValues = (Object[])obj;
 			return (IAIF)returnValues[1];
 		}
-		throw new PDIException(qTasks, NLS.bind("No result found for expression \"{0}\"", expr));
+		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_1, expr));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getId(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getId(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public String getId(BitList qTasks) throws PDIException {
+	public String getId(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
 			Object[] returnValues = (Object[])obj;
 			return (String)returnValues[0];
 		}
-		throw new PDIException(qTasks, NLS.bind("Expression ID {0} not found", exprId));
+		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_2, exprId));
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#toString()
 	 */
 	public String toString() {
-		return getName() + " for tasks " + BitList.showBitList(getTasks()) + ", exp: " + expr + ", id: " + exprId + ", is list children: " + listChildren + ", is express: " + express; 
+		return NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_3, 
+				new Object[] {getName(), getTasks(), expr, exprId, listChildren, express}); 
 	}
 }

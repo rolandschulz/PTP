@@ -24,31 +24,48 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterGroup;
 
 /**
  * @author clement
- *
+ * 
  */
 public class PRegisterDescriptor implements IPRegisterDescriptor {
-	private String fName;
-	private String fGroupName;
+	private final String fGroupName;
+	private final String fName;
 	private IPDIRegisterDescriptor fPDIDescriptor = null;
 
-	public PRegisterDescriptor(String name, String groupName) {
-		fName = name;
-		fGroupName = groupName;
-	}
 	public PRegisterDescriptor(IPDIRegisterGroup group, IPDIRegisterDescriptor desc) {
 		fName = desc.getName();
 		fGroupName = group.getName();
 		fPDIDescriptor = desc;
 	}
-	public String getName() {
-		return fName;
+
+	public PRegisterDescriptor(String name, String groupName) {
+		fName = name;
+		fGroupName = groupName;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPRegisterDescriptor#getGroupName()
+	 */
 	public String getGroupName() {
 		return fGroupName;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPRegisterDescriptor#getName()
+	 */
+	public String getName() {
+		return fName;
+	}
+
+	/**
+	 * @return
+	 */
 	public IPDIRegisterDescriptor getPDIDescriptor() {
 		return fPDIDescriptor;
 	}
+
+	/**
+	 * @param descriptor
+	 */
 	public void setPDIDescriptor(IPDIRegisterDescriptor descriptor) {
 		fPDIDescriptor = descriptor;
 	}

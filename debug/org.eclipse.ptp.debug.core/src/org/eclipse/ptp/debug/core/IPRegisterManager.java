@@ -12,7 +12,6 @@ package org.eclipse.ptp.debug.core;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPPersistableRegisterGroup;
 import org.eclipse.ptp.debug.core.model.IPRegisterDescriptor;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
@@ -30,20 +29,20 @@ public interface IPRegisterManager {
 	 * @param name
 	 * @param descriptors
 	 */
-	public void addRegisterGroup(final BitList qTasks, final String name, final IPRegisterDescriptor[] descriptors);
+	public void addRegisterGroup(final TaskSet qTasks, final String name, final IPRegisterDescriptor[] descriptors);
 
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws DebugException
 	 */
-	public IPRegisterDescriptor[] getAllRegisterDescriptors(BitList qTasks) throws DebugException;
+	public IPRegisterDescriptor[] getAllRegisterDescriptors(TaskSet qTasks) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @return
 	 */
-	public IPStackFrame getCurrentFrame(BitList qTasks);
+	public IPStackFrame getCurrentFrame(TaskSet qTasks);
 
 	/**
 	 * @param qTasks
@@ -51,36 +50,36 @@ public interface IPRegisterManager {
 	 * @return
 	 * @throws DebugException
 	 */
-	public IRegisterGroup[] getRegisterGroups(BitList qTasks, PStackFrame frame) throws DebugException;
+	public IRegisterGroup[] getRegisterGroups(TaskSet qTasks, PStackFrame frame) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @param debugTarget
 	 */
-	public void initialize(BitList qTasks, PDebugTarget debugTarget);
+	public void initialize(TaskSet qTasks, PDebugTarget debugTarget);
 
 	/**
 	 * @param qTasks
 	 * @param group
 	 * @param descriptors
 	 */
-	public void modifyRegisterGroup(final BitList qTasks, final IPPersistableRegisterGroup group,
+	public void modifyRegisterGroup(final TaskSet qTasks, final IPPersistableRegisterGroup group,
 			final IPRegisterDescriptor[] descriptors);
 
 	/**
 	 * @param qTasks
 	 * @param groups
 	 */
-	public void removeRegisterGroups(final BitList qTasks, final IRegisterGroup[] groups);
+	public void removeRegisterGroups(final TaskSet qTasks, final IRegisterGroup[] groups);
 
 	/**
 	 * @param qTasks
 	 */
-	public void restoreDefaults(final BitList qTasks);
+	public void restoreDefaults(final TaskSet qTasks);
 
 	/**
 	 * @param qTasks
 	 */
-	public void targetSuspended(BitList qTasks);
+	public void targetSuspended(TaskSet qTasks);
 
 }

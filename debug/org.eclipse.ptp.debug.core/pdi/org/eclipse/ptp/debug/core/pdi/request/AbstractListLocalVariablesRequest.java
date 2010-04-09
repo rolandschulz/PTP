@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 
 /**
@@ -28,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  *
  */
 public abstract class AbstractListLocalVariablesRequest extends AbstractEventResultRequest implements IPDIListLocalVariablesRequest {
-	public AbstractListLocalVariablesRequest(BitList tasks) {
+	public AbstractListLocalVariablesRequest(TaskSet tasks) {
 		super(tasks);
 	}
 	
@@ -40,21 +41,21 @@ public abstract class AbstractListLocalVariablesRequest extends AbstractEventRes
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListLocalVariablesRequest#getLocalVariables(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListLocalVariablesRequest#getLocalVariables(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public String[] getLocalVariables(BitList qTasks) throws PDIException {
+	public String[] getLocalVariables(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof String[]) {
 			return (String[])obj;
 		}
-		throw new PDIException(qTasks, "No local variables found");
+		throw new PDIException(qTasks, Messages.AbstractListLocalVariablesRequest_0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "List local variables request";
+		return Messages.AbstractListLocalVariablesRequest_1;
 	}
 }

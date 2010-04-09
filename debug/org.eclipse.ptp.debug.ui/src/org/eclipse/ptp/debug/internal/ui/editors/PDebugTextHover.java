@@ -128,12 +128,12 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 	 */
 	private static void appendVariable(StringBuffer buffer, int taskID, String expression, String value) throws DebugException {
 		if (value.length() > MAX_HOVER_INFO_SIZE)
-			value = value.substring(0, MAX_HOVER_INFO_SIZE) + " ...";
-		buffer.append("<p>");
-		buffer.append("<pre>").append(taskID + ": ").append(expression).append("</pre>");
-		buffer.append(" = ");
-		buffer.append("<b><pre>").append(value).append("</pre></b>");
-		buffer.append("</p>");
+			value = value.substring(0, MAX_HOVER_INFO_SIZE) + " ..."; //$NON-NLS-1$
+		buffer.append("<p>"); //$NON-NLS-1$
+		buffer.append("<pre>").append(taskID + ": ").append(expression).append("</pre>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		buffer.append(" = "); //$NON-NLS-1$
+		buffer.append("<b><pre>").append(value).append("</pre></b>"); //$NON-NLS-1$ //$NON-NLS-2$
+		buffer.append("</p>"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -224,13 +224,13 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 			char ch = string.charAt(i);
 			switch(ch) {
 				case '&':
-					buffer.append("&amp;");
+					buffer.append("&amp;"); //$NON-NLS-1$
 					break;
 				case '<':
-					buffer.append("&lt;");
+					buffer.append("&lt;"); //$NON-NLS-1$
 					break;
 				case '>':
-					buffer.append("&gt;");
+					buffer.append("&gt;"); //$NON-NLS-1$
 					break;
 				default:
 					buffer.append(ch);

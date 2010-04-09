@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.core.pdi.manager;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock;
@@ -41,7 +41,7 @@ public interface IPDIMemoryManager extends IPDIManager {
 	 * @return a memory block with the specified identifier
 	 * @throws PDIException on failure
 	 */
-	public IPDIMemoryBlock createMemoryBlock(BitList qTasks, String address, int units, int wordSize) throws PDIException;
+	public IPDIMemoryBlock createMemoryBlock(TaskSet qTasks, String address, int units, int wordSize) throws PDIException;
 	
 	/**
 	 * Returns an array of all memory blocks set for this debug session.
@@ -49,14 +49,14 @@ public interface IPDIMemoryManager extends IPDIManager {
 	 * @return an array of all memory blocks set for this debug session
 	 * @throws PDIException on failure
 	 */
-	public IPDIMemoryBlock[] getMemoryBlocks(BitList qTasks) throws PDIException;
+	public IPDIMemoryBlock[] getMemoryBlocks(TaskSet qTasks) throws PDIException;
 
 	/**
 	 * Requests to remove all memory blocks from the debug session.
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	public void removeAllBlocks(BitList tasks) throws PDIException;
+	public void removeAllBlocks(TaskSet tasks) throws PDIException;
 
 	/**
 	 * Requests to remove the given array of memory blocks from the debug session.
@@ -64,7 +64,7 @@ public interface IPDIMemoryManager extends IPDIManager {
 	 * @param memoryBlock - the array of memory blocks to be removed
 	 * @throws PDIException on failure
 	 */
-	public void removeBlocks(BitList tasks, IPDIMemoryBlock[] memoryBlocks) throws PDIException;
+	public void removeBlocks(TaskSet tasks, IPDIMemoryBlock[] memoryBlocks) throws PDIException;
 
 	/**
 	 * @param block

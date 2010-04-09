@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.core.pdi.event;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIMemoryBlockInfo;
@@ -34,7 +34,7 @@ public class MemoryBlockInfo extends SessionObject implements IPDIMemoryBlockInf
 	private BigInteger[] addresses;
 	private IPDIMemoryBlock block;
 	
-	public MemoryBlockInfo(IPDISession session, BitList tasks, BigInteger[] addresses, IPDIMemoryBlock block) {
+	public MemoryBlockInfo(IPDISession session, TaskSet tasks, BigInteger[] addresses, IPDIMemoryBlock block) {
 		super(session, tasks);
 		this.addresses = addresses;
 		this.block = block;

@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteVariableRequest;
 
@@ -31,7 +32,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteVariableRequest;
 public class DeletePartialExpressionRequest extends AbstractEventResultRequest implements IPDIDeleteVariableRequest {
 	private String varid;
 	
-	public DeletePartialExpressionRequest(BitList tasks, String varid) {
+	public DeletePartialExpressionRequest(TaskSet tasks, String varid) {
 		super(tasks);
 		this.varid = varid;
 	}
@@ -47,12 +48,12 @@ public class DeletePartialExpressionRequest extends AbstractEventResultRequest i
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Delete partial expression request";
+		return Messages.DeletePartialExpressionRequest_0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 	}
 }

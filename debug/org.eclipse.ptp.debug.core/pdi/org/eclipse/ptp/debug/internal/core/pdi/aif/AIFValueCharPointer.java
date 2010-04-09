@@ -45,7 +45,7 @@ public class AIFValueCharPointer extends AIFValueString implements IAIFValueChar
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = "";
+			result = ""; //$NON-NLS-1$
 		}
 		return result;
 	}

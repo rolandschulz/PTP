@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Thrown to indicate some unexpected error has occurred
@@ -31,12 +31,12 @@ public class PDIException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	protected BitList tasks;
+	protected TaskSet tasks;
 	/**
      * Constructs a new exception.
 	 * @param tasks specify tasks throw exception 
 	 */
-	public PDIException(BitList tasks) {
+	public PDIException(TaskSet tasks) {
 		super();
 		this.tasks = tasks;
 	}
@@ -45,12 +45,12 @@ public class PDIException extends Exception {
 	 * @param tasks specify tasks throw exception 
      * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
 	 */
-	public PDIException(BitList tasks, String message) {
+	public PDIException(TaskSet tasks, String message) {
 		super(message);
 		this.tasks = tasks;
 	}
 	
-	public BitList getTasks() {
+	public TaskSet getTasks() {
 		return tasks;
 	}
 }

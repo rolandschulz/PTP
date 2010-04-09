@@ -95,18 +95,18 @@ public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
 		return getAIFTypeArray(range).toString();
 	}
 	public String toString() {
-		return "[r" + low + ".." + high + "U]" + basetype.toString();
+		return "[r" + low + ".." + high + "U]" + basetype.toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	public static void main(String[] args) {
-		String fmt = "[r0..2is4][r0..5is4][r0..5is4][r0..5is4][r0..5is4]is4";
+		String fmt = "[r0..2is4][r0..5is4][r0..5is4][r0..5is4][r0..5is4]is4"; //$NON-NLS-1$
 		IAIFType type = AIFFactory.getAIFType(fmt);
 		if (type instanceof IAIFTypeArray) {
-			System.err.println("dim: " + ((IAIFTypeArray)type).getDimension());
-			System.err.println("base: " + ((IAIFTypeArray)type).getBaseType());
-			System.err.println("foundation: " + ((IAIFTypeArray)type).getFoundationType());
+			System.err.println("dim: " + ((IAIFTypeArray)type).getDimension()); //$NON-NLS-1$
+			System.err.println("base: " + ((IAIFTypeArray)type).getBaseType()); //$NON-NLS-1$
+			System.err.println("foundation: " + ((IAIFTypeArray)type).getFoundationType()); //$NON-NLS-1$
 		}
-		System.err.println("size: " + type.sizeof());
-		System.err.println("1st: " + ((IAIFTypeArray)type).getAIFTypeArray(0));
+		System.err.println("size: " + type.sizeof()); //$NON-NLS-1$
+		System.err.println("1st: " + ((IAIFTypeArray)type).getAIFTypeArray(0)); //$NON-NLS-1$
 	}
 	
 	/*

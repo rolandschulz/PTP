@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents a set of processes in PDI model
@@ -27,8 +27,8 @@ import org.eclipse.ptp.core.util.BitList;
 public interface IPDISet {
 	/**
 	 * Returns a list of Task IDs
-	 * @return BitList of all processes
+	 * @return TaskSet of all processes
 	 */
-	BitList getTasks();
+	TaskSet getTasks();
 }
 

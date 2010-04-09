@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
@@ -29,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 public abstract class AbstractSetCurrentStackFrameRequest extends AbstractEventResultRequest implements IPDISetCurrentStackFrameRequest {
 	private int level = 0;
 	
-	public AbstractSetCurrentStackFrameRequest(BitList tasks, int level) {
+	public AbstractSetCurrentStackFrameRequest(TaskSet tasks, int level) {
 		super(tasks);
 		this.level = level;
 	}
@@ -45,13 +46,13 @@ public abstract class AbstractSetCurrentStackFrameRequest extends AbstractEventR
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Set current stack frame request";
+		return Messages.AbstractSetCurrentStackFrameRequest_0;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#toString()
 	 */
 	public String toString() {
-		return getName() + " set level to " + level; 
+		return getName() + Messages.AbstractSetCurrentStackFrameRequest_1 + level; 
 	}
 }

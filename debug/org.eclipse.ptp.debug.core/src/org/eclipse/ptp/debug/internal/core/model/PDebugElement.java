@@ -28,8 +28,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -39,11 +37,13 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
+import org.eclipse.ptp.debug.core.TaskSet;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -86,7 +86,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	 * @throws DebugException
 	 */
 	public static void targetRequestFailed(String message, PDIException e) throws DebugException {
-		requestFailed(MessageFormat.format("Target request failed: {0}.", new Object[] { message }), e,
+		requestFailed(NLS.bind(Messages.PDebugElement_0, new Object[] { message }), e,
 				DebugException.TARGET_REQUEST_FAILED);
 	}
 
@@ -96,7 +96,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	 * @throws DebugException
 	 */
 	public static void targetRequestFailed(String message, Throwable e) throws DebugException {
-		throwDebugException(MessageFormat.format("Target request failed: {0}.", new Object[] { message }),
+		throwDebugException(NLS.bind(Messages.PDebugElement_0, new Object[] { message }),
 				DebugException.TARGET_REQUEST_FAILED, e);
 	}
 
@@ -117,9 +117,9 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	private PDebugElementState fOldState = PDebugElementState.UNDEFINED;
 	private Object fCurrentStateInfo = null;
 	protected final IPSession fSession;
-	protected final BitList tasks;
+	protected final TaskSet tasks;
 
-	public PDebugElement(IPSession session, BitList tasks) {
+	public PDebugElement(IPSession session, TaskSet tasks) {
 		fSession = session;
 		this.tasks = tasks;
 	}
@@ -276,7 +276,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	public IPDITarget getPDITarget() throws PDIException {
 		IPDebugTarget debugTarget = fSession.findDebugTarget(getTasks());
 		if (debugTarget == null) {
-			throw new PDIException(getTasks(), "No PDITarget found");
+			throw new PDIException(getTasks(), Messages.PDebugElement_2);
 		}
 		return debugTarget.getPDITarget();
 	}
@@ -307,7 +307,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	/**
 	 * @return
 	 */
-	public BitList getTasks() {
+	public TaskSet getTasks() {
 		return tasks;
 	}
 

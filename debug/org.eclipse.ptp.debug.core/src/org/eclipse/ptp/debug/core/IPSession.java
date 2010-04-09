@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -45,14 +44,14 @@ public interface IPSession extends IAdaptable {
 	 * @param refresh
 	 * @param register
 	 */
-	public void createDebugTarget(BitList tasks, boolean refresh, boolean register);
+	public void createDebugTarget(TaskSet tasks, boolean refresh, boolean register);
 	
 	/**
 	 * @param tasks
 	 * @param refresh
 	 * @param register
 	 */
-	public void deleteDebugTarget(BitList tasks, boolean refresh, boolean register);
+	public void deleteDebugTarget(TaskSet tasks, boolean refresh, boolean register);
 
 	/**
 	 * @param register
@@ -68,7 +67,7 @@ public interface IPSession extends IAdaptable {
 	 * @param tasks
 	 * @return
 	 */
-	public IPDebugTarget findDebugTarget(BitList tasks);
+	public IPDebugTarget findDebugTarget(TaskSet tasks);
 
 	/**
 	 * @param change
@@ -94,7 +93,7 @@ public interface IPSession extends IAdaptable {
 	 * @param tasks
 	 * @return
 	 */
-	public IPDebugInfo getDebugInfo(BitList tasks);
+	public IPDebugInfo getDebugInfo(TaskSet tasks);
 	
 	/**
 	 * @return
@@ -139,13 +138,13 @@ public interface IPSession extends IAdaptable {
 	/**
 	 * @return
 	 */
-	public BitList getTasks();
+	public TaskSet getTasks();
 
 	/**
 	 * @param id
 	 * @return
 	 */
-	public BitList getTasks(int id);
+	public TaskSet getTasks(int id);
 	
 	/**
 	 * @return
@@ -157,5 +156,5 @@ public interface IPSession extends IAdaptable {
 	 * @param refresh
 	 * @param register
 	 */
-	public void reloadDebugTargets(BitList tasks, boolean refresh, boolean register);
+	public void reloadDebugTargets(TaskSet tasks, boolean refresh, boolean register);
 }

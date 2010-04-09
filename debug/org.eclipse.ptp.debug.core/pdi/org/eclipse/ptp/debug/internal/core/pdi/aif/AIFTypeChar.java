@@ -33,6 +33,6 @@ public class AIFTypeChar extends TypeIntegral implements IAIFTypeChar {
 		return AIFFactory.SIZE_CHAR;
 	}	
 	public String toString() {
-		return "c" + sizeof();
+		return "c" + sizeof(); //$NON-NLS-1$
 	}
 }

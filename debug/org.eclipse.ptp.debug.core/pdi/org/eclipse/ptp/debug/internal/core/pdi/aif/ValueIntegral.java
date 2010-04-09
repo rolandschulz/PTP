@@ -39,7 +39,7 @@ public abstract class ValueIntegral extends AIFValue implements IValueIntegral {
 	}
 	
 	public static BigInteger bigIntegerValue(String valueString) {
-		if (valueString.startsWith("@")) {
+		if (valueString.startsWith("@")) { //$NON-NLS-1$
 			valueString = valueString.substring(1);
 			int colon = valueString.indexOf(':');
 			if (colon != -1) {

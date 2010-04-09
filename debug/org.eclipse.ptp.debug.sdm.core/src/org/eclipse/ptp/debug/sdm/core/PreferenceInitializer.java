@@ -33,11 +33,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
 
-		//String debuggerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "sdm");
-		//if (debuggerFile != null)
-			//store.setDefault(SDMPreferenceConstants.SDM_DEBUGGER_FILE, debuggerFile);
- 
-		//store.setDefault(SDMPreferenceConstants.SDM_DEBUGGER_HOST, SDMPreferenceConstants.SDM_DEFAULT_DEUBGGER_HOST);
 		store.setDefault(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE, 
 				SDMPreferenceConstants.SDM_DEBUGGER_BACKENDS[SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_INDEX]);
 		store.setDefault(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH, SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_PATH);

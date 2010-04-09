@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
@@ -37,10 +38,10 @@ public class AIFValueVoid extends AIFValue {
 	public String getValueString() throws AIFException {
 		if (result == null) {
 			if (size == 0) {
-				result = "(No value)";
+				result = Messages.AIFValueVoid_0;
 			}
 			else  {
-				result = "";
+				result = ""; //$NON-NLS-1$
 			}
 		}
 		return result;

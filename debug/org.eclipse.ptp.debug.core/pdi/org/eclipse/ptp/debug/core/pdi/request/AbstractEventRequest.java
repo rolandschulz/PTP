@@ -18,9 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 
 /**
@@ -29,10 +31,10 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public abstract class AbstractEventRequest implements IPDIEventRequest {
 	protected int status = UNKNOWN;
-	protected BitList tasks = null;
-	protected String message = "";
+	protected TaskSet tasks = null;
+	protected String message = ""; //$NON-NLS-1$
 	
-	public AbstractEventRequest(BitList tasks) {
+	public AbstractEventRequest(TaskSet tasks) {
 		this.tasks = tasks.copy();
 	}
 	
@@ -49,9 +51,9 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#completed(org.eclipse.ptp.core.util.BitList, java.lang.Object)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#completed(org.eclipse.ptp.core.util.TaskSet, java.lang.Object)
 	 */
-	public boolean completed(BitList cTasks, Object result) {
+	public boolean completed(TaskSet cTasks, Object result) {
 		tasks.andNot(cTasks);
 		return tasks.isEmpty();
 	}
@@ -77,7 +79,7 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 		try {
 			doFinish();
 		} catch (PDIException e) {
-			this.message += " - " + e.getMessage();
+			this.message += " - " + e.getMessage(); //$NON-NLS-1$
 		}
 	}
 	
@@ -117,7 +119,7 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISet#getTasks()
 	 */
-	public BitList getTasks() {
+	public TaskSet getTasks() {
 		return tasks;
 	}
 	
@@ -132,27 +134,24 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		String res = getName() + " in status [";
+		String statusStr = Messages.AbstractEventRequest_0;
 		
 		switch (status) {
 		case ERROR:
-			res += "ERROR";
+			statusStr = Messages.AbstractEventRequest_1;
 			break;
 		case RUNNING:
-			res += "RUNNING";
+			statusStr = Messages.AbstractEventRequest_2;
 			break;
 		case DONE:
-			res += "DONE";
+			statusStr = Messages.AbstractEventRequest_3;
 			break;
 		case CANCELLED:
-			res += "CANCELLED";
-			break;
-		default:
-			res += "UNKNOWN";
+			statusStr = Messages.AbstractEventRequest_4;
 			break;
 		}
 		
-		return res + "] for " + BitList.showBitList(getTasks()) + ".";
+		return NLS.bind(Messages.AbstractEventRequest_5, new Object[]{getName(), statusStr, getTasks()});
 	}
 	
     /**

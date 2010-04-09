@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.Session;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIRestartedEvent;
 
@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIRestartedEvent;
  *
  */
 public class RestartedEvent extends AbstractEvent implements IPDIRestartedEvent {
-	public RestartedEvent(Session session, BitList tasks) {
+	public RestartedEvent(Session session, TaskSet tasks) {
 		super(session, tasks);
 	}
 }

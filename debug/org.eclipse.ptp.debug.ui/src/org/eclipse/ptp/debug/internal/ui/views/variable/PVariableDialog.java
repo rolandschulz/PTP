@@ -36,6 +36,7 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.PVariableManager;
 import org.eclipse.ptp.debug.ui.PVariableManager.PVariableInfo;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -74,7 +75,7 @@ public class PVariableDialog extends Dialog {
 		this.mode = mode;
 	}
 	public void configureShell(Shell newShell) {
-		newShell.setText(PVariableMessages.getString("PVariablesDialog.title"));
+		newShell.setText(Messages.PVariableDialog_0);
 		super.configureShell(newShell);
 	}
 	/** Get OK Button
@@ -93,7 +94,7 @@ public class PVariableDialog extends Dialog {
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		checkBtn = new Button(comp, SWT.CHECK);
-		checkBtn.setText(PVariableMessages.getString("PVariablesDialog.checkBtn"));
+		checkBtn.setText(Messages.PVariableDialog_1);
 		checkBtn.setSelection(true);
 	}
 
@@ -102,7 +103,7 @@ public class PVariableDialog extends Dialog {
 	 */
 	private void createVarSection(Composite parent) {
 		Group aGroup = new Group(parent, SWT.BORDER);
-		aGroup.setText(PVariableMessages.getString("PVariablesDialog.varSection"));
+		aGroup.setText(Messages.PVariableDialog_2);
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
@@ -110,7 +111,7 @@ public class PVariableDialog extends Dialog {
 		aGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
 		
 		Label availLabel = new Label(aGroup, SWT.NONE);
-		availLabel.setText(PVariableMessages.getString("PVariablesDialog.availVar"));
+		availLabel.setText(Messages.PVariableDialog_3);
 		availLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
 		
 		varTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -124,7 +125,7 @@ public class PVariableDialog extends Dialog {
 				TableItem item = (TableItem)e.item;
 				boolean checked = item.getChecked();
 				if (checked) {
-					varText.setText("");
+					varText.setText(""); //$NON-NLS-1$
 				}
 				updateButtons();
 				item.setChecked(checked);
@@ -132,7 +133,7 @@ public class PVariableDialog extends Dialog {
 		});
 
 		Label custLabel = new Label(aGroup, SWT.NONE);
-		custLabel.setText(PVariableMessages.getString("PVariablesDialog.custVar"));
+		custLabel.setText(Messages.PVariableDialog_4);
 		custLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
 		varText = new Text(aGroup, SWT.BORDER | SWT.NONE);
 		varText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -244,10 +245,10 @@ public class PVariableDialog extends Dialog {
 		Control control = super.createButtonBar(parent);
 		switch(mode) {
 		case NEW_MODE:
-			getOkButton().setText("Create");
+			getOkButton().setText(Messages.PVariableDialog_5);
 			break;
 		case EDIT_MODE:
-			getOkButton().setText("Edit");
+			getOkButton().setText(Messages.PVariableDialog_6);
 			break;
 		}
 		updateButtons();
@@ -298,7 +299,7 @@ public class PVariableDialog extends Dialog {
 					jobMgr.addVariable(job, vars[i], checked);
 				}
 				catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog("Duplicate variable", e.getStatus());
+					PTPDebugUIPlugin.errorDialog(Messages.PVariableDialog_7, e.getStatus());
 				}
 			}
 			break;

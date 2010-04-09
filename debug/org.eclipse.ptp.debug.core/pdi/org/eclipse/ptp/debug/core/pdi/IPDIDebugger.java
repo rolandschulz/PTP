@@ -23,7 +23,7 @@ import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents a number of methods to communication to a debugger
@@ -44,7 +44,7 @@ public interface IPDIDebugger extends
 	 * @param command command
 	 * @throws PDIException on failure
 	 */
-	public void commandRequest(BitList tasks, String command) throws PDIException;
+	public void commandRequest(TaskSet tasks, String command) throws PDIException;
 
 	/**
 	 * Disconnects observer from debugger

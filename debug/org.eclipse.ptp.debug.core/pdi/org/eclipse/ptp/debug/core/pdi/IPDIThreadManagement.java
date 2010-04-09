@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents thread management
@@ -31,7 +31,7 @@ public interface IPDIThreadManagement {
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void listInfoThreads(BitList tasks) throws PDIException;
+	void listInfoThreads(TaskSet tasks) throws PDIException;
 	
 	/**
 	 * Requests to select thread with given thread id of specify process
@@ -39,12 +39,12 @@ public interface IPDIThreadManagement {
 	 * @param tid thread id to be selected
 	 * @throws PDIException on failure
 	 */
-	void selectThread(BitList tasks, int tid) throws PDIException;
+	void selectThread(TaskSet tasks, int tid) throws PDIException;
 	
 	/**
 	 * Requests to retrieve a stack info depth of specify process
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void retrieveStackInfoDepth(BitList tasks) throws PDIException;
+	void retrieveStackInfoDepth(TaskSet tasks) throws PDIException;
 }

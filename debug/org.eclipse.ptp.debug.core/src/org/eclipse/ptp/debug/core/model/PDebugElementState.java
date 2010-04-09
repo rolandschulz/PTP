@@ -18,30 +18,38 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
+import org.eclipse.ptp.debug.core.messages.Messages;
+
 /**
  * @author clement
- *
+ * 
  */
 public class PDebugElementState {
-	private final String name;
-	
+	public static final PDebugElementState DISCONNECTED = new PDebugElementState(Messages.PDebugElementState_4);
+	public static final PDebugElementState DISCONNECTING = new PDebugElementState(Messages.PDebugElementState_3);
+	public static final PDebugElementState EXITED = new PDebugElementState(Messages.PDebugElementState_12);
+	public static final PDebugElementState RESTARTING = new PDebugElementState(Messages.PDebugElementState_11);
+	public static final PDebugElementState RESUMED = new PDebugElementState(Messages.PDebugElementState_6);
+	public static final PDebugElementState RESUMING = new PDebugElementState(Messages.PDebugElementState_5);
+	public static final PDebugElementState STEPPED = new PDebugElementState(Messages.PDebugElementState_8);
+	public static final PDebugElementState STEPPING = new PDebugElementState(Messages.PDebugElementState_7);
+	public static final PDebugElementState SUSPENDED = new PDebugElementState(Messages.PDebugElementState_10);
+	public static final PDebugElementState SUSPENDING = new PDebugElementState(Messages.PDebugElementState_9);
+	public static final PDebugElementState TERMINATED = new PDebugElementState(Messages.PDebugElementState_2);
+	public static final PDebugElementState TERMINATING = new PDebugElementState(Messages.PDebugElementState_1);
+	public static final PDebugElementState UNDEFINED = new PDebugElementState(Messages.PDebugElementState_0);
+
+	private final String fName;
+
 	private PDebugElementState(String name) {
-		this.name = name;
+		fName = name;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
-		return this.name;
+		return fName;
 	}
-	public static final PDebugElementState UNDEFINED = new PDebugElementState("undefined");
-	public static final PDebugElementState TERMINATING = new PDebugElementState("terminating");
-	public static final PDebugElementState TERMINATED = new PDebugElementState("terminated");
-	public static final PDebugElementState DISCONNECTING = new PDebugElementState("disconnecting");
-	public static final PDebugElementState DISCONNECTED = new PDebugElementState("disconnected");
-	public static final PDebugElementState RESUMING = new PDebugElementState("resuming");
-	public static final PDebugElementState RESUMED = new PDebugElementState("resumed");
-	public static final PDebugElementState STEPPING = new PDebugElementState("stepping");
-	public static final PDebugElementState STEPPED = new PDebugElementState("stepped");
-	public static final PDebugElementState SUSPENDING = new PDebugElementState("suspending");
-	public static final PDebugElementState SUSPENDED = new PDebugElementState("suspended");
-	public static final PDebugElementState RESTARTING = new PDebugElementState("restarting");
-	public static final PDebugElementState EXITED = new PDebugElementState("exited");
 }

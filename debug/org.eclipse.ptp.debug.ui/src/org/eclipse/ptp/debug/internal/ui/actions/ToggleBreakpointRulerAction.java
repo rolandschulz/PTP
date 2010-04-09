@@ -29,6 +29,7 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -53,7 +54,7 @@ public class ToggleBreakpointRulerAction extends Action {
      * @param ruler
      */
     public ToggleBreakpointRulerAction(IWorkbenchPart part, IVerticalRulerInfo ruler) {
-		super(ActionMessages.getString("ToggleBreakpointRulerAction.Toggle_Breakpoint"));
+		super(Messages.ToggleBreakpointRulerAction_0);
    		this.ruler = ruler;
    		setTargetPart(part);
    		breakpointAdapter = new ToggleBreakpointAdapter();
@@ -75,7 +76,7 @@ public class ToggleBreakpointRulerAction extends Action {
 		try {
 			breakpointAdapter.toggleLineBreakpoints(getTargetPart(), getTargetSelection());
 		} catch(CoreException e) {
-			ErrorDialog.openError(getTargetPart().getSite().getShell(), ActionMessages.getString("ToggleBreakpointRulerAction.Error_1"), ActionMessages.getString("ToggleBreakpointRulerAction.Operation_failed_1"), e.getStatus());
+			ErrorDialog.openError(getTargetPart().getSite().getShell(), Messages.ToggleBreakpointRulerAction_1, Messages.ToggleBreakpointRulerAction_2, e.getStatus());
 		}
     }
 

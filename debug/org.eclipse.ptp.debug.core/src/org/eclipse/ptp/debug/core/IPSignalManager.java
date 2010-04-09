@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.core;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 
@@ -24,19 +23,19 @@ public interface IPSignalManager {
 	/**
 	 * @param qTasks
 	 */
-	public void dispose(BitList qTasks);
+	public void dispose(TaskSet qTasks);
 
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws DebugException
 	 */
-	public IPSignal[] getSignals(BitList qTasks) throws DebugException;
+	public IPSignal[] getSignals(TaskSet qTasks) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @param pdiSignal
 	 */
-	public void signalChanged(BitList qTasks, IPDISignal pdiSignal);
+	public void signalChanged(TaskSet qTasks, IPDISignal pdiSignal);
 
 }

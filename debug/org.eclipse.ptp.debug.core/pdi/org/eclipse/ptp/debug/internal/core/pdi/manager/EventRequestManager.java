@@ -27,12 +27,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventRequestManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStopDebuggerRequest;
 
@@ -45,7 +47,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 		private Vector<IPDIEventRequest> fRequests = null;
 		
 		public EventRequestDispatchJob() {
-			super("PTP Debug Request Job");
+			super(Messages.EventRequestManager_0);
 			setSystem(true);
 			fRequests = new Vector<IPDIEventRequest>(10);
 		}
@@ -57,9 +59,9 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 		public void addEventRequest(IPDIEventRequest request) throws PDIException {
 			synchronized (fRequests) {
 				if (containEventRequest(request))
-					throw new PDIException(request.getTasks(), "[" + request.getName() + "] request is already added.");
+					throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_1, request.getName()));
 
-				PDebugUtils.println("Msg: EventRequestManager - addEventRequest(): Request: " + request);
+				PDebugUtils.println(NLS.bind(Messages.EventRequestManager_2, request));
 				fRequests.add(request);
 			}
 			schedule();
@@ -122,9 +124,9 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 		public void removeEventRequest(IPDIEventRequest request) throws PDIException {
 			synchronized (fRequests) {
 				if (request.getStatus() == IPDIEventRequest.RUNNING)
-					throw new PDIException(request.getTasks(), "[" + request.getName() + "] request cannot be deleted during executing.");
+					throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_3, request.getName()));
 				if (!containEventRequest(request))
-					throw new PDIException(request.getTasks(), "[" + request.getName() + "] request is not existed or already deleted.");
+					throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_4, request.getName()));
 				fRequests.remove(request);
 			}
 		}
@@ -179,10 +181,10 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	public void addEventRequest(IPDIEventRequest request) throws PDIException {
 		if (!(request instanceof IPDIStopDebuggerRequest)) {
 			if (request.getTasks().isEmpty()) {
-				throw new PDIException(request.getTasks(), request.getName()  + ": No tasks found");
+				throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_5, request.getName()));
 			}
 			if (session.getTaskManager().isAllPending(request.getTasks())) {
-				throw new PDIException(request.getTasks(), request.getName() + ": Request tasks are in pending status.");
+				throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_6, request.getName()));
 			}
 		}
 		dispatchJob.addEventRequest(request);
@@ -242,10 +244,10 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	@Override
-	public void update(BitList tasks) throws PDIException {
+	public void update(TaskSet tasks) throws PDIException {
 	}
 	
 	/* (non-Javadoc)

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueChar;
@@ -48,9 +49,9 @@ public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 	public String toString() {
 		try {
 			char charValue = charValue();
-			return ((Character.isISOControl(charValue) && charValue != '\b' && charValue != '\t' && charValue != '\n' && charValue != '\f' && charValue != '\r') || charValue < 0) ? "" : String.valueOf(charValue);		
+			return ((Character.isISOControl(charValue) && charValue != '\b' && charValue != '\t' && charValue != '\n' && charValue != '\f' && charValue != '\r') || charValue < 0) ? "" : String.valueOf(charValue);		 //$NON-NLS-1$
 		} catch (AIFException e) {
-			return "err: " + e.getMessage();
+			return Messages.AIFValueChar_1 + e.getMessage();
 		}
 	}
 	/*

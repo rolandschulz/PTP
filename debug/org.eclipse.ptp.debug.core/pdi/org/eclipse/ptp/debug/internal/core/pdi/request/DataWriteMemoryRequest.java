@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDataWriteMemoryRequest;
 
@@ -35,7 +36,7 @@ public class DataWriteMemoryRequest extends AbstractEventResultRequest implement
 	private int wordSize;
 	private String value;
 	
-	public DataWriteMemoryRequest(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) {
+	public DataWriteMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value) {
 		super(tasks);
 		this.offset = offset;
 		this.address = address;
@@ -55,12 +56,12 @@ public class DataWriteMemoryRequest extends AbstractEventResultRequest implement
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Create data write memory request";
+		return Messages.DataWriteMemoryRequest_0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 	}
 }

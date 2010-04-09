@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
 
@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
 public class ResumedEvent extends AbstractEvent implements IPDIResumedEvent {
 	private int type;
 	
-	public ResumedEvent(IPDISessionObject reason, BitList tasks, int type) {
+	public ResumedEvent(IPDISessionObject reason, TaskSet tasks, int type) {
 		super(reason.getSession(), tasks);
 		this.type = type;
 	}

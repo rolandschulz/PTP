@@ -33,24 +33,29 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 
 /**
- * @author clement
- * Computes the default source lookup path for a launch configuration.
+ * @author clement Computes the default source lookup path for a launch
+ *         configuration.
  */
 public class PSourcePathComputerDelegate implements ISourcePathComputerDelegate {
 	public PSourcePathComputerDelegate() {
 		super();
 	}
-	public ISourceContainer[] computeSourceContainers(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		ISourceContainer[] common = PTPDebugCorePlugin.getDefault().getCommonSourceLookupDirector().getSourceContainers();
-		ArrayList<ISourceContainer> containers = new ArrayList<ISourceContainer>(common.length + 1);
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.ISourcePathComputerDelegate#computeSourceContainers(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public ISourceContainer[] computeSourceContainers(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		final ISourceContainer[] common = PTPDebugCorePlugin.getDefault().getCommonSourceLookupDirector().getSourceContainers();
+		final ArrayList<ISourceContainer> containers = new ArrayList<ISourceContainer>(common.length + 1);
 		containers.addAll(Arrays.asList(common));
-		String projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+		final String projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 		if (projectName != null) {
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			if (project.exists()) {
 				containers.add(0, new ProjectSourceContainer(project, true));
 			}
 		}
-		return (ISourceContainer[]) containers.toArray(new ISourceContainer[containers.size()]);
+		return containers.toArray(new ISourceContainer[containers.size()]);
 	}
 }
