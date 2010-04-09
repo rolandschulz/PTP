@@ -25,7 +25,19 @@ import org.eclipse.debug.core.DebugException;
  * 
  */
 public interface IFormatSupport {
-	boolean supportsFormatting();
-	PVariableFormat getFormat();
-	void changeFormat(PVariableFormat format) throws DebugException;
+	/**
+	 * @return
+	 */
+	public boolean supportsFormatting();
+
+	/**
+	 * @return
+	 */
+	public PVariableFormat getFormat();
+
+	/**
+	 * @param format
+	 * @throws DebugException
+	 */
+	public void changeFormat(PVariableFormat format) throws DebugException;
 }

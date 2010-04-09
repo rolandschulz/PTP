@@ -11,7 +11,7 @@
 
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIOutputEvent;
 
@@ -21,7 +21,7 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIOutputEvent;
 public class OutputEvent extends AbstractEvent implements IPDIOutputEvent {
 	private String fOutput;
 	
-	public OutputEvent(IPDISessionObject reason, BitList tasks, String output) {
+	public OutputEvent(IPDISessionObject reason, TaskSet tasks, String output) {
 		super(reason.getSession(), tasks);
 		fOutput = output;
 	}

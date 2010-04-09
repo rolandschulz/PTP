@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDisconnectedEvent;
 
@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIDisconnectedEvent;
  *
  */
 public class DisconnectedEvent extends AbstractEvent implements IPDIDisconnectedEvent {
-	public DisconnectedEvent(IPDISessionObject reason, BitList tasks) {
+	public DisconnectedEvent(IPDISessionObject reason, TaskSet tasks) {
 		super(reason.getSession(), tasks);
 	}
 }

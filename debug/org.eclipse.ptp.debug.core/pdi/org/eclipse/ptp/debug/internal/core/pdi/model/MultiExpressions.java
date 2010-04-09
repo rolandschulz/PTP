@@ -5,10 +5,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
@@ -57,7 +59,7 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 	private boolean enabled;
 	private Map<Integer,IPDIExpression> expressions = new HashMap<Integer,IPDIExpression>();
 	
-	public MultiExpressions(IPDISession session, BitList tasks, String ex, boolean enabled) {
+	public MultiExpressions(IPDISession session, TaskSet tasks, String ex, boolean enabled) {
 		super(session, tasks);
 		this.expr = ex;
 		this.enabled = enabled;
@@ -75,10 +77,10 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions#cleanExpressionsValue(org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions#cleanExpressionsValue(org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void cleanExpressionsValue(BitList tasks, IProgressMonitor monitor) {
-		monitor.setTaskName("Cleaning expression ["+expr+"]...");
+	public void cleanExpressionsValue(TaskSet tasks, IProgressMonitor monitor) {
+		monitor.setTaskName(NLS.bind(Messages.MultiExpressions_0, expr));
 		for (int task : tasks.toArray()) {
 			IPDIExpression expression = getExpression(task);
 			if (expression != null) {
@@ -124,9 +126,9 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions#removeExpression(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions#removeExpression(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void removeExpression(BitList tasks) {
+	public void removeExpression(TaskSet tasks) {
 		for (int task : tasks.toArray()) {
 			expressions.remove(new Integer(task));
 		}
@@ -154,15 +156,15 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions#updateExpressionsValue(org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions#updateExpressionsValue(org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void updateExpressionsValue(BitList tasks, IProgressMonitor monitor) throws PDIException {
-		monitor.setTaskName("Updating expression ["+expr+"]...");
+	public void updateExpressionsValue(TaskSet tasks, IProgressMonitor monitor) throws PDIException {
+		monitor.setTaskName(NLS.bind(Messages.MultiExpressions_1, expr));
 		IPDIEvaluateExpressionRequest request = session.getRequestFactory().getEvaluateExpressionRequest(tasks, expr);
 		session.getEventRequestManager().addEventRequest(request);
-		Map<BitList, Object> results = request.getResultMap(tasks);
-		for (Iterator<BitList> i = results.keySet().iterator(); i.hasNext();) {
-			BitList sTasks = i.next();
+		Map<TaskSet, Object> results = request.getResultMap(tasks);
+		for (Iterator<TaskSet> i = results.keySet().iterator(); i.hasNext();) {
+			TaskSet sTasks = i.next();
 			Object obj = results.get(sTasks);
 			if (!(obj instanceof IAIF)) {
 				//set unknown aif for tasks
@@ -183,7 +185,7 @@ public class MultiExpressions extends SessionObject implements IPDIMultiExpressi
 					continue;
 				if (monitor.isCanceled()) {
 					expression.setAIF(AIFFactory.UNKNOWNAIF());
-					throw new PDIException(tasks, "Updating is cancelled by user");
+					throw new PDIException(tasks, Messages.MultiExpressions_2);
 				}
 				expression.setAIF(aif);
 				monitor.worked(1);

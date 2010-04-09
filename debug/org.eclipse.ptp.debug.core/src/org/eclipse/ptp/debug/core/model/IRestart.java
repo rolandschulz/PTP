@@ -30,6 +30,7 @@ public interface IRestart {
 	 * @return whether this element can currently be restarted
 	 */
 	public boolean canRestart();
+	
 	/**
 	 * Causes this element to restart its execution.
 	 *

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIArgument;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIArgumentDescriptor;
@@ -45,8 +45,8 @@ public interface IPDIVariableManager extends IPDIManager {
 	public IPDILocalVariable createLocalVariable(IPDILocalVariableDescriptor varDesc) throws PDIException;
 	public IPDIArgumentDescriptor[] getArgumentDescriptors(IPDIStackFrame frame) throws PDIException;
 	public IPDILocalVariableDescriptor[] getLocalVariableDescriptors(IPDIStackFrame frame) throws PDIException;
-	public IPDIVariable getVariableByName(BitList tasks, String varname);
-	public IPDIGlobalVariableDescriptor getGlobalVariableDescriptor(BitList tasks, String filename, String function, String name) throws PDIException;
+	public IPDIVariable getVariableByName(TaskSet tasks, String varname);
+	public IPDIGlobalVariableDescriptor getGlobalVariableDescriptor(TaskSet tasks, String filename, String function, String name) throws PDIException;
 	public IPDIThreadStorage createThreadStorage(IPDIThreadStorageDescriptor desc) throws PDIException;
 	public IPDIThreadStorageDescriptor[] getThreadStorageDescriptors(IPDIThread thread) throws PDIException;
 	public void destroyVariable(IPDIVariable variable) throws PDIException;
@@ -74,5 +74,5 @@ public interface IPDIVariableManager extends IPDIManager {
 	 * @param vars
 	 * @throws PDIException
 	 */
-	public void update(BitList qTasks, String[] vars) throws PDIException;
+	public void update(TaskSet qTasks, String[] vars) throws PDIException;
 }

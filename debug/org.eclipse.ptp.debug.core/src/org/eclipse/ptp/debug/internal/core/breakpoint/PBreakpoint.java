@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.breakpoint;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
@@ -30,7 +29,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.Breakpoint;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 
 /**
@@ -38,11 +39,13 @@ import org.eclipse.ptp.debug.core.model.IPBreakpoint;
  * 
  */
 public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
-	public PBreakpoint() {}
-	
-	public PBreakpoint(final IResource resource, final String markerType, final Map<?,?> attributes, final boolean add) throws CoreException {
+	public PBreakpoint() {
+	}
+
+	public PBreakpoint(final IResource resource, final String markerType, final Map<?, ?> attributes, final boolean add)
+			throws CoreException {
 		this();
-		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
+		final IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				// create the marker
 				setMarker(resource.createMarker(markerType));
@@ -56,8 +59,17 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		};
 		run(wr);
 	}
-	public void createMarker(final IResource resource, final String markerType, final Map<?,?> attributes, final boolean add) throws DebugException {
-		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
+
+	/**
+	 * @param resource
+	 * @param markerType
+	 * @param attributes
+	 * @param add
+	 * @throws DebugException
+	 */
+	public void createMarker(final IResource resource, final String markerType, final Map<?, ?> attributes, final boolean add)
+			throws DebugException {
+		final IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				// create the marker
 				setMarker(resource.createMarker(markerType));
@@ -71,23 +83,10 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		};
 		run(wr);
 	}
-	public String getModelIdentifier() {
-		return PTPDebugCorePlugin.getUniqueIdentifier();
-	}
-	public boolean isInstalled() throws CoreException {
-		return ensureMarker().getAttribute(INSTALL_COUNT, 0) > 0;
-	}
-	public synchronized void resetInstallCount() throws CoreException {
-		setAttribute(INSTALL_COUNT, 0);
-	}
-	public synchronized int incrementInstallCount() throws CoreException {
-		int count = getInstallCount();
-		setAttribute(INSTALL_COUNT, ++count);
-		return count;
-	}
-	public int getInstallCount() throws CoreException {
-		return ensureMarker().getAttribute(INSTALL_COUNT, 0);
-	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#decrementInstallCount()
+	 */
 	public synchronized int decrementInstallCount() throws CoreException {
 		int count = getInstallCount();
 		if (count > 0) {
@@ -95,139 +94,222 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		}
 		return count;
 	}
-	public String getCondition() throws CoreException {
-		return ensureMarker().getAttribute(CONDITION, "");
-	}
-	public void setCondition(String condition) throws CoreException {
-		setAttribute(CONDITION, condition);
-		setAttribute(IMarker.MESSAGE, getMarkerMessage());
-	}
-	public int getIgnoreCount() throws CoreException {
-		return ensureMarker().getAttribute(IGNORE_COUNT, 0);
-	}
-	public void setIgnoreCount(int ignoreCount) throws CoreException {
-		setAttribute(IGNORE_COUNT, ignoreCount);
-		setAttribute(IMarker.MESSAGE, getMarkerMessage());
-	}
-	public String getSourceHandle() throws CoreException {
-		return ensureMarker().getAttribute(SOURCE_HANDLE, "");
-	}
-	public void setSourceHandle(String sourceHandle) throws CoreException {
-		setAttribute(SOURCE_HANDLE, sourceHandle);
-	}
-	public String getSetId() throws CoreException {
-		return ensureMarker().getAttribute(SET_ID, "");
-	}
-	public void setSetId(String id) throws CoreException {
-		setAttribute(SET_ID, id);
-	}
-	public boolean isGlobal() throws CoreException {
-		return (getJobId().equals(IPBreakpoint.GLOBAL));
-	}
-	public String getJobId() throws CoreException {
-		return ensureMarker().getAttribute(JOB_ID, "");
-	}
-	public void setJobId(String id) throws CoreException {
-		setAttribute(JOB_ID, id);
-	}
-	public String getJobName() throws CoreException {
-		return ensureMarker().getAttribute(JOB_NAME, "");
-	}
-	public void setJobName(String name) throws CoreException {
-		setAttribute(JOB_NAME, name);
-	}
-	public String getCurSetId() throws CoreException {
-		return ensureMarker().getAttribute(CUR_SET_ID, "");
-	}
-	public void setCurSetId(String id) throws CoreException {
-		setAttribute(CUR_SET_ID, id);
-	}
-	protected void run(IWorkspaceRunnable wr) throws DebugException {
-		try {
-			ResourcesPlugin.getWorkspace().run(wr, null);
-		} catch (CoreException e) {
-			throw new DebugException(e.getStatus());
-		}
-	}
-	public void register(boolean register) throws CoreException {
-		if (register) {
-			DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(this);
-		}
-	}
-	public void updateMarkerMessage() throws CoreException {
-		setAttribute(IMarker.MESSAGE, getMarkerMessage());
-	}
-	public boolean isConditional() throws CoreException {
-		return ((getCondition() != null && getCondition().trim().length() > 0) || getIgnoreCount() > 0);
-	}
+
 	public void fireChanged() {
 		if (markerExists()) {
 			DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(this);
 		}
 	}
-	protected String getConditionText() throws CoreException {
-		StringBuffer sb = new StringBuffer();
-		int ignoreCount = getIgnoreCount();
-		if (ignoreCount > 0) {
-			sb.append(MessageFormat.format(BreakpointMessages.getString("PBreakpoint.1"), new Object[] { new Integer(ignoreCount) }));
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getCondition()
+	 */
+	public String getCondition() throws CoreException {
+		return ensureMarker().getAttribute(CONDITION, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getCurSetId()
+	 */
+	public String getCurSetId() throws CoreException {
+		return ensureMarker().getAttribute(CUR_SET_ID, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getIgnoreCount()
+	 */
+	public int getIgnoreCount() throws CoreException {
+		return ensureMarker().getAttribute(IGNORE_COUNT, 0);
+	}
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
+	public int getInstallCount() throws CoreException {
+		return ensureMarker().getAttribute(INSTALL_COUNT, 0);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getJobId()
+	 */
+	public String getJobId() throws CoreException {
+		return ensureMarker().getAttribute(JOB_ID, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getJobName()
+	 */
+	public String getJobName() throws CoreException {
+		return ensureMarker().getAttribute(JOB_NAME, ""); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
+	public String getJobSetFormat() throws CoreException {
+		return "{" + getJobName() + ":" + getSetId() + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IBreakpoint#getModelIdentifier()
+	 */
+	public String getModelIdentifier() {
+		return PTPDebugCorePlugin.getUniqueIdentifier();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getSetId()
+	 */
+	public String getSetId() throws CoreException {
+		return ensureMarker().getAttribute(SET_ID, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#getSourceHandle()
+	 */
+	public String getSourceHandle() throws CoreException {
+		return ensureMarker().getAttribute(SOURCE_HANDLE, ""); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#incrementInstallCount()
+	 */
+	public synchronized int incrementInstallCount() throws CoreException {
+		int count = getInstallCount();
+		setAttribute(INSTALL_COUNT, ++count);
+		return count;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#isConditional()
+	 */
+	public boolean isConditional() throws CoreException {
+		return ((getCondition() != null && getCondition().trim().length() > 0) || getIgnoreCount() > 0);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#isGlobal()
+	 */
+	public boolean isGlobal() throws CoreException {
+		return (getJobId().equals(IPBreakpoint.GLOBAL));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#isInstalled()
+	 */
+	public boolean isInstalled() throws CoreException {
+		return ensureMarker().getAttribute(INSTALL_COUNT, 0) > 0;
+	}
+
+	/**
+	 * @param register
+	 * @throws CoreException
+	 */
+	public void register(boolean register) throws CoreException {
+		if (register) {
+			DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(this);
 		}
-		String condition = getCondition();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#resetInstallCount()
+	 */
+	public synchronized void resetInstallCount() throws CoreException {
+		setAttribute(INSTALL_COUNT, 0);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setCondition(java.lang.String)
+	 */
+	public void setCondition(String condition) throws CoreException {
+		setAttribute(CONDITION, condition);
+		setAttribute(IMarker.MESSAGE, getMarkerMessage());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setCurSetId(java.lang.String)
+	 */
+	public void setCurSetId(String id) throws CoreException {
+		setAttribute(CUR_SET_ID, id);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setIgnoreCount(int)
+	 */
+	public void setIgnoreCount(int ignoreCount) throws CoreException {
+		setAttribute(IGNORE_COUNT, ignoreCount);
+		setAttribute(IMarker.MESSAGE, getMarkerMessage());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setJobId(java.lang.String)
+	 */
+	public void setJobId(String id) throws CoreException {
+		setAttribute(JOB_ID, id);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setJobName(java.lang.String)
+	 */
+	public void setJobName(String name) throws CoreException {
+		setAttribute(JOB_NAME, name);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setSetId(java.lang.String)
+	 */
+	public void setSetId(String id) throws CoreException {
+		setAttribute(SET_ID, id);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#setSourceHandle(java.lang.String)
+	 */
+	public void setSourceHandle(String sourceHandle) throws CoreException {
+		setAttribute(SOURCE_HANDLE, sourceHandle);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPBreakpoint#updateMarkerMessage()
+	 */
+	public void updateMarkerMessage() throws CoreException {
+		setAttribute(IMarker.MESSAGE, getMarkerMessage());
+	}
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
+	protected String getConditionText() throws CoreException {
+		final StringBuffer sb = new StringBuffer();
+		final int ignoreCount = getIgnoreCount();
+		if (ignoreCount > 0) {
+			sb.append(NLS.bind(Messages.PBreakpoint_0, new Object[] { new Integer(ignoreCount) }));
+		}
+		final String condition = getCondition();
 		if (condition != null && condition.length() > 0) {
-			sb.append(MessageFormat.format(BreakpointMessages.getString("PBreakpoint.2"), new Object[] { condition }));
+			sb.append(NLS.bind(Messages.PBreakpoint_10, new Object[] { condition }));
 		}
 		return sb.toString();
 	}
-	public String getJobSetFormat() throws CoreException {
-		return "{" + getJobName() + ":" + getSetId() + "}";
-	}
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
 	protected abstract String getMarkerMessage() throws CoreException;
-	/*
-	public String getThreadId() throws CoreException {
-		return ensureMarker().getAttribute(THREAD_ID, null);
-	}
-	public void setThreadId(String threadId) throws CoreException {
-		setAttribute(THREAD_ID, threadId);
-	}
-	public String getModule() throws CoreException {
-		return ensureMarker().getAttribute(MODULE, null);
-	}
-	public void setModule(String module) throws CoreException {
-		setAttribute(MODULE, module);
-	}
-	public void setTargetFilter(IPDebugTarget target) throws CoreException {
-		fFilteredThreadsByTarget.put(target, null);
-	}
-	public void setThreadFilters(IPThread[] threads) throws CoreException {
-		if (threads != null && threads.length > 0) {
-			fFilteredThreadsByTarget.put((IPDebugTarget)threads[0].getDebugTarget(), new HashSet<IPThread>(Arrays.asList(threads)));
+
+	/**
+	 * @param wr
+	 * @throws DebugException
+	 */
+	protected void run(IWorkspaceRunnable wr) throws DebugException {
+		try {
+			ResourcesPlugin.getWorkspace().run(wr, null);
+		} catch (final CoreException e) {
+			throw new DebugException(e.getStatus());
 		}
 	}
-	public IPDebugTarget[] getTargetFilters() throws CoreException {
-		Set<IPDebugTarget> set = fFilteredThreadsByTarget.keySet();
-		return (IPDebugTarget[]) set.toArray(new IPDebugTarget[set.size()]);
-	}
-	public IPThread[] getThreadFilters(IPDebugTarget target) throws CoreException {
-		Set<IPThread> set = fFilteredThreadsByTarget.get(target);
-		return (set != null) ? (IPThread[]) set.toArray(new IPThread[set.size()]) : null;
-	}
-	public void removeTargetFilter(IPDebugTarget target) throws CoreException {
-		if (fFilteredThreadsByTarget.containsKey(target)) {
-			fFilteredThreadsByTarget.remove(target);
-		}
-	}
-	public void removeThreadFilters(IPThread[] threads) throws CoreException {
-		if (threads != null && threads.length > 0) {
-			IDebugTarget target = threads[0].getDebugTarget();
-			if (fFilteredThreadsByTarget.containsKey(target)) {
-				Set<IPThread> set = fFilteredThreadsByTarget.get(target);
-				if (set != null) {
-					set.removeAll(Arrays.asList(threads));
-					if (set.isEmpty()) {
-						fFilteredThreadsByTarget.remove(target);
-					}
-				}
-			}
-		}
-	}
-	*/
 }

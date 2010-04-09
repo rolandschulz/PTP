@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
@@ -29,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 public abstract class AbstractSetThreadSelectRequest extends AbstractEventResultRequest implements IPDISetThreadSelectRequest {
 	private int id = 0;
 	
-	public AbstractSetThreadSelectRequest(BitList tasks, int id) {
+	public AbstractSetThreadSelectRequest(TaskSet tasks, int id) {
 		super(tasks);
 		this.id = id;
 	}
@@ -42,22 +43,22 @@ public abstract class AbstractSetThreadSelectRequest extends AbstractEventResult
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDISetThreadSelectRequest#getThreadId(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDISetThreadSelectRequest#getThreadId(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public int getThreadId(BitList qTasks) throws PDIException {
+	public int getThreadId(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
 			Object[] returnValues = (Object[])obj;
 			return ((Integer)returnValues[0]).intValue();
 		}
-		throw new PDIException(qTasks, "No Thread ID found");
+		throw new PDIException(qTasks, Messages.AbstractSetThreadSelectRequest_0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Set thread select request";
+		return Messages.AbstractSetThreadSelectRequest_1;
 	}
 }

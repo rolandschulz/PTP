@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.IPDISet;
 
@@ -96,7 +96,7 @@ public interface IPDIEventRequest extends IPDISet {
      * @param result
      * @return true if the tasks are completed
      */
-    boolean completed(BitList qTasks, Object result);
+    boolean completed(TaskSet qTasks, Object result);
     
     /**
      * Returns action type for action after completing this request

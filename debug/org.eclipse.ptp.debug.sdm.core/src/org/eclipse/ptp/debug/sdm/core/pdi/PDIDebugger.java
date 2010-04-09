@@ -35,8 +35,8 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.IPDILocation;
@@ -51,6 +51,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
+import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
 import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
@@ -82,59 +83,59 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	private ProxyNotifier proxyNotifier = new ProxyNotifier();
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#commandRequest(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#commandRequest(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void commandRequest(BitList tasks, String command) throws PDIException {
+	public void commandRequest(TaskSet tasks, String command) throws PDIException {
 		try {
 			debugCLIHandle(tasks, command);
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on sending generic command: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(null, Messages.PDIDebugger_0 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataReadMemory(org.eclipse.ptp.core.util.BitList, long, java.lang.String, int, int, int, int, java.lang.Character)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataReadMemory(org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, int, int, java.lang.Character)
 	 */
-	public void createDataReadMemory(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols,
+	public void createDataReadMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols,
 			Character asChar) throws PDIException {
 		try {
 			setDataReadMemoryCommand(tasks, offset, address, getFormat(wordFormat), wordSize, rows, cols, asChar);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting data read memory: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_1 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataWriteMemory(org.eclipse.ptp.core.util.BitList, long, java.lang.String, int, int, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataWriteMemory(org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, java.lang.String)
 	 */
-	public void createDataWriteMemory(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value)
+	public void createDataWriteMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value)
 			throws PDIException {
 		try {
 			setDataWriteMemoryCommand(tasks, offset, address, getFormat(wordFormat), wordSize, value);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting data write memory: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_2 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#deleteBreakpoint(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#deleteBreakpoint(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void deleteBreakpoint(BitList tasks, int bpid) throws PDIException {
+	public void deleteBreakpoint(TaskSet tasks, int bpid) throws PDIException {
 		try {
 			debugDeleteBreakpoint(tasks, bpid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on deleting breakpoint: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_3 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deletePartialExpression(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deletePartialExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void deletePartialExpression(BitList tasks, String var) throws PDIException {
+	public void deletePartialExpression(TaskSet tasks, String var) throws PDIException {
 		try {
 			debugDeletePartialExpression(tasks, var);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on deleting variable: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_4 + e.getMessage()); 
 		}
 	}
 
@@ -146,25 +147,25 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluateExpression(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluateExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void evaluateExpression(BitList tasks, String expr) throws PDIException {
+	public void evaluateExpression(TaskSet tasks, String expr) throws PDIException {
 		try {
 			debugEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on evaluating expression: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_5 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluatePartialExpression(org.eclipse.ptp.core.util.BitList, java.lang.String, java.lang.String, boolean, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluatePartialExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String, java.lang.String, boolean, boolean)
 	 */
-	public void evaluatePartialExpression(BitList tasks, String expr, String exprId, boolean listChildren, boolean express)
+	public void evaluatePartialExpression(TaskSet tasks, String expr, String exprId, boolean listChildren, boolean express)
 			throws PDIException {
 		try {
 			debugEvaluatePartialExpression(tasks, expr, exprId, listChildren, express);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting partial aif: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_6 + e.getMessage()); 
 		}
 	}
 
@@ -209,7 +210,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		 * If there is an existing port specified, use it if possible.
 		 */
 		for (String arg : args) {
-			if (arg.startsWith("--port=")) {
+			if (arg.startsWith("--port=")) { //$NON-NLS-1$
 				try {
 					port = Integer.parseInt(arg.substring(7, arg.length()));
 				} catch (NumberFormatException e) {
@@ -221,7 +222,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			doInitialize(port);
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on getting proxy port number: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage()); 
 		}
 		
 		IResourceManagerControl rm = getResourceManager(configuration);
@@ -245,7 +246,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 									 * FIXME: Since this requires a special option to be enabled in sshd
 									 * on the head node (GatewayPorts), I'd like this to go way.
 									 */
-									port = conn.forwardRemotePort("", getSessionPort(), monitor);
+									port = conn.forwardRemotePort("", getSessionPort(), monitor); //$NON-NLS-1$
 								} catch (RemoteConnectionException e) {
 									throw new PDIException(null, e.getMessage());
 								}
@@ -253,19 +254,19 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 									return;
 								}
 							} else {
-								throw new PDIException(null, "Error getting connection"); //$NON-NLS-1$
+								throw new PDIException(null, Messages.PDIDebugger_8); 
 							}
 						} else {
-							throw new PDIException(null, "Error getting connection manager"); //$NON-NLS-1$
+							throw new PDIException(null, Messages.PDIDebugger_9); 
 						}
 					} else {
-						throw new PDIException(null, "Error getting remote services for connection"); //$NON-NLS-1$
+						throw new PDIException(null, Messages.PDIDebugger_10); 
 					}
 				}
 			}
 			args.add("--port=" + port); //$NON-NLS-1$
 		} else {
-			throw new PDIException(null, "Error getting resource manager"); //$NON-NLS-1$
+			throw new PDIException(null, Messages.PDIDebugger_11); 
 		}
 		
 		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
@@ -291,73 +292,73 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			return false;
 		} catch (IOException e) {
 			disconnect(null);
-			throw new PDIException(null, "Error on connecting proxy: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(null, Messages.PDIDebugger_12 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listArguments(org.eclipse.ptp.core.util.BitList, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listArguments(org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
-	public void listArguments(BitList tasks, int low, int high) throws PDIException {
+	public void listArguments(TaskSet tasks, int low, int high) throws PDIException {
 		try {
 			debugListArguments(tasks, low, high);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing arguments: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_13 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listGlobalVariables(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listGlobalVariables(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void listGlobalVariables(BitList tasks) throws PDIException {
+	public void listGlobalVariables(TaskSet tasks) throws PDIException {
 		try {
 			debugListGlobalVariables(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing global variables: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_14 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#listInfoThreads(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#listInfoThreads(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void listInfoThreads(BitList tasks) throws PDIException {
+	public void listInfoThreads(TaskSet tasks) throws PDIException {
 		try {
 			debugListInfoThreads(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing thread info: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_15 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listLocalVariables(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listLocalVariables(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void listLocalVariables(BitList tasks) throws PDIException {
+	public void listLocalVariables(TaskSet tasks) throws PDIException {
 		try {
 			debugListLocalVariables(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing local variables: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_16 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#listSignals(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#listSignals(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void listSignals(BitList tasks, String name) throws PDIException {
+	public void listSignals(TaskSet tasks, String name) throws PDIException {
 		try {
 			debugListSignals(tasks, name);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing signal: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_17 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#listStackFrames(org.eclipse.ptp.core.util.BitList, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#listStackFrames(org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
-	public void listStackFrames(BitList tasks, int low, int depth) throws PDIException {
+	public void listStackFrames(TaskSet tasks, int low, int depth) throws PDIException {
 		try {
 			debugListStackframes(tasks, low, depth);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on listing stack frames: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_18 + e.getMessage()); 
 		}
 	}
 
@@ -369,135 +370,135 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void restart(BitList tasks) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - restart() yet"); //$NON-NLS-1$
+	public void restart(TaskSet tasks) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_19); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, boolean)
 	 */
-	public void resume(BitList tasks, boolean passSignal) throws PDIException {
+	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
 		try {
 			debugGo(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on resuming tasks: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_20 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
-	public void resume(BitList tasks, IPDILocation location) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDILocation) yet"); //$NON-NLS-1$
+	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_21); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
-	public void resume(BitList tasks, IPDISignal signal) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - resume(IPDISignal) yet"); //$NON-NLS-1$
+	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_22); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#retrieveSignalInfo(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#retrieveSignalInfo(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void retrieveSignalInfo(BitList tasks, String arg) throws PDIException {
+	public void retrieveSignalInfo(TaskSet tasks, String arg) throws PDIException {
 		try {
 			debugSignalInfo(tasks, arg);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting signal info: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_23 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#retrieveStackInfoDepth(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#retrieveStackInfoDepth(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void retrieveStackInfoDepth(BitList tasks) throws PDIException {
+	public void retrieveStackInfoDepth(TaskSet tasks) throws PDIException {
 		try {
 			debugStackInfoDepth(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting stack info depth: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_24 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrieveVariableType(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrieveVariableType(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void retrieveVariableType(BitList tasks, String var) throws PDIException {
+	public void retrieveVariableType(TaskSet tasks, String var) throws PDIException {
 		try {
 			debugGetType(tasks, var);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on getting variable type: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_25 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#selectThread(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#selectThread(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void selectThread(BitList tasks, int tid) throws PDIException {
+	public void selectThread(TaskSet tasks, int tid) throws PDIException {
 		try {
 			debugSetThreadSelect(tasks, tid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting thread id: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_26 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setAddressBreakpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setAddressBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint)
 	 */
-	public void setAddressBreakpoint(BitList tasks, IPDIAddressBreakpoint bpt) throws PDIException {
-		throw new PDIException(tasks, "Not implement PDIDebugger - setAddressBreakpoint() yet"); //$NON-NLS-1$
+	public void setAddressBreakpoint(TaskSet tasks, IPDIAddressBreakpoint bpt) throws PDIException {
+		throw new PDIException(tasks, Messages.PDIDebugger_27); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setConditionBreakpoint(org.eclipse.ptp.core.util.BitList, int, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setConditionBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, java.lang.String)
 	 */
-	public void setConditionBreakpoint(BitList tasks, int bpid, String condition) throws PDIException {
+	public void setConditionBreakpoint(TaskSet tasks, int bpid, String condition) throws PDIException {
 		try {
 			debugConditionBreakpoint(tasks, bpid, condition);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting condition breakpoint: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_28 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#setCurrentStackFrame(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#setCurrentStackFrame(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void setCurrentStackFrame(BitList tasks, int level) throws PDIException {
+	public void setCurrentStackFrame(TaskSet tasks, int level) throws PDIException {
 		try {
 			debugSetCurrentStackframe(tasks, level);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting current stack frame level: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_29 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setEnabledBreakpoint(org.eclipse.ptp.core.util.BitList, int, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setEnabledBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, boolean)
 	 */
-	public void setEnabledBreakpoint(BitList tasks, int bpid, boolean enabled) throws PDIException {
+	public void setEnabledBreakpoint(TaskSet tasks, int bpid, boolean enabled) throws PDIException {
 		try {
 			if (enabled)
 				debugEnableBreakpoint(tasks, bpid);
 			else
 				debugDisableBreakpoint(tasks, bpid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting enabling breakpoint: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_30 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setExceptionpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setExceptionpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint)
 	 */
-	public void setExceptionpoint(BitList tasks, IPDIExceptionpoint bpt) throws PDIException {
-		throw new PDIException(tasks, "Not implement PDIDebugger - setExceptionpoint() yet"); //$NON-NLS-1$
+	public void setExceptionpoint(TaskSet tasks, IPDIExceptionpoint bpt) throws PDIException {
+		throw new PDIException(tasks, Messages.PDIDebugger_31); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setFunctionBreakpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setFunctionBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint)
 	 */
-	public void setFunctionBreakpoint(BitList tasks, IPDIFunctionBreakpoint bpt) throws PDIException {
+	public void setFunctionBreakpoint(TaskSet tasks, IPDIFunctionBreakpoint bpt) throws PDIException {
 		try {
 			IPDICondition condition = bpt.getCondition();
 			int id = bpt.getBreakpointID();
@@ -509,17 +510,17 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			// getFilename(bpt.getLocator().getFile()) + ", func: " +
 			// bpt.getLocator().getFunction());
 			debugSetFuncBreakpoint(tasks, id, bpt.isTemporary(), bpt.isHardware(), getFilename(bpt.getLocator().getFile()), bpt
-					.getLocator().getFunction(), (condition != null ? condition.getExpression() : ""),
+					.getLocator().getFunction(), (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0), 0);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting function breakpoint: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_32 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setLineBreakpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setLineBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint)
 	 */
-	public void setLineBreakpoint(BitList tasks, IPDILineBreakpoint bpt) throws PDIException {
+	public void setLineBreakpoint(TaskSet tasks, IPDILineBreakpoint bpt) throws PDIException {
 		try {
 			IPDICondition condition = bpt.getCondition();
 			int id = bpt.getBreakpointID();
@@ -534,14 +535,14 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 					.getLocator().getLineNumber(), (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0), 0);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting line breakpoint: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_33 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setWatchpoint(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setWatchpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint)
 	 */
-	public void setWatchpoint(BitList tasks, IPDIWatchpoint bpt) throws PDIException {
+	public void setWatchpoint(TaskSet tasks, IPDIWatchpoint bpt) throws PDIException {
 		try {
 			String expression = bpt.getWatchExpression();
 			boolean access = bpt.isReadType() && bpt.isWriteType();
@@ -555,14 +556,14 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			debugSetWatchpoint(tasks, id, expression, access, read, (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0));
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on setting wacthpoint: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_34 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void start(BitList tasks) throws PDIException {
+	public void start(TaskSet tasks) throws PDIException {
 		resume(tasks, false);
 	}
 
@@ -573,69 +574,69 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			debugStartSession(app, path, dir, args);
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on starting debugger: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(null, Messages.PDIDebugger_35 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepInto(BitList tasks, int count) throws PDIException {
+	public void stepInto(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_INTO);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on stepping into: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_36 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepIntoInstruction(BitList tasks, int count) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepIntoInstruction() yet"); //$NON-NLS-1$
+	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_37); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepOver(BitList tasks, int count) throws PDIException {
+	public void stepOver(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_OVER);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on stepping over: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_38 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepOverInstruction(BitList tasks, int count) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepOverInstruction() yet"); //$NON-NLS-1$
+	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_39); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
 	 */
-	public void stepReturn(BitList tasks, IAIF aif) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepReturn(IAIF) yet"); //$NON-NLS-1$
+	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_40); 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepReturn(BitList tasks, int count) throws PDIException {
+	public void stepReturn(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_FINISH);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on stepping return: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_41 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
-	public void stepUntil(BitList tasks, IPDILocation location) throws PDIException {
-		throw new PDIException(null, "Not implement PDIDebugger - stepUntil(IPDILocation) yet"); //$NON-NLS-1$
+	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
+		throw new PDIException(null, Messages.PDIDebugger_42); 
 	}
 
 	/* (non-Javadoc)
@@ -645,31 +646,31 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		try {
 			doShutdown();
 		} catch (IOException e) {
-			throw new PDIException(null, "Error on stopping debugger: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(null, Messages.PDIDebugger_43 + e.getMessage()); 
 		} finally {
 			proxyNotifier.deleteObservers();
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void suspend(BitList tasks) throws PDIException {
+	public void suspend(TaskSet tasks) throws PDIException {
 		try {
 			debugInterrupt(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on suspending tasks: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_44 + e.getMessage()); 
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void terminate(BitList tasks) throws PDIException {
+	public void terminate(TaskSet tasks) throws PDIException {
 		try {
 			debugTerminate(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, "Error on terminating tasks: " + e.getMessage()); //$NON-NLS-1$
+			throw new PDIException(tasks, Messages.PDIDebugger_45 + e.getMessage()); 
 		}
 	}
 

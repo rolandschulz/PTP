@@ -16,24 +16,28 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core; 
+package org.eclipse.ptp.debug.internal.core;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
- 
+
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public PreferenceInitializer() {
 		super();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#
+	 * initializeDefaultPreferences()
 	 */
+	@Override
 	public void initializeDefaultPreferences() {
-		Preferences store = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		final Preferences store = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 		store.setDefault(IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, IPDIFormat.NATURAL);
 		store.setDefault(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL);
 		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);

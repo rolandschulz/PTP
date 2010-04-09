@@ -12,7 +12,7 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
@@ -55,9 +55,9 @@ public abstract class AbstractEventFactory implements IPDIEventFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newBreakpointInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newBreakpointInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
 	 */
-	public IPDIBreakpointInfo newBreakpointInfo(IPDISession session, BitList tasks, IPDIBreakpoint bpt) {
+	public IPDIBreakpointInfo newBreakpointInfo(IPDISession session, TaskSet tasks, IPDIBreakpoint bpt) {
 		return new BreakpointInfo(session, tasks, bpt);
 	}
 
@@ -69,9 +69,9 @@ public abstract class AbstractEventFactory implements IPDIEventFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newConnectedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newConnectedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIConnectedEvent newConnectedEvent(IPDISessionObject reason, BitList tasks) {
+	public IPDIConnectedEvent newConnectedEvent(IPDISessionObject reason, TaskSet tasks) {
 		return new ConnectedEvent(reason, tasks);
 	}
 
@@ -90,16 +90,16 @@ public abstract class AbstractEventFactory implements IPDIEventFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newDisconnectedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newDisconnectedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIDisconnectedEvent newDisconnectedEvent(IPDISessionObject reason, BitList tasks) {
+	public IPDIDisconnectedEvent newDisconnectedEvent(IPDISessionObject reason, TaskSet tasks) {
 		return new DisconnectedEvent(reason, tasks);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newEndSteppingRangeInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocator)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newEndSteppingRangeInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocator)
 	 */
-	public IPDIEndSteppingRangeInfo newEndSteppingRangeInfo(IPDISession session, BitList tasks, IPDILocator locator) {
+	public IPDIEndSteppingRangeInfo newEndSteppingRangeInfo(IPDISession session, TaskSet tasks, IPDILocator locator) {
 		return new EndSteppingRangeInfo(session, tasks, locator);
 	}
 
@@ -111,59 +111,59 @@ public abstract class AbstractEventFactory implements IPDIEventFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newErrorInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newErrorInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, java.lang.String, java.lang.String)
 	 */
-	public IPDIErrorInfo newErrorInfo(IPDISession session, BitList tasks, int code, String msg, String detailMsg) {
+	public IPDIErrorInfo newErrorInfo(IPDISession session, TaskSet tasks, int code, String msg, String detailMsg) {
 		return new ErrorInfo(session, tasks, code, msg, detailMsg);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newExitInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newExitInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public IPDIExitInfo newExitInfo(IPDISession session, BitList tasks, int code) {
+	public IPDIExitInfo newExitInfo(IPDISession session, TaskSet tasks, int code) {
 		return new ExitInfo(session, tasks, code);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newLocationReachedInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocator)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newLocationReachedInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocator)
 	 */
-	public IPDILocationReachedInfo newLocationReachedInfo(IPDISession session, BitList tasks, IPDILocator locator) {
+	public IPDILocationReachedInfo newLocationReachedInfo(IPDISession session, TaskSet tasks, IPDILocator locator) {
 		return new LocationReachedInfo(session, tasks, locator);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newMemoryBlockInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.math.BigInteger[], org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newMemoryBlockInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.math.BigInteger[], org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock)
 	 */
-	public IPDISessionObject newMemoryBlockInfo(IPDISession session, BitList tasks, BigInteger[] bigIntegers, IPDIMemoryBlock block) {
+	public IPDISessionObject newMemoryBlockInfo(IPDISession session, TaskSet tasks, BigInteger[] bigIntegers, IPDIMemoryBlock block) {
 		return new MemoryBlockInfo(session, tasks, bigIntegers, block);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newOutputEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newOutputEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, BitList tasks, String output) {
+	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, TaskSet tasks, String output) {
 		return new OutputEvent(reason, tasks, output);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newResumedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newResumedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public IPDIResumedEvent newResumedEvent(IPDISessionObject reason, BitList tasks, int type) {
+	public IPDIResumedEvent newResumedEvent(IPDISessionObject reason, TaskSet tasks, int type) {
 		return new ResumedEvent(reason, tasks, type);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newSignalInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String, java.lang.String, org.eclipse.ptp.debug.core.pdi.model.IPDISignal, org.eclipse.ptp.debug.core.pdi.IPDILocator)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newSignalInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String, java.lang.String, org.eclipse.ptp.debug.core.pdi.model.IPDISignal, org.eclipse.ptp.debug.core.pdi.IPDILocator)
 	 */
-	public IPDISignalInfo newSignalInfo(IPDISession session, BitList tasks, String name, String desc, IPDISignal signal,
+	public IPDISignalInfo newSignalInfo(IPDISession session, TaskSet tasks, String name, String desc, IPDISignal signal,
 			IPDILocator locator) {
 		return new SignalInfo(session, tasks, name, desc, signal, locator);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newStartedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newStartedEvent(org.eclipse.ptp.debug.core.pdi.IPDISessionObject, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIStartedEvent newStartedEvent(IPDISessionObject reason, BitList tasks) {
+	public IPDIStartedEvent newStartedEvent(IPDISessionObject reason, TaskSet tasks) {
 		return new StartedEvent(reason, tasks);
 	}
 
@@ -175,16 +175,16 @@ public abstract class AbstractEventFactory implements IPDIEventFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newThreadInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, int, org.eclipse.ptp.debug.core.pdi.model.IPDIThread)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newThreadInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.model.IPDIThread)
 	 */
-	public IPDISessionObject newThreadInfo(IPDISession session, BitList tasks, int id, IPDIThread thread) {
+	public IPDISessionObject newThreadInfo(IPDISession session, TaskSet tasks, int id, IPDIThread thread) {
 		return new ThreadInfo(session, tasks, id, thread);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newVariableInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.BitList, java.lang.String, org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory#newVariableInfo(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String, org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
 	 */
-	public IPDIVariableInfo newVariableInfo(IPDISession session, BitList tasks, String name, IPDIVariable var) {
+	public IPDIVariableInfo newVariableInfo(IPDISession session, TaskSet tasks, String name, IPDIVariable var) {
 		return new VariableInfo(session, tasks, name, var);
 	}
 

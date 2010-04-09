@@ -20,8 +20,8 @@ package org.eclipse.ptp.debug.internal.core.pdi.model;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
@@ -30,6 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMemory;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDataWriteMemoryRequest;
@@ -49,7 +50,7 @@ public class MemoryBlock extends SessionObject implements IPDIMemoryBlock {
 	String expression;
 	boolean frozen;
 
-	public MemoryBlock(IPDISession session, BitList tasks, String exp, int wordSize, boolean isLittle, IPDIDataReadMemoryInfo info) {
+	public MemoryBlock(IPDISession session, TaskSet tasks, String exp, int wordSize, boolean isLittle, IPDIDataReadMemoryInfo info) {
 		super(session, tasks);
 		expression = exp;
 		fWordSize = wordSize;
@@ -171,11 +172,11 @@ public class MemoryBlock extends SessionObject implements IPDIMemoryBlock {
 	 */
 	public void setValue(long offset, byte[] bytes) throws PDIException {
 		if (offset >= getLength() || offset + bytes.length > getLength()) {
-			throw new PDIException(getTasks(), "No bad offset found");
+			throw new PDIException(getTasks(), Messages.MemoryBlock_0);
 		}
 		for (int i = 0; i < bytes.length; i++) {
 			long l = new Byte(bytes[i]).longValue() & 0xff;
-			String value = "0x" + Long.toHexString(l);
+			String value = "0x" + Long.toHexString(l); //$NON-NLS-1$
 			IPDIDataWriteMemoryRequest request = session.getRequestFactory().getDataWriteMemoryRequest(getTasks(), offset + i, expression, ExtFormat.HEXADECIMAL, 1, value);
 			session.getEventRequestManager().addEventRequest(request);
 			request.waitUntilCompleted(getTasks());

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * The memory manager manages the collection of memory blocks specified for the debug session.
@@ -38,7 +38,7 @@ public interface IPDIMemoryBlockManagement {
 	 * @param asChar
 	 * @throws PDIException on failure
 	 */
-	void createDataReadMemory(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PDIException;
+	void createDataReadMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PDIException;
 	
 	/**
 	 * Requests to create data write memory
@@ -50,5 +50,5 @@ public interface IPDIMemoryBlockManagement {
 	 * @param value
 	 * @throws PDIException
 	 */
-	void createDataWriteMemory(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PDIException;
+	void createDataWriteMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PDIException;
 }

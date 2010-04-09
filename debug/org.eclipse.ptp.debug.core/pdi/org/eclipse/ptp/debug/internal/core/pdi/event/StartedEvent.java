@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIStartedEvent;
 
@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIStartedEvent;
  *
  */
 public class StartedEvent extends AbstractEvent implements IPDIStartedEvent {
-	public StartedEvent(IPDISessionObject reason, BitList tasks) {
+	public StartedEvent(IPDISessionObject reason, TaskSet tasks) {
 		super(reason.getSession(), tasks);
 	}
 }

@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
@@ -50,41 +52,41 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionReque
  */
 public class ExpressionManager extends AbstractPDIManager implements IPDIExpressionManager {
 	final static IPDIExpression[] EMPTY_EXPRESSIONS = {};
-	Map<BitList, List<IPDIExpression>> expMap;
-	Map<BitList, List<IPDIVariable>> varMap;
+	Map<TaskSet, List<IPDIExpression>> expMap;
+	Map<TaskSet, List<IPDIVariable>> varMap;
 	Map<String, IPDIMultiExpressions> mutliExprMap;
 
 	public ExpressionManager(IPDISession session) {
 		super(session, true);
-		expMap = new Hashtable<BitList, List<IPDIExpression>>();
-		varMap = new Hashtable<BitList, List<IPDIVariable>>();
+		expMap = new Hashtable<TaskSet, List<IPDIExpression>>();
+		varMap = new Hashtable<TaskSet, List<IPDIVariable>>();
 		mutliExprMap = new HashMap<String, IPDIMultiExpressions>();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#cleanMultiExpressions(org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#cleanMultiExpressions(org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void cleanMultiExpressions(BitList tasks, IProgressMonitor monitor) throws PDIException {
+	public void cleanMultiExpressions(TaskSet tasks, IProgressMonitor monitor) throws PDIException {
 		for (IPDIMultiExpressions mexpr : getMultiExpressions()) {
 			mexpr.cleanExpressionsValue(tasks, monitor);
 		}
 	}	
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#cleanMultiExpressions(java.lang.String, org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#cleanMultiExpressions(java.lang.String, org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void cleanMultiExpressions(String exprText, BitList tasks, IProgressMonitor monitor) throws PDIException {
+	public void cleanMultiExpressions(String exprText, TaskSet tasks, IProgressMonitor monitor) throws PDIException {
 		IPDIMultiExpressions mexpr = getMultiExpression(exprText);
 		if (mexpr == null)
-			throw new PDIException(tasks, "No expression " + exprText + " found");
+			throw new PDIException(tasks, NLS.bind(Messages.ExpressionManager_0, exprText));
 	
 		mexpr.cleanExpressionsValue(tasks, monitor);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#createExpression(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#createExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public IPDITargetExpression createExpression(BitList qTasks, String name) throws PDIException {
+	public IPDITargetExpression createExpression(TaskSet qTasks, String name) throws PDIException {
 		IPDITargetExpression expression = session.getModelFactory().newExpression(session, qTasks, name);
 		List<IPDIExpression> exprList = getExpressionList(qTasks);
 		exprList.add(expression);
@@ -92,9 +94,9 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#createMutliExpressions(org.eclipse.ptp.core.util.BitList, java.lang.String, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#createMutliExpressions(org.eclipse.ptp.core.util.TaskSet, java.lang.String, boolean)
 	 */
-	public void createMutliExpressions(BitList tasks, String exprText, boolean enabled) {
+	public void createMutliExpressions(TaskSet tasks, String exprText, boolean enabled) {
 		mutliExprMap.put(exprText, session.getModelFactory().newMultiExpressions(session, tasks, exprText, enabled));
 	}
 	
@@ -132,7 +134,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @param qTasks
 	 * @throws PDIException
 	 */
-	public void deleteAllVariables(BitList qTasks) throws PDIException {
+	public void deleteAllVariables(TaskSet qTasks) throws PDIException {
 		List<IPDIVariable> varList = getVariableList(qTasks);
 		IPDIVariable[] variables = (IPDIVariable[]) varList.toArray(new IPDIVariable[varList.size()]);
 		for (int i = 0; i < variables.length; ++i) {
@@ -172,15 +174,15 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @param qTasks
 	 * @throws PDIException
 	 */
-	public void destroyAllExpressions(BitList qTasks) throws PDIException {
+	public void destroyAllExpressions(TaskSet qTasks) throws PDIException {
 		IPDIExpression[] expressions = getExpressions(qTasks);
 		destroyExpressions(qTasks, expressions);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#destroyExpressions(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIExpression[])
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#destroyExpressions(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIExpression[])
 	 */
-	public void destroyExpressions(BitList qTasks, IPDIExpression[] expressions) throws PDIException {
+	public void destroyExpressions(TaskSet qTasks, IPDIExpression[] expressions) throws PDIException {
 		List<IPDIExpression> expList = getExpressionList(qTasks);
 		for (int i = 0; i < expressions.length; ++i) {
 			expList.remove(expressions[i]);
@@ -193,7 +195,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @return
 	 * @throws PDIException
 	 */
-	public IAIF getAIF(BitList qTasks, String expr) throws PDIException {
+	public IAIF getAIF(TaskSet qTasks, String expr) throws PDIException {
 		IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(qTasks, expr, null);
 		session.getEventRequestManager().addEventRequest(request);
 		return request.getPartialAIF(qTasks);
@@ -204,7 +206,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIExpression[] getExpressions(BitList qTasks) throws PDIException {
+	public IPDIExpression[] getExpressions(TaskSet qTasks) throws PDIException {
 		List<IPDIExpression> expList = expMap.get(qTasks);
 		if (expList != null) {
 			return (IPDIExpression[])expList.toArray(EMPTY_EXPRESSIONS);
@@ -213,9 +215,9 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#getExpressionValue(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#getExpressionValue(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public IAIF getExpressionValue(BitList qTasks, String expr) throws PDIException {
+	public IAIF getExpressionValue(TaskSet qTasks, String expr) throws PDIException {
 		IPDIEvaluateExpressionRequest request = session.getRequestFactory().getEvaluateExpressionRequest(qTasks, expr);
 		session.getEventRequestManager().addEventRequest(request);
 		return request.getAIF(qTasks);
@@ -256,7 +258,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @param varId
 	 * @return
 	 */
-	public IPDIVariable getVariable(BitList qTasks, String varid) {
+	public IPDIVariable getVariable(TaskSet qTasks, String varid) {
 		List<IPDIVariable> varList = getVariableList(qTasks);
 		IPDIVariable[] vars = (IPDIVariable[])varList.toArray(new IPDIVariable[0]);
 		for (int i = 0; i < vars.length; i++) {
@@ -272,9 +274,9 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#removeMutliExpressions(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#removeMutliExpressions(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public void removeMutliExpressions(BitList tasks, String exprText) {
+	public void removeMutliExpressions(TaskSet tasks, String exprText) {
 		IPDIMultiExpressions mexpr = getMultiExpression(exprText);
 		if (mexpr != null) {
 			mexpr.removeExpression(tasks);
@@ -302,16 +304,16 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	}	
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) throws PDIException {
+	public void update(TaskSet qTasks) throws PDIException {
 		update(qTasks, new String[0]);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#update(org.eclipse.ptp.core.util.BitList, java.lang.String[])
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#update(org.eclipse.ptp.core.util.TaskSet, java.lang.String[])
 	 */
-	public void update(BitList qTasks, String[] varList) throws PDIException {
+	public void update(TaskSet qTasks, String[] varList) throws PDIException {
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>();
 		for (int i=0; i<varList.length; i++) {
 			IPDIVariable variable = getVariable(qTasks, varList[i]);
@@ -324,9 +326,9 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#updateMultiExpressions(org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#updateMultiExpressions(org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void updateMultiExpressions(BitList tasks, IProgressMonitor monitor) throws PDIException {
+	public void updateMultiExpressions(TaskSet tasks, IProgressMonitor monitor) throws PDIException {
 		for (IPDIMultiExpressions mexpr : getMultiExpressions()) {
 			if (mexpr.isEnabled())
 				mexpr.updateExpressionsValue(tasks, monitor);
@@ -334,12 +336,12 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#updateMultiExpressions(java.lang.String, org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIExpressionManager#updateMultiExpressions(java.lang.String, org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void updateMultiExpressions(String exprText, BitList tasks, IProgressMonitor monitor) throws PDIException {
+	public void updateMultiExpressions(String exprText, TaskSet tasks, IProgressMonitor monitor) throws PDIException {
 		IPDIMultiExpressions mexpr = getMultiExpression(exprText);
 		if (mexpr == null)
-			throw new PDIException(tasks, "No expression " + exprText + " found");
+			throw new PDIException(tasks, NLS.bind(Messages.ExpressionManager_0, exprText));
 	
 		if (mexpr.isEnabled())
 			mexpr.updateExpressionsValue(tasks, monitor);
@@ -359,7 +361,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @param qTasks
 	 * @return
 	 */
-	private synchronized List<IPDIExpression> getExpressionList(BitList qTasks) {
+	private synchronized List<IPDIExpression> getExpressionList(TaskSet qTasks) {
 		List<IPDIExpression> expList = expMap.get(qTasks);
 		if (expList == null) {
 			expList = Collections.synchronizedList(new ArrayList<IPDIExpression>());
@@ -372,7 +374,7 @@ public class ExpressionManager extends AbstractPDIManager implements IPDIExpress
 	 * @param qTasks
 	 * @return
 	 */
-	private synchronized List<IPDIVariable> getVariableList(BitList qTasks) {
+	private synchronized List<IPDIVariable> getVariableList(TaskSet qTasks) {
 		List<IPDIVariable> varList = varMap.get(qTasks);
 		if (varList == null) {
 			varList = Collections.synchronizedList(new ArrayList<IPDIVariable>());

@@ -35,6 +35,7 @@ import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.ui.PreferencesAdapter;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.preferences.AbstractPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -69,7 +70,7 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	 */
 	public PDebugPreferencePage() {
 		super();
-		setDescription(PreferenceMessages.getString("PDebugPreferencePage.desc"));
+		setDescription(Messages.PDebugPreferencePage_0);
 		setPreferenceStore(new PreferencesAdapter(PTPDebugCorePlugin.getDefault().getPluginPreferences()));
 	}
 	
@@ -113,15 +114,15 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	 * @param parent
 	 */
 	protected void createViewSettingPreferences(Composite parent) {
-		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.default1"));
-		fPathsButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.default2"));
-		fRegisteredProcessButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.registerProcess"));
+		Composite comp = createGroupComposite(parent, 1, false, Messages.PDebugPreferencePage_1);
+		fPathsButton = createCheckButton(comp, Messages.PDebugPreferencePage_2);
+		fRegisteredProcessButton = createCheckButton(comp, Messages.PDebugPreferencePage_3);
 		fRegisteredProcessButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 			public void widgetSelected(SelectionEvent e) {
 				boolean isChecked = fRegisteredProcessButton.getSelection();
 				if (!isChecked) {
-					MessageDialog.openWarning(getShell(), PreferenceMessages.getString("PDebugPreferencePage.warningTitle1"), PreferenceMessages.getString("PDebugPreferencePage.warning1"));
+					MessageDialog.openWarning(getShell(), Messages.PDebugPreferencePage_4, Messages.PDebugPreferencePage_5);
 				}
 			}
 		});
@@ -133,19 +134,19 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	 * @param parent
 	 */
 	protected void createCommunicationPreferences(Composite parent) {
-		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.communication_group"));
+		Composite comp = createGroupComposite(parent, 1, false, Messages.PDebugPreferencePage_6);
 		Composite spacingComposite = new Composite(comp, SWT.NONE);
 		spacingComposite.setLayout(new GridLayout());
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 2;
 		spacingComposite.setLayoutData(data);
-		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, PreferenceMessages.getString("PDebugPreferencePage.command_timeout"), spacingComposite);
+		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, Messages.PDebugPreferencePage_7, spacingComposite);
 		commandTimeoutField.setPreferenceStore(getPreferenceStore());
 		commandTimeoutField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		commandTimeoutField.setValidRange(IPDebugConstants.MIN_REQUEST_TIMEOUT, IPDebugConstants.MAX_REQUEST_TIMEOUT);
 		String minValue = Integer.toString(IPDebugConstants.MIN_REQUEST_TIMEOUT);
 		String maxValue = Integer.toString(IPDebugConstants.MAX_REQUEST_TIMEOUT);
-		commandTimeoutField.setErrorMessage(MessageFormat.format(PreferenceMessages.getString("PDebugPreferencePage.timeoutError"), new Object[] { minValue, maxValue }));
+		commandTimeoutField.setErrorMessage(MessageFormat.format(Messages.PDebugPreferencePage_8, new Object[] { minValue, maxValue }));
 		commandTimeoutField.setEmptyStringAllowed(false);
 		commandTimeoutField.setPropertyChangeListener(listener);
 		commandTimeoutField.load();
@@ -157,9 +158,9 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	 * @param parent
 	 */
 	protected void createVariablesPreferences(Composite parent) {
-		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.variable_group"));
-		updateVariableOnSuspendButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnSuspend"));
-		updateVariableOnChangeButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnChange"));
+		Composite comp = createGroupComposite(parent, 1, false, Messages.PDebugPreferencePage_9);
+		updateVariableOnSuspendButton = createCheckButton(comp, Messages.PDebugPreferencePage_10);
+		updateVariableOnChangeButton = createCheckButton(comp, Messages.PDebugPreferencePage_11);
 	}
 	
 	/*

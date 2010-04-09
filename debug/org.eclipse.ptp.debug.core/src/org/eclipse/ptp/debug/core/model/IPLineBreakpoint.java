@@ -23,17 +23,39 @@ import org.eclipse.debug.core.model.ILineBreakpoint;
 
 /**
  * @author Clement
- *
+ * 
  */
 public interface IPLineBreakpoint extends IPBreakpoint, ILineBreakpoint {
-	public static final String FUNCTION = "org.eclipse.ptp.debug.core.function";	
-	public static final String ADDRESS = "org.eclipse.ptp.debug.core.address";	
+	public static final String ADDRESS = "org.eclipse.ptp.debug.core.address"; //$NON-NLS-1$
+	public static final String FUNCTION = "org.eclipse.ptp.debug.core.function"; //$NON-NLS-1$
 
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
 	public String getAddress() throws CoreException;
-	public void setAddress(String address) throws CoreException;
-	
-	public String getFunction() throws CoreException;
-	public void setFunction(String function) throws CoreException;
-	
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
 	public String getFileName() throws CoreException;
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
+	public String getFunction() throws CoreException;
+
+	/**
+	 * @param address
+	 * @throws CoreException
+	 */
+	public void setAddress(String address) throws CoreException;
+
+	/**
+	 * @param function
+	 * @throws CoreException
+	 */
+	public void setFunction(String function) throws CoreException;
 }

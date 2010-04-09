@@ -27,9 +27,10 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEventFactory;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager;
@@ -44,6 +45,7 @@ import org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDITaskManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIThreadManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIModelFactory;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
@@ -143,10 +145,10 @@ public class Session implements IPDISession {
 	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String dir, String[] args) throws PDIException {
 		setStatus(CONNECTING);
 		if (!getDebugger().isConnected(monitor)) {
-			throw new PDIException(getTasks(), "Cannot connect to debugger");
+			throw new PDIException(getTasks(), Messages.Session_0);
 		}
 		getDebugger().register(eventManager);
-		monitor.beginTask("Initialising debug processes ("+total_tasks+")...", total_tasks);
+		monitor.beginTask(NLS.bind(Messages.Session_1, total_tasks), total_tasks);
 		IPDIStartDebuggerRequest request = getRequestFactory().getStartDebuggerRequest(getTasks(), app, path, dir, args);
 		eventRequestManager.addEventRequest(request);
 		request.waitUntilCompleted(null, monitor);
@@ -357,154 +359,154 @@ public class Session implements IPDISession {
 	 * IPDIExecuteManagement
 	 *******************************************/
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void restart(BitList tasks) throws PDIException {
+	public void restart(TaskSet tasks) throws PDIException {
 		checkStatus();
-		throw new PDIException(tasks, "Not implement restart() yet");
+		throw new PDIException(tasks, Messages.Session_2);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void start(BitList tasks) throws PDIException {
+	public void start(TaskSet tasks) throws PDIException {
 		checkStatus();
 		getEventRequestManager().addEventRequest(getRequestFactory().getResumeRequest(tasks, false));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, boolean)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, boolean)
 	 */
-	public void resume(BitList tasks, boolean passSignal) throws PDIException {
+	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
 		checkStatus();
 		if (passSignal)
-			throw new PDIException(tasks, "Not implment resume() - Pass Signal yet");
+			throw new PDIException(tasks, Messages.Session_3);
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
+			throw new PDIException(tasks, Messages.Session_4);
 		getEventRequestManager().addEventRequest(getRequestFactory().getResumeRequest(tasks, passSignal));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
-	public void resume(BitList tasks, IPDILocation location) throws PDIException {
+	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
-		throw new PDIException(tasks, "Not implment resume(IPDILocation) yet");
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_5);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
-	public void resume(BitList tasks, IPDISignal signal) throws PDIException {
+	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
-		throw new PDIException(tasks, "Not implment resume(IPDISignal) yet");
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_6);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepInto(BitList tasks, int count) throws PDIException {
+	public void stepInto(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
+			throw new PDIException(tasks, Messages.Session_4);
 		getEventRequestManager().addEventRequest(getRequestFactory().getStepIntoRequest(tasks, count));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepIntoInstruction(BitList tasks, int count) throws PDIException {
+	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
-		throw new PDIException(tasks, "Not implment stepIntoInstruction() yet");
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_7);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepOver(BitList tasks, int count) throws PDIException {
+	public void stepOver(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
+			throw new PDIException(tasks, Messages.Session_4);
 		getEventRequestManager().addEventRequest(getRequestFactory().getStepOverRequest(tasks, count));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepOverInstruction(BitList tasks, int count) throws PDIException {
+	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
-		throw new PDIException(tasks, "Not implment stepOverInstruction() yet");
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_8);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
 	 */
-	public void stepReturn(BitList tasks, IAIF aif) throws PDIException {
+	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
-		throw new PDIException(tasks, "Not implment stepReturn(IAIF) yet");
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_9);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.BitList, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public void stepReturn(BitList tasks, int count) throws PDIException {
+	public void stepReturn(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getCanStepReturnTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
+			throw new PDIException(tasks, Messages.Session_4);
 		getEventRequestManager().addEventRequest(getRequestFactory().getStepFinishRequest(tasks, count));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
-	public void stepUntil(BitList tasks, IPDILocation location) throws PDIException {
+	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No suspended processes found");
-		throw new PDIException(tasks, "Not implment stepUntil(IPDILocation) yet");
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_10);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void suspend(BitList tasks) throws PDIException {
+	public void suspend(TaskSet tasks) throws PDIException {
 		checkStatus();
 		taskManager.getRunningTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "No running processes found");
+			throw new PDIException(tasks, Messages.Session_11);
 		getEventRequestManager().addEventRequest(getRequestFactory().getSuspendRequest(tasks));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void terminate(BitList tasks) throws PDIException {
+	public void terminate(TaskSet tasks) throws PDIException {
 		checkStatus();
 		taskManager.getNonTerminatedTasks(tasks);
 		if (tasks.isEmpty())
-			throw new PDIException(tasks, "All processes have been terminated");
+			throw new PDIException(tasks, Messages.Session_12);
 
-		BitList nonTerTasks = tasks.copy();
+		TaskSet nonTerTasks = tasks.copy();
 		taskManager.getRunningTasks(nonTerTasks);
 		if (!nonTerTasks.isEmpty()) {
 			getEventRequestManager().addEventRequest(getRequestFactory().getSuspendRequest(nonTerTasks, false));
@@ -514,9 +516,9 @@ public class Session implements IPDISession {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#validateStepReturn(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#validateStepReturn(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void validateStepReturn(BitList tasks) throws PDIException {
+	public void validateStepReturn(TaskSet tasks) throws PDIException {
 		/*
 		taskManager.getUnregisteredTasks(tasks);
 		if (!tasks.isEmpty()) {
@@ -534,7 +536,7 @@ public class Session implements IPDISession {
 		if (status != EXITING && status != EXITED) {
 			setStatus(EXITING);
 			eventRequestManager.cleanEventRequests();
-			BitList tasks = getTasks();
+			TaskSet tasks = getTasks();
 			taskManager.getRunningTasks(tasks);
 			if (!tasks.isEmpty()) {
 				getEventRequestManager().addEventRequest(getRequestFactory().getSuspendRequest(tasks, false));
@@ -544,7 +546,7 @@ public class Session implements IPDISession {
 			if (!tasks.isEmpty())
 				getEventRequestManager().addEventRequest(getRequestFactory().getTerminateRequest(tasks));
 			
-			getEventRequestManager().addEventRequest(getRequestFactory().getStopDebuggerRequest(new BitList(total_tasks)));
+			getEventRequestManager().addEventRequest(getRequestFactory().getStopDebuggerRequest(new TaskSet(total_tasks)));
 			taskManager.setPendingTasks(true, tasks);
 		}
 	}
@@ -567,16 +569,16 @@ public class Session implements IPDISession {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#isTerminated(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#isTerminated(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isTerminated(BitList tasks) {
+	public boolean isTerminated(TaskSet tasks) {
 		return taskManager.isAllTerminated(tasks);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#isSuspended(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#isSuspended(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean isSuspended(BitList tasks) {
+	public boolean isSuspended(TaskSet tasks) {
 		return taskManager.isAllSuspended(tasks);
 	}
 	
@@ -584,15 +586,15 @@ public class Session implements IPDISession {
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isRunning(BitList tasks) {
+	public boolean isRunning(TaskSet tasks) {
 		return taskManager.isAllRunning(tasks);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTasks()
 	 */
-	public BitList getTasks() {
-		BitList tasks = new BitList(total_tasks);
+	public TaskSet getTasks() {
+		TaskSet tasks = new TaskSet(total_tasks);
 		tasks.set(0, total_tasks);
 		return tasks;
 	}	
@@ -636,16 +638,16 @@ public class Session implements IPDISession {
 	 */
 	protected void checkStatus() throws PDIException {
 		if (status == EXITING || status == EXITED)
-			throw new PDIException(null, "Cannot process for your request due to session is exiting or exited.");
+			throw new PDIException(null, Messages.Session_13);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#findTarget(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#findTarget(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDITarget findTarget(BitList qTasks) throws PDIException {
+	public IPDITarget findTarget(TaskSet qTasks) throws PDIException {
 		IPDITarget target = targetManager.getTarget(qTasks);
 		if (target == null)
-			throw new PDIException(qTasks, "No target found.");
+			throw new PDIException(qTasks, Messages.Session_14);
 		return target;
 	}
 	
@@ -653,7 +655,7 @@ public class Session implements IPDISession {
 	 * @param qTasks
 	 * @return
 	 */
-	public boolean isTarget(BitList qTasks) {
+	public boolean isTarget(TaskSet qTasks) {
 		return (targetManager.getTarget(qTasks) != null);
 	}
 	
@@ -661,9 +663,9 @@ public class Session implements IPDISession {
 	 * process on running or suspended 
 	 **********************************************/
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#processRunningEvent(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#processRunningEvent(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public synchronized void processRunningEvent(BitList tasks) {
+	public synchronized void processRunningEvent(TaskSet tasks) {
 		IPDITarget[] targets = targetManager.getTargets();
 		for (final IPDITarget target : targets) {
 			if (target.getTasks().intersects(tasks)) {
@@ -678,9 +680,9 @@ public class Session implements IPDISession {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#processSupsendedEvent(org.eclipse.ptp.core.util.BitList, int, java.lang.String[])
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#processSupsendedEvent(org.eclipse.ptp.core.util.TaskSet, int, java.lang.String[])
 	 */
-	public synchronized void processSupsendedEvent(BitList tasks, final int thread_id, final String[] vars) {
+	public synchronized void processSupsendedEvent(TaskSet tasks, final int thread_id, final String[] vars) {
 		IPDITarget[] targets = targetManager.getTargets();
 		for (final IPDITarget target : targets) {
 			if (target.getTasks().intersects(tasks)) {
@@ -743,7 +745,7 @@ public class Session implements IPDISession {
 	class NotifyJob extends Job {
 		private Vector<Runnable> fRunnables;
 		public NotifyJob() {
-			super("PTP Notify Job");
+			super(Messages.Session_15);
 			setSystem(true);
 			fRunnables = new Vector<Runnable>(10);
 		}
@@ -764,15 +766,15 @@ public class Session implements IPDISession {
 			}
 			MultiStatus failed = null;
 			monitor.beginTask(getName(), runnables.length);
-			PDebugUtils.println("Msg: NotifyJob - size of runnables: " + runnables.length);
+			PDebugUtils.println(Messages.Session_16 + runnables.length);
 			for (Runnable runnable : runnables) {
 				try {
 					runnable.run();
 				}
 				catch (Exception e) {
 					if (failed == null)
-						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, "Event notify error", null);
-					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, "Event notify error", e));
+						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, Messages.Session_17, null);
+					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, Messages.Session_17, e));
 				}
 				monitor.worked(1);
 			}

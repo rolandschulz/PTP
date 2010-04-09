@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents signal management
@@ -32,7 +32,7 @@ public interface IPDISignalManagement {
 	 * @param name name of signal
 	 * @throws PDIException on failure
 	 */
-	void listSignals(BitList tasks, String name) throws PDIException;
+	void listSignals(TaskSet tasks, String name) throws PDIException;
 	
 	/**
 	 * Requests to retrieve signal information with given argument of specify process
@@ -41,5 +41,5 @@ public interface IPDISignalManagement {
 	 * @throws PDIException on failure
 	 * @deprecated
 	 */
-	void retrieveSignalInfo(BitList tasks, String arg) throws PDIException;	
+	void retrieveSignalInfo(TaskSet tasks, String arg) throws PDIException;	
 }

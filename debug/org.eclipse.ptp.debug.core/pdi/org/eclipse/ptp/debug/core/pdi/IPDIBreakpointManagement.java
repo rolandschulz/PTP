@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint;
@@ -37,7 +37,7 @@ public interface IPDIBreakpointManagement {
 	 * @param bpt line breakpoint to be set
  	 * @throws PDIException on failure
 	 */
-	void setLineBreakpoint(BitList tasks, IPDILineBreakpoint bpt) throws PDIException;
+	void setLineBreakpoint(TaskSet tasks, IPDILineBreakpoint bpt) throws PDIException;
 	
 	/**
 	 * Requests to set a function breakpoint of specify process
@@ -45,7 +45,7 @@ public interface IPDIBreakpointManagement {
 	 * @param bpt function breakpoint to be set
 	 * @throws PDIException on failure
 	 */
-	void setFunctionBreakpoint(BitList tasks, IPDIFunctionBreakpoint bpt) throws PDIException;
+	void setFunctionBreakpoint(TaskSet tasks, IPDIFunctionBreakpoint bpt) throws PDIException;
 	
 	/**
 	 * Requests to set a address breakpoint of specify process
@@ -53,7 +53,7 @@ public interface IPDIBreakpointManagement {
 	 * @param bpt address breakpoint to be set
 	 * @throws PDIException on failure
 	 */
-	void setAddressBreakpoint(BitList tasks, IPDIAddressBreakpoint bpt) throws PDIException;
+	void setAddressBreakpoint(TaskSet tasks, IPDIAddressBreakpoint bpt) throws PDIException;
 
 	/**
 	 * Requests to set a watchpoint of specify process
@@ -61,7 +61,7 @@ public interface IPDIBreakpointManagement {
 	 * @param bpt watchpoint to be set
 	 * @throws PDIException on failure
 	 */
-	void setWatchpoint(BitList tasks, IPDIWatchpoint bpt) throws PDIException;
+	void setWatchpoint(TaskSet tasks, IPDIWatchpoint bpt) throws PDIException;
 	
 	/**
 	 * Requests to set an exceptionpoint of specify process
@@ -69,7 +69,7 @@ public interface IPDIBreakpointManagement {
 	 * @param bpt an exceptionpoint to be set
 	 * @throws PDIException failure
 	 */
-	void setExceptionpoint(BitList tasks, IPDIExceptionpoint bpt) throws PDIException;
+	void setExceptionpoint(TaskSet tasks, IPDIExceptionpoint bpt) throws PDIException;
 	
 	/**
 	 * Requests to delete a given breakpoint of specify process
@@ -77,7 +77,7 @@ public interface IPDIBreakpointManagement {
 	 * @param bpid breakpoint id to be deleted
 	 * @throws PDIException on failure
 	 */
-	void deleteBreakpoint(BitList tasks, int bpid) throws PDIException;
+	void deleteBreakpoint(TaskSet tasks, int bpid) throws PDIException;
 	
 	/**
 	 * Requests to set enable / disable a given breakpoint of specify process  
@@ -86,7 +86,7 @@ public interface IPDIBreakpointManagement {
 	 * @param enabled true if enable
 	 * @throws PDIException on failure
 	 */
-	void setEnabledBreakpoint(BitList tasks, int bpid, boolean enabled) throws PDIException;
+	void setEnabledBreakpoint(TaskSet tasks, int bpid, boolean enabled) throws PDIException;
 	
 	/**
 	 * Requests to set condition on given breakpoint of specify process 
@@ -95,5 +95,5 @@ public interface IPDIBreakpointManagement {
 	 * @param condition condition rule
 	 * @throws PDIException on failure
 	 */
-	void setConditionBreakpoint(BitList tasks, int bpid, String condition) throws PDIException;
+	void setConditionBreakpoint(TaskSet tasks, int bpid, String condition) throws PDIException;
 }

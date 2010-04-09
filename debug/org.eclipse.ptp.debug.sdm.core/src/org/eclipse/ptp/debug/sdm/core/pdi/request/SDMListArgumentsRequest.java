@@ -10,20 +10,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractListArgumentsRequest;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugArgsEvent;
 
 public class SDMListArgumentsRequest extends AbstractListArgumentsRequest {
 	
-	public SDMListArgumentsRequest(BitList tasks, int low, int high) {
+	public SDMListArgumentsRequest(TaskSet tasks, int low, int high) {
 		super(tasks, low, high);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, java.lang.Object)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, java.lang.Object)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugArgsEvent) {
 			results.put(rTasks, ((IProxyDebugArgsEvent)result).getVariables());
 		}

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueNamed;
@@ -45,7 +46,7 @@ public class AIFValueReference extends ValueParent implements IAIFValueReference
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = (getParent()==null)?"unknown value":"ref: " + getName();
+			result = (getParent()==null)?Messages.AIFValueReference_0:Messages.AIFValueReference_1 + getName();
 		}
 		return result;
 	}

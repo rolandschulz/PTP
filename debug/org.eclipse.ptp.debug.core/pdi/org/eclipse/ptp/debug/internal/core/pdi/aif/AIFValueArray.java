@@ -61,15 +61,15 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 		return result;
 	}
 	private String getString() throws AIFException {
-		String content = "[";
+		String content = "["; //$NON-NLS-1$
 		IAIFValue[] aifValues = getValues();
 		for (int i=0; i<aifValues.length; i++) {
 			content += aifValues[i].getValueString();
 			if (i < aifValues.length - 1) {
-				content += ",";
+				content += ","; //$NON-NLS-1$
 			}
 		}
-		content += "]";
+		content += "]"; //$NON-NLS-1$
 		return content;
 	}
 }

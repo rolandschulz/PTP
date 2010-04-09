@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -73,7 +73,7 @@ public interface IPDIBreakpoint extends IPDISessionObject {
 	 * 
 	 * @return pending tasks
 	 */
-	public BitList getPendingTasks();
+	public TaskSet getPendingTasks();
 	
 	/**
 	 * Breakpoint has been marked for deletion. The breakpoint is not

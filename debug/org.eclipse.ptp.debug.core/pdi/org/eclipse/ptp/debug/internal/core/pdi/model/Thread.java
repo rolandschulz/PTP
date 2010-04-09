@@ -285,7 +285,7 @@ public class Thread extends SessionObject implements IPDIThread {
 	public String toString() {
 		String str = Integer.toString(id);
 		if (name != null) {
-			str += " " + name;
+			str += " " + name; //$NON-NLS-1$
 		}
 		return str;
 	}

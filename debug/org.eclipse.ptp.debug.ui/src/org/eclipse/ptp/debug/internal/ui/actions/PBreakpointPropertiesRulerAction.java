@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.PropertyDialogAction;
 
@@ -40,7 +41,7 @@ public class PBreakpointPropertiesRulerAction extends AbstractBreakpointRulerAct
 	public PBreakpointPropertiesRulerAction(IWorkbenchPart part, IVerticalRulerInfo info) {
 		setInfo(info);
 		setTargetPart(part);
-		setText(ActionMessages.getString("PBreakpointPropertiesRulerAction.Breakpoint_Properties"));
+		setText(Messages.PBreakpointPropertiesRulerAction_0);
 		setId(IPTPDebugUIConstants.ACTION_BREAKPOINT_PROPERTIES);
 	}
 	

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
@@ -32,5 +32,5 @@ public interface IPDIGetStackInfoDepthRequest extends IPDIEventRequest {
 	 * @return
 	 * @throws PDIException
 	 */
-	public int getDepth(BitList qTasks) throws PDIException;
+	public int getDepth(TaskSet qTasks) throws PDIException;
 }

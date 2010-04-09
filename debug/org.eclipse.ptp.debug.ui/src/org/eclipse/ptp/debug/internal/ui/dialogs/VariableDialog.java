@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -59,7 +60,7 @@ public abstract class VariableDialog extends Dialog {
 	}
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText(DialogMessages.getString("VariableDialog.name"));
+		shell.setText(Messages.VariableDialog_0);
 	}
 	protected Control createDialogArea(Composite parent) {
 		final Composite composite = (Composite) super.createDialogArea(parent);
@@ -69,7 +70,7 @@ public abstract class VariableDialog extends Dialog {
 		layout.marginWidth = 0;
 		result.setLayout(layout);
 		result.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING));
-		new Label(result, SWT.NONE).setText(DialogMessages.getString("VariableDialog.label"));
+		new Label(result, SWT.NONE).setText(Messages.VariableDialog_1);
 		listViewer = new ListViewer(result, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		listViewer.getList().setLayoutData(new GridData(GridData.FILL_BOTH));
 		listViewer.getList().setFont(parent.getFont());
@@ -79,10 +80,10 @@ public abstract class VariableDialog extends Dialog {
 					try {
 						return ((IVariable) element).getName();
 					} catch (DebugException e) {
-						return "";
+						return ""; //$NON-NLS-1$
 					}
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		});
 		listViewer.setContentProvider(new IStructuredContentProvider() {

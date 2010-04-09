@@ -121,7 +121,7 @@ public class PDummyStackFrame extends PDebugElement implements IStackFrame, IPDu
 	 * @see org.eclipse.debug.core.model.IStackFrame#getName()
 	 */
 	public String getName() throws DebugException {
-		return "...";
+		return "..."; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

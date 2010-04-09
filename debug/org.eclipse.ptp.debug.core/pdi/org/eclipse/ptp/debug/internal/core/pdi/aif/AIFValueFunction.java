@@ -37,7 +37,7 @@ public class AIFValueFunction extends ValueDerived implements IAIFValueFunction 
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = String.valueOf("");
+			result = String.valueOf(""); //$NON-NLS-1$
 		}
 		return null;
 	}

@@ -28,12 +28,13 @@ import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 import org.eclipse.ptp.debug.ui.PVariableManager.PVariableInfo;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 
 /**
  * @author Clement chu
  */
 public class EditPExpressionAction extends Action {
-	public static final String name = "Edit";
+	public static final String name = Messages.EditPExpressionAction_0;
 	private PVariableView view = null;
 
 	/** Constructor
@@ -56,7 +57,7 @@ public class EditPExpressionAction extends Action {
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 			PVariableInfo jVar = (PVariableInfo)((IStructuredSelection)selection).getFirstElement();
 			if (!jVar.getJob().getID().equals(view.getUIManager().getCurrentJobId())) {
-				MessageDialog.openError(view.getViewSite().getShell(), "Not allow editing", "Selected item does not belong to current Job");
+				MessageDialog.openError(view.getViewSite().getShell(), Messages.EditPExpressionAction_1, Messages.EditPExpressionAction_2);
 				return;
 			}
 			if (new PVariableDialog(view, PVariableDialog.EDIT_MODE).open() == Window.OK) {

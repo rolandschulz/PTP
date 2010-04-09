@@ -69,7 +69,7 @@ public class SourceContainerWorkbenchAdapter implements IWorkbenchAdapter {
 		if (segments.length > 0) {
 			buffer.append(path.lastSegment());
 			if (segments.length > 1) {
-				buffer.append(" - "); 
+				buffer.append(" - ");  //$NON-NLS-1$
 				if (path.getDevice() != null) {
 					buffer.append(path.getDevice());
 				}
@@ -80,6 +80,6 @@ public class SourceContainerWorkbenchAdapter implements IWorkbenchAdapter {
 			}
 			return buffer.toString();
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 }

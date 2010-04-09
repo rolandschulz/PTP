@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui.propertypages;
 
 import java.util.HashMap;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -29,9 +30,9 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  *
  */
 public class PBreakpointPreferenceStore implements IPreferenceStore {
-	protected final static String ENABLED = "ENABLED";
-	protected final static String CONDITION = "CONDITION";
-	protected final static String IGNORE_COUNT = "IGNORE_COUNT";
+	protected final static String ENABLED = "ENABLED"; //$NON-NLS-1$
+	protected final static String CONDITION = "CONDITION"; //$NON-NLS-1$
+	protected final static String IGNORE_COUNT = "IGNORE_COUNT"; //$NON-NLS-1$
 
 	protected HashMap<String, Object> properties;
 	private boolean isDirty = false;

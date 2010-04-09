@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.Preferences;
  *
  */
 public interface ITargetProperties {
-	public static final String PREF_INSTRUCTION_STEPPING_MODE = "instruction_stepping_mode";
+	public static final String PREF_INSTRUCTION_STEPPING_MODE = "instruction_stepping_mode"; //$NON-NLS-1$
 
 	/**
 	 * Adds a property change listener to this target.
@@ -33,7 +33,7 @@ public interface ITargetProperties {
 	 *
 	 * @param listener a property change listener
 	 */
-	void addPropertyChangeListener(Preferences.IPropertyChangeListener listener);
+	public void addPropertyChangeListener(Preferences.IPropertyChangeListener listener);
 
 	/**
 	 * Removes the given listener from this target.
@@ -41,5 +41,5 @@ public interface ITargetProperties {
 	 *
 	 * @param listener a property change listener
 	 */
-	void removePropertyChangeListener(Preferences.IPropertyChangeListener listener);
+	public void removePropertyChangeListener(Preferences.IPropertyChangeListener listener);
 }

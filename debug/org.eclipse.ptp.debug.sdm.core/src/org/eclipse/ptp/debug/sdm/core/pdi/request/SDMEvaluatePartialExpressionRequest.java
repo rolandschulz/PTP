@@ -10,29 +10,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEvaluatePartialExpressionRequest;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugAIF;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
 
 public class SDMEvaluatePartialExpressionRequest extends AbstractEvaluatePartialExpressionRequest {
-	public SDMEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId) {
+	public SDMEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId) {
 		this(tasks, expr, exprId, false, (exprId != null));
 	}
 	
-	public SDMEvaluatePartialExpressionRequest(BitList tasks, String expr, String exprId, boolean listChildren) {
+	public SDMEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren) {
 		this(tasks, expr, exprId, listChildren, false);
 	}
 	
-	public SDMEvaluatePartialExpressionRequest(BitList tasks, String expr, String varid, boolean listChildren, boolean express) {
+	public SDMEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String varid, boolean listChildren, boolean express) {
 		super(tasks, expr, varid, listChildren, express);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugDataEvent) {
 			Object[] objs = new Object[2];
 			objs[0] = ((IProxyDebugDataEvent)result).getName();

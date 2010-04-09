@@ -1,5 +1,7 @@
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor;
 
 public class SignalDescriptor implements IPDISignalDescriptor {
@@ -91,6 +93,6 @@ public class SignalDescriptor implements IPDISignalDescriptor {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "Name: " + name + ", stop: " + stop + ", print: " + print + ", pass: " + pass + ", desc: " + desc; 
+		return NLS.bind(Messages.SignalDescriptor_0, new Object[] {name, stop, print, pass, desc}); 
 	}
 }

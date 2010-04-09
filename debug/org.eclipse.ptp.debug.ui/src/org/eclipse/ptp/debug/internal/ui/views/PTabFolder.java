@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.views.AbstractParallelView;
 import org.eclipse.swt.SWT;
@@ -144,7 +145,7 @@ public abstract class PTabFolder extends AbstractParallelView {
 			}
 		}
 		*/
-		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "No stack frame found", null));
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, Messages.PTabFolder_0, null));
 	}	
 	public abstract void createTabItem(String tabName, Object selection) throws DebugException;
 }

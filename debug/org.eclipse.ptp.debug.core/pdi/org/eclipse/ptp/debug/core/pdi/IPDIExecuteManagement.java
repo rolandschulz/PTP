@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
@@ -38,7 +38,7 @@ public interface IPDIExecuteManagement {
 	 * @param passSignal whether to discard the signal
 	 * @throws PDIException on failure
 	 */
-	void resume(BitList tasks, boolean passSignal) throws PDIException;
+	void resume(TaskSet tasks, boolean passSignal) throws PDIException;
 
 	/**
 	 * Resume execution at location. Note the method does not change stackframe.
@@ -48,7 +48,7 @@ public interface IPDIExecuteManagement {
 	 * @param location
 	 * @throws PDIException on failure
 	 */
-	void resume(BitList tasks, IPDILocation location) throws PDIException;
+	void resume(TaskSet tasks, IPDILocation location) throws PDIException;
 
 	/**
 	 * Resume execution where the program stopped but immediately give the signal.
@@ -56,7 +56,7 @@ public interface IPDIExecuteManagement {
 	 * @param signal
 	 * @throws PDIException on failure
 	 */
-	void resume(BitList tasks, IPDISignal signal) throws PDIException;
+	void resume(TaskSet tasks, IPDISignal signal) throws PDIException;
 
 	/**
 	 * Steps over the current source line. if count <= 0 it is a loop. Can only be called when the associated target/thread is suspended. 
@@ -64,7 +64,7 @@ public interface IPDIExecuteManagement {
 	 * @param count as in `step', but do so count times.
 	 * @throws PDIException on failure
 	 */
-	void stepOver(BitList tasks, int count) throws PDIException;
+	void stepOver(TaskSet tasks, int count) throws PDIException;
 
 	/**
 	 * Steps over the current machine instruction. Can only be called when the associated target/thread is suspended. if count <= 0 it is a loop.
@@ -72,7 +72,7 @@ public interface IPDIExecuteManagement {
 	 * @param count as in `stepOverInstruction', but do so count times.
 	 * @throws PDIException on failure
 	 */
-	void stepOverInstruction(BitList tasks, int count) throws PDIException;
+	void stepOverInstruction(TaskSet tasks, int count) throws PDIException;
 
 	/**
 	 * Steps into the current source line. Can only be called when the associated target/thread is suspended. if count <= 0 it is a loop.
@@ -80,14 +80,14 @@ public interface IPDIExecuteManagement {
 	 * @param count as in `step', but do so count times.
 	 * @throws PDIException on failure
 	 */
-	void stepInto(BitList tasks, int count) throws PDIException;
+	void stepInto(TaskSet tasks, int count) throws PDIException;
 
 	/**
 	 * Steps into the current machine instruction. Can only be called when the associated target/thread is suspended. if count <= 0 it is a loop.
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void stepIntoInstruction(BitList tasks, int count) throws PDIException;
+	void stepIntoInstruction(TaskSet tasks, int count) throws PDIException;
 
 	/**
 	 * Continues running until location is reached.
@@ -97,7 +97,7 @@ public interface IPDIExecuteManagement {
 	 * @param location location
 	 * @throws PDIException on failure
 	 */
-	void stepUntil(BitList tasks, IPDILocation location) throws PDIException;
+	void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException;
 	
 	/**
 	 * Continue execution until the frame return.
@@ -105,7 +105,7 @@ public interface IPDIExecuteManagement {
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void stepReturn(BitList tasks, int count) throws PDIException;
+	void stepReturn(TaskSet tasks, int count) throws PDIException;
 
 	/**
 	 * Cancel execution of the frame and return with value.
@@ -115,7 +115,7 @@ public interface IPDIExecuteManagement {
 	 * @param aif value use as the returning value.
 	 * @throws PDIException on failure
 	 */
-	void stepReturn(BitList tasks, IAIF aif) throws PDIException;
+	void stepReturn(TaskSet tasks, IAIF aif) throws PDIException;
 	
 	/**
 	 * Causes this target/thread to suspend its execution. 
@@ -123,14 +123,14 @@ public interface IPDIExecuteManagement {
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void suspend(BitList tasks) throws PDIException;
+	void suspend(TaskSet tasks) throws PDIException;
 
 	/**
 	 * Requests to terminate of specify process
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void terminate(BitList tasks) throws PDIException;	
+	void terminate(TaskSet tasks) throws PDIException;	
 
 	/**
 	 * TODO not implemented yet in 2.0
@@ -138,12 +138,12 @@ public interface IPDIExecuteManagement {
 	 * @param tasks
 	 * @throws PDIException on failure
 	 */
-	void restart(BitList tasks) throws PDIException;
+	void restart(TaskSet tasks) throws PDIException;
 	
 	/**
 	 * Starts specify process
 	 * @param tasks target process
 	 * @throws PDIException on failure
 	 */
-	void start(BitList tasks) throws PDIException;
+	void start(TaskSet tasks) throws PDIException;
 }

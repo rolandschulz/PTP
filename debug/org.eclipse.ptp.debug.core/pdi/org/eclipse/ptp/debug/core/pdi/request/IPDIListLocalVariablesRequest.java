@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
@@ -33,6 +33,6 @@ public interface IPDIListLocalVariablesRequest extends IPDIEventRequest {
 	 * @return
 	 * @throws PDIException
 	 */
-	public String[] getLocalVariables(BitList tasks) throws PDIException;
+	public String[] getLocalVariables(TaskSet tasks) throws PDIException;
 
 }

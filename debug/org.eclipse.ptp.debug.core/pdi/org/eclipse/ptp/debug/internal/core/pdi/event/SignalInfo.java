@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
@@ -35,7 +35,7 @@ public class SignalInfo extends SessionObject implements IPDISignalInfo {
 	private IPDISignal signal;
 	private IPDILocator locator;
 	
-	public SignalInfo(IPDISession session, BitList tasks, String name, String desc, IPDISignal signal, IPDILocator locator) {
+	public SignalInfo(IPDISession session, TaskSet tasks, String name, String desc, IPDISignal signal, IPDILocator locator) {
 		super(session, tasks);
 		this.name = name;
 		this.signal = signal;

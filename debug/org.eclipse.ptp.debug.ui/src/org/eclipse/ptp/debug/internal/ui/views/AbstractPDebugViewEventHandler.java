@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.debug.core.IPDebugEventListener;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -122,7 +123,7 @@ public abstract class AbstractPDebugViewEventHandler implements IPDebugEventList
 	class PDebugEventWorkbenchJob extends WorkbenchJob {
 		Vector<IPDebugEvent> events = new Vector<IPDebugEvent>(10);
 		PDebugEventWorkbenchJob() {
-			super("Handling Debug Event");
+			super(Messages.AbstractPDebugViewEventHandler_0);
 		}
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			IPDebugEvent[] pEvents;

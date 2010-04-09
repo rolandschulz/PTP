@@ -30,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
  * 
  */
 public class AIFValueAddress extends AIFValue implements IAIFValueAddress {
-	String addr = "";
+	String addr = ""; //$NON-NLS-1$
 
 	public AIFValueAddress(IAIFTypeAddress type, SimpleByteBuffer buffer) {
 		super(type);
@@ -44,7 +44,7 @@ public class AIFValueAddress extends AIFValue implements IAIFValueAddress {
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = "0x" + addr;
+			result = "0x" + addr; //$NON-NLS-1$
 		}
 		return result;
 	}

@@ -100,13 +100,13 @@ public abstract class TypeAggregate extends AIFType implements ITypeAggregate {
 		types.add(aifType);
 		
 		if (pos == fmt.length())
-			return "";
+			return ""; //$NON-NLS-1$
 
 		return fmt.substring(pos+1);
 	}
 
 	protected int getSeperatePosition(String fmt) {
-		return getSeperatePosition(fmt, "");
+		return getSeperatePosition(fmt, ""); //$NON-NLS-1$
 	}
 	protected int getSeperatePosition(String fmt, String regex) {
 		int regex_len = regex.length();		
@@ -124,9 +124,9 @@ public abstract class TypeAggregate extends AIFType implements ITypeAggregate {
 	public String toString() {
 		String content = getName() + AIFFactory.SIGN_STROKE;
 		for (int i=0; i<fields.size(); i++) {
-			content += (String)fields.get(i) + "=" + ((IAIFType)types.get(i)).toString();
+			content += (String)fields.get(i) + "=" + ((IAIFType)types.get(i)).toString(); //$NON-NLS-1$
 			if (i < fields.size()-1) {
-				content += ",";
+				content += ","; //$NON-NLS-1$
 			}
 		}
 		return content;

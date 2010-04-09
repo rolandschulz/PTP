@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
@@ -30,7 +31,7 @@ public abstract class AbstractListArgumentsRequest extends AbstractEventResultRe
 	private int low = 0;
 	private int high = 0;
 	
-	public AbstractListArgumentsRequest(BitList tasks, int low, int high) {
+	public AbstractListArgumentsRequest(TaskSet tasks, int low, int high) {
 		super(tasks);
 		this.low = low;
 		this.high = high;
@@ -44,21 +45,21 @@ public abstract class AbstractListArgumentsRequest extends AbstractEventResultRe
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListArgumentsRequest#getArguments(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListArgumentsRequest#getArguments(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public String[] getArguments(BitList qTasks) throws PDIException {
+	public String[] getArguments(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof String[]) {
 			return (String[])obj;
 		}
-		throw new PDIException(qTasks, "No arguments found");
+		throw new PDIException(qTasks, Messages.AbstractListArgumentsRequest_0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "List arguments request";
+		return Messages.AbstractListArgumentsRequest_1;
 	}
 }

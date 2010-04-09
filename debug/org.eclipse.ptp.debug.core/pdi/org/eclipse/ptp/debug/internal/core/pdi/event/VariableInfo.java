@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIVariableInfo;
@@ -32,7 +32,7 @@ public class VariableInfo extends SessionObject implements IPDIVariableInfo {
 	private String name;
 	private IPDIVariable var;
 	
-	public VariableInfo(IPDISession session, BitList tasks, String name, IPDIVariable var) {
+	public VariableInfo(IPDISession session, TaskSet tasks, String name, IPDIVariable var) {
 		super(session, tasks);
 		this.name = name;
 		this.var = var;

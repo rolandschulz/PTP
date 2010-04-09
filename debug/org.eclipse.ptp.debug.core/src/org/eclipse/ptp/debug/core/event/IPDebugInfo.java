@@ -19,15 +19,15 @@
 package org.eclipse.ptp.debug.core.event;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * @author Clement
  */
 public interface IPDebugInfo {
 	IPJob getJob();
-	BitList getAllTasks();
-	BitList getAllRegisteredTasks();
-	BitList getAllUnregisteredTasks();
+	TaskSet getAllTasks();
+	TaskSet getAllRegisteredTasks();
+	TaskSet getAllUnregisteredTasks();
 }
 

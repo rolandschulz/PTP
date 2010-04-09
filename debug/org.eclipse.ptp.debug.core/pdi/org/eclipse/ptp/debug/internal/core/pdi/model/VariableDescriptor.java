@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
@@ -71,7 +71,7 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 	protected String varId = null;
 	protected IAIF aif = null;
 	
-	public VariableDescriptor(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame stack, String n, String fn, int pos, int depth) {
+	public VariableDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame stack, String n, String fn, int pos, int depth) {
 		super(session, tasks);
 		fName = n;
 		fFullName = fn;
@@ -107,7 +107,7 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		String fn = getFullName();
 		if (castingLength > 0 || castingIndex > 0) {
 			StringBuffer buffer = new StringBuffer();
-			buffer.append("*(");
+			buffer.append("*("); //$NON-NLS-1$
 			buffer.append('(').append(fn).append(')');
 			buffer.append('+').append(castingIndex).append(')');
 			buffer.append('@').append(castingLength);

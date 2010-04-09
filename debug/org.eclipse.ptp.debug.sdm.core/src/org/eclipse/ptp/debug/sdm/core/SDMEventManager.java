@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PDebugUtils;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
@@ -113,7 +113,7 @@ public class SDMEventManager extends AbstractEventManager {
 	 * @param event
 	 */
 	private synchronized void fireEvent(IPDIEventRequest request, IProxyDebugEvent event) {
-		BitList eTasks = ProxyDebugClient.decodeBitSet(event.getBitSet());
+		TaskSet eTasks = ProxyDebugClient.decodeTaskSet(event.getBitSet());
 
 		PDebugUtils.println("Msg: SDMEventManager - fireEvent(): event " + event); //$NON-NLS-1$
 		
@@ -316,7 +316,7 @@ public class SDMEventManager extends AbstractEventManager {
 	 */
 	private void verifyEvent(IPDIEventRequest request, IProxyDebugEvent result) {
 		if (request != null) {
-			BitList eTasks = ProxyDebugClient.decodeBitSet(result.getBitSet());
+			TaskSet eTasks = ProxyDebugClient.decodeTaskSet(result.getBitSet());
 			if (request.completed(eTasks, result)) {
 				request.done();
 				notifyEventRequest(request);

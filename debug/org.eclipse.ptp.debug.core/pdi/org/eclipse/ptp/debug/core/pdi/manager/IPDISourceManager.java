@@ -2,7 +2,7 @@ package org.eclipse.ptp.debug.core.pdi.manager;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIInstruction;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMixedInstruction;
@@ -36,7 +36,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIInstruction[] getInstructions(BitList qTasks, BigInteger start,
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, BigInteger start,
 			BigInteger end) throws PDIException;
 
 	/**
@@ -46,7 +46,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIInstruction[] getInstructions(BitList qTasks, String filename,
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename,
 			int linenum) throws PDIException;
 
 	/**
@@ -57,7 +57,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIInstruction[] getInstructions(BitList qTasks, String filename,
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename,
 			int linenum, int lines) throws PDIException;
 
 	/**
@@ -67,7 +67,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(BitList qTasks,
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
 			BigInteger start, BigInteger end) throws PDIException;
 
 	/**
@@ -77,7 +77,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(BitList qTasks,
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
 			String filename, int linenum) throws PDIException;
 
 	/**
@@ -88,7 +88,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(BitList qTasks,
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
 			String filename, int linenum, int lines) throws PDIException;
 
 	/**
@@ -96,7 +96,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public String[] getSourcePaths(BitList qTasks) throws PDIException;
+	public String[] getSourcePaths(TaskSet qTasks) throws PDIException;
 
 	/**
 	 * @param target
@@ -121,7 +121,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param dirs
 	 * @throws PDIException
 	 */
-	public void setSourcePaths(BitList qTasks, String[] dirs)
+	public void setSourcePaths(TaskSet qTasks, String[] dirs)
 			throws PDIException;
 
 }

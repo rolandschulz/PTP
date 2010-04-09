@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.core.pdi.manager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMultiExpressions;
@@ -40,7 +40,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param monitor
 	 * @throws PDIException
 	 */
-	public void cleanMultiExpressions(BitList tasks, IProgressMonitor monitor) throws PDIException;
+	public void cleanMultiExpressions(TaskSet tasks, IProgressMonitor monitor) throws PDIException;
 	
 	/**
 	 * Clean expression value with given tasks
@@ -49,7 +49,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param monitor
 	 * @throws PDIException
 	 */
-	public void cleanMultiExpressions(String exprText, BitList tasks, IProgressMonitor monitor) throws PDIException;
+	public void cleanMultiExpressions(String exprText, TaskSet tasks, IProgressMonitor monitor) throws PDIException;
 	
 	/**
 	 * Creates an expression for specify variable
@@ -58,7 +58,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @return IPDIExpression expression
 	 * @throws PDIException on failure
 	 */
-	public IPDITargetExpression createExpression(BitList qTasks, String expr) throws PDIException;
+	public IPDITargetExpression createExpression(TaskSet qTasks, String expr) throws PDIException;
 	
 	/**
 	 * Creates mutliple expression object for a number of processes with one variable
@@ -66,7 +66,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param exprText variable
 	 * @param enabled status of this expression
 	 */
-	public void createMutliExpressions(BitList tasks, String exprText, boolean enabled);
+	public void createMutliExpressions(TaskSet tasks, String exprText, boolean enabled);
 	
 	/**
 	 * @param frame
@@ -87,7 +87,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param expressions
 	 * @throws PDIException
 	 */
-	public void destroyExpressions(BitList qTasks, IPDIExpression[] expressions) throws PDIException;
+	public void destroyExpressions(TaskSet qTasks, IPDIExpression[] expressions) throws PDIException;
 	
 	/**
 	 * @param qTasks
@@ -95,7 +95,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public IAIF getExpressionValue(BitList qTasks, String expr) throws PDIException;
+	public IAIF getExpressionValue(TaskSet qTasks, String expr) throws PDIException;
 
 	/**
 	 * Returns IPDIMultiExpressions with specific expression value
@@ -122,7 +122,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param qTasks task 
 	 * @param exprText expression name
 	 */
-	public void removeMutliExpressions(BitList tasks, String exprText);
+	public void removeMutliExpressions(TaskSet tasks, String exprText);
 	
 	/**
 	 * Remove multiple expressions from store
@@ -135,7 +135,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param varList
 	 * @throws PDIException
 	 */
-	public void update(BitList qTasks, String[] varList) throws PDIException;
+	public void update(TaskSet qTasks, String[] varList) throws PDIException;
 	
 	/**
 	 * Update expression value
@@ -143,7 +143,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param monitor
 	 * @throws PDIException
 	 */
-	public void updateMultiExpressions(BitList tasks, IProgressMonitor monitor) throws PDIException;
+	public void updateMultiExpressions(TaskSet tasks, IProgressMonitor monitor) throws PDIException;
 	
 	/**
 	 * Update expression value
@@ -152,7 +152,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param monitor
 	 * @throws PDIException
 	 */
-	public void updateMultiExpressions(String exprText, BitList tasks, IProgressMonitor monitor) throws PDIException;
+	public void updateMultiExpressions(String exprText, TaskSet tasks, IProgressMonitor monitor) throws PDIException;
 	
 	/**
 	 * Update status of multiple expressions

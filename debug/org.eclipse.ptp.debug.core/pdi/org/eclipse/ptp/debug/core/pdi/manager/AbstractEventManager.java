@@ -25,13 +25,14 @@ import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PDebugUtils;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStopDebuggerRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.manager.AbstractPDIManager;
@@ -40,7 +41,7 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	/************************************ 
 	 * event scheduler 
 	 ***********************************/
-	class EventRequestScheduledTask {
+	public class EventRequestScheduledTask {
 		Timer eventTimer = null;
 		IPDIEventRequest request = null;
 		
@@ -61,8 +62,8 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 		public void scheduleTimeout() {
 			eventTimer.schedule(new TimerTask() {
 				public void run() {
-					PDebugUtils.println("Msg: EventRequestScheduledTask - scheduleTimeout(): Request: " + request);
-					request.error("Time out for this request.");
+					PDebugUtils.println(Messages.AbstractEventManager_0 + request);
+					request.error(Messages.AbstractEventManager_1);
 					notifyEventRequest(request);
 				}
 			}, session.getTimeout());
@@ -72,7 +73,7 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	/*****************************************
 	 * Request Notifier
 	 *****************************************/
-	class RequestNotifier extends Observable {
+	public class RequestNotifier extends Observable {
 		public void notify(IPDIEventRequest request) {
 			setChanged();
 			notifyObservers(request);
@@ -130,17 +131,17 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 				requestList.remove(0).cancelTimeout();
 			}
 			requestNotifier.notify(request);
-			PDebugUtils.println("**** Msg: AbstractEventManager - notifyEventRequest(): Request: " + request);
+			PDebugUtils.println(Messages.AbstractEventManager_2 + request);
 			switch (request.getStatus()) {
 			//case IPDIEventRequest.DONE:
 			//case IPDIEventRequest.RUNNING:
 			case IPDIEventRequest.UNKNOWN:
 				fireEvent(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL, request.getName() + " error!", "Unknown error")));
+						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL, request.getName() + Messages.AbstractEventManager_3, Messages.AbstractEventManager_4)));
 	   			break;
 			case IPDIEventRequest.CANCELLED:
 				fireEvent(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL, request.getName() + " error!", "Request has been cancelled")));
+						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL, request.getName() + Messages.AbstractEventManager_5, Messages.AbstractEventManager_6)));
 	   			break;
 			case IPDIEventRequest.ERROR:
 				int errorType = IPDIErrorInfo.DBG_NORMAL;
@@ -156,7 +157,7 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 					}
 				}
 				fireEvent(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, request.getTasks(), errorType, request.getName() + " error!", request.getErrorMessage())));
+						session.getEventFactory().newErrorInfo(session, request.getTasks(), errorType, request.getName() + Messages.AbstractEventManager_7, request.getErrorMessage())));
 	   			break;
 			}
 		}
@@ -174,7 +175,7 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 				return;
 			}
 			else {
-				PDebugUtils.println("**** Msg: AbstractEventManager - registerEventRequest(): Request: " + request);
+				PDebugUtils.println(Messages.AbstractEventManager_8 + request);
 				requestList.add(new EventRequestScheduledTask(request));
 			}
 		}
@@ -210,10 +211,10 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	@Override
-	public void update(BitList tasks) throws PDIException {
+	public void update(TaskSet tasks) throws PDIException {
 	}
 	
 	/**

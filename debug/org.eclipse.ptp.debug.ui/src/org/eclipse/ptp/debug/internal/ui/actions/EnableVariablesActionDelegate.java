@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.core.model.IEnableDisableTarget;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewActionDelegate;
@@ -87,7 +88,7 @@ public class EnableVariablesActionDelegate implements IViewActionDelegate {
 		if (size == 0)
 			return;
 		final Iterator<?> it = selection.iterator();
-		final MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, ActionMessages.getString("EnableVariablesActionDelegate.0"), null);
+		final MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, Messages.EnableVariablesActionDelegate_0, null);
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 				while(it.hasNext()) {
@@ -109,7 +110,7 @@ public class EnableVariablesActionDelegate implements IViewActionDelegate {
 			}
 		});
 		if (!ms.isOK()) {
-			PTPDebugUIPlugin.errorDialog(ActionMessages.getString("EnableVariablesActionDelegate.1"), ms);
+			PTPDebugUIPlugin.errorDialog(Messages.EnableVariablesActionDelegate_1, ms);
 		}
 	}
 

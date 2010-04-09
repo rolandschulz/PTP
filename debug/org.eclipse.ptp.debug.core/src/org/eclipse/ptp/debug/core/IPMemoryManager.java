@@ -13,7 +13,6 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 
 /**
@@ -25,7 +24,7 @@ public interface IPMemoryManager {
 	/**
 	 * @param qTasks
 	 */
-	public void dispose(BitList qTasks);
+	public void dispose(TaskSet qTasks);
 
 	/**
 	 * @param qTasks
@@ -34,23 +33,23 @@ public interface IPMemoryManager {
 	 * @return
 	 * @throws DebugException
 	 */
-	public IMemoryBlock getMemoryBlock(BitList qTasks, long startAddress, long length) throws DebugException;
+	public IMemoryBlock getMemoryBlock(TaskSet qTasks, long startAddress, long length) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @return
 	 */
-	public IMemoryBlockRetrievalExtension getMemoryRetrieval(BitList qTasks);
+	public IMemoryBlockRetrievalExtension getMemoryRetrieval(TaskSet qTasks);
 
 	/**
 	 * @param qTasks
 	 * @param debugTarget
 	 */
-	public void initialize(BitList qTasks, PDebugTarget debugTarget);
+	public void initialize(TaskSet qTasks, PDebugTarget debugTarget);
 
 	/**
 	 * @param qTasks
 	 */
-	public void save(BitList qTasks);
+	public void save(TaskSet qTasks);
 
 }

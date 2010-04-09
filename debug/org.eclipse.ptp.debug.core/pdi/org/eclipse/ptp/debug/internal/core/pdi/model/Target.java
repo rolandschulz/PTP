@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -32,6 +32,7 @@ import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIGlobalVariable;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIInstruction;
@@ -60,7 +61,7 @@ public class Target extends SessionObject implements IPDITarget {
 	private int currentThreadId;
 	private final ReentrantLock lock = new ReentrantLock();
 
-	public Target(IPDISession session, BitList tasks) {
+	public Target(IPDISession session, TaskSet tasks) {
 		super(session, tasks);
 		currentThreads = noThreads;
 	}
@@ -109,7 +110,7 @@ public class Target extends SessionObject implements IPDITarget {
 			}
 			if (aif != null)
 				return aif.getValue().toString();
-			throw new PDIException(getTasks(), "Unknonw varibale: " + expr);
+			throw new PDIException(getTasks(), Messages.Target_0 + expr);
 		} finally {
 			target.setCurrentThread(currentThread, false);
 			currentThread.setCurrentStackFrame(currentFrame, false);
@@ -213,7 +214,7 @@ public class Target extends SessionObject implements IPDITarget {
 	 */
 	public IPDISharedLibrary[] getSharedLibraries() throws PDIException {
 		throw new PDIException(getTasks(),
-				"Not implemented yet - Target: getSharedLibraries()");
+				Messages.Target_1);
 	}
 
 	/* (non-Javadoc)
@@ -289,10 +290,10 @@ public class Target extends SessionObject implements IPDITarget {
 						new IPDIEvent[] { session.getEventFactory().newDestroyedEvent(
 								session.getEventFactory().newThreadInfo(session, getTasks(), id, getThread(id))) });
 				throw new PDIException(getTasks(),
-						"Target - Cannot switch to thread " + id);
+						Messages.Target_2 + id);
 			}
 		} else {
-			throw new PDIException(getTasks(), "Target - Unknown_thread");
+			throw new PDIException(getTasks(), Messages.Target_3);
 		}
 	}
 

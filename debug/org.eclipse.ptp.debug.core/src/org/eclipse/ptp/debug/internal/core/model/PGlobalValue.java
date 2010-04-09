@@ -27,6 +27,11 @@ public class PGlobalValue extends PValue {
 	public PGlobalValue(PVariable parent, IPDIVariable variable) {
 		super(parent, variable);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PValue#hasVariables()
+	 */
+	@Override
 	public boolean hasVariables() throws DebugException {
 		if (fHasChildren == null) {
 			fHasChildren = new Boolean(super.hasVariables());

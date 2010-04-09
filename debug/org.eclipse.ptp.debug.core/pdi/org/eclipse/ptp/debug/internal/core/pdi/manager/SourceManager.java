@@ -20,10 +20,11 @@ package org.eclipse.ptp.debug.internal.core.pdi.manager;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDISourceManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIInstruction;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMixedInstruction;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
@@ -49,7 +50,7 @@ public class SourceManager extends AbstractPDIManager implements
 	public String getDetailTypeName(IPDITarget target, String typename)
 			throws PDIException {
 		throw new PDIException(target.getTasks(),
-				"Not implements SourceManager - getDetailTypeName() yet");
+				Messages.SourceManager_0);
 	}
 
 	/*
@@ -78,22 +79,22 @@ public class SourceManager extends AbstractPDIManager implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getInstructions(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getInstructions(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.math.BigInteger, java.math.BigInteger)
 	 */
-	public IPDIInstruction[] getInstructions(BitList qTasks, BigInteger start,
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, BigInteger start,
 			BigInteger end) throws PDIException {
 		throw new PDIException(qTasks,
-				"Not implemented SourceManager - getInstructions() yet");
+				Messages.SourceManager_1);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getInstructions(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getInstructions(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.lang.String, int)
 	 */
-	public IPDIInstruction[] getInstructions(BitList qTasks, String filename,
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename,
 			int linenum) throws PDIException {
 		return getInstructions(qTasks, filename, linenum, -1);
 	}
@@ -101,34 +102,34 @@ public class SourceManager extends AbstractPDIManager implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getInstructions(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getInstructions(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.lang.String, int, int)
 	 */
-	public IPDIInstruction[] getInstructions(BitList qTasks, String filename,
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename,
 			int linenum, int lines) throws PDIException {
 		throw new PDIException(qTasks,
-				"Not implemented SourceManager - getInstructions() yet");
+				Messages.SourceManager_1);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getMixedInstructions(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getMixedInstructions(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.math.BigInteger, java.math.BigInteger)
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(BitList qTasks,
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
 			BigInteger start, BigInteger end) throws PDIException {
 		throw new PDIException(qTasks,
-				"Not implemented SourceManager - getMixedInstructions() yet");
+				Messages.SourceManager_2);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getMixedInstructions(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getMixedInstructions(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.lang.String, int)
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(BitList qTasks,
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
 			String filename, int linenum) throws PDIException {
 		return getMixedInstructions(qTasks, filename, linenum, -1);
 	}
@@ -136,23 +137,23 @@ public class SourceManager extends AbstractPDIManager implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getMixedInstructions(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getMixedInstructions(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.lang.String, int, int)
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(BitList qTasks,
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
 			String filename, int linenum, int lines) throws PDIException {
 		throw new PDIException(qTasks,
-				"Not implemented SourceManager - getMixedInstructions() yet");
+				Messages.SourceManager_2);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getSourcePaths(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#getSourcePaths(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public String[] getSourcePaths(BitList qTasks) throws PDIException {
+	public String[] getSourcePaths(TaskSet qTasks) throws PDIException {
 		throw new PDIException(qTasks,
-				"Not implemented SourceManager - getSourcePaths() yet");
+				Messages.SourceManager_3);
 	}
 
 	/*
@@ -164,7 +165,7 @@ public class SourceManager extends AbstractPDIManager implements
 	public String getTypeName(IPDITarget target, String variable)
 			throws PDIException {
 		throw new PDIException(target.getTasks(),
-				"Not implements SourceManager - getTypeName() yet");
+				Messages.SourceManager_4);
 	}
 
 	/*
@@ -193,13 +194,13 @@ public class SourceManager extends AbstractPDIManager implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#setSourcePaths(org.eclipse.ptp.core.util.BitList,
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.IPDISourceManager#setSourcePaths(org.eclipse.ptp.core.util.TaskSet,
 	 *      java.lang.String[])
 	 */
-	public void setSourcePaths(BitList qTasks, String[] dirs)
+	public void setSourcePaths(TaskSet qTasks, String[] dirs)
 			throws PDIException {
 		throw new PDIException(qTasks,
-				"Not implemented SourceManager - setSourcePaths() yet");
+				Messages.SourceManager_5);
 	}
 
 	/* (non-Javadoc)
@@ -209,9 +210,9 @@ public class SourceManager extends AbstractPDIManager implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) throws PDIException {
+	public void update(TaskSet qTasks) throws PDIException {
 		// Do dothing here
 	}
 }

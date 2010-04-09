@@ -25,6 +25,9 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 
 public class CommonSourceLookupDirector extends PSourceLookupDirector {
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector#setSourceContainers(org.eclipse.debug.core.sourcelookup.ISourceContainer[])
+	 */
 	public void setSourceContainers(ISourceContainer[] containers) {
 		try {
 			super.setSourceContainers(containers);

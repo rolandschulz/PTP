@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import org.eclipse.ptp.core.util.BitList;
 
 /**
  * @author greg
@@ -22,13 +21,13 @@ public interface IPSetManager {
 	 * @param sid
 	 * @param tasks
 	 */
-	public void addTasks(String sid, BitList tasks);
+	public void addTasks(String sid, TaskSet tasks);
 
 	/**
 	 * @param sid
 	 * @param tasks
 	 */
-	public void createSet(String sid, BitList tasks);
+	public void createSet(String sid, TaskSet tasks);
 
 	/**
 	 * @param sid
@@ -39,12 +38,12 @@ public interface IPSetManager {
 	 * @param sid
 	 * @return
 	 */
-	public BitList getTasks(String sid);
+	public TaskSet getTasks(String sid);
 
 	/**
 	 * @param sid
 	 * @param tasks
 	 */
-	public void removeTasks(String sid, BitList tasks);
+	public void removeTasks(String sid, TaskSet tasks);
 
 }

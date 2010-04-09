@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThreadStorageDescriptor;
  *
  */
 public class ThreadStorageDescriptor extends VariableDescriptor implements IPDIThreadStorageDescriptor {
-	public ThreadStorageDescriptor(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String n, String fn, int pos, int depth) {
+	public ThreadStorageDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String n, String fn, int pos, int depth) {
 		super(session, tasks, thread, frame, n, fn, pos, depth);
 	}
 }

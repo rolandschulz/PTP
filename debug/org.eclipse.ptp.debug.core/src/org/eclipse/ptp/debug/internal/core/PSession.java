@@ -38,7 +38,6 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
 import org.eclipse.ptp.debug.core.IPMemoryManager;
 import org.eclipse.ptp.debug.core.IPRegisterManager;
@@ -46,6 +45,7 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.IPSetManager;
 import org.eclipse.ptp.debug.core.IPSignalManager;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugErrorInfo;
@@ -136,9 +136,9 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#createDebugTarget(org.eclipse.ptp.core.util.BitList, boolean, boolean)
+	 * @see org.eclipse.ptp.debug.core.IPSession#createDebugTarget(org.eclipse.ptp.core.util.TaskSet, boolean, boolean)
 	 */
-	public void createDebugTarget(BitList tasks, boolean refresh, boolean register) {
+	public void createDebugTarget(TaskSet tasks, boolean refresh, boolean register) {
 		if (isReady()) {
 			List<IPDITarget> targets = new ArrayList<IPDITarget>();
 			int[] task_array = tasks.toArray();
@@ -158,9 +158,9 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#deleteDebugTarget(org.eclipse.ptp.core.util.BitList, boolean, boolean)
+	 * @see org.eclipse.ptp.debug.core.IPSession#deleteDebugTarget(org.eclipse.ptp.core.util.TaskSet, boolean, boolean)
 	 */
-	public void deleteDebugTarget(BitList tasks, boolean refresh, boolean register) {
+	public void deleteDebugTarget(TaskSet tasks, boolean refresh, boolean register) {
 		int[] task_array = tasks.toArray();
 		for (int task_id : task_array) {
 			if (!getPDISession().getTargetManager().removeTarget(getTasks(task_id))) {
@@ -177,7 +177,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 */
 	public void deleteDebugTargets(boolean register) {
 		if (isReady()) {
-			BitList tasks = getPDISession().getTaskManager().getRegisteredTasks().copy();
+			TaskSet tasks = getPDISession().getTaskManager().getRegisteredTasks().copy();
 			deleteDebugTarget(tasks, true, register);
 		}
 	}
@@ -190,9 +190,9 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#findDebugTarget(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.IPSession#findDebugTarget(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public PDebugTarget findDebugTarget(BitList tasks) {
+	public PDebugTarget findDebugTarget(TaskSet tasks) {
 		return (PDebugTarget)launch.getDebugTarget(tasks);
 	}
 	
@@ -245,7 +245,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param details
 	 * @param tasks
 	 */
-	public void fireDebugEvent(int type, int details, BitList tasks) {
+	public void fireDebugEvent(int type, int details, TaskSet tasks) {
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, type, details, getDebugInfo(tasks)));
 	}
 	
@@ -411,7 +411,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @see org.eclipse.ptp.debug.core.IPSession#forceStoppedDebugger(boolean)
 	 */
 	public void forceStoppedDebugger(boolean isError) {
-		BitList tasks = getTasks();
+		TaskSet tasks = getTasks();
 		changeProcessState(tasks, ProcessAttributes.State.COMPLETED);
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.TERMINATE, IPDebugEvent.DEBUGGER, getDebugInfo(tasks)));
 		dispose(true);
@@ -437,9 +437,9 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#getDebugInfo(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.IPSession#getDebugInfo(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDebugInfo getDebugInfo(BitList eTasks) {
+	public IPDebugInfo getDebugInfo(TaskSet eTasks) {
 		IPDITaskManager taskMgr = getPDISession().getTaskManager();
 		return new PDebugInfo(getJob(), eTasks, taskMgr.getRegisteredTasks(eTasks.copy()), taskMgr.getUnregisteredTasks(eTasks.copy()));
 	}
@@ -510,16 +510,16 @@ public class PSession implements IPSession, IPDIEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPSession#getTasks()
 	 */
-	public BitList getTasks() {
+	public TaskSet getTasks() {
 		return getPDISession().getTasks();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IPSession#getTasks(int)
 	 */
-	public BitList getTasks(int id) {
+	public TaskSet getTasks(int id) {
 		int max = getPDISession().getTotalTasks();
-		BitList tasks = new BitList(max);
+		TaskSet tasks = new TaskSet(max);
 		if (id >= 0 && id <= max)
 			tasks.set(id);
 		return tasks;
@@ -591,12 +591,12 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#reloadDebugTargets(org.eclipse.ptp.core.util.BitList, boolean, boolean)
+	 * @see org.eclipse.ptp.debug.core.IPSession#reloadDebugTargets(org.eclipse.ptp.core.util.TaskSet, boolean, boolean)
 	 */
-	public void reloadDebugTargets(BitList tasks, boolean refresh, boolean register) {
+	public void reloadDebugTargets(TaskSet tasks, boolean refresh, boolean register) {
 		if (isReady()) {
-			BitList curRegTasks = getPDISession().getTaskManager().getRegisteredTasks(tasks.copy());
-			BitList othRegTasks = getPDISession().getTaskManager().getRegisteredTasks().copy();
+			TaskSet curRegTasks = getPDISession().getTaskManager().getRegisteredTasks(tasks.copy());
+			TaskSet othRegTasks = getPDISession().getTaskManager().getRegisteredTasks().copy();
 			othRegTasks.andNot(curRegTasks);
 			deleteDebugTarget(othRegTasks, refresh, register);
 			createDebugTarget(curRegTasks, refresh, register);
@@ -609,7 +609,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param tasks
 	 * @param state
 	 */
-	private void changeProcessState(BitList tasks, State state) {
+	private void changeProcessState(TaskSet tasks, State state) {
 		IPJob job = getJob();
 		List<IPProcessControl> processes = new ArrayList<IPProcessControl>();
 		for (int task : tasks.toArray()) {
@@ -649,7 +649,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param tasks
 	 * @param output
 	 */
-	private void setProcessOutput(BitList tasks, String output) {
+	private void setProcessOutput(TaskSet tasks, String output) {
 		IPJob job = getJob();
 		List<IPProcessControl> processes = new ArrayList<IPProcessControl>();
 		for (int task : tasks.toArray()) {

@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteBreakpointRequest;
 
@@ -30,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIDeleteBreakpointRequest;
  *
  */
 public class DeleteBreakpointRequest extends BreakpointRequest implements IPDIDeleteBreakpointRequest {
-	public DeleteBreakpointRequest(BitList tasks, IPDIBreakpoint bpt, boolean allowUpdate) {
+	public DeleteBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt, boolean allowUpdate) {
 		super(tasks, bpt, allowUpdate);
 	}
 	
@@ -45,6 +46,6 @@ public class DeleteBreakpointRequest extends BreakpointRequest implements IPDIDe
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Delete Breakpoint Request";
+		return Messages.DeleteBreakpointRequest_0;
 	}
 }

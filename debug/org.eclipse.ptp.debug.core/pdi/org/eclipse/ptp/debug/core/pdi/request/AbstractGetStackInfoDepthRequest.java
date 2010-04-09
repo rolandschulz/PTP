@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 
 /**
@@ -28,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  *
  */
 public abstract class AbstractGetStackInfoDepthRequest extends AbstractEventResultRequest implements IPDIGetStackInfoDepthRequest {
-	public AbstractGetStackInfoDepthRequest(BitList tasks) {
+	public AbstractGetStackInfoDepthRequest(TaskSet tasks) {
 		super(tasks);
 	}
 	
@@ -40,21 +41,21 @@ public abstract class AbstractGetStackInfoDepthRequest extends AbstractEventResu
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetStackInfoDepthRequest#getDepth(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetStackInfoDepthRequest#getDepth(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public int getDepth(BitList qTasks) throws PDIException {
+	public int getDepth(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Integer) {
 			return ((Integer)obj).intValue();
 		}
-		throw new PDIException(qTasks, "No stack info depth found");
+		throw new PDIException(qTasks, Messages.AbstractGetStackInfoDepthRequest_0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Retrieve stack info depth request";
+		return Messages.AbstractGetStackInfoDepthRequest_1;
 	}
 }

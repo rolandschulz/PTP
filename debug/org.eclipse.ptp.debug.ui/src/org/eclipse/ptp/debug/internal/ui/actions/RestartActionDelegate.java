@@ -23,6 +23,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ptp.debug.core.model.IRestart;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 
 /**
  * @author Clement chu
@@ -57,21 +58,21 @@ public class RestartActionDelegate extends AbstractListenerActionDelegate {
 	 * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractDebugActionDelegate#getStatusMessage()
 	 */
 	protected String getStatusMessage() {
-		return ActionMessages.getString("RestartActionDelegate.0");
+		return Messages.RestartActionDelegate_0;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractDebugActionDelegate#getErrorDialogMessage()
 	 */
 	protected String getErrorDialogMessage() {
-		return ActionMessages.getString("RestartActionDelegate.1");
+		return Messages.RestartActionDelegate_1;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractDebugActionDelegate#getErrorDialogTitle()
 	 */
 	protected String getErrorDialogTitle() {
-		return ActionMessages.getString("RestartActionDelegate.2");
+		return Messages.RestartActionDelegate_2;
 	}
 
 	/* (non-Javadoc)

@@ -28,12 +28,46 @@ import org.eclipse.debug.core.model.IStackFrame;
  * 
  */
 public interface IPSourceLocator extends ISourceLocator {
-	IProject getProject();
-	int getLineNumber(IStackFrame stackFrame);
-	IPSourceLocation[] getSourceLocations();
-	void setSourceLocations(IPSourceLocation[] locations);
-	boolean contains(IResource resource);
-	Object findSourceElement(String fileName);
-	boolean searchForDuplicateFiles();
-	void setSearchForDuplicateFiles(boolean search);
+	/**
+	 * @param resource
+	 * @return
+	 */
+	public boolean contains(IResource resource);
+
+	/**
+	 * @param fileName
+	 * @return
+	 */
+	public Object findSourceElement(String fileName);
+
+	/**
+	 * @param stackFrame
+	 * @return
+	 */
+	public int getLineNumber(IStackFrame stackFrame);
+
+	/**
+	 * @return
+	 */
+	public IProject getProject();
+
+	/**
+	 * @return
+	 */
+	public IPSourceLocation[] getSourceLocations();
+
+	/**
+	 * @return
+	 */
+	public boolean searchForDuplicateFiles();
+
+	/**
+	 * @param search
+	 */
+	public void setSearchForDuplicateFiles(boolean search);
+
+	/**
+	 * @param locations
+	 */
+	public void setSourceLocations(IPSourceLocation[] locations);
 }

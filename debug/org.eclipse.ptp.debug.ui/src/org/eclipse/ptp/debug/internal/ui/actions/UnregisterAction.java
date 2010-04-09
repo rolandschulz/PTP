@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.model.IElement;
 /**
@@ -28,7 +29,7 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public class UnregisterAction extends DebugAction {
-	public static final String name = "Unregister Selected Elements";
+	public static final String name = Messages.UnregisterAction_0;
 	
 	/** Constructor
 	 * @param view
@@ -47,7 +48,7 @@ public class UnregisterAction extends DebugAction {
 				view.unregisterSelectedElements();
 				view.refresh(false);
 			} catch (CoreException e) {
-				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
+				PTPDebugUIPlugin.errorDialog(getShell(), Messages.UnregisterAction_1, e.getStatus());				
 			}
 		}
 	}	

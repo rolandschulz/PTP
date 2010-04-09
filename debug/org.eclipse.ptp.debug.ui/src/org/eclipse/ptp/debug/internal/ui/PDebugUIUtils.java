@@ -45,7 +45,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ptp.core.resources.FileStorage;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceNotFoundElement;
@@ -237,7 +237,7 @@ public class PDebugUIUtils {
 	
 	//self testing
 	public static void main(String[] args) {
-		BitList tasks = new BitList(0);
+		TaskSet tasks = new TaskSet(0);
 		System.out.println(showBitList(tasks));
 	}
 	
@@ -245,7 +245,7 @@ public class PDebugUIUtils {
 	 * @param tasks
 	 * @return
 	 */
-	public static String showBitList(BitList tasks) {
+	public static String showBitList(TaskSet tasks) {
 		if (tasks == null || tasks.isEmpty()) {
 			return ""; //$NON-NLS-1$
 		}

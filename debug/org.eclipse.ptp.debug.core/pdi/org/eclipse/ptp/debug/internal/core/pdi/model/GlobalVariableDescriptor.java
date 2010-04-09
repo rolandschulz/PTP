@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
  *
  */
 public class GlobalVariableDescriptor extends VariableDescriptor implements IPDIGlobalVariableDescriptor {
-	public GlobalVariableDescriptor(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String n, String fn, int pos, int depth) {
+	public GlobalVariableDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String n, String fn, int pos, int depth) {
 		super(session, tasks, thread, frame, n, fn, pos, depth);
 	}
 }

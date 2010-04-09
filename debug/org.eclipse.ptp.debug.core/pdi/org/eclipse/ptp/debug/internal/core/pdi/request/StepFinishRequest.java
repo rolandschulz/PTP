@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepFinishRequest;
 
 
@@ -29,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStepFinishRequest;
  *
  */
 public class StepFinishRequest extends StepRequest implements IPDIStepFinishRequest {
-	public StepFinishRequest(BitList tasks, int count) {
+	public StepFinishRequest(TaskSet tasks, int count) {
 		super(tasks, count);
 	}
 	
@@ -49,6 +50,6 @@ public class StepFinishRequest extends StepRequest implements IPDIStepFinishRequ
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Step finish request";
+		return Messages.StepFinishRequest_0;
 	}
 }

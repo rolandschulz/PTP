@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegister;
@@ -32,7 +32,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  *
  */
 public class Register extends Variable implements IPDIRegister {
-	public Register(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String n, String q, int pos, int depth, String varid) {
+	public Register(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String n, String q, int pos, int depth, String varid) {
 		super(session, tasks, thread, frame, n, q, pos, depth, varid);
 	}
 
@@ -61,8 +61,8 @@ public class Register extends Variable implements IPDIRegister {
 	public String getFullName() {
 		if (fFullName == null) {
 			String n = getName();
-			if (!n.startsWith("$")) {
-				fFullName = "$" + n;
+			if (!n.startsWith("$")) { //$NON-NLS-1$
+				fFullName = "$" + n; //$NON-NLS-1$
 			} else {
 				fFullName = n;
 			}
@@ -71,9 +71,9 @@ public class Register extends Variable implements IPDIRegister {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.model.Variable#createVariable(org.eclipse.ptp.debug.internal.core.pdi.Session, org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.internal.core.pdi.model.Thread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int, java.lang.String)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.model.Variable#createVariable(org.eclipse.ptp.debug.internal.core.pdi.Session, org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.internal.core.pdi.model.Thread, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String, java.lang.String, int, int, java.lang.String)
 	 */
-	protected IPDIVariable createVariable(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
+	protected IPDIVariable createVariable(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid) {
 		return new Register(session, tasks, thread, frame, name, fullName, pos, depth, varid);
 	}
 }

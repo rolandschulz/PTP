@@ -10,6 +10,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IEditorActionDelegate;
@@ -53,7 +54,7 @@ public class ResumeAtLineActionDelegate implements IEditorActionDelegate, IViewA
 	public void init(IAction action) {
 		this.fAction = action;
 		if (action != null) {
-			action.setText(ActionMessages.getString("ResumeAtLineActionDelegate.0"));
+			action.setText(Messages.ResumeAtLineActionDelegate_0);
 		}
 	}
 	public void dispose() {
@@ -70,7 +71,7 @@ public class ResumeAtLineActionDelegate implements IEditorActionDelegate, IViewA
 				fPartTarget.resumeAtLine(fActivePart, fActivePart.getSite().getSelectionProvider().getSelection(), fTargetElement);
 			}
 			catch(CoreException e) {
-				ErrorDialog.openError(fActivePart.getSite().getWorkbenchWindow().getShell(), ActionMessages.getString("ResumeAtLineActionDelegate.1"), ActionMessages.getString("ResumeAtLineActionDelegate.2"), e.getStatus()); //$NON-NLS-1$ //$NON-NLS-2$
+				ErrorDialog.openError(fActivePart.getSite().getWorkbenchWindow().getShell(), "Resume At Line", "Resume at line failed", e.getStatus()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}

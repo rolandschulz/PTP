@@ -28,17 +28,17 @@ public interface ISteppingModeTarget {
 	 * Returns whether this debug target supports instruction stepping.
 	 * @return whether this debug target supports instruction stepping
 	 */
-	boolean supportsInstructionStepping();
+	public boolean supportsInstructionStepping();
 
 	/**
 	 * Sets whether the instruction stepping are enabled in this debug target.
 	 * @param enabled whether the instruction stepping are enabled in this debug target
 	 */
-	void enableInstructionStepping(boolean enabled);
+	public void enableInstructionStepping(boolean enabled);
 	
 	/**
 	 * Returns whether the instruction stepping are currently enabled in this debug target.
 	 * @return whether the instruction stepping are currently enabled in this debug target
 	 */
-	boolean isInstructionSteppingEnabled();
+	public boolean isInstructionSteppingEnabled();
 }

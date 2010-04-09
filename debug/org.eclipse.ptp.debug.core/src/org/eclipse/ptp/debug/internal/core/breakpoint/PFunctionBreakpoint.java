@@ -18,33 +18,47 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.breakpoint;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFunctionBreakpoint {
-	private static final String P_FUNCTION_BREAKPOINT = "org.eclipse.ptp.debug.core.pFunctionBreakpointMarker";
+	private static final String P_FUNCTION_BREAKPOINT = "org.eclipse.ptp.debug.core.pFunctionBreakpointMarker"; //$NON-NLS-1$
 
-	public PFunctionBreakpoint() {
-	}
-	public PFunctionBreakpoint(IResource resource, Map<?,?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
-	}
+	/**
+	 * @return
+	 */
 	public static String getMarkerType() {
 		return P_FUNCTION_BREAKPOINT;
 	}
+
+	public PFunctionBreakpoint() {
+	}
+
+	public PFunctionBreakpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	 */
+	@Override
 	protected String getMarkerMessage() throws CoreException {
 		String fileName = ensureMarker().getResource().getName();
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new Object[] { fileName, getFunction(), getConditionText() });
+		return getJobSetFormat()
+				+ " " //$NON-NLS-1$
+				+ NLS.bind(Messages.PFunctionBreakpoint_0,
+						new Object[] { fileName, getFunction(), getConditionText() });
 	}
 }

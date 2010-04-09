@@ -23,6 +23,9 @@ package org.eclipse.ptp.debug.core.model;
  * 
  */
 public interface IPGlobalVariable extends IPVariable {
+	/**
+	 * @return
+	 */
 	public IPGlobalVariableDescriptor getDescriptor();
 }
 

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -39,9 +39,9 @@ public abstract class Breakpoint extends SessionObject implements IPDIBreakpoint
 	private boolean deleted = false;
 	private int internal_id;
 
-	private BitList pendingTasks; // tasks remaining to set breakpoint
+	private TaskSet pendingTasks; // tasks remaining to set breakpoint
 
-	public Breakpoint(IPDISession session, BitList tasks, int type, IPDICondition condition, boolean enabled) {
+	public Breakpoint(IPDISession session, TaskSet tasks, int type, IPDICondition condition, boolean enabled) {
 		super(session, tasks);
 		this.type = type;
 		this.condition = condition;
@@ -73,7 +73,7 @@ public abstract class Breakpoint extends SessionObject implements IPDIBreakpoint
 		return internal_id;
 	}
 	
-	public BitList getPendingTasks() {
+	public TaskSet getPendingTasks() {
 		return pendingTasks;
 	}
 	

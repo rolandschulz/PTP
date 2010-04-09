@@ -153,7 +153,7 @@ public class StackFrame extends SessionObject implements IPDIStackFrame {
 		if (fLocator != null) {
 			return fLocator;
 		}
-		return PDILocationFactory.newLocator("", "", 0, BigInteger.ZERO);
+		return PDILocationFactory.newLocator("", "", 0, BigInteger.ZERO); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	/* (non-Javadoc)

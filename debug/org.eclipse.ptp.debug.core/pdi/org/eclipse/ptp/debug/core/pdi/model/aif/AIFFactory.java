@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 import java.util.Random;
 
 import org.eclipse.ptp.debug.core.PDebugUtils;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIF;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeAddress;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeArray;
@@ -118,23 +119,23 @@ public class AIFFactory {
 	public static final int FDS_INTEGER_SIZE_POS = 2;
 	
 	public static final int FDS_RANGE_DOT_LEN = 2;
-	public static final String SIGN_OPEN = "[";
-	public static final String SIGN_CLOSE = "]";
-	public static final String SIGN_STROKE = "|";
-	public static final String SIGN_COMMA = ",";
-	public static final String SIGN_EQUAL = "=";
-	public static final String SIGN_SEMI_COLON = ";";
-	public static final String SIGN_COLON = ":";
+	public static final String SIGN_OPEN = "["; //$NON-NLS-1$
+	public static final String SIGN_CLOSE = "]"; //$NON-NLS-1$
+	public static final String SIGN_STROKE = "|"; //$NON-NLS-1$
+	public static final String SIGN_COMMA = ","; //$NON-NLS-1$
+	public static final String SIGN_EQUAL = "="; //$NON-NLS-1$
+	public static final String SIGN_SEMI_COLON = ";"; //$NON-NLS-1$
+	public static final String SIGN_COLON = ":"; //$NON-NLS-1$
 	
-	public static final String SIGN_DOT = ".";
-	public static final String FDS_STRUCT_END = ";;;}";
-	public static final String FDS_CLASS_END = "}";
-	public static final String FDS_UNION_END = ")";
-	public static final String FDS_ENUM_END =  ">";
-	public static final String FDS_FUNCTION_END =  "/";
-	public static final String FDS_REFERENCE_END = "/";
+	public static final String SIGN_DOT = "."; //$NON-NLS-1$
+	public static final String FDS_STRUCT_END = ";;;}"; //$NON-NLS-1$
+	public static final String FDS_CLASS_END = "}"; //$NON-NLS-1$
+	public static final String FDS_UNION_END = ")"; //$NON-NLS-1$
+	public static final String FDS_ENUM_END =  ">"; //$NON-NLS-1$
+	public static final String FDS_FUNCTION_END =  "/"; //$NON-NLS-1$
+	public static final String FDS_REFERENCE_END = "/"; //$NON-NLS-1$
 	
-	public static final String FDS_NAMED_END = "/";
+	public static final String FDS_NAMED_END = "/"; //$NON-NLS-1$
 	public static final int NO_SIZE = 0;
 	public static final int SIZE_BOOL = 1;
 	public static final int SIZE_CHAR = 1;
@@ -196,80 +197,80 @@ public class AIFFactory {
 	 */
 	public static IAIFType getAIFType(String fmt) {
 		if (fmt == null || fmt.length() == 0) {
-			PDebugUtils.println("        ======= null: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_0 + fmt);
 			return UNKNOWNTYPE;			
 		}
 		switch (fmt.charAt(0)) {
 		case FDS_CHAR: //char is signed or unsigned ???
-			PDebugUtils.println("        ======= character: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_1 + fmt);
 			return new AIFTypeChar();
 		case FDS_FLOAT:
 			int float_size = Character.digit(fmt.charAt(FDS_FLOAT_SIZE_POS), 10);
-			PDebugUtils.println("        ======= floating: " + fmt + ", size: " + float_size);
+			PDebugUtils.println(Messages.AIFFactory_2 + fmt + Messages.AIFFactory_3 + float_size);
 			return new AIFTypeFloat(float_size);
 		case FDS_INT: //long and int is same???  long long type
 			boolean signed = (fmt.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			int int_size = Character.digit(fmt.charAt(FDS_INTEGER_SIZE_POS), 10);
-			PDebugUtils.println("        ======= int: " + fmt + ", size: " + int_size);
+			PDebugUtils.println(Messages.AIFFactory_4 + fmt + Messages.AIFFactory_5 + int_size);
 			return new AIFTypeInt(signed, int_size);
 		case FDS_CHAR_POINTER:
-			PDebugUtils.println("        ======= char pointer: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_6 + fmt);
 			return new AIFTypeCharPointer(getAIFType(fmt.substring(1, 3)));
 		case FDS_STRING:
-			PDebugUtils.println("        ======= string: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_7 + fmt);
 			return new AIFTypeString();
 		case FDS_BOOL:
-			PDebugUtils.println("        ======= boolean: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_8 + fmt);
 			return new AIFTypeBool();
 		case FDS_ENUM:
-			PDebugUtils.println("        ======= enum: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_9 + fmt);
 			int enum_end_pos = getEndPosFromLast(fmt, FDS_ENUM_END);
 			String enum_type = fmt.substring(enum_end_pos+FDS_ENUM_END.length());
 			return new AIFTypeEnum(extractFormat(fmt, 1, enum_end_pos), getAIFType(enum_type));
 		case FDS_FUNCTION:
-			PDebugUtils.println("        ======= function: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_10 + fmt);
 			int func_end_pos = getEndPosFromLast(fmt, FDS_FUNCTION_END);
 			String func_type = fmt.substring(func_end_pos+FDS_FUNCTION_END.length());
 			return new AIFTypeFunction(extractFormat(fmt, 1, func_end_pos), getAIFType(func_type));
 		case FDS_STRUCT_CLASS: //struct or class
 			int struct_end_pos = getEndPosFromLast(fmt, FDS_STRUCT_END);
 			if (fmt.length() == struct_end_pos + FDS_STRUCT_END.length()) {
-				PDebugUtils.println("        ======= struct " + fmt);
+				PDebugUtils.println(Messages.AIFFactory_11 + fmt);
 				return new AIFTypeStruct(extractFormat(fmt, 1, struct_end_pos));
 			}
 			else {
 				struct_end_pos = getEndPosFromLast(fmt, FDS_CLASS_END);
-				PDebugUtils.println("        ======= class " + fmt);
+				PDebugUtils.println(Messages.AIFFactory_12 + fmt);
 				return new AIFTypeClass(extractFormat(fmt, 1, struct_end_pos));
 			}
 		case FDS_UNION:
-			PDebugUtils.println("        ======= union: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_13 + fmt);
 			int union_end_pos = getEndPosFromLast(fmt, FDS_UNION_END);
 			return new AIFTypeUnion(extractFormat(fmt, 1, union_end_pos));
 		case FDS_REFERENCE:
-			PDebugUtils.println("        ======= reference: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_14 + fmt);
 			int ref_end_pos = getEndPosFromStart(fmt, FDS_REFERENCE_END);
 			return new AIFTypeReference(extractFormat(fmt, 1, ref_end_pos));
 		case FDS_ADDRESS:
-			PDebugUtils.println("        ======= address: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_15 + fmt);
 			return new AIFTypeAddress(Character.digit(fmt.charAt(1), 10));
 		case FDS_POINTER:
-			PDebugUtils.println("        ======= pointer: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_16 + fmt);
 			return new AIFTypePointer(getAIFType(fmt.substring(1, 3)), getAIFType(fmt.substring(3)));
 		case FDS_VOID:
-			PDebugUtils.println("        ======= void: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_17 + fmt);
 			int void_size = Character.digit(fmt.charAt(FDS_VOID_SIZE_POS), 10);
 			return new AIFTypeVoid(void_size);
 		case FDS_ARRAY:
-			PDebugUtils.println("        ======= array: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_18 + fmt);
 			int array_end_pos = getEndPosFromStart(fmt, SIGN_CLOSE);
 			return new AIFTypeArray(extractFormat(fmt, 1, array_end_pos), getAIFType(fmt.substring(array_end_pos+1)));
 		case FDS_NAMED:
-			PDebugUtils.println("        ======= named: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_19 + fmt);
 			int named_end_pos = getEndPosFromStart(fmt, FDS_NAMED_END);
 			return new AIFTypeNamed(extractFormat(fmt, 1, named_end_pos), getAIFType(fmt.substring(named_end_pos+1)));
 		default:
-			PDebugUtils.println("        ======= unknown: " + fmt);
+			PDebugUtils.println(Messages.AIFFactory_20 + fmt);
 			return new AIFTypeIncomplete();
 		}
 	}

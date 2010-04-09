@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIGoRequest;
 
@@ -32,7 +33,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIGoRequest;
 public class ResumeRequest extends AbstractEventRequest implements IPDIGoRequest {
 	private boolean passSignal = false;
 	
-	public ResumeRequest(BitList tasks, boolean passSignal) {
+	public ResumeRequest(TaskSet tasks, boolean passSignal) {
 		super(tasks);
 		this.passSignal = passSignal;
 	}
@@ -53,6 +54,6 @@ public class ResumeRequest extends AbstractEventRequest implements IPDIGoRequest
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Resume request";
+		return Messages.ResumeRequest_0;
 	}
 }

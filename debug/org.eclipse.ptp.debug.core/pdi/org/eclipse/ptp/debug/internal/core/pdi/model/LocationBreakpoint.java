@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.core.pdi.model;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIAddressLocation;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDIFunctionLocation;
@@ -38,7 +38,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDILocationBreakpoint;
 public abstract class LocationBreakpoint extends Breakpoint implements IPDILocationBreakpoint {
 	private IPDILocation location;
 	
-	public LocationBreakpoint(IPDISession session, BitList tasks, int type, IPDILocation location, IPDICondition condition, boolean enabled) {
+	public LocationBreakpoint(IPDISession session, TaskSet tasks, int type, IPDILocation location, IPDICondition condition, boolean enabled) {
 		super(session, tasks, type, condition, enabled);
 		this.location = location;
 	}

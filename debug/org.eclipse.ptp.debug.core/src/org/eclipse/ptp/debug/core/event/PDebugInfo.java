@@ -19,38 +19,55 @@
 package org.eclipse.ptp.debug.core.event;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * @author Clement
  */
 public class PDebugInfo implements IPDebugInfo {
-	private BitList allTasks = null;
-	private BitList allRegTasks = null;
-	private BitList allUnregTasks = null;
+	private TaskSet allTasks = null;
+	private TaskSet allRegTasks = null;
+	private TaskSet allUnregTasks = null;
 	private IPJob job = null;
-	
+
 	public PDebugInfo(IPDebugInfo info) {
 		this.job = info.getJob();
 		this.allTasks = info.getAllTasks();
 		this.allRegTasks = info.getAllRegisteredTasks();
 		this.allUnregTasks = info.getAllUnregisteredTasks();
 	}
-	public PDebugInfo(IPJob job, BitList allTasks, BitList allRegTasks, BitList allUnregTasks) {
+
+	public PDebugInfo(IPJob job, TaskSet allTasks, TaskSet allRegTasks, TaskSet allUnregTasks) {
 		this.job = job;
 		this.allTasks = allTasks;
 		this.allRegTasks = allRegTasks;
 		this.allUnregTasks = allUnregTasks;
 	}
-	public BitList getAllTasks() {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllTasks()
+	 */
+	public TaskSet getAllTasks() {
 		return allTasks;
 	}
-	public BitList getAllRegisteredTasks() {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllRegisteredTasks()
+	 */
+	public TaskSet getAllRegisteredTasks() {
 		return allRegTasks;
 	}
-	public BitList getAllUnregisteredTasks() {
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllUnregisteredTasks()
+	 */
+	public TaskSet getAllUnregisteredTasks() {
 		return allUnregTasks;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getJob()
+	 */
 	public IPJob getJob() {
 		return job;
 	}

@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.core.pdi.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMemory;
 
 /**
@@ -31,7 +32,7 @@ public class Memory implements IPDIMemory {
 	private String addr;
 	private long[] data = new long[0];
 	private List<Integer> badOffsets = new ArrayList<Integer>();
-	private String ascii = "";
+	private String ascii = ""; //$NON-NLS-1$
 
 	public Memory(String addr, String ascii, String[] values) {
 		this.addr = addr;
@@ -87,8 +88,8 @@ public class Memory implements IPDIMemory {
 	 */
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("addr=\"" + addr + "\"");
-		buffer.append("data=[");
+		buffer.append(Messages.Memory_1 + addr + "\""); //$NON-NLS-2$ //$NON-NLS-1$
+		buffer.append(Messages.Memory_3);
 		for (int i = 0; i < data.length; i++) {
 			if (i != 0) {
 				buffer.append(',');
@@ -97,7 +98,7 @@ public class Memory implements IPDIMemory {
 		}
 		buffer.append(']');
 		if (ascii.length() > 0) {
-			buffer.append(",ascii=\"" + ascii + "\"");
+			buffer.append(Messages.Memory_4 + ascii + "\""); //$NON-NLS-2$ //$NON-NLS-1$
 		}
 		return buffer.toString();
 	}

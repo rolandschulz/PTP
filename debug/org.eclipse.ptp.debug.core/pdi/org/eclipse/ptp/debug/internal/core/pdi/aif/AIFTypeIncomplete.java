@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 
 public class AIFTypeIncomplete extends AIFType {
@@ -25,6 +26,6 @@ public class AIFTypeIncomplete extends AIFType {
 		return AIFFactory.SIZE_INVALID;
 	}
 	public String toString() {
-		return "<incomplete type>";
+		return Messages.AIFTypeIncomplete_0;
 	}
 }

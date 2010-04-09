@@ -29,6 +29,7 @@ import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
 import org.eclipse.ptp.debug.internal.ui.views.PTabItem;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -67,7 +68,7 @@ public class ArrayView extends PTabFolder {
 	public void createTabItem(String tabName, Object selection) throws DebugException {
 		if (selection instanceof IPVariable) {
 			if (items.containsKey(tabName)) {
-				throw new DebugException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Already existed variable", null));
+				throw new DebugException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, Messages.ArrayView_0, null));
 			}
 			ArrayTabItem item = new ArrayTabItem(this, tabName, (IPVariable)selection);
 			item.init((IPVariable)selection);

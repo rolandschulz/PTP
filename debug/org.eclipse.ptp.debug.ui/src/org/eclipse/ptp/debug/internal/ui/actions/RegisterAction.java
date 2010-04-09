@@ -19,8 +19,10 @@
 package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
@@ -29,7 +31,7 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public class RegisterAction extends DebugAction {
-	public static final String name = "Register Selected Elements";
+	public static final String name = Messages.RegisterAction_0;
 	private int NUM_PROCESS_WARNING = 10;
 	
 	/** Constructor
@@ -46,7 +48,7 @@ public class RegisterAction extends DebugAction {
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
 			if (elements.length > NUM_PROCESS_WARNING) {
-				if (!UIUtils.showQuestionDialog("Register Confirmation", "Are you sure you want to register (" + elements.length + ") processes?")) {
+				if (!UIUtils.showQuestionDialog(Messages.RegisterAction_1, NLS.bind(Messages.RegisterAction_2, elements.length))) {
 					return;
 				}
 			}
@@ -54,7 +56,7 @@ public class RegisterAction extends DebugAction {
 				view.registerSelectedElements();
 				view.refresh(false);
 			} catch (CoreException e) {
-				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
+				PTPDebugUIPlugin.errorDialog(getShell(), Messages.RegisterAction_3, e.getStatus());				
 			}
 		}
 	}	

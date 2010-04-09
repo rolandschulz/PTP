@@ -26,11 +26,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIArgument;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIArgumentDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIGlobalVariable;
@@ -56,11 +57,11 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIListLocalVariablesRequest;
 public class VariableManager extends AbstractPDIManager implements IPDIVariableManager {
 	static final IPDIVariable[] EMPTY_VARIABLES = {};
 	int MAX_STACK_DEPTH = IPDIThread.STACKFRAME_DEFAULT_DEPTH;
-	Map<BitList, List<IPDIVariable>> variablesMap;
+	Map<TaskSet, List<IPDIVariable>> variablesMap;
 
 	public VariableManager(IPDISession session) {
 		super(session, true);
-		variablesMap = new Hashtable<BitList, List<IPDIVariable>>();
+		variablesMap = new Hashtable<TaskSet, List<IPDIVariable>>();
 	}
 	
 	/* (non-Javadoc)
@@ -144,7 +145,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager#createThreadStorage(org.eclipse.ptp.debug.core.pdi.model.IPDIThreadStorageDescriptor)
 	 */
 	public IPDIThreadStorage createThreadStorage(IPDIThreadStorageDescriptor desc) throws PDIException {
-		throw new PDIException(desc.getTasks(), PDIResources.getString("pdi.VariableManager.Unknown_variable_object"));
+		throw new PDIException(desc.getTasks(), Messages.VariableManager_0);
 	}
 	
 	/**
@@ -164,14 +165,14 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 		} else if (varDesc instanceof IPDIThreadStorageDescriptor) {
 			return createThreadStorage((IPDIThreadStorageDescriptor)varDesc);
 		}
-		throw new PDIException(varDesc.getTasks(), PDIResources.getString("pdi.VariableManager.Unknown_variable_object"));			
+		throw new PDIException(varDesc.getTasks(), Messages.VariableManager_0);			
 	}
 	
 	/**
 	 * @param qTasks
 	 * @throws PDIException
 	 */
-	public void destroyAllVariables(BitList qTasks) throws PDIException {
+	public void destroyAllVariables(TaskSet qTasks) throws PDIException {
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>();
 		IPDIVariable[] variables = getVariables(qTasks);
 		for (int i = 0; i < variables.length; ++i) {
@@ -186,7 +187,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager#destroyVariable(org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
 	 */
 	public void destroyVariable(IPDIVariable variable) throws PDIException {
-		BitList qTasks = variable.getTasks();
+		TaskSet qTasks = variable.getTasks();
 		List<IPDIVariable> varList = getVariablesList(qTasks);
 		if (varList.contains(variable)) {
 			removeVar(qTasks, variable.getId());
@@ -254,7 +255,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @return
 	 * @throws PDIException
 	 */
-	public IPDIGlobalVariableDescriptor getGlobalVariableDescriptor(BitList tasks, String filename, String function, String name) throws PDIException {
+	public IPDIGlobalVariableDescriptor getGlobalVariableDescriptor(TaskSet tasks, String filename, String function, String name) throws PDIException {
 		if (filename == null) {
 			filename = new String();
 		}
@@ -266,10 +267,10 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 		}
 		StringBuffer buffer = new StringBuffer();
 		if (filename.length() > 0) {
-			buffer.append('\'').append(filename).append('\'').append("::");
+			buffer.append('\'').append(filename).append('\'').append("::"); //$NON-NLS-1$
 		}
 		if (function.length() > 0) {
-			buffer.append(function).append("::");
+			buffer.append(function).append("::"); //$NON-NLS-1$
 		}
 		buffer.append(name);
 		return session.getModelFactory().newGlobalVariableDescriptor(session, tasks, null, null, buffer.toString(), null, 0, 0);
@@ -315,7 +316,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @param varId
 	 * @return
 	 */
-	public IPDIVariable getVariable(BitList tasks, String varid) {
+	public IPDIVariable getVariable(TaskSet tasks, String varid) {
 		IPDIVariable[] vars = getVariables(tasks);
 		for (IPDIVariable var : vars) {
 			if (var.getId().equals(varid)) {
@@ -330,9 +331,9 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager#getVariableByName(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager#getVariableByName(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
-	public IPDIVariable getVariableByName(BitList tasks, String varname) {
+	public IPDIVariable getVariableByName(TaskSet tasks, String varname) {
 		IPDIVariable[] vars = getVariables(tasks);
 		for (IPDIVariable var : vars) {
 			if (var.getName().equals(varname))
@@ -364,7 +365,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 		} else if (varDesc instanceof IPDIThreadStorageDescriptor || varDesc instanceof IPDIThreadStorage) {
 			vo = session.getModelFactory().newThreadStorageDescriptor(session, varDesc.getTasks(), thread, frame, name, fullName, pos, depth);
 		} else {
-			throw new PDIException(varDesc.getTasks(), PDIResources.getString("pdi.VariableManager.Unknown_variable_object"));			
+			throw new PDIException(varDesc.getTasks(), Messages.VariableManager_0);			
 		}
 
 		vo.setCastingArrayStart(varDesc.getCastingArrayStart() + start);
@@ -376,14 +377,14 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIVariableManager#getVariableDescriptorAsType(org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor, java.lang.String)
 	 */
 	public IPDIVariableDescriptor getVariableDescriptorAsType(IPDIVariableDescriptor varDesc, String type) throws PDIException {
-		throw new PDIException(varDesc.getTasks(), "Not implemented getVariableDescriptorAsType() yet.");
+		throw new PDIException(varDesc.getTasks(), Messages.VariableManager_1);
 	}
 	
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public IPDIVariable[] getVariables(BitList tasks) {
+	public IPDIVariable[] getVariables(TaskSet tasks) {
 		List<IPDIVariable> variableList = (List<IPDIVariable>)variablesMap.get(tasks);
 		if (variableList != null) {
 			return (IPDIVariable[]) variableList.toArray(new IPDIVariable[variableList.size()]);
@@ -396,7 +397,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @param varId
 	 * @throws PDIException
 	 */
-	public void removeVar(BitList tasks, String varid) throws PDIException {
+	public void removeVar(TaskSet tasks, String varid) throws PDIException {
 		session.getEventRequestManager().addEventRequest(session.getRequestFactory().getDeletePartialExpressionRequest(tasks, varid));
 	}
 	
@@ -405,7 +406,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @param varId
 	 * @return
 	 */
-	public IPDIVariable removeVariableFromList(BitList tasks, String varId) {
+	public IPDIVariable removeVariableFromList(TaskSet tasks, String varId) {
 		List<IPDIVariable> varList = getVariablesList(tasks);
 		synchronized (varList) {
 			for (Iterator<IPDIVariable> iterator = varList.iterator(); iterator.hasNext();) {
@@ -427,9 +428,9 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) throws PDIException {
+	public void update(TaskSet qTasks) throws PDIException {
 		update(qTasks, new String[0]);
 	}
 	
@@ -438,7 +439,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @param vars
 	 * @throws PDIException
 	 */
-	public void update(BitList qTasks, String[] vars) throws PDIException {
+	public void update(TaskSet qTasks, String[] vars) throws PDIException {
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>();
 		for (int i = 0; i < vars.length; i++) {
 			IPDIVariable variable = getVariable(qTasks, vars[i]);
@@ -454,7 +455,7 @@ public class VariableManager extends AbstractPDIManager implements IPDIVariableM
 	 * @param tasks
 	 * @return
 	 */
-	private synchronized List<IPDIVariable> getVariablesList(BitList tasks) {
+	private synchronized List<IPDIVariable> getVariablesList(TaskSet tasks) {
 		List<IPDIVariable> variablesList = (List<IPDIVariable>) variablesMap.get(tasks);
 		if (variablesList == null) {
 			variablesList = Collections.synchronizedList(new ArrayList<IPDIVariable>());

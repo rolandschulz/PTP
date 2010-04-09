@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIThreadInfo;
@@ -32,7 +32,7 @@ public class ThreadInfo extends SessionObject implements IPDIThreadInfo {
 	private int thread_id;
 	private IPDIThread thread;
 	
-	public ThreadInfo(IPDISession session, BitList tasks, int thread_id, IPDIThread thread) {
+	public ThreadInfo(IPDISession session, TaskSet tasks, int thread_id, IPDIThread thread) {
 		super(session, tasks);
 		this.thread_id = thread_id;
 		this.thread = thread;

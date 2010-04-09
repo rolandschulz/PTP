@@ -32,8 +32,8 @@ public class AIFTypeStruct extends TypeAggregate implements IAIFTypeStruct {
 		return AIFFactory.FDS_STRUCT_CLASS + super.toString() + AIFFactory.FDS_STRUCT_END;
 	}
 	public static void main(String[] args) {
-		IAIFType testType = AIFFactory.getAIFType("{structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}");
-		System.out.println("----: " + testType);
-		System.out.println("----: " + testType.sizeof());
+		IAIFType testType = AIFFactory.getAIFType("{structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}"); //$NON-NLS-1$
+		System.out.println("----: " + testType); //$NON-NLS-1$
+		System.out.println("----: " + testType.sizeof()); //$NON-NLS-1$
 	}
 }

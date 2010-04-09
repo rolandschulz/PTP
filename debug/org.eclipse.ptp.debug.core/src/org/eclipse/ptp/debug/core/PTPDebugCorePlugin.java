@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
@@ -53,7 +54,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		 * Creates a new event dispatch job.
 		 */
 		public EventDispatchJob() {
-			super("EventDispatchJob");
+			super("EventDispatchJob"); //$NON-NLS-1$
 			setPriority(Job.INTERACTIVE);
 			setSystem(true);
 		}
@@ -105,7 +106,7 @@ public class PTPDebugCorePlugin extends Plugin {
 
 		public void handleException(Throwable exception) {
 			log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR,
-					"PTPDebugCorePlugin occurred exception while dispacthing debug event", exception));
+					Messages.PTPDebugCorePlugin_0, exception));
 		}
 
 		public void run() throws Exception {
@@ -113,7 +114,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 	}
 	
-	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.core";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.core"; //$NON-NLS-1$
 	
 	public static final int INTERNAL_ERROR = 1000;
 	
@@ -123,8 +124,8 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public static final Object FAMILY_EVENT = new Object();
 	
-	public static final String PDEBUGGER_EXTENSION_POINT_ID = "parallelDebuggers";
-	public static final String DEBUGGER_ELEMENT = "debugger";
+	public static final String PDEBUGGER_EXTENSION_POINT_ID = "parallelDebuggers"; //$NON-NLS-1$
+	public static final String DEBUGGER_ELEMENT = "debugger"; //$NON-NLS-1$
 
 	private static PTPDebugCorePlugin plugin;
 	private static PDebugModel debugModel = null;
@@ -192,7 +193,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		// this message is intentionally not internationalized, as an exception
 		// may
 		// be due to the resource bundle itself
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, "Internal error logged from PDI Debug: ", top));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, Messages.PTPDebugCorePlugin_1, top));
 	}
 
 	private HashMap<String, PDebugConfiguration> fDebugConfigurations;
@@ -260,7 +261,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		IPDebugConfiguration dbgCfg = (IPDebugConfiguration) fDebugConfigurations.get(id);
 		if (dbgCfg == null) {
-			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 100, "PTPDebugCorePlugin Debug Configuration Error",
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 100, Messages.PTPDebugCorePlugin_2,
 					null);
 			throw new CoreException(status);
 		}

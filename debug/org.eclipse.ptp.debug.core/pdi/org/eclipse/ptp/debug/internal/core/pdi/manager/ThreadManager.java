@@ -22,7 +22,7 @@ package org.eclipse.ptp.debug.internal.core.pdi.manager;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIThreadManager;
@@ -36,16 +36,16 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIGetInfoThreadsRequest;
  */
 public class ThreadManager extends AbstractPDIManager implements IPDIThreadManager {
 	private static final IPDIThread[] noThreads = new IPDIThread[0];
-	private Map<BitList, IPDIThread[]> threadMap = new Hashtable<BitList, IPDIThread[]>();
+	private Map<TaskSet, IPDIThread[]> threadMap = new Hashtable<TaskSet, IPDIThread[]>();
 	
 	public ThreadManager(IPDISession session) {
 		super(session, true);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIThreadManager#getThreads(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIThreadManager#getThreads(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIThread[] getThreads(BitList qTasks) throws PDIException {
+	public IPDIThread[] getThreads(TaskSet qTasks) throws PDIException {
 		IPDIThread[] threads =  threadMap.get(qTasks);
 		if (threads == null) {
 			threads = getPThreads(qTasks);
@@ -62,9 +62,9 @@ public class ThreadManager extends AbstractPDIManager implements IPDIThreadManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) throws PDIException {
+	public void update(TaskSet qTasks) throws PDIException {
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class ThreadManager extends AbstractPDIManager implements IPDIThreadManag
 	 * @return
 	 * @throws PDIException
 	 */
-	private IPDIThread[] getPThreads(BitList qTasks) throws PDIException {
+	private IPDIThread[] getPThreads(TaskSet qTasks) throws PDIException {
 		IPDIThread[] pthreads = noThreads;
 		int currentThreadId = 0;
 		

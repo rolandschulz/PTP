@@ -11,7 +11,7 @@
 
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 
@@ -41,5 +41,5 @@ public interface IPDIManager extends IPDISessionObject {
 	 * @param tasks
 	 * @throws PDIException
 	 */
-	public void update(BitList tasks) throws PDIException;
+	public void update(TaskSet tasks) throws PDIException;
 }

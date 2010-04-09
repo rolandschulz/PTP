@@ -26,10 +26,37 @@ import org.eclipse.core.runtime.IAdaptable;
  * 
  */
 public interface IPSourceLocation extends IAdaptable {
-	Object findSourceElement(String name) throws CoreException;
-	String getMemento() throws CoreException;
-	void initializeFrom(String memento) throws CoreException;
-	boolean searchForDuplicateFiles();
-	void setSearchForDuplicateFiles(boolean search);
-	void dispose();
+	/**
+	 * 
+	 */
+	public void dispose();
+
+	/**
+	 * @param name
+	 * @return
+	 * @throws CoreException
+	 */
+	public Object findSourceElement(String name) throws CoreException;
+
+	/**
+	 * @return
+	 * @throws CoreException
+	 */
+	public String getMemento() throws CoreException;
+
+	/**
+	 * @param memento
+	 * @throws CoreException
+	 */
+	public void initializeFrom(String memento) throws CoreException;
+
+	/**
+	 * @return
+	 */
+	public boolean searchForDuplicateFiles();
+
+	/**
+	 * @param search
+	 */
+	public void setSearchForDuplicateFiles(boolean search);
 }

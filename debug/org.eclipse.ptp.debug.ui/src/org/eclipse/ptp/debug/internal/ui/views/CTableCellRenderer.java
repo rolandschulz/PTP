@@ -40,7 +40,7 @@ public class CTableCellRenderer {
 		String text = content.toString();
 		if (fixed) {
 			if (col == 0 && row == 0)
-				text = "";
+				text = ""; //$NON-NLS-1$
 
 			rect.height += 1;
 			rect.width += 1;
@@ -96,7 +96,7 @@ public class CTableCellRenderer {
 	private void drawText(GC gc, String text, int x, int y, int w, int h, int leftMargin, int topMargin) {
 		Point pt = getStringExtentCache(gc, text);
 		if (pt.x > w-leftMargin) {
-			text = "...";
+			text = "..."; //$NON-NLS-1$
 			pt = getStringExtentCache(gc, text);
 		}
 		gc.drawText(text, x+(w-pt.x)/2+leftMargin, y+(h-pt.y)/2+topMargin);

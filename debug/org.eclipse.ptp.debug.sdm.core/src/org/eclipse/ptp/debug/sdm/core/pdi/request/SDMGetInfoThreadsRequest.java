@@ -10,19 +10,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractGetInfoThreadsRequest;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
 
 public class SDMGetInfoThreadsRequest extends AbstractGetInfoThreadsRequest {
-	public SDMGetInfoThreadsRequest(BitList tasks) {
+	public SDMGetInfoThreadsRequest(TaskSet tasks) {
 		super(tasks);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
-	protected void storeResult(BitList rTasks, Object result) {
+	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugInfoThreadsEvent) {
 			results.put(rTasks, ((IProxyDebugInfoThreadsEvent)result).getThreadIds());
 		}

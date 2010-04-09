@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.core.pdi.model;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
@@ -40,7 +40,7 @@ public interface IPDIMultiExpressions extends IPDISessionObject {
 	 * @param tasks
 	 * @param monitor
 	 */
-	public void cleanExpressionsValue(BitList tasks, IProgressMonitor monitor);
+	public void cleanExpressionsValue(TaskSet tasks, IProgressMonitor monitor);
 	
 	/**
 	 * Returns the value of this expression.
@@ -76,9 +76,9 @@ public interface IPDIMultiExpressions extends IPDISessionObject {
 	
 	/**
 	 * Remove an expression from store
-	 * @param tasks BitList
+	 * @param tasks TaskSet
 	 */
-	public void removeExpression(BitList tasks);
+	public void removeExpression(TaskSet tasks);
 	
 	/**
 	 * Remove an expression from store
@@ -101,5 +101,5 @@ public interface IPDIMultiExpressions extends IPDISessionObject {
 	 * @param monitor
 	 * @throws PDIException
 	 */
-	public void updateExpressionsValue(BitList tasks, IProgressMonitor monitor) throws PDIException;
+	public void updateExpressionsValue(TaskSet tasks, IProgressMonitor monitor) throws PDIException;
 }

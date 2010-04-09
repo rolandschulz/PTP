@@ -37,12 +37,12 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugEvent;
 import org.eclipse.ptp.debug.core.event.PDebugRegisterInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -404,7 +404,7 @@ public class PDebugModel {
 	public static void updatePBreakpoints(String set_id, IProgressMonitor monitor) throws CoreException {
 		try {
 			IBreakpoint[] breakpoints = getPBreakpoints();
-			monitor.beginTask("Updating parallel breakpoint...", breakpoints.length);
+			monitor.beginTask(Messages.PDebugModel_0, breakpoints.length);
 			for (IBreakpoint bpt : breakpoints) {
 				if (!(bpt instanceof IPBreakpoint))
 					continue;
@@ -468,8 +468,8 @@ public class PDebugModel {
 	 * @param refresh
 	 * @param resumeTarget
 	 */
-	public void addNewDebugTargets(final IPLaunch launch, final BitList tasks, final IPDITarget[] pdiTargets, final boolean refresh, final boolean resumeTarget) {
-		WorkspaceJob aJob = new WorkspaceJob("Creating new debug targets...") {
+	public void addNewDebugTargets(final IPLaunch launch, final TaskSet tasks, final IPDITarget[] pdiTargets, final boolean refresh, final boolean resumeTarget) {
+		WorkspaceJob aJob = new WorkspaceJob(Messages.PDebugModel_1) {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				boolean allowTerminate = true;
 				boolean allowDisconnect = false;
@@ -503,8 +503,8 @@ public class PDebugModel {
 	 * @param set_id ID of the set to add the tasks to
 	 * @param tasks tasks to add to the set
 	 */
-	public void addTasks(IPSession session, String set_id, BitList tasks) {
-		BitList curSetTasks = getTasks(session, set_id);
+	public void addTasks(IPSession session, String set_id, TaskSet tasks) {
+		TaskSet curSetTasks = getTasks(session, set_id);
 		session.getSetManager().addTasks(set_id, tasks);
 		tasks.andNot(curSetTasks);
 		try {
@@ -538,7 +538,7 @@ public class PDebugModel {
 	 * @param set_id
 	 * @param tasks
 	 */
-	public void createSet(IPSession session, String set_id, BitList tasks) {
+	public void createSet(IPSession session, String set_id, TaskSet tasks) {
 		session.getSetManager().createSet(set_id, tasks);
 	}
 	
@@ -562,7 +562,7 @@ public class PDebugModel {
 	 * @param tasks
 	 * @param refresh
 	 */
-	public void fireRegisterEvent(IPJob job, BitList tasks, boolean refresh) {
+	public void fireRegisterEvent(IPJob job, TaskSet tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
 			IPSession session = getSession(job);
 			if (session != null) {
@@ -577,7 +577,7 @@ public class PDebugModel {
 	 * @param tasks
 	 * @param refresh
 	 */
-	public void fireUnregisterEvent(IPJob job, BitList tasks, boolean refresh) {
+	public void fireUnregisterEvent(IPJob job, TaskSet tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
 			IPSession session = getSession(job);
 			if (session != null) {
@@ -600,8 +600,8 @@ public class PDebugModel {
 	 * @param set_id
 	 * @return
 	 */
-	public BitList getTasks(IPSession session, String set_id) {
-		BitList tasks = session.getSetManager().getTasks(set_id);
+	public TaskSet getTasks(IPSession session, String set_id) {
+		TaskSet tasks = session.getSetManager().getTasks(set_id);
 		if (tasks != null)
 			return tasks.copy();
 		return null;
@@ -612,8 +612,8 @@ public class PDebugModel {
 	 * @param tasks
 	 * @param refresh
 	 */
-	public void removeDebugTarget(final IPLaunch launch, final BitList tasks, final boolean refresh) {
-		WorkspaceJob aJob = new WorkspaceJob("Removing the debug targets...") {
+	public void removeDebugTarget(final IPLaunch launch, final TaskSet tasks, final boolean refresh) {
+		WorkspaceJob aJob = new WorkspaceJob(Messages.PDebugModel_2) {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				int[] taskArray = tasks.toArray();
 				for (int task : taskArray) {
@@ -636,8 +636,8 @@ public class PDebugModel {
 	 * @param set_id
 	 * @param tasks
 	 */
-	public void removeTasks(IPSession session, String set_id, BitList tasks) {
-		BitList curSetTasks = getTasks(session, set_id);
+	public void removeTasks(IPSession session, String set_id, TaskSet tasks) {
+		TaskSet curSetTasks = getTasks(session, set_id);
 		session.getSetManager().removeTasks(set_id, tasks);
 		tasks.and(curSetTasks);
 		try {

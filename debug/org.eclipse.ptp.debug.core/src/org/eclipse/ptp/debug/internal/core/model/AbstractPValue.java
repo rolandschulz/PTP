@@ -46,7 +46,7 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 	 * @see org.eclipse.ptp.debug.core.model.IPValue#evaluateAsExpression(org.eclipse.ptp.debug.core.model.IPStackFrame)
 	 */
 	public String evaluateAsExpression(IPStackFrame frame) {
-		String valueString = "";
+		String valueString = ""; //$NON-NLS-1$
 		AbstractPVariable parent = getParentVariable();
 		if (parent != null) {
 			if (frame != null && frame.canEvaluate()) {
@@ -54,7 +54,7 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 					IAIFValue value = parent.getAIF().getValue();
 					if (value instanceof IAIFValueArray) {
 						//TODO if value is array, show nothing.  Prevent no value for partial aif
-						valueString = "";
+						valueString = ""; //$NON-NLS-1$
 					} else {
 						valueString = value.getValueString();
 						if (valueString == null || valueString.length() == 0)

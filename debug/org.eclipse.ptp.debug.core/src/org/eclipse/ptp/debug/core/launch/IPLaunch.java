@@ -2,7 +2,7 @@ package org.eclipse.ptp.debug.core.launch;
 
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
 /**
@@ -13,10 +13,10 @@ public interface IPLaunch extends ILaunch {
 	/**
 	 * Get the IPDebugTarget responsible for the processes in procs
 	 * 
-	 * @param tasks BitList containing processes we're interested in
+	 * @param tasks TaskSet containing processes we're interested in
 	 * @return IPDebugTarget responsible for processes
 	 */
-	public IPDebugTarget getDebugTarget(BitList procs);
+	public IPDebugTarget getDebugTarget(TaskSet procs);
 	
 	/**
 	 * Get the IPDebugTarget responsible for the procId.

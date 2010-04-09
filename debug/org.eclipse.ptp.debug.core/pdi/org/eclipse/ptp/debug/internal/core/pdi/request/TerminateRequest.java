@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDITerminateRequest;
 
@@ -30,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDITerminateRequest;
  *
  */
 public class TerminateRequest extends AbstractEventRequest implements IPDITerminateRequest {
-	public TerminateRequest(BitList tasks) {
+	public TerminateRequest(TaskSet tasks) {
 		super(tasks);
 	}
 	
@@ -50,6 +51,6 @@ public class TerminateRequest extends AbstractEventRequest implements IPDITermin
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Terminate request";
+		return Messages.TerminateRequest_0;
 	}
 }

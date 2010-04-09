@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.debug.core.IPSession;
@@ -34,6 +35,7 @@ import org.eclipse.ptp.debug.internal.ui.PDebugUIUtils;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
@@ -137,7 +139,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				break;
 			case IPDebugEvent.RESUME:
 				time_record = System.currentTimeMillis();
-				System.err.println("================= TIME RESUME: " + time_record);
+				System.err.println("================= TIME RESUME: " + time_record); //$NON-NLS-1$
 				//((UIDebugManager) getPView().getUIManager()).updateVariableValue(false, info.getAllRegisteredTasks());
 				refresh(true);
 				break;
@@ -145,7 +147,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				IPSession s = ((UIDebugManager) getPView().getUIManager()).getDebugSession(job);
 				if (s != null) {
 					if (s.getTasks().cardinality() == s.getPDISession().getTaskManager().getSuspendedTasks().cardinality()) {
-						System.err.println("================= TIME ALL SUSPENDED: " + (System.currentTimeMillis() - time_record));
+						System.err.println("================= TIME ALL SUSPENDED: " + (System.currentTimeMillis() - time_record)); //$NON-NLS-1$
 						time_record = System.currentTimeMillis();
 					}
 				}
@@ -195,9 +197,9 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				if (event.getDetail() != IPDebugEvent.ERR_NORMAL) {
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							String msg = "Error on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllTasks()) + " - " + errInfo.getMsg() + "\nReason: " + errInfo.getDetailsMsg();
+							String msg = NLS.bind(Messages.ParallelDebugViewEventHandler_2, new Object[] {PDebugUIUtils.showBitList(errInfo.getAllTasks()), errInfo.getMsg(), errInfo.getDetailsMsg()});
 							IStatus status = new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, msg, null);
-							PTPDebugUIPlugin.errorDialog("Error", status);
+							PTPDebugUIPlugin.errorDialog(Messages.ParallelDebugViewEventHandler_3, status);
 						}
 					});
 					//only change process icon and unregister for fatal error

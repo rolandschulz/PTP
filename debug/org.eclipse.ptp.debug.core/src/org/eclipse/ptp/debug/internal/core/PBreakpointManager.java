@@ -45,12 +45,12 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugBreakpointInfo;
@@ -225,9 +225,9 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPBreakpointManager#addSetBreakpoints(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.model.IPBreakpoint[])
+	 * @see org.eclipse.ptp.debug.internal.core.IPBreakpointManager#addSetBreakpoints(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.model.IPBreakpoint[])
 	 */
-	public void addSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints) {
+	public void addSetBreakpoints(TaskSet tasks, IPBreakpoint[] breakpoints) {
 		if (breakpoints.length == 0) {
 			return;
 		}
@@ -311,9 +311,9 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPBreakpointManager#deleteSetBreakpoints(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.model.IPBreakpoint[])
+	 * @see org.eclipse.ptp.debug.internal.core.IPBreakpointManager#deleteSetBreakpoints(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.model.IPBreakpoint[])
 	 */
-	public void deleteSetBreakpoints(BitList tasks, IPBreakpoint[] breakpoints) {
+	public void deleteSetBreakpoints(TaskSet tasks, IPBreakpoint[] breakpoints) {
 		if (breakpoints.length == 0)
 			return;
 		for (IPBreakpoint bpt : breakpoints) {
@@ -428,7 +428,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param tasks
 	 * @throws PDIException
 	 */
-	public void setStopInMain(BitList tasks) throws PDIException {
+	public void setStopInMain(TaskSet tasks) throws PDIException {
 		IPDIBreakpointManager pdiBptMgr = getPDISession().getBreakpointManager();
 		IPDIFunctionLocation location = pdiBptMgr.createFunctionLocation("", "main"); //$NON-NLS-1$ //$NON-NLS-2$
 		pdiBptMgr.setFunctionBreakpoint(tasks, IPDIBreakpoint.TEMPORARY, location, null, true, true);
@@ -474,7 +474,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param tasks
 	 * @param pdiWatchpoint
 	 */
-	public void watchpointOutOfScope(BitList tasks, IPDIWatchpoint pdiWatchpoint) {
+	public void watchpointOutOfScope(TaskSet tasks, IPDIWatchpoint pdiWatchpoint) {
 		doHandleDestroyedEvent(tasks, pdiWatchpoint);
 	}
 
@@ -546,7 +546,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param enabled
 	 * @param condition
 	 */
-	private void changeBreakpointPropertiesOnSession(final BitList tasks, final IPDIBreakpoint breakpoint, final Boolean enabled,
+	private void changeBreakpointPropertiesOnSession(final TaskSet tasks, final IPDIBreakpoint breakpoint, final Boolean enabled,
 			final IPDICondition condition) {
 		DebugPlugin.getDefault().asyncExec(new Runnable() {
 			public void run() {
@@ -603,7 +603,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param tasks
 	 * @param pdiBreakpoint
 	 */
-	private void doHandleChangedEvent(BitList tasks, IPDIBreakpoint pdiBreakpoint) {
+	private void doHandleChangedEvent(TaskSet tasks, IPDIBreakpoint pdiBreakpoint) {
 		IPBreakpoint breakpoint = getBreakpointMap().getPBreakpoint(pdiBreakpoint);
 		if (breakpoint != null) {
 			Map<String, Object> map = new HashMap<String, Object>(3);
@@ -637,7 +637,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param tasks
 	 * @param pdiBreakpoint
 	 */
-	private void doHandleDestroyedEvent(BitList tasks, IPDIBreakpoint pdiBreakpoint) {
+	private void doHandleDestroyedEvent(TaskSet tasks, IPDIBreakpoint pdiBreakpoint) {
 		IPBreakpoint breakpoint = null;
 		synchronized (getBreakpointMap()) {
 			breakpoint = getBreakpointMap().getPBreakpoint(pdiBreakpoint);
@@ -653,7 +653,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param tasks
 	 * @param pdiBreakpoint
 	 */
-	private void doHandleLocationBreakpointCreatedEvent(BitList tasks, IPDILocationBreakpoint pdiBreakpoint) {
+	private void doHandleLocationBreakpointCreatedEvent(TaskSet tasks, IPDILocationBreakpoint pdiBreakpoint) {
 		if (pdiBreakpoint.isTemporary())
 			return;
 		IPBreakpoint breakpoint = null;
@@ -677,7 +677,7 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @param tasks
 	 * @param pdiWatchpoint
 	 */
-	private void doHandleWatchpointCreatedEvent(BitList tasks, IPDIWatchpoint pdiWatchpoint) {
+	private void doHandleWatchpointCreatedEvent(TaskSet tasks, IPDIWatchpoint pdiWatchpoint) {
 		IPBreakpoint breakpoint = null;
 		synchronized (getBreakpointMap()) {
 			breakpoint = getBreakpointMap().getPBreakpoint(pdiWatchpoint);
@@ -731,12 +731,12 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	 * @return set of tasks
 	 * @throws CoreException
 	 */
-	private BitList getBreakpointTasks(IPBreakpoint pBpt) throws CoreException {
+	private TaskSet getBreakpointTasks(IPBreakpoint pBpt) throws CoreException {
 		String sid = pBpt.getSetId();
 		if (sid.equals(PreferenceConstants.SET_ROOT_ID)) {
 			return session.getTasks();
 		}
-		BitList setTasks = session.getSetManager().getTasks(sid);
+		TaskSet setTasks = session.getSetManager().getTasks(sid);
 		if (setTasks != null) {
 			return setTasks.copy();
 		}

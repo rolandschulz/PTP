@@ -36,6 +36,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.sourcelookup.DefaultSourceLocator;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.swt.widgets.Display;
@@ -49,7 +50,7 @@ import org.osgi.framework.BundleContext;
  * The main plugin class to be used in the desktop.
  */
 public class PTPDebugUIPlugin extends AbstractUIPlugin {
-	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui"; //$NON-NLS-1$
 
 	private static PTPDebugUIPlugin plugin;
 	private static UIDebugManager uiDebugManager = null;
@@ -102,7 +103,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		if (t instanceof CoreException) {
 			status = ((CoreException)t).getStatus();
 		} else {
-			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within Debug UI: ", t);
+			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, Messages.PTPDebugUIPlugin_1, t);
 			log(status);	
 		}
 		errorDialog(shell, title, message, status);
@@ -297,7 +298,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, Messages.PTPDebugUIPlugin_2, e));
 	}
 	
 	/** 
@@ -309,8 +310,8 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
 	}
 	
-	public static final String PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID = "debuggerConfigurations";
-	public static final String DEBUGGERID_ELEMENT = "debuggerID";
+	public static final String PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID = "debuggerConfigurations"; //$NON-NLS-1$
+	public static final String DEBUGGERID_ELEMENT = "debuggerID"; //$NON-NLS-1$
 
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
@@ -338,7 +339,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		IConfigurationElement configElement = (IConfigurationElement)fDebuggerPageMap.get(debuggerID);
 		ILaunchConfigurationTab tab = null;
 		if (configElement != null) {
-			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension("class");
+			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension("class"); //$NON-NLS-1$
 		}
 		return tab;
 	}
@@ -349,7 +350,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public ResourceBundle getResourceBundle() {
 		try {
 			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.debug.ui.UiPluginResources");
+				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.debug.ui.UiPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}

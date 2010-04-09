@@ -18,41 +18,43 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
+import org.eclipse.ptp.debug.ui.messages.Messages;
+
 /**
  * @author Clement chu
  *
  */
 public interface IPTPDebugUIConstants {
 	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
+	public static final String PREFIX = PLUGIN_ID + "."; //$NON-NLS-1$
 	
-	public static final String ID_PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
-	public static final String ID_VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
-	public static final String ID_VIEW_ARRAY = PREFIX + "views.ArrayView";
-	public static final String ID_VIEW_SIGNAL = PREFIX + "views.SignalsView";
-	public static final String ID_VIEW_VARIABLE = PREFIX + "views.PVariableView";
-	public static final String ID_BREAKPOINT_ORGANIZER = PREFIX + "pBreakpointSetOrganizer";
+	public static final String ID_PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective"; //$NON-NLS-1$
+	public static final String ID_VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView"; //$NON-NLS-1$
+	public static final String ID_VIEW_ARRAY = PREFIX + "views.ArrayView"; //$NON-NLS-1$
+	public static final String ID_VIEW_SIGNAL = PREFIX + "views.SignalsView"; //$NON-NLS-1$
+	public static final String ID_VIEW_VARIABLE = PREFIX + "views.PVariableView"; //$NON-NLS-1$
+	public static final String ID_BREAKPOINT_ORGANIZER = PREFIX + "pBreakpointSetOrganizer"; //$NON-NLS-1$
 	
-	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
-	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
-	public static final String ACTION_SET_BREAKPOINT = PREFIX + "toggleBreakpointRulerAction";
+	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties"; //$NON-NLS-1$
+	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint"; //$NON-NLS-1$
+	public static final String ACTION_SET_BREAKPOINT = PREFIX + "toggleBreakpointRulerAction"; //$NON-NLS-1$
 		
-	public static final String REG_ANN_INSTR_POINTER_CURRENT = PREFIX + "regCurrentIP";
-	public static final String REG_ANN_INSTR_POINTER_SECONDARY = PREFIX + "regSecondaryIP";
-	public static final String CURSET_ANN_INSTR_POINTER_CURRENT = PREFIX + "currentSetIP";
-	public static final String SET_ANN_INSTR_POINTER_CURRENT = PREFIX + "setIP";
+	public static final String REG_ANN_INSTR_POINTER_CURRENT = PREFIX + "regCurrentIP"; //$NON-NLS-1$
+	public static final String REG_ANN_INSTR_POINTER_SECONDARY = PREFIX + "regSecondaryIP"; //$NON-NLS-1$
+	public static final String CURSET_ANN_INSTR_POINTER_CURRENT = PREFIX + "currentSetIP"; //$NON-NLS-1$
+	public static final String SET_ANN_INSTR_POINTER_CURRENT = PREFIX + "setIP"; //$NON-NLS-1$
 	
 	
-	public static final String THREAD_GROUP = "threadGroup";
-	public static final String STEP_GROUP = "stepGroup";
-	public static final String STEP_INTO_GROUP = "stepIntoGroup";
-	public static final String STEP_OVER_GROUP = "stepOverGroup";
-	public static final String STEP_RETURN_GROUP = "stepReturnGroup";
-	public static final String EMPTY_STEP_GROUP = "emptyStepGroup";	
-	public static final String REG_GROUP = "regGroup";	
+	public static final String THREAD_GROUP = "threadGroup"; //$NON-NLS-1$
+	public static final String STEP_GROUP = "stepGroup"; //$NON-NLS-1$
+	public static final String STEP_INTO_GROUP = "stepIntoGroup"; //$NON-NLS-1$
+	public static final String STEP_OVER_GROUP = "stepOverGroup"; //$NON-NLS-1$
+	public static final String STEP_RETURN_GROUP = "stepReturnGroup"; //$NON-NLS-1$
+	public static final String EMPTY_STEP_GROUP = "emptyStepGroup";	 //$NON-NLS-1$
+	public static final String REG_GROUP = "regGroup";	 //$NON-NLS-1$
 
-	public static final String VAR_GROUP = "VarGroup";	
+	public static final String VAR_GROUP = "VarGroup";	 //$NON-NLS-1$
 	
-	public static final String IUITABEMPTYGROUP = "emptygroup";
-    public static final String IUITABVARIABLEGROUP = "variablegroup";	
+	public static final String IUITABEMPTYGROUP = "emptygroup"; //$NON-NLS-1$
+    public static final String IUITABVARIABLEGROUP = "variablegroup";	 //$NON-NLS-1$
 }

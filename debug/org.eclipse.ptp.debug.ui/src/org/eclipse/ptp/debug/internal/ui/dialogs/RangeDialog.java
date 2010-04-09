@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -83,7 +84,7 @@ public class RangeDialog extends Dialog {
     }
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText(DialogMessages.getString("RangeDialog.group"));
+        shell.setText("Range setting"); //$NON-NLS-1$
     }
     protected void createButtonsForButtonBar(Composite parent) {
     	super.createButtonsForButtonBar(parent);
@@ -96,21 +97,21 @@ public class RangeDialog extends Dialog {
     	Composite composite = (Composite)super.createDialogArea(parent);
 
     	colGroup = new Group(composite, SWT.NONE);
-        colGroup.setText(DialogMessages.getString("RangeDialog.column"));
+        colGroup.setText(Messages.RangeDialog_0);
         colGroup.setLayout(new FillLayout());
         colGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-       	colFromField = new RangeIntegerFieldEditor("colFromField", DialogMessages.getString("RangeDialog.from"), colGroup);
+       	colFromField = new RangeIntegerFieldEditor("colFromField", Messages.RangeDialog_1, colGroup); //$NON-NLS-1$
        	colFromField.setPropertyChangeListener(listener);
-       	colToField = new RangeIntegerFieldEditor("colToField", DialogMessages.getString("RangeDialog.to"), colGroup);
+       	colToField = new RangeIntegerFieldEditor("colToField", Messages.RangeDialog_2, colGroup); //$NON-NLS-1$
        	colToField.setPropertyChangeListener(listener);
        	
     	rowGroup = new Group(composite, SWT.NONE);
-        rowGroup.setText(DialogMessages.getString("RangeDialog.row"));
+        rowGroup.setText(Messages.RangeDialog_3);
         rowGroup.setLayout(new FillLayout());
         rowGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-       	rowFromField = new RangeIntegerFieldEditor("rowFromField", DialogMessages.getString("RangeDialog.from"), rowGroup);
+       	rowFromField = new RangeIntegerFieldEditor("rowFromField", Messages.RangeDialog_1, rowGroup); //$NON-NLS-1$
        	rowFromField.setPropertyChangeListener(listener);
-       	rowToField = new RangeIntegerFieldEditor("rowToField", DialogMessages.getString("RangeDialog.to"), rowGroup);
+       	rowToField = new RangeIntegerFieldEditor("rowToField", Messages.RangeDialog_2, rowGroup); //$NON-NLS-1$
        	rowToField.setPropertyChangeListener(listener);
        	
         errorMessageText = new Text(composite, SWT.READ_ONLY);
@@ -136,10 +137,10 @@ public class RangeDialog extends Dialog {
     	rowGroup.setEnabled(showRow);
     	rowFromField.setEnabled(showRow, rowGroup);
     	rowToField.setEnabled(showRow, rowGroup);
-       	colFromField.setStringValue(""+fromCol);
-       	colToField.setStringValue(""+toCol);
-       	rowFromField.setStringValue(""+fromRow);
-       	rowToField.setStringValue(""+toRow);
+       	colFromField.setStringValue(""+fromCol); //$NON-NLS-1$
+       	colToField.setStringValue(Messages.RangeDialog_12+toCol);
+       	rowFromField.setStringValue(Messages.RangeDialog_13+fromRow);
+       	rowToField.setStringValue(Messages.RangeDialog_14+toRow);
     	return open();
     }
     
@@ -163,7 +164,7 @@ public class RangeDialog extends Dialog {
 	    		}
     		}
     		getOkButton().setEnabled(!hasError);
-    		errorMessageText.setText(hasError?"Invalid input":"");
+    		errorMessageText.setText(hasError?Messages.RangeDialog_15:Messages.RangeDialog_16);
     	}
     };
     

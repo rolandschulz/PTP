@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.listeners;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * @author Clement chu
@@ -29,9 +29,9 @@ public interface IRegListener {
 	/** Register tasks
 	 * @param tasks
 	 */
-	public void register(BitList tasks);
+	public void register(TaskSet tasks);
 	/** Unregister tasks
 	 * @param tasks
 	 */
-	public void unregister(BitList tasks);
+	public void unregister(TaskSet tasks);
 }

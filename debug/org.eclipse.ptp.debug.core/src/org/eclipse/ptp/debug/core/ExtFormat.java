@@ -45,7 +45,7 @@ public class ExtFormat {
 		int offset = 0;
 		int len = buffer.length();
 
-		if ((offset = buffer.indexOf("0x")) != -1 || (offset = buffer.indexOf("0X")) != -1) {
+		if ((offset = buffer.indexOf("0x")) != -1 || (offset = buffer.indexOf("0X")) != -1) { //$NON-NLS-1$ //$NON-NLS-2$
 			radix = 16;
 			cursor = offset + 2;
 		}
@@ -67,17 +67,17 @@ public class ExtFormat {
 		}
 
 		// Handle minus sign, if present
-		if (address.startsWith("-")) {
+		if (address.startsWith("-")) { //$NON-NLS-1$
 			negative = true;
 			index++;
 		}
-		if (address.startsWith("0x", index) || address.startsWith("0X", index)) {
+		if (address.startsWith("0x", index) || address.startsWith("0X", index)) { //$NON-NLS-1$ //$NON-NLS-2$
 			index += 2;
 			radix = 16;
-		} else if (address.startsWith("#", index)) {
+		} else if (address.startsWith("#", index)) { //$NON-NLS-1$
 			index ++;
 			radix = 16;
-		} else if (address.startsWith("0", index) && address.length() > 1 + index) {
+		} else if (address.startsWith("0", index) && address.length() > 1 + index) { //$NON-NLS-1$
 			index ++;
 			radix = 8;
 		}
@@ -86,7 +86,7 @@ public class ExtFormat {
 			address = address.substring(index);
 		}
 		if (negative) {
-			address = "-" + address;
+			address = "-" + address; //$NON-NLS-1$
 		}
 		try {
 			return new BigInteger(address, radix);

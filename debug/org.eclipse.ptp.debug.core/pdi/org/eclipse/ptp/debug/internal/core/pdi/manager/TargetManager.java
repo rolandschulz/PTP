@@ -22,7 +22,7 @@ package org.eclipse.ptp.debug.internal.core.pdi.manager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager;
@@ -33,17 +33,17 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
  *
  */
 public class TargetManager extends AbstractPDIManager implements IPDITargetManager {
-	private Map<BitList, IPDITarget> targetMap;
+	private Map<TaskSet, IPDITarget> targetMap;
 
 	public TargetManager(IPDISession session) {
 		super(session, true);
-		targetMap = new HashMap<BitList, IPDITarget>();
+		targetMap = new HashMap<TaskSet, IPDITarget>();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager#addTarget(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager#addTarget(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDITarget addTarget(BitList qTasks) {
+	public IPDITarget addTarget(TaskSet qTasks) {
 		if (getTarget(qTasks) == null) {
 			IPDITarget target = session.getModelFactory().newTarget(session, qTasks);
 			targetMap.put(qTasks, target);
@@ -60,9 +60,9 @@ public class TargetManager extends AbstractPDIManager implements IPDITargetManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager#getTarget(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager#getTarget(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDITarget getTarget(BitList qTasks) {
+	public IPDITarget getTarget(TaskSet qTasks) {
 		synchronized (targetMap) {
 			return targetMap.get(qTasks);
 		}
@@ -76,9 +76,9 @@ public class TargetManager extends AbstractPDIManager implements IPDITargetManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager#removeTarget(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDITargetManager#removeTarget(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean removeTarget(BitList qTasks) {
+	public boolean removeTarget(TaskSet qTasks) {
 		return (targetMap.remove(qTasks) != null);
 	}
 	
@@ -90,8 +90,8 @@ public class TargetManager extends AbstractPDIManager implements IPDITargetManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.manager.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.manager.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) throws PDIException {
+	public void update(TaskSet qTasks) throws PDIException {
 	}
 }

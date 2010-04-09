@@ -19,10 +19,11 @@
 package org.eclipse.ptp.debug.internal.core.pdi.manager;
 
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegister;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterGroup;
@@ -44,14 +45,14 @@ public class RegisterManager extends AbstractPDIManager implements IPDIRegisterM
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager#createRegister(org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterDescriptor)
 	 */
 	public IPDIRegister createRegister(IPDIRegisterDescriptor regDesc) throws PDIException {
-		throw new PDIException(regDesc.getTasks(), "Not implement RegisterManager - createRegister() yet");
+		throw new PDIException(regDesc.getTasks(), Messages.RegisterManager_0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager#createShadowRegister(org.eclipse.ptp.debug.core.pdi.model.IPDIRegister, org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame, java.lang.String)
 	 */
 	public IPDIVariable createShadowRegister(IPDIRegister register, IPDIStackFrame frame, String regName) throws PDIException {
-		throw new PDIException(register.getTasks(), "Not implement RegisterManager - createShadowRegister() yet");
+		throw new PDIException(register.getTasks(), Messages.RegisterManager_1);
 	}
 	
 	/* (non-Javadoc)
@@ -61,9 +62,9 @@ public class RegisterManager extends AbstractPDIManager implements IPDIRegisterM
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager#getRegisterGroups(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIRegisterManager#getRegisterGroups(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIRegisterGroup[] getRegisterGroups(BitList qTasks) throws PDIException {
+	public IPDIRegisterGroup[] getRegisterGroups(TaskSet qTasks) throws PDIException {
 		//TODO Not implement RegisterManager - getRegisterGroups() yet
 		return new IPDIRegisterGroup[0];
 		//throw new PDIException(qTasks, "Not implement RegisterManager - getRegisterGroups() yet");
@@ -76,8 +77,8 @@ public class RegisterManager extends AbstractPDIManager implements IPDIRegisterM
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList tasks) throws PDIException {
+	public void update(TaskSet tasks) throws PDIException {
 	}
 }

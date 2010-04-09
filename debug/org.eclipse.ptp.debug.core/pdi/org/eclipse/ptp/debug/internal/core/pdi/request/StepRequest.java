@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepRequest;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStepRequest;
 public abstract class StepRequest extends AbstractEventRequest implements IPDIStepRequest {
 	protected int count = 0;
 	
-	public StepRequest(BitList tasks, int count) {
+	public StepRequest(TaskSet tasks, int count) {
 		super(tasks);
 		this.count = count;
 	}

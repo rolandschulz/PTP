@@ -23,8 +23,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * Abstract base class of events that return results
@@ -34,17 +36,17 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public abstract class AbstractEventResultRequest extends AbstractEventRequest implements IPDIInternalEventRequest {
 	private final Object lock = new Object();
-	protected Map<BitList, Object> results = new HashMap<BitList, Object>();
+	protected Map<TaskSet, Object> results = new HashMap<TaskSet, Object>();
 	protected long DEFAULT_TIMEOUT = 5000;
 	
-	public AbstractEventResultRequest(BitList tasks) {
+	public AbstractEventResultRequest(TaskSet tasks) {
 		super(tasks);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#completed(org.eclipse.ptp.core.util.BitList, java.lang.Object)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#completed(org.eclipse.ptp.core.util.TaskSet, java.lang.Object)
 	 */
-	public boolean completed(BitList cTasks, Object result) {
+	public boolean completed(TaskSet cTasks, Object result) {
 		//if (!(result instanceof IProxyDebugEvent))
 		//	return false;
 		if (tasks.intersects(cTasks)) {
@@ -63,44 +65,44 @@ public abstract class AbstractEventResultRequest extends AbstractEventRequest im
     }
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#getResult(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#getResult(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public Object getResult(BitList  qTasks) throws PDIException {
+	public Object getResult(TaskSet  qTasks) throws PDIException {
 		if (findResult(qTasks))
 			return results.get(qTasks);
 		
-		for (Iterator<BitList> i = results.keySet().iterator(); i.hasNext();) {
-			BitList sTasks = i.next();
+		for (Iterator<TaskSet> i = results.keySet().iterator(); i.hasNext();) {
+			TaskSet sTasks = i.next();
 			if (sTasks.intersects(qTasks))
 				return results.get(sTasks);
 		}
-		throw new PDIException(qTasks, getName() + ": No request task found");
+		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEventResultRequest_0, getName()));
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#getResultMap(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#getResultMap(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public Map<BitList, Object> getResultMap(BitList qTasks) throws PDIException {
+	public Map<TaskSet, Object> getResultMap(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		return results;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#waitUntilCompleted(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#waitUntilCompleted(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void waitUntilCompleted(BitList qTasks) throws PDIException {
+	public void waitUntilCompleted(TaskSet qTasks) throws PDIException {
 		waiting();
 		if (status == ERROR)
 			throw new PDIException(qTasks, getErrorMessage());
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#waitUntilCompleted(org.eclipse.ptp.core.util.BitList, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIInternalEventRequest#waitUntilCompleted(org.eclipse.ptp.core.util.TaskSet, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void waitUntilCompleted(BitList qTasks, IProgressMonitor monitor) throws PDIException {
+	public void waitUntilCompleted(TaskSet qTasks, IProgressMonitor monitor) throws PDIException {
 		while (!tasks.isEmpty() && (status == UNKNOWN || status == RUNNING)) {
 			if (monitor.isCanceled()) {
-				error("This request is interrupted.");
+				error(Messages.AbstractEventResultRequest_1);
 				break;
 			}
 			lockRequest(500);
@@ -130,7 +132,7 @@ public abstract class AbstractEventResultRequest extends AbstractEventRequest im
 	 * @param qTasks
 	 * @return
 	 */
-	protected boolean findResult(BitList qTasks) {
+	protected boolean findResult(TaskSet qTasks) {
 		return results.containsKey(qTasks);
 	}
 	
@@ -159,13 +161,13 @@ public abstract class AbstractEventResultRequest extends AbstractEventRequest im
 	 * @param rTasks
 	 * @param result
 	 */
-	protected abstract void storeResult(BitList rTasks, Object result);
+	protected abstract void storeResult(TaskSet rTasks, Object result);
 
 	/**
 	 * @param rTasks
 	 * @param result
 	 */
-	protected void storeUnknownResult(BitList rTasks, Object result) {
+	protected void storeUnknownResult(TaskSet rTasks, Object result) {
 		results.put(rTasks, result);
 	}
 	

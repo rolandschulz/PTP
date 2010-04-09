@@ -25,5 +25,8 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
  * 
  */
 public interface ISourceLookupChangeListener {
+	/**
+	 * @param director
+	 */
 	public void sourceContainersChanged(ISourceLookupDirector director);
 }

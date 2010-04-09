@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Thrown to indicate some unexpected internal error has occurred 
@@ -31,12 +31,12 @@ public class PDIInternalException extends RuntimeException {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	protected BitList tasks;
+	protected TaskSet tasks;
 	/**
      * Constructs a new exception.
 	 * @param tasks specify tasks throw exception 
 	 */
-	public PDIInternalException(BitList tasks) {
+	public PDIInternalException(TaskSet tasks) {
 		super();
 		this.tasks = tasks;
 	}
@@ -45,7 +45,7 @@ public class PDIInternalException extends RuntimeException {
 	 * @param tasks specify tasks throw exception 
      * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
 	 */
-	public PDIInternalException(BitList tasks, String message) {
+	public PDIInternalException(TaskSet tasks, String message) {
 		super(message);
 		this.tasks = tasks;
 	}

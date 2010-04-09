@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
@@ -29,14 +29,14 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
  *
  */
 public class RegisterDescriptor extends VariableDescriptor implements IPDIRegisterDescriptor {
-	public RegisterDescriptor(IPDISession session, BitList tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fn, int pos, int depth) {
+	public RegisterDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fn, int pos, int depth) {
 		super(session, tasks, thread, frame, name, fn, pos, depth);
 	}
 	public String getFullName() {
 		if (fFullName == null) {
 			String n = getName();
-			if (!n.startsWith("$")) {
-				fFullName = "$" + n;
+			if (!n.startsWith("$")) { //$NON-NLS-1$
+				fFullName = "$" + n; //$NON-NLS-1$
 			}
 		}
 		return fFullName;

@@ -30,10 +30,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.IPSignalManager;
 import org.eclipse.ptp.debug.core.PDebugModel;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
@@ -50,11 +50,11 @@ import org.eclipse.ptp.debug.internal.core.model.PSignal;
 public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalManager {
 	private class PSignalSet {
 		private IPDebugTarget debugTarget;
-		private final BitList sTasks;
+		private final TaskSet sTasks;
 		private IPSignal[] fSignals = null;
 		private boolean fIsDisposed = false;
 
-		public PSignalSet(BitList sTasks, PDebugTarget debugTarget) {
+		public PSignalSet(TaskSet sTasks, PDebugTarget debugTarget) {
 			this.sTasks = sTasks;
 			this.debugTarget = debugTarget;
 		}
@@ -131,16 +131,16 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 	}
 
 	private final IPSession session;
-	protected final Map<BitList, PSignalSet> fPSignalSetMap = new HashMap<BitList, PSignalSet>();
+	protected final Map<TaskSet, PSignalSet> fPSignalSetMap = new HashMap<TaskSet, PSignalSet>();
 
 	public PSignalManager(IPSession session) {
 		this.session = session;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#dispose(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#dispose(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void dispose(BitList qTasks) {
+	public void dispose(TaskSet qTasks) {
 		getSignalSet(qTasks).dispose();
 	}
 
@@ -176,9 +176,9 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#getSignals(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#getSignals(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPSignal[] getSignals(BitList qTasks) throws DebugException {
+	public IPSignal[] getSignals(TaskSet qTasks) throws DebugException {
 		return getSignalSet(qTasks).getSignals();
 	}
 
@@ -186,7 +186,7 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 	 * @param qTasks
 	 * @return
 	 */
-	public PSignalSet getSignalSet(BitList qTasks) {
+	public PSignalSet getSignalSet(TaskSet qTasks) {
 		synchronized (fPSignalSetMap) {
 			PSignalSet set = (PSignalSet) fPSignalSetMap.get(qTasks);
 			if (set == null) {
@@ -204,9 +204,9 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#signalChanged(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
+	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#signalChanged(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
-	public void signalChanged(BitList qTasks, IPDISignal pdiSignal) {
+	public void signalChanged(TaskSet qTasks, IPDISignal pdiSignal) {
 		getSignalSet(qTasks).signalChanged(pdiSignal);
 	}
 

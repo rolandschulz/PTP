@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
@@ -32,6 +32,6 @@ public interface IPDIListArgumentsRequest extends IPDIEventRequest {
 	 * @param tasks
 	 * @return
 	 */
-	public String[] getArguments(BitList tasks) throws PDIException;
+	public String[] getArguments(TaskSet tasks) throws PDIException;
 
 }

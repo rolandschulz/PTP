@@ -24,115 +24,136 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.debug.core.messages.Messages;
+
 /**
  * @author Clement chu
  */
 public class DebugJobStorage {
 	private static Map<String, DebugJobStorage> storages = new HashMap<String, DebugJobStorage>();
-	
-	private String name;
-	private Map<String, Storage> jobMap;
-	
+
+	private final String name;
+	private final Map<String, Storage> jobMap;
+
 	public DebugJobStorage(String name) {
 		jobMap = new HashMap<String, Storage>();
-		if (containsKey(name))
-			throw new IllegalArgumentException("Key: " + name + " is already defined.");
+		if (containsKey(name)) {
+			throw new IllegalArgumentException(NLS.bind(Messages.DebugJobStorage_0, name));
+		}
 
 		this.name = name;
 		addDebugStorage(this.name, this);
 	}
+
 	public void closeDebugJobStorage() {
-		Storage[] storages = jobMap.values().toArray(new Storage[0]);
-		for (Storage st : storages) {
+		final Storage[] storages = jobMap.values().toArray(new Storage[0]);
+		for (final Storage st : storages) {
 			st.clean();
 		}
 		jobMap.clear();
 		removeDebugStorage(name);
 	}
+
 	private Storage getJobStorage(String job_id) {
 		synchronized (jobMap) {
 			if (!jobMap.containsKey(job_id)) {
 				jobMap.put(job_id, new Storage());
 			}
-			return (Storage)jobMap.get(job_id);
+			return jobMap.get(job_id);
 		}
 	}
+
 	public void removeJobStorage(String job_id) {
 		synchronized (jobMap) {
-			Storage storage = (Storage)jobMap.remove(job_id);
+			final Storage storage = jobMap.remove(job_id);
 			if (storage != null) {
 				storage.clean();
 			}
 		}
 	}
+
 	public Collection<Object> getJobValueCollection() {
 		synchronized (jobMap) {
-			List<Object> values = new ArrayList<Object>();
-			for (Storage st : jobMap.values()) {
+			final List<Object> values = new ArrayList<Object>();
+			for (final Storage st : jobMap.values()) {
 				values.addAll(st.getValueCollection());
 			}
 			return values;
 		}
 	}
+
 	public Collection<Object> getValueCollection(String job_id) {
 		synchronized (jobMap) {
 			return getJobStorage(job_id).getValueCollection();
 		}
 	}
+
 	public Object getValue(String job_id, String key) {
 		synchronized (jobMap) {
 			return getJobStorage(job_id).getStore(key);
 		}
 	}
+
 	public void addValue(String job_id, String key, Object value) {
 		synchronized (jobMap) {
 			getJobStorage(job_id).addStore(key, value);
 		}
 	}
+
 	public Object removeValue(String job_id, String key) {
 		synchronized (jobMap) {
 			return getJobStorage(job_id).removeStore(key);
 		}
 	}
+
 	/***********
 	 * Storage *
 	 ***********/
 	class Storage {
 		Map<String, Object> aMap = new HashMap<String, Object>();
+
 		void clean() {
 			aMap.clear();
 		}
+
 		boolean containsStore(String key) {
 			synchronized (aMap) {
 				return aMap.containsKey(key);
 			}
 		}
+
 		void addStore(String key, Object value) {
 			synchronized (aMap) {
 				aMap.put(key, value);
 			}
 		}
+
 		Object removeStore(String key) {
 			synchronized (aMap) {
 				return aMap.remove(key);
 			}
 		}
+
 		Object getStore(String key) {
 			synchronized (aMap) {
 				return aMap.get(key);
 			}
 		}
+
 		Collection<Object> getValueCollection() {
 			synchronized (aMap) {
 				return aMap.values();
 			}
 		}
+
 		String[] getKeys() {
 			synchronized (aMap) {
-				return (String[])aMap.keySet().toArray(new String[0]);
+				return aMap.keySet().toArray(new String[0]);
 			}
 		}
 	}
+
 	/***************************
 	 * static functions
 	 ***************************/
@@ -141,33 +162,38 @@ public class DebugJobStorage {
 			return storages.containsKey(name);
 		}
 	}
+
 	public static DebugJobStorage getDebugStorage(String name) {
 		synchronized (storages) {
-			return (DebugJobStorage)storages.get(name);
+			return storages.get(name);
 		}
 	}
+
 	public static void addDebugStorage(String name, DebugJobStorage storage) {
 		synchronized (storages) {
 			storages.put(name, storage);
 		}
 	}
+
 	public static DebugJobStorage[] getDebugStorages() {
 		synchronized (storages) {
-			return (DebugJobStorage[])storages.values().toArray(new DebugJobStorage[0]);
+			return storages.values().toArray(new DebugJobStorage[0]);
 		}
 	}
+
 	public static void removeDebugStorage(String name) {
 		synchronized (storages) {
-			DebugJobStorage storage = (DebugJobStorage)storages.remove(name);
+			final DebugJobStorage storage = storages.remove(name);
 			if (storage != null) {
 				storage.closeDebugJobStorage();
 			}
 		}
 	}
+
 	public static void removeDebugStorages() {
 		synchronized (storages) {
-			DebugJobStorage[] dStoreages = storages.values().toArray(new DebugJobStorage[0]);
-			for (DebugJobStorage dStoreage : dStoreages) {
+			final DebugJobStorage[] dStoreages = storages.values().toArray(new DebugJobStorage[0]);
+			for (final DebugJobStorage dStoreage : dStoreages) {
 				dStoreage.closeDebugJobStorage();
 			}
 			storages.clear();

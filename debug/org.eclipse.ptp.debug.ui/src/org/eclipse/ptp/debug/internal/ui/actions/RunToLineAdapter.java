@@ -35,6 +35,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.debug.core.model.IRunToLine;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -57,12 +58,12 @@ public class RunToLineAdapter implements IRunToLineTarget {
 			ITextEditor textEditor = (ITextEditor)part;
 			IEditorInput input = textEditor.getEditorInput();
 			if (input == null) {
-				errorMessage = ActionMessages.getString("RunToLineAdapter.Empty_editor_1");
+				errorMessage = Messages.RunToLineAdapter_0;
 			}
 			else {
 				IDocument document = textEditor.getDocumentProvider().getDocument(input);
 				if (document == null) {
-					errorMessage = ActionMessages.getString("RunToLineAdapter.Missing_document_1");
+					errorMessage = Messages.RunToLineAdapter_1;
 				}
 				else {
 					final String fileName = getFileName(input);
@@ -119,7 +120,7 @@ public class RunToLineAdapter implements IRunToLineTarget {
 		}
 		*/
 		else {
-			errorMessage = ActionMessages.getString("RunToLineAdapter.Operation_is_not_supported_1");
+			errorMessage = Messages.RunToLineAdapter_2;
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
@@ -203,7 +204,7 @@ public class RunToLineAdapter implements IRunToLineTarget {
 	 * @param e
 	 */
 	protected void failed(Throwable e) {
-		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, ActionMessages.getString("ResumeAtLineAdapter.4"), null);
+		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, Messages.RunToLineAdapter_3, null);
 		ms.add(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, e.getMessage(), e));
 		IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(ms);
 		if (handler != null) {

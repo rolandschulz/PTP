@@ -42,6 +42,7 @@ import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPWatchpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
@@ -65,7 +66,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		 */
 		public BreakpointIntegerFieldEditor(String name, String labelText, Composite parent) {
 			super(name, labelText, parent);
-			setErrorMessage(PropertyPageMessages.getString("PBreakpointPropertyPage.0"));
+			setErrorMessage(Messages.PBreakpointPropertyPage_0);
 		}
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.preference.StringFieldEditor#checkState()
@@ -255,7 +256,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			IPreferenceStore store = getPreferenceStore();
 			String condition = breakpoint.getCondition();
 			if (condition == null) {
-				condition = "";
+				condition = ""; //$NON-NLS-1$
 			}
 			store.setValue(PBreakpointPreferenceStore.CONDITION, condition);
 			createConditionEditor(getFieldEditorParent());
@@ -264,7 +265,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			store.setValue(PBreakpointPreferenceStore.IGNORE_COUNT, (ignoreCount >= 0) ? ignoreCount : 0);
 			createIgnoreCountEditor(getFieldEditorParent());
 		} catch (CoreException ce) {
-			PTPDebugUIPlugin.errorDialog(getShell(), "Breakpoint Property Page", "", ce);
+			PTPDebugUIPlugin.errorDialog(getShell(), Messages.PBreakpointPropertyPage_2, "", ce); //$NON-NLS-2$
 		}
 	}
 	/** Create type specific lable field editors
@@ -274,90 +275,90 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	private void createTypeSpecificLabelFieldEditors(IPBreakpoint breakpoint) throws CoreException {
 		if (breakpoint instanceof IPFunctionBreakpoint) {
 			IPFunctionBreakpoint funcBpt = (IPFunctionBreakpoint) breakpoint;
-			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), PropertyPageMessages.getString("PBreakpointPropertyPage.3")));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_4, Messages.PBreakpointPropertyPage_5));
 			String function = funcBpt.getFunction();
 			if (function != null) {
-				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.2"), function));
+				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_6, function));
 			}
 		} else if (breakpoint instanceof IPAddressBreakpoint) {
 			IPAddressBreakpoint addrBpt = (IPAddressBreakpoint) breakpoint;
-			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), PropertyPageMessages.getString("PBreakpointPropertyPage.6")));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_7, Messages.PBreakpointPropertyPage_8));
 			String address = addrBpt.getAddress();
 			if (address != null) {
-				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.5"), address));
+				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_9, address));
 			}
 		} else if (breakpoint instanceof IPWatchpoint) {
 			IPWatchpoint watchpoint = (IPWatchpoint) breakpoint;
-			String type = "";
+			String type = ""; //$NON-NLS-1$
 			if (watchpoint.isReadType() && !watchpoint.isWriteType())
-				type = PropertyPageMessages.getString("PBreakpointPropertyPage.11");
+				type = Messages.PBreakpointPropertyPage_11;
 			else if (!watchpoint.isReadType() && watchpoint.isWriteType())
-				type = PropertyPageMessages.getString("PBreakpointPropertyPage.12");
+				type = Messages.PBreakpointPropertyPage_12;
 			else
-				type = PropertyPageMessages.getString("PBreakpointPropertyPage.13");
+				type = Messages.PBreakpointPropertyPage_13;
 
 			String expression = watchpoint.getExpression();
-			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), type));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_14, type));
 			String projectName = breakpoint.getMarker().getResource().getLocation().toOSString();
 			if (projectName != null) {
-				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.10"), projectName));
+				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_15, projectName));
 			}
-			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.14"), expression));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_16, expression));
 		} else if (breakpoint instanceof ILineBreakpoint) {
-			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), PropertyPageMessages.getString("PBreakpointPropertyPage.8")));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_17, Messages.PBreakpointPropertyPage_18));
 			String fileName = breakpoint.getSourceHandle();
 			if (fileName != null) {
-				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.7"), fileName));
+				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_19, fileName));
 			}
 			ILineBreakpoint lineBpt = (ILineBreakpoint) breakpoint;
 			int lineNumber = lineBpt.getLineNumber();
 			if (lineNumber > 0) {
-				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.9"), String.valueOf(lineNumber)));
+				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_20, String.valueOf(lineNumber)));
 			}
 		}
 		// Set
 		String job_id = breakpoint.getJobId();
 		String jobName = breakpoint.getJobName();
-		addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.20"), jobName));
+		addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_21, jobName));
 		String set_id = breakpoint.getSetId();
-		addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.21"), set_id));
+		addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_22, set_id));
 		//show total number of processes
 		if (!job_id.equals(IPBreakpoint.GLOBAL)) {
 			IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
 			IElementSet elementSet = (IElementSet)setManager.getElementByID(set_id);
-			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.22"), String.valueOf(elementSet.size())));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_23, String.valueOf(elementSet.size())));
 			String[] setNames = elementSet.getMatchSetIDs();
 			StringBuffer buffer = new StringBuffer();
 			for (int i=0; i<setNames.length; i++) {
 				buffer.append(setNames[i]);
 				if (i < setNames.length - 1)
-					buffer.append(",");
+					buffer.append(","); //$NON-NLS-1$
 			}
 			if (buffer.length() > 0)
-				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.23"), buffer.toString()));
+				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_25, buffer.toString()));
 		}
 	}
 	/** Create enabled field
 	 * @param parent
 	 */
 	protected void createEnabledField(Composite parent) {
-		enabled = new BooleanFieldEditor(PBreakpointPreferenceStore.ENABLED, PropertyPageMessages.getString("PBreakpointPropertyPage.19"), parent);
+		enabled = new BooleanFieldEditor(PBreakpointPreferenceStore.ENABLED, Messages.PBreakpointPropertyPage_26, parent);
 		addField(enabled);
 	}
 	/** Create condition field
 	 * @param parent
 	 */
 	protected void createConditionEditor(Composite parent) {
-		condition = new BreakpointStringFieldEditor(PBreakpointPreferenceStore.CONDITION, PropertyPageMessages.getString("PBreakpointPropertyPage.15"), parent);
+		condition = new BreakpointStringFieldEditor(PBreakpointPreferenceStore.CONDITION, Messages.PBreakpointPropertyPage_27, parent);
 		condition.setEmptyStringAllowed(true);
-		condition.setErrorMessage(PropertyPageMessages.getString("PBreakpointPropertyPage.16"));
+		condition.setErrorMessage(Messages.PBreakpointPropertyPage_28);
 		addField(condition);
 	}
 	/** Create ignore count field
 	 * @param parent
 	 */
 	protected void createIgnoreCountEditor(Composite parent) {
-		ignoreCount = new BreakpointIntegerFieldEditor(PBreakpointPreferenceStore.IGNORE_COUNT, PropertyPageMessages.getString("PBreakpointPropertyPage.17"), parent);
+		ignoreCount = new BreakpointIntegerFieldEditor(PBreakpointPreferenceStore.IGNORE_COUNT, Messages.PBreakpointPropertyPage_29, parent);
 		ignoreCount.setValidRange(0, Integer.MAX_VALUE);
 		ignoreCountTextControl = ignoreCount.getTextControl(parent);
 		try {

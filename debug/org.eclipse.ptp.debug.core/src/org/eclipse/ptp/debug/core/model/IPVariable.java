@@ -28,8 +28,20 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  * 
  */
 public interface IPVariable extends IVariable, IPDebugElement, IFormatSupport, IValueModification, IEnableDisableTarget {
-	IAIF getAIF() throws DebugException;
-	boolean isArgument();
-	public String getExpressionString() throws DebugException;
-}
+	/**
+	 * @return
+	 * @throws DebugException
+	 */
+	public IAIF getAIF() throws DebugException;
 
+	/**
+	 * @return
+	 * @throws DebugException
+	 */
+	public String getExpressionString() throws DebugException;
+
+	/**
+	 * @return
+	 */
+	public boolean isArgument();
+}

@@ -19,8 +19,8 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 public class PSignal extends PDebugElement implements IPSignal {
 	private final IPDISignal pdiSignal;
 
-	public PSignal(IPSession session, BitList tasks, IPDISignal pdiSignal) {
+	public PSignal(IPSession session, TaskSet tasks, IPDISignal pdiSignal) {
 		super(session, tasks);
 		this.pdiSignal = pdiSignal;
 	}

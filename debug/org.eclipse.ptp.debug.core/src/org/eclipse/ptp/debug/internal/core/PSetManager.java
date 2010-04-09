@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.IPSetManager;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
 /**
@@ -34,7 +34,7 @@ import org.eclipse.ptp.debug.core.pdi.IPDISession;
  */
 public class PSetManager implements IPSetManager {
 	private final IPSession session;
-	private final Map<String, BitList> setMap = new HashMap<String, BitList>();
+	private final Map<String, TaskSet> setMap = new HashMap<String, TaskSet>();
 
 	public PSetManager(IPSession session) {
 		this.session = session;
@@ -42,17 +42,17 @@ public class PSetManager implements IPSetManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#addTasks(java.lang.String, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#addTasks(java.lang.String, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void addTasks(String sid, BitList tasks) {
+	public void addTasks(String sid, TaskSet tasks) {
 		createSet(sid, tasks);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#createSet(java.lang.String, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#createSet(java.lang.String, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void createSet(String sid, BitList tasks) {
-		BitList oldTasks = getTasks(sid);
+	public void createSet(String sid, TaskSet tasks) {
+		TaskSet oldTasks = getTasks(sid);
 		if (oldTasks == null) {
 			setMap.put(sid, tasks);
 		} else {
@@ -84,15 +84,15 @@ public class PSetManager implements IPSetManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#getTasks(java.lang.String)
 	 */
-	public BitList getTasks(String sid) {
+	public TaskSet getTasks(String sid) {
 		return setMap.get(sid);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#removeTasks(java.lang.String, org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#removeTasks(java.lang.String, org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void removeTasks(String sid, BitList tasks) {
-		BitList oldTasks = getTasks(sid);
+	public void removeTasks(String sid, TaskSet tasks) {
+		TaskSet oldTasks = getTasks(sid);
 		if (oldTasks != null) {
 			oldTasks.andNot(tasks);
 		}

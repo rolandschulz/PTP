@@ -74,16 +74,16 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 	}
 	
 	private String getString() throws AIFException {
-		String content = "{";
+		String content = "{"; //$NON-NLS-1$
 		int length = values.size();
 		for (int i=0; i<length; i++) {
 			IAIFValue value = (IAIFValue)values.get(i);
 			content += value.getValueString();
 			if (i < length - 1) {
-				content += ",";
+				content += ","; //$NON-NLS-1$
 			}
 		}
-		return content + "}";
+		return content + "}"; //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)

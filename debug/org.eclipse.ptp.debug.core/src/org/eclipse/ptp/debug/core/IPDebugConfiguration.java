@@ -31,7 +31,7 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.core.runtime.CoreException;
 
 public interface IPDebugConfiguration {
-	public final static String CPU_NATIVE = "native";
+	public final static String CPU_NATIVE = "native"; //$NON-NLS-1$
 
 	/**
 	 * @return

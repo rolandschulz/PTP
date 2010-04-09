@@ -53,6 +53,10 @@ public class SourceUtils {
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATTR_MEMENTO = "memento"; //$NON-NLS-1$
 
+	/**
+	 * @param locations
+	 * @return
+	 */
 	public static ISourceContainer[] convertSourceLocations(IPSourceLocation[] locations) {
 		ArrayList<ISourceContainer> containers = new ArrayList<ISourceContainer>(locations.length);
 		for (int i = 0; i < locations.length; ++i) {
@@ -63,6 +67,10 @@ public class SourceUtils {
 		return (ISourceContainer[]) containers.toArray(new ISourceContainer[containers.size()]);
 	}
 	
+	/**
+	 * @param memento
+	 * @return
+	 */
 	public static IPSourceLocation[] getCommonSourceLocationsFromMemento(String memento) {
 		IPSourceLocation[] result = new IPSourceLocation[0];
 		if (!isEmpty(memento)) {
@@ -84,6 +92,10 @@ public class SourceUtils {
 		return result;
 	}
 	
+	/**
+	 * @param locations
+	 * @return
+	 */
 	public static String getCommonSourceLocationsMemento(IPSourceLocation[] locations) {
 		Document document = null;
 		Throwable ex = null;
@@ -104,6 +116,10 @@ public class SourceUtils {
 		return null;
 	}
 	
+	/**
+	 * @param root
+	 * @return
+	 */
 	public static IPSourceLocation[] initializeSourceLocations(Element root) {
 		List<IPSourceLocation> sourceLocations = new LinkedList<IPSourceLocation>();
 		NodeList list = root.getChildNodes();
@@ -149,10 +165,19 @@ public class SourceUtils {
 		return (IPSourceLocation[]) sourceLocations.toArray(new IPSourceLocation[sourceLocations.size()]);
 	}
 	
+	/**
+	 * @param string
+	 * @return
+	 */
 	private static boolean isEmpty(String string) {
 		return (string == null || string.trim().length() == 0);
 	}
 	
+	/**
+	 * @param doc
+	 * @param node
+	 * @param locations
+	 */
 	private static void saveSourceLocations(Document doc, Element node, IPSourceLocation[] locations) {
 		for (int i = 0; i < locations.length; i++) {
 			Element child = doc.createElement(NAME_SOURCE_LOCATION);

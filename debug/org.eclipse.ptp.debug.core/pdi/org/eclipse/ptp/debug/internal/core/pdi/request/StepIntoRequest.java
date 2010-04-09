@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepIntoRequest;
 
 
@@ -29,11 +30,11 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStepIntoRequest;
  *
  */
 public class StepIntoRequest extends StepRequest implements IPDIStepIntoRequest {
-	public StepIntoRequest(BitList tasks) {
+	public StepIntoRequest(TaskSet tasks) {
 		this(tasks, 1);
 	}
 	
-	public StepIntoRequest(BitList tasks, int count) {
+	public StepIntoRequest(TaskSet tasks, int count) {
 		super(tasks, count);
 	}
 	
@@ -53,6 +54,6 @@ public class StepIntoRequest extends StepRequest implements IPDIStepIntoRequest 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
-		return "Step into request";
+		return Messages.StepIntoRequest_0;
 	}
 }

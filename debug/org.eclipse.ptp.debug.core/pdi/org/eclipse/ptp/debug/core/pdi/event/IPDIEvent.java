@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
@@ -32,5 +32,5 @@ public interface IPDIEvent extends IPDISessionObject {
 	 * @param tasks Tasks
 	 * @return true if this event contains the given tasks
 	 */
-	boolean contains(BitList tasks);
+	boolean contains(TaskSet tasks);
 }

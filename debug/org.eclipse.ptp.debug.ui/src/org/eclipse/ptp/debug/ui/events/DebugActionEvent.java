@@ -24,7 +24,7 @@ package org.eclipse.ptp.debug.ui.events;
  */
 public abstract class DebugActionEvent implements IDebugActionEvent {
 	private Object source = null;
-	private String job_id = "";
+	private String job_id = ""; //$NON-NLS-1$
 	private Object target = null;
 	
 	/** Constructor

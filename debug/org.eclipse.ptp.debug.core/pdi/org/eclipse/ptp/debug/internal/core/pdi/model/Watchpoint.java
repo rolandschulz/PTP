@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
@@ -32,7 +32,7 @@ public class Watchpoint extends Breakpoint implements IPDIWatchpoint {
 	private int watchType;
 	private String expression;
 	
-	public Watchpoint(IPDISession session, BitList tasks, int type, String expression, int wType, IPDICondition condition, boolean enabled) {
+	public Watchpoint(IPDISession session, TaskSet tasks, int type, String expression, int wType, IPDICondition condition, boolean enabled) {
 		super(session, tasks, type, condition, enabled);
 		this.watchType = wType;
 		this.expression = expression;

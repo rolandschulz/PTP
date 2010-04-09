@@ -35,18 +35,31 @@ public class PSourceNotFoundElement implements IDebugElement {
 		this.element = element;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return element.getAdapter(adapter);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
+	 */
 	public IDebugTarget getDebugTarget() {
 		return element.getDebugTarget();
 	}
 
+	/**
+	 * @return
+	 */
 	public IDebugElement getElement() {
 		return element;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getFile() {
 		IPStackFrame frame = (IPStackFrame) ((IAdaptable) element).getAdapter(IPStackFrame.class);
 		if (frame != null) {
@@ -55,10 +68,16 @@ public class PSourceNotFoundElement implements IDebugElement {
 		return ""; //$NON-NLS-1$
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
+	 */
 	public ILaunch getLaunch() {
 		return element.getLaunch();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
+	 */
 	public String getModelIdentifier() {
 		return element.getModelIdentifier();
 	}

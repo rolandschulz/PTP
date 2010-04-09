@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represent expression manager to manage processes
@@ -31,30 +31,30 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public boolean canAllStepReturn(BitList tasks);
+	public boolean canAllStepReturn(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getCannotStepReturnTasks(BitList tasks);
+	public TaskSet getCannotStepReturnTasks(TaskSet tasks);
 
 	/**
 	 * @return
 	 */
-	public BitList getCanStepReturnTasks();
-
-	/**
-	 * @param tasks
-	 * @return
-	 */
-	public BitList getCanStepReturnTasks(BitList tasks);
+	public TaskSet getCanStepReturnTasks();
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getNonPendingTasks(BitList tasks);
+	public TaskSet getCanStepReturnTasks(TaskSet tasks);
+
+	/**
+	 * @param tasks
+	 * @return
+	 */
+	public TaskSet getNonPendingTasks(TaskSet tasks);
 
 	/**
 	 * Find terminated or suspended tasks
@@ -62,7 +62,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getNonRunningTasks(BitList tasks);
+	public TaskSet getNonRunningTasks(TaskSet tasks);
 
 	/**
 	 * Find terminated or running tasks
@@ -70,7 +70,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getNonSuspendedTasks(BitList tasks);
+	public TaskSet getNonSuspendedTasks(TaskSet tasks);
 
 	/**
 	 * Find running or suspended tasks
@@ -78,25 +78,25 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getNonTerminatedTasks(BitList tasks);
+	public TaskSet getNonTerminatedTasks(TaskSet tasks);
 
 	/**
 	 * @return
 	 */
-	public BitList getPendingTasks();
+	public TaskSet getPendingTasks();
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getPendingTasks(BitList tasks);
+	public TaskSet getPendingTasks(TaskSet tasks);
 
 	/**
 	 * Get all registered tasks
 	 * 
 	 * @return
 	 */
-	public BitList getRegisteredTasks();
+	public TaskSet getRegisteredTasks();
 
 	/**
 	 * Find registered tasks
@@ -104,7 +104,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getRegisteredTasks(BitList tasks);
+	public TaskSet getRegisteredTasks(TaskSet tasks);
 
 	/**
 	 * Find running tasks
@@ -112,14 +112,14 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getRunningTasks(BitList tasks);
+	public TaskSet getRunningTasks(TaskSet tasks);
 
 	/**
 	 * Get all suspended tasks
 	 * 
 	 * @return
 	 */
-	public BitList getSuspendedTasks();
+	public TaskSet getSuspendedTasks();
 
 	/**
 	 * Find suspended tasks
@@ -127,14 +127,14 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getSuspendedTasks(BitList tasks);
+	public TaskSet getSuspendedTasks(TaskSet tasks);
 
 	/**
 	 * Get all terminated tasks
 	 * 
 	 * @return
 	 */
-	public BitList getTerminatedTasks();
+	public TaskSet getTerminatedTasks();
 
 	/**
 	 * Find terminated tasks
@@ -142,7 +142,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getTerminatedTasks(BitList tasks);
+	public TaskSet getTerminatedTasks(TaskSet tasks);
 
 	/**
 	 * Find unregistered tasks
@@ -150,65 +150,65 @@ public interface IPDITaskManager extends IPDIManager {
 	 * @param tasks
 	 * @return
 	 */
-	public BitList getUnregisteredTasks(BitList tasks);
+	public TaskSet getUnregisteredTasks(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isAllPending(BitList tasks);
+	public boolean isAllPending(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isAllRegistered(BitList tasks);
+	public boolean isAllRegistered(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isAllRunning(BitList tasks);
+	public boolean isAllRunning(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isAllSuspended(BitList tasks);
+	public boolean isAllSuspended(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isAllTerminated(BitList tasks);
+	public boolean isAllTerminated(TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
 	 */
-	public void setCanStepReturnTasks(boolean isAdd, BitList tasks);
+	public void setCanStepReturnTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
 	 */
-	public void setPendingTasks(boolean isAdd, BitList tasks);
+	public void setPendingTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
 	 */
-	public void setRegisterTasks(boolean isAdd, BitList tasks);
+	public void setRegisterTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
 	 */
-	public void setSuspendTasks(boolean isAdd, BitList tasks);
+	public void setSuspendTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
 	 */
-	public void setTerminateTasks(boolean isAdd, BitList tasks);
+	public void setTerminateTasks(boolean isAdd, TaskSet tasks);
 }

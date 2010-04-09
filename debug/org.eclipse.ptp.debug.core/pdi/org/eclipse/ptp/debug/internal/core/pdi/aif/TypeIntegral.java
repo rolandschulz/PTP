@@ -35,7 +35,7 @@ public abstract class TypeIntegral extends AIFType implements ITypeIntegral {
 		return signed;
 	}
 	public String toString() {
-		return "i" + (isSigned()?"s":"u") + sizeof();
+		return "i" + (isSigned()?"s":"u") + sizeof(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}	
 }
 

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.request;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEventRequest;
@@ -33,11 +33,11 @@ public abstract class BreakpointRequest extends AbstractEventRequest implements 
 	protected IPDIBreakpoint bpt;
 	protected boolean allowUpdate;
 	
-	public BreakpointRequest(BitList tasks, IPDIBreakpoint bpt) {
+	public BreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt) {
 		this(tasks, bpt, true);
 	}
 	
-	public BreakpointRequest(BitList tasks, IPDIBreakpoint bpt, boolean allowUpdate) {
+	public BreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt, boolean allowUpdate) {
 		super(tasks);
 		this.bpt = bpt;
 		this.allowUpdate = allowUpdate;

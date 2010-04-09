@@ -18,10 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.model;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExpression;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
 import org.eclipse.ptp.debug.core.pdi.model.IPDITargetExpression;
@@ -38,7 +39,7 @@ public class Expression extends SessionObject implements IPDITargetExpression {
 	private String fExpression;
 	private IPDIVariable variable = null;	
 
-	public Expression(IPDISession session, BitList tasks, String ex) {
+	public Expression(IPDISession session, TaskSet tasks, String ex) {
 		super(session, tasks);
 		fExpression = ex;
 		id = ++ID_COUNT;
@@ -87,7 +88,7 @@ public class Expression extends SessionObject implements IPDITargetExpression {
 	public IPDIVariable getVariable(IPDIStackFrame context) throws PDIException {
 		IPDIVariable var = session.getExpressionManager().createVariable((StackFrame)context, getExpressionText());
 		if (var == null)
-			throw new PDIException(context.getTasks(), "No variable found");
+			throw new PDIException(context.getTasks(), Messages.Expression_0);
 		
 		variable = var;
 		return var;

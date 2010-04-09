@@ -18,21 +18,25 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
+import org.eclipse.ptp.debug.core.messages.Messages;
+
 /**
  * @author clement
- *
+ * 
  */
 public class PVariableFormat {
-	private final String name;
-	
-	private PVariableFormat(String name) {
-		this.name = name;
-	}
-	public String toString() {
-		return name;
-	}
+	public static final PVariableFormat BINARY = new PVariableFormat(Messages.PVariableFormat_2);
+	public static final PVariableFormat DECIMAL = new PVariableFormat(Messages.PVariableFormat_1);
+	public static final PVariableFormat HEXADECIMAL = new PVariableFormat(Messages.PVariableFormat_4);
+	public static final PVariableFormat NATURAL = new PVariableFormat(Messages.PVariableFormat_0);
+	public static final PVariableFormat OCTAL = new PVariableFormat(Messages.PVariableFormat_3);
+
+	/**
+	 * @param code
+	 * @return
+	 */
 	public static PVariableFormat getFormat(int code) {
-		switch(code) {
+		switch (code) {
 		case 0:
 			return NATURAL;
 		case 1:
@@ -47,9 +51,18 @@ public class PVariableFormat {
 			return DECIMAL;
 		}
 	}
-	public static final PVariableFormat NATURAL = new PVariableFormat("natural");
-	public static final PVariableFormat DECIMAL = new PVariableFormat("decimal");
-	public static final PVariableFormat BINARY = new PVariableFormat("binary");
-	public static final PVariableFormat OCTAL = new PVariableFormat("octal");
-	public static final PVariableFormat HEXADECIMAL = new PVariableFormat("dexadecimal");
+
+	private final String fName;
+
+	private PVariableFormat(String name) {
+		fName = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return fName;
+	}
 }

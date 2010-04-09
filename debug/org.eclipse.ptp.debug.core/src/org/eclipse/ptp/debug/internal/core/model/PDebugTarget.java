@@ -64,6 +64,7 @@ import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IExecFileInfo;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
@@ -114,7 +115,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceCon
  */
 public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEventListener, ILaunchListener, IExpressionListener,
 		ISourceLookupChangeListener {
-	private final String PROCESS_NAME = "Process ";
+	private final String PROCESS_NAME = Messages.PDebugTarget_0;
 	private ArrayList<IThread> fThreads;
 	private IPDITarget pdiTarget;
 	private Boolean fIsLittleEndian = null;
@@ -238,7 +239,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 					info.getName());
 		} catch (PDIException e) {
 			throw new DebugException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(),
-					DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(),
+					DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), //$NON-NLS-1$
 					null));
 		}
 		return PVariableFactory.createGlobalVariable(this, info, vo);
@@ -248,7 +249,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
 	 */
 	public void disconnect() throws DebugException {
-		targetRequestFailed("Not implement PDebugTarget - disconnect() yet", null);
+		targetRequestFailed(Messages.PDebugTarget_1, null);
 	}
 
 	/* (non-Javadoc)
@@ -314,7 +315,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 */
 	public BigInteger getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException {
 		return (fSession.getBreakpointManager() != null) ? fSession.getBreakpointManager().getBreakpointAddress(breakpoint)
-				: new BigInteger("0");
+				: new BigInteger("0"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -328,7 +329,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * @see org.eclipse.ptp.debug.core.model.IExecFileInfo#getGlobals()
 	 */
 	public IPGlobalVariableDescriptor[] getGlobals() throws DebugException {
-		targetRequestFailed("Not implement PDebugTarget - getGlobal() yet", null);
+		targetRequestFailed(Messages.PDebugTarget_2, null);
 		return new IPGlobalVariableDescriptor[0];
 	}
 
@@ -520,7 +521,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#restart()
 	 */
 	public void restart() throws DebugException {
-		targetRequestFailed("Not implement PDebugTarget - restart() yet", null);
+		targetRequestFailed(Messages.PDebugTarget_3, null);
 		if (!canRestart()) {
 			return;
 		}
@@ -630,7 +631,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		try {
 			result = getName();
 		} catch (DebugException e) {
@@ -869,8 +870,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 			IPDIErrorInfo info = (IPDIErrorInfo) reason;
 			setStatus(IPDebugElementStatus.ERROR, info.getMessage());
 			MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.STATUS_CODE_ERROR,
-					CoreModelMessages.getString("PDebugTarget.1"), null);
-			StringTokenizer st = new StringTokenizer(info.getDetailMessage(), "\n\r");
+					Messages.PDebugTarget_4, null);
+			StringTokenizer st = new StringTokenizer(info.getDetailMessage(), "\n\r"); //$NON-NLS-1$
 			while (st.hasMoreTokens()) {
 				String token = st.nextToken();
 				if (token.length() > 200) {

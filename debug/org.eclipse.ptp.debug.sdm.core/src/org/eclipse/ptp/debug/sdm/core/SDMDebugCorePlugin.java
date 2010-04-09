@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
  * @author clement The main plugin class to be used in the desktop.
  */
 public class SDMDebugCorePlugin extends Plugin {
-	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.sdm.core";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.sdm.core"; //$NON-NLS-1$
 
 	private static SDMDebugCorePlugin plugin;
 

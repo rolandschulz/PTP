@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIBreakpointInfo;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 public class BreakpointInfo extends SessionObject implements IPDIBreakpointInfo {
 	private IPDIBreakpoint bpt;
 	
-	public BreakpointInfo(IPDISession session, BitList tasks, IPDIBreakpoint bpt) {
+	public BreakpointInfo(IPDISession session, TaskSet tasks, IPDIBreakpoint bpt) {
 		super(session, tasks);
 		this.bpt = bpt;
 	}

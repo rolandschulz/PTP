@@ -27,8 +27,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
@@ -43,17 +43,17 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIDataReadMemoryRequest;
  */
 public class MemoryManager extends AbstractPDIManager implements IPDIMemoryManager {
 	IPDIMemoryBlock[] EMPTY_MEMORY_BLOCKS = {};
-	Map<BitList, List<IPDIMemoryBlock>> blockMap;
+	Map<TaskSet, List<IPDIMemoryBlock>> blockMap;
 
 	public MemoryManager(IPDISession session) {
 		super(session, true);
-		blockMap = new Hashtable<BitList, List<IPDIMemoryBlock>>();
+		blockMap = new Hashtable<TaskSet, List<IPDIMemoryBlock>>();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#createMemoryBlock(org.eclipse.ptp.core.util.BitList, java.lang.String, int, int)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#createMemoryBlock(org.eclipse.ptp.core.util.TaskSet, java.lang.String, int, int)
 	 */
-	public IPDIMemoryBlock createMemoryBlock(BitList qTasks, String address, int units, int wordSize) throws PDIException {
+	public IPDIMemoryBlock createMemoryBlock(TaskSet qTasks, String address, int units, int wordSize) throws PDIException {
 		IPDIDataReadMemoryInfo info = createDataReadMemoryInfo(qTasks, address, units, wordSize);
 		IPDIMemoryBlock block = session.getModelFactory().newMemoryBlock(session, qTasks, address, wordSize, true, info);
 		List<IPDIMemoryBlock> blockList = getMemoryBlockList(qTasks);
@@ -65,25 +65,25 @@ public class MemoryManager extends AbstractPDIManager implements IPDIMemoryManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#getMemoryBlocks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#getMemoryBlocks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIMemoryBlock[] getMemoryBlocks(BitList qTasks) throws PDIException {
+	public IPDIMemoryBlock[] getMemoryBlocks(TaskSet qTasks) throws PDIException {
 		List<IPDIMemoryBlock> blockList = getMemoryBlockList(qTasks);
 		return (IPDIMemoryBlock[]) blockList.toArray(new IPDIMemoryBlock[blockList.size()]);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#removeAllBlocks(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#removeAllBlocks(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void removeAllBlocks(BitList qTasks) throws PDIException {
+	public void removeAllBlocks(TaskSet qTasks) throws PDIException {
 		IPDIMemoryBlock[] blocks = getMemoryBlocks(qTasks);
 		removeBlocks(qTasks, blocks);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#removeBlocks(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock[])
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIMemoryManager#removeBlocks(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock[])
 	 */
-	public void removeBlocks(BitList qTasks, IPDIMemoryBlock[] memoryBlocks) throws PDIException {
+	public void removeBlocks(TaskSet qTasks, IPDIMemoryBlock[] memoryBlocks) throws PDIException {
 		List<IPDIMemoryBlock> blockList = blockMap.get(qTasks);
 		if (blockList != null) {
 			blockList.removeAll(Arrays.asList(memoryBlocks));
@@ -98,9 +98,9 @@ public class MemoryManager extends AbstractPDIManager implements IPDIMemoryManag
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public void update(BitList qTasks) {
+	public void update(TaskSet qTasks) {
 		List<IPDIMemoryBlock> blockList = getMemoryBlockList(qTasks);
 		IPDIMemoryBlock[] blocks = (IPDIMemoryBlock[]) blockList.toArray(new IPDIMemoryBlock[blockList.size()]);
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>(blocks.length);
@@ -180,7 +180,7 @@ public class MemoryManager extends AbstractPDIManager implements IPDIMemoryManag
 	 * @return
 	 * @throws PDIException
 	 */
-	private IPDIDataReadMemoryInfo createDataReadMemoryInfo(BitList qTasks, String exp, int units, int wordSize) throws PDIException {
+	private IPDIDataReadMemoryInfo createDataReadMemoryInfo(TaskSet qTasks, String exp, int units, int wordSize) throws PDIException {
 		IPDIDataReadMemoryRequest request = session.getRequestFactory().getDataReadMemoryRequest(session, qTasks, 0, exp, ExtFormat.HEXADECIMAL, wordSize, 1, units, null);
 		session.getEventRequestManager().addEventRequest(request);
 		return request.getDataReadMemoryInfo(qTasks);
@@ -190,7 +190,7 @@ public class MemoryManager extends AbstractPDIManager implements IPDIMemoryManag
 	 * @param qTasks
 	 * @return
 	 */
-	private synchronized List<IPDIMemoryBlock> getMemoryBlockList(BitList qTasks) {
+	private synchronized List<IPDIMemoryBlock> getMemoryBlockList(TaskSet qTasks) {
 		List<IPDIMemoryBlock> blockList = blockMap.get(qTasks);
 		if (blockList == null) {
 			blockList = Collections.synchronizedList(new ArrayList<IPDIMemoryBlock>());

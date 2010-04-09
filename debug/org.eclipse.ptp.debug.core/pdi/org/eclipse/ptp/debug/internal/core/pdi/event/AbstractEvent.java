@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
@@ -28,14 +28,14 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
  *
  */
 public abstract class AbstractEvent extends SessionObject implements IPDIEvent {
-	public AbstractEvent(IPDISession session, BitList tasks) {
+	public AbstractEvent(IPDISession session, TaskSet tasks) {
 		super(session, tasks);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEvent#contains(org.eclipse.ptp.core.util.BitList)
+	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEvent#contains(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public boolean contains(BitList qTasks) {
+	public boolean contains(TaskSet qTasks) {
 		return tasks.intersects(qTasks);
 	}
 }

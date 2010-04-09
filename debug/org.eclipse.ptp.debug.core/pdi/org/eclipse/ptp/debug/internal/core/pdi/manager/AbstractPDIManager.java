@@ -1,7 +1,7 @@
 package org.eclipse.ptp.debug.internal.core.pdi.manager;
 
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.SessionObject;
@@ -38,7 +38,7 @@ public abstract class AbstractPDIManager extends SessionObject implements IPDIMa
 	 * @param tasks
 	 * @throws PDIException
 	 */
-	public abstract void update(BitList tasks) throws PDIException;
+	public abstract void update(TaskSet tasks) throws PDIException;
 	
 	/**
 	 * 
