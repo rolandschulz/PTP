@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
-import java.text.MessageFormat;
-
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
@@ -31,6 +29,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
@@ -146,7 +145,7 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 		commandTimeoutField.setValidRange(IPDebugConstants.MIN_REQUEST_TIMEOUT, IPDebugConstants.MAX_REQUEST_TIMEOUT);
 		String minValue = Integer.toString(IPDebugConstants.MIN_REQUEST_TIMEOUT);
 		String maxValue = Integer.toString(IPDebugConstants.MAX_REQUEST_TIMEOUT);
-		commandTimeoutField.setErrorMessage(MessageFormat.format(Messages.PDebugPreferencePage_8, new Object[] { minValue, maxValue }));
+		commandTimeoutField.setErrorMessage(NLS.bind(Messages.PDebugPreferencePage_8, new Object[] { minValue, maxValue }));
 		commandTimeoutField.setEmptyStringAllowed(false);
 		commandTimeoutField.setPropertyChangeListener(listener);
 		commandTimeoutField.load();

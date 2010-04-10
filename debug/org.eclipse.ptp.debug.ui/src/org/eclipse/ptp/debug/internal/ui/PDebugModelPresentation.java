@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -209,7 +208,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			return null;
 		StringBuffer baseText = new StringBuffer(bt);
 		if (element instanceof IPDebugElementStatus && !((IPDebugElementStatus) element).isOK()) {
-			baseText.append(MessageFormat.format(" <{0}>", new Object[] { ((IPDebugElementStatus)element).getMessage() })); //$NON-NLS-1$
+			baseText.append(NLS.bind(" <{0}>", new Object[] { ((IPDebugElementStatus)element).getMessage() })); //$NON-NLS-1$
 		}
 		if (element instanceof IAdaptable) {
 			IEnableDisableTarget target = (IEnableDisableTarget) ((IAdaptable) element).getAdapter(IEnableDisableTarget.class);
@@ -394,7 +393,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				return label.toString();
 			}
 		} catch (DebugException e) {
-			return MessageFormat.format(Messages.PDebugModelPresentation_3, new Object[] { e.getMessage() });
+			return NLS.bind(Messages.PDebugModelPresentation_3, new Object[] { e.getMessage() });
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}

@@ -18,14 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.propertypages;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
@@ -64,7 +63,7 @@ public class SignalPropertyPage extends PropertyPage {
 		try {
 			String description = getSignal().getDescription();
 			Label label = new Label(composite, SWT.WRAP);
-			label.setText(MessageFormat.format(Messages.SignalPropertyPage_0, new Object[] { description }));
+			label.setText(NLS.bind(Messages.SignalPropertyPage_0, new Object[] { description }));
 			GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
 			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
