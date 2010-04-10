@@ -1,9 +1,8 @@
 package org.eclipse.ptp.debug.sdm.core.utils;
 
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 
 public class DebugUtil {
@@ -33,7 +32,7 @@ public class DebugUtil {
 	}
 
 	public static void trace(boolean option, String pattern, Object ... arguments) {
-		trace(option, MessageFormat.format(pattern, arguments));
+		trace(option, NLS.bind(pattern, arguments));
 	}
 
 	public static void trace(boolean option, String message) {
@@ -44,7 +43,7 @@ public class DebugUtil {
 	}
 
 	public static void error(boolean option, String pattern, Object ... arguments) {
-		error(option, MessageFormat.format(pattern, arguments));
+		error(option, NLS.bind(pattern, arguments));
 	}
 
 	public static void error(boolean option, String message) {

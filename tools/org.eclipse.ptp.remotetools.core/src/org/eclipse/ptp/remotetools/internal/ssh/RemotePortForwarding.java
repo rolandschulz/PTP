@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
 
-import java.text.MessageFormat;
-
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.core.IRemotePortForwarding;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
@@ -123,7 +122,7 @@ public class RemotePortForwarding implements IRemotePortForwarding {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return MessageFormat.format("remote port {0} to local {1}:{2}", new Object[] { new Integer(remotePort), localAddress, new Integer(localPort)});
+		return NLS.bind("remote port {0} to local {1}:{2}", new Object[] { new Integer(remotePort), localAddress, new Integer(localPort)});
 	}
 	
 	/*

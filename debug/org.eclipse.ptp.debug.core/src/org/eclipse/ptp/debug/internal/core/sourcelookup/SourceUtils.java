@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.messages.Messages;
@@ -140,7 +140,7 @@ public class SourceUtils {
 					try {
 						clazz = PTPDebugCorePlugin.getDefault().getBundle().loadClass(className);
 					} catch (ClassNotFoundException e) {
-						PTPDebugCorePlugin.log(MessageFormat.format(Messages.SourceUtils_5, new Object[] { className }));
+						PTPDebugCorePlugin.log(NLS.bind(Messages.SourceUtils_5, new Object[] { className }));
 						continue;
 					}
 					IPSourceLocation location = null;

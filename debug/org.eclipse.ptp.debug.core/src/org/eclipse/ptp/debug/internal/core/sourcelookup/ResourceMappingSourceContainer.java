@@ -11,8 +11,6 @@
 
 package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +18,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.ISourceContainerType;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 
 /**
@@ -124,7 +123,7 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getName()
 	 */
 	public String getName() {
-		return MessageFormat.format("{0}/{1} <-> {2}", new Object[] { getContainer().getProject().getName(), getContainer().getProjectRelativePath(), getPath().toOSString() }); //$NON-NLS-1$
+		return NLS.bind("{0}/{1} <-> {2}", new Object[] { getContainer().getProject().getName(), getContainer().getProjectRelativePath(), getPath().toOSString() }); //$NON-NLS-1$
 	}
 	
 	/**

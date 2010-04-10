@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -47,6 +46,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.messages.Messages;
@@ -323,8 +323,7 @@ public class PSourceLocator implements IPSourceLocator,
 						clazz = bundle.loadClass(className);
 					} catch (ClassNotFoundException e) {
 						PTPDebugCorePlugin
-								.log(MessageFormat
-										.format(
+								.log(NLS.bind(
 												Messages.PSourceLocator_5,
 												new Object[] { className }));
 						continue;
@@ -377,9 +376,7 @@ public class PSourceLocator implements IPSourceLocator,
 					try {
 						clazz = bundle.loadClass(className);
 					} catch (ClassNotFoundException e) {
-						PTPDebugCorePlugin
-								.log(MessageFormat
-										.format(
+						PTPDebugCorePlugin.log(NLS.bind(
 												Messages.PSourceLocator_5,
 												new Object[] { className }));
 						continue;
