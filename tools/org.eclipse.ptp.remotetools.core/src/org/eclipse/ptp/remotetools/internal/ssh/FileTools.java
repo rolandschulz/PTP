@@ -478,13 +478,10 @@ public class FileTools implements IRemoteFileTools {
 					};
 					c.syncCmdInThread(Messages.FileTools_9, monitor);
 				} catch (SftpException e) {
-					e.printStackTrace(); //Exception in close often ignored
 					throw new IOException(e);
 				} catch (RemoteException e) {
-					e.printStackTrace();
 					throw new IOException(e);
 				} catch (CancelException e) {
-					e.printStackTrace();
 					throw new IOException(e);
 				}
 			}
