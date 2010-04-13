@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.remotetools.internal.ssh;
+package org.eclipse.ptp.remotetools.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -114,6 +114,12 @@ public class Messages extends NLS {
 	public static String KillableExecution_FinishStatus_WindowSizeChange;
 	public static String KillableExecution_ScriptExecutionConnectionException;
 	public static String PathTools_47;
+	public static String PortForwardingException_0;
+	public static String PortForwardingException_1;
+	public static String PortForwardingException_2;
+	public static String PortForwardingException_3;
+	public static String RemoteExecutionException_0;
+	public static String RemoteExecutionException_1;
 	public static String RemoteFileTools_FailedSetPermission;
 	public static String RemoteFileTools_FetchRemoteAttr_FailedFetchAttr;
 	public static String RemoteFileTools_GetItem_PathNotExist;

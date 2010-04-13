@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.Debug;
 import org.eclipse.ptp.remotetools.utils.stream.ILineStreamListener;

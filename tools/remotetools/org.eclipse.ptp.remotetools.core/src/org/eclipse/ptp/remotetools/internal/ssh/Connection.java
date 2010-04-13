@@ -30,6 +30,7 @@ import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteOperation;
 import org.eclipse.ptp.remotetools.core.KeyAuthToken;
 import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.RemoteTunnel;

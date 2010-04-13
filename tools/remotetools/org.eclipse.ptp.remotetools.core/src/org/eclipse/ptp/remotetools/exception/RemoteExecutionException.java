@@ -11,6 +11,9 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.exception;
 
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
+
 
 public class RemoteExecutionException extends RemoteException {
 	private static final long serialVersionUID = 1L;
@@ -50,7 +53,7 @@ public class RemoteExecutionException extends RemoteException {
 
 	public String getErrorMessage() {
 		if (errormessage == null) {
-			return Messages.getString("RemoteExecutionException.GetErrorMessage_NoErrorInfoAvailable"); //$NON-NLS-1$
+			return Messages.RemoteExecutionException_0;
 		} else {
 			return errormessage;
 		}
@@ -62,8 +65,14 @@ public class RemoteExecutionException extends RemoteException {
 
 	public String toString() {
 		if (exitCode != 0) {
-			return getMessage() + "\n" + Messages.getString("RemoteExecutionException.ToString_ExitCode") + exitCode + (resultmessage != null ? "\n" + resultmessage : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					+ (errormessage != null ? "\n" + errormessage : ""); //$NON-NLS-1$ //$NON-NLS-2$
+			String msg = NLS.bind(Messages.RemoteExecutionException_1, new Object[] {getMessage(), exitCode});
+			if (resultmessage != null) {
+				msg += "\n" + resultmessage; //$NON-NLS-1$
+			}
+			if (errormessage != null ) {
+				msg += "\n" + errormessage; //$NON-NLS-1$
+			}
+			return msg;
 		} else {
 			return super.toString();
 		}
