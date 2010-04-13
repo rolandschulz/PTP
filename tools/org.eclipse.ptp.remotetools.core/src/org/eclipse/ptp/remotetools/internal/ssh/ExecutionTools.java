@@ -17,6 +17,7 @@ import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteScript;
 import org.eclipse.ptp.remotetools.core.IRemoteScriptExecution;
 import org.eclipse.ptp.remotetools.core.RemoteProcess;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;

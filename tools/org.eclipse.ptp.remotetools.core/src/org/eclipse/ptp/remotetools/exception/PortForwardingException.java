@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remotetools.exception;
 
+import org.eclipse.ptp.remotetools.core.messages.Messages;
+
 
 public class PortForwardingException extends RemoteException {
 	private static final long serialVersionUID = -2455858989206677165L;
@@ -34,13 +36,13 @@ public class PortForwardingException extends RemoteException {
 	public String getMessage() {
 		switch (code) {
 		case REMOTE_PORT_ALREADY_FORWARDED:
-			return Messages.getString("PortForwardingException.REMOTE_PORT_ALREADY_FORWARDED"); //$NON-NLS-1$
+			return Messages.PortForwardingException_0;
 		case REMOTE_FORWARDING_FAILED:
-			return Messages.getString("PortForwardingException.REMOTE_FORWARDING_FAILED"); //$NON-NLS-1$
+			return Messages.PortForwardingException_1;
 		case INVALID_PARAMETERS:
-			return Messages.getString("PortForwardingException.INVALID_PARAMETERS"); //$NON-NLS-1$
+			return Messages.PortForwardingException_2;
 		case REMOTE_FORWARDING_NOT_ATIVE:
-			return Messages.getString("PortForwardingException.REMOTE_FORWARDING_NOT_ATIVE"); //$NON-NLS-1$			
+			return Messages.PortForwardingException_3;	
 		default:
 			assert false;
 			return null;

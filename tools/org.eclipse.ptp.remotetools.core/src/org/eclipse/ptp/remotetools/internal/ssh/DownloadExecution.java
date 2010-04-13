@@ -18,6 +18,7 @@ import java.io.OutputStream;
 
 import org.eclipse.ptp.remotetools.core.IRemoteDownloadExecution;
 import org.eclipse.ptp.remotetools.core.IRemotePathTools;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.Debug;
 

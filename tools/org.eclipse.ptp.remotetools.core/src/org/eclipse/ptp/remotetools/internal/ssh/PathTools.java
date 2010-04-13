@@ -16,6 +16,7 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
 import org.eclipse.ptp.remotetools.core.IRemotePathTools;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 
 
 public class PathTools implements IRemotePathTools {

@@ -24,6 +24,7 @@ import org.eclipse.ptp.remotetools.core.IRemotePathTools;
 import org.eclipse.ptp.remotetools.core.IRemotePortForwardingTools;
 import org.eclipse.ptp.remotetools.core.IRemoteStatusTools;
 import org.eclipse.ptp.remotetools.core.IRemoteTunnel;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;

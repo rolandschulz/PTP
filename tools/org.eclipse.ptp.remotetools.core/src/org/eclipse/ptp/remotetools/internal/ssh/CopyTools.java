@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
 import org.eclipse.ptp.remotetools.core.IRemoteFileEnumeration;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;

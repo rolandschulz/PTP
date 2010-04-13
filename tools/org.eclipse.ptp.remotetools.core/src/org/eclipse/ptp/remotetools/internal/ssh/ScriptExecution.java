@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.eclipse.ptp.remotetools.core.IRemoteScriptExecution;
+import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.Debug;
 import org.eclipse.ptp.remotetools.internal.common.RemoteScript;
