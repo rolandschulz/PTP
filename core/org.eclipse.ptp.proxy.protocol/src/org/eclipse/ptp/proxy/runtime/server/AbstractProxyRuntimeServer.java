@@ -80,6 +80,20 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	 */
 	public abstract void startEventThread(int transID);
 
+	/**
+	 * @return
+	 */
+	protected IProxyRuntimeEventFactory getEventFactory() {
+		return fEventFactory;
+	}
+	
+	/**
+	 * @return
+	 */
+	protected Thread getEventThread() {
+		return fEventThread;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.server.AbstractProxyServer#runStateMachine()
 	 */
@@ -147,6 +161,13 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				break;
 			}	
 		}
+	}
+	
+	/**
+	 * @param thread
+	 */
+	protected void setEventThread(Thread thread) {
+		fEventThread = thread;
 	}
 	
 	/**
