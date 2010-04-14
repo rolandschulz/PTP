@@ -18,19 +18,10 @@ public class Messages extends NLS {
 	public static String PBSResourceManagerConfigurationWizardPage_name;
 	public static String PBSResourceManagerConfigurationWizardPage_title;
 	public static String PBSResourceManagerConfigurationWizardPage_description;
-
 	public static String PBSRMLaunchConfigurationDynamicTab_0;
 	public static String PBSRMLaunchConfigurationDynamicTab_1;
 	public static String PBSRMLaunchConfigurationDynamicTab_2;
 	public static String PBSRMLaunchConfigurationDynamicTab_3;
-	public static String PBSRMLaunchConfigurationDynamicTab_4;
-	public static String PBSRMLaunchConfigurationDynamicTab_5;
-	public static String PBSRMLaunchConfigurationDynamicTab_6;
-	public static String PBSRMLaunchConfigurationDynamicTab_7;
-	public static String PBSRMLaunchConfigurationDynamicTab_8;
-	public static String PBSRMLaunchConfigurationDynamicTab_9;
-	public static String PBSRMLaunchConfigurationDynamicTab_10;
-
 	public static String PBSConfigurationWizardPage_name;
 	public static String PBSConfigurationWizardPage_title;
 	public static String PBSConfigurationWizardPage_description;
@@ -44,7 +35,6 @@ public class Messages extends NLS {
 	public static String PBSConfigurationWizardPage_connection_error_msg;
 	public static String PBSConfigurationWizardPage_numProcsInvalid;
 	public static String PBSConfigurationWizardPage_timeLimitInvalid;
-
 	public static String PBSPreferencesPage_group_pbsd;
 	public static String PBSPreferencesPage_pbsdFile_text;
 	public static String PBSPreferencesPage_Select_PBSd_FILE;
