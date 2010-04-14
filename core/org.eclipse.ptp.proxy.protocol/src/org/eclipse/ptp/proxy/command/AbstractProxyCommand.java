@@ -1,12 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * IBM Corporation - Initial API and implementation
+ *     IBM Corporation - Initial API and implementation
+ *     Dieter Krachtus, University of Heidelberg
+ *     Roland Schulz, University of Tennessee
  *******************************************************************************/
 
 package org.eclipse.ptp.proxy.command;
@@ -31,6 +33,7 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	protected AbstractProxyCommand(int commandID, int transID, String[] args) {
 		this.commandID = commandID;
 		this.transactionID = transID;
+		this.args = new ArrayList<String>();
 		for (String arg : args) {
 			this.args.add(arg);
 		}

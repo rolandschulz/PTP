@@ -6,14 +6,18 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * IBM Corporation - Initial API and implementation
+ *     IBM Corporation - Initial API and implementation
+ *     Dieter Krachtus, University of Heidelberg
+ *     Roland Schulz, University of Tennessee
  *******************************************************************************/
 
 package org.eclipse.ptp.proxy.server;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,65 +25,81 @@ import java.util.List;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.IProxyCommandFactory;
 import org.eclipse.ptp.proxy.command.IProxyCommandListener;
-import org.eclipse.ptp.proxy.command.IProxyExtendedCommand;
-import org.eclipse.ptp.proxy.command.IProxyQuitCommand;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public abstract class AbstractProxyServer implements IProxyServer {
-	private enum ServerState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN}
+	protected enum ServerState {
+		INIT, DISCOVERY, NORMAL, SUSPENDED, SHUTDOWN
+	}
 
 	public static final int MAX_ERRORS = 5;
-	
-	private ServerState 				state = ServerState.SHUTDOWN;
 
-	private String						sessHost;
-	private int							sessPort;
-	private Socket 						sessSocket;
-	private ReadableByteChannel 		sessInput;
-	private IProxyCommandFactory		proxyCommandFactory;
-	private Thread						commandThread;
-	private List<IProxyCommandListener>	listeners = 
-		Collections.synchronizedList(new ArrayList<IProxyCommandListener>());
+	protected ServerState state = ServerState.INIT;
+
+	private String sessHost;
+	private int sessPort;
+	// private Socket sessSocket;
+	protected ReadableByteChannel sessInput;
+	protected WritableByteChannel sessOutput;
+	private IProxyCommandFactory proxyCommandFactory;
+	private Thread commandThread;
+	private List<IProxyCommandListener> listeners = Collections.synchronizedList(new ArrayList<IProxyCommandListener>());
 
 	public AbstractProxyServer(String host, int port, IProxyCommandFactory factory) {
 		this.sessHost = host;
 		this.sessPort = port;
 		this.proxyCommandFactory = factory;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.server.IProxyServer#addListener(org.eclipse.ptp.proxy.command.IProxyCommandListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.server.IProxyServer#addListener(org.eclipse.ptp
+	 * .proxy.command.IProxyCommandListener)
 	 */
 	public void addListener(IProxyCommandListener listener) {
 		listeners.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.server.IProxyServer#addListener(org.eclipse.ptp.proxy.command.IProxyCommandListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.server.IProxyServer#addListener(org.eclipse.ptp
+	 * .proxy.command.IProxyCommandListener)
 	 */
 	public void removeListener(IProxyCommandListener listener) {
 		listeners.remove(listener);
 	}
 
-	public void connect() throws IOException {
-		sessSocket = new Socket(sessHost, sessPort);
-		sessInput = sessSocket.getChannel();
-	}
-	
 	/**
-	 * Start a thread to process commands from the proxy by repeatedly 
-	 * calling sessionProgress(). 
+	 * @throws IOException
 	 */
-	public void start() {
+	public void connect() throws IOException {
+		// sessSocket = new Socket(sessHost, sessPort);
+		SocketChannel channel = SocketChannel.open();
+		channel.connect(new InetSocketAddress(sessHost, sessPort));
+		sessInput = channel;
+		sessOutput = channel;
+	}
+
+	/**
+	 * Start a thread to process commands from the proxy by repeatedly calling
+	 * sessionProgress().
+	 * 
+	 * @throws IOException
+	 */
+	public void start() throws IOException {
 		commandThread = new Thread("Proxy Server Command Thread") { //$NON-NLS-1$
 			public void run() {
 				boolean error = false;
-				int errorCount = 0;			
-				
+				int errorCount = 0;
+
 				System.out.println("server command thread starting..."); //$NON-NLS-1$
 				try {
 					while (errorCount < MAX_ERRORS && !isInterrupted()) {
-						synchronized(state) {
+						synchronized (state) {
 							if (state == ServerState.SHUTDOWN) {
 								break;
 							}
@@ -89,24 +109,24 @@ public abstract class AbstractProxyServer implements IProxyServer {
 						}
 					}
 				} catch (IOException e) {
-					synchronized(state) {
-						if (!isInterrupted() && state != ServerState.SHUTTING_DOWN) {
+					synchronized (state) {
+						if (!isInterrupted() && state != ServerState.SHUTDOWN) {
 							error = true;
 							System.out.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
 						}
 					}
-				} 
-				
+				}
+
 				if (errorCount >= MAX_ERRORS) {
 					error = true;
 				}
-				
+
 				try {
-					sessSocket.close();
+					sessInput.close();
 				} catch (IOException e) {
-				} 
-				
-				synchronized(state) {
+				}
+
+				synchronized (state) {
 					state = ServerState.SHUTDOWN;
 				}
 
@@ -118,65 +138,54 @@ public abstract class AbstractProxyServer implements IProxyServer {
 				}
 			}
 		};
-
+		commandThread.start();
 		try {
-			commandThread.join();
+			runStateMachine();
+			commandThread.interrupt();
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Process commands from the wire
 	 * 
-	 * @return 
+	 * @return
 	 * @throws IOException
 	 */
 	private boolean sessionProgress() throws IOException {
 		ProxyPacket packet = new ProxyPacket();
+		System.out.print("sessionProgress: "); //$NON-NLS-1$
 		if (!packet.read(sessInput)) {
+			System.out.println("false"); //$NON-NLS-1$
 			return false;
 		}
-		
+		System.out.println(packet.getID() + "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
 		/*
 		 * Now convert the event into an IProxyEvent
 		 */
 		IProxyCommand cmd = proxyCommandFactory.toCommand(packet);
-				
+		System.out.println("cmd: " + cmd); //$NON-NLS-1$
 		if (cmd != null) {
-			if (cmd instanceof IProxyQuitCommand) {
-				fireProxyQuitCommand((IProxyQuitCommand)cmd);
-			} else if (cmd instanceof IProxyExtendedCommand) {
-				fireProxyExtendedCommand((IProxyExtendedCommand)cmd);
-			}
-			
+			fireProxyCommand(cmd);
+
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Send command to command handlers
 	 * 
 	 * @param cmd
 	 */
-	protected void fireProxyExtendedCommand(IProxyExtendedCommand cmd) {
-		IProxyCommandListener[] la = listeners.toArray(new IProxyCommandListener[0]);
-		for (IProxyCommandListener listener : la) {
-			listener.handleCommand(cmd);
-		}
-	}
-	
-	/**
-	 * Send command to command handlers
-	 * 
-	 * @param cmd
-	 */
-	protected void fireProxyQuitCommand(IProxyQuitCommand cmd) {
-		IProxyCommandListener[] la = listeners.toArray(new IProxyCommandListener[0]);
-		for (IProxyCommandListener listener : la) {
+	protected void fireProxyCommand(IProxyCommand cmd) {
+		System.out.println("fireProxyCommand: " + cmd.getCommandID()); //$NON-NLS-1$
+		for (IProxyCommandListener listener : listeners) {
 			listener.handleCommand(cmd);
 		}
 	}
 
+	protected abstract void runStateMachine() throws InterruptedException, IOException;
 }
