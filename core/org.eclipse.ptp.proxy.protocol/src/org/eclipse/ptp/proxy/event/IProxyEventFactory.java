@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006, 2007 Los Alamos National Security, LLC.
+ * Copyright (c) 2005, 2006, 2007, 2010 Los Alamos National Security, LLC and others.
  * This material was produced under U.S. Government contract DE-AC52-06NA25396
  * for Los Alamos National Laboratory (LANL), which is operated by the Los Alamos
  * National Security, LLC (LANS) for the U.S. Department of Energy.  The U.S. Government has
@@ -13,6 +13,12 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     LANS - Initial Implementation
+ *     Dieter Krachtus, University of Heidelberg
+ *     Roland Schulz, University of Tennessee
+ *     Greg Watson, IBM
  *******************************************************************************/
 
 package org.eclipse.ptp.proxy.event;
@@ -20,5 +26,36 @@ package org.eclipse.ptp.proxy.event;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public interface IProxyEventFactory {
+	/**
+	 * Decode event packet into a proxy event.
+	 * 
+	 * @param packet packet recevied from proxy
+	 * @return decoded event packet or null if the packet couldn't be decoded
+	 */
 	public IProxyEvent toEvent(ProxyPacket packet);
+	
+	/**
+	 * Create a new ok event.
+	 * 
+	 * @param transID transaction id
+	 * @return new ok event
+	 */
+	public IProxyOKEvent newOKEvent(int transID);
+	
+	/**
+	 * Create a new shutdown event.
+	 * 
+	 * @param transID transaction id
+	 * @return new shutdown event
+	 */
+	public IProxyShutdownEvent newShutdownEvent(int transID);
+	
+	/**
+	 * Create a new error event.
+	 * 
+	 * @param transID transaction id
+	 * @return new err0r event
+	 */
+	public IProxyErrorEvent newErrorEvent(int transID, int code, String message);
+
 }
