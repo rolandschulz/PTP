@@ -34,7 +34,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class DStoreServerRunner extends Job {
-	public enum DStoreServerState {STARTING, RUNNING, FINISHED, ERROR}
+	public enum DStoreServerState {STARTING, RUNNING, FINISHED}
 
 	private boolean DEBUG = true;
 	
@@ -263,10 +263,10 @@ public class DStoreServerRunner extends Job {
 			}
 			return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
 		} catch (CoreException e) {
-			setServerState(DStoreServerState.ERROR);
+			setServerState(DStoreServerState.FINISHED);
 			return e.getStatus();
 		} catch (IOException e) {
-			setServerState(DStoreServerState.ERROR);
+			setServerState(DStoreServerState.FINISHED);
 			return new Status(IStatus.ERROR, UIPlugin.getPluginId(), "failed to start dstore server", e); //$NON-NLS-1$
 		} finally {
 			synchronized (this) {
@@ -280,11 +280,13 @@ public class DStoreServerRunner extends Job {
 	}
 	
 	protected synchronized void setServerState(DStoreServerState state) {
-		if (DStoreServerDefaults.DSTORE_TRACING) {
-			System.out.println("DSTORE RUNNER: " + state.toString()); //$NON-NLS-1$
+		if (fServerState != state) {
+			if (DStoreServerDefaults.DSTORE_TRACING) {
+				System.out.println("DSTORE RUNNER: " + state.toString()); //$NON-NLS-1$
+			}
+			fServerState = state;
+			this.notifyAll();
 		}
-		fServerState = state;
-		this.notifyAll();
 	}
 
 	protected synchronized void terminateServer() {
