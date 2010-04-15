@@ -3,6 +3,7 @@
 	<name>org.eclipse.ptp.proxy</name>
 	<comment></comment>
 	<projects>
+		<project>org.eclipse.ptp.utils</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
