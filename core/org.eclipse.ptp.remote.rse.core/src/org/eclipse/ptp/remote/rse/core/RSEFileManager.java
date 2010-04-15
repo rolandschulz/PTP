@@ -11,6 +11,7 @@
 package org.eclipse.ptp.remote.rse.core;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -67,8 +68,8 @@ public class RSEFileManager implements IRemoteFileManager {
 	 */
 	public URI toURI(IPath path) {
 		try {
-			return EFS.getFileSystem("rse").getStore(path).toURI(); //$NON-NLS-1$
-		} catch (CoreException e) {
+			return new URI("rse", fConnection.getHost().getHostName(), path.toString(), fConnection.getHost().getAliasName(), null); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
 			return null;
 		}
 	}
