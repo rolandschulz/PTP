@@ -14,7 +14,7 @@ package org.eclipse.ptp.rm.pbs.jproxy.attributes;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.proxy.jproxy.attributes.IElementAttributes;
+import org.eclipse.ptp.rm.proxy.core.attributes.IElementAttributes;
 
 /**
  * The Class defining the map that links the xml tag names to the attributes-ids
@@ -28,44 +28,50 @@ import org.eclipse.ptp.proxy.jproxy.attributes.IElementAttributes;
  * org.eclipse.ptp.core.elements.attributes.JobAttributes
  * 
  * are all required? Or only some?
- * 
- * public enum State { STARTING, RUNNING, SUSPENDED, COMPLETED }
- * 
- * public static final int IO_FORWARDING_NONE = 0x0; public static final int
- * IO_FORWARDING_STDIN = 0x01; public static final int IO_FORWARDING_STDOUT =
- * 0x02; public static final int IO_FORWARDING_STDERR = 0x04;
- * 
- * private static final String DEBUG_ARGS_ATTR_ID = "debugArgs"; //$NON-NLS-1$
- * private static final String DEBUG_EXEC_NAME_ATTR_ID = "debugExecName";
- * //$NON-NLS-1$ private static final String DEBUG_EXEC_PATH_ATTR_ID =
- * "debugExecPath"; //$NON-NLS-1$ private static final String DEBUG_FLAG_ATTR_ID
- * = "debug"; //$NON-NLS-1$ private static final String
- * DEBUG_STOP_IN_MAIN_ATTR_ID = "debugStopInMain"; //$NON-NLS-1$ private static
- * final String DEBUGGER_ID_ATTR_ID = "debugerId"; //$NON-NLS-1$ private static
- * final String ENV_ATTR_ID = "env"; //$NON-NLS-1$ private static final String
- * EXEC_NAME_ATTR_ID = "execName"; //$NON-NLS-1$ private static final String
- * EXEC_PATH_ATTR_ID = "execPath"; //$NON-NLS-1$ private static final String
- * IO_FORWARDING_ATTR_ID = "ioForwarding"; //$NON-NLS-1$ private static final
- * String LAUNCHED_BY_PTP_FLAG_ATTR_ID = "launchedByPTP"; //$NON-NLS-1$ private
- * static final String JOB_ID_ATTR_ID = "jobId"; //$NON-NLS-1$ private static
- * final String NUM_PROCS_ATTR_ID = "jobNumProcs"; //$NON-NLS-1$ private static
- * final String PROG_ARGS_ATTR_ID = "progArgs"; //$NON-NLS-1$ private static
- * final String QUEUEID_ATTR_ID = "queueId"; //$NON-NLS-1$ private static final
- * String STATE_ATTR_ID = "jobState"; //$NON-NLS-1$ private static final String
- * STATUS_ATTR_ID = "jobStatus"; //$NON-NLS-1$ private static final String
- * STATUS_MESSAGE_ATTR_ID = "jobStatusMessage"; //$NON-NLS-1$ private static
- * final String SUBID_ATTR_ID = "jobSubId"; //$NON-NLS-1$ private static final
- * String USERID_ATTR_ID = "userId"; //$NON-NLS-1$ private static final String
- * WORKING_DIR_ATTR_ID = "workingDir"; //$NON-NLS-1$
+   
+   public enum State {
+		STARTING,
+		RUNNING,
+		SUSPENDED,
+		COMPLETED
+	}
+	
+	public static final int IO_FORWARDING_NONE = 0x0;
+	public static final int IO_FORWARDING_STDIN = 0x01;
+	public static final int IO_FORWARDING_STDOUT = 0x02;
+	public static final int IO_FORWARDING_STDERR = 0x04;
+	
+	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs"; //$NON-NLS-1$
+	private static final String DEBUG_EXEC_NAME_ATTR_ID = "debugExecName"; //$NON-NLS-1$
+	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath"; //$NON-NLS-1$
+	private static final String DEBUG_FLAG_ATTR_ID = "debug"; //$NON-NLS-1$
+	private static final String DEBUG_STOP_IN_MAIN_ATTR_ID = "debugStopInMain"; //$NON-NLS-1$
+	private static final String DEBUGGER_ID_ATTR_ID = "debugerId"; //$NON-NLS-1$
+	private static final String ENV_ATTR_ID = "env"; //$NON-NLS-1$
+	private static final String EXEC_NAME_ATTR_ID = "execName"; //$NON-NLS-1$
+	private static final String EXEC_PATH_ATTR_ID = "execPath"; //$NON-NLS-1$
+	private static final String IO_FORWARDING_ATTR_ID = "ioForwarding"; //$NON-NLS-1$
+	private static final String LAUNCHED_BY_PTP_FLAG_ATTR_ID = "launchedByPTP"; //$NON-NLS-1$
+	private static final String JOB_ID_ATTR_ID = "jobId"; //$NON-NLS-1$
+	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs"; //$NON-NLS-1$
+	private static final String PROG_ARGS_ATTR_ID = "progArgs"; //$NON-NLS-1$
+	private static final String QUEUEID_ATTR_ID = "queueId"; //$NON-NLS-1$
+	private static final String STATE_ATTR_ID = "jobState"; //$NON-NLS-1$
+	private static final String STATUS_ATTR_ID = "jobStatus"; //$NON-NLS-1$
+	private static final String STATUS_MESSAGE_ATTR_ID = "jobStatusMessage"; //$NON-NLS-1$
+	private static final String SUBID_ATTR_ID = "jobSubId"; //$NON-NLS-1$
+	private static final String USERID_ATTR_ID = "userId"; //$NON-NLS-1$
+	private static final String WORKING_DIR_ATTR_ID = "workingDir"; //$NON-NLS-1$
+
  */
 
 public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements IElementAttributes {
 
 	private static final Map<String, String> xmlTag_AttributeID_Map = new HashMap<String, String>();
 
-	private static final String key = "job_id";
-	private static final String parent_key = "queue";
-
+	private static final String key = "job_id"; //$NON-NLS-1$
+	private static final String parent_key = "queue"; //$NON-NLS-1$
+	
 	/*
 	 * (non-Javadoc)
 	 * 

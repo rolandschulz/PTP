@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.proxy.runtime.event;
 
+import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyEventFactory;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
@@ -186,4 +187,11 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @return
 	 */
 	public IProxyRuntimeTerminateJobErrorEvent newProxyRuntimeTerminateJobErrorEvent(int transID, String[] args);
+         
+         /**
+	 * @param transID
+	 * @param errArgs
+	 * @return
+	 */
+	public IProxyEvent newErrorEvent(int transID, String[] errArgs);
 }

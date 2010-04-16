@@ -26,10 +26,12 @@ package org.eclipse.ptp.proxy.command;
 
 public interface IProxyCommandListener {
 
+
 	/**
-	 * Command handler
+	 * Handler for commands
 	 * 
-	 * @param c command to handle
+	 * @param cmd command to handle
 	 */
-	public void handleCommand(IProxyCommand c);
+	public void handleCommand(IProxyCommand cmd);
+
 }

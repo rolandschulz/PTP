@@ -35,7 +35,7 @@ public class ProxyPacket {
 	public static final int PACKET_NARGS_SIZE = 8;
 	public static final int PACKET_ARG_LEN_SIZE = 8;
 
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	private int packetID;
 	private int packetTransID;
