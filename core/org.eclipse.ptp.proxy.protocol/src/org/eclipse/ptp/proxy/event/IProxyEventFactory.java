@@ -27,12 +27,21 @@ import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public interface IProxyEventFactory {
 	/**
-	 * Decode event packet into a proxy event.
+	 * Create a new error event.
 	 * 
-	 * @param packet packet recevied from proxy
-	 * @return decoded event packet or null if the packet couldn't be decoded
+	 * @param transID transaction id
+	 * @return new error event
 	 */
-	public IProxyEvent toEvent(ProxyPacket packet);
+	public IProxyErrorEvent newErrorEvent(int transID, int code, String message);
+	
+	/**
+	 * Create a new error event.
+	 * 
+	 * @param transID transaction id
+	 * @param args array of arguments for the event
+	 * @return new error event
+	 */
+	public IProxyErrorEvent newErrorEvent(int transID, String[] args);
 	
 	/**
 	 * Create a new ok event.
@@ -51,11 +60,10 @@ public interface IProxyEventFactory {
 	public IProxyShutdownEvent newShutdownEvent(int transID);
 	
 	/**
-	 * Create a new error event.
+	 * Decode event packet into a proxy event.
 	 * 
-	 * @param transID transaction id
-	 * @return new err0r event
+	 * @param packet packet received from proxy
+	 * @return decoded event packet or null if the packet couldn't be decoded
 	 */
-	public IProxyErrorEvent newErrorEvent(int transID, int code, String message);
-
+	public IProxyEvent toEvent(ProxyPacket packet);
 }

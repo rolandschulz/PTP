@@ -42,6 +42,9 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 		return new ProxyErrorEvent(transID, args);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newErrorEvent(int, java.lang.String[])
+	 */
 	public IProxyErrorEvent newErrorEvent(int transID,String[] args) {
 		return new ProxyErrorEvent(transID,args);
 	}
