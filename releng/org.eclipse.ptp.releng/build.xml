@@ -18,7 +18,6 @@
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
 		<property name="eclipseRelease" value="helios"/>
 		<property name="ptpBranchVersion" value="4.0.0"/>
-		<property name="photranBranchVersion" value="6.0.0"/>
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
@@ -33,7 +32,6 @@
 		<property name="buildId" value="${buildType}${timestamp}"/>
 		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
 		<property name="ptpMasterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
-		<!--property name="photranMasterFile" value="photran-master-${photranBranchVersion}-${buildId}.zip"/-->
 		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
 		<property name="mailto" value="g.watson@computer.org"/>
 		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
