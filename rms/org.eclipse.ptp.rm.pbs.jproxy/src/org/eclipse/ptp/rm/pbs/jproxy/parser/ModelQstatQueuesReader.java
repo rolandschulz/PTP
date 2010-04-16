@@ -20,19 +20,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ptp.proxy.jproxy.IParser;
-import org.eclipse.ptp.proxy.jproxy.attributes.AttributeDefinition;
-import org.eclipse.ptp.proxy.jproxy.element.IElement;
+import org.eclipse.ptp.rm.proxy.core.IParser;
+import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
+import org.eclipse.ptp.rm.proxy.core.element.IElement;
 
 public class ModelQstatQueuesReader implements IParser {
 	private Set<IElement> queues;
 	
 	
-	public Set<org.eclipse.ptp.proxy.jproxy.element.IElement> parse(
+	public Set<IElement> parse(
 			AttributeDefinition attrDef, InputStream in) {
 		Set<IElement> queues = new HashSet<IElement>();
 		try {
@@ -59,8 +58,8 @@ public class ModelQstatQueuesReader implements IParser {
 		
 		BufferedReader reader = new BufferedReader( new InputStreamReader(in) );
 		
-		Pattern queuepattern = Pattern.compile("^[Qq]ueue:(.*)$");
-		Pattern keyvalpattern = Pattern.compile("^([^=]+)=(.+)$");
+		Pattern queuepattern = Pattern.compile("^[Qq]ueue:(.*)$"); //$NON-NLS-1$
+		Pattern keyvalpattern = Pattern.compile("^([^=]+)=(.+)$"); //$NON-NLS-1$
 
 		String line;
 		ArrayList<HashMap<String,String> > qhashes = new ArrayList<HashMap<String,String>>();
@@ -78,7 +77,7 @@ public class ModelQstatQueuesReader implements IParser {
 					firstqueue = false;
 				}
 				thisqueue = new HashMap<String,String>();
-				thisqueue.put("name", mq.group(1).trim());
+				thisqueue.put("name", mq.group(1).trim()); //$NON-NLS-1$
 				continue;
 			}
 		

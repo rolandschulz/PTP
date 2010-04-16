@@ -766,7 +766,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					IAttribute<?,?,?> attr = attrDef.create(value);
 					mgr.addAttribute(attr);
 				} catch (IllegalValueException e1) {
-					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14);
+					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14+": "+e1.getMessage()); //$NON-NLS-1$
 				}
 			}
 		}

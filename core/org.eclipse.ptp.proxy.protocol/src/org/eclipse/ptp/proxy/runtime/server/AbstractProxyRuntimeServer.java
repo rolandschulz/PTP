@@ -24,12 +24,14 @@ import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand;
 import org.eclipse.ptp.proxy.runtime.command.ProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.server.AbstractProxyServer;
 
 public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer implements IProxyCommandListener {
+
 	/*
 	 * Event queue for incoming events.
 	 */
@@ -37,6 +39,8 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 		new LinkedBlockingQueue<IProxyCommand>();
 	
 	protected final IProxyRuntimeEventFactory fEventFactory;
+
+
 	
 	public int fEventLoopTransID;
 
@@ -153,7 +157,9 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 					sendEvent(event);
 					state = ServerState.SHUTDOWN;
 				} else if (command instanceof IProxyRuntimeTerminateJobCommand) {
-					terminateJob(command.getArguments());
+					terminateJob(transID,command.getArguments());
+				} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
+					submitJob(transID, command.getArguments());
 				} else {
 					System.err.println("unexpected command (NORM): "+command); //$NON-NLS-1$
 				}
@@ -169,9 +175,10 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	protected void setEventThread(Thread thread) {
 		fEventThread = thread;
 	}
-	
-	/**
-	 * @param arguments
-	 */
-	protected abstract void terminateJob(String[] arguments);
+
+	protected abstract void submitJob(int transID, String[] arguments);
+
+	protected abstract void terminateJob(int transID, String[] arguments);
+
+	protected Thread eventThread;
 }

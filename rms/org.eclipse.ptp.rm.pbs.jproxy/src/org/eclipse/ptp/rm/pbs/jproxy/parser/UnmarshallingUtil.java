@@ -13,15 +13,10 @@
 package org.eclipse.ptp.rm.pbs.jproxy.parser;
 
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,10 +26,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.ptp.proxy.jproxy.IParser;
-import org.eclipse.ptp.proxy.jproxy.attributes.AttributeDefinition;
-import org.eclipse.ptp.proxy.jproxy.element.IElement;
-import org.eclipse.ptp.proxy.jproxy.element.IElement.UnknownValueExecption;
+import org.eclipse.ptp.rm.proxy.core.IParser;
+import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
+import org.eclipse.ptp.rm.proxy.core.element.IElement;
+import org.eclipse.ptp.rm.proxy.core.element.IElement.UnknownValueExecption;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -117,7 +112,7 @@ public class UnmarshallingUtil implements IParser {
 		// true when qstat XML output is not well-formed
 		if (textContent.length() > 0 && item.getNodeType() == Node.TEXT_NODE) {
 //			System.out.println("Invalid XML: "+textContent);
-			input.put("job_id", textContent);
+			input.put("job_id", textContent); //$NON-NLS-1$
 		}
 		
 		for (int i = 0; i < childNodes.getLength(); i++) {

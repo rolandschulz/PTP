@@ -42,6 +42,10 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 		return new ProxyErrorEvent(transID, args);
 	}
 	
+	public IProxyErrorEvent newErrorEvent(int transID,String[] args) {
+		return new ProxyErrorEvent(transID,args);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newOKEvent(int)
 	 */
@@ -56,9 +60,11 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 		return new ProxyShutdownEvent(transID);
 	}
 	
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.event.AbstractProxyEventFactory#toEvent(org.eclipse.ptp.proxy.packet.ProxyPacket)
 	 */
+	@Override
 	public IProxyEvent toEvent(ProxyPacket packet) {
 		IProxyEvent evt = null;
 
@@ -78,4 +84,7 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 
 		return evt;
 	}
+	
+	
+
 }
