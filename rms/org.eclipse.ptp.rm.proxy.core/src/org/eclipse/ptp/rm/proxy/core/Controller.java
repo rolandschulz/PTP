@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.ElementManager;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.event.IEventFactory;
+import org.eclipse.ptp.rm.proxy.core.parser.IParser;
 import org.eclipse.ptp.utils.core.RangeSet;
 
 

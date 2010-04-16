@@ -7,7 +7,7 @@ if test "x${base:0:1}" != 'x/'; then
 fi
 #echo `dirname $BASH_SOURCE`
 cd $base/org.eclipse.ptp.rm.pbs.jproxy
-java -cp $base/org.eclipse.ptp.proxy.protocol/bin/:$base/org.eclipse.ptp.utils.core/bin/:$base/org.eclipse.ptp.proxy.jproxy/bin/:bin/ org/eclipse/ptp/rm/pbs/jproxy/PBSProxyRuntimeServer $*
+java -cp $base/org.eclipse.ptp.proxy.protocol/bin/:$base/org.eclipse.ptp.utils.core/bin/:$base/org.eclipse.ptp.rm.proxy.core/bin/:bin/ org/eclipse/ptp/rm/pbs/jproxy/PBSProxyRuntimeServer $*
 if test $? != 0 ; then 
     echo -e \\n\\nMake sure to run from proj folder!
 fi
