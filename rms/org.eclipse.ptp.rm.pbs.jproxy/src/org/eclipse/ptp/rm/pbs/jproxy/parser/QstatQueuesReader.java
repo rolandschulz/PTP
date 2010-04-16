@@ -23,11 +23,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ptp.rm.proxy.core.IParser;
 import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
+import org.eclipse.ptp.rm.proxy.core.parser.IParser;
 
-public class ModelQstatQueuesReader implements IParser {
+public class QstatQueuesReader implements IParser {
 	private Set<IElement> queues;
 	
 	

@@ -10,7 +10,7 @@
 
 *******************************************************************************/
 
-package org.eclipse.ptp.rm.pbs.jproxy.parser;
+package org.eclipse.ptp.rm.proxy.core.parser;
 
 import java.beans.IntrospectionException;
 import java.io.FileNotFoundException;
@@ -26,7 +26,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.ptp.rm.proxy.core.IParser;
 import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.element.IElement.UnknownValueExecption;
@@ -36,14 +35,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class UnmarshallingUtil implements IParser {
+public class XMLReader implements IParser {
 	 
 	private static boolean DEBUG = false;
 
 	public static void main (String argv []) throws IntrospectionException, IllegalAccessException, InvocationTargetException, InstantiationException, FileNotFoundException{
 		DEBUG = true;
 //		parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
-//		new UnmarshallingUtil().parse(ModelNode.class, new FileInputStream(new File("pbsnodes.helics.xml")));
+//		new XMLReader().parse(ModelNode.class, new FileInputStream(new File("pbsnodes.helics.xml")));
 	}
 
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
@@ -98,22 +97,14 @@ public class UnmarshallingUtil implements IParser {
 	}
 	
 
-	private Map<String, String> populateInput(Node node, Map<String, String> input) throws IntrospectionException, IllegalAccessException, InvocationTargetException, InstantiationException {
+	protected Map<String, String> populateInput(Node node, Map<String, String> input) throws IntrospectionException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		if (input == null) input = new HashMap<String, String>();
 		
 //		if (node.getNodeType() == Node.ELEMENT_NODE) System.out.println(node.getNodeName());
 
 		NodeList childNodes = node.getChildNodes();
 		
-		//TODO move this PBS specific hack out of UnmarshallingUtil
-		// Hack to recover from not well-formed XML (old qstat versions generate not well-formed XML) 
-		Node item = childNodes.item(0);
-		String textContent = item.getTextContent().trim();
-		// true when qstat XML output is not well-formed
-		if (textContent.length() > 0 && item.getNodeType() == Node.TEXT_NODE) {
-//			System.out.println("Invalid XML: "+textContent);
-			input.put("job_id", textContent); //$NON-NLS-1$
-		}
+
 		
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node childNode = childNodes.item(i);

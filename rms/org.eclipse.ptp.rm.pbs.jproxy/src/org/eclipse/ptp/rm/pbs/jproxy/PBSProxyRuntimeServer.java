@@ -29,14 +29,15 @@ import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
 import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSJobClientAttributes;
 import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSNodeClientAttributes;
 import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSQueueClientAttributes;
-import org.eclipse.ptp.rm.pbs.jproxy.parser.ModelQstatQueuesReader;
-import org.eclipse.ptp.rm.pbs.jproxy.parser.UnmarshallingUtil;
+import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatJobXMLReader;
+import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatQueuesReader;
 import org.eclipse.ptp.rm.proxy.core.Controller;
 import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.event.JobEventFactory;
 import org.eclipse.ptp.rm.proxy.core.event.NodeEventFactory;
 import org.eclipse.ptp.rm.proxy.core.event.QueueEventFactory;
+import org.eclipse.ptp.rm.proxy.core.parser.XMLReader;
 
 public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	
@@ -89,7 +90,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				"pbsnodes -x", // command //$NON-NLS-1$
 				new AttributeDefinition(new PBSNodeClientAttributes()), // attributes. TODO: should include a flag whether mandatory. 
 				new NodeEventFactory(),
-				new UnmarshallingUtil(), // Parser
+				new XMLReader(), // Parser
 				dummyMachineID // BaseID
 		);
 
@@ -97,7 +98,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				"qstat -Q -f -1", // command //$NON-NLS-1$
 				new AttributeDefinition(new PBSQueueClientAttributes()), // attributes
 				new QueueEventFactory(),
-				new ModelQstatQueuesReader(), // Parser
+				new QstatQueuesReader(), // Parser
 				resourceManagerID // BaseID
 		);
 
@@ -105,7 +106,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				"qstat -x", // command //$NON-NLS-1$
 				new AttributeDefinition(new PBSJobClientAttributes()), // attributes
 				new JobEventFactory(),
-				new UnmarshallingUtil(), // Parser
+				new QstatJobXMLReader(), // Parser
 				queueController // Parent
 		);
 		if (debugReadFromFiles) {
@@ -119,6 +120,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		
 		jobController.setFilter("job_owner",Pattern.quote(getUser())+"@.*");  //$NON-NLS-1$ //$NON-NLS-2$
 
+		
+		//TODO: the following could be moved to the abstract class.
 		if (eventThread == null) {
 			eventThread = new Thread() {
 				

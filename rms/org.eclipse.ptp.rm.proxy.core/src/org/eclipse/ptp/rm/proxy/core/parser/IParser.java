@@ -10,7 +10,7 @@
 
 *******************************************************************************/
 
-package org.eclipse.ptp.rm.proxy.core;
+package org.eclipse.ptp.rm.proxy.core.parser;
 
 import java.io.InputStream;
 import java.util.Set;
