@@ -16,5 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.etfw.toolopts,
  org.eclipse.ptp.etfw,
  org.eclipse.cdt.managedbuilder.core
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
