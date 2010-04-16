@@ -14,10 +14,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.filesystem,
  org.eclipse.equinox.security;bundle-version="1.0.1",
  org.eclipse.ptp.utils.core;bundle-version="1.0.0"
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.remotetools.environment,
  org.eclipse.ptp.remotetools.environment.control,
  org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ptp.remotetools.environment.extension,
  org.eclipse.ptp.remotetools.environment.wizard,
  org.eclipse.ptp.remotetools.utils.verification
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
