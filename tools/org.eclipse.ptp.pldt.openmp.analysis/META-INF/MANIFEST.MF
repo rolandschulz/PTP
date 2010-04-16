@@ -25,4 +25,5 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ptp.pldt.common
-Eclipse-AutoStart: true
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

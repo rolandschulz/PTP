@@ -14,5 +14,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.pldt.common,
  org.eclipse.help,
  org.eclipse.cdt.doc.user
-Eclipse-AutoStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

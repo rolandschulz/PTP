@@ -26,7 +26,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remotetools.utils,
  org.eclipse.ptp.utils.ui;bundle-version="1.0.0",
  org.eclipse.ptp.utils.core;bundle-version="1.0.0"
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.remotetools.environment.launcher,
  org.eclipse.ptp.remotetools.environment.launcher.core,
  org.eclipse.ptp.remotetools.environment.launcher.data,
@@ -34,3 +34,4 @@ Export-Package: org.eclipse.ptp.remotetools.environment.launcher,
  org.eclipse.ptp.remotetools.environment.launcher.preferences,
  org.eclipse.ptp.remotetools.environment.launcher.ui,
  org.eclipse.ptp.remotetools.environment.launcher.variables
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.help,
  org.eclipse.text,
  org.eclipse.ui.forms
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.common.actions,
  org.eclipse.ptp.pldt.common.analysis,
@@ -25,3 +25,4 @@ Export-Package: org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.common.views
 Bundle-ClassPath: .
 Bundle-Vendor: %pluginProvider
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

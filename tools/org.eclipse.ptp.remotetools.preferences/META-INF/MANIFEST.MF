@@ -8,7 +8,8 @@ Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Eclipse-AutoStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.remotetools.preferences,
  org.eclipse.ptp.remotetools.preferences.events,
  org.eclipse.ptp.remotetools.preferences.ui
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
