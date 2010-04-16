@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: org.eclipse.ptp.etfw.toolopts
+Bundle-SymbolicName: org.eclipse.ptp.etfw.toolopts;singleton:=true
 Bundle-Version: 1.0.1.qualifier
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
@@ -9,3 +9,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core,
  org.eclipse.core.runtime
 Export-Package: org.eclipse.ptp.etfw.toolopts
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
