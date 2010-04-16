@@ -17,8 +17,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.rm.core,
  org.eclipse.ptp.rm.mpi.mpich2.core
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.mpi.mpich2.ui,
  org.eclipse.ptp.rm.mpi.mpich2.ui.launch,
  org.eclipse.ptp.rm.mpi.mpich2.ui.wizards
 Bundle-Vendor: %pluginProvider
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
