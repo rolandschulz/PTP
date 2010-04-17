@@ -33,10 +33,6 @@ import org.eclipse.ptp.proxy.runtime.command.ProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.server.AbstractProxyServer;
 
-/**
- * @author rschulz
- * 
- */
 public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 		implements IProxyCommandListener {
 
@@ -85,6 +81,10 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 	protected Thread eventThread;
 
+	/**
+	 * @param host
+	 * @param port
+	 */
 	public AbstractProxyRuntimeServer(String host, int port,
 			IProxyRuntimeEventFactory eventFactory) {
 		super(host, port, new ProxyRuntimeCommandFactory());
@@ -205,6 +205,9 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	public void sendEvent(IProxyEvent event) throws IOException {
 		// if (!isReady()) {
 		// throw new IOException(Messages.AbstractProxyClient_0);
