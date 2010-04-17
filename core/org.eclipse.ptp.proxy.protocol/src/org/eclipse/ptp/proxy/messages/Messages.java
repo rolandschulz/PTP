@@ -39,6 +39,9 @@ public class Messages extends NLS {
 	public static String AbstractProxyRuntimeClient_7;
 	public static String AbstractProxyRuntimeClient_8;
 	public static String AbstractProxyRuntimeClient_9;
+	public static String AbstractProxyRuntimeServer_0;
+	public static String AbstractProxyRuntimeServer_1;
+	public static String AbstractProxyRuntimeServer_2;
 	public static String ElementIDGenerator_0;
 	public static String ProxyPacket_0;
 	public static String ProxyPacket_1;
