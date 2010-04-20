@@ -79,6 +79,13 @@ import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		implements IProxyRuntimeClient, IProxyEventListener {
 
+	/*
+	 * Proxy state
+	 */
+	enum ProxyState {
+		IDLE, STARTUP, INIT, MODEL_DEF, RUNNING, SHUTDOWN, END, ERROR
+	}
+
 	private class StateMachineThread implements Runnable {
 		private static final String name = "State Machine Thread"; //$NON-NLS-1$
 
@@ -94,13 +101,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				System.out.println("state machine thread exited"); //$NON-NLS-1$
 			}
 		}
-	}
-
-	/*
-	 * Proxy state
-	 */
-	enum ProxyState {
-		IDLE, STARTUP, INIT, MODEL_DEF, RUNNING, SHUTDOWN, END, ERROR
 	}
 
 	/*
@@ -162,6 +162,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		}
 	}
 
+	/**
+	 * Add a command to the list of commands that have been sent to the proxy
+	 * 
+	 * @param command
+	 */
+	private void addCommand(IProxyCommand command) {
+		synchronized (commands) {
+			commands.add(command);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -181,341 +192,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 		IProxyCommand command = cmdFactory.newProxyRuntimeFilterEventsCommand(attrs);
 		addCommand(command);
 		sendCommand(command);	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyConnectedEvent)
-	 */
-	public void handleEvent(IProxyConnectedEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyDisconnectedEvent)
-	 */
-	public void handleEvent(IProxyDisconnectedEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyErrorEvent)
-	 */
-	public void handleEvent(IProxyErrorEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
-	 */
-	public void handleEvent(IProxyExtendedEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyMessageEvent)
-	 */
-	public void handleEvent(IProxyMessageEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyOKEvent)
-	 */
-	public void handleEvent(IProxyOKEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyTimeoutEvent)
-	 */
-	public void handleEvent(IProxyTimeoutEvent event) {
-		try {
-			// this will wake up the state machine to process the event
-			events.add(event);
-		} catch (IllegalStateException except) {
-			// events list should never be full
-			except.printStackTrace();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#removeProxyRuntimeEventListener(org.eclipse.ptp.proxy.runtime.client.event.IProxyRuntimeEventListener)
-	 */
-	public void removeProxyRuntimeEventListener(
-			IProxyRuntimeEventListener listener) {
-		listeners.remove(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#shutdown()
-	 */
-	public void shutdown() throws IOException {
-		if (state != ProxyState.SHUTDOWN) {
-			if (logEvents) {
-				System.out.println(toString() + ": shutting down server..."); //$NON-NLS-1$
-			}
-			state = ProxyState.SHUTDOWN;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startEvents()
-	 */
-	public void startEvents() throws IOException {
-		if (state != ProxyState.RUNNING) {
-			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
-		}
-		IProxyCommand command = cmdFactory.newProxyRuntimeStartEventsCommand();
-		addCommand(command);
-		sendCommand(command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startup()
-	 */
-	public void startup() throws IOException {
-		if (state == ProxyState.IDLE) {
-			state = ProxyState.STARTUP;
-
-			Thread smt = new Thread(new StateMachineThread(), proxyName
-					+ StateMachineThread.name);
-			smt.start();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#stopEvents()
-	 */
-	public void stopEvents() throws IOException {
-		if (state != ProxyState.RUNNING) {
-			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
-		}
-		IProxyCommand command = cmdFactory.newProxyRuntimeStopEventsCommand();
-		addCommand(command);
-		sendCommand(command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#submitJob(java.lang.String[])
-	 */
-	public void submitJob(String[] attrs) throws IOException {
-		if (state != ProxyState.RUNNING) {
-			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
-		}
-		IProxyCommand command = cmdFactory
-				.newProxyRuntimeSubmitJobCommand(attrs);
-		addCommand(command);
-		sendCommand(command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#terminateJob(java.lang.String)
-	 */
-	public void terminateJob(String jobId) throws IOException {
-		if (state != ProxyState.RUNNING) {
-			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
-		}
-		IProxyCommand command = cmdFactory
-				.newProxyRuntimeTerminateJobCommand(jobId);
-		addCommand(command);
-		sendCommand(command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return proxyName + "ProxyRuntimeClient"; //$NON-NLS-1$
-	}
-
-	/**
-	 * Add a command to the list of commands that have been sent to the proxy
-	 * 
-	 * @param command
-	 */
-	private void addCommand(IProxyCommand command) {
-		synchronized (commands) {
-			commands.add(command);
-		}
-	}
-
-	/**
-	 * Locate the command associated with a particular event. Uses the
-	 * transaction ID o match commands/events.
-	 * 
-	 * @param event
-	 * @return
-	 */
-	private IProxyCommand getCommandForEvent(IProxyEvent event) {
-		IProxyCommand[] ca;
-		IProxyCommand command = null;
-		synchronized (commands) {
-			ca = commands.toArray(new IProxyCommand[0]);
-		}
-		for (IProxyCommand cmd : ca) {
-			if (cmd.getTransactionID() == event.getTransactionID()) {
-				command = cmd;
-				break;
-			}
-		}
-		return command;
-	}
-
-	/**
-	 * Process events while in the RUNNING state.
-	 */
-	private void processRunningEvent(IProxyCommand command, IProxyEvent event) {
-		if (logEvents) {
-			System.out.println(toString() + " received event " + event); //$NON-NLS-1$
-		}
-		if (event instanceof IProxyMessageEvent) {
-			fireProxyRuntimeMessageEvent(eventFactory
-					.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
-		} else if (command instanceof IProxyRuntimeStartEventsCommand) {
-			if (event instanceof IProxyRuntimeNewJobEvent) {
-				fireProxyRuntimeNewJobEvent((IProxyRuntimeNewJobEvent) event);
-			} else if (event instanceof IProxyRuntimeNewMachineEvent) {
-				fireProxyRuntimeNewMachineEvent((IProxyRuntimeNewMachineEvent) event);
-			} else if (event instanceof IProxyRuntimeNewNodeEvent) {
-				fireProxyRuntimeNewNodeEvent((IProxyRuntimeNewNodeEvent) event);
-			} else if (event instanceof IProxyRuntimeNewProcessEvent) {
-				fireProxyRuntimeNewProcessEvent((IProxyRuntimeNewProcessEvent) event);
-			} else if (event instanceof IProxyRuntimeNewQueueEvent) {
-				fireProxyRuntimeNewQueueEvent((IProxyRuntimeNewQueueEvent) event);
-			} else if (event instanceof IProxyRuntimeJobChangeEvent) {
-				fireProxyRuntimeJobChangeEvent((IProxyRuntimeJobChangeEvent) event);
-			} else if (event instanceof IProxyRuntimeMachineChangeEvent) {
-				fireProxyRuntimeMachineChangeEvent((IProxyRuntimeMachineChangeEvent) event);
-			} else if (event instanceof IProxyRuntimeNodeChangeEvent) {
-				fireProxyRuntimeNodeChangeEvent((IProxyRuntimeNodeChangeEvent) event);
-			} else if (event instanceof IProxyRuntimeProcessChangeEvent) {
-				fireProxyRuntimeProcessChangeEvent((IProxyRuntimeProcessChangeEvent) event);
-			} else if (event instanceof IProxyRuntimeQueueChangeEvent) {
-				fireProxyRuntimeQueueChangeEvent((IProxyRuntimeQueueChangeEvent) event);
-			} else if (event instanceof IProxyRuntimeRemoveAllEvent) {
-				fireProxyRuntimeRemoveAllEvent((IProxyRuntimeRemoveAllEvent) event);
-			} else if (event instanceof IProxyRuntimeRemoveJobEvent) {
-				fireProxyRuntimeRemoveJobEvent((IProxyRuntimeRemoveJobEvent) event);
-			} else if (event instanceof IProxyRuntimeRemoveMachineEvent) {
-				fireProxyRuntimeRemoveMachineEvent((IProxyRuntimeRemoveMachineEvent) event);
-			} else if (event instanceof IProxyRuntimeRemoveNodeEvent) {
-				fireProxyRuntimeRemoveNodeEvent((IProxyRuntimeRemoveNodeEvent) event);
-			} else if (event instanceof IProxyRuntimeRemoveProcessEvent) {
-				fireProxyRuntimeRemoveProcessEvent((IProxyRuntimeRemoveProcessEvent) event);
-			} else if (event instanceof IProxyRuntimeRemoveQueueEvent) {
-				fireProxyRuntimeRemoveQueueEvent((IProxyRuntimeRemoveQueueEvent) event);
-			} else if (event instanceof IProxyRuntimeRMChangeEvent) {
-				fireProxyRuntimeRMChangeEvent((IProxyRuntimeRMChangeEvent) event);
-			} else if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeErrorStateEvent(eventFactory
-						.newProxyRuntimeErrorStateEvent());
-			} else if (event instanceof IProxyOKEvent) {
-				removeCommand(command);
-			}
-		} else if (command instanceof IProxyRuntimeStopEventsCommand) {
-			removeCommand(command);
-		} else if (command instanceof IProxyRuntimeFilterEventsCommand) {
-			removeCommand(command);
-		} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
-			if (event instanceof IProxyRuntimeSubmitJobErrorEvent) {
-				fireProxyRuntimeSubmitJobErrorEvent(eventFactory
-						.newProxyRuntimeSubmitJobErrorEvent(event
-								.getTransactionID(), event.getAttributes()));
-			} else if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeErrorStateEvent(eventFactory
-						.newProxyRuntimeErrorStateEvent());
-			}
-			removeCommand(command);
-		} else if (command instanceof IProxyRuntimeTerminateJobCommand) {
-			if (event instanceof IProxyRuntimeTerminateJobErrorEvent) {
-				fireProxyRuntimeTerminateJobErrorEvent(eventFactory
-						.newProxyRuntimeTerminateJobErrorEvent(event
-								.getTransactionID(), event.getAttributes()));
-			} else if (event instanceof IProxyErrorEvent) {
-				fireProxyRuntimeErrorStateEvent(eventFactory
-						.newProxyRuntimeErrorStateEvent());
-			}
-			removeCommand(command);
-		}
-
-	}
-
-	/**
-	 * Remove command from list of sent commands.
-	 * 
-	 * @param command
-	 */
-	private void removeCommand(IProxyCommand command) {
-		synchronized (commands) {
-			command.completed();
-			commands.remove(command);
-		}
-	}
 
 	/**
 	 * Forward event to listeners
@@ -827,6 +503,234 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	}
 
 	/**
+	 * Locate the command associated with a particular event. Uses the
+	 * transaction ID o match commands/events.
+	 * 
+	 * @param event
+	 * @return
+	 */
+	private IProxyCommand getCommandForEvent(IProxyEvent event) {
+		IProxyCommand[] ca;
+		IProxyCommand command = null;
+		synchronized (commands) {
+			ca = commands.toArray(new IProxyCommand[0]);
+		}
+		for (IProxyCommand cmd : ca) {
+			if (cmd.getTransactionID() == event.getTransactionID()) {
+				command = cmd;
+				break;
+			}
+		}
+		return command;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyConnectedEvent)
+	 */
+	public void handleEvent(IProxyConnectedEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyDisconnectedEvent)
+	 */
+	public void handleEvent(IProxyDisconnectedEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyErrorEvent)
+	 */
+	public void handleEvent(IProxyErrorEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
+	 */
+	public void handleEvent(IProxyExtendedEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyMessageEvent)
+	 */
+	public void handleEvent(IProxyMessageEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyOKEvent)
+	 */
+	public void handleEvent(IProxyOKEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyTimeoutEvent)
+	 */
+	public void handleEvent(IProxyTimeoutEvent event) {
+		try {
+			// this will wake up the state machine to process the event
+			events.add(event);
+		} catch (IllegalStateException except) {
+			// events list should never be full
+			except.printStackTrace();
+		}
+	}
+
+	/**
+	 * Process events while in the RUNNING state.
+	 */
+	private void processRunningEvent(IProxyCommand command, IProxyEvent event) {
+		if (logEvents) {
+			System.out.println(toString() + " received event " + event); //$NON-NLS-1$
+		}
+		if (event instanceof IProxyMessageEvent) {
+			fireProxyRuntimeMessageEvent(eventFactory
+					.newProxyRuntimeMessageEvent((IProxyMessageEvent) event));
+		} else if (command instanceof IProxyRuntimeStartEventsCommand) {
+			if (event instanceof IProxyRuntimeNewJobEvent) {
+				fireProxyRuntimeNewJobEvent((IProxyRuntimeNewJobEvent) event);
+			} else if (event instanceof IProxyRuntimeNewMachineEvent) {
+				fireProxyRuntimeNewMachineEvent((IProxyRuntimeNewMachineEvent) event);
+			} else if (event instanceof IProxyRuntimeNewNodeEvent) {
+				fireProxyRuntimeNewNodeEvent((IProxyRuntimeNewNodeEvent) event);
+			} else if (event instanceof IProxyRuntimeNewProcessEvent) {
+				fireProxyRuntimeNewProcessEvent((IProxyRuntimeNewProcessEvent) event);
+			} else if (event instanceof IProxyRuntimeNewQueueEvent) {
+				fireProxyRuntimeNewQueueEvent((IProxyRuntimeNewQueueEvent) event);
+			} else if (event instanceof IProxyRuntimeJobChangeEvent) {
+				fireProxyRuntimeJobChangeEvent((IProxyRuntimeJobChangeEvent) event);
+			} else if (event instanceof IProxyRuntimeMachineChangeEvent) {
+				fireProxyRuntimeMachineChangeEvent((IProxyRuntimeMachineChangeEvent) event);
+			} else if (event instanceof IProxyRuntimeNodeChangeEvent) {
+				fireProxyRuntimeNodeChangeEvent((IProxyRuntimeNodeChangeEvent) event);
+			} else if (event instanceof IProxyRuntimeProcessChangeEvent) {
+				fireProxyRuntimeProcessChangeEvent((IProxyRuntimeProcessChangeEvent) event);
+			} else if (event instanceof IProxyRuntimeQueueChangeEvent) {
+				fireProxyRuntimeQueueChangeEvent((IProxyRuntimeQueueChangeEvent) event);
+			} else if (event instanceof IProxyRuntimeRemoveAllEvent) {
+				fireProxyRuntimeRemoveAllEvent((IProxyRuntimeRemoveAllEvent) event);
+			} else if (event instanceof IProxyRuntimeRemoveJobEvent) {
+				fireProxyRuntimeRemoveJobEvent((IProxyRuntimeRemoveJobEvent) event);
+			} else if (event instanceof IProxyRuntimeRemoveMachineEvent) {
+				fireProxyRuntimeRemoveMachineEvent((IProxyRuntimeRemoveMachineEvent) event);
+			} else if (event instanceof IProxyRuntimeRemoveNodeEvent) {
+				fireProxyRuntimeRemoveNodeEvent((IProxyRuntimeRemoveNodeEvent) event);
+			} else if (event instanceof IProxyRuntimeRemoveProcessEvent) {
+				fireProxyRuntimeRemoveProcessEvent((IProxyRuntimeRemoveProcessEvent) event);
+			} else if (event instanceof IProxyRuntimeRemoveQueueEvent) {
+				fireProxyRuntimeRemoveQueueEvent((IProxyRuntimeRemoveQueueEvent) event);
+			} else if (event instanceof IProxyRuntimeRMChangeEvent) {
+				fireProxyRuntimeRMChangeEvent((IProxyRuntimeRMChangeEvent) event);
+			} else if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeErrorStateEvent(eventFactory
+						.newProxyRuntimeErrorStateEvent());
+			} else if (event instanceof IProxyOKEvent) {
+				removeCommand(command);
+			}
+		} else if (command instanceof IProxyRuntimeStopEventsCommand) {
+			removeCommand(command);
+		} else if (command instanceof IProxyRuntimeFilterEventsCommand) {
+			removeCommand(command);
+		} else if (command instanceof IProxyRuntimeSubmitJobCommand) {
+			if (event instanceof IProxyRuntimeSubmitJobErrorEvent) {
+				fireProxyRuntimeSubmitJobErrorEvent(eventFactory
+						.newProxyRuntimeSubmitJobErrorEvent(event
+								.getTransactionID(), event.getAttributes()));
+			} else if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeErrorStateEvent(eventFactory
+						.newProxyRuntimeErrorStateEvent());
+			}
+			removeCommand(command);
+		} else if (command instanceof IProxyRuntimeTerminateJobCommand) {
+			if (event instanceof IProxyRuntimeTerminateJobErrorEvent) {
+				fireProxyRuntimeTerminateJobErrorEvent(eventFactory
+						.newProxyRuntimeTerminateJobErrorEvent(event
+								.getTransactionID(), event.getAttributes()));
+			} else if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeErrorStateEvent(eventFactory
+						.newProxyRuntimeErrorStateEvent());
+			}
+			removeCommand(command);
+		}
+
+	}
+
+	/**
+	 * Remove command from list of sent commands.
+	 * 
+	 * @param command
+	 */
+	private void removeCommand(IProxyCommand command) {
+		synchronized (commands) {
+			command.completed();
+			commands.remove(command);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#removeProxyRuntimeEventListener(org.eclipse.ptp.proxy.runtime.client.event.IProxyRuntimeEventListener)
+	 */
+	public void removeProxyRuntimeEventListener(
+			IProxyRuntimeEventListener listener) {
+		listeners.remove(listener);
+	}
+
+	/**
 	 * Main proxy state machine. Use to manage communication with a proxy
 	 * client.
 	 * 
@@ -1037,5 +941,101 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 						NLS.bind(Messages.AbstractProxyRuntimeClient_9, state.toString()));
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#shutdown()
+	 */
+	public void shutdown() throws IOException {
+		if (state != ProxyState.SHUTDOWN) {
+			if (logEvents) {
+				System.out.println(toString() + ": shutting down server..."); //$NON-NLS-1$
+			}
+			state = ProxyState.SHUTDOWN;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startEvents()
+	 */
+	public void startEvents() throws IOException {
+		if (state != ProxyState.RUNNING) {
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
+		}
+		IProxyCommand command = cmdFactory.newProxyRuntimeStartEventsCommand();
+		addCommand(command);
+		sendCommand(command);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startup()
+	 */
+	public void startup() throws IOException {
+		if (state == ProxyState.IDLE) {
+			state = ProxyState.STARTUP;
+
+			Thread smt = new Thread(new StateMachineThread(), proxyName
+					+ StateMachineThread.name);
+			smt.start();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#stopEvents()
+	 */
+	public void stopEvents() throws IOException {
+		if (state != ProxyState.RUNNING) {
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
+		}
+		IProxyCommand command = cmdFactory.newProxyRuntimeStopEventsCommand();
+		addCommand(command);
+		sendCommand(command);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#submitJob(java.lang.String[])
+	 */
+	public void submitJob(String[] attrs) throws IOException {
+		if (state != ProxyState.RUNNING) {
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
+		}
+		IProxyCommand command = cmdFactory
+				.newProxyRuntimeSubmitJobCommand(attrs);
+		addCommand(command);
+		sendCommand(command);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#terminateJob(java.lang.String)
+	 */
+	public void terminateJob(String jobId) throws IOException {
+		if (state != ProxyState.RUNNING) {
+			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
+		}
+		IProxyCommand command = cmdFactory
+				.newProxyRuntimeTerminateJobCommand(jobId);
+		addCommand(command);
+		sendCommand(command);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return proxyName + "ProxyRuntimeClient"; //$NON-NLS-1$
 	}
 }

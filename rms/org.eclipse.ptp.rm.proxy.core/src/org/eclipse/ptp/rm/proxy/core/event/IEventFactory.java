@@ -25,6 +25,14 @@ public interface IEventFactory {
 	 * @param args the args
 	 * @return the proxy event
 	 */
+	IProxyEvent createChangeEvent(String[] array);
+
+	/**
+	 * Creates a new IEvent object.
+	 * 
+	 * @param args the args
+	 * @return the proxy event
+	 */
 	IProxyEvent createNewEvent(String[] args);
 
 	/**
@@ -34,13 +42,5 @@ public interface IEventFactory {
 	 * @return the proxy event
 	 */
 	IProxyEvent createRemoveEvent(String[] args);
-
-	/**
-	 * Creates a new IEvent object.
-	 * 
-	 * @param args the args
-	 * @return the proxy event
-	 */
-	IProxyEvent createChangeEvent(String[] array);
 
 }

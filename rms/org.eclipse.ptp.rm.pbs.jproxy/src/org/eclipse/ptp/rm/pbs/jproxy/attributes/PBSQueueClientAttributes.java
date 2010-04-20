@@ -40,19 +40,16 @@ public class PBSQueueClientAttributes extends PBSQueueProtocolAttributes impleme
 		xmlTag_AttributeID_Map.put("resources_default__walltime"      ,   RES_DEFAULT_WALLTIME_ATTR_ID        ); //$NON-NLS-1$
 		xmlTag_AttributeID_Map.put("resources_assigned__nodect"      ,   RES_ASSIGNED_NODECT_ATTR_ID        );		 //$NON-NLS-1$
 	}
-	public Map<String, String> getXmltagAttributeID_Map() {
-		return xmlTag_AttributeID_Map;
-	}
-
 	private static final String key = "name"; //$NON-NLS-1$
+
 	private static final String parent_key = null;
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#getKey()
 	 */
 	public String getKey() {
 		return key;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#getParentKey()
 	 */
@@ -61,5 +58,8 @@ public class PBSQueueClientAttributes extends PBSQueueProtocolAttributes impleme
 	}
 	public Map<String, DefaultValueMap<String, String>> getValueMap() {
 		return null;
+	}
+	public Map<String, String> getXmltagAttributeID_Map() {
+		return xmlTag_AttributeID_Map;
 	}
 }

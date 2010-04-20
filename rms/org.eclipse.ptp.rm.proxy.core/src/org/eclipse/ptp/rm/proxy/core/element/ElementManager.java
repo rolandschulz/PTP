@@ -63,43 +63,12 @@ public class ElementManager {
 	
 	
 	/**
-	 * Gets the element by key.
+	 * Adds the content of other ElementManager to this one 
 	 * 
-	 * @param key the key
-	 * @return the element by key
+	 * @param other ElementManager to be added
 	 */
-	IElement getElementByKey(String key) {
-		return keyToElement.get(key);
-	}
-	
-	/**
-	 * Gets the element id by key.
-	 * 
-	 * @param key the key
-	 * @return the element id by key
-	 */
-	public int getElementIDByKey(String key) {
-		return getElementByKey(key).getElementID();
-	}
-	
-	/**
-	 * Gets the element by element id.
-	 * 
-	 * @param elementID the element id
-	 * @return the element by element id
-	 */
-	public IElement getElementByElementID(int elementID) {
-		for (IElement element : getElements()) {
-			if (element.getElementID()==elementID) 
-				return element;
-		}
-		return null;
-		//return elementIDToElement.get(elementID);
-	}
-	
-	
-	public int size() {
-		return keyToElement.size();
+	private void  add(ElementManager other) {
+		keyToElement.putAll(other.keyToElement);
 	}
 	
 	/**
@@ -114,65 +83,18 @@ public class ElementManager {
 	}
 	
 	/**
-	 * Returns a list of Elements split by Parent
-	 * 
-	 * @return the map
+	 * @return added elements by last update 
 	 */
-	public Map<String,ElementManager> splitByParent() {
-		Map<String, ElementManager> ret = new HashMap<String,ElementManager>();
-		
-		for (IElement element: getElements()) {
-			String parentKey = element.getParentKey();
-//			System.err.println("splitByParent: "+element.getKey()+","+parentKey);
-			if (!ret.containsKey(parentKey))
-				ret.put(parentKey,new ElementManager());
-			ret.get(parentKey).addElement(element);
-		}
-		return ret;
+	public ElementManager getAddedElements() {
+		return addedElements;
 	}
 	
-//	private Collection<String> getParentKeys() {
-//		Set<String> parentKeys = new HashSet<String>();
-//		for (IElement element: keyToElement.values()) {
-//			parentKeys.add(element.getParentKey());
-//		}
-//		return parentKeys;
-//	}
 	
-	//returns those elements (considering only key) which are in this list but not in the passed list 
 	/**
-	 * Minus.
-	 * 
-	 * @param other the list
-	 * @return the element manager
+	 * @return changed elements by last update 
 	 */
-	private ElementManager minus(ElementManager other) {
-		//get the matching keys first
-		Set<String> keys = new HashSet<String>(getElementIDs());
-		keys.removeAll(other.getElementIDs());
-		//get the elements for these keys
-		return getElementsByKeys(keys);
-	}
-
-	/**
-	 * @return
-	 */
-	private Set<String> getElementIDs() {
-		return keyToElement.keySet();
-	}
-
-	/**
-	 * Gets the elements by keys.
-	 * 
-	 * @param keys the keys
-	 * @return the elements by keys
-	 */
-	private ElementManager getElementsByKeys(Set<String> keys) {
-		ElementManager ret = new ElementManager();
-		for (String key : keys) {
-			ret.addElement(getElementByKey(key));
-		}
-		return ret;
+	public ElementManager getChangedElements() {
+		return changedElements;
 	}
 	
 	/**
@@ -192,29 +114,53 @@ public class ElementManager {
 	}
 	
 	/**
-	 * Adds the content of other ElementManager to this one 
+	 * Gets the element by element id.
 	 * 
-	 * @param other ElementManager to be added
+	 * @param elementID the element id
+	 * @return the element by element id
 	 */
-	private void  add(ElementManager other) {
-		keyToElement.putAll(other.keyToElement);
+	public IElement getElementByElementID(int elementID) {
+		for (IElement element : getElements()) {
+			if (element.getElementID()==elementID) 
+				return element;
+		}
+		return null;
+		//return elementIDToElement.get(elementID);
 	}
 	
-
-	
+//	private Collection<String> getParentKeys() {
+//		Set<String> parentKeys = new HashSet<String>();
+//		for (IElement element: keyToElement.values()) {
+//			parentKeys.add(element.getParentKey());
+//		}
+//		return parentKeys;
+//	}
 	
 	/**
-	 * Returns a new ElementManager with those elements which are common to 
-	 * both lists (by ID) but are different in their values
+	 * Gets the element by key.
 	 * 
-	 * @param other ElementManager to compare to
-	 * @return the ElementManager with the modified elements (those elements from this ElementManager)
-	 * 
+	 * @param key the key
+	 * @return the element by key
 	 */
-	private ElementManager getModified(ElementManager other) {
-		Collection<IElement> commonElements = getCommon(other).getElements();
-		commonElements.removeAll(other.getElements());
-		return new ElementManager(commonElements);
+	IElement getElementByKey(String key) {
+		return keyToElement.get(key);
+	}
+
+	/**
+	 * Gets the element id by key.
+	 * 
+	 * @param key the key
+	 * @return the element id by key
+	 */
+	public int getElementIDByKey(String key) {
+		return getElementByKey(key).getElementID();
+	}
+
+	/**
+	 * @return
+	 */
+	private Set<String> getElementIDs() {
+		return keyToElement.keySet();
 	}
 	
 	/**
@@ -231,24 +177,77 @@ public class ElementManager {
 	}
 	
 	/**
-	 * Assign element ids 
-	 * Because the ElmentManger is not sorted the assignment is random.
-	 * 
-	 * @param rangeSet the range of ids 
-	 */
-	private void setElementIDs(RangeSet rangeSet) {
-		Iterator<String> i = rangeSet.iterator();
-		for(IElement e : getElements()) {
-			e.setElementID(Integer.parseInt((i.next())));
-		}
-	}
-
-	/**
 	 * @return
 	 */
 	private Collection<IElement> getElements() {
 		return keyToElement.values();
+	}
+	
+
+	
+	
+	/**
+	 * Gets the elements by keys.
+	 * 
+	 * @param keys the keys
+	 * @return the elements by keys
+	 */
+	private ElementManager getElementsByKeys(Set<String> keys) {
+		ElementManager ret = new ElementManager();
+		for (String key : keys) {
+			ret.addElement(getElementByKey(key));
+		}
+		return ret;
+	}
+	
+	/**
+	 * Returns a new ElementManager with those elements which are common to 
+	 * both lists (by ID) but are different in their values
+	 * 
+	 * @param other ElementManager to compare to
+	 * @return the ElementManager with the modified elements (those elements from this ElementManager)
+	 * 
+	 */
+	private ElementManager getModified(ElementManager other) {
+		Collection<IElement> commonElements = getCommon(other).getElements();
+		commonElements.removeAll(other.getElements());
+		return new ElementManager(commonElements);
+	}
+	
+	/**
+	 * @return removed elements by last update 
+	 */
+	public ElementManager getRemovedElements() {
+		return removedElements;
+	}
+
+	//returns those elements (considering only key) which are in this list but not in the passed list 
+	/**
+	 * Minus.
+	 * 
+	 * @param other the list
+	 * @return the element manager
+	 */
+	private ElementManager minus(ElementManager other) {
+		//get the matching keys first
+		Set<String> keys = new HashSet<String>(getElementIDs());
+		keys.removeAll(other.getElementIDs());
+		//get the elements for these keys
+		return getElementsByKeys(keys);
 	}	
+
+	/**
+
+	 */
+	public List<String> serialize() { 
+		List<String> eventArgs = new ArrayList<String>();  ;
+		//create the Args for one sendEvent (all Element Arguments with the same parent)
+		eventArgs.add(new Integer(size()).toString());//Number of Elements
+		for (IElement element : getElements()) {
+			eventArgs.addAll(element.toStringArray());  //Convert Element
+		}
+		return eventArgs;
+	}
 
 	/* 
 	 * Serialize into List of List of Strings. 
@@ -273,41 +272,42 @@ public class ElementManager {
 		}
 		return result;
 	}
-
+	
 	/**
-
+	 * Assign element ids 
+	 * Because the ElmentManger is not sorted the assignment is random.
+	 * 
+	 * @param rangeSet the range of ids 
 	 */
-	public List<String> serialize() { 
-		List<String> eventArgs = new ArrayList<String>();  ;
-		//create the Args for one sendEvent (all Element Arguments with the same parent)
-		eventArgs.add(new Integer(size()).toString());//Number of Elements
-		for (IElement element : getElements()) {
-			eventArgs.addAll(element.toStringArray());  //Convert Element
+	private void setElementIDs(RangeSet rangeSet) {
+		Iterator<String> i = rangeSet.iterator();
+		for(IElement e : getElements()) {
+			e.setElementID(Integer.parseInt((i.next())));
 		}
-		return eventArgs;
 	}
 	
+	public int size() {
+		return keyToElement.size();
+	}
+	/**
+	 * Returns a list of Elements split by Parent
+	 * 
+	 * @return the map
+	 */
+	public Map<String,ElementManager> splitByParent() {
+		Map<String, ElementManager> ret = new HashMap<String,ElementManager>();
+		
+		for (IElement element: getElements()) {
+			String parentKey = element.getParentKey();
+//			System.err.println("splitByParent: "+element.getKey()+","+parentKey);
+			if (!ret.containsKey(parentKey))
+				ret.put(parentKey,new ElementManager());
+			ret.get(parentKey).addElement(element);
+		}
+		return ret;
+	}
 	public String toString() {
 		return keyToElement.toString();
-	}
-	
-	/**
-	 * @return added elements by last update 
-	 */
-	public ElementManager getAddedElements() {
-		return addedElements;
-	}
-	/**
-	 * @return removed elements by last update 
-	 */
-	public ElementManager getRemovedElements() {
-		return removedElements;
-	}
-	/**
-	 * @return changed elements by last update 
-	 */
-	public ElementManager getChangedElements() {
-		return changedElements;
 	}
 	public void update(Collection<IElement> eList) {
 		ElementManager newElements = new ElementManager(eList);

@@ -40,52 +40,14 @@ private IElementAttributes attrs = null;
 	}
 		
 	/**
-	 * Gets the key.
+	 * Creates the element.
 	 * 
-	 * @return the key
+	 * @return the element
 	 */
-	public String getKey() {
-		return attrs.getKey();
+	public Element createElement() {
+		return new Element(this);
 	}
 	
-	/**
-	 * Gets the parent key.
-	 * 
-	 * @return the parent key
-	 */
-	public String getParentKey() {
-		return attrs.getParentKey();
-	}
-	
-	
-	/**
-	 * Checks for attribute.
-	 * 
-	 * @param attr the attr
-	 * @return true, if successful
-	 */
-	public boolean hasAttribute(String attr) {
-		//IDEA: return also optionalAttributes if available
-		return getRequiredAttributes().contains(attr);
-	}
-		
-	/**
-	 * Gets the required attributes.
-	 * 
-	 * @return the required attributes
-	 */
-	public Set<String> getRequiredAttributes() {
-//		List<String> ret = new Vector<String>();
-//		for (Entry<String, Boolean> attr : attributes.entrySet()) {
-//			if (attr.getValue()) ret.add(attr.getKey());
-//		}
-		return attrs.getXmltagAttributeID_Map().keySet();
-	}
-	
-//	public Map<String, String> getXmltagAttributeID_Map() {
-//		return attrs.getXmltagAttributeID_Map();
-//	}
-
 	/**
  * Equals.
  * 
@@ -97,25 +59,16 @@ public boolean equals(AttributeDefinition o) {
 			o.getKey().equals(getKey()) && o.getParentKey().equals(getParentKey());
 	}
 	
-	/**
-	 * Creates the element.
-	 * 
-	 * @return the element
-	 */
-	public Element createElement() {
-		return new Element(this);
-	}
-
-	/**
-	 * Gets the protocol key.
-	 * 
-	 * @param attr the attr
-	 * @return the protocol key
-	 */
-	public String getProtocolKey(String attr) {
-		return attrs.getXmltagAttributeID_Map().get(attr);
-	}
 	
+	/**
+	 * Gets the key.
+	 * 
+	 * @return the key
+	 */
+	public String getKey() {
+		return attrs.getKey();
+	}
+		
 	/**
 	 * Gets the mapped value.
 	 * 
@@ -129,5 +82,52 @@ public boolean equals(AttributeDefinition o) {
 		} else {
 			return value;  //unmapped
 		}
+	}
+	
+//	public Map<String, String> getXmltagAttributeID_Map() {
+//		return attrs.getXmltagAttributeID_Map();
+//	}
+
+	/**
+	 * Gets the parent key.
+	 * 
+	 * @return the parent key
+	 */
+	public String getParentKey() {
+		return attrs.getParentKey();
+	}
+	
+	/**
+	 * Gets the protocol key.
+	 * 
+	 * @param attr the attr
+	 * @return the protocol key
+	 */
+	public String getProtocolKey(String attr) {
+		return attrs.getXmltagAttributeID_Map().get(attr);
+	}
+
+	/**
+	 * Gets the required attributes.
+	 * 
+	 * @return the required attributes
+	 */
+	public Set<String> getRequiredAttributes() {
+//		List<String> ret = new Vector<String>();
+//		for (Entry<String, Boolean> attr : attributes.entrySet()) {
+//			if (attr.getValue()) ret.add(attr.getKey());
+//		}
+		return attrs.getXmltagAttributeID_Map().keySet();
+	}
+	
+	/**
+	 * Checks for attribute.
+	 * 
+	 * @param attr the attr
+	 * @return true, if successful
+	 */
+	public boolean hasAttribute(String attr) {
+		//IDEA: return also optionalAttributes if available
+		return getRequiredAttributes().contains(attr);
 	}
 }

@@ -39,6 +39,34 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		}
 	}
 
+	/**
+	 * @param arg
+	 */
+	protected void addArgument(boolean arg) {
+		addArgument(arg?"1":"0"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	/**
+	 * @param arg
+	 */
+	protected void addArgument(Character arg) {
+		args.add(arg==null ? "" : arg.toString()); //$NON-NLS-1$
+	}
+	
+	/**
+	 * @param arg
+	 */
+	protected void addArgument(int arg) {
+		args.add(Integer.toString(arg));
+	}
+	
+	/**
+	 * @param arg
+	 */
+	protected void addArgument(long arg) {
+		args.add(Long.toString(arg));
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#addArgument(java.lang.String)
 	 */
@@ -49,7 +77,16 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 			args.add(arg);
 		}
 	}
-	
+
+	/**
+	 * @param args
+	 */
+	protected void addArguments(String[] args) {
+		for (String arg : args) {
+			addArgument(arg);
+		}
+	}
+
 	/**
 	 * Mark the command that it has been completed so the transaction
 	 * ID can be used by future commands.
@@ -57,14 +94,14 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	public void completed() {
 		pendingCommands.add(transactionID, null);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getArguments()
 	 */
 	public String[] getArguments() {
 		return args.toArray(new String[args.size()]);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getCommandID()
 	 */
@@ -77,21 +114,6 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	 */
 	public int getTransactionID() {
 		return transactionID;
-	}
-
-	public String toString() {
-		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID(); //$NON-NLS-1$
-		
-		for (String arg : args) {
-			if (arg == null) {
-				str += " <null>"; //$NON-NLS-1$
-			} else if (arg.equals("")) { //$NON-NLS-1$
-				str += " \"\""; //$NON-NLS-1$
-			} else {
-				str += " " + arg; //$NON-NLS-1$
-			}
-		}
-		return str;
 	}
 
 	/*
@@ -113,41 +135,19 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		return transID;
 	}
 
-	/**
-	 * @param arg
-	 */
-	protected void addArgument(boolean arg) {
-		addArgument(arg?"1":"0"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * @param arg
-	 */
-	protected void addArgument(Character arg) {
-		args.add(arg==null ? "" : arg.toString()); //$NON-NLS-1$
-	}
-
-	/**
-	 * @param arg
-	 */
-	protected void addArgument(int arg) {
-		args.add(Integer.toString(arg));
-	}
-
-	/**
-	 * @param arg
-	 */
-	protected void addArgument(long arg) {
-		args.add(Long.toString(arg));
-	}
-
-	/**
-	 * @param args
-	 */
-	protected void addArguments(String[] args) {
+	public String toString() {
+		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID(); //$NON-NLS-1$
+		
 		for (String arg : args) {
-			addArgument(arg);
+			if (arg == null) {
+				str += " <null>"; //$NON-NLS-1$
+			} else if (arg.equals("")) { //$NON-NLS-1$
+				str += " \"\""; //$NON-NLS-1$
+			} else {
+				str += " " + arg; //$NON-NLS-1$
+			}
 		}
+		return str;
 	}
 
 }

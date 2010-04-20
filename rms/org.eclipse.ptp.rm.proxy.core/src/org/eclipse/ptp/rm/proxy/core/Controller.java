@@ -37,18 +37,27 @@ import org.eclipse.ptp.utils.core.RangeSet;
 
 public class Controller {
 
+	class FilterData {
+		String key;
+		Pattern pattern;
+		public FilterData(String key, String pattern) {
+			this.key = key;
+			this.pattern = Pattern.compile(pattern);
+		}
+	}
 	private Queue<String> debugFiles = null;
 	private String command;
 	private IEventFactory eventFactory;
 	private IParser parser;
 	private int baseID=0;
-	private Controller parentController=null;
 	
+	private Controller parentController=null;
 	public ElementManager currentElements = new ElementManager();
 	private FilterData filter = null;
+	
 	private AttributeDefinition attrDef;
 	
-	private Controller(String command, AttributeDefinition attrDef, IEventFactory eventFactory, IParser parser) { 
+	 private Controller(String command, AttributeDefinition attrDef, IEventFactory eventFactory, IParser parser) { 
 		/*Ugly to have to pass class - stupid java doesn't allow T.class - 
 		 */
 		this.command = command;
@@ -56,21 +65,75 @@ public class Controller {
 		this.eventFactory = eventFactory;
 		this.parser = parser;
 	}
-	
-	 public Controller(String command, AttributeDefinition attrDef, IEventFactory eventFactory, IParser parser, int baseID) {
-		 this(command, attrDef, eventFactory, parser);
-	     this.baseID = baseID;	 
-	 }
 	 
 	 public Controller(String command, AttributeDefinition attrDef, IEventFactory eventFactory, IParser parser, Controller parentController) {
 		 this(command, attrDef, eventFactory, parser);
 	     this.parentController = parentController;	 
 	 }
 	 
+	public Controller(String command, AttributeDefinition attrDef, IEventFactory eventFactory, IParser parser, int baseID) {
+		 this(command, attrDef, eventFactory, parser);
+	     this.baseID = baseID;	 
+	 }
+	
+	
+	private Set<IElement> filterElements(Set<IElement> elements) {
+		if (filter==null) 
+			return elements;
+		Set<IElement> ret = new HashSet<IElement>();
+		for (IElement t : elements) {
+//			System.err.println("filter:"+filter.pattern+","+filter.key+","+t.getAttribute(filter.key));
+			if (filter.pattern.matcher(t.getAttribute(filter.key)).matches())
+				ret.add(t);
+		}
+		return ret;
+	}
+
+	private int getParentIDFromKey(String parentKey) {
+		//get ParentID
+		int parentID = 0;
+		if (parentController != null ) {
+			parentID = parentController.currentElements.getElementIDByKey(parentKey);
+//			System.err.println(parentKey+":"+parentID);
+		} else {
+			parentID=baseID;
+		}
+		return parentID;
+	}
+	
+	private InputStream readFile(String path) {
+		BufferedInputStream in = null;
+		try {
+			in = new BufferedInputStream(new FileInputStream(new File(path)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return in; 
+	}
+
+
+	private InputStream readProgramOutput(String string) {
+		InputStream stdOut = null;
+		String[] args = string.split(" "); //$NON-NLS-1$
+		try {
+			Process p = Runtime.getRuntime().exec(args);
+
+			// read the standard output of the command
+			stdOut = new BufferedInputStream(p.getInputStream());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return stdOut;
+	}
+	
 	public void setDebug(String...files){
 		debugFiles = new LinkedList<String>(Arrays.asList(files));
 	}
 	
+	public void setFilter(String key, String pattern) {
+		filter = new FilterData(key,pattern);
+	}
 	
 	public List<IProxyEvent> update() {
 		InputStream is = null;
@@ -114,69 +177,6 @@ public class Controller {
 		}	
 		return events;
 
-	}
-
-	private int getParentIDFromKey(String parentKey) {
-		//get ParentID
-		int parentID = 0;
-		if (parentController != null ) {
-			parentID = parentController.currentElements.getElementIDByKey(parentKey);
-//			System.err.println(parentKey+":"+parentID);
-		} else {
-			parentID=baseID;
-		}
-		return parentID;
-	}
-	
-	private Set<IElement> filterElements(Set<IElement> elements) {
-		if (filter==null) 
-			return elements;
-		Set<IElement> ret = new HashSet<IElement>();
-		for (IElement t : elements) {
-//			System.err.println("filter:"+filter.pattern+","+filter.key+","+t.getAttribute(filter.key));
-			if (filter.pattern.matcher(t.getAttribute(filter.key)).matches())
-				ret.add(t);
-		}
-		return ret;
-	}
-
-
-	private InputStream readProgramOutput(String string) {
-		InputStream stdOut = null;
-		String[] args = string.split(" "); //$NON-NLS-1$
-		try {
-			Process p = Runtime.getRuntime().exec(args);
-
-			// read the standard output of the command
-			stdOut = new BufferedInputStream(p.getInputStream());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return stdOut;
-	}
-	
-	private InputStream readFile(String path) {
-		BufferedInputStream in = null;
-		try {
-			in = new BufferedInputStream(new FileInputStream(new File(path)));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return in; 
-	}
-	
-	public void setFilter(String key, String pattern) {
-		filter = new FilterData(key,pattern);
-	}
-	
-	class FilterData {
-		public FilterData(String key, String pattern) {
-			this.key = key;
-			this.pattern = Pattern.compile(pattern);
-		}
-		String key;
-		Pattern pattern;
 	}
 	
 
