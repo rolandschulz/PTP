@@ -72,27 +72,6 @@ public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements 
 	private static final String key = "job_id"; //$NON-NLS-1$
 	private static final String parent_key = "queue"; //$NON-NLS-1$
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#getKey()
-	 */
-	public String getKey() {
-		return key;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#getParentKey
-	 * ()
-	 */
-	public String getParentKey() {
-		return parent_key;
-	}
-
 	// TODO: if key, parentKey or filterKey are not in here - gives NullPointers
 	// - should be checked
 	// compare those three against the reqAttributes and give good error message
@@ -130,15 +109,36 @@ public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements 
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#getKey()
+	 */
+	public String getKey() {
+		return key;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#getParentKey
+	 * ()
+	 */
+	public String getParentKey() {
+		return parent_key;
+	}
+
+	public Map<String, DefaultValueMap<String, String>> getValueMap() {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.pbs.jproxy.pbs.attributes.IElementAttributes#
 	 * getXmltagAttributeID_Map()
 	 */
 	public Map<String, String> getXmltagAttributeID_Map() {
 		return xmlTag_AttributeID_Map;
-	}
-
-	public Map<String, DefaultValueMap<String, String>> getValueMap() {
-		return null;
 	}
 
 }

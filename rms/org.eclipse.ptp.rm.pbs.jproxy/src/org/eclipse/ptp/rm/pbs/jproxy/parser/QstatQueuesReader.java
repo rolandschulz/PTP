@@ -31,28 +31,6 @@ public class QstatQueuesReader implements IParser {
 	private Set<IElement> queues;
 	
 	
-	public Set<IElement> parse(
-			AttributeDefinition attrDef, InputStream in) {
-		Set<IElement> queues = new HashSet<IElement>();
-		try {
-			//qstat -Q -f is not XML - specific Reader has to be used.
-			_parse(in,attrDef);
-			queues = getQueues();
-		} catch(IOException e) {
-			System.out.println(e);
-		} catch(Exception e) {
-			System.out.println(e);
-		}
-		
-//		System.err.println("queues length -> " + queues.size());
-		return queues;
-	}
-
-	
-	public Set<IElement> getQueues() {
-		return queues;
-	}
-	
 	private void _parse(InputStream in, AttributeDefinition attrDef) throws Exception, IOException {
 		queues = new HashSet<IElement>();
 		
@@ -108,6 +86,28 @@ public class QstatQueuesReader implements IParser {
 //			}
 			queues.add( e );
 		}
+	}
+
+	
+	public Set<IElement> getQueues() {
+		return queues;
+	}
+	
+	public Set<IElement> parse(
+			AttributeDefinition attrDef, InputStream in) {
+		Set<IElement> queues = new HashSet<IElement>();
+		try {
+			//qstat -Q -f is not XML - specific Reader has to be used.
+			_parse(in,attrDef);
+			queues = getQueues();
+		} catch(IOException e) {
+			System.out.println(e);
+		} catch(Exception e) {
+			System.out.println(e);
+		}
+		
+//		System.err.println("queues length -> " + queues.size());
+		return queues;
 	}
 
 

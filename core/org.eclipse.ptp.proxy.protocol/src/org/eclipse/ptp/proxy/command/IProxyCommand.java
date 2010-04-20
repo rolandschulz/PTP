@@ -19,14 +19,16 @@ public interface IProxyCommand {
 	public static final int QUIT = 0;
 
 	/**
+	 * Add an argument to the command
+	 * 
+	 * @param arg argument to add to the command
+	 */
+	public void addArgument(String arg);
+		
+	/**
 	 * Mark command as completed
 	 */
 	public void completed();
-		
-	/**
-	 * @return the transaction id used by this command
-	 */
-	public int getCommandID();
 	
 	/**
 	 * @return the encoded message buffer to be sent to the proxy
@@ -36,12 +38,10 @@ public interface IProxyCommand {
 	/**
 	 * @return the transaction id used by this command
 	 */
-	public int getTransactionID();
+	public int getCommandID();
 	
 	/**
-	 * Add an argument to the command
-	 * 
-	 * @param arg argument to add to the command
+	 * @return the transaction id used by this command
 	 */
-	public void addArgument(String arg);
+	public int getTransactionID();
 }

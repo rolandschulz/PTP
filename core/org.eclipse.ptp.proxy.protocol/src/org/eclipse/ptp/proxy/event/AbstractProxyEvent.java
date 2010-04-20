@@ -29,14 +29,14 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 	private int			transactionID;
 	private String[]	attributes;
 	
+	public AbstractProxyEvent(int eventID, int transactionID) {
+		this(eventID, transactionID, null);
+	}
+	
 	public AbstractProxyEvent(int eventID, int transactionID, String[] attrs) {
 		this.eventID		= eventID;
 		this.transactionID	= transactionID;
 		this.attributes		= attrs;
-	}
-	
-	public AbstractProxyEvent(int eventID, int transactionID) {
-		this(eventID, transactionID, null);
 	}
 	
 	public AbstractProxyEvent(int eventID, String[] attrs) {
@@ -44,12 +44,19 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.proxy.event.IProxyEvent#getAttributes()
+	 */
+	public String[] getAttributes() {
+		return attributes;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.event.IProxyEvent#getEventID()
 	 */
 	public int getEventID() {
 		return eventID;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.event.IProxyEvent#getTransactionID()
 	 */
@@ -62,13 +69,6 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 	 */
 	public void setTransactionID(int transactionID) {
 		this.transactionID = transactionID;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.event.IProxyEvent#getAttributes()
-	 */
-	public String[] getAttributes() {
-		return attributes;
 	}
 
 	/* (non-Javadoc)

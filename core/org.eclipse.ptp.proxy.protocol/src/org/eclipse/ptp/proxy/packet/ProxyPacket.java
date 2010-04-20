@@ -80,6 +80,44 @@ public class ProxyPacket {
 	}
 	
 	/**
+	 * Read a full buffer from the socket. Guaranteed to read buf.remaining() bytes
+	 * from the channel.
+	 * 
+	 * FIXME: Can this block if there is nothing available on the channel? If so, then
+	 * there should be some kind of timeout to prevent the UI from hanging.
+	 * 
+	 * @throws	IOException if EOF
+	 */
+	private void fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
+		buf.clear();
+		while (buf.hasRemaining()) {
+			int n = channel.read(buf);
+			if (n < 0) {
+				throw new IOException(Messages.ProxyPacket_2);
+			}
+		}
+		buf.flip();
+	}
+
+	/**
+	 * Write a full buffer to the socket. Guaranteed to write buf.remaingin() bytes to
+	 * the channel.
+	 * 
+	 * FIXME: Can this block? If so, then there should be some kind of timeout to prevent the UI from hanging.
+	 * 
+	 * @param buf
+	 * @throws IOException
+	 */
+	private void fullWrite(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+		while (buf.hasRemaining()) {
+			int n = channel.write(buf);
+			if (n < 0) {
+				throw new IOException(Messages.ProxyPacket_3);
+			}
+		}
+	}
+	
+	/**
 	 * Get the arguments
 	 * 
 	 * @return arguments
@@ -87,7 +125,7 @@ public class ProxyPacket {
 	public String[] getArgs() {
 		return packetArgs;
 	}
-
+	
 	/**
 	 * Get the packet type
 	 * 
@@ -244,43 +282,5 @@ public class ProxyPacket {
 	 */
 	public void setDebug(boolean debug) {
 		this.debug = debug;
-	}
-	
-	/**
-	 * Read a full buffer from the socket. Guaranteed to read buf.remaining() bytes
-	 * from the channel.
-	 * 
-	 * FIXME: Can this block if there is nothing available on the channel? If so, then
-	 * there should be some kind of timeout to prevent the UI from hanging.
-	 * 
-	 * @throws	IOException if EOF
-	 */
-	private void fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
-		buf.clear();
-		while (buf.hasRemaining()) {
-			int n = channel.read(buf);
-			if (n < 0) {
-				throw new IOException(Messages.ProxyPacket_2);
-			}
-		}
-		buf.flip();
-	}
-	
-	/**
-	 * Write a full buffer to the socket. Guaranteed to write buf.remaingin() bytes to
-	 * the channel.
-	 * 
-	 * FIXME: Can this block? If so, then there should be some kind of timeout to prevent the UI from hanging.
-	 * 
-	 * @param buf
-	 * @throws IOException
-	 */
-	private void fullWrite(WritableByteChannel channel, ByteBuffer buf) throws IOException {
-		while (buf.hasRemaining()) {
-			int n = channel.write(buf);
-			if (n < 0) {
-				throw new IOException(Messages.ProxyPacket_3);
-			}
-		}
 	}
 }

@@ -45,6 +45,18 @@ public class XMLReader implements IParser {
 //		new XMLReader().parse(ModelNode.class, new FileInputStream(new File("pbsnodes.helics.xml")));
 	}
 
+	private NodeList getXMLChildren(InputStream in) throws SAXException, IOException, ParserConfigurationException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(in);
+
+		Element root = doc.getDocumentElement();
+		root.normalize();
+
+		return root.getChildNodes();
+	}
+	
+	
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
 //	public <T  extends IElement> Set<T> parse(Class<IElement> pojoClazz, InputStream in) {
 		Set<IElement> elementList = null;
@@ -84,19 +96,25 @@ public class XMLReader implements IParser {
 		return elementList;
 	}
 	
-	
-	private NodeList getXMLChildren(InputStream in) throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(in);
 
-		Element root = doc.getDocumentElement();
-		root.normalize();
+	private  IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption {
+		IElement element = attrDef.createElement();
 
-		return root.getChildNodes();
+//		PropertyDescriptor[] properties = Introspector.getBeanInfo(attrDef).getPropertyDescriptors();
+//		for (PropertyDescriptor property : properties) {
+		for (String attr : attrDef.getRequiredAttributes()) {
+			element.setAttribute(attr, input.get(attr));
+//			String name = property.getName();
+//			Method writeAccess = property.getWriteMethod();
+//			if (writeAccess != null && !Modifier.isStatic(writeAccess.getModifiers())) {
+//				System.out.println(name + " <- " + input.get(name));
+//				writeAccess.invoke(pojo, new Object[]{input.get(name)});
+//			}
+		}
+		return element;
 	}
 	
-
+	
 	protected Map<String, String> populateInput(Node node, Map<String, String> input) throws IntrospectionException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		if (input == null) input = new HashMap<String, String>();
 		
@@ -121,24 +139,6 @@ public class XMLReader implements IParser {
 		}
 		
 		return input;
-	}
-	
-	
-	private  IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption {
-		IElement element = attrDef.createElement();
-
-//		PropertyDescriptor[] properties = Introspector.getBeanInfo(attrDef).getPropertyDescriptors();
-//		for (PropertyDescriptor property : properties) {
-		for (String attr : attrDef.getRequiredAttributes()) {
-			element.setAttribute(attr, input.get(attr));
-//			String name = property.getName();
-//			Method writeAccess = property.getWriteMethod();
-//			if (writeAccess != null && !Modifier.isStatic(writeAccess.getModifiers())) {
-//				System.out.println(name + " <- " + input.get(name));
-//				writeAccess.invoke(pojo, new Object[]{input.get(name)});
-//			}
-		}
-		return element;
 	}
 
 

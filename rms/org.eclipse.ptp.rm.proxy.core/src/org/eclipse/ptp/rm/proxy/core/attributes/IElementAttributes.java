@@ -81,6 +81,13 @@ public interface IElementAttributes {
 	 */
 	public abstract String getParentKey();
 
+	/**
+	 * Gets the value map.
+	 * 
+	 * @return the value map
+	 */
+	public abstract Map<String, DefaultValueMap<String, String>> getValueMap();
+	
 	/* Map between xml-tag (key) and communication protocol keyword (value)*/
 	/**
 	 * Gets the xmltag attribute i d_ map.
@@ -88,12 +95,5 @@ public interface IElementAttributes {
 	 * @return the xmltag attribute i d_ map
 	 */
 	public abstract Map<String, String> getXmltagAttributeID_Map();
-	
-	/**
-	 * Gets the value map.
-	 * 
-	 * @return the value map
-	 */
-	public abstract Map<String, DefaultValueMap<String, String>> getValueMap();
 
 }

@@ -62,6 +62,29 @@ public abstract class AbstractProxyServer implements IProxyServer {
 		listeners.add(listener);
 	}
 
+	/**
+	 * @throws IOException
+	 */
+	public void connect() throws IOException {
+		// sessSocket = new Socket(sessHost, sessPort);
+		SocketChannel channel = SocketChannel.open();
+		channel.connect(new InetSocketAddress(sessHost, sessPort));
+		sessInput = channel;
+		sessOutput = channel;
+	}
+
+	/**
+	 * Send command to command handlers
+	 * 
+	 * @param cmd
+	 */
+	protected void fireProxyCommand(IProxyCommand cmd) {
+		System.out.println("fireProxyCommand: " + cmd.getCommandID()); //$NON-NLS-1$
+		for (IProxyCommandListener listener : listeners) {
+			listener.handleCommand(cmd);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -73,15 +96,34 @@ public abstract class AbstractProxyServer implements IProxyServer {
 		listeners.remove(listener);
 	}
 
+	protected abstract void runStateMachine() throws InterruptedException, IOException;
+
 	/**
+	 * Process commands from the wire
+	 * 
+	 * @return
 	 * @throws IOException
 	 */
-	public void connect() throws IOException {
-		// sessSocket = new Socket(sessHost, sessPort);
-		SocketChannel channel = SocketChannel.open();
-		channel.connect(new InetSocketAddress(sessHost, sessPort));
-		sessInput = channel;
-		sessOutput = channel;
+	private boolean sessionProgress() throws IOException {
+		ProxyPacket packet = new ProxyPacket();
+		System.out.print("sessionProgress: "); //$NON-NLS-1$
+		if (!packet.read(sessInput)) {
+			System.out.println("false"); //$NON-NLS-1$
+			return false;
+		}
+		System.out.println(packet.getID() + "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
+		/*
+		 * Now convert the event into an IProxyEvent
+		 */
+		IProxyCommand cmd = proxyCommandFactory.toCommand(packet);
+		System.out.println("cmd: " + cmd); //$NON-NLS-1$
+		if (cmd != null) {
+			fireProxyCommand(cmd);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -146,46 +188,4 @@ public abstract class AbstractProxyServer implements IProxyServer {
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * Process commands from the wire
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	private boolean sessionProgress() throws IOException {
-		ProxyPacket packet = new ProxyPacket();
-		System.out.print("sessionProgress: "); //$NON-NLS-1$
-		if (!packet.read(sessInput)) {
-			System.out.println("false"); //$NON-NLS-1$
-			return false;
-		}
-		System.out.println(packet.getID() + "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
-		/*
-		 * Now convert the event into an IProxyEvent
-		 */
-		IProxyCommand cmd = proxyCommandFactory.toCommand(packet);
-		System.out.println("cmd: " + cmd); //$NON-NLS-1$
-		if (cmd != null) {
-			fireProxyCommand(cmd);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Send command to command handlers
-	 * 
-	 * @param cmd
-	 */
-	protected void fireProxyCommand(IProxyCommand cmd) {
-		System.out.println("fireProxyCommand: " + cmd.getCommandID()); //$NON-NLS-1$
-		for (IProxyCommandListener listener : listeners) {
-			listener.handleCommand(cmd);
-		}
-	}
-
-	protected abstract void runStateMachine() throws InterruptedException, IOException;
 }

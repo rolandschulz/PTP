@@ -39,19 +39,25 @@ public interface IElement {
 		private static final long serialVersionUID = -6387499727989362192L;
 	}
 
+	@Override
+	public boolean equals(Object obj);
+	
+	/**
+	 * Gets the attribute.
+	 * 
+	 * @param key the key
+	 * @return the attribute
+	 */
+	public String getAttribute(String key);
+	
+	public Map<String, String> getAttributes();
+	
 	/**
 	 * Gets the element id.
 	 * 
 	 * @return the element id
 	 */
 	public int getElementID();
-	
-	/**
-	 * Sets the element id.
-	 * 
-	 * @param elementID the new element id
-	 */
-	public void setElementID(int elementID);
 	
 	/*Returns value of Unique identifier (attribute value) of this element*/
 	/**
@@ -68,32 +74,9 @@ public interface IElement {
 	 * @return the parent key
 	 */
 	public String getParentKey();
-	
-	/* Produces String Array for Protocol */
-	/**
-	 * To string array.
-	 * 
-	 * @return the collection
-	 */
-	public Collection<String> toStringArray();
-	
-	/* Set one Attribute*/
-	/**
-	 * Sets the attribute.
-	 * 
-	 * @param key the key
-	 * @param value the value
-	 * @throws UnknownValueExecption the unknown value execption
-	 */
-	public void setAttribute(String key, String value) throws UnknownValueExecption;
 
-	/**
-	 * Gets the attribute.
-	 * 
-	 * @param key the key
-	 * @return the attribute
-	 */
-	public String getAttribute(String key);
+	@Override
+	public int hashCode();
 	
 	/*checks that all required attributes are set*/
 	/**
@@ -103,14 +86,31 @@ public interface IElement {
 	 */
 	public boolean isComplete();
 
-	public Map<String, String> getAttributes();
+	/* Set one Attribute*/
+	/**
+	 * Sets the attribute.
+	 * 
+	 * @param key the key
+	 * @param value the value
+	 * @throws UnknownValueExecption the unknown value execption
+	 */
+	public void setAttribute(String key, String value) throws UnknownValueExecption;
 	
 	public void setAttributes(IElement element);	
 
-	@Override
-	public boolean equals(Object obj);
+	/**
+	 * Sets the element id.
+	 * 
+	 * @param elementID the new element id
+	 */
+	public void setElementID(int elementID);
 	
-	@Override
-	public int hashCode();
+	/* Produces String Array for Protocol */
+	/**
+	 * To string array.
+	 * 
+	 * @return the collection
+	 */
+	public Collection<String> toStringArray();
 	
 }

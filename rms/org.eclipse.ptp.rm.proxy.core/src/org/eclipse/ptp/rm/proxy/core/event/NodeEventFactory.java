@@ -23,23 +23,23 @@ import org.eclipse.ptp.proxy.event.IProxyEvent;
 public class NodeEventFactory implements IEventFactory {
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createChangeEvent(java.lang.String[])
+	 */
+	public IProxyEvent createChangeEvent(String[] args) {
+		return new ProxyRuntimeNodeChangeEvent(-1,args);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createNewEvent(java.lang.String[])
 	 */
 	public IProxyEvent createNewEvent(String[] args) {
 		return new ProxyRuntimeNewNodeEvent(-1,args);
 	}
-
+    
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createRemoveEvent(java.lang.String[])
 	 */
 	public IProxyEvent createRemoveEvent(String[] args) {
 		return new ProxyRuntimeRemoveNodeEvent(-1,args);
-	}
-    
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createChangeEvent(java.lang.String[])
-	 */
-	public IProxyEvent createChangeEvent(String[] args) {
-		return new ProxyRuntimeNodeChangeEvent(-1,args);
 	}
 }

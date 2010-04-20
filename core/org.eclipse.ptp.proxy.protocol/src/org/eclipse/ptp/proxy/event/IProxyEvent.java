@@ -34,6 +34,13 @@ public interface IProxyEvent {
 	public static final int SHUTDOWN = 6;
 		
 	/**
+	 * Get the event attributes
+	 * 
+	 * @return event attributes or null if there are no attributes
+	 */
+	public String[] getAttributes();
+	
+	/**
 	 * Get the event ID (type)
 	 * 
 	 * @return event ID
@@ -52,11 +59,4 @@ public interface IProxyEvent {
 	 * 
 	 */
 	public void setTransactionID(int transactionID);
-	
-	/**
-	 * Get the event attributes
-	 * 
-	 * @return event attributes or null if there are no attributes
-	 */
-	public String[] getAttributes();
 }

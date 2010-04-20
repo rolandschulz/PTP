@@ -54,13 +54,9 @@ public class PBSNodeClientAttributes extends PBSNodeProtocolAttributes implement
 		// xmlTag_AttributeID_Map.put("status" , STATUS_ATTR_ID );
 	}
 
-	public Map<String, String> getXmltagAttributeID_Map() {
-		return xmlTag_AttributeID_Map;
-	}
-
 	private static final String key = "name"; //$NON-NLS-1$
-	private static final String parent_key = null;
 
+	private static final String parent_key = null;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -87,5 +83,9 @@ public class PBSNodeClientAttributes extends PBSNodeProtocolAttributes implement
 	 */
 	public Map<String, DefaultValueMap<String, String>> getValueMap() {
 		return valueMap;
+	}
+
+	public Map<String, String> getXmltagAttributeID_Map() {
+		return xmlTag_AttributeID_Map;
 	}
 }

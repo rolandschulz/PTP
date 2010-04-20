@@ -20,11 +20,8 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
-		// Prevent instances.
-	}
-
 	public static String AbstractProxyClient_0;
+
 	public static String AbstractProxyClient_1;
 	public static String AbstractProxyClient_2;
 	public static String AbstractProxyClient_3;
@@ -47,5 +44,8 @@ public class Messages extends NLS {
 	public static String ProxyPacket_1;
 	public static String ProxyPacket_2;
 	public static String ProxyPacket_3;
+	private Messages() {
+		// Prevent instances.
+	}
 
 }

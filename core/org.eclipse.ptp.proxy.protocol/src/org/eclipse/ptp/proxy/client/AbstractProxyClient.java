@@ -89,13 +89,106 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		listeners.add(listener);
 	}
 	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyDisconnectedEvent(IProxyDisconnectedEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyErrorEvent(IProxyErrorEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyExtendedEvent(IProxyExtendedEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyOKEvent(IProxyOKEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyTimeoutEvent(IProxyTimeoutEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+	
+	/**
+	 * Get the debug options
+	 * 
+	 * @return debug options
+	 */
+	protected DebugOptions getDebugOptions() {
+		return debugOptions;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#getSessionPort()
 	 */
 	public int getSessionPort() {
 		return sessPort;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#isReady()
 	 */
@@ -104,7 +197,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			return state == SessionState.RUNNING;
 		}
 	}
-
+	
 	/**
 	 * Test if proxy has shut down
 	 * 
@@ -115,7 +208,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			return state == SessionState.SHUTDOWN;
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#newTransactionID()
 	 */
@@ -129,7 +222,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public void removeProxyEventListener(IProxyEventListener listener) {
 		listeners.remove(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sendCommand(java.lang.String)
 	 */
@@ -143,7 +236,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		packet.send(sessOutput);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionConnect()
 	 */
@@ -157,14 +250,14 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public void sessionCreate() throws IOException {
 		sessionCreate(0);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionCreate(int)
 	 */
 	public void sessionCreate(int timeout) throws IOException {
 		sessionCreate(0, timeout);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionCreate(int, int)
 	 */
@@ -257,7 +350,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		fireProxyConnectedEvent(new ProxyConnectedEvent());
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sessionFinish()
 	 */
@@ -368,15 +461,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		eventThread.start();
 	}
-	
-	/**
-	 * Set the factory used to decode events
-	 * 
-	 * @param factory
-	 */
-	public void setEventFactory(IProxyEventFactory factory) {
-		this.proxyEventFactory = factory;
-	}
 
 	/**
 	 * Process incoming events
@@ -421,95 +505,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 	
 	/**
-	 * Send event to event handlers
+	 * Set the factory used to decode events
 	 * 
-	 * @param event
+	 * @param factory
 	 */
-	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyDisconnectedEvent(IProxyDisconnectedEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyErrorEvent(IProxyErrorEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyExtendedEvent(IProxyExtendedEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyOKEvent(IProxyOKEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyTimeoutEvent(IProxyTimeoutEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleEvent(event);
-		}
-	}
-	
-	/**
-	 * Get the debug options
-	 * 
-	 * @return debug options
-	 */
-	protected DebugOptions getDebugOptions() {
-		return debugOptions;
+	public void setEventFactory(IProxyEventFactory factory) {
+		this.proxyEventFactory = factory;
 	}
 }

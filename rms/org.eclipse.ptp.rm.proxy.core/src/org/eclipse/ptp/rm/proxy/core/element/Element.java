@@ -37,89 +37,10 @@ private Map<String, String> attributes = new HashMap<String,String>();
 	/** The attr def. */
 	private AttributeDefinition attrDef;  
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getElementID()
-	 */
-	public int getElementID() {
-		return this.elementID;
-	}
-
-
 	public Element(AttributeDefinition attrDef) {
 		this.attrDef = attrDef;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#setElementID(java.lang.String)
-	 */
-	public void setElementID(int elementID) {
-		this.elementID = elementID;
-	}
-
-
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getKey()
-	 */
-	public String getKey() {
-		return attributes.get(attrDef.getKey());
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getParentKey()
-	 */
-	public String getParentKey() {
-		return attributes.get(attrDef.getParentKey());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#toStringArray()
-	 */
-
-	
-	public Collection<String> toStringArray() {
-		Collection<String> ret = new ArrayList<String>(); 
-		ret.add(Integer.toString(getElementID()));   //ElementID
-		ret.add(Integer.toString(attributes.size())); //Size
-		for (Entry<String, String> e : attributes.entrySet()) {  //Attributes
-			ret.add(attrDef.getProtocolKey(e.getKey()) + "=" + //$NON-NLS-1$
-					attrDef.getMappedValue(e.getKey(), e.getValue()));
-		}
-		return ret;
-	}
-	
-	public String toString() {
-		return toStringArray().toString();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#setAttribute(java.lang.String, java.lang.String)
-	 */
-	public void setAttribute(String key, String value) throws UnknownValueExecption {
-		if (!attrDef.hasAttribute(key))
-			throw new UnknownValueExecption();
-		attributes.put(key, value);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getAttribute(java.lang.String)
-	 */
-	public String getAttribute(String key) {
-		return attributes.get(key);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#isComplete()
-	 */
-	public boolean isComplete() {
-		Set<String> reqAttrs = attrDef.getRequiredAttributes();
-		for (String key : reqAttrs) {
-			if (!attributes.containsKey(key)) return false;
-		}
-		return true;
-	}
 
 	/* Compares all attributes
 	 * Preferable IElement does not contain time values which change at each update
@@ -135,7 +56,48 @@ private Map<String, String> attributes = new HashMap<String,String>();
 		if (other==null || !(other instanceof Element)) return false;
 		return attributes.equals(((Element)other).attributes);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getAttribute(java.lang.String)
+	 */
+	public String getAttribute(String key) {
+		return attributes.get(key);
+	}
+
+
+
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getElementID()
+	 */
+	public int getElementID() {
+		return this.elementID;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#toStringArray()
+	 */
+
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getKey()
+	 */
+	public String getKey() {
+		return attributes.get(attrDef.getKey());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#getParentKey()
+	 */
+	public String getParentKey() {
+		return attributes.get(attrDef.getParentKey());
+	}
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -144,14 +106,52 @@ private Map<String, String> attributes = new HashMap<String,String>();
 		return attributes.hashCode();
 	}
 
-
-	public Map<String, String> getAttributes() {
-		return attributes;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#isComplete()
+	 */
+	public boolean isComplete() {
+		Set<String> reqAttrs = attrDef.getRequiredAttributes();
+		for (String key : reqAttrs) {
+			if (!attributes.containsKey(key)) return false;
+		}
+		return true;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#setAttribute(java.lang.String, java.lang.String)
+	 */
+	public void setAttribute(String key, String value) throws UnknownValueExecption {
+		if (!attrDef.hasAttribute(key))
+			throw new UnknownValueExecption();
+		attributes.put(key, value);
+	}
+
 	public void setAttributes(IElement element) {
 		attributes = new HashMap<String,String>(element.getAttributes());
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IElement#setElementID(java.lang.String)
+	 */
+	public void setElementID(int elementID) {
+		this.elementID = elementID;
+	}
+
+
+	public String toString() {
+		return toStringArray().toString();
+	}
+	
+	public Collection<String> toStringArray() {
+		Collection<String> ret = new ArrayList<String>(); 
+		ret.add(Integer.toString(getElementID()));   //ElementID
+		ret.add(Integer.toString(attributes.size())); //Size
+		for (Entry<String, String> e : attributes.entrySet()) {  //Attributes
+			ret.add(attrDef.getProtocolKey(e.getKey()) + "=" + //$NON-NLS-1$
+					attrDef.getMappedValue(e.getKey(), e.getValue()));
+		}
+		return ret;
 	}
 
 }
