@@ -8,7 +8,17 @@ import java.util.Map;
 import org.eclipse.ptp.rm.proxy.core.parser.XMLReader;
 import org.w3c.dom.Node;
 
+/**
+ * XML reader with fix for broken pbs job format (qstat -x).
+ */
 public class QstatJobXMLReader extends XMLReader {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.proxy.core.parser.XMLReader#populateInput(org.w3c.
+	 * dom.Node, java.util.Map)
+	 */
 	@Override
 	protected Map<String, String> populateInput(Node node,
 			Map<String, String> input) throws IntrospectionException,

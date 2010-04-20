@@ -16,7 +16,6 @@ import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewJobEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveJobEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 
-// TODO: Auto-generated Javadoc
 /**
  * A factory for creating JobEvent objects.
  */

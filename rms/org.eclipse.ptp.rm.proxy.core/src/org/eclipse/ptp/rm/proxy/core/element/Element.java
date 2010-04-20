@@ -34,7 +34,7 @@ public class Element implements IElement {
 	private Map<String, String> attributes = new HashMap<String, String>();
 
 	/** The attr def. */
-	private AttributeDefinition attrDef;
+	private final AttributeDefinition attrDef;
 
 	public Element(AttributeDefinition attrDef) {
 		this.attrDef = attrDef;

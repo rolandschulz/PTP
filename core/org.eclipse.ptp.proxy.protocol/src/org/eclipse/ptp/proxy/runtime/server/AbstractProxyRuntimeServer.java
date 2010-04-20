@@ -239,7 +239,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 	/**
 	 * @param transID
 	 */
-	public abstract void startEventThread(int transID);
+	protected abstract void startEventThread(int transID);
 
 	protected abstract void submitJob(int transID, String[] arguments);
 

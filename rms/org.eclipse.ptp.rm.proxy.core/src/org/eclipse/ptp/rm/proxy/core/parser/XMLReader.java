@@ -35,10 +35,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * XML file reader.
+ */
 public class XMLReader implements IParser {
 
+	/** The DEBUG. */
 	private static boolean DEBUG = false;
 
+	/**
+	 * Testing method
+	 * 
+	 * @param argv
+	 *            the arguments
+	 */
 	public static void main(String argv[]) throws IntrospectionException,
 			IllegalAccessException, InvocationTargetException,
 			InstantiationException, FileNotFoundException {
@@ -60,6 +70,13 @@ public class XMLReader implements IParser {
 		return root.getChildNodes();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
+	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
+	 */
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
 		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
 		// InputStream in) {

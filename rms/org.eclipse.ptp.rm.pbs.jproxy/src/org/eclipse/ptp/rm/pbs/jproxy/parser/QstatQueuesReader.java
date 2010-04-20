@@ -28,7 +28,13 @@ import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.parser.IParser;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Parser for non-xml PBS queue format (qstat -Q -f -1)
+ */
 public class QstatQueuesReader implements IParser {
+
+	/** The queues. */
 	private Set<IElement> queues;
 
 	private void _parse(InputStream in, AttributeDefinition attrDef)
@@ -90,10 +96,17 @@ public class QstatQueuesReader implements IParser {
 		}
 	}
 
-	public Set<IElement> getQueues() {
+	private Set<IElement> getQueues() {
 		return queues;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
+	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
+	 */
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
 		Set<IElement> queues = new HashSet<IElement>();
 		try {

@@ -13,36 +13,35 @@ package org.eclipse.ptp.rm.proxy.core.event;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 
-// TODO: Auto-generated Javadoc
 /**
  * A factory for creating IEvent objects.
  */
 public interface IEventFactory {
 
 	/**
-	 * Creates a new IEvent object.
+	 * Creates a change event.
 	 * 
 	 * @param args
-	 *            the args
-	 * @return the proxy event
+	 *            event arguments
+	 * @return the change event
 	 */
 	IProxyEvent createChangeEvent(String[] array);
 
 	/**
-	 * Creates a new IEvent object.
+	 * Creates a new-event.
 	 * 
 	 * @param args
-	 *            the args
-	 * @return the proxy event
+	 *            event arguments
+	 * @return the new-event
 	 */
 	IProxyEvent createNewEvent(String[] args);
 
 	/**
-	 * Creates a new IEvent object.
+	 * Creates a remove event.
 	 * 
 	 * @param args
-	 *            the args
-	 * @return the proxy event
+	 *            event arguments
+	 * @return the remove event
 	 */
 	IProxyEvent createRemoveEvent(String[] args);
 
