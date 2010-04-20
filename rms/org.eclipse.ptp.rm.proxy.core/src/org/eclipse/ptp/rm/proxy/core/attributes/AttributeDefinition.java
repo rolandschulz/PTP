@@ -35,7 +35,7 @@ public class AttributeDefinition {
 	 * Instantiates a new attribute definition.
 	 * 
 	 * @param attrs
-	 *            the data class containing the definition
+	 *            the attribute definition
 	 */
 	public AttributeDefinition(IElementAttributes attrs) {
 		this.attrs = attrs;

@@ -16,7 +16,6 @@ import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeQueueChangeEvent
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 
-// TODO: Auto-generated Javadoc
 /**
  * A factory for creating QueueEvent objects.
  */

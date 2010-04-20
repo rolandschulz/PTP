@@ -15,7 +15,6 @@ package org.eclipse.ptp.rm.proxy.core.element;
 import java.util.Collection;
 import java.util.Map;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IElement.
  * 
@@ -35,9 +34,6 @@ public interface IElement {
 		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -6387499727989362192L;
 	}
-
-	@Override
-	public boolean equals(Object obj);
 
 	/**
 	 * Gets the attribute.

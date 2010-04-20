@@ -18,20 +18,20 @@ import java.util.Set;
 import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface Parser.
  */
 public interface IParser {
 
 	/**
-	 * Parses the.
+	 * Parses the input stream and returns elements according to the attribute
+	 * definition.
 	 * 
 	 * @param attrDef
-	 *            the attr def
+	 *            the attribute definition
 	 * @param in
-	 *            the in
-	 * @return the set
+	 *            the input stream
+	 * @return the set of elements read
 	 */
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in);
 }

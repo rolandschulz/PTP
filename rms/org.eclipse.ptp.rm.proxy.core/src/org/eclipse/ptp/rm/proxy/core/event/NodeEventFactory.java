@@ -16,7 +16,6 @@ import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveNodeEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 
-// TODO: Auto-generated Javadoc
 /**
  * A factory for creating NodeEvent objects.
  */
