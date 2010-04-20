@@ -8,9 +8,8 @@
  * Contributors:
  *    Roland Schulz - initial implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.jproxy.attributes;
-
 
 public class PBSQueueProtocolAttributes {
 

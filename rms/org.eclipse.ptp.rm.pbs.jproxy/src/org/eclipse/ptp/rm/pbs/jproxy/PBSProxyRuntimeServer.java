@@ -63,8 +63,9 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		}
 
 		Map<String, Object> params = parseArguments(args);
-		if (params == null)
+		if (params == null) {
 			return;
+		}
 		new PBSProxyRuntimeServer((String) params.get("host"), (Integer) params //$NON-NLS-1$
 				.get("port")); //$NON-NLS-1$
 	}
@@ -81,8 +82,9 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	}
 
 	private String getUser() {
-		if (debugReadFromFiles)
+		if (debugReadFromFiles) {
 			user = debugUser;
+		}
 		if (user == null) {
 			try {
 				Process p = Runtime.getRuntime().exec("whoami"); //$NON-NLS-1$
@@ -243,10 +245,11 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 		String jobSubId = null;
 		// Insert values into template and store special parameters
-		for (int i = 0; i < arguments.length; i++) {
-			String[] keyValue = arguments[i].split("=", 2); //$NON-NLS-1$
-			if (keyValue[0].equals("jobSubId"))jobSubId = keyValue[1]; //$NON-NLS-1$
-			else { // any other parameter is used for the template
+		for (String argument : arguments) {
+			String[] keyValue = argument.split("=", 2); //$NON-NLS-1$
+			if (keyValue[0].equals("jobSubId")) {
+				jobSubId = keyValue[1]; //$NON-NLS-1$
+			} else { // any other parameter is used for the template
 				template = template.replaceAll(
 						"@" + keyValue[0] + "@", keyValue[1]); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -280,8 +283,9 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					BufferedReader err = new BufferedReader(
 							new InputStreamReader(p.getErrorStream()));
 					String line, errMsg = ""; //$NON-NLS-1$
-					while ((line = err.readLine()) != null)
+					while ((line = err.readLine()) != null) {
 						errMsg += line;
+					}
 					String errArgs[] = { "jobSubId=" + jobSubId, //$NON-NLS-1$
 							"errorCode=" + 0, //$NON-NLS-1$
 							// p.exitValue()
@@ -340,8 +344,9 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				BufferedReader err = new BufferedReader(new InputStreamReader(p
 						.getErrorStream()));
 				String line, errMsg = ""; //$NON-NLS-1$
-				while ((line = err.readLine()) != null)
+				while ((line = err.readLine()) != null) {
 					errMsg += line;
+				}
 				String errArgs[] = {
 						"errorCode=" + p.exitValue(), "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$
 				sendEvent(getEventFactory().newErrorEvent(transID, errArgs));

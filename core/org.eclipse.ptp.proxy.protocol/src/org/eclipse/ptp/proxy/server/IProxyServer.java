@@ -17,15 +17,17 @@ public interface IProxyServer {
 	/**
 	 * Add listener to receive proxy commands
 	 * 
-	 * @param listener listener to receive commands
+	 * @param listener
+	 *            listener to receive commands
 	 */
 	public void addListener(IProxyCommandListener listener);
-	
+
 	/**
 	 * Remove listener from receiving proxy commands
 	 * 
-	 * @param listener listener to remove
+	 * @param listener
+	 *            listener to remove
 	 */
 	public void removeListener(IProxyCommandListener listener);
-	
+
 }

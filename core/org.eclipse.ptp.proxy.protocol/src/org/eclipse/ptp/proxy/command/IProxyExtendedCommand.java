@@ -11,6 +11,5 @@
 
 package org.eclipse.ptp.proxy.command;
 
-
 public interface IProxyExtendedCommand extends IProxyCommand {
 }

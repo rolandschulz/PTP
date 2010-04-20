@@ -14,7 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.proxy.messages.messages"; //$NON-NLS-1$
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
@@ -44,6 +44,7 @@ public class Messages extends NLS {
 	public static String ProxyPacket_1;
 	public static String ProxyPacket_2;
 	public static String ProxyPacket_3;
+
 	private Messages() {
 		// Prevent instances.
 	}

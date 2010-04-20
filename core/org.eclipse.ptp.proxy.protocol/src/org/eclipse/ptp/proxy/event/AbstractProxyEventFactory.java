@@ -19,10 +19,13 @@ package org.eclipse.ptp.proxy.event;
 
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
-
 public abstract class AbstractProxyEventFactory implements IProxyEventFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#toEvent(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventFactory#toEvent(org.eclipse.ptp
+	 * .proxy.packet.ProxyPacket)
 	 */
 	public abstract IProxyEvent toEvent(ProxyPacket packet);
 }

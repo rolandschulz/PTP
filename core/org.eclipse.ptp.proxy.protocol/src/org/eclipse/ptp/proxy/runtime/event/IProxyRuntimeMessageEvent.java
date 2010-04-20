@@ -23,10 +23,6 @@ import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 
 public interface IProxyRuntimeMessageEvent extends IProxyMessageEvent {
 	public enum ErrorType {
-		CONNECT_TIMEOUT,
-		COMMAND_TIMEOUT,
-		DISCONNECTED,
-		PROXY,
-		INTERNAL
+		CONNECT_TIMEOUT, COMMAND_TIMEOUT, DISCONNECTED, PROXY, INTERNAL
 	}
 }

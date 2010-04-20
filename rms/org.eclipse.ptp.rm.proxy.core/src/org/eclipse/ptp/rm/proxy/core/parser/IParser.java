@@ -8,7 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 
 package org.eclipse.ptp.rm.proxy.core.parser;
 
@@ -23,12 +23,14 @@ import org.eclipse.ptp.rm.proxy.core.element.IElement;
  * The Interface Parser.
  */
 public interface IParser {
-	
+
 	/**
 	 * Parses the.
 	 * 
-	 * @param attrDef the attr def
-	 * @param in the in
+	 * @param attrDef
+	 *            the attr def
+	 * @param in
+	 *            the in
 	 * @return the set
 	 */
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in);

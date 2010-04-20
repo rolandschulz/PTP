@@ -23,7 +23,7 @@ import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
 
 public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	public static final int EVENT_OFFSET = 200;
-	
+
 	/*
 	 * Internal state events
 	 */
@@ -32,12 +32,12 @@ public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	public static final int RUNNING_STATE = EVENT_OFFSET + 3;
 	public static final int SHUTDOWN_STATE = EVENT_OFFSET + 4;
 	public static final int ERROR_STATE = EVENT_OFFSET + 5;
-	
+
 	/*
 	 * Internal error event
 	 */
 	public static final int STARTUP_ERROR = EVENT_OFFSET + 10;
-	
+
 	/*
 	 * Command error events
 	 */

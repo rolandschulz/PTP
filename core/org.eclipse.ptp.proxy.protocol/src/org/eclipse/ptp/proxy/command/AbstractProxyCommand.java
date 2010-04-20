@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractProxyCommand implements IProxyCommand {
-	
+
 	private static List<IProxyCommand> pendingCommands = new ArrayList<IProxyCommand>();
 
-	private int					commandID;
-	private int					transactionID;
-	private ArrayList<String>	args;
-	
+	private int commandID;
+	private int transactionID;
+	private ArrayList<String> args;
+
 	protected AbstractProxyCommand(int commandID) {
 		this.commandID = commandID;
 		this.transactionID = newTransactionID(this);
@@ -43,23 +43,23 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	 * @param arg
 	 */
 	protected void addArgument(boolean arg) {
-		addArgument(arg?"1":"0"); //$NON-NLS-1$ //$NON-NLS-2$
+		addArgument(arg ? "1" : "0"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/**
 	 * @param arg
 	 */
 	protected void addArgument(Character arg) {
-		args.add(arg==null ? "" : arg.toString()); //$NON-NLS-1$
+		args.add(arg == null ? "" : arg.toString()); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @param arg
 	 */
 	protected void addArgument(int arg) {
 		args.add(Integer.toString(arg));
 	}
-	
+
 	/**
 	 * @param arg
 	 */
@@ -67,8 +67,11 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		args.add(Long.toString(arg));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#addArgument(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.command.IProxyCommand#addArgument(java.lang.String)
 	 */
 	public void addArgument(String arg) {
 		if (arg == null) {
@@ -88,21 +91,25 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	}
 
 	/**
-	 * Mark the command that it has been completed so the transaction
-	 * ID can be used by future commands.
+	 * Mark the command that it has been completed so the transaction ID can be
+	 * used by future commands.
 	 */
 	public void completed() {
 		pendingCommands.add(transactionID, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getArguments()
 	 */
 	public String[] getArguments() {
 		return args.toArray(new String[args.size()]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.proxy.command.IProxyCommand#getCommandID()
 	 */
 	public int getCommandID() {
@@ -123,21 +130,23 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	 */
 	private int newTransactionID(IProxyCommand cmd) {
 		int transID = 0;
-		
+
 		for (; transID < pendingCommands.size(); transID++) {
 			if (pendingCommands.get(transID) == null) {
 				break;
 			}
 		}
-		
+
 		pendingCommands.add(transID, cmd);
-		
+
 		return transID;
 	}
 
+	@Override
 	public String toString() {
-		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID(); //$NON-NLS-1$
-		
+		String str = this.getClass().getSimpleName()
+				+ " tid=" + getTransactionID(); //$NON-NLS-1$
+
 		for (String arg : args) {
 			if (arg == null) {
 				str += " <null>"; //$NON-NLS-1$

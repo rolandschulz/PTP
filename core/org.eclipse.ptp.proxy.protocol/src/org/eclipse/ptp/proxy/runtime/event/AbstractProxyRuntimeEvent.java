@@ -21,12 +21,14 @@ package org.eclipse.ptp.proxy.runtime.event;
 
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 
-public abstract class AbstractProxyRuntimeEvent extends AbstractProxyEvent implements IProxyRuntimeEvent {
+public abstract class AbstractProxyRuntimeEvent extends AbstractProxyEvent
+		implements IProxyRuntimeEvent {
 	public AbstractProxyRuntimeEvent(int eventID, int transactionID) {
 		super(eventID, transactionID);
 	}
 
-	public AbstractProxyRuntimeEvent(int eventID, int transactionID, String[] args) {
+	public AbstractProxyRuntimeEvent(int eventID, int transactionID,
+			String[] args) {
 		super(eventID, transactionID, args);
 	}
 }

@@ -18,38 +18,41 @@ public interface IProxyRuntimeCommandFactory extends IProxyCommandFactory {
 	 * @param attrs
 	 * @return
 	 */
-	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(String[] attrs);
-	
+	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(
+			String[] attrs);
+
 	/**
 	 * @param baseID
 	 * @return
 	 */
 	public IProxyRuntimeInitCommand newProxyRuntimeInitCommand(int baseId);
-	
+
 	/**
 	 * @return
 	 */
 	public IProxyRuntimeModelDefCommand newProxyRuntimeModelDefCommand();
-	
+
 	/**
 	 * @return
 	 */
 	public IProxyRuntimeStartEventsCommand newProxyRuntimeStartEventsCommand();
-	
+
 	/**
 	 * @return
 	 */
 	public IProxyRuntimeStopEventsCommand newProxyRuntimeStopEventsCommand();
-	
+
 	/**
 	 * @param attrs
 	 * @return
 	 */
-	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(String[] attrs);
-	
+	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(
+			String[] attrs);
+
 	/**
 	 * @param jobID
 	 * @return
 	 */
-	public IProxyRuntimeTerminateJobCommand newProxyRuntimeTerminateJobCommand(String jobId);
+	public IProxyRuntimeTerminateJobCommand newProxyRuntimeTerminateJobCommand(
+			String jobId);
 }

@@ -20,5 +20,5 @@
 package org.eclipse.ptp.proxy.event;
 
 public interface IProxyConnectedEvent extends IProxyEvent {
-// EMPTY
+	// EMPTY
 }

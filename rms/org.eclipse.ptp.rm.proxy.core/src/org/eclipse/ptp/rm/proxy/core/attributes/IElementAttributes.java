@@ -8,7 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 
 package org.eclipse.ptp.rm.proxy.core.attributes;
 
@@ -20,53 +20,62 @@ import java.util.Map;
  * The Interface IElementAttributes.
  */
 public interface IElementAttributes {
-	
+
 	/**
 	 * The Class DefaultValueMap.
 	 * 
-	 * @param <K> the key type
-	 * @param <V> the value type
+	 * @param <K>
+	 *            the key type
+	 * @param <V>
+	 *            the value type
 	 */
-	public class DefaultValueMap<K,V> extends HashMap<K,V> {
-		
+	public class DefaultValueMap<K, V> extends HashMap<K, V> {
+
 		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 7519098365827806311L;
-		
+
 		/** The default value. */
 		public V defaultValue;
-		
+
 		/**
 		 * Instantiates a new default value map.
 		 * 
-		 * @param defaultValue the default value
+		 * @param defaultValue
+		 *            the default value
 		 */
 		public DefaultValueMap(V defaultValue) {
 			this.defaultValue = defaultValue;
 		}
-		
+
 		/**
 		 * Instantiates a new default value map.
 		 * 
-		 * @param defaultValue the default value
-		 * @param map the map
+		 * @param defaultValue
+		 *            the default value
+		 * @param map
+		 *            the map
 		 */
 		public DefaultValueMap(V defaultValue, Map<K, V> map) {
 			super(map);
 			this.defaultValue = defaultValue;
 		}
-		
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.HashMap#get(java.lang.Object)
 		 */
 		@Override
 		public V get(Object key) {
-			if (containsKey(key))
+			if (containsKey(key)) {
 				return super.get(key);
-			else return defaultValue;
+			} else {
+				return defaultValue;
+			}
 		}
-		
+
 	}
-	 
+
 	/**
 	 * Gets the key.
 	 * 
@@ -87,8 +96,8 @@ public interface IElementAttributes {
 	 * @return the value map
 	 */
 	public abstract Map<String, DefaultValueMap<String, String>> getValueMap();
-	
-	/* Map between xml-tag (key) and communication protocol keyword (value)*/
+
+	/* Map between xml-tag (key) and communication protocol keyword (value) */
 	/**
 	 * Gets the xmltag attribute i d_ map.
 	 * 

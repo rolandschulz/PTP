@@ -21,7 +21,6 @@ package org.eclipse.ptp.proxy.runtime.client;
 
 import java.io.IOException;
 
-
 public interface IProxyRuntimeClient {
 	/**
 	 * Register for events
@@ -29,58 +28,63 @@ public interface IProxyRuntimeClient {
 	 * @param listener
 	 */
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
-	
+
 	/**
 	 * Filter events coming from the proxy
 	 * 
-	 * @param attrs attributes to filter
+	 * @param attrs
+	 *            attributes to filter
 	 * @throws IOException
 	 */
 	public void filterEvents(String[] attrs) throws IOException;
-	
+
 	/**
 	 * Unregister for events
 	 * 
 	 * @param listener
 	 */
-	public void removeProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
-	
+	public void removeProxyRuntimeEventListener(
+			IProxyRuntimeEventListener listener);
+
 	/**
 	 * Shut down the proxy
 	 * 
-	 * @throws IOException if proxy fails to stop
+	 * @throws IOException
+	 *             if proxy fails to stop
 	 */
 	public void shutdown() throws IOException;
-	
+
 	/**
 	 * Tell proxy to start sending events
 	 * 
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void startEvents() throws IOException;
-	
+
 	/**
 	 * Start up the proxy
 	 * 
-	 * @throws IOException if proxy fails to start
+	 * @throws IOException
+	 *             if proxy fails to start
 	 */
 	public void startup() throws IOException;
-	
+
 	/**
 	 * Tell proxy to stop sending events
 	 * 
 	 * @throws IOException
 	 */
 	public void stopEvents() throws IOException;
-	
+
 	/**
 	 * Submit a job for execution
 	 * 
-	 * @param args attributes required for job submission
+	 * @param args
+	 *            attributes required for job submission
 	 * @throws IOException
 	 */
 	public void submitJob(String[] attrs) throws IOException;
-	
+
 	/**
 	 * Terminate a job
 	 * 

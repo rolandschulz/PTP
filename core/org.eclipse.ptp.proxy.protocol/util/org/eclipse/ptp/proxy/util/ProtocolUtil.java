@@ -56,10 +56,10 @@ public class ProtocolUtil {
 			index += 2;
 			radix = 16;
 		} else if (address.startsWith("#", index)) { //$NON-NLS-1$
-			index ++;
+			index++;
 			radix = 16;
 		} else if (address.startsWith("0", index) && address.length() > 1 + index) { //$NON-NLS-1$
-			index ++;
+			index++;
 			radix = 8;
 		}
 
@@ -77,7 +77,7 @@ public class ProtocolUtil {
 		}
 		return BigInteger.ZERO;
 	}
-	
+
 	/**
 	 * Convert as sequence of hexadecimal values to a Java byte array.
 	 * 
@@ -85,15 +85,15 @@ public class ProtocolUtil {
 	 * @return byte array
 	 */
 	public static byte[] decodeBytes(String str) {
-		int len = str.length()/2;
+		int len = str.length() / 2;
 		byte[] strBytes = new byte[len];
-		
+
 		for (int i = 0, p = 0; i < len; i++, p += 2) {
 			byte c = (byte) ((Character.digit(str.charAt(p), 16) & 0xf) << 4);
-			c |= (byte) ((Character.digit(str.charAt(p+1), 16) & 0xf));
+			c |= (byte) ((Character.digit(str.charAt(p + 1), 16) & 0xf));
 			strBytes[i] = c;
 		}
-		
+
 		return strBytes;
 	}
 
@@ -111,7 +111,7 @@ public class ProtocolUtil {
 		end = start + len;
 		return buf.subSequence(start, end).toString();
 	}
-	
+
 	/**
 	 * Convert an integer to it's proxy representation
 	 * 
@@ -123,12 +123,13 @@ public class ProtocolUtil {
 		char[] res = new char[len];
 		String str = Integer.toHexString(val);
 		int rem = len - str.length();
-		
-		for (int i = 0 ; i < len ; i++) {
-			if (i < rem)
+
+		for (int i = 0; i < len; i++) {
+			if (i < rem) {
 				res[i] = '0';
-			else
+			} else {
 				res[i] = str.charAt(i - rem);
+			}
 		}
 		return String.valueOf(res);
 	}
@@ -141,15 +142,15 @@ public class ProtocolUtil {
 	 */
 	public static String encodeString(String str) {
 		int len;
-		
+
 		if (str == null) {
 			len = 0;
 			str = ""; //$NON-NLS-1$
 		} else {
 			len = str.length();
 		}
-		
+
 		return encodeIntVal(len, ProxyPacket.PACKET_ARG_LEN_SIZE) + ":" + str; //$NON-NLS-1$	
-	}	
+	}
 
 }

@@ -51,127 +51,127 @@ public interface IProxyRuntimeEventListener {
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeAttributeDefEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeConnectedStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeErrorStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeJobChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeMachineChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeMessageEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeNewJobEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeNewMachineEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeNewNodeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeNewProcessEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeNewQueueEvent e);
-	
+
 	/**
 	 * @param e
 	 */
-	public void handleEvent(IProxyRuntimeNodeChangeEvent e);	
-	
+	public void handleEvent(IProxyRuntimeNodeChangeEvent e);
+
 	/**
 	 * @param e
 	 */
-	public void handleEvent(IProxyRuntimeProcessChangeEvent e);	
-	
+	public void handleEvent(IProxyRuntimeProcessChangeEvent e);
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeQueueChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveAllEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveJobEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveMachineEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveNodeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveProcessEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRemoveQueueEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRMChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeRunningStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeShutdownStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeStartupErrorEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IProxyRuntimeSubmitJobErrorEvent e);
-	
+
 	/**
 	 * @param e
 	 */

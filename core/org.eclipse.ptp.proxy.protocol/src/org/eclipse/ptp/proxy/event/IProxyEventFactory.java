@@ -29,40 +29,46 @@ public interface IProxyEventFactory {
 	/**
 	 * Create a new error event.
 	 * 
-	 * @param transID transaction id
+	 * @param transID
+	 *            transaction id
 	 * @return new error event
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, int code, String message);
-	
+
 	/**
 	 * Create a new error event.
 	 * 
-	 * @param transID transaction id
-	 * @param args array of arguments for the event
+	 * @param transID
+	 *            transaction id
+	 * @param args
+	 *            array of arguments for the event
 	 * @return new error event
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, String[] args);
-	
+
 	/**
 	 * Create a new ok event.
 	 * 
-	 * @param transID transaction id
+	 * @param transID
+	 *            transaction id
 	 * @return new ok event
 	 */
 	public IProxyOKEvent newOKEvent(int transID);
-	
+
 	/**
 	 * Create a new shutdown event.
 	 * 
-	 * @param transID transaction id
+	 * @param transID
+	 *            transaction id
 	 * @return new shutdown event
 	 */
 	public IProxyShutdownEvent newShutdownEvent(int transID);
-	
+
 	/**
 	 * Decode event packet into a proxy event.
 	 * 
-	 * @param packet packet received from proxy
+	 * @param packet
+	 *            packet received from proxy
 	 * @return decoded event packet or null if the packet couldn't be decoded
 	 */
 	public IProxyEvent toEvent(ProxyPacket packet);

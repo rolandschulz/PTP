@@ -43,9 +43,11 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	protected WritableByteChannel sessOutput;
 	private IProxyCommandFactory proxyCommandFactory;
 	private Thread commandThread;
-	private List<IProxyCommandListener> listeners = Collections.synchronizedList(new ArrayList<IProxyCommandListener>());
+	private List<IProxyCommandListener> listeners = Collections
+			.synchronizedList(new ArrayList<IProxyCommandListener>());
 
-	public AbstractProxyServer(String host, int port, IProxyCommandFactory factory) {
+	public AbstractProxyServer(String host, int port,
+			IProxyCommandFactory factory) {
 		this.sessHost = host;
 		this.sessPort = port;
 		this.proxyCommandFactory = factory;
@@ -96,7 +98,8 @@ public abstract class AbstractProxyServer implements IProxyServer {
 		listeners.remove(listener);
 	}
 
-	protected abstract void runStateMachine() throws InterruptedException, IOException;
+	protected abstract void runStateMachine() throws InterruptedException,
+			IOException;
 
 	/**
 	 * Process commands from the wire
@@ -111,7 +114,8 @@ public abstract class AbstractProxyServer implements IProxyServer {
 			System.out.println("false"); //$NON-NLS-1$
 			return false;
 		}
-		System.out.println(packet.getID() + "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println(packet.getID()
+				+ "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
 		/*
 		 * Now convert the event into an IProxyEvent
 		 */
@@ -134,6 +138,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	 */
 	public void start() throws IOException {
 		commandThread = new Thread("Proxy Server Command Thread") { //$NON-NLS-1$
+			@Override
 			public void run() {
 				boolean error = false;
 				int errorCount = 0;
@@ -154,7 +159,8 @@ public abstract class AbstractProxyServer implements IProxyServer {
 					synchronized (state) {
 						if (!isInterrupted() && state != ServerState.SHUTDOWN) {
 							error = true;
-							System.out.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
+							System.out
+									.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
 						}
 					}
 				}

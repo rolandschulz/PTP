@@ -36,9 +36,9 @@ import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
+import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
-import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeFilterEventsCommand;
@@ -143,7 +143,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	protected final IProxyRuntimeCommandFactory cmdFactory;
 
 	public AbstractProxyRuntimeClient(String name, int baseModelId) {
-		this(name, baseModelId, new ProxyRuntimeCommandFactory(), new ProxyRuntimeEventFactory());
+		this(name, baseModelId, new ProxyRuntimeCommandFactory(),
+				new ProxyRuntimeEventFactory());
 	}
 
 	public AbstractProxyRuntimeClient(String name, int baseModelId,
@@ -176,22 +177,30 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#addProxyRuntimeEventListener(org.eclipse.ptp.proxy.runtime.client.event.IProxyRuntimeEventListener)
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#
+	 * addProxyRuntimeEventListener
+	 * (org.eclipse.ptp.proxy.runtime.client.event.IProxyRuntimeEventListener)
 	 */
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener) {
 		listeners.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#filterEvents(java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#filterEvents
+	 * (java.lang.String[])
 	 */
 	public void filterEvents(String[] attrs) throws IOException {
 		if (state != ProxyState.RUNNING) {
 			throw new IOException(Messages.AbstractProxyRuntimeClient_0);
 		}
-		IProxyCommand command = cmdFactory.newProxyRuntimeFilterEventsCommand(attrs);
+		IProxyCommand command = cmdFactory
+				.newProxyRuntimeFilterEventsCommand(attrs);
 		addCommand(command);
-		sendCommand(command);	}
+		sendCommand(command);
+	}
 
 	/**
 	 * Forward event to listeners
@@ -527,7 +536,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyConnectedEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyConnectedEvent)
 	 */
 	public void handleEvent(IProxyConnectedEvent event) {
 		try {
@@ -542,7 +553,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyDisconnectedEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyDisconnectedEvent)
 	 */
 	public void handleEvent(IProxyDisconnectedEvent event) {
 		try {
@@ -557,7 +570,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyErrorEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyErrorEvent)
 	 */
 	public void handleEvent(IProxyErrorEvent event) {
 		try {
@@ -572,7 +587,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyExtendedEvent)
 	 */
 	public void handleEvent(IProxyExtendedEvent event) {
 		try {
@@ -587,7 +604,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyMessageEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyMessageEvent)
 	 */
 	public void handleEvent(IProxyMessageEvent event) {
 		try {
@@ -602,7 +621,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyOKEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyOKEvent)
 	 */
 	public void handleEvent(IProxyOKEvent event) {
 		try {
@@ -617,7 +638,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyTimeoutEvent)
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyTimeoutEvent)
 	 */
 	public void handleEvent(IProxyTimeoutEvent event) {
 		try {
@@ -723,7 +746,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#removeProxyRuntimeEventListener(org.eclipse.ptp.proxy.runtime.client.event.IProxyRuntimeEventListener)
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#
+	 * removeProxyRuntimeEventListener
+	 * (org.eclipse.ptp.proxy.runtime.client.event.IProxyRuntimeEventListener)
 	 */
 	public void removeProxyRuntimeEventListener(
 			IProxyRuntimeEventListener listener) {
@@ -785,8 +810,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					state = ProxyState.ERROR;
 					fireProxyRuntimeErrorStateEvent(eventFactory
 							.newProxyRuntimeErrorStateEvent());
-					throw new IllegalStateException(
-							NLS.bind(Messages.AbstractProxyRuntimeClient_3, event.toString()));
+					throw new IllegalStateException(NLS.bind(
+							Messages.AbstractProxyRuntimeClient_3, event
+									.toString()));
 				}
 				break;
 
@@ -824,15 +850,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							state = ProxyState.ERROR;
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
-							throw new IllegalStateException(
-									NLS.bind(Messages.AbstractProxyRuntimeClient_4, event.toString()));
+							throw new IllegalStateException(NLS.bind(
+									Messages.AbstractProxyRuntimeClient_4,
+									event.toString()));
 						}
 					} else {
 						state = ProxyState.ERROR;
 						fireProxyRuntimeErrorStateEvent(eventFactory
 								.newProxyRuntimeErrorStateEvent());
-						throw new IllegalStateException(
-								NLS.bind(Messages.AbstractProxyRuntimeClient_5, event.toString()));
+						throw new IllegalStateException(NLS.bind(
+								Messages.AbstractProxyRuntimeClient_5, event
+										.toString()));
 					}
 				}
 				break;
@@ -843,7 +871,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				 * that are used by the proxy to define any attributes that it
 				 * will use. This state is terminated when an OK event is
 				 * received. At this point enter the RUNNING state.
-				 * 
 				 */
 				event = events.take();
 
@@ -875,15 +902,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							state = ProxyState.ERROR;
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
-							throw new IllegalStateException(
-									NLS.bind(Messages.AbstractProxyRuntimeClient_6, event.toString())); 
+							throw new IllegalStateException(NLS.bind(
+									Messages.AbstractProxyRuntimeClient_6,
+									event.toString()));
 						}
 					} else {
 						state = ProxyState.ERROR;
 						fireProxyRuntimeErrorStateEvent(eventFactory
 								.newProxyRuntimeErrorStateEvent());
-						throw new IllegalStateException(
-								NLS.bind(Messages.AbstractProxyRuntimeClient_7, event.toString()));
+						throw new IllegalStateException(NLS.bind(
+								Messages.AbstractProxyRuntimeClient_7, event
+										.toString()));
 					}
 				}
 				break;
@@ -908,8 +937,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 						processRunningEvent(command, event);
 					} else {
 						state = ProxyState.ERROR;
-						throw new IllegalStateException(
-								NLS.bind(Messages.AbstractProxyRuntimeClient_8, event.toString())); 
+						throw new IllegalStateException(NLS.bind(
+								Messages.AbstractProxyRuntimeClient_8, event
+										.toString()));
 					}
 				}
 				break;
@@ -937,8 +967,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				break;
 
 			default:
-				throw new IllegalStateException(
-						NLS.bind(Messages.AbstractProxyRuntimeClient_9, state.toString()));
+				throw new IllegalStateException(NLS
+						.bind(Messages.AbstractProxyRuntimeClient_9, state
+								.toString()));
 			}
 		}
 	}
@@ -960,7 +991,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startEvents()
+	 * @see
+	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#startEvents()
 	 */
 	public void startEvents() throws IOException {
 		if (state != ProxyState.RUNNING) {
@@ -989,7 +1021,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#stopEvents()
+	 * @see
+	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#stopEvents()
 	 */
 	public void stopEvents() throws IOException {
 		if (state != ProxyState.RUNNING) {
@@ -1003,7 +1036,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#submitJob(java.lang.String[])
+	 * @see
+	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#submitJob(java
+	 * .lang.String[])
 	 */
 	public void submitJob(String[] attrs) throws IOException {
 		if (state != ProxyState.RUNNING) {
@@ -1018,7 +1053,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#terminateJob(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeClient#terminateJob
+	 * (java.lang.String)
 	 */
 	public void terminateJob(String jobId) throws IOException {
 		if (state != ProxyState.RUNNING) {
@@ -1035,6 +1072,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return proxyName + "ProxyRuntimeClient"; //$NON-NLS-1$
 	}
