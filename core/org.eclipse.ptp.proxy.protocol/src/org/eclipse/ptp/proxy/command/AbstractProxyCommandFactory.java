@@ -19,10 +19,14 @@ package org.eclipse.ptp.proxy.command;
 
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
-
-public abstract class AbstractProxyCommandFactory implements IProxyCommandFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.command.IProxyCommandFactory#toCommand(org.eclipse.ptp.proxy.packet.ProxyPacket)
+public abstract class AbstractProxyCommandFactory implements
+		IProxyCommandFactory {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.command.IProxyCommandFactory#toCommand(org.eclipse
+	 * .ptp.proxy.packet.ProxyPacket)
 	 */
 	public abstract IProxyCommand toCommand(ProxyPacket packet);
 }

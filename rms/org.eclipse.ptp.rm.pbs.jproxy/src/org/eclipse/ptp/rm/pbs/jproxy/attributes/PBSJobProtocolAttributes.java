@@ -8,7 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 
 package org.eclipse.ptp.rm.pbs.jproxy.attributes;
 
@@ -62,5 +62,5 @@ public class PBSJobProtocolAttributes {
 	protected static final String UMASK_ATTR_ID = "umask"; //$NON-NLS-1$
 	protected static final String USER_LIST_ATTR_ID = "User_List"; //$NON-NLS-1$
 	protected static final String VARIABLE_LIST_ATTR_ID = "Variable_List"; //$NON-NLS-1$
-	
+
 }

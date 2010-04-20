@@ -8,7 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 package org.eclipse.ptp.rm.proxy.core.event;
 
 import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewQueueEvent;
@@ -22,25 +22,37 @@ import org.eclipse.ptp.proxy.event.IProxyEvent;
  */
 public class QueueEventFactory implements IEventFactory {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createChangeEvent(java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createChangeEvent(java
+	 * .lang.String[])
 	 */
 	public IProxyEvent createChangeEvent(String[] args) {
-		return new ProxyRuntimeQueueChangeEvent(-1,args);
+		return new ProxyRuntimeQueueChangeEvent(-1, args);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createNewEvent(java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createNewEvent(java.
+	 * lang.String[])
 	 */
 	public IProxyEvent createNewEvent(String[] args) {
-		return new ProxyRuntimeNewQueueEvent(-1,args);
+		return new ProxyRuntimeNewQueueEvent(-1, args);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createRemoveEvent(java.lang.String[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.pbs.jproxy.core.IEventFactory#createRemoveEvent(java
+	 * .lang.String[])
 	 */
 	public IProxyEvent createRemoveEvent(String[] args) {
-		return new ProxyRuntimeRemoveQueueEvent(-1,args);
+		return new ProxyRuntimeRemoveQueueEvent(-1, args);
 	}
 
 }

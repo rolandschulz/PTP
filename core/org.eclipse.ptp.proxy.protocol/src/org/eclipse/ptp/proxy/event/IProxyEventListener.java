@@ -24,49 +24,56 @@ public interface IProxyEventListener {
 	/**
 	 * Handler for connected events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyConnectedEvent e);
-	
+
 	/**
 	 * Handler for disconnected events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyDisconnectedEvent e);
-	
+
 	/**
 	 * Handler for error events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyErrorEvent e);
-	
+
 	/**
 	 * Handler for extended events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyExtendedEvent e);
 
 	/**
 	 * Handler for message events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyMessageEvent e);
-	
+
 	/**
 	 * Handler for OK events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyOKEvent e);
-	
+
 	/**
 	 * Handler for timeout events.
 	 * 
-	 * @param e event to handle
+	 * @param e
+	 *            event to handle
 	 */
 	public void handleEvent(IProxyTimeoutEvent e);
 }

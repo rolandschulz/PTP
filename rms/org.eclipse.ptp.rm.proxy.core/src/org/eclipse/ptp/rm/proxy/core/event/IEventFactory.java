@@ -8,7 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 package org.eclipse.ptp.rm.proxy.core.event;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
@@ -22,7 +22,8 @@ public interface IEventFactory {
 	/**
 	 * Creates a new IEvent object.
 	 * 
-	 * @param args the args
+	 * @param args
+	 *            the args
 	 * @return the proxy event
 	 */
 	IProxyEvent createChangeEvent(String[] array);
@@ -30,7 +31,8 @@ public interface IEventFactory {
 	/**
 	 * Creates a new IEvent object.
 	 * 
-	 * @param args the args
+	 * @param args
+	 *            the args
 	 * @return the proxy event
 	 */
 	IProxyEvent createNewEvent(String[] args);
@@ -38,7 +40,8 @@ public interface IEventFactory {
 	/**
 	 * Creates a new IEvent object.
 	 * 
-	 * @param args the args
+	 * @param args
+	 *            the args
 	 * @return the proxy event
 	 */
 	IProxyEvent createRemoveEvent(String[] args);

@@ -8,7 +8,7 @@
  * Contributors:
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
 
-*******************************************************************************/
+ *******************************************************************************/
 
 package org.eclipse.ptp.rm.proxy.core.parser;
 
@@ -36,16 +36,20 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XMLReader implements IParser {
-	 
+
 	private static boolean DEBUG = false;
 
-	public static void main (String argv []) throws IntrospectionException, IllegalAccessException, InvocationTargetException, InstantiationException, FileNotFoundException{
+	public static void main(String argv[]) throws IntrospectionException,
+			IllegalAccessException, InvocationTargetException,
+			InstantiationException, FileNotFoundException {
 		DEBUG = true;
-//		parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
-//		new XMLReader().parse(ModelNode.class, new FileInputStream(new File("pbsnodes.helics.xml")));
+		// parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
+		// new XMLReader().parse(ModelNode.class, new FileInputStream(new
+		// File("pbsnodes.helics.xml")));
 	}
 
-	private NodeList getXMLChildren(InputStream in) throws SAXException, IOException, ParserConfigurationException {
+	private NodeList getXMLChildren(InputStream in) throws SAXException,
+			IOException, ParserConfigurationException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(in);
@@ -55,17 +59,18 @@ public class XMLReader implements IParser {
 
 		return root.getChildNodes();
 	}
-	
-	
+
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
-//	public <T  extends IElement> Set<T> parse(Class<IElement> pojoClazz, InputStream in) {
+		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
+		// InputStream in) {
 		Set<IElement> elementList = null;
 		NodeList xmlNodes = null;
 		try {
-			 xmlNodes = getXMLChildren(in);
+			xmlNodes = getXMLChildren(in);
 		} catch (Exception e) {
-//			e.printStackTrace(); //Ignore Premature end of file, TODO: don't ignore other things
-			return new HashSet<IElement>();	
+			// e.printStackTrace(); //Ignore Premature end of file, TODO: don't
+			// ignore other things
+			return new HashSet<IElement>();
 		}
 		try {
 			in.close();
@@ -95,51 +100,58 @@ public class XMLReader implements IParser {
 		}
 		return elementList;
 	}
-	
 
-	private  IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption {
+	private IElement populateElement(AttributeDefinition attrDef,
+			Map<String, String> input) throws UnknownValueExecption {
 		IElement element = attrDef.createElement();
 
-//		PropertyDescriptor[] properties = Introspector.getBeanInfo(attrDef).getPropertyDescriptors();
-//		for (PropertyDescriptor property : properties) {
+		// PropertyDescriptor[] properties =
+		// Introspector.getBeanInfo(attrDef).getPropertyDescriptors();
+		// for (PropertyDescriptor property : properties) {
 		for (String attr : attrDef.getRequiredAttributes()) {
 			element.setAttribute(attr, input.get(attr));
-//			String name = property.getName();
-//			Method writeAccess = property.getWriteMethod();
-//			if (writeAccess != null && !Modifier.isStatic(writeAccess.getModifiers())) {
-//				System.out.println(name + " <- " + input.get(name));
-//				writeAccess.invoke(pojo, new Object[]{input.get(name)});
-//			}
+			// String name = property.getName();
+			// Method writeAccess = property.getWriteMethod();
+			// if (writeAccess != null &&
+			// !Modifier.isStatic(writeAccess.getModifiers())) {
+			// System.out.println(name + " <- " + input.get(name));
+			// writeAccess.invoke(pojo, new Object[]{input.get(name)});
+			// }
 		}
 		return element;
 	}
-	
-	
-	protected Map<String, String> populateInput(Node node, Map<String, String> input) throws IntrospectionException, IllegalAccessException, InvocationTargetException, InstantiationException {
-		if (input == null) input = new HashMap<String, String>();
-		
-//		if (node.getNodeType() == Node.ELEMENT_NODE) System.out.println(node.getNodeName());
+
+	protected Map<String, String> populateInput(Node node,
+			Map<String, String> input) throws IntrospectionException,
+			IllegalAccessException, InvocationTargetException,
+			InstantiationException {
+		if (input == null) {
+			input = new HashMap<String, String>();
+		}
+
+		// if (node.getNodeType() == Node.ELEMENT_NODE)
+		// System.out.println(node.getNodeName());
 
 		NodeList childNodes = node.getChildNodes();
-		
 
-		
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node childNode = childNodes.item(i);
-			
+
 			if (childNode.getNodeType() == Node.ELEMENT_NODE) {
 				if (childNode.getChildNodes().getLength() > 1) {
 					populateInput(childNode, input);
 				} else {
-					input.put(childNode.getNodeName().toLowerCase(), childNode.getTextContent());
+					input.put(childNode.getNodeName().toLowerCase(), childNode
+							.getTextContent());
 				}
 			}
-			
-//			if (childNode.getNodeType() == Node.ELEMENT_NODE) System.out.println("\t" + childNode.getNodeName().toLowerCase() + " -> " + childNode.getTextContent());
+
+			// if (childNode.getNodeType() == Node.ELEMENT_NODE)
+			// System.out.println("\t" + childNode.getNodeName().toLowerCase() +
+			// " -> " + childNode.getTextContent());
 		}
-		
+
 		return input;
 	}
-
 
 }

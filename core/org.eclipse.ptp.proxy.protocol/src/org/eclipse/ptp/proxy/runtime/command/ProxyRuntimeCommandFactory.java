@@ -28,96 +28,131 @@ import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.ProxyCommandFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
-public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements IProxyRuntimeCommandFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeFilterEventsCommand(java.lang.String[])
+public class ProxyRuntimeCommandFactory extends ProxyCommandFactory implements
+		IProxyRuntimeCommandFactory {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeFilterEventsCommand(java.lang.String[])
 	 */
-	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(String[] attrs) {
+	public IProxyRuntimeFilterEventsCommand newProxyRuntimeFilterEventsCommand(
+			String[] attrs) {
 		return new ProxyRuntimeFilterEventsCommand(attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeInitCommand(int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeInitCommand(int)
 	 */
 	public IProxyRuntimeInitCommand newProxyRuntimeInitCommand(int baseId) {
 		return new ProxyRuntimeInitCommand(baseId);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeModelDefCommand()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeModelDefCommand()
 	 */
 	public IProxyRuntimeModelDefCommand newProxyRuntimeModelDefCommand() {
 		return new ProxyRuntimeModelDefCommand();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeStartEventsCommand()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeStartEventsCommand()
 	 */
 	public IProxyRuntimeStartEventsCommand newProxyRuntimeStartEventsCommand() {
 		return new ProxyRuntimeStartEventsCommand();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeStopEventsCommand()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeStopEventsCommand()
 	 */
 	public IProxyRuntimeStopEventsCommand newProxyRuntimeStopEventsCommand() {
 		return new ProxyRuntimeStopEventsCommand();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeSubmitJobCommand(java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeSubmitJobCommand(java.lang.String[])
 	 */
 	public IProxyRuntimeSubmitJobCommand newProxyRuntimeSubmitJobCommand(
 			String[] attrs) {
 		return new ProxyRuntimeSubmitJobCommand(attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#newProxyRuntimeTerminateJobCommand(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeCommandFactory#
+	 * newProxyRuntimeTerminateJobCommand(java.lang.String)
 	 */
 	public IProxyRuntimeTerminateJobCommand newProxyRuntimeTerminateJobCommand(
 			String jobId) {
 		return new ProxyRuntimeTerminateJobCommand(jobId);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.command.ProxyCommandFactory#toCommand(org.eclipse.ptp.proxy.packet.ProxyPacket)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.command.ProxyCommandFactory#toCommand(org.eclipse
+	 * .ptp.proxy.packet.ProxyPacket)
 	 */
+	@Override
 	public IProxyCommand toCommand(ProxyPacket packet) {
-		IProxyRuntimeCommand	cmd = null;
+		IProxyRuntimeCommand cmd = null;
 
 		IProxyCommand c = super.toCommand(packet);
 		if (c != null) {
 			return c;
 		}
-		
+
 		switch (packet.getID()) {
 		case IProxyRuntimeCommand.INIT:
-			cmd = new ProxyRuntimeInitCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeInitCommand(packet.getTransID(), packet
+					.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.MODEL_DEF:
-			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeModelDefCommand(packet.getTransID(), packet
+					.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.START_EVENTS:
-			cmd = new ProxyRuntimeStartEventsCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeStartEventsCommand(packet.getTransID(),
+					packet.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.STOP_EVENTS:
-			cmd = new ProxyRuntimeStopEventsCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeStopEventsCommand(packet.getTransID(), packet
+					.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.SUBMIT_JOB:
-			cmd = new ProxyRuntimeSubmitJobCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeSubmitJobCommand(packet.getTransID(), packet
+					.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.TERMINATE_JOB:
-			cmd = new ProxyRuntimeTerminateJobCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeTerminateJobCommand(packet.getTransID(),
+					packet.getArgs());
 			break;
 
 		case IProxyRuntimeCommand.FILTER_EVENTS:
-			cmd = new ProxyRuntimeFilterEventsCommand(packet.getTransID(), packet.getArgs());
+			cmd = new ProxyRuntimeFilterEventsCommand(packet.getTransID(),
+					packet.getArgs());
 			break;
 		}
 

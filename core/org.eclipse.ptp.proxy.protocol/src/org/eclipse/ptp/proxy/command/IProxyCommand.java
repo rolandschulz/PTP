@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.proxy.command;
 
-
 public interface IProxyCommand {
 	/*
 	 * Base command ids
@@ -21,25 +20,26 @@ public interface IProxyCommand {
 	/**
 	 * Add an argument to the command
 	 * 
-	 * @param arg argument to add to the command
+	 * @param arg
+	 *            argument to add to the command
 	 */
 	public void addArgument(String arg);
-		
+
 	/**
 	 * Mark command as completed
 	 */
 	public void completed();
-	
+
 	/**
 	 * @return the encoded message buffer to be sent to the proxy
 	 */
 	public String[] getArguments();
-	
+
 	/**
 	 * @return the transaction id used by this command
 	 */
 	public int getCommandID();
-	
+
 	/**
 	 * @return the transaction id used by this command
 	 */

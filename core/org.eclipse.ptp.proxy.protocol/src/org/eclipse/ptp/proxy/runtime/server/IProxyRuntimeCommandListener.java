@@ -31,27 +31,27 @@ public interface IProxyRuntimeCommandListener {
 	 * @param c
 	 */
 	public void handleCommand(IProxyRuntimeInitCommand c);
-	
+
 	/**
 	 * @param c
 	 */
 	public void handleCommand(IProxyRuntimeModelDefCommand c);
-	
+
 	/**
 	 * @param c
 	 */
 	public void handleCommand(IProxyRuntimeStartEventsCommand c);
-	
+
 	/**
 	 * @param c
 	 */
 	public void handleCommand(IProxyRuntimeStopEventsCommand c);
-	
+
 	/**
 	 * @param c
 	 */
 	public void handleCommand(IProxyRuntimeSubmitJobCommand c);
-	
+
 	/**
 	 * @param c
 	 */

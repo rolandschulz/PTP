@@ -13,7 +13,6 @@ package org.eclipse.ptp.proxy.runtime.command;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 
-
 public interface IProxyRuntimeCommand extends IProxyCommand {
 	/*
 	 * Command IDs
@@ -25,5 +24,5 @@ public interface IProxyRuntimeCommand extends IProxyCommand {
 	public static final int SUBMIT_JOB = 5;
 	public static final int TERMINATE_JOB = 6;
 	public static final int FILTER_EVENTS = 7;
-		
+
 }

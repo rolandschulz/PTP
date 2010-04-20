@@ -19,6 +19,7 @@ public class ElementIDGenerator {
 	public static ElementIDGenerator getInstance() {
 		return instance;
 	}
+
 	private int baseIDoffset = 0;
 	private int base_ID;
 
@@ -43,7 +44,8 @@ public class ElementIDGenerator {
 
 	public RangeSet getUniqueIDs(int size) {
 		baseIDoffset++;
-		RangeSet range = new RangeSet(base_ID + baseIDoffset, base_ID + baseIDoffset + size);
+		RangeSet range = new RangeSet(base_ID + baseIDoffset, base_ID
+				+ baseIDoffset + size);
 		baseIDoffset += size - 1;
 		return range;
 	}

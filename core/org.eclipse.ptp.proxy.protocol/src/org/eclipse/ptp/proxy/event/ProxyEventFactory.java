@@ -30,42 +30,55 @@ import org.eclipse.ptp.internal.proxy.event.ProxyShutdownEvent;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public class ProxyEventFactory extends AbstractProxyEventFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newErrorEvent(int, int, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newErrorEvent(int,
+	 * int, java.lang.String)
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, int code, String message) {
 		String[] args = new String[] {
-				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code,  //$NON-NLS-1$
+				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code, //$NON-NLS-1$
 				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message //$NON-NLS-1$
 		};
-		
+
 		return new ProxyErrorEvent(transID, args);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newErrorEvent(int, java.lang.String[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newErrorEvent(int,
+	 * java.lang.String[])
 	 */
-	public IProxyErrorEvent newErrorEvent(int transID,String[] args) {
-		return new ProxyErrorEvent(transID,args);
+	public IProxyErrorEvent newErrorEvent(int transID, String[] args) {
+		return new ProxyErrorEvent(transID, args);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newOKEvent(int)
 	 */
 	public IProxyOKEvent newOKEvent(int transID) {
 		return new ProxyOKEvent(transID);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newShutdownEvent(int)
 	 */
 	public ProxyShutdownEvent newShutdownEvent(int transID) {
 		return new ProxyShutdownEvent(transID);
 	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.event.AbstractProxyEventFactory#toEvent(org.eclipse.ptp.proxy.packet.ProxyPacket)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.event.AbstractProxyEventFactory#toEvent(org.eclipse
+	 * .ptp.proxy.packet.ProxyPacket)
 	 */
 	@Override
 	public IProxyEvent toEvent(ProxyPacket packet) {
@@ -75,7 +88,7 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 		case IProxyEvent.OK:
 			evt = new ProxyOKEvent(packet.getTransID());
 			break;
-			
+
 		case IProxyEvent.MESSAGE:
 			evt = new ProxyMessageEvent(packet.getTransID(), packet.getArgs());
 			break;
@@ -87,7 +100,5 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 
 		return evt;
 	}
-	
-	
 
 }

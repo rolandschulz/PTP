@@ -22,12 +22,13 @@ package org.eclipse.ptp.proxy.runtime.command;
 import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
 
 public abstract class AbstractProxyRuntimeCommand extends AbstractProxyCommand
-	implements IProxyRuntimeCommand {
+		implements IProxyRuntimeCommand {
 	public AbstractProxyRuntimeCommand(int eventID) {
 		super(eventID);
 	}
 
-	public AbstractProxyRuntimeCommand(int eventID, int transactionID, String[] args) {
+	public AbstractProxyRuntimeCommand(int eventID, int transactionID,
+			String[] args) {
 		super(eventID, transactionID, args);
 	}
 }

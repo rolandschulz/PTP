@@ -9,9 +9,10 @@
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
  *    Benjamin Lindner (ben@benlabs.net)
 
-*******************************************************************************/
+ *******************************************************************************/
 
 package org.eclipse.ptp.rm.pbs.jproxy.parser;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,22 +30,23 @@ import org.eclipse.ptp.rm.proxy.core.parser.IParser;
 
 public class QstatQueuesReader implements IParser {
 	private Set<IElement> queues;
-	
-	
-	private void _parse(InputStream in, AttributeDefinition attrDef) throws Exception, IOException {
+
+	private void _parse(InputStream in, AttributeDefinition attrDef)
+			throws Exception, IOException {
 		queues = new HashSet<IElement>();
-		
-		BufferedReader reader = new BufferedReader( new InputStreamReader(in) );
-		
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
 		Pattern queuepattern = Pattern.compile("^[Qq]ueue:(.*)$"); //$NON-NLS-1$
 		Pattern keyvalpattern = Pattern.compile("^([^=]+)=(.+)$"); //$NON-NLS-1$
 
 		String line;
-		ArrayList<HashMap<String,String> > qhashes = new ArrayList<HashMap<String,String>>();
-		HashMap<String,String> thisqueue = new HashMap<String,String>();
+		ArrayList<HashMap<String, String>> qhashes = new ArrayList<HashMap<String, String>>();
+		HashMap<String, String> thisqueue = new HashMap<String, String>();
 		boolean firstqueue = true;
-		// parse the input file and store the individual queues as Hashmaps in qhashes
-		while (( line = reader.readLine()) != null) {
+		// parse the input file and store the individual queues as Hashmaps in
+		// qhashes
+		while ((line = reader.readLine()) != null) {
 			Matcher mq = queuepattern.matcher(line);
 
 			boolean newqueue = mq.find();
@@ -54,64 +56,58 @@ public class QstatQueuesReader implements IParser {
 				} else {
 					firstqueue = false;
 				}
-				thisqueue = new HashMap<String,String>();
+				thisqueue = new HashMap<String, String>();
 				thisqueue.put("name", mq.group(1).trim()); //$NON-NLS-1$
 				continue;
 			}
-		
+
 			Matcher mkv = keyvalpattern.matcher(line);
 			if (!mkv.find()) {
 				continue;
 			}
-			if (mkv.groupCount()!=2) {
+			if (mkv.groupCount() != 2) {
 				continue;
 			}
 			String skey = mkv.group(1).trim().toLowerCase();
 			String svalue = mkv.group(2).trim();
 
-			thisqueue.put(skey,svalue);
+			thisqueue.put(skey, svalue);
 		}
 		if (!firstqueue) {
 			qhashes.add(thisqueue);
-		}	
-		
+		}
+
 		// now convert the hashmap representation into beans
-		for (HashMap<String,String> q : qhashes) {
+		for (HashMap<String, String> q : qhashes) {
 			IElement e = attrDef.createElement();
 			for (String attr : attrDef.getRequiredAttributes()) {
 				e.setAttribute(attr, q.get(attr));
 			}
-//			for (Entry<String, String> entry : q.entrySet()) {
-//				e.setAttribute(entry.getKey(), entry.getValue());
-//			}
-			queues.add( e );
+			// for (Entry<String, String> entry : q.entrySet()) {
+			// e.setAttribute(entry.getKey(), entry.getValue());
+			// }
+			queues.add(e);
 		}
 	}
 
-	
 	public Set<IElement> getQueues() {
 		return queues;
 	}
-	
-	public Set<IElement> parse(
-			AttributeDefinition attrDef, InputStream in) {
+
+	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
 		Set<IElement> queues = new HashSet<IElement>();
 		try {
-			//qstat -Q -f is not XML - specific Reader has to be used.
-			_parse(in,attrDef);
+			// qstat -Q -f is not XML - specific Reader has to be used.
+			_parse(in, attrDef);
 			queues = getQueues();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			System.out.println(e);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
-//		System.err.println("queues length -> " + queues.size());
+
+		// System.err.println("queues length -> " + queues.size());
 		return queues;
 	}
 
-
-
-
-	
 }
