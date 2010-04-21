@@ -120,7 +120,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 	/**
 	 * Status of the job submission (NOT the job itself)
 	 */
-	public enum JobSubStatus {SUBMITTED, COMPLETED, ERROR}
+	public enum JobSubStatus {UNSUBMITTED, SUBMITTED, ERROR}
 
 	/**
 	 * The JobSubmission class encapsulates all the information used in
@@ -140,7 +140,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		private IPLaunch launch;
 		private AttributeManager attrMgr;
 		private IPDebugger debugger;
-		private JobSubStatus status = JobSubStatus.SUBMITTED;
+		private JobSubStatus status = JobSubStatus.UNSUBMITTED;
 		private final ReentrantLock subLock = new ReentrantLock();;
 		private final Condition subCondition = subLock.newCondition();
 
@@ -232,7 +232,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 		public JobSubStatus waitFor(IProgressMonitor monitor) {
 			subLock.lock();
 			try {
-				while (!monitor.isCanceled() && status != JobSubStatus.SUBMITTED) {
+				while (!monitor.isCanceled() && status == JobSubStatus.UNSUBMITTED) {
 					try {
 						subCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -265,7 +265,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 							/*
 							 * When the job starts running call back to notify that job submission is completed.
 							 */
-							jobSub.setStatus(JobSubStatus.COMPLETED);
+							jobSub.setStatus(JobSubStatus.SUBMITTED);
 							doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
 							break;
 							
@@ -1081,7 +1081,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends
 				ISynchronizationRule rule = RuleFactory.createRuleFromString(element);
 				result.add(rule);
 			} catch (RuntimeException e) {
-				throw new CoreException(new Status(Status.ERROR,
+				throw new CoreException(new Status(IStatus.ERROR,
 						PTPLaunchPlugin.PLUGIN_ID,
 						Messages.AbstractParallelLaunchConfigurationDelegate_Error_converting_rules));
 			}
