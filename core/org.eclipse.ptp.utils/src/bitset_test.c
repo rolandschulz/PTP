@@ -31,6 +31,7 @@ void test_oreq(int tnum, int nb1, int nb2);
 void test_str(int);
 void test_boundary(int);
 void test_nine(int);
+void test_ninety(int);
 
 int
 main(int argc, char *argv[])
@@ -43,6 +44,7 @@ main(int argc, char *argv[])
 	test_str(4);
 	test_boundary(5);
 	test_nine(6);
+	test_ninety(7);
 
 	return 0;
 }
@@ -153,6 +155,26 @@ test_nine(int tnum)
 	bitset *	b1 = str_to_bitset(str1, &end);
 	bitset *	b2 = bitset_new(9);
 	bitset_set(b2, 0);
+	str2 = bitset_to_str(b1);
+	str3 = bitset_to_str(b2);
+	if (strcmp(str2, str3) != 0) {
+		printf("TEST_%d FAIL: %s != %s\n", tnum, str2, str3);
+	} else {
+		printf("TEST_%d SUCCEDED\n", tnum);
+	}
+}
+
+void
+test_ninety(int tnum)
+{
+	char *		str1 = "90:800000000000000000000000000000000001";
+	char *		str2;
+	char *		str3;
+	char *		end;
+	bitset *	b1 = str_to_bitset(str1, &end);
+	bitset *	b2 = bitset_new(144);
+	bitset_set(b2, 0);
+	bitset_set(b2, 143);
 	str2 = bitset_to_str(b1);
 	str3 = bitset_to_str(b2);
 	if (strcmp(str2, str3) != 0) {
