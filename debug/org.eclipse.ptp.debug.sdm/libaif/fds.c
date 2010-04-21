@@ -297,7 +297,7 @@ _fds_base_type(char *type)
 		break;
 
 	case FDS_RANGE: /* range */
-		p = _fds_skipnum(p); /* skip MinValue */
+		p = _fds_skipnum(type); /* skip MinValue */
 		p += 2;         /* skip '..' */
 		p = _fds_skipnum(p); /* skip MaxValue */
 		break;
@@ -1043,7 +1043,7 @@ FDSArrayIndexInit(char *fmt)
 char *
 _fds_skiptomatch(char *fds)
 {
-	char	ender;
+	char	ender = NULL;
 
 	/*
 	** assert *fds == '{' or '['; find the matching '}' or ']'
