@@ -296,7 +296,9 @@ bitset_firstset(bitset *b)
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-#define NUM_BYTES(bits) (((bits-1) >> 3) + 1)
+#define NUM_BYTES(bits) (((bits-1) >> 3) + 1)	/* number of bytes required to store bits */
+#define NUM_LEN			8*2						/* number of characters required to store largest length */
+#define SEP_LEN			1						/* number of characters for ':' separator */
 
 /**
  * Return a string representation of a bitset. We use hex to compress
@@ -329,7 +331,7 @@ bitset_to_str(bitset *b)
 	 */
 	bytes = NUM_BYTES(b->bs_nbits);
 
-	str = (char *)malloc(bytes + 8 + 2);
+	str = (char *)malloc(bytes*2 + NUM_LEN + SEP_LEN + 1);
 
 	/*
 	 * Start with actual number of bits (silently truncate to 32 bits)
