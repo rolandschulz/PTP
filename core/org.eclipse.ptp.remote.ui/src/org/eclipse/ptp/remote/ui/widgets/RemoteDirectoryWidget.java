@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -34,41 +33,40 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Widget to allow the user to select a remote directory. Provides
- * a "Browse" button that uses the currently specified connection
- * and a "Restore Default" button to revert to the initial setting.
+ * Widget to allow the user to select a remote directory. Provides a "Browse"
+ * button that uses the currently specified connection and a "Restore Default"
+ * button to revert to the initial setting.
  * 
  * If title is supplied then the widget will be placed in a group.
  * 
  * The browse message can be modified using {@link #setBrowseMessage(String)}
- *
+ * 
  */
 public class RemoteDirectoryWidget extends Composite {
-	///private final Label label;
+	// /private final Label label;
 	private final Text text;
 	private final Button browseButton;
-	//private final Button validateButton;
+	// private final Button validateButton;
 	private final Button defaultButton;
-	
-	private String fDefaultPath = null;
-	private String fBrowseMessage = Messages.RemoteDirectoryWidget_0; 
+
+	private final String fDefaultPath = null;
+	private String fBrowseMessage = Messages.RemoteDirectoryWidget_0;
 	private IRemoteConnection fRemoteConnection;
-	private IRemoteServices fRemoteServices;
-	private ListenerList modifyListeners = new ListenerList();
-	
-	private Map<String,String> previousSelections = new HashMap<String,String>();
-	
+	private final ListenerList modifyListeners = new ListenerList();
+
+	private final Map<String, String> previousSelections = new HashMap<String, String>();
+
 	public RemoteDirectoryWidget(Composite parent, int style, String title, String defaultPath) {
 		super(parent, style);
-		
+
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		setLayout(layout);
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 		Composite body = this;
-		
+
 		if (title != null) {
 			Group group = new Group(this, SWT.NONE);
 			group.setText(title);
@@ -76,14 +74,14 @@ public class RemoteDirectoryWidget extends Composite {
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			body = group;
 		}
-		
+
 		Composite textComp = new Composite(body, SWT.NONE);
 		textComp.setLayout(new GridLayout(2, false));
 		textComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-	
+
 		Label label = new Label(textComp, SWT.NONE);
-		label.setText(Messages.RemoteDirectoryWidget_1); 
-		
+		label.setText(Messages.RemoteDirectoryWidget_1);
+
 		text = new Text(textComp, SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 		text.setLayoutData(data);
@@ -94,53 +92,56 @@ public class RemoteDirectoryWidget extends Composite {
 				notifyListeners(e);
 			}
 		});
-		
+
 		Composite buttonComp = new Composite(body, SWT.NONE);
 		buttonComp.setLayout(new GridLayout(2, true));
 		GridData buttonCompData = new GridData(SWT.FILL, SWT.FILL, false, false);
 		buttonCompData.horizontalAlignment = SWT.END;
 		buttonComp.setLayoutData(buttonCompData);
-		
+
 		browseButton = new Button(buttonComp, SWT.NONE);
-		browseButton.setText(Messages.RemoteDirectoryWidget_2); 
+		browseButton.setText(Messages.RemoteDirectoryWidget_2);
 		GridData browseButtonData = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
 		browseButtonData.widthHint = 110;
 		browseButton.setLayoutData(browseButtonData);
 		browseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				browse();
 			}
 		});
-		
+
 		defaultButton = new Button(buttonComp, SWT.NONE);
-		defaultButton.setText(Messages.RemoteDirectoryWidget_3); 
+		defaultButton.setText(Messages.RemoteDirectoryWidget_3);
 		GridData defaultButtonData = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
 		defaultButtonData.widthHint = 110;
 		defaultButton.setLayoutData(defaultButtonData);
 		defaultButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				restoreDefault(fDefaultPath);
 			}
 		});
-		
+
 		if (defaultPath != null) {
 			text.setText(defaultPath);
 		}
 		updateBrowseButton();
 	}
-	
+
 	/**
 	 * Add a listener that will be notified when the directory path is modified.
 	 * 
-	 * @param listener listener to add
+	 * @param listener
+	 *            listener to add
 	 */
 	public void addModifyListener(ModifyListener listener) {
 		modifyListeners.add(listener);
 	}
-	
+
 	/**
-	 * Get the directory location path. This path will be relative
-	 * to the remote machine.
+	 * Get the directory location path. This path will be relative to the remote
+	 * machine.
 	 * 
 	 * @return directory location path
 	 */
@@ -149,47 +150,49 @@ public class RemoteDirectoryWidget extends Composite {
 	}
 
 	/**
-	 * Remove a listener that will be notified when the directory path is modified.
+	 * Remove a listener that will be notified when the directory path is
+	 * modified.
 	 * 
-	 * @param listener listener to remove
+	 * @param listener
+	 *            listener to remove
 	 */
 	public void removeModifyListener(ModifyListener listener) {
 		modifyListeners.remove(listener);
 	}
-	
+
 	/**
-	 * Set the message that will be displayed in the remote directory
-	 * browser dialog.
+	 * Set the message that will be displayed in the remote directory browser
+	 * dialog.
 	 * 
-	 * @param message message to be displayed
+	 * @param message
+	 *            message to be displayed
 	 */
 	public void setBrowseMessage(String message) {
 		fBrowseMessage = message;
 	}
-	
+
 	/**
 	 * Set the remote connection to use for browsing for the remote directory.
 	 * 
-	 * @param services remote services
-	 * @param conn remote connection
+	 * @param conn
+	 *            remote connection
 	 */
-	public void setConnection(IRemoteServices services, IRemoteConnection conn) {
-		if(services == null || conn == null) {
+	public void setConnection(IRemoteConnection conn) {
+		if (conn == null) {
 			throw new NullPointerException();
 		}
-		
-		if (!services.equals(fRemoteServices) || !conn.equals(fRemoteConnection)) {
+
+		if (!conn.equals(fRemoteConnection)) {
 			fRemoteConnection = conn;
-			fRemoteServices = services;
-			
 			String path = getSavedPath();
 			restoreDefault(path);
 			updateBrowseButton();
 		}
 	}
-	
+
 	/**
 	 * Set the initial remote location that will be displayed in the widget.
+	 * 
 	 * @param path
 	 */
 	public void setLocationPath(String path) {
@@ -197,7 +200,7 @@ public class RemoteDirectoryWidget extends Composite {
 			text.setText(path);
 		}
 	}
-	
+
 	private void browse() {
 		IRemoteUIConnectionManager connMgr = getUIConnectionManager();
 		if (connMgr != null) {
@@ -214,34 +217,34 @@ public class RemoteDirectoryWidget extends Composite {
 			}
 		}
 	}
-	
+
 	private String getSavedPath() {
-		if (fRemoteServices != null) {
-			return previousSelections.get(fRemoteServices.getId() + "." + fRemoteConnection.getName()); //$NON-NLS-1$
+		if (fRemoteConnection != null) {
+			return previousSelections.get(fRemoteConnection.getRemoteServices().getId() + "." + fRemoteConnection.getName()); //$NON-NLS-1$
 		}
 		return null;
 	}
-	
+
 	private IRemoteUIFileManager getUIFileManager() {
-		if (fRemoteServices != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIFileManager();
+		if (fRemoteConnection != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIFileManager();
 		}
 		return null;
 	}
-	
+
 	private IRemoteUIConnectionManager getUIConnectionManager() {
-		if (fRemoteServices != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIConnectionManager();
+		if (fRemoteConnection != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIConnectionManager();
 		}
 		return null;
 	}
-	
+
 	private void notifyListeners(ModifyEvent e) {
 		for (Object listener : modifyListeners.getListeners()) {
-			((ModifyListener)listener).modifyText(e);
+			((ModifyListener) listener).modifyText(e);
 		}
 	}
-	
+
 	private void restoreDefault(String path) {
 		if (path == null && fRemoteConnection != null) {
 			path = fRemoteConnection.getWorkingDirectory().toString();
@@ -253,11 +256,11 @@ public class RemoteDirectoryWidget extends Composite {
 	}
 
 	private void setSavedPath(String path) {
-		if (fRemoteServices != null) {
-			previousSelections.put(fRemoteServices.getId() + "." + fRemoteConnection.getName(), path); //$NON-NLS-1$
+		if (fRemoteConnection != null) {
+			previousSelections.put(fRemoteConnection.getRemoteServices().getId() + "." + fRemoteConnection.getName(), path); //$NON-NLS-1$
 		}
 	}
-	
+
 	private void updateBrowseButton() {
 		browseButton.setEnabled(getUIFileManager() != null);
 	}
