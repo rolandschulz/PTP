@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.eclipse.ptp.remote.internal.core.LocalServices;
 import org.eclipse.ptp.remote.internal.core.RemoteServicesProxy;
 import org.osgi.framework.BundleContext;
@@ -252,6 +253,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		DebugUtil.configurePluginDebugOptions();
 		defaultRemoteServices = null;
 	}
 
