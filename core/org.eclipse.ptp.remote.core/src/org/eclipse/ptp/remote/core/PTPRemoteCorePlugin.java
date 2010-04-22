@@ -43,71 +43,71 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core"; //$NON-NLS-1$
-	public static final String EXTENSION_POINT_ID = "remoteServices"; //$NON-NLS-1$
-	
+	public static final String REMOTE_SERVICES_EXTENSION_POINT_ID = "remoteServices"; //$NON-NLS-1$
+
 	// The shared instance
 	private static PTPRemoteCorePlugin plugin;
 
 	/**
-     * If it is possible to adapt the given object to the given type, this
-     * returns the adapter. Performs the following checks:
-     * 
-     * <ol>
-     * <li>Returns <code>sourceObject</code> if it is an instance of the
-     * adapter type.</li>
-     * <li>If sourceObject implements IAdaptable, it is queried for adapters.</li>
-     * <li>If sourceObject is not an instance of PlatformObject (which would have
-     * already done so), the adapter manager is queried for adapters</li>
-     * </ol>
-     * 
-     * Otherwise returns null.
-     * 
-     * @param sourceObject
-     *            object to adapt, or null
-     * @param adapterType
-     *            type to adapt to
-     * @return a representation of sourceObject that is assignable to the
-     *         adapter type, or null if no such representation exists
-     */
-    public static Object getAdapter(Object sourceObject, Class adapterType) {
-    	Assert.isNotNull(adapterType);
-        if (sourceObject == null) {
-            return null;
-        }
-        if (adapterType.isInstance(sourceObject)) {
-            return sourceObject;
-        }
+	 * If it is possible to adapt the given object to the given type, this
+	 * returns the adapter. Performs the following checks:
+	 * 
+	 * <ol>
+	 * <li>Returns <code>sourceObject</code> if it is an instance of the adapter
+	 * type.</li>
+	 * <li>If sourceObject implements IAdaptable, it is queried for adapters.</li>
+	 * <li>If sourceObject is not an instance of PlatformObject (which would
+	 * have already done so), the adapter manager is queried for adapters</li>
+	 * </ol>
+	 * 
+	 * Otherwise returns null.
+	 * 
+	 * @param sourceObject
+	 *            object to adapt, or null
+	 * @param adapterType
+	 *            type to adapt to
+	 * @return a representation of sourceObject that is assignable to the
+	 *         adapter type, or null if no such representation exists
+	 */
+	public static Object getAdapter(Object sourceObject, Class adapterType) {
+		Assert.isNotNull(adapterType);
+		if (sourceObject == null) {
+			return null;
+		}
+		if (adapterType.isInstance(sourceObject)) {
+			return sourceObject;
+		}
 
-        if (sourceObject instanceof IAdaptable) {
-            IAdaptable adaptable = (IAdaptable) sourceObject;
+		if (sourceObject instanceof IAdaptable) {
+			IAdaptable adaptable = (IAdaptable) sourceObject;
 
-            Object result = adaptable.getAdapter(adapterType);
-            if (result != null) {
-                // Sanity-check
-                Assert.isTrue(adapterType.isInstance(result));
-                return result;
-            }
-        } 
-        
-        if (!(sourceObject instanceof PlatformObject)) {
-            Object result = Platform.getAdapterManager().getAdapter(sourceObject, adapterType);
-            if (result != null) {
-                return result;
-            }
-        }
+			Object result = adaptable.getAdapter(adapterType);
+			if (result != null) {
+				// Sanity-check
+				Assert.isTrue(adapterType.isInstance(result));
+				return result;
+			}
+		}
 
-        return null;
-    }
-	
+		if (!(sourceObject instanceof PlatformObject)) {
+			Object result = Platform.getAdapterManager().getAdapter(sourceObject, adapterType);
+			if (result != null) {
+				return result;
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static PTPRemoteCorePlugin getDefault() {
 		return plugin;
 	}
-	
+
 	/**
 	 * Get unique identifier
 	 * 
@@ -151,21 +151,21 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
-	}    
+	}
 
 	// Active remote services plugins (not necessarily loaded)
-	private final Map<String, RemoteServicesProxy> allRemoteServicesById = new HashMap<String, RemoteServicesProxy>();	
-	private final Map<String, RemoteServicesProxy> allRemoteServicesByScheme = new HashMap<String, RemoteServicesProxy>();	
+	private final Map<String, RemoteServicesProxy> allRemoteServicesById = new HashMap<String, RemoteServicesProxy>();
+	private final Map<String, RemoteServicesProxy> allRemoteServicesByScheme = new HashMap<String, RemoteServicesProxy>();
 
 	// Default remote services for new RM wizard
 	private IRemoteServices defaultRemoteServices;
-	
+
 	/**
 	 * The constructor
 	 */
 	public PTPRemoteCorePlugin() {
 	}
-	
+
 	/**
 	 * Retrieve a sorted list of remote services.
 	 * 
@@ -183,8 +183,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Retrieve the default remote services plugin. The default is the LocalServices
-	 * provider, which is guaranteed to exist.
+	 * Retrieve the default remote services plugin. The default is the
+	 * LocalServices provider, which is guaranteed to exist.
 	 * 
 	 * @return default remote services provider
 	 */
@@ -194,22 +194,24 @@ public class PTPRemoteCorePlugin extends Plugin {
 		}
 		return defaultRemoteServices;
 	}
-	
+
 	/**
 	 * Get the remote services descriptor identified by id
 	 * 
-	 * @param id id of the remote services
+	 * @param id
+	 *            id of the remote services
 	 * @return remote services descriptor
 	 */
 	public IRemoteServicesDescriptor getRemoteServicesDescriptor(String id) {
 		retrieveRemoteServices();
 		return allRemoteServicesById.get(id);
 	}
-	
+
 	/**
 	 * Get the remote services implementation identified by id
 	 * 
-	 * @param id id of the remote services
+	 * @param id
+	 *            id of the remote services
 	 * @return remote services
 	 */
 	public synchronized IRemoteServices getRemoteServices(String id) {
@@ -220,7 +222,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get the remote services identified by a URI
 	 * 
@@ -238,45 +240,52 @@ public class PTPRemoteCorePlugin extends Plugin {
 		}
 		return null;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 		defaultRemoteServices = null;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
 	}
-	
-    /**
+
+	/**
 	 * Find and load all remoteServices plugins.
 	 */
 	private void retrieveRemoteServices() {
 		if (allRemoteServicesById.isEmpty()) {
-	    	IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, REMOTE_SERVICES_EXTENSION_POINT_ID);
 			final IExtension[] extensions = extensionPoint.getExtensions();
-			
+
 			for (IExtension ext : extensions) {
 				final IConfigurationElement[] elements = ext.getConfigurationElements();
-			
-				for (IConfigurationElement ce : elements)
-				{
+
+				for (IConfigurationElement ce : elements) {
 					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
 					allRemoteServicesById.put(proxy.getId(), proxy);
 					allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
 				}
 			}
 		}
-    }
+	}
 }
