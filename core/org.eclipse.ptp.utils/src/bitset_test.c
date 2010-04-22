@@ -29,6 +29,7 @@
 void test_invert_mask(char *name, int nbits);
 void test_oreq(char *name, int nb1, int nb2);
 void test_str(char *name);
+void test_set(char *name);
 void test_boundary(char *name);
 void test_nine(char *name);
 void test_144(char *name);
@@ -43,6 +44,7 @@ main(int argc, char *argv[])
 	test_oreq("test_oreq", bits_size*2-4,bits_size*2);
 	test_oreq("test_oreq", bits_size*2,bits_size*2-4);
 	test_str("test_str");
+	test_set("test_set");
 	test_boundary("test_boundary");
 	test_nine("test_nine");
 	test_144("test_144");
@@ -127,6 +129,29 @@ test_str(char *name)
 		printf("TEST(%s)_2 FAIL: end == %d\n", name, *end);
 	} else {
 		printf("TEST(%s)_2 SUCCEDED\n", name);
+	}
+}
+
+
+void
+test_set(char *name)
+{
+	char * 		str1 = "{0,3-5,7-9,14}";
+	char *		str2;
+	bitset *	b = bitset_new(15);
+	bitset_set(b, 0);
+	bitset_set(b, 3);
+	bitset_set(b, 4);
+	bitset_set(b, 5);
+	bitset_set(b, 7);
+	bitset_set(b, 8);
+	bitset_set(b, 9);
+	bitset_set(b, 14);
+	str2 = bitset_to_set(b);
+	if (strcmp(str1, str2) != 0) {
+		printf("TEST(%s) FAIL: %s != %s\n", name, str1, str2);
+	} else {
+		printf("TEST(%s) SUCCEDED\n", name);
 	}
 }
 

@@ -58,7 +58,7 @@ am_libutils_a_OBJECTS = libutils_a-bitset.$(OBJEXT) \
 	libutils_a-args.$(OBJEXT) libutils_a-list.$(OBJEXT) \
 	libutils_a-hash.$(OBJEXT) libutils_a-handler.$(OBJEXT) \
 	libutils_a-compat.$(OBJEXT) libutils_a-rangeset.$(OBJEXT) \
-	libutils_a-serdes.$(OBJEXT)
+	libutils_a-serdes.$(OBJEXT) libutils_a-varstr.$(OBJEXT)
 libutils_a_OBJECTS = $(am_libutils_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
 am_args_test_OBJECTS = args_test-args_test.$(OBJEXT)
@@ -194,7 +194,8 @@ libutils_a_SOURCES = src/bitset.c \
 						src/handler.c \
 						src/compat.c \
 						src/rangeset.c \
-						src/serdes.c
+						src/serdes.c \
+						src/varstr.c
 
 libutils_a_CFLAGS = -I./include $(AM_CFLAGS) -g 
 bitset_test_SOURCES = src/bitset_test.c
@@ -300,6 +301,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-rangeset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-serdes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutils_a-varstr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rangeset_test-rangeset_test.Po@am__quote@
 
 .c.o:
@@ -427,6 +429,20 @@ libutils_a-serdes.obj: src/serdes.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/serdes.c' object='libutils_a-serdes.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o libutils_a-serdes.obj `if test -f 'src/serdes.c'; then $(CYGPATH_W) 'src/serdes.c'; else $(CYGPATH_W) '$(srcdir)/src/serdes.c'; fi`
+
+libutils_a-varstr.o: src/varstr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT libutils_a-varstr.o -MD -MP -MF $(DEPDIR)/libutils_a-varstr.Tpo -c -o libutils_a-varstr.o `test -f 'src/varstr.c' || echo '$(srcdir)/'`src/varstr.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libutils_a-varstr.Tpo $(DEPDIR)/libutils_a-varstr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/varstr.c' object='libutils_a-varstr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o libutils_a-varstr.o `test -f 'src/varstr.c' || echo '$(srcdir)/'`src/varstr.c
+
+libutils_a-varstr.obj: src/varstr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT libutils_a-varstr.obj -MD -MP -MF $(DEPDIR)/libutils_a-varstr.Tpo -c -o libutils_a-varstr.obj `if test -f 'src/varstr.c'; then $(CYGPATH_W) 'src/varstr.c'; else $(CYGPATH_W) '$(srcdir)/src/varstr.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libutils_a-varstr.Tpo $(DEPDIR)/libutils_a-varstr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/varstr.c' object='libutils_a-varstr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o libutils_a-varstr.obj `if test -f 'src/varstr.c'; then $(CYGPATH_W) 'src/varstr.c'; else $(CYGPATH_W) '$(srcdir)/src/varstr.c'; fi`
 
 args_test-args_test.o: src/args_test.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(args_test_CFLAGS) $(CFLAGS) -MT args_test-args_test.o -MD -MP -MF $(DEPDIR)/args_test-args_test.Tpo -c -o args_test-args_test.o `test -f 'src/args_test.c' || echo '$(srcdir)/'`src/args_test.c

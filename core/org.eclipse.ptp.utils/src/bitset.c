@@ -25,6 +25,7 @@
 
 #include "compat.h"
 #include "bitset.h"
+#include "varstr.h"
 
 bitset *
 bitset_new(int nbits)
@@ -407,24 +408,22 @@ str_to_bitset(char *str, char **end)
 	return bp;
 }
 
-int
-emit_range(char ** str, char sep, int lower, int upper)
+static int
+emit_range(varstr *v, char sep, int lower, int upper)
 {
-	int			n;
-
-	if (lower < 0 || upper < lower)
+	if (lower < 0 || upper < lower) {
 		return 0;
-
-	if (sep)
-		*(*str)++ = sep;
-
-	if (lower != upper) {
-		n = sprintf(*str, "%d-%d", lower, upper);
-	} else {
-		n = sprintf(*str, "%d", lower);
 	}
 
-	*str += n;
+	if (sep) {
+		varstr_add(v, sep);
+	}
+
+	if (lower != upper) {
+		varstr_sprintf(v, "%d-%d", lower, upper);
+	} else {
+		varstr_sprintf(v, "%d", lower);
+	}
 
 	return 1;
 }
@@ -442,32 +441,33 @@ bitset_to_set(bitset *b)
 	int			upper;
 	char		sep = 0;
 	char *		str;
-	char *		s;
+	varstr *	v;
 
 	if (b == NULL)
 		return strdup("{}");
 
-	str = s = (char *)malloc(b->bs_nbits * 2 + 3);
-
-	*s++ = '{';
+	v = varstr_fromstr("{");
 
 	for (bit = 0, lower = -1, upper = -1; bit < b->bs_nbits; bit++) {
 		if (bitset_test(b, bit)) {
-			if (lower < 0)
+			if (lower < 0) {
 				lower = bit;
-
+			}
 			upper = bit;
 		} else {
-			if (emit_range(&s, sep, lower, upper))
+			if (emit_range(v, sep, lower, upper)) {
 				sep = ',';
+			}
 			lower = bit + 1;
 		}
 	}
 
-	emit_range(&s, sep, lower, upper);
+	emit_range(v, sep, lower, upper);
 
-	*s++ = '}';
-	*s = '\0';
+	varstr_add(v, '}');
+
+	str = varstr_tostr(v);
+	varstr_free(v);
 
 	return str;
 }
