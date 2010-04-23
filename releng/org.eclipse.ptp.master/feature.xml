@@ -17,7 +17,6 @@
       %license
    </license>
 
-
    <includes
          id="org.eclipse.rephraserengine"
          version="0.0.0"/>
@@ -33,7 +32,7 @@
    <includes
          id="org.eclipse.photran.xlf"
          version="0.0.0"/>
-         
+
    <includes
          id="org.eclipse.ptp.utils"
          version="0.0.0"/>
@@ -134,5 +133,8 @@
          id="org.eclipse.ptp.rdt.xlc"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.rdt.remotetools"
+         version="0.0.0"/>
 
 </feature>

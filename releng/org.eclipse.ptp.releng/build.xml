@@ -281,6 +281,10 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>	
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotetools-feature"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>	
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.services-feature"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
@@ -592,6 +596,10 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.servers.dstore"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">

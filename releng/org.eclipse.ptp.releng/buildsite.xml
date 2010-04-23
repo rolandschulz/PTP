@@ -24,6 +24,9 @@
    <feature url="features/org.eclipse.ptp.rdt.xlc_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt.xlc" version="4.0.0.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.rdt.remotetools_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt.remotetools" version="4.0.0.@timeStamp@">
+      <category name="Remote Development Tools"/>
+   </feature>
    <feature url="features/org.eclipse.photran_6.0.0.@timeStamp@.jar" id="org.eclipse.photran" version="6.0.0.@timeStamp@">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
