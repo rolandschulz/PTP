@@ -16,7 +16,8 @@ import java.util.Map;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.rdt.server.dstore.core.DStoreCIndexServiceProvider;
+import org.eclipse.ptp.rdt.server.dstore.core.RemoteToolsCIndexServiceProvider;
+import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.rdt.server.dstore.ui.DStoreServerWidget.FieldModifier;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -38,9 +39,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-public class DStoreCIndexServiceProviderContributer implements IServiceProviderContributor {
+public class RemoteToolsCIndexServiceProviderContributer implements IServiceProviderContributor {
 
-	private DStoreCIndexServiceProvider fProvider;
+	private RemoteToolsCIndexServiceProvider fProvider;
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private IRemoteServices fSelectedServices;
@@ -57,21 +58,21 @@ public class DStoreCIndexServiceProviderContributer implements IServiceProviderC
 	 * org.eclipse.swt.widgets.Composite)
 	 */
 	public void configureServiceProvider(IServiceProvider sp, final Composite container) {
-		if (!(sp instanceof DStoreCIndexServiceProvider))
+		if (!(sp instanceof RemoteToolsCIndexServiceProvider))
 			throw new IllegalArgumentException(); // should never happen
 
-		fProvider = (DStoreCIndexServiceProvider) sp;
+		fProvider = (RemoteToolsCIndexServiceProvider) sp;
 
 		container.setLayout(new GridLayout(1, false));
 
 		Group connectionGroup = new Group(container, SWT.NONE);
-		connectionGroup.setText("Connection"); //$NON-NLS-1$
+		connectionGroup.setText(Messages.RemoteToolsCIndexServiceProviderContributer_0); 
 		connectionGroup.setLayout(new GridLayout(3, false));
 		connectionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Label for "Provider:"
 		Label providerLabel = new Label(connectionGroup, SWT.LEFT);
-		providerLabel.setText("Provider:"); //$NON-NLS-1$
+		providerLabel.setText(Messages.RemoteToolsCIndexServiceProviderContributer_1); 
 
 		// combo for providers
 		final Combo providerCombo = new Combo(connectionGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -85,7 +86,7 @@ public class DStoreCIndexServiceProviderContributer implements IServiceProviderC
 		// connection combo
 		// Label for "Connection:"
 		Label connectionLabel = new Label(connectionGroup, SWT.LEFT);
-		connectionLabel.setText("Connection:"); //$NON-NLS-1$
+		connectionLabel.setText(Messages.RemoteToolsCIndexServiceProviderContributer_2); 
 
 		// combo for providers
 		final Combo connectionCombo = new Combo(connectionGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -97,7 +98,7 @@ public class DStoreCIndexServiceProviderContributer implements IServiceProviderC
 
 		// new connection button
 		final Button newConnectionButton = new Button(connectionGroup, SWT.PUSH);
-		newConnectionButton.setText("New..."); //$NON-NLS-1$
+		newConnectionButton.setText(Messages.RemoteToolsCIndexServiceProviderContributer_3); 
 		updateNewConnectionButtonEnabled(newConnectionButton);
 
 		newConnectionButton.addSelectionListener(new SelectionAdapter() {

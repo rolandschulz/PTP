@@ -28,7 +28,7 @@ import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
-import org.eclipse.ptp.rdt.core.messages.Messages;
+import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.IRemoteToolsIndexServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -37,7 +37,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
-public class DStoreCIndexServiceProvider extends ServiceProvider implements IRemoteToolsIndexServiceProvider,
+public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements IRemoteToolsIndexServiceProvider,
 		IServiceProviderWorkingCopy {
 
 	protected IIndexLifecycleService fIndexLifecycleService = null;
@@ -48,22 +48,22 @@ public class DStoreCIndexServiceProvider extends ServiceProvider implements IRem
 	protected IModelBuilderService fModelBuilderService = null;
 	protected RemoteSearchService fSearchService = null;
 	protected IContentAssistService fContentAssistService = null;
-	protected DStoreCIndexSubsystem fSubsystem = null;
+	protected RemoteToolsCIndexSubsystem fSubsystem = null;
 	protected boolean fIsDirty = false;
-	protected DStoreCIndexServiceProvider fProvider = null;
+	protected RemoteToolsCIndexServiceProvider fProvider = null;
 	protected boolean fIsConfigured = false;
 
-	public static final String NAME = Messages.RemoteCIndexServiceProvider_0;
+	public static final String NAME = Messages.RemoteToolsCIndexServiceProvider_0;
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.CIndexingService"; //$NON-NLS-1$
 
 	private static final String SERVICE_ID_KEY = "service-name"; //$NON-NLS-1$
 	private static final String CONNECTION_NAME_KEY = "connection-name"; //$NON-NLS-1$
 	private static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
 
-	public DStoreCIndexServiceProvider() {
+	public RemoteToolsCIndexServiceProvider() {
 	}
 
-	public DStoreCIndexServiceProvider(DStoreCIndexServiceProvider provider) {
+	public RemoteToolsCIndexServiceProvider(RemoteToolsCIndexServiceProvider provider) {
 		fProvider = provider;
 		setProperties(provider.getProperties());
 		setDescriptor(provider.getDescriptor());
@@ -76,7 +76,7 @@ public class DStoreCIndexServiceProvider extends ServiceProvider implements IRem
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new DStoreCIndexServiceProvider(this);
+		return new RemoteToolsCIndexServiceProvider(this);
 	}
 
 	/*
@@ -208,7 +208,8 @@ public class DStoreCIndexServiceProvider extends ServiceProvider implements IRem
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rdt.ui.serviceproviders.IRemoteToolsIndexServiceProvider#
+	 * @see
+	 * org.eclipse.ptp.rdt.ui.serviceproviders.IRemoteToolsIndexServiceProvider#
 	 * getConnection()
 	 */
 	public IRemoteConnection getConnection() {
@@ -362,7 +363,7 @@ public class DStoreCIndexServiceProvider extends ServiceProvider implements IRem
 	 */
 	@Override
 	public String toString() {
-		return "DStoreCIndexServiceProvider(" + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "RemoteToolsCIndexServiceProvider(" + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private void initialize() {
@@ -394,7 +395,7 @@ public class DStoreCIndexServiceProvider extends ServiceProvider implements IRem
 		if (fSubsystem != null) {
 			fSubsystem.dispose();
 		}
-		fSubsystem = new DStoreCIndexSubsystem(this);
+		fSubsystem = new RemoteToolsCIndexSubsystem(this);
 		setConfigured(true);
 	}
 

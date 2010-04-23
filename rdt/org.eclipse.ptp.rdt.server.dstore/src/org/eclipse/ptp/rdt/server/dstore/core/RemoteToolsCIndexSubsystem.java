@@ -91,15 +91,15 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * @author crecoskie
  * 
  */
-public class DStoreCIndexSubsystem implements ICIndexSubsystem {
+public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 	private final Map<IProject, String> fInitializedProjects = new HashMap<IProject, String>();
 	private final ProjectChangeListener fProjectOpenListener = new ProjectChangeListener(this);
-	private final DStoreCIndexServiceProvider fProvider;
+	private final RemoteToolsCIndexServiceProvider fProvider;
 	private final List<String> fErrorMessages = new ArrayList<String>();
 	private DStoreServer fDStoreServer = null;
 
-	public DStoreCIndexSubsystem(DStoreCIndexServiceProvider provider) {
+	public RemoteToolsCIndexSubsystem(RemoteToolsCIndexServiceProvider provider) {
 		fProvider = provider;
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectOpenListener);
 		generateErrorMessages();
@@ -882,7 +882,7 @@ public class DStoreCIndexSubsystem implements ICIndexSubsystem {
 		IServiceConfiguration config = serviceModelManager.getActiveConfiguration(project);
 
 		// is the indexing service associated with our service provider?
-		IService service = serviceModelManager.getService(DStoreCIndexServiceProvider.SERVICE_ID);
+		IService service = serviceModelManager.getService(RemoteToolsCIndexServiceProvider.SERVICE_ID);
 		IServiceProvider provider = config.getServiceProvider(service);
 
 		// if so, initialize a scope for the project consisting of all

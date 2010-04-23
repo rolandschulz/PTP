@@ -5,26 +5,26 @@
            point="org.eclipse.ptp.remote.core.remoteServer">
         <remoteServer
               class="org.eclipse.ptp.rdt.server.dstore.core.DStoreServer"
-              id="org.eclipse.ptp.rdt.ui.DStoreRemoteToolsServer"
+              id="org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer"
               launchCommand="java -Xms64m -Xmx128m -Xss2m -DA_PLUGIN_PATH=. -DDSTORE_TRACING_ON=false -Dclient.username=$USER -DDSTORE_SPIRIT_ON=true -jar ${payload} 0 60000"
-              name="DStore Remote Tools Server"
+              name="%RemoteToolsDStoreServer.name"
               payload="rdt-server.jar">
         </remoteServer>
      </extension>
         <extension
               point="org.eclipse.ptp.services.core.providers">
            <provider
-                 class="org.eclipse.ptp.rdt.server.dstore.core.DStoreCIndexServiceProvider"
-                 id="org.eclipse.ptp.rdt.server.dstore.DStoreCIndexServiceProvider"
-                 name="%DStoreCIndexingService.name"
+                 class="org.eclipse.ptp.rdt.server.dstore.core.RemoteToolsCIndexServiceProvider"
+                 id="org.eclipse.ptp.rdt.server.dstore.RemoteToolsCIndexServiceProvider"
+                 name="%RemoteToolsCIndexingService.name"
                  serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
            </provider>
         </extension>
         <extension
            point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
-              class="org.eclipse.ptp.rdt.server.dstore.ui.DStoreCIndexServiceProviderContributer"
-              id="org.eclipse.ptp.rdt.server.dstore.ui.DStoreCIndexServiceProvider">
+              class="org.eclipse.ptp.rdt.server.dstore.ui.RemoteToolsCIndexServiceProviderContributer"
+              id="org.eclipse.ptp.rdt.server.dstore.ui.RemoteToolsCIndexServiceProvider">
         </providerContributor>
      </extension>
 </plugin>
