@@ -7,14 +7,12 @@
  *
  * Contributors:
  *    IBM Corporation - Initial API and implementation
- *******************************************************************************/ 
+ *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.ui.scannerinfo;
-
 
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.ui.newui.AbstractCPropertyTab;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -37,28 +35,27 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 
-
 /**
- * Dialog box that allows the user to browse the remote system for
- * include directories.
+ * Dialog box that allows the user to browse the remote system for include
+ * directories.
  */
 public class RemoteIncludeDialog extends Dialog {
-	
-	private Shell shell; 
-	
+
+	private Shell shell;
+
 	// buttons
 	private Button b_ok;
 	private Button b_cancel;
 	private Button b_browse;
 	private Button b_vars;
-	
+
 	// check boxes
 	private Button b_add2confs;
 	private Button b_add2langs;
-	
+
 	// the text input area
 	private Text text;
-	
+
 	// used to pre-fill the text area with some text
 	private String pathText = null;
 
@@ -67,57 +64,53 @@ public class RemoteIncludeDialog extends Dialog {
 	private String directory = null;
 	private boolean isAllLanguages = false;
 	private boolean isAllConfigurations = false;
-	private ICConfigurationDescription config;
-	
-	
+	private final ICConfigurationDescription config;
+
 	private final boolean isEdit;
-	
+
 	// TODO: should remove IHost and only use IRemoteServices
 	// and IRemoteConnection
-	
+
 	// fHost used for RSE connections
 	private IHost fHost = null;
 	// fRemoteServices and fRemoteConnection used for others
-	private IRemoteServices fRemoteServices = null;
 	private IRemoteConnection fRemoteConnection = null;
-	
+
 	public RemoteIncludeDialog(Shell parent, String title, boolean isEdit, ICConfigurationDescription config) {
 		super(parent);
 		setText(title);
 		this.isEdit = isEdit;
 		this.config = config;
 	}
-	
-	
+
 	public boolean open() {
 		Shell parent = getParent();
- 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
- 		shell.setText(getText());
- 		
- 		createDialogArea(shell);
- 		shell.pack();
- 		
- 		// center window
- 		Rectangle r1 = parent.getBounds();
- 		Rectangle r2 = shell.getBounds();
- 		int x = r1.x + (r1.width - r2.width) / 2;
- 		int y = r1.y + (r1.height - r2.height) / 2;
- 		shell.setBounds(x, y, r2.width, r2.height);
- 		
-	 	shell.open();
-	 	Display display = parent.getDisplay();
-	 	while(!shell.isDisposed()) {
-	 		if(!display.readAndDispatch()) 
-	 			display.sleep();
-	 	}
+		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+		shell.setText(getText());
+
+		createDialogArea(shell);
+		shell.pack();
+
+		// center window
+		Rectangle r1 = parent.getBounds();
+		Rectangle r2 = shell.getBounds();
+		int x = r1.x + (r1.width - r2.width) / 2;
+		int y = r1.y + (r1.height - r2.height) / 2;
+		shell.setBounds(x, y, r2.width, r2.height);
+
+		shell.open();
+		Display display = parent.getDisplay();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
 		return result;
 	}
-	
 
 	protected void createDialogArea(Composite parent) {
 		parent.setLayout(new GridLayout(2, false));
 		GridData gd;
-		
+
 		Label l1 = new Label(parent, SWT.NONE);
 		l1.setText(Messages.RemoteIncludeDialog_directory);
 		l1.setLayoutData(gd = new GridData());
@@ -132,69 +125,66 @@ public class RemoteIncludeDialog extends Dialog {
 		b_browse.setText(Messages.RemoteIncludeDialog_browse);
 		b_browse.addSelectionListener(listener);
 		b_browse.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
+
 		new Label(parent, SWT.NONE);
-		
+
 		b_vars = new Button(parent, SWT.PUSH);
 		b_vars.setText(Messages.RemoteIncludeDialog_vars);
 		b_vars.addSelectionListener(listener);
 		b_vars.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
+
 		b_add2confs = new Button(parent, SWT.CHECK);
 		b_add2confs.setText(Messages.RemoteIncludeDialog_configurations);
 		b_add2confs.setVisible(!isEdit);
 		b_add2confs.setLayoutData(gd = new GridData());
 		gd.horizontalSpan = 2;
-		
+
 		b_add2langs = new Button(parent, SWT.CHECK);
 		b_add2langs.setText(Messages.RemoteIncludeDialog_languages);
 		b_add2langs.setVisible(!isEdit);
 		b_add2langs.setLayoutData(gd = new GridData());
 		gd.horizontalSpan = 2;
-		
+
 		b_ok = new Button(parent, SWT.PUSH);
-		b_ok.setText(Messages.RemoteIncludeDialog_ok); 
+		b_ok.setText(Messages.RemoteIncludeDialog_ok);
 		b_ok.addSelectionListener(listener);
 		b_ok.setLayoutData(gd = new GridData());
 		gd.widthHint = 80;
 		gd.horizontalAlignment = SWT.END;
-		
+
 		b_cancel = new Button(parent, SWT.PUSH);
-		b_cancel.setText(Messages.RemoteIncludeDialog_cancel); 
+		b_cancel.setText(Messages.RemoteIncludeDialog_cancel);
 		b_cancel.addSelectionListener(listener);
 		b_cancel.setLayoutData(gd = new GridData());
 		gd.widthHint = 80;
 	}
-	
-	
-	
+
 	public void setPathText(String path) {
 		this.pathText = path;
 	}
-	
 
-	private SelectionListener listener = new SelectionAdapter() {
+	private final SelectionListener listener = new SelectionAdapter() {
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Widget pressed = e.widget;
-			if(pressed.equals(b_ok)) { 
+			if (pressed.equals(b_ok)) {
 				directory = text.getText();
 				isAllConfigurations = b_add2confs.getSelection();
 				isAllLanguages = b_add2langs.getSelection();
 				result = true;
-				shell.dispose(); 
-			} 
-			else if(pressed.equals(b_cancel)) {
+				shell.dispose();
+			} else if (pressed.equals(b_cancel)) {
 				result = false;
 				shell.dispose();
-			} 
-			else if(pressed.equals(b_browse)) {
+			} else if (pressed.equals(b_browse)) {
 				if (fHost != null) {
-					SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell, Messages.RemoteIncludeDialog_select, fHost);
+					SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(shell,
+							Messages.RemoteIncludeDialog_select, fHost);
 					folderDialog.setShowNewConnectionPrompt(false);
 					folderDialog.open();
 					Object remoteObject = folderDialog.getSelectedObject();
-					if(remoteObject instanceof IRemoteFile) {
-						IRemoteFile folder = (IRemoteFile)remoteObject;
+					if (remoteObject instanceof IRemoteFile) {
+						IRemoteFile folder = (IRemoteFile) remoteObject;
 						text.setText(folder.getCanonicalPath());
 					}
 				} else {
@@ -213,25 +203,21 @@ public class RemoteIncludeDialog extends Dialog {
 						}
 					}
 				}
-			}
-			else if(pressed.equals(b_vars)) {
+			} else if (pressed.equals(b_vars)) {
 				String s = AbstractCPropertyTab.getVariableDialog(shell, config);
-				if(s != null) 
+				if (s != null)
 					text.insert(s);
 			}
 		}
 	};
 
-
 	public String getDirectory() {
 		return directory;
 	}
 
-
 	public boolean isAllLanguages() {
 		return isAllLanguages;
 	}
-
 
 	public boolean isAllConfigurations() {
 		return isAllConfigurations;
@@ -240,22 +226,22 @@ public class RemoteIncludeDialog extends Dialog {
 	public void setHost(IHost host) {
 		fHost = host;
 	}
-	
-	public void setConnection(IRemoteServices services, IRemoteConnection connection) {
-		fRemoteServices = services;
+
+	public void setConnection(IRemoteConnection connection) {
 		fRemoteConnection = connection;
 	}
-	
+
 	private IRemoteUIFileManager getUIFileManager() {
-		if (fRemoteServices != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIFileManager();
+		if (fRemoteConnection != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIFileManager();
 		}
 		return null;
 	}
-	
+
 	private IRemoteUIConnectionManager getUIConnectionManager() {
-		if (fRemoteServices != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices).getUIConnectionManager();
+		if (fRemoteConnection != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices())
+					.getUIConnectionManager();
 		}
 		return null;
 	}
