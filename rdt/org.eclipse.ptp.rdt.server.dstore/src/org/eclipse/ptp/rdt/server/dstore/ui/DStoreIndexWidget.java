@@ -8,6 +8,7 @@
 package org.eclipse.ptp.rdt.server.dstore.ui;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.rdt.server.dstore.ui.DStoreServerWidget.FieldModifier;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteDirectoryWidget;
@@ -30,8 +31,8 @@ public class DStoreIndexWidget extends Composite {
 		setLayout(layout);
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		fDirectoryWidget = new RemoteDirectoryWidget(this, SWT.NONE, "Index location", fDefaultPath);
-		fDirectoryWidget.setBrowseMessage("Select Index File Location"); //$NON-NLS-1$
+		fDirectoryWidget = new RemoteDirectoryWidget(this, SWT.NONE, Messages.DStoreIndexWidget_0, fDefaultPath);
+		fDirectoryWidget.setBrowseMessage(Messages.DStoreIndexWidget_1); 
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 		data.horizontalSpan = 3;
 		fDirectoryWidget.setLayoutData(data); // set layout to grab horizontal
