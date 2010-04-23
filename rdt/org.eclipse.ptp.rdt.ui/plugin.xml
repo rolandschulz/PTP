@@ -174,13 +174,6 @@
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
-      <provider
-            class="org.eclipse.ptp.rdt.ui.serviceproviders.RemoteToolsCIndexServiceProvider"
-            id="org.eclipse.ptp.rdt.ui.RemoteToolsCIndexServiceProvider"
-            name="%RemoteToolsCIndexingService.name"
-            priority="1"
-            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
-      </provider>
    </extension>
    <extension
          id="org.eclipse.ptp.rdt.core.remoteNature"
@@ -663,7 +656,7 @@
       </viewerContribution>
      </extension>
      
-        <extension
+     <extension
            point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
               class="org.eclipse.ptp.rdt.ui.wizards.RSECIndexServiceProviderContributer"
@@ -674,10 +667,6 @@
               class="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderContributor"
               configurationUIClass="org.eclipse.ptp.rdt.ui.wizards.RemoteServicesServiceProviderConfigurer"
               id="org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider">
-        </providerContributor>
-        <providerContributor
-              class="org.eclipse.ptp.rdt.ui.wizards.RemoteToolsCIndexServiceProviderContributer"
-              id="org.eclipse.ptp.rdt.ui.RemoteToolsCIndexServiceProvider">
         </providerContributor>
      </extension>
      <extension
