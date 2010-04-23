@@ -33,6 +33,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteVariableManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.osgi.framework.Bundle;
@@ -43,13 +44,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	private final boolean DEBUG = true;
+
 	private final Map<String, String> fEnv = new HashMap<String, String>();
 	private IRemoteConnection fRemoteConnection;
 	private Bundle fBundle;
-
 	private final String fServerName;
+
 	private String fLaunchCommand;
-	private String fPayload;
 	private String fWorkDir = null;
 	private ServerState fServerState = ServerState.STARTING;
 	private IRemoteProcess fRemoteProcess;
@@ -81,7 +82,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return
 	 */
 	public String getPayload() {
-		return fPayload;
+		return RemoteVariableManager.getInstance().getVariable("payload"); //$NON-NLS-1$
 	}
 
 	/**
@@ -149,7 +150,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            payload name
 	 */
 	public void setPayload(String file) {
-		fPayload = file;
+		RemoteVariableManager.getInstance().setVariable("payload", file); //$NON-NLS-1$
 	}
 
 	/**
@@ -260,7 +261,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				local.copy(server, EFS.NONE, monitor);
 			}
 
-			String launchCmd = NLS.bind(getLaunchCommand(), getPayload());
+			String launchCmd = RemoteVariableManager.getInstance().performStringSubstitution(getLaunchCommand());
 			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
 			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
 			builder.directory(directory);
@@ -269,7 +270,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		} catch (CoreException e) {
 			throw new IOException(e.getMessage());
 		}
-
 	}
 
 	/*
