@@ -25,7 +25,8 @@ public class RemoteUtil {
 			// This might not be the best way of doing this.
 			// DO NOT rename the cdtminer.jar file as RDT will stop working.
 			String classpath = System.getProperty("java.class.path"); //$NON-NLS-1$
-			remote = classpath.contains("cdtminer.jar"); //$NON-NLS-1$
+			remote = classpath.contains("cdtminer.jar") || classpath.contains("rdt-server"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println("classpath=" + classpath); //$NON-NLS-1$
 		}
 		return remote;
 	}
