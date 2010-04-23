@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -122,6 +123,12 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		fBundle = Platform.getBundle(id);
 	}
 
+	/**
+	 * Set the environment prior to launching the server.
+	 * 
+	 * @param env
+	 *            string containing environment (as returned by "env" command)
+	 */
 	public void setEnv(String env) {
 		if (env != null) {
 			for (String vars : env.split("\n")) { //$NON-NLS-1$
@@ -238,29 +245,38 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	private IRemoteProcess launchServer(IRemoteConnection conn, IProgressMonitor monitor) throws IOException {
 		try {
+			/*
+			 * First check if the remote file exists or is a different size to
+			 * the local version and copy over if required.
+			 */
 			IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 			IFileStore directory = fileManager.getResource(getWorkingDir());
 			if (!directory.fetchInfo(EFS.NONE, monitor).exists()) {
 				return null;
 			}
 			IFileStore server = directory.getChild(getPayload());
-			if (!server.fetchInfo(EFS.NONE, monitor).exists()) {
-				IFileStore local = null;
-				try {
-					URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
-					if (jarURL != null) {
-						jarURL = FileLocator.toFileURL(jarURL);
-						local = EFS.getStore(jarURL.toURI());
-					}
-				} catch (URISyntaxException e) {
-					throw new IOException(e.getMessage());
+			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, monitor);
+			IFileStore local = null;
+			try {
+				URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
+				if (jarURL != null) {
+					jarURL = FileLocator.toFileURL(jarURL);
+					local = EFS.getStore(jarURL.toURI());
 				}
-				if (local == null) {
-					return null;
-				}
-				local.copy(server, EFS.NONE, monitor);
+			} catch (URISyntaxException e) {
+				throw new IOException(e.getMessage());
+			}
+			if (local == null) {
+				return null;
+			}
+			IFileInfo localInfo = local.fetchInfo(EFS.NONE, monitor);
+			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
+				local.copy(server, EFS.OVERWRITE, monitor);
 			}
 
+			/*
+			 * Now launch the server.
+			 */
 			String launchCmd = RemoteVariableManager.getInstance().performStringSubstitution(getLaunchCommand());
 			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
 			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
