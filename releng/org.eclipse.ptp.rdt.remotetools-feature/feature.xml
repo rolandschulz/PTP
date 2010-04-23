@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.rdt.remotetools"
+      label="%featureName"
+      version="4.0.0.qualifier"
+      provider-name="%providerName">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/helios"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.core" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.dstore.core" version="3.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.core" version="5.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.remote.core" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.remote.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.connectorservice.dstore" version="3.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.core" version="3.1.1" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.rdt.server.dstore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
