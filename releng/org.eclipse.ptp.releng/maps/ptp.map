@@ -34,6 +34,7 @@ feature@org.eclipse.ptp.etfw.tau.fortran=@ptpTag@,:pserver:anonymous@dev.eclipse
 feature@org.eclipse.ptp.rdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt-feature
 feature@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.xlc-feature
 feature@org.eclipse.ptp.rdt.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotetools-feature
+feature@org.eclipse.ptp.rdt.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotejars-feature
 
 ! PTP Plugins
 plugin@org.eclipse.ptp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp
@@ -119,11 +120,11 @@ plugin@org.eclipse.ptp.etfw.feedback=@ptpTag@,:pserver:anonymous@dev.eclipse.org
 ! RDT Plugins
 plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core
 plugin@org.eclipse.ptp.rdt.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui
-plugin@org.eclipse.ptp.rdt.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.services
 plugin@org.eclipse.ptp.rdt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user
 plugin@org.eclipse.ptp.rdt.managedbuilder.xlc.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui
 plugin@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.xlc
 plugin@org.eclipse.ptp.rdt.make.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.make.ui
+plugin@org.eclipse.ptp.rdt.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.remotejars
 plugin@org.eclipse.ptp.rdt.server.dstore=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.server.dstore
 
 ! ISP Plugins
