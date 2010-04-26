@@ -109,7 +109,6 @@ plugin@org.eclipse.ptp.pldt.wizards=@ptpTag@,:pserver:anonymous@dev.eclipse.org:
 ! ETF Plugins
 plugin@org.eclipse.ptp.etfw=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw
 plugin@org.eclipse.ptp.etfw.tau=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau
-plugin@org.eclipse.ptp.etfw.tau.jars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.jars
 plugin@org.eclipse.ptp.etfw.tau.papiselect=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.papiselect
 plugin@org.eclipse.ptp.etfw.tau.perfdmf=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.perfdmf
 plugin@org.eclipse.ptp.etfw.tau.selinst=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinst
