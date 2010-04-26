@@ -362,10 +362,13 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                     EOL);
                 
                 tokenRef = entry.getTokenRef();
-                output.write(tokenRef.getFilename() + "," +
-                    Integer.toString(tokenRef.getOffset()) + "," +
-                    Integer.toString(tokenRef.getLength()) +
-                    EOL);
+                if (tokenRef == null)
+                    output.write(EOL);
+                else
+                    output.write(tokenRef.getFilename() + "," +
+                        Integer.toString(tokenRef.getOffset()) + "," +
+                        Integer.toString(tokenRef.getLength()) +
+                        EOL);
                 
                 message = entry.getMessage();
                 message.replaceAll(EOL, EOL_ESCAPE);
@@ -409,11 +412,18 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                 
                 //read tokenRef values
                 line = bRead.readLine();
-                tokenRefString = line.split("\\,");
-                tokenRef = vpg.createTokenRef(
-                    tokenRefString[0],
-                    Integer.parseInt(tokenRefString[1]),
-                    Integer.parseInt(tokenRefString[2]));
+                if (line.trim().equals(""))
+                {
+                    tokenRef = null;
+                }
+                else
+                {
+                    tokenRefString = line.split("\\,");
+                    tokenRef = vpg.createTokenRef(
+                        tokenRefString[0],
+                        Integer.parseInt(tokenRefString[1]),
+                        Integer.parseInt(tokenRefString[2]));
+                }
                 
                 //read message
                 line = bRead.readLine();
