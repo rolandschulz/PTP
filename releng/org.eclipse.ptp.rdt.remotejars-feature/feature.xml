@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.rdt.remotejars"
+      label="%featureName"
+      version="4.0.0.qualifier"
+      provider-name="%providerName">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/helios"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ptp.rdt.core" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.make.ui" version="1.0.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.managedbuilder.xlc.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.ui" version="2.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.rdt.core.remotejars"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
