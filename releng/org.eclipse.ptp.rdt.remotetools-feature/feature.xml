@@ -23,8 +23,6 @@
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rdt.core" version="1.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem" version="1.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.dstore.core" version="3.1.1" match="greaterOrEqual"/>
@@ -32,11 +30,14 @@
       <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.core" version="5.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.remote.core" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.core" version="1.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.remote.ui" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.rdt.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.connectorservice.dstore" version="3.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.core" version="3.1.1" match="greaterOrEqual"/>
+      <import feature="org.eclipse.ptp.rdt.remotejars" version="4.0.0.qualifier"/>
    </requires>
 
    <plugin
