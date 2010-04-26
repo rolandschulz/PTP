@@ -71,7 +71,8 @@
 	
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
-	
+	<target name="build.jars" depends="jar, fetch, unpack.platform, all.remote"/>
+
 	<target name="jar" depends="generate.build.scripts">
 		<ant antfile="${basedir}/build.cdtminer.xml">
 			<property name="basedir" value="${basedir}/.."/>
