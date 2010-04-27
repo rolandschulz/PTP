@@ -28,7 +28,6 @@ under Tools $>$ PTP by selecting one of the ``Photran'' components.
 \vspace{-0.2in}
 
 \section{How To Read This Guide} 
-
 This document explains the design of Photran so that interested contributors
 could fix a bug or add a refactoring. Contributors should know how to use
 Photran; user's guides and introductory tutorials are available from the

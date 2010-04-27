@@ -1,0 +1,159 @@
+% Contributing a New Feature or Bug Fix
+
+%\begin{list}{$\bigcirc$}{}
+\begin{enumerate}
+
+\item Make sure you did not copy code from anywhere except Photran and CDT.
+      If you copied code from books, mailing lists, Web sites, any other open
+      source projects, other projects at your company, etc., \textbf{stop}
+      and ask for further instructions.  (If you do not know a Photran
+      committer personally, ask on the photran-dev mailing list.)  It may
+      or may not be possible to contribute your code.
+
+\item Determine who owns the copyright to your code.  Generally,
+      if you are an employee and you were paid to write the code, it is
+      the property of your employer.  If you are a student, the code may
+      be your personal property, or it may be the property of your
+      university, depending on several factors.  Always check with your
+      employer or university to determine who the copyright owner is.
+      The following examples assume that the code was written by John
+      Doe as an employee of the XYZ Corporation.
+
+\item Your code must be contributed under the terms of the Eclipse Public
+      License (EPL).  If the copyright is owned by your employer or
+      university, make sure they will permit you to contribute your code
+      under the EPL.  (They will probably be asked for verification by
+      the Eclipse Legal team.)
+
+\item Ensure that \textit{every} Java file you created or modified has an
+accurate copyright header.
+
+    \begin{itemize}
+
+    \item If you created the file from scratch (i.e., it is not a modification
+          of someone else's code), the copyright header must name the copyright
+          owner and list them as the initial contributor.  For example: \\
+          
+          {\scriptsize
+          \begin{verbatim}
+/*******************************************************************************
+ * Copyright (c) 2010 XYZ Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    John Doe (XYZ Corporation) - Initial API and implementation
+ *******************************************************************************/
+          \end{verbatim}
+          }
+
+    \item If you modified an existing file from Photran or CDT, it must retain the
+          \textit{original} copyright notice, but you should add yourself as a
+          contributor at the bottom.  For example: \\
+          
+          {\scriptsize
+          \begin{verbatim}
+/*******************************************************************************
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    IBM - Initial API and implementation
+ *    John Doe (XYZ Corporation) - Photran modifications
+ *******************************************************************************/
+          \end{verbatim}
+          }
+
+    \end{itemize}
+
+\item Every Java class should have a JavaDoc comment with a brief description
+      of the class and an \texttt{@author} tag with your full name.  Again,
+      if you modified an existing class, add an \texttt{@author} tag with your
+      name.  For example:
+      
+      {\scriptsize
+      \begin{verbatim}
+/**
+ * Refactoring to create getter and setter subprograms for a module variable and replace variable
+ * accesses with calls to those subprograms.
+ * <p>
+ * This refactoring accepts a module variable declaration, makes that declaration PRIVATE, adds
+ * getter and setter procedures to the module, and then replaces accesses to the variable outside
+ * the module with calls to the getter and setter routines.
+ *
+ * @author Tim Yuvashev
+ * @author Jeff Overbey
+ */
+public class EncapsulateVariableRefactoring
+{ ...
+      \end{verbatim}
+      }
+      
+      
+copyright header.
+
+\item Create a new bug in Bugzilla on one of the ``Photran'' components.  You
+can do this by clicking the ``Report a Bug'' link on the Photran home page.
+If your code adds a new feature (rather than fixing a bug), set the severity
+of the bug to ``Enhancement.''
+
+\item Create a patch with the files that you changed. Ê(Highlight all of
+the projects you changed in the Package Explorer, right-click, and
+choose Team $>$ Create Patch.) ÊAttach the patch to the bug in Bugzilla.
+ÊIf you have any binary files (e.g., images), DO NOT include them in
+the patch; attach them to Bugzilla separately.
+
+\item A Photran committer will review the code and may ask you to make changes.
+If so, you will need to create a new patch, attach it to the bug, and mark the
+old patch as ``obsolete.''
+
+\item When the code review succeeds, the Photran committer will make the following
+comment on the bug: \\
+\ \\
+\begin{minipage}{5.5in}
+Please confirm that
+\begin{enumerate}
+\item you wrote 100\% of the code without incorporating content from elsewhere or relying on the intellectual property of others,
+\item you have the right to contribute the code to Eclipse, and
+\item you have included the EPL license header in all source files?
+\end{enumerate}
+\end{minipage} \\
+\ \\
+You can reply with something as simple as the following.  Of course, if you \textit{did} incorporate
+content from elsewhere -- e.g., from CDT, from existing classes in Photran, or elsewhere -- you must
+note that appropriately.
+\ \\
+\begin{minipage}{5.5in}
+I confirm that
+\begin{enumerate}
+\item I wrote 100\% of the code without incorporating content from elsewhere or relying on the intellectual property of others,
+\item I have the right to contribute the code to Eclipse, and
+\item I have included the EPL license header in all source files.
+\end{enumerate}
+\end{minipage}
+
+\item Your code will be passed on to the intellectual property (IP) team at the
+Eclipse Foundation for a legal review.  If there are any questions or concerns
+about the code, a member of the Eclipse IP team will contact you.
+
+\item Once it passes IP review, the committer will commit your code to Photran's CVS repository.
+
+\item Your name will be added on the ``Contributors'' page of the Photran Web site.
+
+\end{enumerate}
+%\end{list}
+
+\vspace*{1.5em}
+
+\textit{References:}
+
+\href{http://wiki.eclipse.org/Development\_Resources\#Everyone:\_IP\_Cleanliness}
+     {http://wiki.eclipse.org/Development\_Resources\#Everyone:\_IP\_Cleanliness}
+
+\href{http://wiki.eclipse.org/Development\_Conventions\_and\_Guidelines}
+     {http://wiki.eclipse.org/Development\_Conventions\_and\_Guidelines}
