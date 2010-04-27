@@ -21,12 +21,14 @@ package org.eclipse.photran.internal.ui.views.vpgproblems;
 
 
 import java.util.List;
-import java.util.logging.ErrorManager;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -38,6 +40,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.vpg.VPGLog;
+import org.eclipse.rephraserengine.core.vpg.eclipse.VPGSchedulingRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.MouseEvent;
@@ -117,27 +120,56 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         initEvents();
     }
 
+    private static RecreateMarkers markersTask = null;
+    
     public void onLogChange()
     {
-        getSite().getShell().getDisplay().syncExec(new Runnable()
+        if (markersTask == null)
         {
-            public void run()
+            // If non-null, this task is already running; don't start a 2nd instance
+            
+            markersTask = new RecreateMarkers();
+            
+            WorkspaceJob job = new RecreateMarkers();
+            job.setRule(MultiRule.combine(VPGSchedulingRule.getInstance(),
+                                          ResourcesPlugin.getWorkspace().getRoot()));
+            job.schedule();
+        }
+    }
+    
+    private class RecreateMarkers extends WorkspaceJob
+    {
+        private RecreateMarkers()
+        {
+            super("Updating Fortran Analysis/Refactoring Problems view");
+        }
+        
+        @Override public IStatus runInWorkspace(final IProgressMonitor monitor)
+        {
+            final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+            
+            getSite().getShell().getDisplay().syncExec(new Runnable()
             {
-                Table t = tableViewer.getTable();
-                t.removeAll();
-                t.update();
-                List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
-                tableViewer.setInput(markers);
-                countMarkers(markers);
-                if(warningsMarkerFilterAction != null && errorsMarkerFilterAction != null)
+                public void run()
                 {
-                    String warnStr = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_WARNING]) + " Warnings";
-                    String errStr  = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_ERROR]) + " Errors";
-                    warningsMarkerFilterAction.setText(warnStr);
-                    errorsMarkerFilterAction.setText(errStr);
+                    Table t = tableViewer.getTable();
+                    t.removeAll();
+                    t.update();
+                    tableViewer.setInput(markers);
+                    countMarkers(markers);
+                    if (warningsMarkerFilterAction != null && errorsMarkerFilterAction != null)
+                    {
+                        String warnStr = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_WARNING]) + " Warnings";
+                        String errStr  = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_ERROR]) + " Errors";
+                        warningsMarkerFilterAction.setText(warnStr);
+                        errorsMarkerFilterAction.setText(errStr);
+                    }
                 }
-            }
-        });
+            });
+            
+            markersTask = null;
+            return Status.OK_STATUS;
+        }
     }
 
     private void setTableGridData()

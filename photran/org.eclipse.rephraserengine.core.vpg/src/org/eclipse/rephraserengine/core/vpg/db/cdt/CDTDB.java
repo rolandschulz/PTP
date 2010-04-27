@@ -57,6 +57,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
               extends VPGDB<A, T, R, L>
 {
     private InternalCDTDB db;
+    private File lock;
 
     public CDTDB(String filename)
     {
@@ -71,6 +72,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
         try
         {
+            lock = new File(file.getPath() + ".lock");
             db = new InternalCDTDB(file);
         }
         catch (CoreException e)
@@ -82,6 +84,42 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     ////////////////////////////////////////////////////////////////////////////
     // VPG DATABASE METHODS
     ////////////////////////////////////////////////////////////////////////////
+
+    @Override public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg)
+    {
+        super.setVPG(vpg);
+        clearDBIfPossiblyCorrupted();
+    }
+
+    /**
+     * Clears the database if a lock file exists, indicating that it might be corrupted.
+     * <p>
+     * A lock file is created when the database is started.  If Eclipse is shut down cleanly, the
+     * lock file is deleted.  However, if it is terminated abnormally, the lock file will still
+     * exist.  This checks if the lock file exists, and, if so, clears the database, which will
+     * force the VPG to re-index all the source files in the workspace.
+     * <p>
+     * Note that only one instance of Eclipse can be open on a particular workspace, so it is not
+     * possible that the lock exists because the database is open in a different instance of Eclipse.
+     */
+    private void clearDBIfPossiblyCorrupted()
+    {
+        if (lock.exists())
+        {
+            this.clearDatabase();
+        }
+        else
+        {
+            try
+            {
+                lock.createNewFile();
+            }
+            catch (IOException e)
+            {
+                //ignore
+            }
+        }
+    }
 
     public void flush()
     {
@@ -99,6 +137,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     {
         try
         {
+            lock.delete();
             db.close();
         }
         catch (CoreException e)

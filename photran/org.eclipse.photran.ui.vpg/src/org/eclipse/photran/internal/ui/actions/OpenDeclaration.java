@@ -92,7 +92,9 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
             if (defMap == null) return true;
             
             Definition def = defMap.lookup(selection, tokenList);
-            if (def == null || def.isExternal() || def.isImplicitExternalSubprogram())
+            if (def == null)
+                def = chooseExternalDef(PhotranVPG.getInstance().findAllExternalSubprogramsNamed(PhotranVPG.canonicalizeIdentifier(selection.getText())));
+            else if (def.isExternal() || def.isImplicitExternalSubprogram())
                 def = chooseExternalDef(PhotranVPG.getInstance().findAllExternalSubprogramsNamed(def.getCanonicalizedName()));
 
             showDeclInUIThread(def);
@@ -111,8 +113,10 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
                 {
                     if (defList.size() > 1)
                         def = openSelectionDialog(defList);
-                    else
+                    else if (defList.size() == 1)
                         def = defList.get(0);
+                    else
+                        def = null;
                 }
             };
             

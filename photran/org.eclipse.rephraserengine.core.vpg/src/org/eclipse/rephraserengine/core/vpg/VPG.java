@@ -86,10 +86,10 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 		this.transientASTs = new HashMap<String, WeakReference<A>>();
 		this.permanentASTs = new HashMap<String, A>();
 		this.transientASTCache = new Object[transientASTCacheSize];
+        this.log = log;
+        this.log.setVPG(this);
 		this.db = database;
-		this.db.setVPG(this);
-	    this.log = log;
-	    this.log.setVPG(this);
+		this.db.setVPG(this); // CDTDB requires the log to be set before this call
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -119,8 +119,6 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 
 			if (ast != null) return ast;
 		}
-
-		log.clearEntriesFor(filename);
 
 		long start = System.currentTimeMillis();
 		ast = parse(filename);
@@ -192,6 +190,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
     protected long computeEdgesAndAnnotations(String filename, A ast)
     {
         long start = System.currentTimeMillis();
+        log.clearEntriesFor(filename);
         db.deleteAllEdgesAndAnnotationsFor(filename);
         populateVPG(filename, ast);
         db.updateModificationStamp(filename);
