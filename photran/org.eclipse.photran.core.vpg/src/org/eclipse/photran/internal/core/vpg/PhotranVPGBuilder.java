@@ -227,6 +227,7 @@ public class PhotranVPGBuilder extends PhotranVPG
                 @Override
                 public void logError(String message, IFile topLevelFile, int offset)
                 {
+                    PhotranVPG.getInstance().log.clearEntriesFor(PhotranVPG.getFilenameForIFile(topLevelFile));
                     PhotranVPG.getInstance().log.logError(message, new PhotranTokenRef(topLevelFile, offset, 0));
                 }
             });
@@ -340,8 +341,11 @@ public class PhotranVPGBuilder extends PhotranVPG
             catch (SyntaxException e)
             {
                 if (e.getFile() != null && e.getFile().getIFile() != null)
+                {
+                    log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
                     log.logError("Error parsing " + filename + ": " + e.getMessage(),
                         new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
+                }
                 else
                     logError(file, "Error parsing " + filename, e);
                 return null;
@@ -349,8 +353,11 @@ public class PhotranVPGBuilder extends PhotranVPG
             catch (LexerException e)
             {
                 if (e.getFile() != null && e.getFile().getIFile() != null)
+                {
+                    log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
                     log.logError("Error parsing " + filename + ": " + e.getMessage(),
                         new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
+                }
                 else
                     logError(file, "Error parsing " + filename, e);
                 return null;

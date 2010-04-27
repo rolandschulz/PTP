@@ -49,8 +49,6 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	// Tested empirically on ibeam-cpp-mod: 5 does better than 3, but 10 does not do better than 5
     private static final int MODULE_SYMTAB_CACHE_SIZE = 5;
 
-
-    
 	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
 	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
 	public static final int BINDING_EDGE_TYPE = 2;
@@ -624,6 +622,12 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
     private List<IMarker> errorLogMarkers = null;
 
+    /**
+     * It is the caller's responsibility to make sure this task is executed in the
+     * with the correct scheduling rule.  (The VPG Problems view locks the entire
+     * workspace; the CVS plug-in was having problems when marker attributes were
+     * being set on resources that were not locked by the scheduling rule.)
+     */
     public List<IMarker> recomputeErrorLogMarkers()
     {
         deleteExistingErrorMarkers();
