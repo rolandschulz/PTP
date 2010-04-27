@@ -163,8 +163,6 @@ class FixedFormLexerPrepass {
 				} 
 				else if(actLine.type==PreLexerLine.COMMENT)
 				{
-				    if(prevLine.type != PreLexerLine.COMMENT && actLine.length() > 0)
-				        markPosition(prevLine.linePos, actLinePos, prevLine.offset+prevLine.length());
 				    prevWhiteSpace=prevWhiteSpace.concat(actLine.getText());
 				    prevWhiteSpace=prevWhiteSpace.concat(in.getFileEOL());
 				    actLinePos = actLine.length();
