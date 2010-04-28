@@ -20,13 +20,12 @@ public class PBSRMLaunchConfigurationFactory extends
 		AbstractRMLaunchConfigurationFactory {
 
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm) throws CoreException {
-		return new PBSRMLaunchConfigurationDynamicTab(rm);
-	}
-
-	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return PBSResourceManager.class;
 	}
 
+	@Override
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm) throws CoreException {
+		return new PBSRMLaunchConfigurationDynamicTab();
+	}
 }
