@@ -18,7 +18,6 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSQueueProtocolAttributes;
 
-
 /**
  * Job attributes
  */
