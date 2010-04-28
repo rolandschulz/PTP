@@ -58,11 +58,14 @@ RoutingList * RoutingList::getInstance()
 }
 
 RoutingList::RoutingList()
+    : maxSegmentSize(TCP_ETHERNET_MTU * 32)
 {
     int hndl = gCtrlBlock->getMyHandle();
     char *envp = ::getenv("SCI_SEGMENT_SIZE");
-    if ((envp == NULL) || ((maxSegmentSize = ::atoi(envp)) <= TCP_ETHERNET_MTU))
-        maxSegmentSize = TCP_ETHERNET_MTU * 32;
+    if (envp != NULL) {
+        maxSegmentSize = atoi(envp);
+        maxSegmentSize = maxSegmentSize > TCP_ETHERNET_MTU ? maxSegmentSize : TCP_ETHERNET_MTU * 32;
+    }
 
     if (hndl == -1) {
         // this is a front end, not parent
@@ -208,23 +211,24 @@ int RoutingList::getSegments(Message *msg, Message ***segments, int ref)
     sci_group_t gid = msg->getGroup();
     Message::Type typ = msg->getType();
     int mid = msg->getID();
-    int fid = msg->getFilterID();
+    int mfid = msg->getFilterID();
+    int hfid = mfid;
     int mlen = msg->getContentLen();
     *segments = (Message **)::malloc(segnum * sizeof(Message *));
     Message **segs = *segments;
 
-    if ((fid != SCI_FILTER_NULL) || (typ != Message::COMMAND)) {
-        fid = SCI_ROUTE_SEGMENT;
+    if ((mfid != SCI_FILTER_NULL) || (typ != Message::COMMAND)) {
+        hfid = SCI_JOIN_SEGMENT;
     }
     ::memset(segs, 0, segnum * sizeof(Message *));
     segs[0] = new Message();
-    segs[0]->build(fid, gid, 0, NULL, NULL, Message::SEGMENT, segnum);
+    segs[0]->build(hfid, gid, 0, NULL, NULL, Message::SEGMENT, segnum);
     segs[0]->setRefCount(ref);
 
     for (i = 1; i < segnum; i++) {
         segs[i] = new Message();
         size = (i < (segnum - 1)) ? maxSegmentSize : (mlen % maxSegmentSize);
-        segs[i]->build(fid, gid, 1, &ptr, &size, typ, mid);
+        segs[i]->build(mfid, gid, 1, &ptr, &size, typ, mid);
         segs[i]->setRefCount(ref);
         ptr += size;
     }

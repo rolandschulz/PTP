@@ -33,7 +33,7 @@ class Message;
 class DistributedGroup;
 class Stream;
 
-#define SCI_ROUTE_SEGMENT -1001
+#define SCI_JOIN_SEGMENT -1001
 
 
 class RoutingList
