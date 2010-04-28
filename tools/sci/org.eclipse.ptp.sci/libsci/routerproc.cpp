@@ -62,7 +62,7 @@ Message * RouterProcessor::read()
     Message *msg = NULL;
     msg = inQueue->consume();
     
-    if (msg && (msg->getType() == Message::SEGMENT) && (msg->getFilterID() == SCI_ROUTE_SEGMENT)) {
+    if (msg && (msg->getType() == Message::SEGMENT) && (msg->getFilterID() == SCI_JOIN_SEGMENT)) {
         int segnum = msg->getID() - 1; // exclude the SEGMENT header
         Message **segments = (Message **)::malloc(segnum * sizeof(Message *));
         inQueue->remove();
