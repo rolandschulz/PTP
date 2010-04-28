@@ -13,6 +13,9 @@ as a guide for contributers on \emph{where} to put their contributions.
 \section{The Rephraser Engine}
 
 There are two major components in Photran's CVS repository: Photran itself, and another project called the Rephraser Engine.  For the most part, you will probably be able to ignore the Rephraser Engine, but it is helpful to know what it is.
+(The Rephraser Engine will contribute a Rephraser Engine Plug-in Developer Guide to the runtime
+workbench; this provides more information about these plug-ins.  Its sources are in the
+org.eclipse.rephraserengine.doc.isv project.)
 
 While developing Photran, one of our research objectives has been to create a common infrastructure that can be reused in refactoring tools for different languages. The Rephraser Engine is one part of this infrastructure: It contains base classes for refactorings, the virtual program graph (VPG), etc.  \textit{None of the classes in the Rephraser Engine know about Fortran, Photran, or CDT.}  They are completely language-independent.  However, many of the classes in Photran's refactoring engine inherit from base classes in the Rephraser Engine: They are ``specialized'' to work with Fortran.
 
@@ -175,29 +178,29 @@ Hilliard at Intel.
 
 \end{itemize}
 
-\section{Rephraser Engine}
-
-The following plug-ins comprise the Rephraser Engine, a language-independent indexing and
-refactoring infrastructure that serves as the basis for Photran's refactoring engine.
-The Rephraser Engine will contribute a Rephraser Engine Plug-in Developer Guide to the runtime
-workbench (sourced in org.eclipse.rephraserengine.doc.isv); this provides more information about
-these plug-ins.  Starred plug-ins are not distributed to end users.
-
-\begin{itemize}
-\item \textbf{org.eclipse.rephraserengine-feature}
-\item \textbf{org.eclipse.rephraserengine-support}*
-\item \textbf{org.eclipse.rephraserengine.core}
-\item \textbf{org.eclipse.rephraserengine.core.refactoring}
-\item \textbf{org.eclipse.rephraserengine.core.vpg}
-\item \textbf{org.eclipse.rephraserengine.core.vpg.tests}*
-\item \textbf{org.eclipse.rephraserengine.doc.isv}*
-\item \textbf{org.eclipse.rephraserengine.examples.text}*
-\item \textbf{org.eclipse.rephraserengine.examples.testing}*
-\item \textbf{org.eclipse.rephraserengine.testing.junit3}*
-\item \textbf{org.eclipse.rephraserengine.ui}
-\item \textbf{org.eclipse.rephraserengine.ui.refactoring}
-\item \textbf{org.eclipse.rephraserengine.ui.vpg}
-\end{itemize}
+%\section{Rephraser Engine}
+%
+%The following plug-ins comprise the Rephraser Engine, a language-independent indexing and
+%refactoring infrastructure that serves as the basis for Photran's refactoring engine.
+%The Rephraser Engine will contribute a Rephraser Engine Plug-in Developer Guide to the runtime
+%workbench (sourced in org.eclipse.rephraserengine.doc.isv); this provides more information about
+%these plug-ins.  Starred plug-ins are not distributed to end users.
+%
+%\begin{itemize}
+%\item \textbf{org.eclipse.rephraserengine-feature}
+%\item \textbf{org.eclipse.rephraserengine-support}*
+%\item \textbf{org.eclipse.rephraserengine.core}
+%\item \textbf{org.eclipse.rephraserengine.core.refactoring}
+%\item \textbf{org.eclipse.rephraserengine.core.vpg}
+%\item \textbf{org.eclipse.rephraserengine.core.vpg.tests}*
+%\item \textbf{org.eclipse.rephraserengine.doc.isv}*
+%\item \textbf{org.eclipse.rephraserengine.examples.text}*
+%\item \textbf{org.eclipse.rephraserengine.examples.testing}*
+%\item \textbf{org.eclipse.rephraserengine.testing.junit3}*
+%\item \textbf{org.eclipse.rephraserengine.ui}
+%\item \textbf{org.eclipse.rephraserengine.ui.refactoring}
+%\item \textbf{org.eclipse.rephraserengine.ui.vpg}
+%\end{itemize}
 
 \section{Non-plug-in projects}
 

@@ -29,26 +29,18 @@ under Tools $>$ PTP by selecting one of the ``Photran'' components.
 
 \vspace{-0.2in}
 
-\section{How To Read This Guide} 
-This document explains the design of Photran so that interested contributors
-could fix a bug or add a refactoring. Contributors should know how to use
-Photran; user's guides and introductory tutorials are available from the
-\href{http://www.eclipse.org/photran/documentation.php}{\emph{Documentation}}
-section of Photran's website.  Contributors also need to understand how to build
-Eclipse plug-ins before they read this document. Two good books on Eclipse
-plug-in development are
-\href{http://www.amazon.com/Eclipse-Building-Commercial-Quality-Plug-Ins/dp/0321228472}{\emph{Building
-Commercial-Quality Plug-ins}} and
-\href{http://www.amazon.com/Java-Developers-Guide-Eclipse-2nd/dp/0321305027/}{\emph{The
-Java Developer's Guide to Eclipse.}}  Like almost all Eclipse plug-ins, Photran
-is written in Java, so knowing Java is also a prerequisite.
+\section{How To Read This Guide}
 
-This is a \emph{duplex} guide. The main chapters provide general descriptions of
-the various components and how they interact. The appendix describes concrete
-examples from Photran so that contributors can familiarize themselves with
-actual code and implementation details. This guide complements the source code
-in the repository; it is \underline{not a substitute} for reading the actual
-source code.
+The \textit{Photran Developer's Guide} is intended to complement the
+source code in the repository; it is not a substitute for reading
+the actual source code.  Rather, it contains high-level information that
+\textit{can't} easily be derived simply by reading the source code.
+
+The \textit{Photran Developer's Guide} has been divided into two documents.
+This document is Part~I: It contains general information that every developer
+should know.  Part~II gives more detail about specific components of Photran;
+it should be used as a reference, depending on what specific parts of Photran
+you want to work on.
 
 
 \vspace{-0.2in}
@@ -57,15 +49,10 @@ source code.
 
 If you have not already, work through the items on the ``Checklist for New
 Developers'' at the beginning of this manual.
-
 In particular, \textit{please} join the photran-dev mailing list, and use it to
-ask for help!  Although we have attempted to document the most-used parts of
-Photran's codebase, either in JavaDoc or in this manual, our documentation is
-by no means comprehensive.  As you attempt to fix or extend parts of Photran,
+ask for help!  Although Photran is better documented than many projects,
 you will probably encounter problems that you cannot resolve simply by reading
-the documentation or reverse engineering the code.  When this is the case, ask
-for help!  It will make you more productive, and it will help us improve this
-documentation.
+the documentation or reverse engineering the code.
 
 When your contribution is finished, follow the procedure in
 Appendix~\ref{app:contributing} to contribute your code to the ``official''

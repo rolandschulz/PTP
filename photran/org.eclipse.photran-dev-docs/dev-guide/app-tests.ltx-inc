@@ -12,16 +12,16 @@
 	\item Change the ``VM arguments'' field to \texttt{-ea -Xms40m -Xmx512m}
 	\item Switch to the ``Environment'' tab.
 	\item Create a new environment variable called \texttt{TESTING} with a value of 1.
-	\item \textit{(Optional)} If you are running Linux or Mac OS X and have gfortran installed:
-	      \begin{enumerate}
-	      \item[] \textit{Some of Photran's refactoring unit tests can attempt to compile
+	\item \textit{(Optional)} If you are running Linux or Mac OS X and have gfortran installed,
+	            some of Photran's refactoring unit tests can attempt to compile
 	            and run the Fortran test programs before and after the refactoring in order
 	            to ensure that the refactoring actually preserves behavior (and produces
 	            code that compiles).  The following steps will enable this behavior.
 	            Note, however, that if the path to gfortran is incorrect, or if gfortran
 	            cannot be run successfully, it will cause the test suite to fail\dots
 	            so you might not want to do this the very first time you attempt to run
-	            the test suite.}
+	            the test suite.
+	      \begin{enumerate}
 	      \item Create a new environment variable called \texttt{COMPILER} with the full
 	            path to gfortran.  This will be something like
 	            \texttt{/usr/local/bin/gfortran}
@@ -29,13 +29,13 @@
 	            path to some non-existent file in your home directory, e.g.,
 	            \texttt{/Users/joverbey/a.out}.  When gfortran is run, it will write
 	            the executable to this path.
-	      \item[] \textit{When both of these environment variables are set, you will be able
-	            to see the output from the compiler and the Fortran program in the Console
-	            view as the test suite runs.  If compilation fails, or if the Fortran program
-	            exits with a nonzero status code, or if the Fortran program does not produce
-	            the same output before and after refactoring, the corresponding JUnit test
-	            will fail.  See the JavaDoc for the method
-	            \texttt{RefactoringTestCase\#compileAndRunFortranProgram} for more details.}
+	      %\item[] \textit{When both of these environment variables are set, you will be able
+	      %      to see the output from the compiler and the Fortran program in the Console
+	      %      view as the test suite runs.  If compilation fails, or if the Fortran program
+	      %      exits with a nonzero status code, or if the Fortran program does not produce
+	      %      the same output before and after refactoring, the corresponding JUnit test
+	      %      will fail.  See the JavaDoc for the method
+	      %      \texttt{RefactoringTestCase\#compileAndRunFortranProgram} for more details.}
 	      \end{enumerate}
 	\item Click the ``Run'' button to run the tests.  It will take at least a minute to run
 	      the test suite.  When it finishes, you should get a green bar in the JUnit view.
@@ -43,11 +43,14 @@
 	\item To run the tests again later, just launch the
 	      ``Photran-Tests'' configuration from the Eclipse Run menu.
 
-	\vspace{.5em}
-	\noindent\textit{\textbf{Note.} Some parser tests will attempt to look for closed-source
-	code that you may not have.  A warning will appear in the JUnit runner if this code is not
-	available, but all tests should still pass.
-	UIUC personnel: See the appendix \textit{Additional Information for UIUC Personnel} in the
-	\textit{Photran Developer's Guide} for more information.}
+	%\vspace{.5em}
+	%\noindent\textit{\textbf{Note.} Some parser tests will attempt to look for closed-source
+	%code that you may not have.  A warning will appear in the JUnit runner if this code is not
+	%available, but all tests should still pass.
+	%UIUC personnel: See the appendix \textit{Additional Information for UIUC Personnel} in the
+	%\textit{Photran Developer's Guide} for more information.}
+	\noindent\textit{\textbf{Note.} UIUC personnel: See the appendix
+	``Additional Information for UIUC Personnel'' in the
+	\textit{Photran Developer's Guide} for information on additional unit test cases.}
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}

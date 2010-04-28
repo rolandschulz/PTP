@@ -22,7 +22,10 @@ You will need to \href{https://bugs.eclipse.org/bugs/createaccount.cgi}{create a
 
 \item \textbf{Get a book or two on Eclipse plug-in development.}
 Eventually, you'll want to buy (or check out from the library) a book on Eclipse plug-in development.
-\textit{The Java Developer's Guide to Eclipse} by D'Anjou et al.~is a good choice.
+\textit{\href{http://www.amazon.com/Java-Developers-Guide-Eclipse-2nd/dp/0321305027/}{\emph{The
+Java Developer's Guide to Eclipse}}} by D'Anjou et al.~is a good choice.
+\textit{\href{http://www.amazon.com/Eclipse-Building-Commercial-Quality-Plug-Ins/dp/0321228472}{\emph{Eclipse:
+Building Commercial-Quality Plug-ins}}} is also recommended.
 
 \item \textbf{Learn the basics of Eclipse plug-in development.}
 If you get D'Anjou's book, read Chapters 7-9 and 21.

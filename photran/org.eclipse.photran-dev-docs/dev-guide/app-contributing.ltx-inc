@@ -133,7 +133,7 @@ Please confirm that
 \end{minipage}
 } \\
 \ \\
-You can reply with something as simple as the following.
+You can reply with something as simple as the following. \\
 \ \\
 {\footnotesize\itshape
 \begin{minipage}{5.5in}
@@ -156,7 +156,7 @@ about the code, a member of the Eclipse IP team will contact you.
 
 \item Once it passes IP review, the committer will commit your code to Photran's CVS repository.
 
-\item Your name will be added on the ``Contributors'' page of the Photran Web site.
+\item The committer will add your name to the ``Contributors'' page of the Photran Web site.
 
 \end{enumerate}
 %\end{list}
