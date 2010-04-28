@@ -1,40 +1,27 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
- *     IBM Corporation - Initial API and implementation
- *     Dieter Krachtus, University of Heidelberg
- *     Roland Schulz, University of Tennessee
- *******************************************************************************/
+ *     IBM Corporation - initial API and implementation 
+ *     Albert L. Rossi (NCSA) - full implementation (bug 310188)
+ ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.launch;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.TableViewerFocusCellManager;
-import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -42,341 +29,273 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.pbs.core.PBSJobAttributes;
-import org.eclipse.ptp.rm.pbs.core.PBSNodeAttributes;
+import org.eclipse.ptp.rm.pbs.ui.AttributePlaceholder;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
+import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
+import org.eclipse.ptp.rm.pbs.ui.wizards.DynamicTabWizardPage;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.ptp.utils.ui.Activator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ScrollBar;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * This tab provides fields for setting the user-determined subset of attribute
+ * values. This subset must be configured using the PBS Resource Manager
+ * preference page.
+ * 
+ * @author Albert L. Rossi, NCSA University of Illinois
+ */
 public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
+	/*
+	 * (non-Javadoc) Accesses the parent's map of widgets to attribute
+	 * placeholders for the various update functions.
+	 */
+	class PBSRMLaunchDataSource extends RMLaunchConfigurationDynamicTabDataSource {
+		private boolean save = false;
 
-	private class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
-		private boolean useDefArgs;
-		private String args;
-		private boolean useDefParams;
-		private Map<String, String> params;
-
-		protected DataSource(BaseRMLaunchConfigurationDynamicTab page) {
+		protected PBSRMLaunchDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
 		}
 
 		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#copyFromFields()
+		 * (non-Javadoc) Note that only three types are defined: int, string and
+		 * boolean. These are mapped to Spinner, Text and (check) Button
+		 * widgets.
 		 */
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			useDefArgs = useArgsDefaultsButton.getSelection();
-			args = extractText(argsText);
-
-			useDefParams = useParamsDefaultsButton.getSelection();
-			params.clear();
-			for (Object object : paramsViewer.getCheckedElements()) {
-				// if (object instanceof Parameter) {
-				// Parameter param = (Parameter) object;
-				// params.put(param.getName(), param.getValue());
-				// }
+			toggleSave();
+			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets.entrySet().iterator(); i.hasNext();) {
+				Entry<Control, AttributePlaceholder> e = i.next();
+				Control c = e.getKey();
+				AttributePlaceholder ap = e.getValue();
+				Object value = null;
+				if (c instanceof Text) {
+					value = extractText((Text) c);
+				} else if (c instanceof Spinner) {
+					value = ((Spinner) c).getSelection();
+				} else if (c instanceof Button) {
+					value = ((Button) c).getSelection();
+				}
+				if (value != null)
+					try {
+						ap.getAttribute().setValueAsString(value.toString());
+					} catch (IllegalValueException t) {
+						throw new ValidationException(t.toString());
+					}
 			}
+			toggleSave();
 		}
 
 		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#copyToFields()
+		 * (non-Javadoc) Note that only three types are defined: int, string and
+		 * boolean. These are mapped to Spinner, Text and (check) Button
+		 * widgets.
 		 */
 		@Override
 		protected void copyToFields() {
-			applyText(argsText, args);
-			useArgsDefaultsButton.setSelection(useDefArgs);
-			useParamsDefaultsButton.setSelection(useDefParams);
-
-			// if (info != null) {
-			// for (Entry<String, String> param : params.entrySet()) {
-			// Parameter p = info.getParameter(param.getKey());
-			// if (p != null) {
-			// p.setValue(param.getValue());
-			// paramsViewer.setChecked(p, true);
-			// paramsViewer.update(p, null);
-			// }
-			// }
-			// }
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#copyToStorage()
-		 */
-		@Override
-		protected void copyToStorage() {
-			// getConfigurationWorkingCopy().setAttribute(
-			// OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
-			// useDefArgs);
-			// getConfigurationWorkingCopy().setAttribute(
-			// OpenMPILaunchConfiguration.ATTR_ARGUMENTS, args);
-			// getConfigurationWorkingCopy().setAttribute(
-			// OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
-			// useDefParams);
-			// getConfigurationWorkingCopy().setAttribute(
-			// OpenMPILaunchConfiguration.ATTR_PARAMETERS, params);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#loadDefault()
-		 */
-		@Override
-		protected void loadDefault() {
-			// args = OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS;
-			// useDefArgs =
-			// OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS;
-			// useDefParams =
-			// OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS;
-			// params = OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS;
-
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#loadFromStorage()
-		 */
-		@Override
-		protected void loadFromStorage() {
-			// try {
-			// args = getConfiguration().getAttribute(
-			// OpenMPILaunchConfiguration.ATTR_ARGUMENTS,
-			// OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
-			// useDefArgs = getConfiguration()
-			// .getAttribute(
-			// OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
-			// OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
-			// useDefParams = getConfiguration()
-			// .getAttribute(
-			// OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
-			// OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS);
-			// params = getConfiguration().getAttribute(
-			// OpenMPILaunchConfiguration.ATTR_PARAMETERS,
-			// OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
-			// } catch (CoreException e) {
-			// // TODO handle exception?
-			// }
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#validateLocal()
-		 */
-		@Override
-		protected void validateLocal() throws ValidationException {
-			// if (!useDefArgs && args == null)
-			// throw new ValidationException(
-			// Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyArguments);
-			// if (!useDefParams) {
-			// for (Object object : paramsViewer.getCheckedElements()) {
-			// if (object instanceof Parameter) {
-			// Parameter param = (Parameter) object;
-			//						if (param.getValue().equals("")) //$NON-NLS-1$
-			// throw new ValidationException(
-			// Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyParameter);
-			// }
-			// }
-			// }
-		}
-	}
-
-	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
-		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
-			super(dynamicTab);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org
-		 * .eclipse.jface.viewers.CheckStateChangedEvent)
-		 */
-		public void checkStateChanged(CheckStateChangedEvent event) {
-			if (isEnabled()) {
-				Object source = event.getSource();
-				if (source == paramsViewer) {
-					fireContentsChanged();
-					updateControls();
+			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets.entrySet().iterator(); i.hasNext();) {
+				Entry<Control, AttributePlaceholder> e = i.next();
+				Control c = e.getKey();
+				AttributePlaceholder ap = e.getValue();
+				Object value = ap.getAttribute().getValue();
+				if (value != null) {
+					if (c instanceof Text) {
+						applyText((Text) c, (String) value);
+					} else if (c instanceof Spinner) {
+						((Spinner) c).setSelection((Integer) value);
+					} else if (c instanceof Button) {
+						((Button) c).setSelection((Boolean) value);
+					}
 				}
 			}
 		}
 
 		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.rm.ui.utils.WidgetListener#doWidgetSelected(org.eclipse
-		 * .swt.events.SelectionEvent)
+		 * (non-Javadoc) Note that only three types are defined: int, string and
+		 * boolean.
 		 */
 		@Override
-		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == paramsViewer) {
-				updateControls();
-			} else {
-				super.doWidgetSelected(e);
+		protected void copyToStorage() {
+			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
+			for (Iterator<AttributePlaceholder> i = valueWidgets.values().iterator(); i.hasNext();) {
+				AttributePlaceholder ap = i.next();
+				IAttribute<?, ?, ?> attr = ap.getAttribute();
+				String id = attr.getDefinition().getId();
+				Object value = attr.getValue();
+				if (value instanceof Boolean)
+					config.setAttribute(id, (Boolean) value);
+				else if (value instanceof Integer)
+					config.setAttribute(id, (Integer) value);
+				else if (value instanceof String)
+					config.setAttribute(id, (String) value);
 			}
 		}
-	}
 
-	protected Composite control;
-	protected Button useArgsDefaultsButton;
-	protected Text argsText;
-	protected Button useParamsDefaultsButton;
-	protected CheckboxTableViewer paramsViewer;
-	protected Table paramsTable;
-	protected AttributeManager attributes = new AttributeManager();
+		/*
+		 * (non-Javadoc) NOP for the moment.
+		 */
+		@Override
+		protected void loadDefault() {
+		}
 
-	public PBSRMLaunchConfigurationDynamicTab(IResourceManager rm) {
-		addAttributes(PBSNodeAttributes.getDefaultAttributeDefinitions());
-		addAttributes(PBSJobAttributes.getDefaultAttributeDefinitions());
-	}
-
-	/**
-	 * @param attrDefs
-	 */
-	private void addAttributes(IAttributeDefinition<?, ?, ?>[] attrDefs) {
-		for (IAttributeDefinition<?, ?, ?> iAttributeDefinition : attrDefs) {
-			try {
-				attributes.addAttribute(iAttributeDefinition.create());
-			} catch (IllegalValueException e) {
-				// Should not happen with default values
+		/*
+		 * (non-Javadoc) Note that only three types are defined: int, string and
+		 * boolean.
+		 */
+		@Override
+		protected void loadFromStorage() {
+			ILaunchConfiguration config = getConfigurationWorkingCopy();
+			if (config == null) {
+				config = getConfiguration();
 			}
+			if (config == null)
+				return;
+			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets.entrySet().iterator(); i.hasNext();) {
+				Entry<Control, AttributePlaceholder> e = i.next();
+				Control c = e.getKey();
+				AttributePlaceholder ap = e.getValue();
+				IAttribute<?, ?, ?> attr = ap.getAttribute();
+				String id = attr.getDefinition().getId();
+				Object value = null;
+				try {
+					if (c instanceof Text) {
+						value = config.getAttribute(id, EMPTY_STRING);
+					} else if (c instanceof Button) {
+						value = config.getAttribute(id, false);
+					} else if (c instanceof Spinner) {
+						value = config.getAttribute(id, 1);
+					}
+					if (value != null) {
+						attr.setValueAsString(value.toString());
+					}
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}
+
+		/*
+		 * (non-Javadoc) If this is called during a save, we check that none of
+		 * the widget Text values is null; else we validate the attribute
+		 * values.
+		 */
+		@Override
+		protected void validateLocal() throws ValidationException {
+			if (!save()) {
+				for (Iterator<AttributePlaceholder> i = valueWidgets.values().iterator(); i.hasNext();) {
+					AttributePlaceholder ap = i.next();
+					Object value = ap.getAttribute().getValue();
+					if (null == value || "".equals(value.toString().trim()))
+						throw new ValidationException(ap.getName() + ": VALUE NOT SET");
+				}
+			} else {
+				for (Iterator<Control> i = valueWidgets.keySet().iterator(); i.hasNext();) {
+					Control c = i.next();
+					if (c instanceof Text) {
+						String value = ((Text) c).getText().trim();
+						if (null == value || "".equals(value)) {
+							AttributePlaceholder ap = valueWidgets.get(c);
+							throw new ValidationException(ap.getName() + ": VALUE NOT SET");
+						}
+					}
+				}
+			}
+		}
+
+		private synchronized boolean save() {
+			return save;
+		}
+
+		private synchronized void toggleSave() {
+			save = !save;
 		}
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * (non-Javadoc) No specific sub-functionality for the moment, but we define
+	 * the PBS-specific class anyway.
+	 */
+	class PBSRMLaunchWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+		public PBSRMLaunchWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+			super(dynamicTab);
+		}
+	}
+
+	private Composite control;
+
+	/*
+	 * //////////////////////////////////////////////////////////////////////////
+	 * Fields
+	 */
+	private PBSRMLaunchDataSource dataSource;
+	private PBSRMLaunchWidgetListener listener;
+	private Map<Control, AttributePlaceholder> valueWidgets;
+	private DynamicTabWizardPage wizardPage;
+
+	/*
+	 * (non-Javadoc) The control is populated by a wizard page with adds widgets
+	 * on the basis of the selected attributes.
 	 * 
 	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#
+	 * createControl(org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.ptp.core.elements.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		control = new Composite(parent, SWT.NONE);
-		control.setLayout(new GridLayout());
-
-		final Group jobAttributesGroup = new Group(control, SWT.NONE);
-		jobAttributesGroup.setText(Messages.PBSRMLaunchConfigurationDynamicTab_0);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		jobAttributesGroup.setLayout(layout);
-		jobAttributesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		paramsViewer = CheckboxTableViewer.newCheckList(jobAttributesGroup, SWT.CHECK | SWT.FULL_SELECTION);
-		paramsViewer.setContentProvider(new IStructuredContentProvider() {
-			public void dispose() {
-				// Empty implementation.
-			}
-
-			public Object[] getElements(Object inputElement) {
-				return attributes.getAttributes();
-			}
-
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-				// Empty implementation.
-				System.err.println("PBSRMLaunchConfigurationDynamicTab#IStructuredContentProvider#inputChanged"); //$NON-NLS-1$
-			}
-		});
-		paramsViewer.setSorter(new ViewerSorter() {
-			@Override
-			public int compare(Viewer viewer, Object j1, Object j2) {
-				return ((IAttribute<?, ?, ?>) j1).getDefinition().getName().compareTo(
-						((IAttribute<?, ?, ?>) j2).getDefinition().getName());
-			}
-		});
-		paramsViewer.addCheckStateListener(getLocalListener());
-		paramsViewer.setAllChecked(false);
-
-		// Enable cursor keys in table
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(paramsViewer,
-				new FocusCellOwnerDrawHighlighter(paramsViewer));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(paramsViewer) {
-			@Override
-			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
-			}
-		};
-		TableViewerEditor.create(paramsViewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
-				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
-				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
-
-		paramsTable = paramsViewer.getTable();
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.heightHint = 100;
-		paramsTable.setLayoutData(gd);
-		paramsTable.setLinesVisible(true);
-		paramsTable.setHeaderVisible(true);
-		paramsTable.setEnabled(true);
-		// Disable cell item selection
-		paramsTable.addListener(SWT.EraseItem, new Listener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.
-			 * widgets.Event)
-			 */
-			public void handleEvent(Event event) {
-				event.detail &= ~SWT.SELECTED;
-			}
-		});
-
-		addColumns();
-
-		paramsViewer.setInput(this);
+		control = WidgetUtils.createContainer(parent, null, false, 110);
+		valueWidgets = new HashMap<Control, AttributePlaceholder>();
+		wizardPage = new DynamicTabWizardPage(valueWidgets, getListener());
+		wizardPage.createControl(control);
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * //////////////////////////////////////////////////////////////////////////
+	 * Public superclass methods
+	 */
+
+	/*
+	 * (non-Javadoc) A copy of the attributes, with their values, to be handed
+	 * of to the launch method, is constructed from the configuration.
 	 * 
 	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getAttributes(org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#
+	 * getAttributes(org.eclipse.ptp.core.elements.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
 	 */
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
-		return null;
+		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
+		Map<?, ?> configAttr = configuration.getAttributes();
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		try {
+			for (Iterator<?> i = configAttr.entrySet().iterator(); i.hasNext();) {
+				Entry<?, ?> e = (Entry<?, ?>) i.next();
+				Object value = e.getValue();
+				IAttributeDefinition<?, ?, ?> def = defs.get(e.getKey());
+				if (def != null && value != null)
+					attrs.add(defs.get(e.getKey()).create(value.toString()));
+			}
+		} catch (IllegalValueException e) {
+			throw new CoreException(new Status(Status.WARNING, Activator.PLUGIN_ID, "getAttributes", e));
+		}
+		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getControl()
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#
+	 * getControl()
 	 */
 	public Control getControl() {
 		return control;
@@ -403,166 +322,79 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	@Override
 	public String getText() {
-		return Messages.PBSRMLaunchConfigurationDynamicTab_1;
+		return Messages.BasicPBSConfigurationWizardPage_title;
+	}
+
+	/*
+	 * (non-Javadoc) overridden to do validation only on save actions.
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#performApply
+	 * (org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
+	@Override
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		dataSource.toggleSave();
+		RMLaunchValidation validation = super.performApply(configuration, rm, queue);
+		dataSource.toggleSave();
+		return validation;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#
+	 * setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.core.elements.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		// configuration.setAttribute(
-		// OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
-		// OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
-		// configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS,
-		// OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
-		// configuration.setAttribute(
-		// OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
-		// OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS);
-		// configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS,
-		// OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
+	 * updateControls()
+	 */
 	@Override
 	public void updateControls() {
 	}
 
-	/**
-	 * Add columns to the table viewer
+	/*
+	 * //////////////////////////////////////////////////////////////////////////
+	 * Protected Superclass Methods
 	 */
-	private void addColumns() {
-		/*
-		 * Name column
-		 */
-		final TableViewerColumn column1 = new TableViewerColumn(paramsViewer, SWT.NONE);
-		column1.setLabelProvider(new ColumnLabelProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang
-			 * .Object)
-			 */
-			@Override
-			public String getText(Object element) {
-				if (element instanceof IAttribute<?, ?, ?>) {
-					String name = ((IAttribute<?, ?, ?>) element).getDefinition().getName();
-					return name;
-				}
-				return null;
-			}
-
-		});
-		column1.getColumn().setResizable(true);
-		column1.getColumn().setText(Messages.PBSRMLaunchConfigurationDynamicTab_2);
-
-		/*
-		 * Value column
-		 */
-		final TableViewerColumn column2 = new TableViewerColumn(paramsViewer, SWT.NONE);
-		column2.setLabelProvider(new ColumnLabelProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang
-			 * .Object)
-			 */
-			@Override
-			public String getText(Object element) {
-				if (element instanceof IAttribute<?, ?, ?>) {
-					return ((IAttribute<?, ?, ?>) element).getValueAsString();
-				}
-				return null;
-			}
-
-		});
-		column2.setEditingSupport(new EditingSupport(paramsViewer) {
-			@Override
-			protected boolean canEdit(Object element) {
-				return paramsViewer.getChecked(element);
-			}
-
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return new TextCellEditor(paramsTable);
-			}
-
-			@Override
-			protected Object getValue(Object element) {
-				return ((IAttribute<?, ?, ?>) element).getValueAsString();
-			}
-
-			@Override
-			protected void setValue(Object element, Object value) {
-				try {
-					((IAttribute<?, ?, ?>) element).setValueAsString((String) value);
-				} catch (IllegalValueException e) {
-					return;
-				}
-				getViewer().update(element, null);
-				fireContentsChanged();
-				updateControls();
-			}
-		});
-		column2.getColumn().setResizable(true);
-		column2.getColumn().setText(Messages.PBSRMLaunchConfigurationDynamicTab_3);
-
-		paramsTable.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				Rectangle area = paramsTable.getClientArea();
-				// Point size = paramsTable.computeSize(SWT.DEFAULT,
-				// SWT.DEFAULT);
-				ScrollBar vBar = paramsTable.getVerticalBar();
-				int width = area.width - paramsTable.computeTrim(0, 0, 0, 0).width - vBar.getSize().x;
-				paramsTable.getColumn(1).setWidth(width / 3);
-				paramsTable.getColumn(0).setWidth(width - paramsTable.getColumn(1).getWidth());
-			}
-		});
-
-	}
-
-	/**
-	 * @return
-	 */
-	private DataSource getLocalDataSource() {
-		return (DataSource) super.getDataSource();
-	}
-
-	/**
-	 * @return
-	 */
-	private WidgetListener getLocalListener() {
-		return (WidgetListener) super.getListener();
-	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
+	 * @seeorg.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
 	 * createDataSource()
 	 */
 	@Override
-	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
-		return new DataSource(this);
+	protected synchronized RMLaunchConfigurationDynamicTabDataSource createDataSource() {
+		if (dataSource == null) {
+			dataSource = new PBSRMLaunchDataSource(this);
+		}
+		return dataSource;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
+	 * @seeorg.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
 	 * createListener()
 	 */
 	@Override
-	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		return new WidgetListener(this);
+	protected synchronized RMLaunchConfigurationDynamicTabWidgetListener createListener() {
+		if (listener == null) {
+			listener = new PBSRMLaunchWidgetListener(this);
+		}
+		return listener;
 	}
-
 }
