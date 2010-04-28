@@ -29,7 +29,7 @@ import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.ui.Activator;
-import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;

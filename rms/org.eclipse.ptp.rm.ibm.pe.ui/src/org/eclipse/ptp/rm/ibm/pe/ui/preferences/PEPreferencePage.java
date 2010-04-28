@@ -27,7 +27,7 @@ package org.eclipse.ptp.rm.ibm.pe.ui.preferences;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
-import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

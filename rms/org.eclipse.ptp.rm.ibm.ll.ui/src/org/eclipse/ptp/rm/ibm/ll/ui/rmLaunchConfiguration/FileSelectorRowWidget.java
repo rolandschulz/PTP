@@ -9,7 +9,7 @@ package org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration.ValidationState;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

@@ -65,7 +65,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.pe.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.BooleanRowWidget;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.CheckboxRowWidget;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.ComboRowWidget;
