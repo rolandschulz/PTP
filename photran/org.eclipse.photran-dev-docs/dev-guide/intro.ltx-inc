@@ -1,7 +1,7 @@
 % Introduction
 \vspace{-0.5in}
 
-{\scriptsize Revision: \footnotesize \$Id$ $ - based on 08/08/08 revision (nchen)}
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
 
 Photran is an IDE for Fortran 77--2008 that is built on top of
 Eclipse. It is structured as an Eclipse feature, in other words, as a set of

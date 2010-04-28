@@ -1,4 +1,7 @@
 % Additional Information for UIUC Personnel
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
 
 \begin{center}
 \framebox{\parbox{5.5in}{\textit{The following information is only of interest
@@ -26,11 +29,6 @@ Currently, this repository contains the following.
 \begin{itemize}
 
 \item
-\textbf{Lua refactoring tool (lua-refactoring).}
-A small, prototype, Eclipse-based refactoring tool for the Lua scripting
-language, based on Photran's refactoring infrastructure.
-
-\item
 \textbf{Large Fortran test codes (photran-projects).}
 Checking these out into your workspace will enable about 6,000 additional
 test cases in the JUnit test suite.  \textit{These applications are PRIVATE.
@@ -41,9 +39,13 @@ They may NOT be distributed and are intended only for testing Photran.}
 The sample refactoring described in Appendix~\ref{app:obfuscate_refactoring}.
 
 \item
-\textbf{C preprocessor support (c-preprocessor).}
-C preprocessor support, based on the C preprocessor in CDT 5.  This will
-eventually be moved into the public CVS repository.
+\textbf{Refactoring tools for PHP, Lua, and BC.}
+Prototype Eclipse-based refactoring tools based on the Rephraser Engine.
+
+%\item
+%\textbf{C preprocessor support (c-preprocessor).}
+%C preprocessor support, based on the C preprocessor in CDT 5.  This will
+%eventually be moved into the public CVS repository.
 
 \end{itemize}
 

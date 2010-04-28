@@ -1,6 +1,8 @@
 % Checklist for New Developers
 \vspace{-0.5in}
 
+{\scriptsize Revision: \footnotesize \$Id$ $}
+
 \begin{list}{$\bigcirc$}{}
 
 \item \textbf{Install Photran, read its documentation, and become a proficient user.}

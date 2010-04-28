@@ -1,0 +1,49 @@
+% Use Times New Roman instead of Computer Modern
+\usepackage{times}
+
+% Unnumbered footnotes
+\long\def\symbolfootnote[#1]#2{\begingroup\def\thefootnote{\fnsymbol{footnote}}
+\footnote[#1]{#2}\endgroup}
+
+% Use 1-inch margins
+\usepackage{fullpage}
+
+% Image/graphics support
+\usepackage[pdftex]{graphicx}
+\usepackage{rotating} % for sidewaysfigure
+\usepackage{color} 
+\definecolor{LightMagenta}{cmyk}{0.1,0.8,0,0.1} 
+
+% For nicely-formatted source code displays
+\usepackage{listings}
+\lstset{numbers=left, numberstyle=\tiny, tabsize=2, numbersep=5pt, captionpos=b,
+basicstyle=\footnotesize, showstringspaces=false,
+emphstyle=\color{LightMagenta}\bfseries, language=Java}
+
+% Hyperlinks
+\usepackage[pdftex]{hyperref}
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=blue
+}
+
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{image}{htp}{lop}[chapter]
+\floatname{image}{Figure}
+
+\newfloat{code}{htp}{lop}[chapter]
+\floatname{code}{Listing}
+
+\usepackage{shadow}
+
+% Adjust spacing to minimize the amount of hyphenation
+\hyphenpenalty=5000
+\tolerance=1000
+
+% Skip a line between paragraphs, and don't indent them
+\setlength{\parskip}{10pt}  % 10 pt = space between paragraphs
+\setlength{\parindent}{0pt} % 0 pt  = indentation

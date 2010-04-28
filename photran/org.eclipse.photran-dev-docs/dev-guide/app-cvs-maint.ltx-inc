@@ -1,4 +1,7 @@
 % Getting the Photran Sources from CVS
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
 
 \emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.5} (Galileo)
 and a \textbf{Java 5} or later JVM. We recommend the

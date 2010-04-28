@@ -1,4 +1,7 @@
 % Release and Deployment Procedure
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
 
 \textit{Most contributors/committers do not need to read this.  This explains
 our entire release and deployment procedure: setting the Photran version

@@ -1,0 +1,67 @@
+\documentclass[10pt,letterpaper]{report}
+\input{prologue.ltx-inc}
+\begin{document}
+
+\title{
+  {\Huge\bfseries Photran 6.0 Developer's Guide} \\
+  \vspace*{1em}
+  {\LARGE Part II: Specialized Topics}
+  \vspace*{3in}
+}
+\author{
+N. Chen \\
+J. Overbey \\
+}
+\date{}
+
+\maketitle
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Interactions with CDT}
+\label{cha:cdt}
+\input{cdt.ltx-inc}
+
+\chapter{Parsing and Program Analysis}
+\label{cha:parsing}
+\input{parsing.ltx-inc}
+
+\chapter{Refactoring}
+\label{cha:refactoring}
+\input{refactoring.ltx-inc}
+
+\chapter{Photran Editors}
+\label{cha:editor}
+\input{editor.ltx-inc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\chapter{Creating an Error Parser}
+\label{ap:creating_an_error_parser}
+\input{app-error-parsers.ltx-inc}
+
+\chapter{Simple Fortran Refactoring Example}
+\label{app:obfuscate_refactoring}
+\input{app-obfuscate-fortran.ltx-inc}
+
+%\chapter{Creating Tests for the Rename Refactoring}
+%\input{app-rename-tests.ltx-inc}
+
+\chapter{Adding New Fortran Syntax}
+\input{app-new-syntax.ltx-inc}
+
+\chapter{Regenerating the Help Plug-in}
+\label{app:help}
+\input{app-generating-help.ltx-inc}
+
+\chapter{Release and Deployment Procedure}
+\input{app-deploy.ltx-inc}
+
+\chapter{Release History}
+\input{app-history.ltx-inc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

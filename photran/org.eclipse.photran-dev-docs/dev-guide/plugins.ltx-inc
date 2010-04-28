@@ -1,4 +1,8 @@
 % Plug-in Decomposition
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
 \section{Introduction}
 
 This chapter presents a high-level overview of the different projects and
@@ -14,7 +18,7 @@ While developing Photran, one of our research objectives has been to create a co
 
 In addition to Photran, Ralph Johnson's research group at UIUC is developing prototype refactoring tools for PHP, Lua, and BC; all of these use the Rephraser Engine.  Therefore, if you ever need to change a class in the Rephraser Engine, you should be sure that the change applies to all of these tools, not just Photran.
 
-\section{Overview and Dependencies in Photran's Architecture}
+\section{Photran's Architecture: Overview and Dependencies}
 
 Figure~\ref{fig:images_architecture_overview} illustrates the plug-in
 decomposition of Photran and the Rephraser Engine, as well as their relationship

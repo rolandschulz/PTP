@@ -16,12 +16,22 @@
 		<exec executable="${pdflatex}"
 			failonerror="true"
 			failifexecutionfails="true">
-			<arg value="dev-guide.ltx" />
+			<arg value="dev-guide-general.ltx" />
 		</exec>
 		<exec executable="${pdflatex}"
 			failonerror="true"
 			failifexecutionfails="true">
-			<arg value="dev-guide.ltx" />
+			<arg value="dev-guide-general.ltx" />
+		</exec>
+		<exec executable="${pdflatex}"
+			failonerror="true"
+			failifexecutionfails="true">
+			<arg value="dev-guide-specialized.ltx" />
+		</exec>
+		<exec executable="${pdflatex}"
+			failonerror="true"
+			failifexecutionfails="true">
+			<arg value="dev-guide-specialized.ltx" />
 		</exec>
 		<exec executable="${pdflatex}"
 			failonerror="true"
@@ -29,7 +39,7 @@
 			<arg value="cvs-instructions.ltx" />
 		</exec>
 	  	<delete><fileset dir="." includes="*.aux *.log *.toc *.dvi *.ps *.out" /></delete>
-	  	<exec executable="bash"><arg value="-c" /><arg value="if [ &quot;$$LOGNAME&quot; == &quot;joverbey&quot; ]; then open dev-guide.pdf; fi" /></exec>
+	  	<exec executable="bash"><arg value="-c" /><arg value="if [ &quot;$$LOGNAME&quot; == &quot;joverbey&quot; ]; then open dev-guide-general.pdf; fi" /></exec>
 	</target>
 
 	<target name="clean" description="Remove generated PDFs">

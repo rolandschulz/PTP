@@ -1,45 +1,53 @@
 % Running Photran's Automated Test Suite
+\vspace{-0.5in}
 
-The basic procedure for running Photran's automated test suite is described in the previous
-appendix as part of the procedure for checking out Photran's source code from CVS.  In particular,
-\begin{itemize}
-\item the test suite is run as a JUnit 3 plug-in test,
-\item assertions are enabled, and
-\item a TESTING environment variable is set, which (among other things) places the VPG in a testing
-      mode.
-\end{itemize}
+{\scriptsize Revision: \footnotesize \$Id$ $}
 
-This appendix explains some of the additional options that are available when running the test suite.
+\begin{enumerate}
+	\setcounter{enumi}{\value{running_counter}}
+	\item In the Package Explorer view, select the \texttt{org.eclipse.photran.core.vpg.tests} project.
+	\item Right-click on that project and select Run As $>$ Run Configurations\ldots. A dialog will appear.
+	\item In that dialog, create a new \textbf{JUnit Plug-in Test} launch configuration. Call it ``Photran-Tests''.
+	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
+	\item Change the ``VM arguments'' field to \texttt{-ea -Xms40m -Xmx512m}
+	\item Switch to the ``Environment'' tab.
+	\item Create a new environment variable called \texttt{TESTING} with a value of 1.
+	\item \textit{(Optional)} If you are running Linux or Mac OS X and have gfortran installed:
+	      \begin{enumerate}
+	      \item[] \textit{Some of Photran's refactoring unit tests can attempt to compile
+	            and run the Fortran test programs before and after the refactoring in order
+	            to ensure that the refactoring actually preserves behavior (and produces
+	            code that compiles).  The following steps will enable this behavior.
+	            Note, however, that if the path to gfortran is incorrect, or if gfortran
+	            cannot be run successfully, it will cause the test suite to fail\dots
+	            so you might not want to do this the very first time you attempt to run
+	            the test suite.}
+	      \item Create a new environment variable called \texttt{COMPILER} with the full
+	            path to gfortran.  This will be something like
+	            \texttt{/usr/local/bin/gfortran}
+	      \item Create a new environment variable called \texttt{EXECUTABLE} with a
+	            path to some non-existent file in your home directory, e.g.,
+	            \texttt{/Users/joverbey/a.out}.  When gfortran is run, it will write
+	            the executable to this path.
+	      \item[] \textit{When both of these environment variables are set, you will be able
+	            to see the output from the compiler and the Fortran program in the Console
+	            view as the test suite runs.  If compilation fails, or if the Fortran program
+	            exits with a nonzero status code, or if the Fortran program does not produce
+	            the same output before and after refactoring, the corresponding JUnit test
+	            will fail.  See the JavaDoc for the method
+	            \texttt{RefactoringTestCase\#compileAndRunFortranProgram} for more details.}
+	      \end{enumerate}
+	\item Click the ``Run'' button to run the tests.  It will take at least a minute to run
+	      the test suite.  When it finishes, you should get a green bar in the JUnit view.
+	      If you get a red bar, some of the tests failed; the JUnit view will have details.
+	\item To run the tests again later, just launch the
+	      ``Photran-Tests'' configuration from the Eclipse Run menu.
 
-\section{Enabling Fortran Compilation \& Run Comparison}
-
-Some of Photran's refactoring unit tests can attempt to compile and run the Fortran test programs
-before and after the refactoring in order to ensure that the refactoring actually preserves behavior
-(and produces code that compiles).
-
-To enable this behavior,
-\begin{itemize}
-\item Open the run configuration for the test suite, and switch to the Environment tab.
-\item Add environment variables similar to the following: \\
-  \begin{tabular}{ll}
-  \texttt{COMPILER} & \texttt{/usr/local/bin/gfortran} \\
-  \texttt{EXECUTABLE} & \texttt{/Users/joverbey/a.out} \\
-  \end{tabular} \\
-\end{itemize}
-The COMPILER environment variable should give the path to gfortran.  When gfortran is run, the
-compiled Fortran program will be written to the file specified by the EXECUTABLE environment
-variable.
-
-When both of these environment variables are set, you will be able to see the output from the
-compiler and the Fortran program in the Console view.  If compilation fails, or if the Fortran
-program exits with a nonzero status code, or if the Fortran program does not produce the same output
-before and after refactoring, the JUnit test will fail.
-
-See the JavaDoc for the method
-\texttt{RefactoringTestCase\#compileAndRunFortranProgram} for more details.
-
-\section{Enabling Closed-Source Parser Tests}
-
-UIUC personnel may check out additional projects from a private Subversion repository at UIUC to
-enable additional parser and source reproduction tests.  This is described in more detail in the
-appendix \textit{Additional Information for UIUC Personnel.}
+	\vspace{.5em}
+	\noindent\textit{\textbf{Note.} Some parser tests will attempt to look for closed-source
+	code that you may not have.  A warning will appear in the JUnit runner if this code is not
+	available, but all tests should still pass.
+	UIUC personnel: See the appendix \textit{Additional Information for UIUC Personnel} in the
+	\textit{Photran Developer's Guide} for more information.}
+	\setcounter{running_counter}{\value{enumi}}
+\end{enumerate}

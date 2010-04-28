@@ -1,3 +1,8 @@
+% Sample Refactoring
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
 \section{Introduction}
 
 Contributing a new refactoring to Photran is best done by following a working

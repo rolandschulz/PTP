@@ -1,5 +1,7 @@
 \documentclass[10pt,letterpaper]{article}
 
+\usepackage{times} % Use Times New Roman instead of Computer Modern font
+
 %\usepackage{anysize}
 %\marginsize{1.5in}{1.5in}{1.5in}{1.5in}
 \usepackage{fullpage}
@@ -21,12 +23,18 @@
 
 \begin{document}
 
-\title{Getting the Photran 5.0 Sources from CVS}
+\title{\bfseries Getting the Photran 6.0 Sources from CVS \\
+       {\normalsize and Running the Automated Test Suite}}
 \author{}
 \date{}
 
 \maketitle
 
 \input{app-cvs.ltx-inc}
+
+\vspace{1em}
+\noindent\textbf{Part~III.  Running the test cases}
+
+\input{app-tests.ltx-inc}
 
 \end{document}

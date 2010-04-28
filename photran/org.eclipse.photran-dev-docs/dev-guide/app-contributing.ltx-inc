@@ -1,7 +1,17 @@
 % Contributing a New Feature or Bug Fix
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
 
 %\begin{list}{$\bigcirc$}{}
 \begin{enumerate}
+
+\item Run Photran's automated test suite.  All tests must pass.
+
+\item If you are contributing a refactoring, program analysis, or similar
+      complex feature, please include JUnit tests in your contribution.
+      The parser and AST inevitably change over time, and this is how we will
+      determine whether or not a change has broken your contribution.
 
 \item Make sure you did not copy code from anywhere except Photran and CDT.
       If you copied code from books, mailing lists, Web sites, any other open
@@ -79,8 +89,8 @@ accurate copyright header.
       {\scriptsize
       \begin{verbatim}
 /**
- * Refactoring to create getter and setter subprograms for a module variable and replace variable
- * accesses with calls to those subprograms.
+ * Refactoring which creates getter and setter subprograms for a module variable and replaces
+ * variable accesses with calls to those subprograms.
  * <p>
  * This refactoring accepts a module variable declaration, makes that declaration PRIVATE, adds
  * getter and setter procedures to the module, and then replaces accesses to the variable outside
@@ -93,9 +103,6 @@ public class EncapsulateVariableRefactoring
 { ...
       \end{verbatim}
       }
-      
-      
-copyright header.
 
 \item Create a new bug in Bugzilla on one of the ``Photran'' components.  You
 can do this by clicking the ``Report a Bug'' link on the Photran home page.
@@ -115,6 +122,7 @@ old patch as ``obsolete.''
 \item When the code review succeeds, the Photran committer will make the following
 comment on the bug: \\
 \ \\
+{\footnotesize\itshape
 \begin{minipage}{5.5in}
 Please confirm that
 \begin{enumerate}
@@ -122,12 +130,12 @@ Please confirm that
 \item you have the right to contribute the code to Eclipse, and
 \item you have included the EPL license header in all source files?
 \end{enumerate}
-\end{minipage} \\
+\end{minipage}
+} \\
 \ \\
-You can reply with something as simple as the following.  Of course, if you \textit{did} incorporate
-content from elsewhere -- e.g., from CDT, from existing classes in Photran, or elsewhere -- you must
-note that appropriately.
+You can reply with something as simple as the following.
 \ \\
+{\footnotesize\itshape
 \begin{minipage}{5.5in}
 I confirm that
 \begin{enumerate}
@@ -136,6 +144,11 @@ I confirm that
 \item I have included the EPL license header in all source files.
 \end{enumerate}
 \end{minipage}
+} \\
+\ \\
+However, if you \textit{did} incorporate content from elsewhere -- e.g., if your
+contribution is based on code from CDT or elsewhere -- DO NOT copy-and-paste this
+directly; change the first statement to note this explicitly.
 
 \item Your code will be passed on to the intellectual property (IP) team at the
 Eclipse Foundation for a legal review.  If there are any questions or concerns
@@ -148,12 +161,14 @@ about the code, a member of the Eclipse IP team will contact you.
 \end{enumerate}
 %\end{list}
 
-\vspace*{1.5em}
+\vfill
 
-\textit{References:}
-
+{\footnotesize
+\textit{Eclipse Foundation References:}
+\\
 \href{http://wiki.eclipse.org/Development\_Resources\#Everyone:\_IP\_Cleanliness}
      {http://wiki.eclipse.org/Development\_Resources\#Everyone:\_IP\_Cleanliness}
-
+\\
 \href{http://wiki.eclipse.org/Development\_Conventions\_and\_Guidelines}
      {http://wiki.eclipse.org/Development\_Conventions\_and\_Guidelines}
+}

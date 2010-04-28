@@ -1,4 +1,7 @@
 % Creating a Rename Refactoring Test Case
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
 
 JUnit tests for the Rename refactoring are located in the
 \texttt{org.eclipse.photran.refactoring.tests} plug-in project. A Rename test

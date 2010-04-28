@@ -1,8 +1,13 @@
 % Getting the Photran Sources from CVS
+\vspace{-0.5in}
 
 \emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.5} (Galileo)
 and a \textbf{Java 5} or later JVM. We recommend the
 \href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
+
+\vspace{-1em}
 
 \newcounter{running_counter}
 \textbf{Part~I.  Check out the CDT 6.0 sources from CVS}
@@ -69,25 +74,3 @@ and a \textbf{Java 5} or later JVM. We recommend the
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}
 The sources should all compile (albeit with lots of warnings).
-
-\vspace{1em}
-\noindent\textbf{Part~III.  Running the test cases}
-
-\begin{enumerate}
-	\setcounter{enumi}{\value{running_counter}}
-	\item In Package Explorer view, select the \texttt{org.eclipse.photran.core.vpg.tests} project.
-	\item Right-click on that project and select Run As $>$ Run Configurations\ldots. A dialog will appear.
-	\item In that dialog, create a new \textbf{JUnit Plug-in Test} launch configuration. Call it ``Photran-Tests''.
-	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
-	      Change the ``VM arguments'' field to \texttt{-ea -Xms40m -Xmx512m}
-	\item Then switch to the ``Environment'' tab and create a new environment variable called ``TESTING'' with a value of 1.
-	\item Select ``Run'' to run the tests. To run the tests again, just launch the ``Photran-Tests'' configuration from the Eclipse Run menu.
-
-	\vspace{.5em}
-	\noindent\textit{\textbf{Note.} If you will be developing refactorings or modifying the parser,
-	please read the appendix ``Running Photran's Automated Test Suite'' in the \textit{Photran
-	Developer's Guide.}  Also note that some parser tests will attempt to look for closed-source
-	code that you did not check out as part of this procedure;
-	a warning will appear in the JUnit runner if this code is not available.}
-	\setcounter{running_counter}{\value{enumi}}
-\end{enumerate}

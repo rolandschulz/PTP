@@ -1,0 +1,57 @@
+\documentclass[10pt,letterpaper]{report}
+\input{prologue.ltx-inc}
+\begin{document}
+
+\title{
+  {\Huge\bfseries Photran 6.0 Developer's Guide} \\
+  \vspace*{1em}
+  {\LARGE Part I: General Information}
+  \vspace*{3in}
+}
+\author{
+N. Chen \\
+J. Overbey \\
+}
+\date{}
+
+\maketitle
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{Checklist for New Developers}%\symbolfootnote[0]{Last significant update: 04/27/10 (JO)}
+\input{checklist.ltx-inc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\label{cha:introduction}
+\input{intro.ltx-inc}
+
+\chapter{Plug-in Decomposition}
+\label{cha:plugins}
+\input{plugins.ltx-inc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\chapter{Getting the Photran 5.0 Sources from CVS}
+\label{app:cvs}
+\input{app-cvs.ltx-inc}
+
+\chapter{Running Photran's Automated Test Suite}
+\label{app:testsuite}
+\setcounter{running_counter}{0}
+\input{app-tests.ltx-inc}
+
+\chapter{Additional Information for UIUC Personnel}
+\label{app:uiuc}
+\input{app-uiuc.ltx-inc}
+
+\chapter{Procedure for Contributing a New Feature or Bug Fix}
+\label{app:contributing}
+\input{app-contributing.ltx-inc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

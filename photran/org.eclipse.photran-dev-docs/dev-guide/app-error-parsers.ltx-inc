@@ -1,4 +1,7 @@
 % Creating an Error Parser
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
 
 Error parsers scan the output of \texttt{make} for error messages for a
 particular compiler. When they see an error message they can recognize, they
