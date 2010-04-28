@@ -24,7 +24,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui.wizards;
 
-import org.eclipse.ptp.rm.ibm.ll.ui.internal.ui.Messages;
+import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
