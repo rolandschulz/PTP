@@ -1,6 +1,8 @@
 % Introduction
 \vspace{-0.5in}
 
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 08/08/08 revision (nchen)}
+
 Photran is an IDE for Fortran 77--2008 that is built on top of
 Eclipse. It is structured as an Eclipse feature, in other words, as a set of
 plug-ins that are designed to be used together. Starting with version 3.0, it is
