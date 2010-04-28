@@ -17,32 +17,26 @@ public class PBSPreferenceManager {
 	private static final String SELECTED = "selectedAttributes";
 	private static final String TEMPLATE = "attributeConfiguration";
 
-	@SuppressWarnings("deprecation")
 	public static Preferences getPreferences() {
 		return Activator.getDefault().getPluginPreferences();
 	}
 
-	@SuppressWarnings("deprecation")
 	public static String getSelectedAttributes() {
 		return getPreferences().getString(SELECTED);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static String getTemplatePreference() {
 		return getPreferences().getString(TEMPLATE);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void savePreferences() {
 		Activator.getDefault().savePluginPreferences();
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void setSelectedAttributes(String selected) {
 		getPreferences().setValue(SELECTED, selected);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void setTemplatePreference(String attrConfig) {
 		getPreferences().setValue(TEMPLATE, attrConfig);
 	}
