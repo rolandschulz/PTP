@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2008  IBM Corporation.
+ * Copyright (c) 2007,2010  IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.pldt.mpi.analysis.actions;
 
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierAnalysisResults;
@@ -26,6 +25,9 @@ import org.eclipse.ptp.pldt.mpi.analysis.view.MPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.mpi.analysis.view.MatchingSet;
 import org.eclipse.ptp.pldt.mpi.analysis.view.ShowErrors;
 
+/**
+ * Main class for handling MPI Barrier Analysis
+ */
 public class MPIAnalysisManager{
 	protected BarrierTable btable_;
 	protected MPICallGraph cg_;
@@ -41,7 +43,7 @@ public class MPIAnalysisManager{
 	 * Runs analysis and returns true if any errors were found
 	 * @return
 	 */
-	public boolean run()
+	public boolean run(boolean reportErrors)
 	{	
 	  if(traceOn)System.out.println("MPI AM: 1. build CG");
 		cg_.buildCG();
@@ -76,7 +78,7 @@ public class MPIAnalysisManager{
 		if(traceOn)System.out.println("6. Multi-valued Analysis finished !");
 		
 		MPIBarrierMatching bm = new MPIBarrierMatching(cg_, btable_);
-		bm.run();
+		bm.run(reportErrors);
 		if(traceOn)System.out.println("7. Barrier Matching finished! ");
 				
 		MPIBarrierAnalysisResults results = new MPIBarrierAnalysisResults();

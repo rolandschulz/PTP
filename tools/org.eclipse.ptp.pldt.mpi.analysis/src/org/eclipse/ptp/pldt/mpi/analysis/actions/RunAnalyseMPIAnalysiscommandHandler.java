@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2008 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandler;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
@@ -38,7 +39,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIResourceCollector;
  */
 public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	protected MPICallGraph callGraph_;
-	boolean traceOn=false;
+	boolean traceOn=true;
 	
 	public RunAnalyseMPIAnalysiscommandHandler(){ 
 		callGraph_ = null;
@@ -47,7 +48,6 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	/** 
 	 * Execute the action for MPI barrier analysis
 	 */
-	@SuppressWarnings("unchecked")
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		boolean foundError=false;
 		getSelection(event);
@@ -58,25 +58,8 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 							"Please select a source file  or container (folder or project) to analyze.");
 			return null;
 		} else {
-			callGraph_ = new MPICallGraph();
-			//int numFiles=this.countFilesSelected();
-			// BRT use numfiles for a progress monitor?
-
-			for(Iterator iter = selection.iterator(); iter.hasNext();){
-				Object obj =  iter.next();
-				// It can be a Project, Folder, File, etc...
-				if (obj instanceof IAdaptable) {
-					final IResource res = (IResource) ((IAdaptable) obj)
-							.getAdapter(IResource.class);
-					if(traceOn)System.out.println("resourceCollector on "+res.getName());
-					// FIXME put this in a runnable to batch resource changes?
-					if (res != null) {
-						resourceCollector(res);
-					}
-				}
-			} // end for
-			MPIAnalysisManager manager = new MPIAnalysisManager(callGraph_);
-			foundError=manager.run();
+			final boolean reportErrors=true;
+			foundError = analyseBarriers(selection,reportErrors);
 		}
 		ViewActivater.activateView(IDs.matchingSetViewID);
 		ViewActivater.activateView(IDs.barrierViewID);
@@ -85,6 +68,36 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			ViewActivater.activateView(IDs.errorViewID);
 		}
 		return null;
+	}
+
+	/**
+	 * Basics of MPI barrier analysis encapsulated here so can be used by testing
+	 * <br>
+	 * Results are saved in the markers that are generated.
+	 * @return true if error found
+	 */
+	public boolean analyseBarriers(IStructuredSelection selection, boolean reportErrors) {
+		boolean foundError;
+		callGraph_ = new MPICallGraph();
+		//int numFiles=this.countFilesSelected();
+		// BRT use numfiles for a progress monitor?
+
+		for(Iterator iter = selection.iterator(); iter.hasNext();){
+			Object obj =  iter.next();
+			// It can be a Project, Folder, File, etc...
+			if (obj instanceof IAdaptable) {
+				final IResource res = (IResource) ((IAdaptable) obj)
+						.getAdapter(IResource.class);
+				if(traceOn)System.out.println("resourceCollector on "+res.getName());
+				// FIXME put this in a runnable to batch resource changes?
+				if (res != null) {
+					resourceCollector(res);
+				}
+			}
+		} // end for
+		MPIAnalysisManager manager = new MPIAnalysisManager(callGraph_);
+		foundError=manager.run(reportErrors);
+		return foundError;
 	}
 	
 /*	//ProgressMonitorDialog example?
@@ -132,12 +145,9 @@ public Object execute2(ExecutionEvent event) throws ExecutionException {
 
 		if (resource instanceof IFile) {
 			try{
-				// BRT barrierMarker change to non-problem marker here?
 				resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-				//resource.deleteMarkers(IDs.errorMarkerID,true,IResource.DEPTH_INFINITE);
 			} catch(CoreException e){
-				//System.out.println("RM: exception deleting markers.");
-				//e.printStackTrace();
+				//System.out.println("Exception deleting markers.");
 			}
 			IFile file = (IFile) resource;
 			String filename = file.getName();
