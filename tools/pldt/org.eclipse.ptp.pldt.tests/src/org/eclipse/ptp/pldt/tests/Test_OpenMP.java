@@ -84,11 +84,11 @@ public class Test_OpenMP extends PldtBaseTestFramework{
 			// concentrate on these
 			int[] expectedLinenos = {12, 14,20};
 			final String pragma="#pragma omp parallel private(numThreads, tid)";
-			String[] expectedMpiTypes= {pragma, "omp_get_thread_num","omp_get_num_threads"};
+			String[] expectedOpenMPTypes= {pragma, "omp_get_thread_num","omp_get_num_threads"};
 			ArtifactWithLine[] expectedArts = new ArtifactWithLine[expectedLinenos.length];
 			ArtifactWithLine[] markerArts = new ArtifactWithLine[markers.length];
 			for (int i = 0; i < expectedArts.length; i++) {
-				expectedArts[i]=new ArtifactWithLine(expectedLinenos[i],expectedMpiTypes[i]);		
+				expectedArts[i]=new ArtifactWithLine(expectedLinenos[i],expectedOpenMPTypes[i]);		
 			}
 			for (int i = 0; i < markerArts.length; i++) {
 				markerArts[i]=new ArtifactWithLine(markers[i]);
@@ -179,7 +179,6 @@ public class Test_OpenMP extends PldtBaseTestFramework{
 			int lineNo=(Integer) marker.getAttribute(IMarker.LINE_NUMBER);
 			System.out.println(i+ " marker: lineNo "+lineNo+ " name: "+marker.getAttribute(IDs.NAME));
 		}
-		//wait!!! markers aren't sorted!!
 		
 		// should find pragma and two other openmp artifacts
 		assertEquals(expectedArts.length, markerArts.length);
