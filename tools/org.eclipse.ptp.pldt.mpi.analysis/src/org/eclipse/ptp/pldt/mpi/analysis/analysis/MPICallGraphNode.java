@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,39 +23,39 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl.CallGraphNode;
 
 public class MPICallGraphNode extends CallGraphNode {
 
-	/* Used (defined) global variables in this function */
+	/** Used (defined) global variables in this function */
 	protected List<String> globalUse_;
 	protected List<String> globalDef_;
-	/* Defined parameters that can be propagated to its callers */
+	/** Defined parameters that can be propagated to its callers */
 	protected List<String> paramDef_;
 	
 	protected boolean barrierRelated;
-	/* One barrier expression for each communicator */
+	/** One barrier expression for each communicator */
 	protected Hashtable<String,BarrierExpression> barrierExpr_;
-	/* The list of all barriers */
+	/** The list of all barriers */
 	protected List<BarrierInfo> barriers_;
 	
-	/* Is the parameter multi-valued in any call ? 
+	/** Is the parameter multi-valued in any call ? 
 	 * One entry for each parameter
 	 */
 	protected Hashtable<String,Boolean> paramMV_;
-	/* Is the return value multi-valued? */
+	/** Is the return value multi-valued? */
 	protected boolean mv;
 	
-	/* For each parameter or used global variable "V", summarize
+	/** For each parameter or used global variable "V", summarize
 	 * a set of MV data (passable parameters, defined global vars,
 	 * and returned value) if V is MV. 
 	 */
 	protected Hashtable<String,List<String>> mvSummary_; 
 	
-	/*
+	/**
 	 * A table storing each defined variable V in this function and 
 	 * the set of blocks that contain the definitions of V. This is
 	 * used in \phi node placement.
 	 */
 	protected Hashtable<String,List<IBlock>> defTable_;
 	
-	/* Number of assignments for each variable (local vars, global vars, 
+	/** hashtable contains number of assignments for each variable (local vars, global vars, 
 	 * and parameters) 
 	 */
 	protected Hashtable<String,Integer> saVar_;
