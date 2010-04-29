@@ -1,6 +1,13 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2010 IBM Corporation
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.tests;
 
 import java.io.BufferedReader;
@@ -13,24 +20,25 @@ import java.util.HashMap;
 
 import org.eclipse.cdt.core.tests.BaseTestFramework;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.pldt.common.IDs;
 
 /**
- * @author beth
+ * Basic Test framework for PLDT tests, extends that of CDT
+ * @author Beth Tibbitts
  * 
  */
 public abstract class PldtBaseTestFramework extends BaseTestFramework {
 	private static HashMap<String, ArrayList<Integer>> lineMaps = new HashMap<String, ArrayList<Integer>>();
 
-	/**
-	 * Put the file into the test project
-	 */
 	protected IFile importFile(String srcDir, String filename) throws Exception {
 		// project.getProject().getFile(filename).delete(true, new
 		// NullProgressMonitor());
 		IFile result = super.importFile(filename, readTestFile(srcDir, filename));
 		// project.refreshLocal(IResource.DEPTH_INFINITE, new
 		// NullProgressMonitor());
+		System.out.println("==========Using file: "+result);
 		return result;
 	}
 
@@ -75,5 +83,86 @@ public abstract class PldtBaseTestFramework extends BaseTestFramework {
 	 */
 	protected int getLineColOffset(String filename, int line, int col) {
 		return lineMaps.get(filename).get(line - 1) + (col - 1);
+	}
+	
+	/**
+	 * Convenience class for sorting artifacts so we compare them in an expected order
+	 * @author beth
+	 *
+	 */
+	public class ArtifactWithLine implements Comparable{
+		public int getLineNo() {
+			return lineNo;
+		}
+		public String getName() {
+			return name;
+		}
+		public IMarker getMarker() {
+			return marker;
+		}
+		private int lineNo;
+		private String name;
+		private IMarker marker;
+		 
+		public ArtifactWithLine(int line, String nam) {
+			lineNo=line;
+			name=nam;
+		}
+
+		public ArtifactWithLine(IMarker marker) {
+			try {
+				String nam = marker.getAttribute(IDs.NAME).toString();
+				String line=getLineNoAttr(marker );
+				Integer ii = Integer.decode(line);
+				int theInt = ii.intValue();
+				this.lineNo = theInt;
+				this.name = nam;
+				this.marker=marker;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public boolean equals(ArtifactWithLine other) {
+			boolean a=this.lineNo==other.lineNo;
+			boolean b=this.name.equals(other.name);
+			return a&&b;
+		}
+
+		public String toString() {
+			return lineNo+": "+name;
+		}
+		boolean traceOn=false;
+		public int compareTo(Object o) {
+			int result;
+			String sign="=";
+			ArtifactWithLine other=(ArtifactWithLine)o;
+			if(this.lineNo<other.lineNo) {
+				result=-1;
+				if(traceOn)sign="<";
+			}
+			else if(this.lineNo>other.lineNo) {
+				result=1;
+				if(traceOn)sign=">";
+			}
+			// lineNo's equal, must compare name
+			else {
+				result=this.name.compareTo(other.name);		
+			}
+			//System.out.println("CompareTo: "+this+" -to- "+other+"; result is: "+result);
+			if(traceOn)System.out.println("ArtifactWithLine.compareTo: "+this.lineNo+sign+other.lineNo);
+			return result;
+		}
+	}
+	public String getLineNoAttr(IMarker marker) throws CoreException {
+		return marker.getAttribute(IMarker.LINE_NUMBER).toString();
+	}
+	public String getNameAttr(IMarker marker) throws CoreException {
+		return (String) marker.getAttribute(IDs.NAME);
+	}
+
+	public String getMethodName() {
+		String name = (new Exception().getStackTrace()[1].getMethodName());
+		return name;
 	}
 }
