@@ -10,18 +10,16 @@
  */
 package org.eclipse.ptp.proxy.messages;
 
-import org.eclipse.osgi.util.NLS;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class Messages extends NLS {
+public class Messages {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.proxy.messages.messages"; //$NON-NLS-1$
 
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+			.getBundle(BUNDLE_NAME);
 
 	public static String AbstractProxyClient_0;
-
 	public static String AbstractProxyClient_1;
 	public static String AbstractProxyClient_2;
 	public static String AbstractProxyClient_3;
@@ -44,6 +42,14 @@ public class Messages extends NLS {
 	public static String ProxyPacket_1;
 	public static String ProxyPacket_2;
 	public static String ProxyPacket_3;
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 
 	private Messages() {
 		// Prevent instances.
