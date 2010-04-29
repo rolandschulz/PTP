@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,11 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierExpression.BarrierExpre
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 
+/**
+ * MPIBarrierExpr is an ASTVisitor
+ * @author beth
+ *
+ */
 public class MPIBarrierExpr extends ASTVisitor {
 	protected BarrierTable bTable_;
 	protected ICallGraph cg_;
