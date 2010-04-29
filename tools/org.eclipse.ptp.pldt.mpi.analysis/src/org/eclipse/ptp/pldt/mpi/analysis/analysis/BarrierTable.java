@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.cdt.core.dom.ast.IASTExpression;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
 import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
+import org.eclipse.cdt.core.dom.ast.IASTInitializerClause;
 import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
@@ -152,6 +153,7 @@ public class BarrierTable {
 		 */
 		protected void setComm() { 
 			IASTExpression parameter = barrier_.getParameterExpression(); 
+			IASTInitializerClause[] newParms = barrier_.getArguments(); // BRT could fix deprecation?
 			
 			if (parameter instanceof IASTUnaryExpression) {  
 				IASTUnaryExpression commExpr = (IASTUnaryExpression) parameter;
@@ -170,7 +172,7 @@ public class BarrierTable {
 						comm_ = commOp.toString();
 					} else {
 						
-						if(commOp instanceof IASTUnaryExpression) {// Mac OSX Openmpi < 1.3 (/usr/include/mpi.h)
+						if(commOp instanceof IASTUnaryExpression) {// Mac OSX Openmpi < 1.3 (/usr/include/mpi.h) // 4/14/10: got here OMPI 1.3.3
 							IASTUnaryExpression iastUnaryExpression = (IASTUnaryExpression) commOp;
 							if(dbg_barrier)System.out.println("bdbg: communicator is IASTUnaryExpression");
 							comm_= iastUnaryExpression.getRawSignature();
