@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.core.dom.ast.c.ICASTTypeIdInitializerExpression;
 import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator;
 import org.eclipse.cdt.internal.core.dom.parser.IASTAmbiguousExpression;
+import org.eclipse.cdt.internal.core.dom.parser.c.CASTBinaryExpression;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IBlock;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
@@ -41,6 +42,7 @@ public class MPIMVAnalysis{
 	protected final int rhs = 1;
 	
 	protected boolean changed = false;
+	private static final boolean traceOn=false;
 	
 	public MPIMVAnalysis(ICallGraph cg){
 		cg_ = cg;
@@ -318,7 +320,10 @@ public class MPIMVAnalysis{
 		}
 	}
 	
-	
+	/**
+	 * Expression Multi-valued Analyzer
+	 *
+	 */
 	class ExprMVAnalyzer{
 		private IASTStatement stmt_;
 		private IASTExpression expr_;
@@ -350,7 +355,7 @@ public class MPIMVAnalysis{
 			value = false;
 		}
 		
-		public ExprMVAnalyzer(IASTNode node, List<String> context, MPIBlock block){
+		public ExprMVAnalyzer(IASTNode node, List<String> context, MPIBlock block){//BRT this one is called
 			if(node instanceof IASTExpression){
 				stmt_ = null;
 				expr_ = (IASTExpression)node;
@@ -494,7 +499,7 @@ public class MPIMVAnalysis{
 					Util.addAll(set, l3);
 				} 
 				else {
-					v1 = useDefMVMapping(biE.getOperand1(), rhs, func, l1);
+					v1 = useDefMVMapping(biE.getOperand1(), rhs, func, l1);// BRT results are diff from 3.0!
 					v2 = useDefMVMapping(biE.getOperand2(), rhs, func, l2);
 					Util.addAll(set, l1);
 					Util.addAll(set, l2);
@@ -524,7 +529,7 @@ public class MPIMVAnalysis{
 				Util.addAll(set, l3);
 				return v1 | v2 | v3;
 			}
-			else if(expr instanceof IASTExpressionList){
+			else if(expr instanceof IASTExpressionList){// BRT IASTExpressionList no longer in AST; see below
 				IASTExpressionList exprList = (IASTExpressionList)expr;
 				IASTExpression[] exprs = exprList.getExpressions();
 				boolean[] newContext_ = new boolean[exprs.length];
@@ -558,7 +563,12 @@ public class MPIMVAnalysis{
 					boolean returnval = false;
 					if(parameter != null){
 						v1 = useDefMVMapping(parameter, side, funcE, l1);
-						if(parameter instanceof IASTExpressionList){ // >1 parameter
+						// BRT note with CDT 7.0 the IASTExpressionList is not encountered in the AST
+						// See bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=306064
+						// But since we get it from a method call 
+						// IASTFunctionCallExpression.getParameterExpression()  this probably still
+						// works ok here.
+						if(parameter instanceof IASTExpressionList){ // >1 parameter  
 							boolean[] paramContext = (boolean[])exprListMVContext_.pop();
 							for(int i=0; i<paramContext.length; i++){
 								if(paramContext[i]){
@@ -834,7 +844,7 @@ public class MPIMVAnalysis{
 			}
 			
 			/* Function Multi-valued Summary --- (1) whether a function's REAL
-			 * paramters are multi-valued (A real parameter of function foo is 
+			 * parameters are multi-valued (A real parameter of function foo is 
 			 * multi-valued if in any of foo's call sites the parameter is 
 			 * multi-valued)
 			 */
@@ -899,7 +909,8 @@ public class MPIMVAnalysis{
 	class WorkListCollector extends ASTVisitor{	
 		private ICallGraphNode func_;
 		private boolean inRankFunc;
-		private IASTExpressionList params;
+		private IASTExpressionList paramsOLD;
+		private IASTInitializerClause[] params_;// BRT will perhaps replace IASTExpressionList
 		private LinkedList<IBlock> wlist;
 		private MPIBlock currentBlock_;
 		
@@ -923,7 +934,10 @@ public class MPIMVAnalysis{
 			return wlist;
 		}
 	
+		//int visitDebugCount=0;
 		public int visit(IASTExpression expr){
+			//System.out.println("visitDebugCount="+visitDebugCount+" expr="+expr+" "+expr.getRawSignature());
+			//visitDebugCount++;
 			if(expr instanceof IASTFunctionCallExpression){
 				IASTFunctionCallExpression funcExpr = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcExpr.getFunctionNameExpression();
@@ -941,29 +955,57 @@ public class MPIMVAnalysis{
 							currentBlock_.getMVvar().remove(n.getFuncName());
 					}
 				}
-			} else if(expr instanceof IASTIdExpression){
+				if (inRankFunc) {
+					// BRT do what was formerly done when we hit an
+					// IASTExpressionList node.
+					IASTInitializerClause[] initClause = funcExpr.getArguments();
+					params_ = initClause;
+				}
+				
+			} else if(expr instanceof IASTIdExpression){ // BRT NOTE: most of changes (for CDT 7.0 change) are here
+				// BRT re: CDT 7.0 changes for barrier matching bug: still not working perfectly yet
+				//IASTIdExpression id2 = (IASTIdExpression)expr;
+				//String var2 = id2.getName().toString();
+				String var2=((IASTIdExpression) expr).getName().toString();
+				// BRT debug cond bkpt here: var2.equals("my_rank")
 				if(inRankFunc){
 					IASTNode me = expr;
 					IASTNode parent = me.getParent();
 					while(true){
-						if(parent == params) break;
-						else if(parent instanceof IASTFunctionCallExpression) break;
+						//if(parent == params) break; // BRT ptp40: params is null. not in ptp30; there is no longer an ASTnode for the parameters
+						//else 
+							if(parent instanceof IASTFunctionCallExpression) break;
 						else{
+							if(traceOn)System.out.println("MMVA: me=parent, parent=parent.getParent()");
 							me = parent;
 							parent = parent.getParent();
 						}
 					}
-					if(!(parent instanceof IASTExpressionList))
+					String meSig=me.getRawSignature();
+					boolean temp=false;// BRT never encountered now?
+					if(temp&&!(parent instanceof IASTExpressionList /* new: || parent instanceof IASTFunctionCallExpression*/))// BRT false in PTP 4.0   - is CASTFunctionCallExpression now
 						return PROCESS_CONTINUE;
-					IASTExpression[] rankParams = params.getExpressions();
-					int index;
-					for(index=0; index<rankParams.length; index++){
-						if(me == rankParams[index]) break;
+					//IASTExpression[] rankParams = params.getExpressions();
+
+					if(params_!=null) {
+					IASTInitializerClause cl = params_[0];
+					if(cl instanceof IASTIdExpression) {
+						System.out.println("IASTInitializerClause is IASTIdExpression");
 					}
+					}
+					
+					
+					int index;
+					for(index=0; index<params_.length; index++){
+						//if(me == rankParams[index]) break;
+						if(me == params_[index])break;
+					}
+					// BRT The second arg of MPI_Comm_rank is the variable that is thus multi-valued.
 					if(index == 1){
 						IASTIdExpression id = (IASTIdExpression)expr;
 						String var = id.getName().toString();
 						//if(var.equals("MPI_Comm_rank")) return PROCESS_CONTINUE;
+						// BRT Add this variable to the list of multivalued variables in the current block, if not already there
 						if(!currentBlock_.getMVvar().contains(var))
 							currentBlock_.getMVvar().add(var);
 						if(!wlist.contains(currentBlock_)) wlist.add(currentBlock_);
@@ -971,7 +1013,7 @@ public class MPIMVAnalysis{
 				}
 			} else if(expr instanceof IASTExpressionList){
 				if(inRankFunc){
-					params = (IASTExpressionList)expr;
+					paramsOLD = (IASTExpressionList)expr;// BRT investigate if ptp40 gets here
 				}
 			}
 			return PROCESS_CONTINUE;
@@ -985,9 +1027,12 @@ public class MPIMVAnalysis{
 				if(signature.equals("MPI_Comm_rank")){
 					inRankFunc = false;
 				}
+				params_=null; // BRT ???? do we do this here since no more IASTExpressionList below?
+				// BRT do we need to do paramsOLD=null instead?
+				// BRT IASTFunctionCallExpr is one level higher in the AST than the old IASTExpressionList was
 			}
 			else if(expr instanceof IASTExpressionList){
-				params = null;
+				paramsOLD = null;
 			}
 			return PROCESS_CONTINUE;
 		}
@@ -1209,10 +1254,13 @@ public class MPIMVAnalysis{
 			IControlFlowGraph cfg = node.getCFG();
 			for(IBlock b = cfg.getEntry(); b != null; b = b.topNext()){
 				MPIBlock block = (MPIBlock)b;
-				//System.out.println("Block " + block.getID());
+				// BRT System.out.println("expMVAnalysis(): Block " + block.getID());
 				ExprMVAnalyzer EA = new ExprMVAnalyzer(block.getContent(), block.getMVvar(), block);
+				//                                                         ^^^ BRT isEmpty 
 				EA.run();
+				boolean mv=EA.isMV();
 				block.setMV(EA.isMV());
+				
 			}
 		}
 	}
