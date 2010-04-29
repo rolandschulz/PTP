@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -199,40 +199,41 @@ public class PldtAstVisitor extends CASTVisitor {
 	 */
 	protected boolean isArtifact(IASTName funcName) {
 		IBinding binding = funcName.resolveBinding();
-		String name=binding.getName(); 
-		String rawSig=funcName.getRawSignature();
+		String name = binding.getName();
+		String rawSig = funcName.getRawSignature();
 		name = chooseName(name, rawSig);
 
 		IASTTranslationUnit tu = funcName.getTranslationUnit();
 
 		// Use index instead of full AST for the header file inclusion stuff
-		// Without full AST, further introspection into APIs will need to explicitly ask for it from the Index
-		IName[] names = tu.getDeclarations(binding);  // get from the index not ast of e.g. header files
+		// Without full AST, further introspection into APIs will need to
+		// explicitly ask for it from the Index
+		IName[] names = tu.getDeclarations(binding); // get from the index not ast of e.g. header files
 		for (int i = 0; i < names.length; i++) {
-      IName name2 = names[i];
-      IASTFileLocation floc = name2.getFileLocation();
-      if(floc==null) {
-        if(traceOn)System.out.println("PldtAstVisitor  IASTFileLocn null for "+name2+" ("+funcName+")");
-        return false;  //(e.g. 'ptr'  )
-      }
-      String filename = floc.getFileName();
-      IPath path = new Path(filename);
-      if(isInIncludePath(path)) {
-        //System.out.println("    found "+path+"  in artifact path (via index)!");
-        return true;
-      }
-      else {
-        if (traceOn) {
-          System.out.println(name + " was found in " + path
-              + " but  PLDT preferences have been set to only include: " + includes_.toString());
-        }
-        // add them here?
-        if(allowIncludePathAdd()) {
-          boolean addit = addIncludePath(path, name, dontAskToModifyIncludePathAgain);
-          if(addit)return true;
-        }
-      }
-    }
+			IName name2 = names[i];
+			IASTFileLocation floc = name2.getFileLocation();
+			if (floc == null) {
+				if (traceOn)
+					System.out.println("PldtAstVisitor  IASTFileLocn null for "+ name2 + " (" + funcName + ")");
+				return false; // (e.g. 'ptr' )
+			}
+			String filename = floc.getFileName();
+			IPath path = new Path(filename);
+			if (isInIncludePath(path)) {
+				// System.out.println("    found "+path+"  in artifact path (via index)!");
+				return true;
+			} else {
+				if (traceOn) {
+					System.out.println(name+ " was found in "+ path+ " but  PLDT preferences have been set to only include: "+ includes_.toString());
+				}
+				// add them here?
+				if (allowIncludePathAdd()) {
+					boolean addit = addIncludePath(path, name,dontAskToModifyIncludePathAgain);
+					if (addit)
+						return true;
+				}
+			}
+		}
 		return false;
 	}
 	
