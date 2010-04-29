@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2008 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,8 +79,12 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		} catch (Exception e) {
 			Throwable t=e.getCause();
 			//e.printStackTrace();
-			System.out.println("AnalysisDropdownHandler <init> "+ e.getMessage()+" cause: "+t.getMessage());
+			String msg ="(no cause)";
+			if(t!=null)
+				msg=t.getMessage();
+			System.out.println("AnalysisDropdownHandler <init> "+ e.getMessage()+" cause: "+msg);
 			// FIXME this gets hit on target workbench shutdown. WHY?
+			// BRT maybe we DO want to return here; sometimes ss=null (Junit tests) and the code below fails sometimes.
 			//return;
 
 		}
