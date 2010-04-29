@@ -32,6 +32,25 @@ import org.eclipse.ptp.pldt.mpi.analysis.actions.RunAnalyseMPIAnalysiscommandHan
 
 
 /**
+ * 
+ * Test MPI Barrier Analysis
+ * 
+ * Current status of tests: 29 April 2010
+ * 
+ * testMPI_barriers_tiny(): 
+ *       OK, this very trivial test case of two barriers does match, and no error is found
+ *       
+ * testMPI_barriers_helloBarrier
+ *       (not working) Barriers are not found to be in the same set, and a barrier error is found when it should not.
+ * 
+ * testMPI_barriers_error()
+ *       (not working) does not detect an error, when it should.
+ *       
+ * Most changes are in org.eclipse.ptp.pldt.mpi.analysis.analysis package
+ * most significant changes are in MPIMVAnalaysis.java
+ * notation of my initials (BRT) accompany most changes made by me, and notes
+ * regarding these problems.
+ * See also https://bugs.eclipse.org/bugs/show_bug.cgi?id=306064   Barrier Analysis bug
  * @author beth
  *
  */
