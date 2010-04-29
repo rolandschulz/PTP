@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
@@ -263,11 +264,18 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		// Insert values into template and store special parameters
 		for (String argument : arguments) {
 			String[] keyValue = argument.split("=", 2); //$NON-NLS-1$
-			if (keyValue[0].equals("jobSubId")) {
-				jobSubId = keyValue[1];
+			String key = keyValue[0];
+			String value = keyValue[1];
+			if (key.equals("jobSubId")) {
+				jobSubId = value;
 			} else { // any other parameter is used for the template
-				template = template.replaceAll(
-						"@" + keyValue[0] + "@", keyValue[1]); //$NON-NLS-1$ //$NON-NLS-2$
+				Matcher m = Pattern.compile("@" + key + "@").matcher(template); //$NON-NLS-1$ //$NON-NLS-2$
+				if (m.find()) {
+					template = m.replaceAll(value);
+				} else {
+					System.out.println("Parameter " + key + " with value \""
+							+ value + "\" not used in template.");
+				}
 			}
 		}
 
