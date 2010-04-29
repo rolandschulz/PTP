@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,7 @@ public class MPIDUChain{
 	}
 
 	/** Calculate the Gen and Kill sets for each block */
-	protected void GenKillSet(){
+	protected void genKillSet(){
 		for(IBlock b = cfg_.getEntry(); b != null; b = b.topNext()){
 			MPIBlock block = (MPIBlock)b;
 			for(Enumeration<String> e = defTable_.keys(); e.hasMoreElements();){
@@ -78,7 +78,7 @@ public class MPIDUChain{
 	}
 	
 	/** Calculate the reaching definition */
-	protected void ReachingDefinition(){
+	protected void reachingDefinition(){
 		for(IBlock b = cfg_.getEntry(); b != null; b = b.topNext()){
 			MPIBlock block = (MPIBlock)b;
 			block.setOut((Hashtable<String,List<IBlock>>)block.getGen().clone());
@@ -112,7 +112,7 @@ public class MPIDUChain{
 	}
 	
 	/** Construct the DUchain */
-	protected void FlowDependence(){
+	protected void flowDependence(){
 		for(IBlock b = cfg_.getEntry(); b != null; b = b.topNext()){
 			MPIBlock block = (MPIBlock)b;
 			Hashtable<String,List<IBlock>> in = block.getIn();
@@ -138,9 +138,9 @@ public class MPIDUChain{
 				System.out.println("MPIDUChain.DUChain(): Moc_KWayFM "+node.getFuncName());
 			cfg_ = node.getCFG();
 			defTable_ = node.getDefTable();
-			GenKillSet();
-			ReachingDefinition();
-			FlowDependence();
+			genKillSet();
+			reachingDefinition();
+			flowDependence();
 			//((MPIControlFlowGraph)cfg_).print();
 		}
 	}
