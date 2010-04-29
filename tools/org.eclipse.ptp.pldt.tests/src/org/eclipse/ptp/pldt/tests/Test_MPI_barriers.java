@@ -87,12 +87,12 @@ public class Test_MPI_barriers extends PldtBaseTestFramework{
 		final boolean reportErrors=false;
 		boolean error=racm.analyseBarriers(selection,reportErrors);
 		System.out.println("Barrier error?="+error+"; expected "+bsb.getError());
-//		if(bsb.getError()) {
-//			assertTrue("Expected to find barrier error in "+filename, error);
-//		}
-//		else {
-//			assertFalse("No barrier errors should be found in "+filename, error);
-//		}
+		if(bsb.getError()) {
+			assertTrue("Expected to find barrier error in "+filename, error);
+		}
+		else {
+			assertFalse("No barrier errors should be found in "+filename, error);
+		}
 		
 		String barrierMarkerID=org.eclipse.ptp.pldt.mpi.analysis.IDs.barrierMarkerID;
 		
