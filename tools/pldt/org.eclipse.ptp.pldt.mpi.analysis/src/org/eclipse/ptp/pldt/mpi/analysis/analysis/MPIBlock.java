@@ -63,6 +63,7 @@ public class MPIBlock extends Block{
 	/** This block contains a \phi node ? */
 	protected boolean phi;
 	
+	/** list of multi-valued variables (in this block?  BRT) */
 	protected List<String> mvVar_;
 	protected List<String> oldMVvar_;
 	
@@ -166,7 +167,12 @@ public class MPIBlock extends Block{
 	public List<String> getOldMVvar() {return oldMVvar_;}
 	public void setOldMVvar(List<String> list) {oldMVvar_ = list;}
 	
-	public void setMV(boolean val){mv = val;}
+	//public static int countMV=0;  // BRT for debugging
+	public void setMV(boolean val){
+		//countMV++;
+		// BRT System.out.println("setMV: "+val+"   "+countMV);
+		mv = val;
+		}
 	public boolean getMV(){return mv;}
 	
 	public void print(){
@@ -210,5 +216,44 @@ public class MPIBlock extends Block{
 	/** reset the block ID counter */
 	public static void clean(){
 		counter = 0;
+	}
+ 
+
+	public String toString(){
+		super.print();
+		StringBuffer buf = new StringBuffer();
+		
+		buf.append("joins to: ");
+		for(Iterator<IBlock> i = joinBlocks_.iterator(); i.hasNext();){
+			buf.append(i.next().getID() + ", ");
+		}
+		buf.append(" \n");
+		
+		buf.append(" use = ");
+		for(Iterator<String> i = use_.iterator(); i.hasNext();){
+			buf.append(i.next() + ", ");
+		}
+		buf.append(" def = ");
+		for(Iterator<String> i = def_.iterator(); i.hasNext();){
+			buf.append(i.next() + ", ");
+		}
+		buf.append(" \n");
+	
+		buf.append("Flow dependence: \n");
+		for(Enumeration<String> e = duSucc_.keys(); e.hasMoreElements();){
+			String var = e.nextElement();
+			List<IBlock> list = duSucc_.get(var);
+			if(list.isEmpty()) continue;
+			buf.append(var + " to: ");
+			for(Iterator<IBlock> i = list.iterator(); i.hasNext();){
+				buf.append(i.next().getID() + ", ");
+			}
+			buf.append(" \n");
+		}
+		buf.append(" \n");
+		
+		if(mv) buf.append("------ Multi-valued ------\n");
+		else buf.append("------ Single-valued ------\n");
+		return buf.toString();
 	}
 }
