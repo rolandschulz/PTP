@@ -14,6 +14,17 @@ package org.eclipse.ptp.pldt.mpi.analysis.analysis;
 import org.eclipse.cdt.core.dom.ast.IASTExpression;
 import org.eclipse.cdt.core.dom.ast.IASTStatement;
 
+/**
+ * "A Barrier Expression is a special form of a path expression that, for a
+ * given program point, describes the sequences of barriers that may execute
+ * until a thread reaches that point. Barrier Expressions provide a compact
+ * representation of the synchronization structure of the program."
+ * 
+ * -- From Zhang/Duesterwald paper
+ * 
+ * @author beth
+ * 
+ */
 public class BarrierExpression {
 	protected BarrierExpressionOP op_;
 	protected BarrierExpression operand1_;
@@ -30,23 +41,27 @@ public class BarrierExpression {
 	boolean visited;
 	boolean ceVisited; // visited in counter example construction
 	
-	/* There are four terminals: 
-	 * barrier id(int > 0)
-	 * function name (String)
-	 * \top -- undecidable
+	/** There are four terminals: <br>
+	 * barrier id(int > 0) <br>
+	 * function name (String) <br>
+	 * \top -- undecidable <br>
 	 * \bot -- no barrier
 	 */  
-	public static final int BE_bot = 1;
-	public static final int BE_ID = 2;
-	public static final int BE_func = 3;
 	protected int type;
+	/** type is bottom - no barrier */
+	public static final int BE_bot = 1;
+	/** type is barrier ID (int > 0)*/
+	public static final int BE_ID = 2;
+	/** type is function name (String) */
+	public static final int BE_func = 3;
+	
 	
 	protected int barrierID;
 	protected String funcName_; 
 	
 	protected BarrierExpression parent_;
 	
-	/* Has the mismatching error already reported? */
+	/** Has the mismatching error already reported? */
 	protected boolean error = false;
 	
 	public BarrierExpression(){
@@ -126,7 +141,7 @@ public class BarrierExpression {
 	public void setErrorFlag(boolean val) {error = val;}
 	public boolean getErrorFlag() {return error;}
 	
-	/*
+	/**
 	 * @return: BE = BE1.BE2
 	 */
 	public static BarrierExpression concatBE(BarrierExpression BE1, BarrierExpression BE2){
@@ -149,7 +164,7 @@ public class BarrierExpression {
 		return concatBE(concatBE(BE1, BE2), BE3);
 	}
 
-	/*
+	/**
 	 * @return: BE' = BE*
 	 */
 	public static BarrierExpression repeatBE(BarrierExpression BE, 
@@ -165,7 +180,7 @@ public class BarrierExpression {
 		return be;
 	}
 	
-	/*
+	/**
 	 * @return: BE = BE1 | BE2
 	 */
 	public static BarrierExpression branchBE(BarrierExpression BE1, 
@@ -197,12 +212,15 @@ public class BarrierExpression {
 		} else if(type == BE_func){
 			return funcName_;
 		} else if(type == BE_bot){
-			return "(\bot)";
+			return "(\\bot)";
 		}
 		return null;
 	}
+	public String toString() {
+		return prettyPrinter();
+	}
 	
-	/*
+	/**
 	 * Barrier Expression Operator
 	 */
 	public class BarrierExpressionOP
