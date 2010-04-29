@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -221,21 +221,27 @@ public class Block implements IBlock {
 	 * Print IBlock information, include id, content (type & raw signature), and successors
 	 */
 	public void print(){
-		System.out.print("Block " + id + ": ");
+		System.out.println(toString());
+	}
+	public String toString(){
+		StringBuffer buf = new StringBuffer();
+		buf.append("Block " + id + ": ");
 		IASTNode content = getContent();
 		if(content != null) {
 			String type=content.toString(); // a.b.c.Name@abcd
 			type = type.substring(type.lastIndexOf('.')+1);  // Name@abcd
 			type=type.substring(0,type.indexOf('@'));
-			System.out.println("  "+type+"  "+content.getRawSignature());
+			buf.append("  "+type+"  "+content.getRawSignature()+"\n");
 		}
-		else
-			System.out.println("  Empty block");
-		System.out.print("  flows to: ");
+		else {
+			buf.append("  Empty block");
+			buf.append("\n");
+		}
+		buf.append("  flows to: ");
 		for(Iterator<IBlock> i = succs_.iterator(); i.hasNext();){
-			System.out.print(i.next().getID() + ", ");
+			buf.append(i.next().getID() + ", ");
 		}
-		System.out.println(" ");
+		buf.append(" \n");
 		/*
 		System.out.print("Dominator: ");
 		for(Iterator i = DOM_.iterator(); i.hasNext();){
@@ -244,5 +250,6 @@ public class Block implements IBlock {
 		}
 		System.out.println(" ");
 		*/
+		return buf.toString();
 	}
 }
