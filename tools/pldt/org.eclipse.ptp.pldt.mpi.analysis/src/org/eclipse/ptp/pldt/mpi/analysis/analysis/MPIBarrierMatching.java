@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,8 +70,14 @@ public class MPIBarrierMatching {
 		return barrierErrors_;
 	}
 	
-	public void run(){
-		boolean errorAlreadyReported=false;
+	/**
+	 * Determine matching of MPI barriers.
+	 * @param reportErrors if true, produces a popup warning of barrier errors when found.
+	 * <br>if false, no popup occurs. Useful for running under JUnit test, with no user interaction.
+	 * Note that reportErrors is also used to make sure only a single error is reported -
+	 * the popup warning, if shown, is only shown once per analysis.
+	 */
+	public void run(boolean reportErrors){
 		for(ICallGraphNode n = cg_.botEntry(); n != null; n = n.botNext()){
 			MPICallGraphNode node = (MPICallGraphNode)n;
 			if(!node.marked || !node.barrierRelated()) continue;
@@ -84,9 +90,11 @@ public class MPIBarrierMatching {
 				BarrierExpression be = barrierExpr.get(currentComm_);
 				error = false;
 				fixedLength(be);
-				if(error){// BRT this reports an error dialog for *each* barrier matching error found!
-					if (!errorAlreadyReported) {
-						errorAlreadyReported=true;
+				if(error){
+					// Don't report an error dialog for *each* barrier matching error found
+					// Only the first one, if at all
+					if (reportErrors) {
+						reportErrors=false; // don't report any more
 						String errorMsg = "Found barrier synchronization error(s)!";
 						MessageDialog.openInformation(ShowMatchSet
 								.getStandardDisplay().getActiveShell(),
@@ -482,16 +490,16 @@ public class MPIBarrierMatching {
 			else {
 				//System.out.println("MPIBarrierMatching.getSourceInfo().. ! More than one IASTNodeLocation !");
 				// CASTCompoundStatement causes this.  Probably ok? assuming it descends into the child nodes
-				if(traceOn) {
-				if(node instanceof CASTCompoundStatement) {
-					CASTCompoundStatement cstmt = (CASTCompoundStatement)node;
-					System.out.println("Compound stmt: "+cstmt.getRawSignature());
-					IASTNodeLocation[] locs = cstmt.getNodeLocations();
-					for (int i = 0; i < locs.length; i++) {
-						IASTNodeLocation loc = locs[i];
-						System.out.println("  subnode: "+loc.toString());			
+				if (traceOn) {
+					if (node instanceof CASTCompoundStatement) {
+						CASTCompoundStatement cstmt = (CASTCompoundStatement) node;
+						System.out.println("Compound stmt: " + cstmt.getRawSignature());
+						IASTNodeLocation[] locs = cstmt.getNodeLocations();
+						for (int i = 0; i < locs.length; i++) {
+							IASTNodeLocation loc = locs[i];
+							System.out.println("  subnode: " + loc.toString());
+						}
 					}
-				}
 					
 				}
 			}
@@ -655,10 +663,10 @@ public class MPIBarrierMatching {
 		BarrierExpression T2 = BE2;
 		int direction = dir;
 		while(true){
-			if(traceOn)System.out.println(T1.prettyPrinter());
-			if(traceOn)System.out.println(T2.prettyPrinter());
-			if(direction == down) {if(traceOn)System.out.println("down");}
-			else {if(traceOn)System.out.println("up");}
+			if(traceOn)System.out.println("match: "+T1.prettyPrinter());
+			if(traceOn)System.out.println("       "+T2.prettyPrinter());
+			if(direction == down) {if(traceOn)System.out.println("       down");}
+			else {if(traceOn)System.out.println("       up");}
 			
 			if(direction == down && !pairVisited(T1, T2))
 				addVisitedPair(T1, T2);
@@ -672,7 +680,7 @@ public class MPIBarrierMatching {
 				direction = up;
 			else if(direction == down && OP1 == null && OP2 == null && 
 					T1.isBarrier() && T2.isBarrier()){
-				addMatchedPair(T1, T2);
+				addMatchedPair(T1, T2); // BRT 5 and 5 ???
 				addMatchedPair(T1, T1);
 				addMatchedPair(T2, T2);
 				direction = up;
@@ -778,7 +786,7 @@ public class MPIBarrierMatching {
 		BarrierInfo bar2 = barrierTable_.searchBarrierbyID(b2.getBarrierID());
 		List<BarrierInfo> set1 = bar1.getMatchingSet();
 		List<BarrierInfo> set2 = bar2.getMatchingSet();
-		if(!set1.contains(bar2)) set1.add(bar2);
+		if(!set1.contains(bar2)) set1.add(bar2); // adds to matchingSet_
 		if(!set2.contains(bar1)) set2.add(bar1);
 	}
 	
