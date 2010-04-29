@@ -71,7 +71,9 @@
 	
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
-	<target name="build.jars" depends="jar, fetch, unpack.platform, all.remote"/>
+	
+	<target name="build.jars" depends="jar"/>
+    <target name="gather.bin.parts" depends="fetch, unpack.platform, all.remote"/>
 
 	<target name="jar" depends="generate.build.scripts">
 		<ant antfile="${basedir}/build.cdtminer.xml">
@@ -149,35 +151,59 @@
 	  	/>
 	</target>
 	
-	<target name="get.cdt.bin">
-		<!--Get cdt.core from PTP build-->
+	<target name="get.cdt">
+		<!--Get cdt.core source from CVS-->
+        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
+                package="org.eclipse.cdt/all/org.eclipse.cdt.core"
+                command="checkout -d org.eclipse.cdt.core"
+                dest="${basedir}/.."
+        />
+		<!--Get cdt.core bin from PTP build-->
 		<unzip src="${basedir}/../../eclipse/plugins/${cdtCoreJar}"
 			dest="${basedir}/../org.eclipse.cdt.core/@dot"
 		/>
 	</target>
 	
-	<target name="get.cdt.core.lrparser.bin">
-		<!--Get cdt.core.lrparser from PTP build-->
+	<target name="get.cdt.core.lrparser">
+		<!--Get cdt.core.lrparser source from CVS-->
+        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
+                package="org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser"
+                command="checkout -d org.eclipse.cdt.core.lrparser"
+                dest="${basedir}/.."
+        />
+		<!--Get cdt.core.lrparser bin from PTP build-->
 		<unzip src="${basedir}/../../eclipse/plugins/${cdtLRParserJar}"
 			dest="${basedir}/../org.eclipse.cdt.core.lrparser/@dot"
 		/>
 	</target>
 	
-	<target name="get.cdt.core.parser.upc.bin">
-			<!--Get cdt.core.parser.upc from PTP build-->
-			<unzip src="${basedir}/../../eclipse/plugins/${cdtUPCParserJar}"
-				dest="${basedir}/../org.eclipse.cdt.core.parser.upc/@dot"
-			/>
-		</target>
+	<target name="get.cdt.core.parser.upc">
+		<!--Get cdt.core.parser.upc source from CVS-->
+        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
+                package="org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc"
+                command="checkout -d org.eclipse.cdt.core.parser.upc"
+                dest="${basedir}/.."
+        />
+		<!--Get cdt.core.parser.upc bin from PTP build-->
+		<unzip src="${basedir}/../../eclipse/plugins/${cdtUPCParserJar}"
+			dest="${basedir}/../org.eclipse.cdt.core.parser.upc/@dot"
+		/>
+	</target>
 	
-	<target name="get.cdt.core.lrparser.xlc.bin">
-		<!--Get cdt.core.lrparser.xlc from PTP build-->
+	<target name="get.cdt.core.lrparser.xlc">
+		<!--Get cdt.core.lrparser.xlc source from CVS-->
+        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
+                package="org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc"
+                command="checkout -d org.eclipse.cdt.core.lrparser.xlc"
+                dest="${basedir}/.."
+        />
+		<!--Get cdt.core.lrparser.xlc bin from PTP build-->
 		<unzip src="${basedir}/../../eclipse/plugins/${cdtLRParserXLCJar}"
 			dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/@dot"
 		/>
 	</target>
 	
-	<target name="generate.file.lists" depends="compile.all, get.cdt.bin, get.cdt.core.lrparser.bin, get.cdt.core.parser.upc.bin, get.cdt.core.lrparser.xlc.bin">
+	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc">
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
