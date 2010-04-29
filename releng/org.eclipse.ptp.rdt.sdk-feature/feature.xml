@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.rdt.sdk"
       label="%featureName"
-      version="2.1.4.qualifier"
+      version="4.0.0.qualifier"
       provider-name="%providerName">
 
    <description url="http://eclipse.org/ptp">
@@ -18,9 +18,9 @@
    </license>
 
    <url>
-      <update url="http://download.eclipse.org/tools/ptp/releases/2.1"/>
-   </url>   
-   
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
+   </url>
+
    <includes
          id="org.eclipse.ptp.rdt.source"
          version="0.0.0"/>
