@@ -48,7 +48,6 @@ public class PASTOMPFactory
     protected IASTTranslationUnit ast_          = null;
     protected Dictionary          dictionary_   = null;
     
-    protected static boolean      traceOn_      = false;
     private static final boolean traceOn=false;
     
     protected OpenMPScanner scanner_ = null;
@@ -71,7 +70,7 @@ public class PASTOMPFactory
         
         //experiment();
         
-        if (traceOn_)
+        if (traceOn)
           readTokens();
         
         //otherinit(null);
@@ -1122,9 +1121,11 @@ public class PASTOMPFactory
               int              totalOffset = node.getOffset();
               // test use of IASTNode vs ASTNode. compare with Utility.getLocation which uses a combination of the two
               IASTNode inode = (IASTNode) node;
-              int ilen=inode.getNodeLocations()[0].getNodeLength();
-              int ioff=inode.getNodeLocations()[0].getNodeOffset();
-              System.out.println("    ilen="+ilen+" ioff="+ioff);
+				if (traceOn) {
+					int ilen = inode.getNodeLocations()[0].getNodeLength();
+					int ioff = inode.getNodeLocations()[0].getNodeOffset();
+					System.out.println("    ilen=" + ilen + " ioff=" + ioff);
+				}
               
               Utility.Location loc = Utility.getLocation(node);
               assert(loc!=null);
@@ -1164,7 +1165,7 @@ public class PASTOMPFactory
                   oPragma_.setRegionLength(length);
                   oPragma_.setRegionOffset(localOffset);
                   oPragma_.setRegion(statement);
-                  if (traceOn_)
+                  if (traceOn)
                     System.out.println((searchType_==FOR_BLOCK ? "(for)" : "(region)") + "pragma at "+ pragmaLocation_+
                         " has statement at "+ localOffset);
                 }
