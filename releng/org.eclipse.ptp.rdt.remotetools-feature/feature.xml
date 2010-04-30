@@ -37,7 +37,6 @@
       <import plugin="org.eclipse.ptp.rdt.ui" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.connectorservice.dstore" version="3.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.core" version="3.1.1" match="greaterOrEqual"/>
-      <import feature="org.eclipse.ptp.rdt.remotejars" version="4.0.0.qualifier"/>
    </requires>
 
    <plugin
