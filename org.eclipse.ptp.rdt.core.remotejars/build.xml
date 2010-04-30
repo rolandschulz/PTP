@@ -17,9 +17,9 @@
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
 	<tstamp/>
-	<property name="buildTarget" value="helios"/>
-	<property name="copyToDir" value="/home/www/tools/ptp/builds/${buildTarget}/latest"/>
-	<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
+	<!--property name="buildTarget" value="helios"/-->
+	<!--property name="copyToDir" value="/home/www/tools/ptp/builds/${buildTarget}/latest"/-->
+	<!--property name="timestamp" value="${DSTAMP}${TSTAMP}" /-->
 	
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
@@ -66,6 +66,9 @@
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
 	<property name="rseVersion" value="S-3.2M6-201003160452"/>
 	<property name="dStoreBaseName" value="rseserver-3.2M6"/>
+	
+	<property name="jdtUIVersion" value="3.6.0.v20100308-1800"/>
+	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
@@ -390,6 +393,24 @@
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.bat"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.bat"/>
 	</target>
+	
+	<target name="prepare.remote.jar">
+		<property name="platform" value="linux"/>
+			
+		<delete dir="${remoteServerTempDir}"/>
+		<untar src="${downloads}/${dStoreBaseName}-${platform}.tar" dest="${remoteServerTempDir}"/>
+		
+		<!-- Add CDTMiner to minerFile.dat -->
+		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.rdt.core.miners.CDTMiner</concat>
+		
+		<!-- Add the Jar-in-jar loader to the server -->
+		<unzip src="${basedir}/../../eclipse/plugins/${jdtUIJar}" dest="${downloads}">
+			<patternset>
+				<include name="jar-in-jar-loader.zip"/>	
+			</patternset>
+		</unzip>
+		<unzip src="${downloads}/jar-in-jar-loader.zip" dest="${remoteServerTempDir}"/>
+	</target>
 		
 	<target name="assemble.remote">
 		<!-- Copy over the RDT JARs and their dependencies -->
@@ -451,6 +472,25 @@
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
 	
+	<target name="jar.remote" depends="prepare.remote.jar, assemble.remote">
+		<jar destfile="${serverJar}.jar">
+			<fileset dir="${basedir}">
+				<include name="rdt-server/**/*"/>
+			</fileset>
+			<manifest>
+				<attribute name="Rsrc-Class-Path" value="./ cdtminer.jar cdtmodel.jar cdtparser.jar ${coreRuntimeJar} ${equinoxJar} ${filesystemJar} ${icuBaseJar} stubs.jar lrparser.jar upcparser.jar xlcparser.jar ${lpgRuntimeJar}"/>
+				<attribute name="Class-Path" value="."/>
+				<attribute name="Rsrc-Main-Class" value="org.eclipse.dstore.core.server.Server"/>
+				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+			</manifest>
+		</jar>
+		
+		<copy file="${serverJar}.jar" 
+			todir="${basedir}/../org.eclipse.ptp.rdt.server.dstore"/>
+				
+		<delete dir="${remoteServerTempDir}"/>
+	</target>
+	
 	<target name="all.remote">
 		<antcall target="zip.remote"/>
 		<antcall target="tar.remote">
@@ -462,5 +502,6 @@
 		<antcall target="tar.remote">
 			<param name="platform" value="macosx"/>
 		</antcall>
+		<antcall target="jar.remote"/>
 	</target>
 </project>
