@@ -9,10 +9,6 @@
 		<property name="type" value="feature"/>
 		<property name="id" value="org.eclipse.ptp.master"/>
 	</ant>
-	<!--ant antfile="${genericTargets}" target="${target}">
-		<property name="type" value="feature"/>
-		<property name="id" value="org.eclipse.photran.master"/>
-	</ant-->
 </target>
 
 <!-- ===================================================================== -->
@@ -27,12 +23,6 @@
 		<property name="archiveName" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
 	</ant>
 </target>
-	
-<!--target name="assemble.org.eclipse.photran.master.group.group.group">
-	<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-		<property name="archiveName" value="photran-master-${photranBranchVersion}-${buildId}.zip"/>
-	</ant>
-</target-->
 	
 <!-- ===================================================================== -->
 <!-- Check out map files from correct repository -->
@@ -101,7 +91,6 @@
 	<replace dir="${buildDirectory}/plugins" value="${timestamp}" token="@build@">
 		<include name="**/about.mappings" />
 	</replace>
-	<!--unzip src="${tauJars}" dest="${buildDirectory}/plugins/org.eclipse.ptp.etfw.tau.jars"/-->
 	<replace file="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc/BUILD">
 		<replacefilter token="@buildVersion@" value="${ptpBranchVersion}.${timestamp}"/>
 	</replace>
