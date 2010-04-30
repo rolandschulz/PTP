@@ -75,8 +75,8 @@
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
 	
-	<target name="build.jars" depends="jar"/>
-    <target name="gather.bin.parts" depends="fetch, unpack.platform, all.remote"/>
+	<target name="build.jars" depends="server.all"/>
+    <target name="gather.bin.parts" depends="server.all"/>
 
 	<target name="jar" depends="generate.build.scripts">
 		<ant antfile="${basedir}/build.cdtminer.xml">
@@ -473,10 +473,7 @@
 	</target>
 	
 	<target name="jar.remote" depends="prepare.remote.jar, assemble.remote">
-		<jar destfile="${serverJar}.jar">
-			<fileset dir="${basedir}">
-				<include name="rdt-server/**/*"/>
-			</fileset>
+		<jar destfile="${serverJar}.jar" basedir="${basedir}/rdt-server">
 			<manifest>
 				<attribute name="Rsrc-Class-Path" value="./ cdtminer.jar cdtmodel.jar cdtparser.jar ${coreRuntimeJar} ${equinoxJar} ${filesystemJar} ${icuBaseJar} stubs.jar lrparser.jar upcparser.jar xlcparser.jar ${lpgRuntimeJar}"/>
 				<attribute name="Class-Path" value="."/>
